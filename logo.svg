@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+    <!-- Light mode logo: Blue and clean design -->
+    <defs>
+        <linearGradient id="lightGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#3178c6;stop-opacity:1"/>
+            <stop offset="100%" style="stop-color:#65ade0;stop-opacity:1"/>
+        </linearGradient>
+        <style>
+            @keyframes orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+            }
+            @keyframes orbit-reverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+            }
+            .ring-1 { transform-origin: 100px 100px; animation: orbit 20s linear infinite; }
+            .ring-2 { transform-origin: 100px 100px; animation: orbit-reverse 25s linear infinite; }
+            .satellites { transform-origin: 100px 100px; animation: orbit 30s linear infinite; }
+        </style>
+    </defs>
+
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="95" fill="white" stroke="#e0e0e0" stroke-width="2"/>
+
+    <!-- Planet/Circle base -->
+    <circle cx="100" cy="100" r="60" fill="url(#lightGradient)"/>
+
+    <!-- Orbital rings -->
+    <g class="ring-1">
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#3178c6" stroke-width="2" opacity="0.3"
+                stroke-dasharray="20 10"/>
+    </g>
+    <g class="ring-2">
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#65ade0" stroke-width="2" opacity="0.2"
+                stroke-dasharray="15 15"/>
+    </g>
+
+    <!-- Central star -->
+    <circle cx="100" cy="100" r="8" fill="#ffffff" opacity="0.9"/>
+
+    <!-- Accent dots representing technology -->
+    <g class="satellites">
+        <circle cx="130" cy="85" r="4" fill="#3178c6"/>
+        <circle cx="115" cy="70" r="3" fill="#65ade0"/>
+        <circle cx="70" cy="75" r="3" fill="#3178c6"/>
+        <circle cx="85" cy="130" r="4" fill="#65ade0"/>
+    </g>
+
+    <!-- Text (optional) -->
+    <text x="100" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold"
+          fill="#3178c6">
+        RWX
+    </text>
+</svg>

@@ -15,6 +15,7 @@ Rebuilding and extending Rusted Warfare as an open-source cross-platform RTS gam
 
 English, [简体中文](README_zh.md)
 
+
 ## 🗺️ Roadmap
 
 - [ ] Reconstruct project structure
@@ -30,6 +31,42 @@ English, [简体中文](README_zh.md)
 ## 💬 Community Discussion
 
 * [Discord Server](https://discord.gg/q2amh4Gt3f)
+
+
+## 🔨 Building
+
+### Prerequisites
+
+- CMake 3.16+
+- C++17 compiler
+- JDK (for JNI)
+
+### rocketConnector Native Library
+
+The rocketConnector native library requires libRocket. Due to license restrictions, libRocket cannot be included in this repository.
+
+**1. Clone libRocket:**
+
+```bash
+git clone https://github.com/libRocket/libRocket.git
+```
+
+**2. Build libRocket:**
+
+```bash
+cd libRocket/Build
+cmake . -DBUILD_SHARED_LIBS=OFF
+cmake --build . -j$(nproc)
+```
+
+**3. Build rocketConnector:**
+
+```bash
+export LIBROCKET_ROOT=/path/to/libRocket   # Point to libRocket source directory
+cd native/rocketConnector
+cmake -B build -S .
+cmake --build build
+```
 
 ## Disclaimer
 

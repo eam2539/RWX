@@ -62,6 +62,11 @@ val rocketConnectorSourceDir = layout.projectDirectory.dir("native/rocketConnect
 val configureRocketConnectorNative by tasks.registering(Exec::class) {
     inputs.dir(rocketConnectorSourceDir)
     outputs.dir(rocketConnectorNativeDir)
+    doFirst {
+        val librocketRoot = System.getenv("LIBROCKET_ROOT")
+            ?: throw GradleException("LIBROCKET_ROOT environment variable is not set")
+        environment("LIBROCKET_ROOT", librocketRoot)
+    }
     commandLine("cmake", "-S", rocketConnectorSourceDir.asFile.absolutePath, "-B", rocketConnectorNativeDir.get().asFile.absolutePath)
 }
 
@@ -69,6 +74,17 @@ val buildRocketConnectorNative by tasks.registering(Exec::class) {
     dependsOn(configureRocketConnectorNative)
     inputs.dir(rocketConnectorSourceDir)
     outputs.dir(rocketConnectorNativeDir)
+    onlyIf {
+        val soFile = rocketConnectorNativeDir.get().asFile.resolve("librocketConnector.so")
+        val dllFile = rocketConnectorNativeDir.get().asFile.resolve("rocketConnector.dll")
+        val dylibFile = rocketConnectorNativeDir.get().asFile.resolve("librocketConnector.dylib")
+        !soFile.exists() && !dllFile.exists() && !dylibFile.exists()
+    }
+    doFirst {
+        val librocketRoot = System.getenv("LIBROCKET_ROOT")
+            ?: throw GradleException("LIBROCKET_ROOT environment variable is not set")
+        environment("LIBROCKET_ROOT", librocketRoot)
+    }
     commandLine("cmake", "--build", rocketConnectorNativeDir.get().asFile.absolutePath, "--config", "Release")
 }
 

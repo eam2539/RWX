@@ -26,6 +26,9 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+### rocketConnector ###
+native/rocketConnector/build/
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

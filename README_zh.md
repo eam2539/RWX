@@ -17,6 +17,7 @@
 
 简体中文, [English](README.md)
 
+
 ## 🗺️ 开发路线图
 
 - [ ] 复原项目结构
@@ -33,6 +34,42 @@
 
 * [QQ群组](https://qun.qq.com/universal-share/share?ac=1&authKey=EQ73b%2BVCr5a5mUrJR1yOhp0oJFmDHuBglEPrHJEWmHxSyMZjH4xI2H0hgqXZ%2B3dW&busi_data=eyJncm91cENvZGUiOiI5ODI4MzgwODYiLCJ0b2tlbiI6ImZaMHZqZDJ2UllsZnpHTEQxRHBtanhiZDgwTFVZdXcwV1N6a1dZMm1oQVNaUEZNR1cxSWptV0VBOW9aYXVIYlAiLCJ1aW4iOiIzMDYwMzA5MzQwIn0%3D&data=Maw6iUgqhXNqLNXmhH7V6FVNDiLqVgvN6paLZrQeSiDxJLu8IxDpAhmmCqdXJsJNViI0SCU-oM5_h-buAOY00Q&svctype=4&tempid=h5_group_info)
 * [Discord 群组](https://discord.gg/q2amh4Gt3f)
+
+
+## 🔨 编译
+
+### 前置要求
+
+- CMake 3.16+
+- C++17 编译器
+- JDK (用于 JNI)
+
+### rocketConnector Native 库
+
+rocketConnector 原生库依赖 libRocket。由于许可证限制，libRocket 不能包含在本仓库中。
+
+**1. 克隆 libRocket：**
+
+```bash
+git clone https://github.com/libRocket/libRocket.git
+```
+
+**2. 编译 libRocket：**
+
+```bash
+cd libRocket/Build
+cmake . -DBUILD_SHARED_LIBS=OFF
+cmake --build . -j$(nproc)
+```
+
+**3. 编译 rocketConnector：**
+
+```bash
+export LIBROCKET_ROOT=/path/to/libRocket   # 指向 libRocket 源码目录
+cd native/rocketConnector
+cmake -B build -S .
+cmake --build build
+```
 
 ## 免责声明
 
