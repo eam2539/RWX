@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+<FrameLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    
+    >
+<!-- 
+<com.corrodinggames.rts.appFramework.GameViewNonSurface android:id="@+id/GameView"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" />
+ -->
+ 
+ 
+ <!--<Button android:text="&lt;"  -->
+ <ImageView android:src="@drawable/back_circle"
+    android:scaleType="fitXY"
+    android:layout_width="35dp"
+	android:layout_height="35dp"
+	
+	android:id="@+id/levelButtonBack"
+	android:layout_gravity="left|top"
+	android:background="@android:color/transparent"
+	android:textSize="14pt"
+	android:padding="7dp"
+	
+	/>
+ 
+ 
+<LinearLayout
+  android:layout_height="fill_parent" android:orientation="vertical" android:layout_width="fill_parent"
+  >
+
+<LinearLayout
+  android:layout_height="wrap_content" android:orientation="horizontal" android:layout_width="wrap_content" android:layout_gravity="center"
+  >
+<!--
+<Button android:text="&lt;"
+    android:id="@+id/levelButtonBack"
+    android:layout_gravity="left"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" 
+    android:background="@android:color/transparent"
+    android:textSize="14pt"
+    />
+-->
+<TextView android:id="@+id/LevelTextTop" android:layout_gravity="center_horizontal" android:layout_width="wrap_content"
+          android:text="i:menus.singlePlayer.mapSelect.title" android:layout_height="wrap_content" android:textSize="14pt"
+          android:textColor="#FFFFFF" android:shadowColor="#88000000" android:shadowDx="2" android:shadowDy="2" android:shadowRadius="2"></TextView>
+</LinearLayout>
+
+<LinearLayout android:paddingTop="3dip" android:paddingBottom="3dip"  android:layout_height="wrap_content" android:orientation="horizontal" android:layout_width="wrap_content" android:layout_gravity="center" android:background="#44ffffff">
+	<Spinner android:theme="@style/SpinnerTheme"
+	    android:visibility="gone"
+	    android:id="@+id/aiDifficulty"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="8dip"
+	    android:entries="@array/aidifficulty_array"
+	    android:prompt="@string/aidifficulty_prompt"
+	    android:layout_gravity="center"
+	    
+	    />
+   
+   <Spinner android:theme="@style/SpinnerTheme"
+        android:visibility="gone"
+        android:id="@+id/aiCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:entries="@array/skirmish_ai_count"
+        android:prompt="@string/skirmish_ai_count_prompt"
+        android:layout_gravity="center"
+        android:layout_marginLeft="10dip"
+        />
+  
+  <Spinner android:theme="@style/SpinnerTheme"
+        android:visibility="gone"
+        android:id="@+id/gameMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:entries="@array/skirmish_game_mode"
+        android:prompt="@string/skirmish_game_mode_prompt"
+        android:layout_gravity="center"
+        android:layout_marginLeft="10dip"
+        />
+  
+
+  
+</LinearLayout>
+
+
+<Button android:textSize="10sp" android:layout_gravity="center"
+android:layout_width="wrap_content" android:layout_height="wrap_content"
+android:text="i:menus.mods.importFile" android:layout_marginLeft="10px" android:id="@+id/modsImportMod"></Button>
+
+<TextView android:visibility="gone" android:id="@+id/messageInfo" android:layout_gravity="center_horizontal" android:layout_width="wrap_content"
+          android:text="" android:layout_height="wrap_content" android:textSize="8pt"
+          android:textColor="#FFFFFF"></TextView>
+
+<GridView
+    android:id="@+id/levelHolder"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:columnWidth="240dp"
+    android:numColumns="auto_fit"
+    android:verticalSpacing="20dp"
+    android:horizontalSpacing="20dp"
+    android:stretchMode="columnWidth"
+    android:gravity="center"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+/>
+
+<!--
+<ScrollView android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+	
+	<LinearLayout android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent">
+	
+	 <LinearLayout android:layout_height="wrap_content" android:id="@+id/levelHolder" android:orientation="vertical" android:layout_width="fill_parent" android:layout_margin="0dp">
+		</LinearLayout>
+		
+	</LinearLayout>
+</ScrollView>
+-->
+
+
+
+
+
+</LinearLayout>
+
+
+</FrameLayout>

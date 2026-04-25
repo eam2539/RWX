@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:background="#000" android:layout_height="match_parent" android:padding="15dip">
+    
+
+<ScrollView android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+    <LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="left" android:orientation="vertical">
+        
+   
+         <LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content">
+           <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:text="Spawn point:" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:textStyle="bold"></TextView>
+	         <!-- 
+	         <EditText
+	            android:id="@+id/teamId"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:ems="2"
+	            android:inputType="number" >
+	         </EditText>
+	         -->
+	        <Spinner  android:theme="@style/SpinnerTheme"
+					  android:id="@+id/teamId"
+					  android:layout_width="wrap_content"
+					  android:layout_height="wrap_content"
+					  android:layout_marginLeft="8dip"
+					  android:entries="@array/team_array"
+					  android:prompt="@string/spawn_array_prompt"
+					  />
+	        
+	        
+        </LinearLayout>
+			
+        <TextView android:paddingBottom="5dip" android:layout_width="wrap_content" android:text="The spawn point controls where on the map this players starts. Most maps use odd/even spawn points" android:layout_height="wrap_content" android:layout_gravity="center_vertical"></TextView>
+        
+	      
+	      <LinearLayout android:id="@+id/teamAllyGroupWrap" android:layout_height="wrap_content" android:layout_width="wrap_content">
+           <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:text="Team:" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:textStyle="bold"></TextView>
+           <!-- 
+	         <EditText
+	            android:id="@+id/teamAllyGroup"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:ems="2"
+	            android:inputType="number" >
+	         </EditText>
+            -->
+        
+        <Spinner  android:theme="@style/SpinnerTheme"
+            android:id="@+id/teamAllyGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dip"
+            android:entries="@array/ally_array"
+            android:prompt="@string/team_array_prompt"
+            />
+        
+        
+        </LinearLayout>
+        
+	      <TextView android:paddingBottom="5dip" android:layout_width="wrap_content" android:text="Players with the same team will be allied together." android:layout_height="wrap_content" android:layout_gravity="center_vertical"></TextView>
+        
+        <LinearLayout android:id="@+id/playerOverridesSection" android:paddingTop="10dip"
+                      android:layout_height="wrap_content" android:layout_width="wrap_content" android:orientation="vertical">
+	        
+	        <TextView android:textAppearance="?android:attr/textAppearanceMedium"
+               android:textStyle="bold"
+	             android:layout_width="wrap_content"
+	             android:layout_marginLeft="0dip"
+	             android:text="i:menus.battleroom.gameoptions.playerOverrides" android:layout_height="wrap_content" android:layout_gravity="center_vertical"></TextView>
+	         
+	         <TextView android:paddingBottom="5dip" android:layout_marginLeft="0dip" android:layout_width="wrap_content"
+          android:text="Optional overrides for this player.." android:layout_height="wrap_content" android:layout_gravity="center_vertical"></TextView>
+        
+	         
+	        <LinearLayout android:layout_marginLeft="20dip" android:id="@+id/aiDifficultyWrap" android:layout_height="wrap_content" android:layout_width="wrap_content">
+	        
+	        
+	        <TextView
+	           android:textAppearance="?android:attr/textAppearanceMedium"
+	           android:textStyle="bold"
+		         android:layout_width="wrap_content"
+		         android:layout_height="wrap_content"
+		         android:text="i:menus.battleroom.gameoptions.aiDifficulty" />
+	        
+			    <Spinner android:theme="@style/SpinnerTheme"
+			        android:id="@+id/aiDifficulty"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="8dip"
+			        android:entries="@array/aidifficulty_array"
+			        android:prompt="@string/aidifficulty_prompt"
+			        />
+			        
+			    </LinearLayout>
+				  
+				  <LinearLayout android:layout_marginLeft="20dip" android:layout_height="wrap_content" android:layout_width="wrap_content">
+				  
+			    <TextView
+			            android:textAppearance="?android:attr/textAppearanceMedium"
+			            android:textStyle="bold"
+			            android:id="@+id/startingUnitsText"
+			            android:paddingTop="5dip"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            android:text="i:menus.battleroom.gameoptions.startingUnits" />
+			    
+			    <Spinner android:theme="@style/SpinnerTheme"
+			        android:id="@+id/startingUnits"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="8dip"
+			        android:entries="@array/startingUnits_array"
+			        android:prompt="@string/startingUnits_prompt"
+			        />
+			      
+			    </LinearLayout>
+			    
+			    <LinearLayout android:layout_marginLeft="20dip" android:layout_height="wrap_content" android:layout_width="wrap_content">
+          
+			    
+          <TextView
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:textStyle="bold"
+                  android:id="@+id/playerColorText"
+                  android:paddingTop="5dip"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="i:menus.battleroom.gameoptions.playerColor" />
+          
+          <Spinner  android:theme="@style/SpinnerTheme"
+              android:id="@+id/playerColor"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginLeft="8dip"
+              />
+            
+			    </LinearLayout>
+			      
+        </LinearLayout>
+        
+        
+        <LinearLayout android:paddingTop="5dip" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                  
+            <Button android:text="i:menus.battleroom.playerpopup.apply" android:layout_margin="3dip" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/battleroom_playerpopup_apply"></Button>
+            
+            
+            <Button android:text="i:menus.battleroom.playerpopup.kick" android:layout_margin="3dip" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/battleroom_playerpopup_kick"></Button>
+            
+            <Button android:text="i:menus.battleroom.playerpopup.give"   android:layout_margin="3dip" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/battleroom_playerpopup_give"></Button>
+            <Button android:text="i:menus.battleroom.playerpopup.cancel" android:layout_margin="3dip" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/battleroom_playerpopup_cancel"></Button>
+            
+        </LinearLayout>
+        
+		</LinearLayout>
+    
+</ScrollView>
+   
+   
+</LinearLayout>

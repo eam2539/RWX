@@ -1,0 +1,141 @@
+<rml>
+	<head>
+		<title>Singleplayer</title>
+		<link type="text/rcss" href="rkt.rcss"/>
+		<link type="text/rcss" href="common.rcss"/>
+	  <link type="text/rcss" href="forms.rcss"/>
+		<style>
+			
+			.background
+      {
+        
+        /*background:rgba(205,205,205,0);*/
+        
+        
+      }
+      
+      
+      .mainButtons button
+      {
+        color:rgba(0,0,0,230);
+        header-color: rgba(255,255,255,128);
+        
+        header-width: 2px;
+        
+        font-size: 32;
+        font-weight:bold;
+			}
+			
+			.mainButtons button.needsUnicodeFont
+      {
+        font-size: 27;
+      }
+      
+			.mainButtons button:hover p
+      {
+        color:rgba(230,20,20,255);
+        header-color: rgba(255,255,255,88);
+        header-width: 2px;
+        
+      }
+      
+			button p
+			{
+			  z-index:2;
+			}
+			
+      button .clone
+			{
+			  /* childclone class="cloneShadow"  */
+			
+			  position:relative;
+			  
+			  height:0;
+			  
+			  header-font-effect: shadow;
+        header-color: rgba(0,0,0,50);
+        
+        
+        header-offset: 7px 7px;
+			  
+			  header-width: 2px;
+        
+			  color:rgba(180,20,20,0);
+			  
+			  
+			  margin:0;
+			  padding:0;
+			  
+			  z-index:1;
+			  
+			  /*header-color: rgba(0,0,0,0);*/
+			}
+      
+      .bottomPaddding
+      {
+        padding:5px;
+      }
+      
+      
+		</style>
+		<script>
+def CloseLogo():
+	print "test 123"
+		</script>
+	</head>
+	<body onload="onShowNewScreen();">
+		
+		
+		<div class="panelMain">
+		
+		  <div class="panelCloseButton" onclick="backOrClose()"  click_on_escape=""/>
+		  
+		  <div class="mainButtons">
+		  
+		  <button class="stealFocus"></button>
+		  
+		  <button childclone onclick="open('levelSelect.rml', 'maps/normal')"    id="campaignButton"     ><p>${i:menus.singlePlayer.campaign}</p></button>
+		  <button childclone onclick="open('levelSelect.rml', 'maps/skirmish')"  id="skirmishButton"     ><p>${i:menus.singlePlayer.skirmish}</p></button>
+		  <button childclone onclick="open('levelSelect.rml', 'maps/challenge')" id="challengeButton"    ><p>${i:menus.singlePlayer.challenge}</p></button>
+		  <button childclone onclick="open('levelSelect.rml', 'maps/survival')"  id="endlessButton"      ><p>${i:menus.singlePlayer.survival}</p></button>
+		  
+		  
+		  <button childclone onclick="open('levelSelect.rml', '/SD/rusted_warfare_maps')"><p>${i:menus.singlePlayer.custom_pc}</p></button>
+		  
+		  
+		  <button childclone onclick="open('sandboxOptions.rml', 'maps/skirmish/[z;p10]Crossing Large (10p).tmx')"><p>${i:menus.singlePlayer.sandbox}</p></button>
+		  
+		  
+		  <button childclone onclick="open('levelSelect.rml', 'saves')"          ><p>${i:menus.singlePlayer.loadSave}</p></button>
+		  
+		  <!--
+	    <button childclone onclick="open('levelSelect.rml', 'maps/testing')"><p>Testing</p></button>
+		  -->
+		  
+		  
+		  <div class="panelBottomButtons">
+	      <button childclone class="backButton backButtonText" onclick="backOrClose()" click_on_escape=""><p>${i:menus.common.back}</p></button>
+	    </div>
+	    
+	    
+	    <!--
+	    <p>test</p>
+	    <form>
+	    <input type="text" name="test" value="test123"/>
+	    </form>
+	    -->
+	    
+	    
+	    
+	    </div>
+		  
+		  <div class="clearDiv bottomPaddding"></div>
+		  
+		
+		
+		
+		</div>
+		
+		
+	</body>
+</rml>

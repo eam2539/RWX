@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:f="http://schemas.android.com/apk/res-auto"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:background="@drawable/backrepeat" android:layout_height="match_parent">
+    
+    
+
+    
+<ScrollView android:id="@+id/mainScrollView" android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+  
+  <LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:orientation="vertical" android:gravity="center">
+  
+  <TextView android:id="@+id/battleroom_status_info" android:gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="INFO HERE" android:textSize="6pt" android:textColor="#FFF" android:background="#AA222222"></TextView>
+        
+     
+     <com.corrodinggames.rts.appFramework.FlowLayout android:id="@+id/battleroom_flowlayout" android:layout_height="wrap_content" android:layout_width="wrap_content"
+                                                     android:gravity="center" f:horizontalSpacing="6dip" f:verticalSpacing="6dip" android:paddingTop="6dip">
+        
+        
+			
+			
+         
+         <LinearLayout android:layout_height="wrap_content" android:orientation="vertical"
+            android:gravity="center" android:padding="10dip" android:paddingTop="20dip" android:background="@drawable/rounded_border" android:layout_margin="5dip" android:layout_width="wrap_content">
+           
+          	    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:text="i:menus.battleroom.sectionHeader.game" android:textColor="@color/frametitlecolour"></TextView>
+                
+                <TextView android:id="@+id/battleroom_game_summary" android:layout_width="wrap_content" android:text="" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:textStyle="bold"></TextView>
+                
+			    <LinearLayout android:layout_height="wrap_content" android:id="@+id/battleroom_typeLayout" android:layout_width="wrap_content" android:layout_gravity="center">
+                  <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:text="Type:" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:textStyle="bold"></TextView>
+                  <Spinner android:theme="@style/SpinnerTheme" android:layout_height="wrap_content" android:id="@+id/battleroom_type" android:layout_width="wrap_content" android:layout_gravity="center_vertical" android:minWidth="70dip"></Spinner>
+                </LinearLayout>
+               
+				<LinearLayout android:layout_height="wrap_content" android:id="@+id/battleroom_mapLayout" android:layout_width="wrap_content" android:layout_gravity="center">
+					<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:text="Map:" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:textStyle="bold"></TextView>
+					<Spinner android:theme="@style/SpinnerTheme" android:layout_height="wrap_content" android:id="@+id/battleroom_map" android:layout_width="wrap_content" android:layout_gravity="center_vertical" android:minWidth="70dip"></Spinner>
+	       		</LinearLayout>
+	    		
+				<!-- pad -->
+				<LinearLayout android:layout_height="2dip"  android:layout_width="fill_parent"></LinearLayout>
+				
+				<com.corrodinggames.rts.appFramework.DynamicImageView android:layout_width="130dip" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:id="@+id/battleroom_thumbnail" ></com.corrodinggames.rts.appFramework.DynamicImageView>
+				
+				<LinearLayout android:paddingTop="5dip" android:layout_width="wrap_content" android:layout_height="wrap_content">
+				  
+				  
+				  
+				  
+                  <Button android:text="i:menus.battleroom.button.changeTeam" android:layout_marginRight="10dip" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/battleroom_changeTeam"></Button>
+                  
+                  <Button android:text="i:menus.battleroom.button.gameOptions" android:layout_marginRight="10dip" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/battleroom_otherGameOptions"></Button>
+                  
+			      
+       		      <Button android:text="i:menus.battleroom.button.startBluetooth" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/battleroom_startBluetoothButton"></Button>
+                  
+		          <Button android:text="i:menus.battleroom.button.startGame" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/battleroom_startNetButton"></Button>
+		          <CheckBox android:visibility="gone" android:layout_height="wrap_content" android:text="Ready" android:layout_width="wrap_content" android:id="@+id/battleroom_ready"></CheckBox>
+		        </LinearLayout>
+					    
+								   
+				   
+			  </LinearLayout>
+         
+         
+         
+				   
+			   <LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout63" android:orientation="vertical"
+            android:gravity="center" android:padding="10dip" android:paddingTop="20dip" android:background="@drawable/rounded_border" android:layout_margin="5dip" android:layout_width="wrap_content">
+			         
+			        <TextView android:text="i:menus.battleroom.sectionHeader.playerList" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold"  android:textColor="@color/frametitlecolour"></TextView>
+			      
+			        
+			        
+			        <com.corrodinggames.rts.appFramework.ExpandedListView android:visibility="gone" android:scrollbars="none" android:layout_width="300dip" android:id="@+id/networkPlayerList" android:layout_height="150dip"></com.corrodinggames.rts.appFramework.ExpandedListView>
+			        
+			        
+			        
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                
+                android:layout_height="wrap_content"
+                android:gravity="center" >
+                
+                <TableLayout
+                    android:id="@+id/battleroom_playerTable"
+                    android:layout_width="wrap_content"
+                    
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dip"
+                    android:layout_marginBottom="15dip"
+                    android:layout_gravity="center_horizontal" >
+
+                    <TableRow
+                        android:id="@+id/battleroom_playerTableHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="i:menus.battleroom.heading.name"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="i:menus.battleroom.heading.spawnPoint"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="i:menus.battleroom.heading.team"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="i:menus.battleroom.heading.ping"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                        
+                    </TableRow>
+                </TableLayout>
+             </HorizontalScrollView>
+			        
+            
+            <Button android:text="i:menus.battleroom.button.addAI" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/battleroom_addAI"></Button>
+            
+            
+            
+           </LinearLayout>
+			   
+			   </com.corrodinggames.rts.appFramework.FlowLayout>
+			   
+		   
+			   <LinearLayout android:id="@+id/chatLogWrap" android:layout_height="wrap_content" android:orientation="vertical"
+                             android:gravity="center" android:padding="10dip" android:paddingTop="20dip" android:background="@drawable/rounded_border" android:layout_margin="5dip" android:layout_width="wrap_content">
+	         
+			        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:text="i:menus.battleroom.sectionHeader.chat" android:textColor="@color/frametitlecolour"></TextView>
+			      
+							   
+							<LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content">
+								  <LinearLayout android:layout_height="match_parent" android:orientation="vertical" android:layout_width="wrap_content">
+				            
+									  
+                    <LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content">
+                      <EditText 
+                          android:layout_height="wrap_content" android:id="@+id/battleroom_text"
+                          android:layout_width="wrap_content" android:maxWidth="220dip" android:maxLength="110" android:maxLines="1"
+                          android:width="220dip" android:imeOptions="flagNoExtractUi"></EditText>
+                      <Button android:layout_width="wrap_content" android:text="i:menus.battleroom.button.sendChat" android:layout_height="wrap_content" android:id="@+id/battleroom_send"></Button>
+                    </LinearLayout>
+                    
+									  
+									  <TextView android:minHeight="300dip" android:text="" android:layout_height="wrap_content"
+									            android:id="@+id/chatLog" android:textIsSelectable="true" android:layout_width="wrap_content"></TextView>
+									  
+									  
+							    </LinearLayout>
+							</LinearLayout>
+					
+			 </LinearLayout>
+
+		
+			
+		  
+    </LinearLayout>
+</ScrollView>
+   
+   
+</LinearLayout>

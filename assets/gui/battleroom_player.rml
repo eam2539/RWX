@@ -1,0 +1,113 @@
+<!--
+<!DOCTYPE html>
+-->
+
+
+<div class="smallForms" style="width: 100%;">
+
+  <div class="panelCloseButton" onclick="closePopup()"  click_on_escape=""/>
+
+  <div class="hide" id="team_id" ></div>
+  
+
+  <div class="selectDiv">
+    <label>Spawn Point</label>
+    <select id="spawnPoint" data-settings>
+      <option class="green" value="1">1 <span class="teamA"> Side A</span></option>
+      <option class="green" value="3">3 <span class="teamA"> Side A</span></option>
+      <option class="green" value="5">5 <span class="teamA"> Side A</span></option>
+      <option class="green" value="7">7 <span class="teamA"> Side A</span></option>
+      <option class="green" value="9">9 <span class="teamA"> Side A</span></option>
+      
+      
+      <option class="red"   value="2">2 <span class="teamB"> Side B</span></option>
+      <option class="red"   value="4">4 <span class="teamB"> Side B</span></option>
+      <option class="red"   value="6">6 <span class="teamB"> Side B</span></option>
+      <option class="red"   value="8">8 <span class="teamB"> Side B</span></option>
+      <option class="red"   value="10">10 <span class="teamB">Side B</span></option>
+      
+      <option value="-2">Spectator</option> <!-- Converts to -3 -->
+      
+    </select>
+  </div>
+  
+  <div class="selectDiv">
+    <label>Ally Team</label>
+    <select id="allyTeam" data-settings>
+      <option value="fromSpawn2">Use Spawn</option>
+      <option value="1">A</option>
+      <option value="2">B</option>
+      <option value="3">C</option>
+      <option value="4">D</option>
+      <option value="5">E</option>
+      <option value="6">F</option>
+      <option value="7">G</option>
+      <option value="8">H</option>
+      <option value="9">I</option>
+      <option value="10">J</option>
+      
+    </select>
+  </div>
+  <p>Players with the same team will be allied together.</p>
+  
+  <div id="playerOverridesSection">
+    
+    <h5  >-- ${i:menus.battleroom.gameoptions.playerOverrides} --</h5>
+    
+    
+    <div id="aiDifficultySelection" class="selectDiv">
+      <label>${i:menus.battleroom.gameoptions.aiDifficulty}</label>
+      <select id="aiDifficulty" data-settings>
+        <option value="-99" selected>${i:menus.settings.option.aiDefault}</option>
+        <option value="-2" >${i:menus.settings.option.ai.-2}</option>
+        <option value="-1" >${i:menus.settings.option.ai.-1}</option>
+        <option value="0"  >${i:menus.settings.option.ai.0}</option>
+        <option value="1"  >${i:menus.settings.option.ai.1}</option>
+        <option value="2"  >${i:menus.settings.option.ai.2}</option>
+        <option value="3"  >${i:menus.settings.option.ai.3}</option>
+      </select>
+    </div>
+    
+
+    <div class="selectDiv bigger2" id="startingUnitsSelection">
+      <label>${i:menus.battleroom.gameoptions.startingUnits}</label>
+      
+      <div id="startingUnitsWrap">
+        <select id="startingUnits" data-settings>
+          
+        </select>
+      </div>
+    </div>
+    
+    <div class="selectDiv bigger2" id="playerColorSelection">
+      <label>${i:menus.battleroom.gameoptions.playerColor}</label>
+      
+      <div id="playerColorWrap">
+        <select id="playerColor" data-settings>
+          
+        </select>
+      </div>
+    </div>
+    
+  </div>
+  
+  
+  <div id="mainButtons" class="mainBoxButtons">
+    
+    
+    <button class="boxButton" id="button_apply" onclick="mp.playerConfig_apply(); closePopup();">${i:menus.battleroom.playerpopup.apply}</button>
+    
+    <button class="boxButton" id="button_kick"  onclick="mp.playerConfig_kick(); closePopup();">${i:menus.battleroom.playerpopup.kick}</button>
+    
+    <div class="hide">
+      <button class="boxButton" id="button_give"  onclick="">${i:menus.battleroom.playerpopup.give}</button>
+    </div>
+    
+    <button class="boxButton" id="button_back"  onclick="closePopup();">${i:menus.battleroom.playerpopup.cancel}</button>
+    
+  </div>
+
+
+</div>
+
+

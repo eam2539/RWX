@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+  
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:myapp="http://schemas.android.com/apk/res/com.corrodinggames"
+    
+    android:layout_width="fill_parent" android:layout_height="fill_parent"
+    android:orientation="vertical" android:gravity="center"
+    >
+
+      <Gallery
+          android:id="@+id/quickhelp_gallery"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content" >
+
+</Gallery>
+  
+    <LinearLayout
+        android:id="@+id/quickhelp_outerlayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:visibility="visible" >
+	  
+	    <ImageView android:id="@+id/quickhelp_image" android:layout_height="fill_parent" android:layout_width="fill_parent"
+	      ></ImageView>
+	  
+   
+     </LinearLayout>
+   
+   
+  </LinearLayout>
+

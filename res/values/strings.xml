@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="onscreenlocationaction_prompt">Action Location</string>
+    <string name="onscreenlocationdpad_prompt">Dpad Location</string>
+    
+    <string-array name="onscreenlocation_array">
+        <item>Top-Left</item>
+        <item>Top-Right</item>
+        <item>Bottom-Left</item>
+        <item>Bottom-Right</item>
+    </string-array>
+    
+    <string name="aidifficulty_prompt">AI Difficulty</string>
+    
+    <string-array name="aidifficulty_array">
+        <item>Very Easy</item>
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+        <item>Very Hard</item>
+        <item>Impossible</item>
+        <!--
+        <item>Profile: Defensive</item>
+        <item>Profile: Cold War</item>
+        -->
+    </string-array>
+    
+    
+    
+    <string name="setTeams_prompt">Set Teams</string>
+    
+    <string-array name="setTeams_array">
+        <item>Keep current</item>
+        <item>2 Teams (eg 5v5)</item>
+        <item>3 Teams (eg 1v1v1)</item>
+        <item>No teams (FFA)</item>
+        <item>All spectators</item>
+    </string-array>
+    
+    
+    
+    
+    <string name="unitcap_prompt">Unit Cap</string>
+    <string-array name="unitcap_array">
+        <item>100</item>
+        <item>250</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>2000</item>
+        <item>5000</item>
+        <item>10000</item>
+    </string-array>
+    
+    <string name="fog_prompt">Fog Mode</string>
+    
+    <string-array name="fog_array">
+        <item>No Fog</item>
+        <item>Basic Fog</item>
+        <item>LOS Fog</item>
+    </string-array>
+    
+    <string name="credits_prompt">Starting Credits</string>
+    
+    <string-array name="credits_array">
+        <item>Default</item>
+        <item>$0</item>
+        <item>$1000</item>
+        <item>$2000</item>
+        <item>$5000</item>
+        <item>$10000</item>
+        <item>$50000</item>
+        <item>$100000</item>
+        <item>$200000</item>
+    </string-array>
+    
+    
+    <string name="income_prompt">Income Multiplier</string>
+    
+    <string-array name="income_array">
+        <item>1x</item>
+        <item>1.5x</item>
+        <item>2x</item>
+        <item>2.5x</item>
+    </string-array>
+    
+    
+    <string name="startingUnits_prompt">Starting Units</string>
+    
+    <string-array name="startingUnits_array">
+        <item>Normal (1 builder)</item>
+        <item>Small Army</item>
+        <item>3 Engineers</item>
+        <item>3 Engineers (No Command Center)</item>
+        <item>Experimental Spider</item>
+    </string-array>
+    
+    
+    
+    <string-array name="skirmish_game_mode">
+        <item>All vs you</item>
+        <item>All vs you and 1 ally</item>
+        <item>All vs you and 2 allies</item>
+        <item>All vs you and 3 allies</item>
+        <item>Free for all</item>
+        
+    </string-array>
+    
+    
+    <string name="skirmish_game_mode_prompt">Game Mode</string>
+    
+    <string-array name="skirmish_ai_count">
+        <item>up to 1 AIs</item>
+        <item>up to 2 AIs</item>
+        <item>up to 3 AIs</item>
+        <item>up to 4 AIs</item>
+        <item>up to 5 AIs</item>
+        <item>up to 6 AIs</item>
+        <item>up to 7 AIs</item>
+    </string-array>
+    
+    <string name="skirmish_ai_count_prompt">Number of AIs</string>
+    
+    
+    
+    <string name="spawn_array_prompt">Spawn point</string>
+    <string name="team_array_prompt">Team</string>
+    
+    
+    
+    <string-array name="team_array">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>S</item>
+    </string-array>
+    
+    
+    <string-array name="ally_array">
+        <item>auto</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+    
+    
+    
+    <string name="storageType_prompt">Storage Mode</string>
+    
+    <string-array name="storageType_array">
+        <item>Internal only (no permissions needed, deleted on uninstall)</item>
+        <item>Internal (read/write) and External (read)</item>
+        <item>External (read/write) and Internal (read)</item>
+        <item>External only (was default before v1.15)</item>
+    </string-array>
+    
+    
+</resources>

@@ -1,0 +1,1213 @@
+<rml>
+	<head>
+		<title>Settings</title>
+		<link type="text/rcss" href="rkt.rcss"/>
+		<link type="text/rcss" href="common.rcss"/>
+		<link type="text/rcss" href="forms.rcss"/>
+		<style>
+			
+			body
+	    {
+		    /*width: 680px;*/
+		    
+		    width: 85%;
+		    height: 775px;
+		    /*height: 100%;*/
+		    
+		    
+		    font-size: 25;
+		    
+		    
+		    height: 75%;
+		    
+		  }
+			
+			
+			.background
+      {
+        background:rgba(205,205,205,120);
+        
+        padding:8px;
+        padding-right:25px;
+      }
+      
+      
+		  h2
+	    {
+	      font-size: 35;
+        font-weight:bold;
+	    }
+	
+      h3
+      {
+        font-size: 30;
+	      color:black;
+	      font-weight:bold;
+	      
+	      header-font-effect: shadow;
+	      
+	      header-width: 2px;
+	      
+        header-offset: 2px 2px;
+        header-color: gray;
+        
+        display:block;
+        
+        border-bottom: 3px rgba(0,0,0,128);
+        
+        padding-left:0.4em;
+        
+        margin-bottom:0.5em;
+        margin-top:0.5em;
+        
+        background:rgba(0,100,0,128);
+        
+      }
+      
+			.unit h4
+      {
+        font-size: 20;
+	      color:black;
+	      font-weight:bold;
+	      
+	      header-font-effect: shadow;
+	      
+	      header-width: 2px;
+	      
+        header-offset: 2px 2px;
+        header-color: gray;
+        
+        display:block;
+        
+        /*border-bottom: 3px rgba(0,0,0,128);*/
+        
+        padding-left:0.4em;
+        
+        margin-bottom:0.3em;
+        margin-top:0.2em;
+        
+        /*background:rgba(0,100,0,128);*/
+      }
+      
+      .unit
+      {
+        /*clear:both;*/
+        padding:10px;
+        margin:10px;
+        margin-left:30px;
+        background:rgba(0,100,0,58);
+        float:left;
+        width:320px;
+        border-width: 2px;
+        border-color: rgba(0,0,0,128);
+        
+        min-height:370px;
+        
+        text-align:center;
+        
+        
+      }
+      
+      .unit img
+      {
+        height:80px;
+        /*width:80px;*/
+        /*background:none;*/
+        z-index:10;
+        
+      }
+      .unit p
+      {
+        font-size: 16;
+        padding:10px;
+        background:rgba(0,100,0,98);
+        margin-left:1em;
+        
+        color: black;
+        
+        line-height: 0.8em;
+        
+      }
+      
+      .unit pre
+      {
+        white-space: pre-wrap;
+        font-size: 16;
+        
+        line-height: 0.9em;
+      }
+      
+      
+			.group
+			{
+			  padding-left:0.5em;
+			  
+			}
+			
+			
+			div
+			{
+			  /*border-style: solid;
+	      border-width: 1px;
+	      border-color: red;*/
+			}
+			
+			
+			.form
+			{
+			  text-align: left;
+			  display: block;
+			  
+			  text-color:black;
+			}
+			
+		  body
+	    {
+		    /*width: 680px;*/
+		    
+		    /*height: 100%;*/
+		    
+		    
+		    font-size: 25;
+		  }
+		  
+			label
+			{
+			  padding-bottom:0em;
+			  margin-top:0em;
+			  
+			  /*border-style: solid;
+			  border-width: 2px;
+			  border-color: green;*/
+			  
+			  /*display:inline-block;*/
+			  
+        /*vertical-align:middle; */
+        
+			}
+			
+			#scrollDivWrap
+      {
+        
+        height: 100%;
+        
+        position: relative;
+			  
+        /*background:rgba(0,220,0,120);*/
+        
+      }
+      
+      
+      #scrollDiv
+      {
+        
+        display:block;
+			  
+			  overflow-y: auto;
+			  
+			  /*min-height:250px;
+			  max-height:550px;*/
+			  
+			  
+			  
+			  position: absolute;
+			  top:0px;
+			  bottom:30px;
+			  left:0px;
+			  right:0px;
+			  
+			  
+			  /* width:100%;
+			  border-style: solid;
+			  border-width: 2px;
+			  border-color: red;
+			  */
+			  
+			  margin: 3px;
+			  padding: 3px;
+			  
+      }
+      
+      .mainButtons button
+	    {
+	      margin:6px;
+	    }
+      
+		</style>
+	</head>
+	<body id="body" onshow="setPageMinWidthAndHeight(1100, 800);">
+		
+		
+		<div class="panelMain">
+		
+		  <div class="panelCloseButton" onclick="backOrClose()"  click_on_escape=""/>
+		  
+		  <div class="mainButtons">
+		    
+		    <div id="scrollDivWrap"><div id="scrollDiv">
+		      
+		      <h2>Help</h2>
+	        <form class="form">
+	          
+	          <h3>Units</h3>
+	          <div class="group">
+	            
+	            <!------------------------------------------------------->
+	          <div class="unit">
+<img src="unit:lightGunship" />
+<h4>Light gun ship</h4>
+<p>-Very weak<br/>-Light ground attack only<br/>-Slow</p>
+<pre>Price: $250
+Hp: 50
+Speed: 1.1
+Turn speed: 99
+Mass: 250
+Shoot Delay: 40
+Attack Range: 120
+Direct Damage: 10
+</pre></div>
+
+<div class="unit">
+<img src="unit:gunBoat" />
+<h4>Gun Boat</h4>
+<p>-Fast<br/>-Can attack ground</p>
+<pre>Price: $300
+Hp: 170
+Speed: 1.5
+Turn speed: 2.8
+Mass: 1500
+Shoot Delay: 60
+Attack Range: 120
+Direct Damage: 12
+</pre></div>
+
+<div class="unit">
+<img src="unit:c_tank" />
+<h4>Tank</h4>
+<p>-Can attack ground only</p>
+<pre>Price: $350
+Hp: 210
+Speed: 1.1
+Turn speed: 4.1
+Mass: 3000
+Shoot Delay: 75
+Attack Range: 130
+Direct Damage: 25
+</pre></div>
+
+<div class="unit">
+<img src="unit:hoverTank" />
+<h4>Hovertank</h4>
+<p>-Light armour<br/>-Able to move over water<br/>-Can attack air and ground</p>
+<pre>Price: $450
+Hp: 150
+Speed: 1
+Turn speed: 180
+Mass: 3000
+Shoot Delay: 90
+Attack Range: 140
+Direct Damage: 23
+</pre></div>
+
+<div class="unit">
+<img src="unit:lightSub" />
+<h4>Underwater Probe</h4>
+<p>-Very weak<br/>-Light torpedo attack only</p>
+<pre>Price: $450
+Hp: 80
+Speed: 0.7
+Turn speed: 2.5
+Mass: 1000
+Shoot Delay: 100
+Attack Range: 100
+Direct Damage: 10
+</pre></div>
+
+<div class="unit">
+<img src="unit:turret" />
+<h4>Turret</h4>
+<p>-Attacks ground units.<br/>-Upgradable</p>
+<pre>Price: $500
+T2 Upgrade Price: $1000
+Hp: 700
+Speed: 0
+Turn speed: 0
+Mass: 3000
+Shoot Delay: 30
+Attack Range: 165
+Direct Damage: 41
+</pre></div>
+
+<div class="unit">
+<img src="unit:builder" />
+<h4>Builder</h4>
+<p>-Constructs and repairs buildings.<br/>-Can not attack.</p>
+<pre>Price: $500
+Hp: 170
+Speed: 0.6
+Turn speed: 1.7
+Mass: 3000
+</pre></div>
+
+<div class="unit">
+<img src="unit:builderShip" />
+<h4>Builder Ship</h4>
+<p>-Builds buildings</p>
+<pre>Price: $500
+Hp: 500
+Speed: 0.8
+Turn speed: 1.9
+Mass: 6000
+</pre></div>
+
+<div class="unit">
+<img src="unit:hovercraft" />
+<h4>Landing Craft</h4>
+<p>-Transports units<br/>-Able to move over land and water.<br/>-Can not attack</p>
+<pre>Price: $600
+Hp: 450
+Speed: 1.2
+Turn speed: 1.8
+Mass: 12000
+</pre></div>
+
+<div class="unit">
+<img src="unit:c_interceptor" />
+<h4>Interceptor</h4>
+<p>-Extremely fast<br/>-Can attack air only</p>
+<pre>Price: $600
+Hp: 250
+Speed: 2.4
+Turn speed: 5.7
+Mass: 3000
+Shoot Delay: 40
+Attack Range: 170
+Direct Damage: 25
+</pre></div>
+
+<div class="unit">
+<img src="unit:mechGun" />
+<h4>Basic Mech</h4>
+<p>-Attacks land only</p>
+<pre>Price: $600
+Hp: 500
+Speed: 0.8
+Turn speed: 7
+Mass: 3000
+Shoot Delay: 30
+Attack Range: 130
+Direct Damage: 23
+</pre></div>
+
+<div class="unit">
+<img src="unit:c_antiAirTurret" />
+<h4>Anti-air Turret</h4>
+<p>-Attacks air units.<br/>-Upgradable</p>
+<pre>Price: $600
+T2 Upgrade Price: $1200
+Hp: 800
+Speed: 0
+Turn speed: 0
+Mass: 9000
+Shoot Delay: 80
+Attack Range: 250
+Direct Damage: 60
+</pre></div>
+
+<div class="unit">
+<img src="unit:extractor" />
+<h4>Extractor</h4>
+<p>-Generates credits.<br/>-Can only be built on resource pools.<br/>-Upgradable to T3</p>
+<pre>Price: $700
+T2 Upgrade Price: $1200
+T3 Upgrade Price: $2500
+Hp: 800
+Speed: 0
+Turn speed: 0
+Mass: 3000
+</pre></div>
+
+<div class="unit">
+<img src="unit:landFactory" />
+<h4>Land Factory</h4>
+<p>-Builds land units.<br/>-Upgradable</p>
+<pre>Price: $700
+T2 Upgrade Price: $2000
+Hp: 1200
+Speed: 0
+Turn speed: 0
+Mass: 3000
+</pre></div>
+
+<div class="unit">
+<img src="unit:c_helicopter" />
+<h4>Helicopter</h4>
+<p>-Not cost-effective in direct combat.<br/>-Can attack ground and air.</p>
+<pre>Price: $700
+Hp: 150
+Speed: 1.8
+Turn speed: 6
+Mass: 3000
+Shoot Delay: 60
+Attack Range: 130
+Direct Damage: 17
+</pre></div>
+
+<div class="unit">
+<img src="unit:scout" />
+<h4>Scout</h4>
+<p>-Mid armour - Not cost-effective for combat<br/>-Can see further through fog<br/>-Able to move over water<br/>-Can attack air and ground</p>
+<pre>Price: $700
+Hp: 350
+Speed: 1
+Turn speed: 2.4
+Mass: 500
+Shoot Delay: 50
+Attack Range: 110
+Direct Damage: 17
+</pre></div>
+
+<div class="unit">
+<img src="unit:gunShip" />
+<h4>Gun Ship</h4>
+<p>-Can attack ground only<br/>-Strong attack<br/>-Heavily armored</p>
+<pre>Price: $800
+Hp: 260
+Speed: 0
+Turn speed: 4
+Mass: 3000
+Shoot Delay: 40
+Attack Range: 140
+Direct Damage: 35
+</pre></div>
+
+<div class="unit">
+<img src="unit:heavyTank" />
+<h4>Heavy Tank</h4>
+<p>-heavily armed<br/>-Can attack ground<br/>-Light air attack</p>
+<pre>Price: $800
+Hp: 600
+Speed: 0.8
+Turn speed: 1.9
+Mass: 7000
+Shoot Delay: 70
+Attack Range: 160
+Direct Damage: 50
+</pre></div>
+
+<div class="unit">
+<img src="unit:dropship" />
+<h4>Dropship</h4>
+<p>-Transports units<br/>-Can not attack</p>
+<pre>Price: $800
+Hp: 500
+Speed: 2.3
+Turn speed: 1.4
+Mass: 16000
+</pre></div>
+
+<div class="unit">
+<img src="unit:attackSubmarine" />
+<h4>Attack Submarine</h4>
+<p>-Attacks ships</p>
+<pre>Price: $800
+Hp: 260
+Speed: 0.8
+Turn speed: 1.2
+Mass: 3000
+Shoot Delay: 170
+Attack Range: 250
+Direct Damage: 42
+</pre></div>
+
+<div class="unit">
+<img src="unit:missileShip" />
+<h4>Missile Ship</h4>
+<p>-Can attack ground and air<br/>-Light anti-sub torpedos</p>
+<pre>Price: $900
+Hp: 350
+Speed: 1.2
+Turn speed: 1.9
+Mass: 3000
+Shoot Delay: 170
+Attack Range: 200
+Direct Damage: 62
+</pre></div>
+
+<div class="unit">
+<img src="unit:mechMissile" />
+<h4>Anti-Air Mech</h4>
+<p>-Attacks air only<br/>-Area affect</p>
+<pre>Price: $900
+Hp: 500
+Speed: 0.8
+Turn speed: 7
+Mass: 3000
+Shoot Delay: 130
+Attack Range: 190
+Direct Damage: 70
+Area Damage: 45
+</pre></div>
+
+<div class="unit">
+<img src="unit:plasmaTank" />
+<h4>Plasma Tank</h4>
+<p>-Very heavily armed <br/>-Can attack ground only</p>
+<pre>Price: $900
+Hp: 220
+Speed: 0.8
+Turn speed: 2.4
+Mass: 10000
+Shoot Delay: 90
+Attack Range: 165
+Direct Damage: 100
+</pre></div>
+
+<div class="unit">
+<img src="unit:c_artillery" />
+<h4>Artillery</h4>
+<p>-Can attack ground only<br/>-Long range</p>
+<pre>Price: $900
+Hp: 140
+Speed: 0.9
+Turn speed: 1.7
+Mass: 14000
+Shoot Delay: 240
+Attack Range: 290
+Direct Damage: 1
+Area Damage: 80
+</pre></div>
+
+<div class="unit">
+<img src="unit:airFactory" />
+<h4>Air Factory</h4>
+<p>-Builds air units.<br/>-Upgradable</p>
+<pre>Price: $1000
+T2 Upgrade Price: $1500
+Hp: 1000
+Speed: 0
+Turn speed: 0
+Mass: 3000
+</pre></div>
+
+<div class="unit">
+<img src="unit:seaFactory" />
+<h4>Sea Factory</h4>
+<p>-Builds sea units.<br/>-Can only be built on water.</p>
+<pre>Price: $1000
+T2 Upgrade Price: $2000
+Hp: 1000
+Speed: 0
+Turn speed: 0
+Mass: 3000
+</pre></div>
+
+<div class="unit">
+<img src="unit:heavyHoverTank" />
+<h4>Heavy Hovertank</h4>
+<p>-Heavy armour<br/>-Able to move over water<br/>-Can attack air and ground</p>
+<pre>Price: $1000
+Hp: 450
+Speed: 0.7
+Turn speed: 20
+Mass: 3000
+Shoot Delay: 75
+Attack Range: 160
+Direct Damage: 40
+</pre></div>
+
+<div class="unit">
+<img src="unit:mechFactory" />
+<h4>Mech Factory</h4>
+<p>-Builds mech & land units<br/>-Upgradable</p>
+<pre>Price: $1000
+T2 Upgrade Price: $4000
+Hp: 1800
+Speed: 0
+Turn speed: 0
+Mass: 9000
+</pre></div>
+
+<div class="unit">
+<img src="unit:laserDefence" />
+<h4>Laser Shield</h4>
+<p>-Defence against long-range projectiles.<br/>-Upgradable</p>
+<pre>Price: $1200
+T2 Upgrade Price: $2000
+Hp: 500
+Speed: 0
+Turn speed: 0
+Mass: 3000
+</pre></div>
+
+<div class="unit">
+<img src="unit:turret_flamethrower" />
+<h4>Flamethrower</h4>
+<p>-Short range area affect<br/>-Adds self-repair</p>
+<pre>Price: $1200
+Hp: 1600
+Speed: 0
+Turn speed: 0
+Mass: 3000
+Shoot Delay: 5
+Attack Range: 155
+Area Damage: 3
+</pre></div>
+
+<div class="unit">
+<img src="unit:heavyInterceptor" />
+<h4>Heavy Interceptor</h4>
+<p>-Fast<br/>-Can attack air only<br/>-Heavily armed with shield<br/>-Shield weak vs lightning</p>
+<pre>Price: $1200
+Hp: 150
+Speed: 2.5
+Turn speed: 5
+Mass: 6000
+Shoot Delay: 20
+Attack Range: 170
+Direct Damage: 12 (total:24.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:laserTank" />
+<h4>Laser Tank</h4>
+<p>-Can attack ground and air.<br/>-Weak vs multiple units<br/>-Powerful single shot, slow recharge</p>
+<pre>Price: $1300
+Hp: 300
+Speed: 0.7
+Turn speed: 1.5
+Mass: 3000
+Shoot Delay: 450
+Attack Range: 190
+Direct Damage: 450
+</pre></div>
+
+<div class="unit">
+<img src="unit:battleShip" />
+<h4>Battle Ship</h4>
+<p>-Medium range land attack</p>
+<pre>Price: $1500
+Hp: 1200
+Speed: 0.8
+Turn speed: 1.8
+Mass: 9000
+Shoot Delay: 120
+Attack Range: 240
+Direct Damage: 65 (total:130.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:repairbay" />
+<h4>Repair Bay</h4>
+<p>-Repairs units.<br/>-Can reclaim own units</p>
+<pre>Price: $1500
+Hp: 1000
+Speed: 0
+Turn speed: 0
+Mass: 3000
+</pre></div>
+
+<div class="unit">
+<img src="unit:fabricator" />
+<h4>Fabricator</h4>
+<p>-Generates credits 4 times slower than extractors.<br/>-Upgradable</p>
+<pre>Price: $1500
+T2 Upgrade Price: $3000
+T3 Upgrade Price: $5000
+Hp: 800
+Speed: 0
+Turn speed: 0
+Mass: 3000
+</pre></div>
+
+<div class="unit">
+<img src="unit:turretT2" />
+<h4>Turret T2</h4>
+<p>-Attacks ground units.</p>
+<pre>Price: $1500
+T2 Upgrade Price: $11000
+Hp: 1100
+Speed: 0
+Turn speed: 0
+Mass: 3000
+Shoot Delay: 20
+Attack Range: 185
+Direct Damage: 44
+</pre></div>
+
+<div class="unit">
+<img src="unit:mechArtillery" />
+<h4>Artillery Mech</h4>
+<p>-Ground attack<br/>-Long range<br/>-Can move while firing</p>
+<pre>Price: $1700
+Hp: 500
+Speed: 0.6
+Turn speed: 5
+Mass: 6000
+Shoot Delay: 220
+Attack Range: 290
+Area Damage: 100
+</pre></div>
+
+<div class="unit">
+<img src="unit:amphibiousJet" />
+<h4>Amphibious Jet</h4>
+<p>-Shoots lightning while in air or underwater<br/>-Lightning weak vs grounded buildings</p>
+<pre>Price: $1800
+Hp: 530
+Speed: 1.4
+Turn speed: 3.8
+Mass: 3000
+Shoot Delay: 110
+Attack Range: 100
+Direct Damage: 45 (total:90.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:c_antiAirTurretT2" />
+<h4>Anti-air T2</h4>
+<p>-Attacks air units.</p>
+<pre>Price: $1800
+T2 Upgrade Price: $11000
+Hp: 1400
+Speed: 0
+Turn speed: 0
+Mass: 9000
+Shoot Delay: 70
+Attack Range: 320
+Direct Damage: 60 (total:120.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:turret_artillery" />
+<h4>Artillery</h4>
+<p>-Large range<br/>-Can not fire while moving</p>
+<pre>Price: $2100
+Hp: 1000
+Speed: 0
+Turn speed: 0
+Mass: 3000
+Shoot Delay: 220
+Attack Range: 350
+Area Damage: 80
+</pre></div>
+
+<div class="unit">
+<img src="unit:missileTank" />
+<h4>AA Missile Tank</h4>
+<p>-Long range anti-air only missiles<br/>-Light Shield</p>
+<pre>Price: $2500
+Hp: 1300
+Speed: 0.6
+Turn speed: 2.1
+Mass: 9000
+Shoot Delay: 230
+Attack Range: 340
+Direct Damage: 80 (total:160.0)
+Area Damage: 40 (total:80.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:commandCenter" />
+<h4>Command</h4>
+<p>-Builds builders<br/>-Attacks land and air</p>
+<pre>Price: $3000
+Hp: 4000
+Speed: 0
+Turn speed: 0
+Mass: 3000
+Shoot Delay: 70
+Attack Range: 280
+Direct Damage: 70
+</pre></div>
+
+<div class="unit">
+<img src="unit:heavyArtillery" />
+<h4>Heavy Artillery</h4>
+<p>-Can attack ground only<br/>-Long range<br/>-Limited Laser defence</p>
+<pre>Price: $3800
+Hp: 600
+Speed: 0.7
+Turn speed: 1.5
+Mass: 21000
+Shoot Delay: 150
+Attack Range: 290
+Direct Damage: 1
+Area Damage: 110
+</pre></div>
+
+<div class="unit">
+<img src="unit:c_mammothTank" />
+<h4>Mammoth Tank</h4>
+<p>-Heavily armed<br/>-Attacks ground with lightning<br/>-Lightning weak vs grounded buildings</p>
+<pre>Price: $3900
+Hp: 2600
+Speed: 0.5
+Turn speed: 1
+Mass: 14000
+Shoot Delay: 50
+Attack Range: 190
+Direct Damage: 130
+</pre></div>
+
+<div class="unit">
+<img src="unit:bomber" />
+<h4>Bomber</h4>
+<p>-Very heavily armored but slow<br/>-Needs to recharge after dropping bombs</p>
+<pre>Price: $4000
+Hp: 3000
+Speed: 0.85
+Turn speed: 1.2
+Mass: 20000
+Shoot Delay: 30
+Attack Range: 45
+Area Damage: 370
+</pre></div>
+
+<div class="unit">
+<img src="unit:missileAirship" />
+<h4>Missile Airship</h4>
+<p>-Land/air missiles with area affect<br/>-Need to reload after firing<br/>-Self repair</p>
+<pre>Price: $4200
+Hp: 1000
+Speed: 1.4
+Turn speed: 3.6
+Mass: 10000
+Shoot Delay: 110
+Attack Range: 180
+Direct Damage: 50
+Area Damage: 30
+</pre></div>
+
+<div class="unit">
+<img src="unit:mechBunker" />
+<h4>Mobile Turret</h4>
+<p>-Ground attack<br/>-Deploys for extra range and a shield</p>
+<pre>Price: $4500
+Hp: 800
+Speed: 0.5
+Turn speed: 1
+Mass: 6000
+Shoot Delay: 70
+Attack Range: 200
+Area Damage: 110
+</pre></div>
+
+<div class="unit">
+<img src="unit:antiAirTurretFlak" />
+<h4>Anti-air Flak</h4>
+<p>-Attacks air units with area affect<br/>-Short range</p>
+<pre>Price: $4600
+Hp: 2200
+Speed: 0
+Turn speed: 0
+Mass: 9000
+Shoot Delay: 160
+Attack Range: 200
+Area Damage: 80 (total:160.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:mechMinigun" />
+<h4>Minigun Mech</h4>
+<p>-Ground attack<br/>-Fast firing<br/>-Speeds up as it fires<br/>-Has shields (weak vs lightning)</p>
+<pre>Price: $5000
+Hp: 800
+Speed: 0.6
+Turn speed: 5
+Mass: 6000
+Shoot Delay: 34
+Attack Range: 210
+Direct Damage: 55
+</pre></div>
+
+<div class="unit">
+<img src="unit:heavySub" />
+<h4>Heavy Sub</h4>
+<p>-Heavily armored with torpedos<br/>-Can not attack units out of water</p>
+<pre>Price: $5500
+Hp: 1000
+Speed: 0.85
+Turn speed: 1.5
+Mass: 40000
+Shoot Delay: 100
+Attack Range: 210
+Direct Damage: 95 (total:190.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:mechLightning" />
+<h4>Tesla Mech</h4>
+<p>-Land & air lightning attack<br/>-Very strong vs shields<br/>-Reduced damage vs grounded buildings</p>
+<pre>Price: $5500
+Hp: 2000
+Speed: 0.5
+Turn speed: 1
+Mass: 6000
+Shoot Delay: 80
+Attack Range: 190
+Direct Damage: 140 (total:280.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:combatEngineer" />
+<h4>Combat Engineer</h4>
+<p>-Builds some units and T2 buildings<br/>-Heavily armored with land attack<br/>-Sub attack while hovering over water<br/>-Self repair with built-in Fabricator<br/>-Able to move over water</p>
+<pre>Price: $6000
+Hp: 1500
+Speed: 1.2
+Turn speed: 3.7
+Mass: 4000
+Shoot Delay: 50
+Attack Range: 170
+Direct Damage: 30
+</pre></div>
+
+<div class="unit">
+<img src="unit:heavyBattleship" />
+<h4>Heavy Battleship</h4>
+<p>-Long range land attack<br/>-Anti-air<br/>-Light anti-sub torpedos</p>
+<pre>Price: $6000
+Hp: 4000
+Speed: 0.7
+Turn speed: 1
+Mass: 40000
+Shoot Delay: 160
+Attack Range: 290
+Area Damage: 110 (total:220.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:mechLaser" />
+<h4>Plasma Mech</h4>
+<p>-Attacks land & air<br/>-Needs to recharge after firing<br/>-Long range</p>
+<pre>Price: $7000
+Hp: 1200
+Speed: 0.6
+Turn speed: 5
+Mass: 6000
+Shoot Delay: 5
+Attack Range: 310
+Direct Damage: 90
+</pre></div>
+
+<div class="unit">
+<img src="unit:experimentalLandFactory" />
+<h4>Experimental Factory</h4>
+<p>-Builds experimental land units.</p>
+<pre>Price: $11000
+Hp: 3200
+Speed: 0
+Turn speed: 0
+Mass: 3000
+</pre></div>
+
+<div class="unit">
+<img src="unit:fireBee" />
+<h4>Fire bee</h4>
+<p>-Heavily armed<br/>-Can attack ground<br/>-Medium air attack<br/>-Needs to reload after firing<br/>-Self repair</p>
+<pre>Price: $12000
+Hp: 5400
+Speed: 1.1
+Turn speed: 2
+Mass: 40000
+Shoot Delay: 25
+Attack Range: 210
+Direct Damage: 22 (total:44.0)
+Area Damage: 45 (total:270.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:mechFlame" />
+<h4>Flame Mech</h4>
+<p>-Area affect flame<br/>-Land only<br/>-High HP with self repair</p>
+<pre>Price: $12000
+Hp: 4500
+Speed: 0.6
+Turn speed: 5
+Mass: 6000
+Shoot Delay: 5
+Attack Range: 170
+Area Damage: 12 (total:24.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:turretT3" />
+<h4>Turret T3</h4>
+<p>-Attacks ground units.</p>
+<pre>Price: $12500
+Hp: 3900
+Speed: 0
+Turn speed: 0
+Mass: 3000
+Shoot Delay: 13
+Attack Range: 320
+Direct Damage: 40
+</pre></div>
+
+<div class="unit">
+<img src="unit:c_antiAirTurretT3" />
+<h4>Anti-air T3</h4>
+<p>-Attacks air units.</p>
+<pre>Price: $12800
+Hp: 3900
+Speed: 0
+Turn speed: 0
+Mass: 9000
+Shoot Delay: 70
+Attack Range: 400
+Direct Damage: 200 (total:400.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:c_experimentalTank" />
+<h4>Experimental Tank</h4>
+<p>-Very heavily armed<br/>-Quad cannons<br/>-Can attack ground<br/>-Light air attack</p>
+<pre>Price: $14000
+Hp: 6000
+Speed: 0.4
+Turn speed: 0.8
+Mass: 80000
+Shoot Delay: 110
+Attack Range: 310
+Direct Damage: 60 (total:240.0)
+Area Damage: 60 (total:240.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:antiNukeLauncherC" />
+<h4>Anti-Nuke Defence</h4>
+<p>-Intercepts nuclear missiles fired from Nuke Launcher.<br/>-Requires missiles to be built</p>
+<pre>Price: $15000
+Hp: 2800
+Speed: 0
+Turn speed: 0
+Mass: 9000
+</pre></div>
+
+<div class="unit">
+<img src="unit:heavyMissileShip" />
+<h4>Heavy Missile Ship</h4>
+<p>-Can attack air & land<br/>-Long range</p>
+<pre>Price: $18000
+Hp: 3000
+Speed: 0.5
+Turn speed: 0.8
+Mass: 30000
+Shoot Delay: 180
+Attack Range: 390
+Direct Damage: 70 (total:280.0)
+Area Damage: 180 (total:720.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:nautilusSubmarine" />
+<h4>Nautilus</h4>
+<p>-Heavily armed and armored<br/>-Can attack ships<br/>-Can surface and walk on land<br/>-Can attack land and air when surfaced</p>
+<pre>Price: $18000
+Hp: 4000
+Speed: 0.45
+Turn speed: 0.8
+Mass: 30000
+Shoot Delay: 300
+Attack Range: 240
+Direct Damage: 50 (total:300.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:experimentalHoverTank" />
+<h4>Shielded Hovertank</h4>
+<p>-Very heavily armed with shield<br/>-Can attack ground and air<br/>-Able to move over water</p>
+<pre>Price: $21000
+Hp: 3500
+Speed: 0.7
+Turn speed: 1.2
+Mass: 80000
+Shoot Delay: 8
+Attack Range: 180
+Direct Damage: 380
+</pre></div>
+
+<div class="unit">
+<img src="unit:experimentalDropship" />
+<h4>Flying Fortress</h4>
+<p>-Transports units<br/>-Builds units<br/>-Anti-air<br/>-Ground attack while landed<br/>-Self repair with built-in Fabricator</p>
+<pre>Price: $30000
+Hp: 8000
+Speed: 1.1
+Turn speed: 1.3
+Mass: 90000
+Shoot Delay: 25
+Attack Range: 210
+Direct Damage: 35 (total:70.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:experiementalCarrier" />
+<h4>Carrier</h4>
+<p>-Heavily armed and armored<br/>-Builds air units (at x5 speed)<br/>-Laser defence & repairbay<br/>-Anti-air<br/>-Built-in Fabricator<br/>-Can build anti-nuke missiles <br/>-Goes nuclear on death (if nukes are enabled)</p>
+<pre>Price: $38000
+Hp: 6000
+Speed: 0.5
+Turn speed: 0.7
+Mass: 200000
+Shoot Delay: 100
+Attack Range: 290
+Area Damage: 110 (total:220.0)
+</pre></div>
+
+<div class="unit">
+<img src="unit:nukeLauncherC" />
+<h4>Nuke Launcher</h4>
+<p>-Launches powerful nuclear missiles.<br/>-Requires missiles to be built</p>
+<pre>Price: $45000
+T2 Upgrade Price: $11000
+Hp: 1500
+Speed: 0
+Turn speed: 0
+Mass: 9000
+</pre></div>
+
+<div class="unit">
+<img src="unit:experimentalSpider" />
+<h4>Experimental Spider</h4>
+<p>-Very heavily armored but slow<br/>-Can build units and buildings<br/>-Auto repairs nearby units<br/>-Laser defence<br/>-Can move over water<br/>-Built-in Fabricator<br/>-Goes nuclear on death (if nukes are enabled)</p>
+<pre>Price: $70000
+Hp: 10000
+Speed: 0.5
+Turn speed: 0.5
+Mass: 90000
+Shoot Delay: 85
+Attack Range: 260
+Direct Damage: 80 (total:160.0)
+Area Damage: 160
+</pre></div>
+
+
+ 
+	            
+	            <!------------------------------------------------------->
+	            
+	          </div>
+	          
+	          
+	        </form>
+		      
+		      <br/>
+		      
+	        
+	      </div></div>
+	      
+	      <button class="stealFocus"></button>
+	      
+	      <!--<button onclick="open('credits.rml', null)">Credits</button>-->
+	      
+	      <button onclick="backOrClose()" click_on_escape="">Back</button>
+	      
+		  </div>
+		  
+		  
+		</div>
+		
+	</body>
+</rml>

@@ -1,0 +1,279 @@
+<!--
+<!DOCTYPE html>
+-->
+<!-- -->
+<rml>
+	<head>
+		<title>Options</title>
+		<link type="text/rcss" href="rkt.rcss"/>
+		<link type="text/rcss" href="common.rcss"/>
+		<link type="text/rcss" href="forms.rcss"/>
+		<style>
+			
+			body
+			{
+				/*width: 100%;*/
+				
+				height: 600px;
+				
+				
+		  }
+			
+			.mainButtons
+			{
+			  margin: auto;
+			  /*width:18em;*/
+			  
+			  width:540px;
+			}
+			
+			.formSection
+			{
+			  /*float:left;*/
+			  
+			  border-style: solid;
+			  border-width: 1px;
+			  border-color: gray;
+			  width:7em;
+			  margin:2px;
+			  
+			  margin: 0 auto;
+			  
+			  
+			  
+			}
+		  
+			.joinSection input, .joinSection p
+			{
+			  font-size: 20;
+			}
+			
+			.joinSection p
+			{
+			  
+			  
+			}
+			
+			.joinSection input
+			{
+			  display:block;
+			  margin: 0 auto;
+			  text-align:center;
+			  
+			}
+			
+			
+			#joinAddress
+			{
+			  width:9em;
+			  
+			}
+			
+			
+			.mapImage
+			{
+			  width:200px;
+			  height:200px;
+			}
+			
+			.mapText
+			{
+			  font-size: 20;
+			}
+			
+      .mainButtons2 button
+	    {
+	      margin:6px;
+	    }
+      
+      /*
+      select
+      {
+        font-size: 18;
+        /width:340px;/
+        text-align: center;
+        line-height:2.2;
+        
+      }
+      
+      selectbox
+      {
+        text-align: left;
+        
+        max-height: 340px;
+        overflow-y: auto;
+        /width:300px;/
+        
+        line-height:1.2;
+      }
+      
+      option
+      {
+        font-size: 18;
+      }
+      */
+      
+      .selectDiv label
+      {
+        display:block;
+        
+        width:8em;
+        
+        /*border-style: solid;
+        border-width: 1px;
+        border-color: red;*/
+        
+        text-align:right;
+        
+        color:white;
+        
+        font-size: 25;
+        
+        
+        
+      }
+      
+      .selectDiv select
+      {
+        /*border-style: solid;
+        border-width: 1px;
+        border-color: red;*/
+        
+        width:8em;
+        
+        text-align:center;
+        
+        float:left;
+        
+        font-size: 25;
+        
+        
+        
+      }
+      
+        
+        
+	    .map button img
+		  {
+		    border-style: solid;
+		    border-color: rgba( 0%, 0%, 0%, 20%);
+		    border-width: 2px;
+		    
+		  }
+		
+		  .map button:hover img
+		  {
+		    border-style: solid;
+		    border-width: 2px;
+		    border-color: red;
+		  }
+      
+		</style>
+	</head>
+	<body onshow="setPageMinWidthAndHeight(700, 700); showLevelOptions(); onShowNewScreen();">
+		
+		
+		<div class="panelMain">
+		
+		  <div class="panelCloseButton" onclick="backOrClose()"  click_on_escape=""/>
+		
+		  <div class="mainButtons">
+		    
+		    
+<!-- -->
+		    
+		    
+		    <h3>Sandbox Editor</h3>
+		    
+		    <div class="selectDiv bigger typeSelectorWrap">
+          <label>Map Type:</label>
+		      <select id="typeSelector" onchange="showSandboxMapSelectOnChange()">
+            <option value="0" selected  >Skirmish Map</option>
+            <option value="1"   >Custom Map</option>
+            <option value="2"   >Saved Game</option>
+            
+          </select>   
+		    </div>
+		    
+		    <div class="map">
+		      <button onclick="showSandboxMapSelect()">
+		        <img class="mapImage" _src="${getMapThumbnail(mode)}" />
+		      </button>
+		      <br/>
+		      <div class="mapText">${getMapNameFromPath(mode)}</div>
+		    </div>
+		    
+		    
+		    <div class="selectDiv">
+        <label>Difficulty:</label>
+        <select id="aiDifficulty" data-settings>
+          <option value="-2">${i:menus.settings.option.ai.-2}</option>
+          <option value="-1">${i:menus.settings.option.ai.-1}</option>
+          <option value="0" selected>${i:menus.settings.option.ai.0}</option>
+          <option value="1"  >${i:menus.settings.option.ai.1}</option>
+          <option value="2"  >${i:menus.settings.option.ai.2}</option>
+          <option value="3"  >${i:menus.settings.option.ai.3}</option>
+        </select>
+        </div>
+		    
+		    
+		    
+		    <div class="skirmishOnly">
+		    
+		      <div class="selectDiv">
+          <label>AIs:</label>
+          <select id="numberOfAIs" data-settings>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+          </select>
+          </div>
+          
+          
+		      <div class="selectDiv">
+          <label>Teams:</label>
+          <select id="aiTeams" data-settings>
+            <option value="1" selected>vs all</option>
+            <option value="2">1 ally vs all</option>
+            <option value="3">2 ally vs all</option>
+            <option value="4">3 ally vs all</option>
+            <option value="5">Free for all</option>
+          </select>
+          </div>
+          
+        
+          
+	        
+        
+        </div>
+        
+	      <div class="formSection_na mainButtons2 panelBottomButtons">
+	        <button class="stealFocus"></button>
+	        <button class="backButton" onclick="backOrClose()" click_on_escape="">Back</button>
+	        <button id="advancedButton" onclick="loadConfigAndStartNewSandboxInAdvanced(mode)">Advanced</button>
+	        <button onclick="loadConfigAndStartNewSandbox(mode)">Start</button>
+	        
+	        
+	      </div>
+	      
+	    
+	    
+<!-- -->
+	    
+	    </div>
+
+		
+		
+		</div>
+		
+		
+	</body>
+</rml>
+
+<!-- -->
+

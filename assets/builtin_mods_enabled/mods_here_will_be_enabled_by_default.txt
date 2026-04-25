@@ -1,0 +1,8 @@
+But the best place for mods is under:
+
+'{game_folder}/mods/units' on pc
+and 'rustedwarfare/units' on android
+
+The mods directory also allows for workshop upload on PC
+
+

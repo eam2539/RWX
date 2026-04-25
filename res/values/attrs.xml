@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+
+
+
+<declare-styleable name="GalleryTheme">
+<attr name="android:galleryItemBackground" />
+</declare-styleable>
+
+<declare-styleable name="FlowLayout">
+ <attr name="horizontalSpacing" format="dimension" />
+ <attr name="verticalSpacing" format="dimension" />
+</declare-styleable>
+<declare-styleable name="FlowLayout_LayoutParams">
+  <attr name="layout_breakLine" format="boolean" />
+  <attr name="layout_horizontalSpacing" format="dimension" />
+</declare-styleable>
+
+
+
+<item name="reservedNamedId1" type="id"/>
+<item name="reservedNamedId2" type="id"/>
+<item name="reservedNamedId3" type="id"/>
+
+</resources>

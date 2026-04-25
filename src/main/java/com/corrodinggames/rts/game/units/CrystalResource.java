@@ -1,0 +1,152 @@
+package com.corrodinggames.rts.game.units;
+
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.RectF;
+import com.corrodinggames.rts.R;
+import com.corrodinggames.rts.game.units.buildings.BaseBuilding;
+import com.corrodinggames.rts.gameFramework.GameEngine;
+import com.corrodinggames.rts.gameFramework.graphics.Texture;
+
+/* JADX INFO: renamed from: com.corrodinggames.rts.game.units.e */
+/* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/e.class */
+public class CrystalResource extends BaseBuilding {
+
+    /* JADX INFO: renamed from: b */
+    float animationTimer;
+    static Texture a = null;
+    static PorterDuffColorFilter c = new PorterDuffColorFilter(Color.a(200, 200, 200), PorterDuff.Mode.MULTIPLY);
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: b, reason: merged with bridge method [inline-methods] */
+    public UnitTypeEnum r() {
+        return UnitTypeEnum.crystalResource;
+    }
+
+    public static void a_() {
+        a = GameEngine.getInstance().graphicsEngine2.a(R.drawable.crystal);
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public Texture d() {
+        return a;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.BaseUnit
+    public boolean e() {
+        return true;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.OrderableUnit
+    public void a(int i) {
+    }
+
+    public CrystalResource(boolean z) {
+        super(z);
+        this.baseTexture = a;
+        b(a);
+        this.speed = 11.0f;
+        this.maxSpeed = this.speed + 1.0f;
+        this.maxHealth = 600.0f;
+        this.currentHealth = this.maxHealth;
+        S(1);
+        this.buildingTargetRect.a(0, -1, 0, 0);
+        this.buildingVelocityRect.a(this.buildingTargetRect);
+    }
+
+    @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding
+    /* JADX INFO: renamed from: f */
+    public Paint getBuildingPaint() {
+        return super.getBuildingPaint();
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
+    /* JADX INFO: renamed from: a */
+    public void update(float f) {
+        super.update(f);
+        this.animationTimer += 0.01f * f;
+        if (this.animationTimer > 1.0f) {
+            this.animationTimer -= 1.0f;
+            if (this.animationTimer > 1.0f) {
+                this.animationTimer = 0.0f;
+            }
+        }
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: g */
+    public float getUnitHealthPercent() {
+        return 0.02f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.BaseUnit
+    public UnitMovementType h() {
+        return UnitMovementType.NONE;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.BaseUnit
+    public boolean i() {
+        return false;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: s_ */
+    public boolean isBuilding() {
+        GameEngine gameEngine = GameEngine.getInstance();
+        du.a(getUnitMassBounds());
+        return RectF.a(gameEngine.cameraFollowMode, du);
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public Texture k() {
+        return null;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: l */
+    public boolean canAttack() {
+        return false;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float m() {
+        return 0.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float b(int i) {
+        return 0.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float c(int i) {
+        return 0.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public void a(BaseUnit baseUnit, int i) {
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public void n() {
+        super.n();
+        this.animationTimer = ((this.posY * 5.0f) + (this.posX * 3.0f)) % 1.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public boolean o() {
+        return true;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public boolean p() {
+        return true;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public boolean q() {
+        return true;
+    }
+}

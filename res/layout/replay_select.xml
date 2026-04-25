@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+<FrameLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    
+    >
+    
+    
+    
+    <ImageView android:src="@drawable/back_circle"
+    android:scaleType="fitXY"
+    android:layout_width="35dp"
+  android:layout_height="35dp"
+  
+  android:id="@+id/levelButtonBack"
+  android:layout_gravity="left|top"
+  android:background="@android:color/transparent"
+  android:textSize="14pt"
+  android:padding="7dp"
+  
+  />
+    
+    
+    <!-- 
+<com.corrodinggames.rts.appFramework.GameView android:id="@+id/GameView"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" />
+ -->
+<LinearLayout
+  
+  android:layout_height="fill_parent" android:orientation="vertical" android:layout_width="fill_parent"
+  
+  >
+  
+<TextView android:id="@+id/LevelTextTop" android:layout_gravity="center_horizontal" android:layout_width="wrap_content" android:text="Select Map" android:layout_height="wrap_content" android:textSize="14pt" android:textColor="#FFFFFF"></TextView>
+
+<ScrollView android:id="@+id/ScrollView02" android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+	
+	<LinearLayout android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent">
+	
+	    
+	    
+    	<LinearLayout android:layout_height="wrap_content" android:orientation="horizontal" android:layout_width="wrap_content" android:layout_gravity="center">
+			
+		  
+
+		  
+		</LinearLayout>
+		
+		<LinearLayout android:layout_height="wrap_content" android:id="@+id/replayHolder" android:orientation="vertical" android:layout_width="fill_parent" android:layout_margin="0dp">
+		</LinearLayout>
+		
+	</LinearLayout>
+</ScrollView>
+</LinearLayout>
+
+
+</FrameLayout>

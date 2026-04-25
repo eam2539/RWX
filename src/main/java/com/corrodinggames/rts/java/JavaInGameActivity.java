@@ -1,0 +1,112 @@
+package com.corrodinggames.rts.java;
+
+import com.corrodinggames.librocket.GameMainManager;
+import com.corrodinggames.librocket.scripts.ScriptEngine;
+import com.corrodinggames.rts.appFramework.InGameActivity;
+import com.corrodinggames.rts.gameFramework.GameEngine;
+
+/* JADX INFO: renamed from: com.corrodinggames.rts.java.h */
+/* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/java/h.class */
+public class JavaInGameActivity extends InGameActivity {
+    @Override // com.corrodinggames.rts.appFramework.InGameActivity
+    /* JADX INFO: renamed from: c */
+    public void selectMenuOption(int i) {
+        GameEngine.isInSpace("InGameActivityJava selectMenuOption: " + i);
+        onSelectMenuOption(i);
+    }
+
+    private void e(String str) {
+        ScriptEngine.getInstance().getRoot().makeSaveGamePopup(str);
+    }
+
+    private void f(String str) {
+        ScriptEngine.getInstance().getRoot().makeExportMapGamePopup(str);
+    }
+
+    @Override // com.corrodinggames.rts.appFramework.InGameActivity
+    /* JADX INFO: renamed from: d */
+    public void onSelectMenuOption(int i) {
+        switch (i) {
+            case 2:
+                GameMainManager.getInstance().showSettings();
+                break;
+            case 3:
+                GameEngine.isInSpace("TODO");
+                break;
+            case 4:
+                GameEngine.getInstance().isGameEngineReady = !GameEngine.getInstance().isGameEngineReady;
+                break;
+            case 5:
+                GameEngine.isInSpace("TODO");
+                break;
+            case 6:
+                GameEngine gameEngine = GameEngine.getInstance();
+                gameEngine.isNetworkGameActive = !gameEngine.isNetworkGameActive;
+                break;
+            case 9:
+                GameEngine gameEngine2 = GameEngine.getInstance();
+                if (!gameEngine2.isServer) {
+                    gameEngine2.isServer = true;
+                } else {
+                    gameEngine2.isServer = false;
+                }
+                break;
+            case 10:
+                ScriptEngine.getInstance().addScriptToQueue("mp.multiplayerExitPrompt();");
+                break;
+            case 11:
+                GameEngine gameEngine3 = GameEngine.getInstance();
+                if (gameEngine3.missionEngine != null && gameEngine3.missionEngine.h != null) {
+                    gameEngine3.showMessageBox("Briefing", gameEngine3.missionEngine.h);
+                    break;
+                }
+                break;
+            case 12:
+                e(null);
+                break;
+            case 13:
+                ScriptEngine.getInstance().addScriptToQueue("makeSendMessagePopup();");
+                break;
+            case 14:
+                GameEngine gameEngine4 = GameEngine.getInstance();
+                if (gameEngine4.networkEngine != null) {
+                    gameEngine4.networkEngine.H();
+                }
+                break;
+            case 15:
+                ScriptEngine.getInstance().addScriptToQueue("showMainMenu();");
+                break;
+            case 16:
+                ScriptEngine.getInstance().addScriptToQueue("makeSendTeamMessagePopup();");
+                break;
+            case 17:
+                ScriptEngine.getInstance().addScriptToQueue("mp.reinviteAsk();");
+                break;
+            case 18:
+                f(null);
+                break;
+            case 19:
+                ScriptEngine.getInstance().addScriptToQueue("mp.surrenderPrompt();");
+                break;
+            case 20:
+                ScriptEngine.getInstance().addScriptToQueue("showMainMenu();");
+                break;
+            case 21:
+                ScriptEngine.getInstance().addScriptToQueue("showBattleroom();");
+                break;
+            case 22:
+                GameEngine gameEngine5 = GameEngine.getInstance();
+                gameEngine5.isMenuOpen = true;
+                gameEngine5.gameUI.isDraggingSelection = false;
+                break;
+            case 23:
+                GameMainManager.getInstance().showLeaderboard();
+                break;
+        }
+    }
+
+    @Override // com.corrodinggames.rts.appFramework.InGameActivity
+    public void m() {
+        ScriptEngine.getInstance().addScriptToQueue("showMainMenu();");
+    }
+}

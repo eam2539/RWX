@@ -1,0 +1,200 @@
+<rml>
+	<head>
+		<title>Game Log</title>
+		<link type="text/rcss" href="rkt.rcss"/>
+		<link type="text/rcss" href="common.rcss"/>
+		<link type="text/rcss" href="forms.rcss"/>
+		<style>
+		
+		  body
+	    {
+		    /*width: 680px;*/
+		    
+		    width: 80%;
+		    /*height: 525px;*/
+		    /*height: 100%;*/
+		    
+		    
+		    font-size: 25;
+		    
+		    height: 70%;
+		    
+		    
+		  }
+		  
+		  
+			.background
+      {
+        background:rgba(205,205,205,120);
+        
+        padding:8px;
+        padding-right:25px;
+      }
+      
+      
+		  h2
+	    {
+	      font-size: 35;
+        font-weight:bold;
+	    }
+	
+      h3
+      {
+        font-size: 30;
+	      color:black;
+	      font-weight:bold;
+	      
+	      header-font-effect: shadow;
+	      
+	      header-width: 2px;
+	      
+        header-offset: 2px 2px;
+        header-color: gray;
+        
+        display:block;
+        
+        border-bottom: 3px rgba(0,0,0,128);
+        
+        padding-left:0.4em;
+        
+        margin-bottom:0.5em;
+        margin-top:0.5em;
+        
+        background:rgba(0,100,0,128);
+        
+      }
+			
+			.group
+			{
+			  padding-left:0.5em;
+			  
+			}
+			
+			
+			div
+			{
+			  /*border-style: solid;
+	      border-width: 1px;
+	      border-color: red;*/
+			}
+			
+			
+			.form
+			{
+			  text-align: left;
+			  display: block;
+			  
+			  text-color:black;
+			}
+			
+		  
+		  
+			label
+			{
+			  padding-bottom:0em;
+			  margin-top:0em;
+			  
+			  /*border-style: solid;
+			  border-width: 2px;
+			  border-color: green;*/
+			  
+			  /*display:inline-block;*/
+			  
+        /*vertical-align:middle; */
+        
+			}
+			
+			
+      #scrollDiv
+      {
+        
+        display:block;
+			  
+			  overflow-y: auto;
+			  
+			  min-height:250px;
+			  /*max-height:500px;*/
+			  
+			  max-height:100%;
+			  
+			  width:100%;
+			  /*
+			  border-style: solid;
+			  border-width: 2px;
+			  border-color: red;
+			  */
+			  
+			  margin: 3px;
+			  padding: 3px;
+			  
+      }
+      
+      .mainButtons button
+	    {
+	      margin:6px;
+	    }
+      
+      
+      .gameLog
+      {
+        font-size: 14;
+        white-space: pre-wrap;
+        line-height:1.0em;
+        
+        padding:5px;
+        
+        
+        
+        
+        /*font-family: chinese;
+        
+        font-charset: U+0020-007E, U+3000-33FF, U+4E00-9FFF;*/
+        font-charset: U+0020-007E, U+3000-33FF, U+4E00-9FFF;
+        
+        /*font-family: notoSans;*/
+      }
+      
+      
+		</style>
+	</head>
+	<body id="body" onshow="writeGameLog('gameLog');">
+		
+		
+		<div class="panelMain">
+		
+		  <div class="panelCloseButton" onclick="back()"  click_on_escape=""/>
+		  
+		  <div class="mainButtons">
+		    
+		    <div id="scrollDiv">
+		      
+		      <h2>Game Log</h2>
+	        <form class="form">
+	          
+	          <!--<img  src="drawable:logo.png" />-->
+	          
+	          <div class="clearDiv"></div>
+	          
+	          <div class="gameLog" id="gameLog">
+	            
+	            
+	            
+	          </div>
+	          
+	        </form>
+		      
+		      <br/>
+		      
+	        
+	      </div>
+	      
+	      <button onclick="back()" click_on_escape="">Back</button>
+	      <button onclick="exportGameLog()">Export</button>
+	      
+		  </div>
+		  
+		  
+		</div>
+		
+	</body>
+</rml>

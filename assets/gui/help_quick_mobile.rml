@@ -1,0 +1,273 @@
+<rml>
+	<head>
+		<title>Settings</title>
+		<link type="text/rcss" href="rkt.rcss"/>
+		<link type="text/rcss" href="common.rcss"/>
+		<link type="text/rcss" href="forms.rcss"/>
+		<style>
+			
+			body
+	    {
+		    /*width: 680px;*/
+		    
+		    width: 80%;
+		    /*height: 525px;*/
+		    
+		    font-size: 25;
+		    
+		    
+		    height: 80%;
+		    
+		    font-size: 25;
+		    
+		  }
+			
+			
+			.background
+      {
+        background:rgba(205,205,205,120);
+        
+        padding:8px;
+        padding-right:25px;
+      }
+      
+      
+		  h2
+	    {
+	      font-size: 35;
+        font-weight:bold;
+	    }
+	
+      h3
+      {
+        font-size: 30;
+	      color:black;
+	      font-weight:bold;
+	      
+	      header-font-effect: shadow;
+	      
+	      header-width: 2px;
+	      
+        header-offset: 2px 2px;
+        header-color: gray;
+        
+        display:block;
+        
+        border-bottom: 3px rgba(0,0,0,128);
+        
+        padding-left:0.4em;
+        
+        margin-bottom:0.5em;
+        margin-top:0.5em;
+        
+        background:rgba(0,100,0,128);
+        
+      }
+      
+			.unit h4
+      {
+        font-size: 20;
+	      color:black;
+	      font-weight:bold;
+	      
+	      header-font-effect: shadow;
+	      
+	      header-width: 2px;
+	      
+        header-offset: 2px 2px;
+        header-color: gray;
+        
+        display:block;
+        
+        /*border-bottom: 3px rgba(0,0,0,128);*/
+        
+        padding-left:0.4em;
+        
+        margin-bottom:0.3em;
+        margin-top:0.2em;
+        
+        /*background:rgba(0,100,0,128);*/
+      }
+      
+      .unit
+      {
+        /*clear:both;*/
+        padding:10px;
+        margin:10px;
+        margin-left:40px;
+        background:rgba(0,100,0,58);
+        float:left;
+        width:400px;
+        border-width: 2px;
+        border-color: rgba(0,0,0,128);
+        
+        min-height:350px;
+        
+        text-align:center;
+        
+        
+      }
+      
+      .unit img
+      {
+        height:80px;
+        /*width:80px;*/
+        /*background:none;*/
+        z-index:10;
+        
+      }
+      .unit p
+      {
+        font-size: 16;
+        padding:10px;
+        background:rgba(0,100,0,98);
+        margin-left:1em;
+        
+        color: black;
+        
+        line-height: 0.8em;
+        
+      }
+      
+      .unit pre
+      {
+        white-space: pre-wrap;
+        font-size: 16;
+        
+        line-height: 0.9em;
+      }
+      
+      
+			.group
+			{
+			  padding-left:0.5em;
+			  
+			}
+			
+			
+			div
+			{
+			  /*border-style: solid;
+	      border-width: 1px;
+	      border-color: red;*/
+			}
+			
+			
+			.form
+			{
+			  text-align: left;
+			  display: block;
+			  
+			  text-color:black;
+			}
+		  
+			label
+			{
+			  padding-bottom:0em;
+			  margin-top:0em;
+			  
+			  /*border-style: solid;
+			  border-width: 2px;
+			  border-color: green;*/
+			  
+			  /*display:inline-block;*/
+			  
+        /*vertical-align:middle; */
+        
+			}
+			
+			#scrollDivWrap
+      {
+        
+        height: 100%;
+        
+        position: relative;
+			  
+        /*background:rgba(0,220,0,120);*/
+        
+      }
+      
+      
+      #scrollDiv
+      {
+        
+        display:block;
+			  
+			  overflow-y: auto;
+			  
+			  /*min-height:250px;
+			  max-height:550px;*/
+			  
+			  position: absolute;
+			  top:0px;
+			  bottom:30px;
+			  left:0px;
+			  right:0px;
+			  
+			  
+			  /* width:100%;
+			  border-style: solid;
+			  border-width: 2px;
+			  border-color: red;
+			  */
+			  
+			  margin: 3px;
+			  padding: 3px;
+			  
+      }
+      
+      .mainButtons button
+	    {
+	      margin:6px;
+	    }
+      
+      .form
+      {
+        text-align: center;
+      }
+      
+      .helpImage
+      {
+        margin-bottom:1.3em;
+        width:100%;
+        
+      }
+      
+		</style>
+	</head>
+	<body id="body" onshow="setPageMinWidthAndHeight(600, 600);">
+		
+		
+		<div class="panelMain" >
+		
+		  <div class="panelCloseButton" onclick="backOrClose()"  click_on_escape=""/>
+		
+		  <div class="mainButtons">
+		    
+		    <div id="scrollDivWrap"><div id="scrollDiv">
+		      
+		      <h2>Quick Help</h2>
+	        <form class="form">
+	          
+	          <img class="helpImage" src="drawable:help1.png" />
+	          <img class="helpImage" src="drawable:help2.png" />
+	          <img class="helpImage" src="drawable:help3.png" />
+	          <img class="helpImage" src="drawable:help4.png" />
+	          
+	        </form>
+		      
+		      <br/>
+	        
+	      </div></div>
+	      
+	      <button class="stealFocus"></button>
+	      
+	      <button onclick="backOrClose()" >Back</button>
+	      
+		  </div>
+		  
+		  
+		</div>
+		
+	</body>
+</rml>

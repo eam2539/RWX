@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" 
+    
+    >
+    
+    <!-- 
+<com.corrodinggames.rts.appFramework.GameViewNonSurface android:id="@+id/GameView"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" />
+-->
+
+<TextView android:id="@+id/titleInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true" 
+            android:text="" android:layout_marginRight="5px" />
+            
+
+<ScrollView tabindex="-1"
+android:layout_height="fill_parent"
+android:layout_width="fill_parent" android:gravity="center"
+android:scrollbarAlwaysDrawVerticalTrack="true" android:fillViewport="true"  android:weightSum="1"
+>
+  <!--  android:background="@drawable/backrepeat" xmlns:myapp="http://schemas.android.com/apk/res/com.corrodinggames" -->
+    
+    
+  <LinearLayout
+    android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1" android:weightSum="1"
+    android:orientation="vertical" android:gravity="center"
+    >
+	    
+	  <LinearLayout
+	    android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.7"
+	    android:orientation="vertical"  android:gravity="center_horizontal"
+	    >
+	    
+	    <RelativeLayout
+	      android:layout_width="fill_parent" 
+	      android:layout_height="wrap_content" >
+	    
+		    <ImageView android:layout_centerHorizontal="true"
+		    android:id="@+id/TitleImage" android:layout_height="wrap_content" android:src="@drawable/title" android:layout_width="wrap_content"
+		    android:paddingTop="2dp"  ></ImageView>
+	    
+	    </RelativeLayout>
+	    
+	    <LinearLayout android:layout_height="wrap_content" 
+	      android:layout_width="wrap_content" android:layout_marginTop="5px" android:orientation="vertical" android:gravity="center"
+	    
+	      android:paddingRight="40dp" android:paddingLeft="40dp"
+	    >
+	      
+	        
+	      
+	      <Button android:id="@+id/buyButton"
+	            android:layout_height="wrap_content" android:layout_x="12px" android:layout_y="12px" android:layout_width="fill_parent" android:text="Buy now!" android:layout_marginTop="4dp" android:textStyle="bold"
+	            style="@style/MenuButton" android:paddingBottom="10px" android:paddingTop="10px"/>
+	        
+	        
+	      
+	      <Button android:id="@+id/startgameButton"
+	                  android:layout_height="wrap_content" android:layout_x="12px" android:layout_y="12px" android:layout_width="wrap_content" android:text="Continue" android:layout_marginTop="4dp" android:textStyle="bold"
+	                  style="@style/MenuButton" android:paddingBottom="14px" android:paddingTop="14px"
+	                  />
+	      
+	      <Button android:layout_height="wrap_content" android:layout_x="12px" android:layout_y="12px" android:layout_width="wrap_content" android:id="@+id/menuCustomButton" android:layout_marginTop="4dp" android:textStyle="bold"
+	        style="@style/MenuButton"  android:paddingBottom="14px" android:paddingTop="14px" android:text="Single Player"/>
+	      
+	      
+	      <Button android:layout_height="wrap_content" android:layout_x="12px" android:layout_y="12px" android:layout_width="wrap_content" android:id="@+id/multiplayerButton" android:layout_marginTop="4dp" android:textStyle="bold"
+	        style="@style/MenuButton"  android:paddingBottom="14px" android:paddingTop="14px" android:text="Multiplayer"/>
+	      
+	      
+	
+	      <LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_marginTop="10px" android:orientation="vertical" android:gravity="center"
+	      >
+	        
+	        
+	        <Button android:id="@+id/settingsButton" android:layout_height="wrap_content" android:text="Settings" android:layout_width="wrap_content"
+	          style="@style/MenuButton" android:singleLine="true"></Button>
+	        
+	        <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/helpButton" android:layout_marginTop="4dp" android:textStyle="bold"
+	        style="@style/MenuButton"   android:text="Help" android:singleLine="true"/>
+	      
+	      
+	        
+	        <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/modsButton" android:layout_marginTop="4dp" android:textStyle="bold"
+	        style="@style/MenuButton"   android:text="Mods" android:singleLine="true"/>
+	      
+	        
+	        <Button android:id="@+id/exitgameButton" android:layout_height="wrap_content" android:text="Exit" android:layout_width="wrap_content" android:layout_marginTop="10dip"
+	          style="@style/MenuButton" android:visibility="gone"></Button>
+	        
+	       
+	      </LinearLayout>
+	    
+	    
+	    
+	    </LinearLayout>
+	  
+	  
+  
+    </LinearLayout>
+  
+  </LinearLayout>
+
+
+
+</ScrollView>
+
+
+</RelativeLayout>
+
+

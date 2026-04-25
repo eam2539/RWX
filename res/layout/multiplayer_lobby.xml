@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:f="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/backrepeat"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:scrollbarAlwaysDrawVerticalTrack="true" android:id="@+id/mainScrollView" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="10dip" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="i:menus.lobby.usernameLabel"
+                android:textColor="#00D41F"
+                android:textStyle="bold" >
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center" >
+
+                <EditText
+                    android:id="@+id/networkPlayerName"
+                    android:layout_width="250dip"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:text="Unnamed" android:maxLines="1"
+                    android:imeOptions="flagNoExtractUi" android:maxLength="20" >
+                </EditText>
+            </LinearLayout>
+
+
+
+            <com.corrodinggames.rts.appFramework.FlowLayout android:layout_height="wrap_content" android:layout_width="wrap_content"
+                android:gravity="center" f:horizontalSpacing="6dip" f:verticalSpacing="6dip" android:paddingTop="6dip">
+
+            <!-- 
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="10dip" >
+            -->
+              
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dip"
+                    android:background="@drawable/rounded_border"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingBottom="5dip"
+                    android:paddingLeft="23dip"
+                    android:paddingRight="23dip"
+                    android:paddingTop="10dip" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="i:menus.lobby.directJoinHeader"
+                        android:textColor="@color/frametitlecolour"
+                        android:textStyle="bold" >
+                    </TextView>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="10dip" >
+
+                        <EditText
+                            android:id="@+id/joinIpAddress" android:maxLines="1"
+                            android:layout_width="200dip"
+                            android:layout_height="wrap_content"
+                            android:hint="i:menus.lobby.joinGameHint" 
+                            android:imeOptions="flagNoExtractUi" >
+
+                            <requestFocus>
+                            </requestFocus>
+                        </EditText>
+
+                        <Button
+                            android:id="@+id/joinButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="i:menus.lobby.button.joinGame" 
+                            android:textSize="16sp" 
+                            >
+                            
+                        </Button>
+                        
+			      
+       		     	    <Button
+       		     	        android:text="i:menus.battleroom.button.joinBluetooth"
+       		     	        android:layout_height="wrap_content"
+       		     	        android:layout_width="wrap_content"
+       		     	        android:id="@+id/battleroom_joinBluetoothButton">
+       		     	        
+       		     	    </Button>
+                        
+                        
+                        
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dip"
+                    android:background="@drawable/rounded_border"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingBottom="5dip"
+                    android:paddingLeft="23dip"
+                    android:paddingRight="23dip"
+                    android:paddingTop="10dip" android:minWidth="60dp" >
+
+                    <!--  <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="i:menus.lobby.hostHeader"
+                        android:textColor="@color/frametitlecolour"
+                        android:textStyle="bold" >
+                    </TextView> -->
+
+                    <Button
+                        android:id="@+id/hostButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dip"
+                        android:text="i:menus.lobby.button.hostNewGame" 
+                        android:textSize="16sp" android:minWidth="20dp"
+                        android:maxLines="1"
+                        >
+                    </Button>
+                    
+                    <Button
+                        android:id="@+id/watchReplayButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dip"
+                        android:text="i:menus.singlePlayer.loadReplay" 
+                        android:textSize="16sp" android:minWidth="20dp"
+                        android:maxLines="1"
+                        >
+                    </Button>
+                    
+                </LinearLayout>
+            
+            <!-- </LinearLayout> -->
+            </com.corrodinggames.rts.appFramework.FlowLayout>
+            
+            
+            <!-- android:visibility="gone" -->
+            
+             <TextView
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="i:menus.lobby.activeGamesHeader"
+                 android:paddingTop="10dip"
+                 android:textColor="@color/frametitlecolour"
+                 android:textStyle="bold" >
+             </TextView>
+            
+            
+            
+            <!-- android:visibility="gone" -->
+
+            <com.corrodinggames.rts.appFramework.ExpandedListView
+                android:id="@+id/foundServersList"
+                android:layout_width="300dip"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:scrollbars="none"
+                android:visibility="gone" >
+            </com.corrodinggames.rts.appFramework.ExpandedListView>
+            
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                fillViewport="true"
+                 >
+                
+                <TableLayout
+                    android:id="@+id/gameListTable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dip"
+                    android:layout_marginBottom="15dip"
+                    
+                    
+                    android:layout_weight="1"
+                    >
+                    <!--  TableLayout was: android:layout_gravity="center_horizontal" in 1.14 -->
+                    
+                    <TableRow
+                        android:id="@+id/gameListHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="i:menus.lobby.listheading.state"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+
+                        <!-- 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="IP"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+ 						-->
+ 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="i:menus.lobby.listheading.host"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                        
+						<TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="i:menus.lobby.listheading.playerCount"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="i:menus.lobby.listheading.map"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="i:menus.lobby.listheading.version"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="i:menus.lobby.listheading.open"
+                            android:gravity="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                    </TableRow>
+
+                    <TableRow 
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        
+                        <TextView
+                            android:id="@+id/loadingTextView"
+                            android:layout_span="6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape"
+                            android:padding="5dp"
+                            android:gravity="center"
+                            android:text="...LOADING..."
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                    </TableRow>
+                        
+                    <TableRow android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:drawable/list_selector_background"
+                        android:clickable="true" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape"
+                            android:padding="5dp"
+                            android:text="TextView test TextView"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                        
+					    <!-- 
+                        <TextView android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape"
+                            android:padding="5dp"
+                            android:text="124.145.156.145"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+						-->
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape"
+                            android:padding="5dp"
+                            android:text="Luke TextView TextView TextView"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                        
+						<TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape"
+                            android:padding="5dp"
+                            android:text="3\8"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                        
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape"
+                            android:padding="5dp"
+                            android:text="Large Ice Outcrop TextView TextView TextView TextView TextView"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape"
+                            android:padding="5dp"
+                            android:text="0.89"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/cell_shape"
+                            android:padding="5dp"
+                            android:text="110"
+                            android:textAppearance="?android:attr/textAppearanceMedium" >
+                        </TextView>
+                    </TableRow>
+                </TableLayout>
+            </HorizontalScrollView>
+            
+            
+            <Button
+                 android:id="@+id/refreshServersButton"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text="i:menus.lobby.button.refresh" >
+             </Button>
+            
+            
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

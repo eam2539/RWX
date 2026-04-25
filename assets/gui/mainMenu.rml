@@ -1,0 +1,454 @@
+<html>
+	<head>
+		<title>Main</title>
+		<link rel="stylesheet" type="text/css" href="rkt.rcss"/>
+		<link rel="stylesheet" type="text/css" href="common.rcss"/>
+		<link type="text/rcss" href="forms.rcss"/>
+		<style>
+			
+			body
+			{
+				width: 100%;
+				
+				
+				
+				height: 100%;
+		  }
+			
+			.menuCenter
+			{
+			  
+			}
+			
+			.menuCenterInner
+			{
+			  position:relative;
+			  top:50%;
+			  /*
+			  1.13.3
+			  height: 625px;
+			  margin-top:-312px;
+			  */
+			  
+			  height: 525px;
+			  margin-top:-262px;
+			  
+			}
+			
+			.mainButtons button
+			{
+			  font-size: 35;
+			}
+			
+			.mainButtons button.needsUnicodeFont
+      {
+        font-size: 27;
+      }
+
+			.title
+			{
+			  display:block;
+			  margin: 0 auto;
+			  width:362px;
+			  height:143px;
+			  
+			  
+			}
+			
+			.background
+			{
+			  background:rgba(255,255,255,0);
+			}
+			
+
+			.mainButtons button
+			{
+			  
+			  /*color:black;*/
+
+        
+			  /*header-font-effect: outline;*/
+        /*header-width: 2px;*/
+        
+        /*
+        header-font-effect: shadow;
+        header-color: gray;
+        header-offset: 2px 2px;
+        */
+        
+        /*header-color: rgba(255,255,255,128);*/
+        
+        
+        header-width: 2px;
+        
+        color:rgba(0,0,0,250);
+        header-color: rgba(255,255,255,108);
+        
+        
+        font-size: 37;
+        font-weight:bold;
+        
+        
+        /*
+        header-font-effect: shadow;
+        header-color: rgba(170,170,170,128);;
+        header-offset: 2px 2px;
+        */
+        
+        line-height:1.1em;
+        
+        
+        /*display:block;*/
+        
+        /*
+        border-style: solid;
+			  border-width: 2px;
+			  border-color: green;
+			  */
+			  
+			  display:block;
+			  width:auto;
+			}
+			
+			/*
+			.mobile .mainButtons button
+			{
+			  font-size: 42;
+			}
+			*/
+			
+			.mainButtons button.hide
+			{
+			  display:none; /* repeat */
+			}
+			
+			
+			.mainButtons button:hover p
+      {
+        color:rgba(180,20,20,255);
+        header-color: rgba(255,255,255,88);
+        header-width: 3px;
+        
+        color:red;
+        
+        
+        
+        
+      }
+			
+			
+			
+			.mainButtons button .clone
+			{
+			  position:relative;
+			  height:0;
+			  
+			  header-font-effect: shadow;
+        header-color: rgba(0,0,0,90);
+        header-offset: 7px 7px;
+			  
+			  header-width: 2px;
+        
+			  color:rgba(180,20,20,0);
+			  
+			  margin:0;
+			  padding:0;
+			  
+			  z-index:-1;
+			  
+			  /*header-color: rgba(0,0,0,0);*/
+			  
+			}
+			
+			.mainButtons button:hover p.clone
+			{
+			
+			  /*header-color: rgba(0,0,0,120);
+			  
+			  header-offset: 10px 10px;
+			  
+			  font-size: 37;*/
+			}
+			
+			
+			.mainButtons button.notInDemo
+			{
+			  color: rgba(50,50,50,170);
+			  header-color: rgba(0,0,0,0);
+			  
+			  
+			}
+			
+			.buttonSpacer
+			{
+			  padding:4px;
+			}
+			
+			.sizeRestrict
+			{
+			  /*width:50px;*/
+			  
+			  margin: auto;
+			  width:320px;
+			}
+			
+			.sizeRestrict button
+			{
+			  /*border-style: solid;
+			  border-width: 2px;
+			  border-color: green;*/
+			}
+			
+			.versionNumber
+			{
+			  font-size: 20;
+			  display:block;
+			  float:left;
+			  position:absolute;
+			  bottom:0;
+			  left:0;
+			  text-align:right;
+			  padding:10px;
+			}
+			
+			
+			.updateNews
+			{
+			   
+			}
+			
+			.updateNewsWrap
+			{
+        display:block;
+			  position:absolute;
+			  bottom:0;
+			  right:0;
+			  z-index:-1;
+			  
+			  font-size: 16;
+			  
+			  text-align:right;
+			  
+			  overflow-y: visible;
+			  
+			  padding:10px;
+			  
+			  width:375px;
+			  /*height:270px;*/
+			  
+			  /*height:350px;*/
+			  
+			  float:right;
+			  
+			  /*margin-right:15px;*/
+			  
+			  
+			  text-align:center;
+			  
+			  
+			  
+			  
+			}
+			
+			.updateNews
+			{
+			  background-color: rgba(0,0,0,70);
+			  
+        
+			}
+			
+			.alertText
+			{
+			  display:block;
+			  position:absolute;
+			  top:0;
+			  right:0;
+			}
+			
+			.updateLog
+			{
+			  text-align:center;
+			  font-size: 14;
+			  border-style: solid;
+        border-width: 1px;
+        border-color: rgba(128,128,128,128);
+        
+        margin:2px;
+			}
+			
+			.updateLogTitle
+			{
+			  font-size: 18;
+			  font-weight:bold;
+			  
+			}
+			
+			.versionNumberHeader
+			{
+			  display:block;
+			  position:absolute;
+			  top:0;
+			  right:0;
+			  text-align:right;
+			  
+			  font-size: 14;
+			}
+			
+		</style>
+	</head>
+	<body onshow="onShowNewScreen();">
+		
+		<!--<div class="versionNumber"></div>-->
+		
+		<div _class="${hideUnless(isIOS())}">
+		  <div class="versionNumberHeader" >
+		    ${getVersionName()}
+		  </div>
+		</div>
+		
+		<div >
+	    <div class="updateNewsWrap" >
+	      <div class="updateNews" >
+	        Update news - ${getVersionName()}
+	        
+	        <div id="iosNews" _class="${hideUnless(isIOS())}">
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              New units: Spy Drone, Heavy AA Ship, shaders, per player overrides, lots of new features, and fixes.
+	            </div>
+	          </div>
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              New features, better performance, lots of fixes.
+	            </div>
+	            
+	          </div>
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              Released on iOS!
+	            </div>
+	            Email or message me on discord with any bugs or issues you find. This is the first release on iOS so please be patient while I get problems fixed.
+	          </div>
+	          
+	        </div>
+	        
+	        <div id="pcNews" _class="${hideUnless(isDesktop())}">
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              New units, shaders, performance and features.
+	            </div>
+	            Added Heavy anti-air mech, Spy Drone units. Shader effects (enable in settings). Over 100% faster rendering (in tests with high numbers of units). New modding features such as streaming resources, 3d voxel units, decals, easier logic, etc.
+	          </div>
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              New units, maps and features.
+	            </div>
+	            Large Modular Spider starting unit. Lots of new units. Better performance. Tons of new modding features. iOS version out very soon (with android and PC crossplay).
+	          </div>
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              Faster, new modding features, handles more mods
+	            </div>
+	            Reduced memory use loading larger maps, 2x-3x pathfinding performance, lots of new mods features including creating new resource types
+	          </div>
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              New Units & Maps! Much more Modding! Faster!
+	            </div>
+	            8 new units, 3 maps and 1 mission. Optimisations to handle 10,000+ units and large maps. Smarter AI. Huge set of modding features added. Reduced memory usage. Patrol/Guard orders.
+	          </div>
+	          
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              Workshop support added for new Maps & Units!
+	            </div>
+	            Also new units, queue lines of buildings, performance boost, fixes, and many more graphical effects.
+	          </div>
+	          
+	          <!--
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              Multiplayer Replays! More Mechs!
+	            </div>
+	            Watch back your multiplayer games. More mechs added. New mission - spider battle. Lots of optimisations.
+	          </div>
+	          
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              Shared control, Mech units, Lots more!
+	            </div>
+	            Shared control option. Mech factory added with a set of initial mechs. AI and path finding fixes. New placement system. Better mod support. Lots more.
+	          </div>
+	          
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              Mac Support, Game speed, Larger unit cap
+	            </div>
+	            Mac support added. Doubled unit cap in singleplayer. Fixed click and drag actions.
+	          </div>
+	          
+	          
+	          <div class="updateLog">
+	            <div class="updateLogTitle">
+	              Sandbox editor has been added
+	            </div>
+	            Saves from the sandbox can be shared and played in singleplayer or multiplayer.
+	          </div>
+	          -->
+	        </div>
+	      </div>
+	    </div>
+		</div>
+		
+		<div class="menuCenterOuter"><div class="menuCenterInner">
+		
+		  <div class="background">
+		    <div class="mainButtons">
+		      
+		      <!--<h1>Rusted Warfare</h1>-->
+		      ${ifCondition(isVersionBeta(),'BETA VERSION','')}
+		      
+		      <img class="title" src="drawable:title.png" />
+		      <div class="sizeRestrict">
+		        <div class="">
+		          
+		          <button class="stealFocus"></button>
+		          <div class="buttonSpacer"></div>
+		          <button childclone onclick="resumeNonMenu()" _class="${hideUnless(canResume())}" id="resumeButton" ><p>${i:menus.front.continue}</p></button>
+		          <div class="buttonSpacer"></div>
+		          <button childclone onclick="openAfterHelpPopup('singleplayer.rml')" id="singlePlayerButton"><p>${i:menus.front.singlePlayer}</p></button>
+		          <div class="buttonSpacer"></div>
+	            <button childclone onclick="openIfNotDemo('multiplayerLobby.rml', null, 'Sorry multiplayer is not available in the demo')" id="multiplayerButton" _class="${fullVersionOnlyStyle()}"><p>${i:menus.front.multiplayer}</p></button>
+	            <div class="buttonSpacer"></div>
+	            <button childclone onclick="open('settingsPlaceholder.rml')" id="settingsButton" ><p>${i:menus.front.settings}</p></button>
+	            <div class="buttonSpacer"></div>
+	            <button childclone onclick="open('mods.rml')" id="modsButton" _class="${hideUnless(usingMods())}"><p>${i:menus.front.mods}</p></button>
+	            <div class="buttonSpacer"></div>
+	            <button childclone onclick="open('help.rml')"><p>${i:menus.front.help}</p></button>
+	            <div class="buttonSpacer"></div>
+	            <button childclone onclick="exit()" id="exitButton" _class="${hideUnless(isDesktop())}" ><p>${i:menus.front.exit}</p></button>
+	            
+	            <button style="display:none;" onclick="askQuitGame()" click_on_escape=""><p>Escape_button</p></button>
+	            
+	            
+	          </div>
+	        </div>
+	        
+	      </div>
+		
+		
+		  </div>
+		</div></div>
+		
+	</body>
+</html>

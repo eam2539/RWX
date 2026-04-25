@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:background="@drawable/backrepeat" android:layout_height="match_parent">
+    
+    
+
+    
+<ScrollView  android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+    <LinearLayout  android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center" android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#222"
+            android:text="TEMP"
+            android:textColor="#FFF"
+            android:textSize="7pt" />
+         
+         <LinearLayout android:layout_height="wrap_content" android:orientation="vertical"
+            android:gravity="center" android:padding="10dip" android:paddingTop="20dip" android:background="@drawable/rounded_border" android:layout_margin="5dip" android:layout_width="wrap_content">
+           
+          <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:text="&lt;&lt; Select Map &gt;&gt;" android:textColor="@color/frametitlecolour"></TextView>
+        
+			
+							<LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="center">
+							
+								<TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:text="Map:" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:textStyle="bold"></TextView>
+					      
+								<Spinner android:layout_height="wrap_content" android:id="@+id/missionstarter_map" android:layout_width="wrap_content" android:layout_gravity="center_vertical" android:minWidth="70dip"></Spinner>
+				       </LinearLayout>
+				    
+				    
+								   
+				   
+			  </LinearLayout>
+         
+         
+         
+				   
+			   <LinearLayout android:layout_height="wrap_content" android:orientation="vertical"
+            android:gravity="center" android:padding="10dip" android:paddingTop="20dip" android:background="@drawable/rounded_border" android:layout_margin="5dip" android:layout_width="wrap_content">
+			         
+			        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:text="&lt;&lt; Player List &gt;&gt;" android:textColor="@color/frametitlecolour"></TextView>
+			      
+			        <Spinner android:id="@+id/missionstarter_numberofplayers" android:layout_width="match_parent" android:layout_height="wrap_content"></Spinner>
+
+			        <EditText android:layout_height="wrap_content" android:id="@+id/editText1" android:layout_width="match_parent" android:inputType="number">
+			            <requestFocus></requestFocus>
+			        </EditText>
+			        <ToggleButton android:text="ToggleButton" android:id="@+id/toggleButton1" android:layout_width="wrap_content" android:layout_height="wrap_content"></ToggleButton>
+			        
+        </LinearLayout>
+         
+         
+			
+			
+			
+		</LinearLayout>
+    
+</ScrollView>
+   
+   
+</LinearLayout>

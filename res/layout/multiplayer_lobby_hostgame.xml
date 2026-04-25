@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:background="#000" android:layout_height="match_parent" android:padding="15dip" android:paddingTop="2dip">
+    
+
+<ScrollView android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+    <LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="left" android:orientation="vertical">
+        
+         <TextView android:textSize="10sp" android:paddingBottom="5dip" android:layout_width="wrap_content" android:text="i:menus.hostgame.info" android:layout_height="wrap_content" android:layout_gravity="center_vertical"></TextView>
+         
+         <!-- 
+         <CheckBox
+            android:id="@+id/showPublicly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="i:menus.hostgame.publicCheckbox" >
+         </CheckBox>
+         -->
+         
+         <CheckBox
+            android:id="@+id/useMods"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="i:menus.hostgame.modsLabel" >
+         </CheckBox>
+	        
+         <LinearLayout android:layout_height="wrap_content" android:layout_width="wrap_content">
+           <TextView android:textSize="12sp" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:text="i:menus.hostgame.passwordLabel" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:textStyle="bold"></TextView>
+	         
+	         <EditText
+	            android:id="@+id/gamePassword"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:ems="8">
+	         </EditText>
+        </LinearLayout>
+			
+        
+        <LinearLayout android:paddingTop="5dip" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <Button android:textSize="12sp" android:layout_margin="1dip" android:text="i:menus.hostgame.startButtonPublic" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/hostgame_startPublic"></Button>
+            
+            <Button android:textSize="12sp" android:layout_margin="1dip" android:text="i:menus.hostgame.startButtonPrivate" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/hostgame_startPrivate"></Button>
+            
+            <Button android:textSize="12sp" android:layout_margin="1dip" android:text="i:menus.hostgame.cancelButton" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/hostgame_cancel"></Button>
+        </LinearLayout>
+        
+		</LinearLayout>
+    
+</ScrollView>
+
+</LinearLayout>

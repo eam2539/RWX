@@ -1,0 +1,35 @@
+<!--
+<!DOCTYPE html>
+-->
+
+
+<div>
+  
+  <div class="panelCloseButton" onclick="closePopup()"  click_on_escape=""/>
+
+
+  <input class="hide" id="team_id" type="hidden" />
+  
+
+  <div class="selectDiv bigger">
+    <label>Team Layout</label>
+    <select id="teamLayout" data-settings>
+      <option selected value="2t">2 Teams (eg 5v5)</option>
+      <option  value="3t">3 Teams (eg 1v1v1)</option>
+      <option  value="FFA">No teams (FFA)</option>
+      <option  value="spectators">All spectators</option>
+    </select>
+  </div>
+  
+  <div id="mainButtons" class="mainBoxButtons">
+    
+    <button class="boxButton" id="button_apply" onclick="mp.teamsSet_apply();  closePopup();">${i:menus.battleroom.playerpopup.apply}</button>
+    
+    <button class="boxButton" id="button_back"  onclick="closePopup();">${i:menus.battleroom.playerpopup.cancel}</button>
+    
+  </div>
+
+
+</div>
+
+

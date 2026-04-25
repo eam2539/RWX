@@ -1,0 +1,28 @@
+<!--
+<!DOCTYPE html>
+-->
+
+
+<div>
+  
+  
+  
+  <p id="message">Connecting...</p>
+  
+  
+  <!-- -->
+  
+  
+  <div class="mainButtons">
+    
+    <!--
+    <button id="button_apply" onclick="keyBindingPopup_apply(false);closePopup();">${i:menus.battleroom.playerpopup.apply}</button>
+    -->
+    <button id="button_cancel"  onclick="cancelJoinServer();">Cancel</button>
+    
+  </div>
+
+
+</div>
+
+

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:background="#000" android:layout_height="match_parent" android:padding="15dip">
+    
+
+<ScrollView android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+    <LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="left" android:orientation="vertical">
+        
+	   	<Spinner android:theme="@style/SpinnerTheme"
+	    android:visibility="gone"
+	    android:id="@+id/aiDifficulty"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="8dip"
+	    android:entries="@array/aidifficulty_array"
+	    android:prompt="@string/aidifficulty_prompt"
+	    android:layout_gravity="center"
+	    
+	    />
+   
+     <Spinner android:theme="@style/SpinnerTheme"
+          android:visibility="gone"
+          android:id="@+id/aiCount"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:entries="@array/skirmish_ai_count"
+          android:prompt="@string/skirmish_ai_count_prompt"
+          android:layout_gravity="center"
+          android:layout_marginLeft="10dip"
+          />
+      
+      <Spinner android:theme="@style/SpinnerTheme"
+            android:visibility="gone"
+            android:id="@+id/gameMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/skirmish_game_mode"
+            android:prompt="@string/skirmish_game_mode_prompt"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dip"
+            />
+    
+
+        
+		    
+        <LinearLayout android:paddingTop="5dip" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <Button android:text="Start" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/applyButton"></Button>
+            
+            <Button android:text="Advanced" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/advancedButton"></Button>
+        
+            <Button android:text="Cancel" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/cancelButton"></Button>
+        
+        
+        </LinearLayout>
+        
+	</LinearLayout>
+    
+</ScrollView>
+   
+   
+</LinearLayout>

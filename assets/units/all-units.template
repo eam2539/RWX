@@ -1,0 +1,10 @@
+
+[core]
+
+
+#strictLevel:1 = Error on repeated keys, and missing build links
+
+strictLevel: 1
+
+
+

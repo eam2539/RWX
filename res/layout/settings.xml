@@ -1,0 +1,767 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/backrepeat"
+    android:orientation="vertical" >
+
+<ScrollView android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <!-- Dummy item to prevent focus -->
+    <LinearLayout
+    android:focusable="true" android:focusableInTouchMode="true"
+    android:layout_width="0px" android:layout_height="0px"/>
+
+    
+    
+    <!--=============== Gameplay  ====================-->
+    
+    <TextView
+        android:text="i:menus.settings.heading.gameplay"
+        style="@style/SettingsHeader"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="15px" />
+    
+    <LinearLayout
+	    style="@style/SettingsSectionGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical" >
+	
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dip"
+	        android:text="i:menus.settings.option.aiDifficulty" />
+	
+	    <Spinner  android:theme="@style/SpinnerTheme"
+	        android:id="@+id/aiDifficulty"
+	        
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="8dip"
+	        android:entries="@array/aidifficulty_array"
+	        android:prompt="@string/aidifficulty_prompt"
+	        
+	        />
+	
+	
+	     
+	
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dip"
+	        android:text="i:menus.settings.option.scrollSpeed" />
+		
+		<TextView
+	        android:id="@+id/scrollSpeedText"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dip"
+	        android:text="xx%" >
+	    </TextView>
+	    
+	    <SeekBar
+	        android:id="@+id/scrollSpeed"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginBottom="8dip"
+	        android:layout_marginLeft="8dip"
+	        android:layout_marginRight="8dip"
+	        android:max="400"
+	        android:minWidth="350dip"
+          android:maxWidth="450dip"
+	        android:progress="70" />
+	    
+    	
+	    <CheckBox
+	        android:id="@+id/settingsShowUnitGroups"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.unitGroupInterface" />
+	    
+	    <CheckBox
+	        android:id="@+id/settingsGestureZoom"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.zoomGesture" >
+	    </CheckBox>
+    	
+	    <CheckBox
+	        android:id="@+id/settingsUseCircleSelect"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.useCircleSelect" >
+	    </CheckBox>
+	    
+	    
+	    <CheckBox
+	        android:id="@+id/settingsSmartSelection"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.smartSelection" >
+	    </CheckBox>
+	    
+	    
+	    <CheckBox
+	        android:id="@+id/settingsQuickRally"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.quickRally" >
+	    </CheckBox>
+	    
+	    
+	    
+      <CheckBox
+          android:id="@+id/settingsDoubleClickToAttackMove"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="false"
+          android:text="i:menus.settings.option.doubleClickToAttackMove" >
+      </CheckBox>
+      
+	    
+	    
+	    <CheckBox
+	        android:id="@+id/settingsMouseSupport"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.mouseSupport" >
+	    </CheckBox>
+	    
+	    <CheckBox
+	        android:id="@+id/settingsKeyboardSupport"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.keyboardSupport" >
+	    </CheckBox>
+	    
+	    
+	    <CheckBox
+	        android:id="@+id/settingsForceEnglish"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.forceEnglish" >
+	    </CheckBox>
+	    
+	    
+	    <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="10dip"
+          android:text="i:menus.settings.option.teamUnitCapSinglePlayer" />
+  
+      <Spinner android:theme="@style/SpinnerTheme"
+          android:id="@+id/teamUnitCapSinglePlayer"
+          
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="8dip"
+          android:entries="@array/unitcap_array"
+          android:prompt="@string/unitcap_prompt"
+          />
+      
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="10dip"
+          android:text="i:menus.settings.option.teamUnitCapHostedGame" />
+  
+      <Spinner  android:theme="@style/SpinnerTheme"
+          android:id="@+id/teamUnitCapHostedGame"
+          
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="8dip"
+          android:entries="@array/unitcap_array"
+          android:prompt="@string/unitcap_prompt"
+          />
+	    
+	    
+      </LinearLayout>
+		    
+	    <!--=============== Storage  ====================-->
+	    <TextView
+	        android:text="i:menus.settings.heading.storage"
+	        style="@style/SettingsHeader"
+	        android:layout_width="wrap_content" android:layout_height="wrap_content"
+	        android:layout_marginTop="15px" />
+		  
+		  <LinearLayout
+        style="@style/SettingsSectionGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical" >
+        
+	    <LinearLayout
+	      android:id="@+id/settingsStorageLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical" >
+	      
+	  
+	      <Button
+	          android:id="@+id/settingsSetupExternalFolder"
+	          android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:text="i:menus.externalStorage.button" >
+	      </Button>
+	      
+	      <TextView
+	          android:id="@+id/settingsExternalFolderInfo"
+	          android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:layout_marginLeft="10dip"
+	          android:text=""
+	          android:textColor="@color/notecolour" />
+	  
+	      <Spinner  android:theme="@style/SpinnerTheme"
+	          android:id="@+id/storageType"
+	          android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:layout_marginLeft="8dip"
+	          android:entries="@array/storageType_array"
+	          android:prompt="@string/storageType_prompt"
+	          />
+		    
+		    <TextView
+	          android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:layout_marginLeft="10dip"
+	          android:text="i:menus.externalStorage.internalNote"
+	          android:textColor="@color/notecolour" />
+		  
+		  </LinearLayout>
+		  
+		  
+      <CheckBox
+          android:id="@+id/settingsAutoSaveEnabled"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="false"
+          android:text="i:menus.settings.option.autoSaveEnabled" >
+      </CheckBox>
+	    
+	    
+    </LinearLayout>
+    
+    
+    
+    <!--=============== Audio  ====================-->
+    <TextView
+        android:text="i:menus.settings.heading.audio"
+        style="@style/SettingsHeader"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="15px" />
+  
+    <LinearLayout
+      style="@style/SettingsSectionGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical" >
+        
+      
+      <CheckBox
+          android:id="@+id/SettingsEnableSounds"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="true"
+          android:text="i:menus.settings.option.enableGameSounds" 
+          android:visibility="gone">
+      </CheckBox>
+      
+      <Button
+          android:id="@+id/settingsConfKeys"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Configure Keyboard"
+          android:visibility="gone" >
+      </Button>
+      
+      <!-- game volume -->
+      
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="10dip"
+          android:text="i:menus.settings.option.gameVolume" >
+      </TextView>
+
+      <TextView
+          android:id="@+id/gameVolumeText"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="10dip"
+          android:text="xx%" >
+      </TextView>
+      
+      <SeekBar
+          android:id="@+id/gameVolume"
+          
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="8dip"
+          android:layout_marginLeft="8dip"
+          android:layout_marginRight="8dip"
+          android:max="100"
+          android:minWidth="350dip"
+          android:maxWidth="450dip"
+          android:progress="50" >
+      </SeekBar>
+      
+      <!-- interface volume -->
+      
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="10dip"
+          android:text="i:menus.settings.option.interfaceVolume" >
+      </TextView>
+
+      <TextView
+          android:id="@+id/interfaceVolumeText"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="10dip"
+          android:text="xx%" >
+      </TextView>
+      
+      <SeekBar
+          android:id="@+id/interfaceVolume"
+          
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="8dip"
+          android:layout_marginLeft="8dip"
+          android:layout_marginRight="8dip"
+          android:max="100"
+          android:minWidth="350dip"
+          android:maxWidth="450dip"
+          android:progress="50" >
+      </SeekBar>
+      
+      <!-- music volume -->
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="10dip"
+          android:text="i:menus.settings.option.musicVolume" >
+      </TextView>
+
+      <TextView
+          android:id="@+id/musicVolumeText"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="10dip"
+          android:text="xx%" >
+      </TextView>
+      
+      <SeekBar
+          android:id="@+id/musicVolume"
+          
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="8dip"
+          android:layout_marginLeft="8dip"
+          android:layout_marginRight="8dip"
+          android:max="100"
+          android:minWidth="350dip"
+          android:maxWidth="450dip"
+          android:progress="50" >
+      </SeekBar>
+      
+    </LinearLayout>
+    
+    <!--=============== Graphics  ====================-->
+    
+	<TextView
+        android:text="i:menus.settings.heading.graphics"
+        style="@style/SettingsHeader"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="15px" />
+
+	<LinearLayout
+	    style="@style/SettingsSectionGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"  android:orientation="vertical" >
+		
+	    
+	    
+	    <CheckBox
+	        android:id="@+id/settingsBatterySaving"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.batterySaving" >
+	    </CheckBox>
+	    
+      <CheckBox
+          android:id="@+id/settingsHighRefreshRate"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="false"
+          android:text="i:menus.settings.option.highRefreshRate" >
+      </CheckBox>
+      
+	    <CheckBox
+          android:id="@+id/settingsUnlockedScreenRotation"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="false"
+          android:text="i:menus.settings.option.unlockedScreenRotation" >
+      </CheckBox>
+	    
+	    
+	    <CheckBox
+	        android:id="@+id/settingsShowUnitWaypoints"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.showUnitWaypoints" >
+	    </CheckBox>
+	
+	    <CheckBox
+	        android:id="@+id/settingsShowHp"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.alwayUnitHealth" >
+	    </CheckBox>
+	
+	    <CheckBox
+	        android:id="@+id/settingsShowUnitIcons"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.unitIcons" >
+	    </CheckBox>
+	    
+	    <CheckBox
+          android:id="@+id/settingsUseMinimapAllyColors"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="true"
+          android:text="i:menus.settings.option.useMinimapAllyColors" >
+      </CheckBox>
+      
+	    <CheckBox
+	        android:id="@+id/settingsZoomButton"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.zoomButton" >
+	    </CheckBox>
+    
+	    <CheckBox
+	        android:id="@+id/settingsImmersiveFullScreen"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.immersiveFullScreen" >
+	    </CheckBox>
+	    
+	    <CheckBox
+	        android:id="@+id/settingsRenderDoubleScale"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.halfResolution" >
+	    </CheckBox>
+	    
+	    <CheckBox
+	        android:id="@+id/settingsRenderClouds"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.renderClouds" >
+	    </CheckBox>
+	    
+      <CheckBox
+          android:id="@+id/settingsShowWarLogOnScreen"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="false"
+          android:text="i:menus.settings.option.showWarLogOnScreen" >
+      </CheckBox>
+      
+      
+      <CheckBox
+          android:id="@+id/settingsClassicInterface"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="false"
+          android:text="i:menus.settings.option.classicInterface" >
+      </CheckBox>
+	    
+	    
+	    <CheckBox
+          android:id="@+id/settingsNewRender"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="false"
+          android:text="i:menus.settings.option.androidOpenGL" >
+      </CheckBox>
+      
+      
+      <CheckBox
+          android:id="@+id/settingsShaderEffects"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="false"
+          android:text="i:menus.settings.option.shaderEffects" >
+      </CheckBox>
+      
+      <CheckBox
+          android:id="@+id/settingsTeamShaders"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:checked="false"
+          android:text="i:menus.settings.option.teamShaders" >
+      </CheckBox>
+      
+	    
+    </LinearLayout>
+    
+    
+    <!--=============== Developer  ====================-->
+    
+	<TextView
+        android:text="i:menus.settings.heading.developer"
+        style="@style/SettingsHeader"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="15px" />
+	
+	<LinearLayout
+	    style="@style/SettingsSectionGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical" >
+	
+	    
+	    <CheckBox
+	        android:id="@+id/settingsShowFps"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.showFps" >
+	    </CheckBox>
+	    
+	    
+      
+	    
+	    <CheckBox
+	        android:id="@+id/settingsSendReports"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.sendReports" >
+	    </CheckBox>
+	    
+	    
+      <Button
+            android:id="@+id/settingsDebugOptions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10px"
+            android:text="Set Debug Options"
+            android:textSize="16sp" android:minHeight="0dp" android:minWidth="0dp" >
+        </Button>
+	    
+   		<CheckBox
+	        android:id="@+id/settingsAllowGameRecording"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.videoRecord" />
+	    
+    </LinearLayout>
+    
+    
+
+    
+    <CheckBox
+        android:id="@+id/settingsRenderBackground"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="Render Background"
+        android:visibility="gone" >
+    </CheckBox>
+
+    <CheckBox
+        android:id="@+id/settingsRenderExtraLayers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="Render Extra Layers"
+        android:visibility="gone" >
+    </CheckBox>
+    
+    
+    
+    <TextView
+        android:text="i:menus.settings.heading.networking"
+        style="@style/SettingsHeader"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="15px" />
+    
+    <LinearLayout
+	    style="@style/SettingsSectionGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical" >
+   		
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content" >
+	        
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center_vertical"
+	            android:text="Port Number (default=5123): " >
+	        </TextView>
+	
+	        <EditText
+	          android:id="@+id/settingsNetworkPort"
+	          android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:layout_gravity="center_vertical"
+	          
+	          android:ems="10"
+	          android:inputType="number" 
+	          android:imeOptions="flagNoExtractUi"
+	          >
+	          
+	        </EditText>
+	        
+		        
+	        
+	        
+	    </LinearLayout>
+	    
+	    
+	    
+	    
+	    <CheckBox
+	        android:id="@+id/settingsUdpInMultiplayer"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="false"
+	        android:text="i:menus.settings.option.udpInMultiplayer"
+	        >
+	    </CheckBox>
+	    
+	    
+	    <CheckBox
+	        android:id="@+id/settingsSaveMultiplayerReplays"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="true"
+	        android:text="i:menus.settings.option.saveReplays" >
+	    </CheckBox>
+		  
+		  
+		  
+		  
+		  
+	    <CheckBox
+	        android:id="@+id/settingsShowMapPingsOnBattlefield"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="true"
+	        android:text="i:menus.settings.option.showMapPingsOnBattlefield" >
+	    </CheckBox>
+		  
+		  
+	    <CheckBox
+	        android:id="@+id/settingsShowMapPingsOnMinimap"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="true"
+	        android:text="i:menus.settings.option.showMapPingsOnMinimap" >
+	    </CheckBox>
+	    
+	    <CheckBox
+	        android:id="@+id/settingsShowPlayerChatInGame"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="true"
+	        android:text="i:menus.settings.option.showPlayerChatInGame" >
+	    </CheckBox>
+		  
+		  
+		  
+	    <CheckBox
+	        android:id="@+id/settingsReplaysShowRecordedChat"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="true"
+	        android:text="i:menus.settings.option.replaysShowRecordedChat" >
+	    </CheckBox>
+		  
+		  
+    </LinearLayout>
+    
+    
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15px" >
+
+        <Button
+            style="@style/SettingsMainButtons"
+            android:id="@+id/settingsDone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="i:menus.settings.button.done"
+            android:textSize="16sp" android:minHeight="0dp" android:minWidth="0dp" >
+        </Button>
+
+        <Button
+            style="@style/SettingsMainButtons"
+            android:id="@+id/settingsCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10px"
+            android:text="i:menus.settings.button.cancel"
+            android:textSize="16sp" android:minHeight="0dp" android:minWidth="0dp" >
+        </Button>
+
+        <Button
+            style="@style/SettingsMainButtons"
+            android:id="@+id/settingsCredits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20px"
+            android:text="i:menus.settings.button.credits"
+            android:textSize="16sp" android:minHeight="0dp" android:minWidth="0dp" >
+        </Button>
+        
+        
+        <Button
+            style="@style/SettingsMainButtons"
+            android:id="@+id/settingsMods"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20px"
+            android:text="i:menus.front.mods"
+            android:textSize="16sp" android:minHeight="0dp" android:minWidth="0dp" >
+        </Button>
+        
+        
+    </LinearLayout>
+</LinearLayout>
+
+</ScrollView>
+
+
+</LinearLayout>

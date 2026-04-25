@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:background="#000" android:layout_height="match_parent" android:padding="15dip">
+    
+
+<ScrollView android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+    <LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="left" android:orientation="vertical">
+      
+     <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginLeft="10dip"
+         android:text="i:menus.battleroom.gameoptions.aiDifficulty" />
+       
+    <Spinner  android:theme="@style/SpinnerTheme"
+        android:id="@+id/netgameoptions_aiDifficulty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dip"
+        android:entries="@array/aidifficulty_array"
+        android:prompt="@string/aidifficulty_prompt"
+        />
+        
+      
+      
+    <TextView
+            android:id="@+id/startingUnitsText"
+            android:paddingTop="5dip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:text="i:menus.battleroom.gameoptions.startingUnits" />
+    
+    <Spinner  android:theme="@style/SpinnerTheme"
+        android:id="@+id/startingUnits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dip"
+        android:entries="@array/startingUnits_array"
+        android:prompt="@string/startingUnits_prompt"
+        />
+      
+      
+        
+        
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dip"
+	        android:text="i:menus.battleroom.gameoptions.fogMode" />
+	
+	    <Spinner  android:theme="@style/SpinnerTheme"
+	        android:id="@+id/fogMode"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="8dip"
+	        android:entries="@array/fog_array"
+	        android:prompt="@string/fog_prompt"
+	        />
+	    
+        <CheckBox
+            android:id="@+id/revealedMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="i:menus.battleroom.gameoptions.startRevealed" >
+        </CheckBox>
+		
+        <TextView
+            android:id="@+id/startingCreditsText"
+            android:paddingTop="5dip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:text="i:menus.battleroom.gameoptions.startingCredits" />
+    
+        <Spinner  android:theme="@style/SpinnerTheme"
+            android:id="@+id/startingCredits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dip"
+            android:entries="@array/credits_array"
+            android:prompt="@string/credits_prompt"
+            />
+		
+		
+		
+		<TextView
+            android:id="@+id/incomeMultiplierText"
+            android:paddingTop="5dip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:text="i:menus.battleroom.gameoptions.incomeMultiplier" />
+    
+        <Spinner  android:theme="@style/SpinnerTheme"
+            android:id="@+id/incomeMultiplier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dip"
+            android:entries="@array/income_array"
+            android:prompt="@string/income_prompt"
+            />
+		
+        
+		<TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="10dip"
+          android:text="i:menus.battleroom.gameoptions.setTeamLayout" />
+        
+    <Spinner  android:theme="@style/SpinnerTheme"
+        android:id="@+id/netgameoptions_setTeams"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dip"
+        android:entries="@array/setTeams_array"
+        android:prompt="@string/setTeams_prompt"
+        />
+        
+        <!-- 
+		    <CheckBox
+            android:id="@+id/doubleIncome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="i:menus.battleroom.gameoptions.doubleIncome" >
+        </CheckBox>
+		    -->
+		 
+		    <CheckBox
+            android:id="@+id/noNukes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="i:menus.battleroom.gameoptions.noNukes" >
+        </CheckBox>
+		    
+		    <CheckBox
+            android:id="@+id/sharedControl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="i:menus.battleroom.gameoptions.sharedControl" >
+        </CheckBox>
+		    
+		    
+        <LinearLayout android:paddingTop="5dip" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <Button android:text="i:menus.battleroom.gameoptions.apply" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/applyButton"></Button>
+            <Button android:text="i:menus.battleroom.gameoptions.cancel" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/cancelButton"></Button>
+        
+        
+        </LinearLayout>
+        
+	</LinearLayout>
+    
+</ScrollView>
+   
+   
+</LinearLayout>

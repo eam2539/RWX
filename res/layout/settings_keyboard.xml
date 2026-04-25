@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent"
+    android:background="@drawable/backrepeat"
+  >
+
+
+<ScrollView android:id="@+id/ScrollView01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+
+<LinearLayout android:id="@+id/LinearLayoutLuke01" android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent">
+
+
+
+<TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Configure Keyboard" android:textSize="18px"></TextView>
+
+
+<LinearLayout android:id="@+id/LinearLayout06" android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent"><LinearLayout android:id="@+id/LinearLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Action: Enter" android:id="@+id/settingsKAction"></Button>
+</LinearLayout><LinearLayout android:id="@+id/LinearLayout02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Conf" android:id="@+id/settingsKJump"></Button></LinearLayout><LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/Settings" android:layout_gravity="center"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Conf" android:id="@+id/settingsKLeft"></Button></LinearLayout><LinearLayout android:id="@+id/LinearLayout04" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Conf" android:id="@+id/settingsKRight"></Button></LinearLayout><LinearLayout android:id="@+id/LinearLayout03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Conf" android:id="@+id/settingsKDown"></Button></LinearLayout></LinearLayout>
+
+
+
+<LinearLayout android:id="@+id/LinearLayout05" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10px" android:layout_marginBottom="10px"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/settingsKDone" android:text="Save"></Button>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cancel" android:id="@+id/settingsKCancel"></Button>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Defaults" android:id="@+id/settingKDefaults"></Button>
+</LinearLayout>
+
+</LinearLayout>
+</ScrollView>
+</LinearLayout>

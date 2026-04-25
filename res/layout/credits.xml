@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent" android:background="#000">
+
+<ScrollView android:id="@+id/ScrollView01" android:layout_height="wrap_content" android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true">
+
+<LinearLayout android:id="@+id/LinearLayout01" android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="fill_parent">
+
+
+<TextView  android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/creditsText" android:text=""></TextView><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Close" android:layout_marginLeft="10px" android:id="@+id/creditsClose"></Button>
+
+
+
+
+</LinearLayout>
+</ScrollView>
+
+
+</LinearLayout>

@@ -1,0 +1,500 @@
+<rml>
+	<head>
+		<title>Mods</title>
+		<link type="text/rcss" href="rkt.rcss"/>
+		<link type="text/rcss" href="common.rcss"/>
+		<link type="text/rcss" href="forms.rcss"/>
+		<style>
+			
+			body
+	    {
+		    /*width: 680px;*/
+		    
+		    width: 80%;
+		    height: 525px;
+		    /*height: 100%;*/
+		    
+		    
+		    font-size: 25;
+		    
+		    
+		    height: 90%;
+		    
+		  }
+			
+			
+			.background
+      {
+        /*background:rgba(205,205,205,150);*/
+        
+        background:rgba(205,205,205,0);
+        
+        /*padding:13px;
+        padding-right:40px;
+        */
+        
+      }
+      
+      
+		  h2
+	    {
+	      font-size: 35;
+        font-weight:bold;
+        
+        text-align:center;
+        
+        display:block;
+        
+        padding-top:15px;
+	    }
+	
+      h3
+      {
+        font-size: 30;
+	      color:black;
+	      font-weight:bold;
+	      
+	      header-font-effect: shadow;
+	      
+	      header-width: 2px;
+	      
+        header-offset: 2px 2px;
+        header-color: gray;
+        
+        display:block;
+        
+        border-bottom: 3px rgba(0,0,0,128);
+        
+        padding-left:0.6em;
+        
+        margin-bottom:0.5em;
+        margin-top:0.5em;
+        
+        background:rgba(0,100,0,128);
+        
+      }
+			
+			.group
+			{
+			  padding-left:0.5em;
+			  
+			}
+			
+			
+			div
+			{
+			  /*border-style: solid;
+	      border-width: 1px;
+	      border-color: red;*/
+			}
+			
+			
+			.form
+			{
+			  text-align: left;
+			  display: block;
+			  
+			  text-color:black;
+			}
+			
+		  
+		  
+			label
+			{
+			  padding-bottom:0em;
+			  margin-top:0em;
+			  
+			  /*border-style: solid;
+			  border-width: 2px;
+			  border-color: green;*/
+			  
+			  /*display:inline-block;*/
+			  
+        /*vertical-align:middle; */
+        
+			}
+			
+			#scrollDivWrap
+      {
+        /*max-height:500px;*/
+      }
+       
+      #scrollDiv
+      {
+        
+        display:block;
+			  
+			  overflow-y: auto;
+			  
+			  min-height:230px;
+			  /*max-height:470px;*/
+			  max-height:540px;
+			  
+			  max-height:91%;
+			  
+			  width:100%;
+			  /*
+			  border-style: solid;
+			  border-width: 2px;
+			  border-color: red;
+			  */
+			  
+			  margin: 3px;
+			  
+			  padding: 3px;
+			  
+			  
+      }
+      
+      .sliderDiv input
+      {
+        width:15em;
+      }
+      
+      .audioGroup .sliderDiv label
+      {
+        width:7em;
+			  
+			  text-align:right;
+      }
+      
+
+
+      .mainButtons button
+	    {
+	      margin:6px;
+	    }
+      
+      .whiteText label, .whiteText h2, .whiteText h3
+      {
+        color:white;
+        header-color: black;
+      }
+      
+      .selectDivMouse label
+      {
+        width:6.5em;
+      }
+      
+      .selectDivMouse .boxButtonWrap
+      {
+        margin:10px;
+        float:left;
+        width:300px;
+        
+        
+      }
+      
+      .hide
+			{
+			  display:none; /* not sure if needed */
+			}
+			
+			
+			
+			.modErrorMessage
+			{
+			  
+			  color:red;
+			  padding-left: 50px;
+			  
+			  padding-bottom:20px;
+			  
+			  display: none;
+			  
+			  font-size: 16;
+			}
+			
+			.modMessage
+			{
+			  color:#77f7ed;
+			  
+			  font-size: 16;
+			  
+			  padding-left: 25px;
+			}
+			
+			
+			.modItem
+			{
+			  border-style: solid;
+			  border-width: 1px;
+			  border-color: gray;
+			  
+			  margin: 15px;
+			  padding: 10px;
+			  margin-right:5px;
+			  margin-left:5px;
+			}
+			
+			.modInfo
+			{
+			  font-size: 16;
+			  padding: 5px;
+			}
+			
+			.modItemError .modErrorMessage
+			{
+			  display: block;
+			}
+			
+			.modItemError label
+			{
+			  color:gray;
+			}
+			
+			.modItemError input
+			{
+			  disabled:true;
+			}
+      
+      .modUpload,.modEdit,.modView,.modMapView,.modDelete
+      {
+        display:none;
+      }
+      
+      .modItemCanBePublished .modUpload
+      {
+        display:inline;
+      }
+      
+      .modItemIsOwner .modEdit
+      {
+        display:inline;
+      }
+      
+      .modItemCanBeDeleted .modDelete
+      {
+        display:inline;
+      }
+      
+      .modItemIsPublished .modView
+      {
+        display:inline;
+      }
+      
+      .modItemIsPublished .modButton
+      {
+        display:inline;
+      }
+      
+      .modItemHasMaps .modMapView
+      {
+        display:inline;
+      }
+      
+      .modItem .checkboxDiv input,
+      .modItem .checkboxDiv label,
+      .modItem .checkboxDiv
+      {
+        /*border-style: solid;
+			  border-width: 1px;
+			  border-color: gray;*/
+			  
+			  /*padding-bottom:0px;*/
+			  
+      }
+      
+      .modItem .checkboxDiv
+      {
+        display:inline;
+        margin-bottom:-15px;
+      }
+      
+      .modItem .modControls
+      {
+        padding-top:10px;
+      }
+      
+      
+      .modItem .modControls .boxButton
+      {
+        font-size:15px;
+      }
+      
+      .helpText
+      {
+        font-size: 14;
+        text-align:center;
+      }
+      .helpTextLarge
+      {
+        padding-top:5px;
+        padding-bottom:5px;
+        font-size: 20;
+        text-align:center;
+      }
+      
+      
+      .modFilter
+      {
+        position: absolute;
+        right:70px;
+        /*display:inline;*/
+        /*width:400px;*/
+        /*text-align: right;*/
+        
+        float:right;
+        
+        width:210px;
+        
+        /*text-align: right;*/
+        padding: 2px;
+        
+        border-style: solid;
+			  border-width: 1px;
+			  border-color: #aaaaaaaa;
+      }
+
+      .modFilter label
+      {
+        /*float:right;*/
+      }
+      
+      .modFilter input
+      {
+        width: 150px;
+      }
+      
+      .modItemFilteredOut
+      {
+        display: none;
+      }
+      
+		</style>
+	</head>
+	<body onshow="mods.loadMods()" id="body">
+		
+		<div class="background panelMainNoAlpha whiteText">
+		  
+		    <div class="panelCloseButton" onclick="backOrClose()"  click_on_escape=""/>
+		    
+		    
+		    
+		    <div id="scrollDivWrap" >
+		    
+		    <div id="scrollDiv">
+		      
+		      <div class="modFilter smallForms inputDiv textinputUnicodeWrap">
+           <label>Filter:</label> <input id="modFilter" type="text" value="" onchange="mods.setModFilter(getValueById('modFilter'));" onblur="" />
+          </div>
+          
+          
+		      <h2>Mods</h2>
+	        <form class="form"  >
+	        
+	          <div _class="${hideUnless(hasWorkshopSupport())}">
+	            <div class="group helpTextLarge" >
+	              &gt;&gt; <button class="boxButton" onclick="mods.openWorkshop();">View workshop</button> &lt;&lt;
+	            </div>
+	            
+	            <div class="group helpText">
+	              <p>Use the workshop to subscribe to new mods.</p>
+	              <p>Your own mod folders can be placed in: 'mods/units/' for editing and upload.</p>
+	              <p>There is an example mod at: 'assets/builtin_mods/mega_builders'</p>
+	              <p>Most of the game's units are in 'assets/units/' feel free to copy them into your mod and change them</p>
+	              <p>Use the reload button in sandbox to load in your unit changes without restarting the game</p>
+	            </div>
+	          </div>
+	          
+	          <div _class="${hideUnless(isIOS())}">
+	            <div class="group helpText">
+	              <p>Mod support is still experimental on this platform</p>
+	              <p>Don't expect everything to work yet</p>
+	              <p>ogg sound loading is missing, so sound effects in a lot of mods will be broken</p>
+	            </div>
+	          </div>
+	           
+	          <h3 id="modListTitle">
+	          
+	            <div class="" style="float:left; width: 200px;">Installed mods</div>
+	            
+	            <div class="checkboxDiv" style="margin-top:5px; height: 20px;" >
+                <input type="checkbox" id="onlyEnabledMods" class="modListOptions" onchange="mods.applyModFilter();"><label for="onlyEnabledMods">Show only enabled mods</label></input>
+              </div>
+	            
+	          </h3>
+	          
+	          
+	          
+	          <div class="group">
+	            
+	            <div id="modTemplate" style="display:none;">
+	              <div class="modItem _CLASS_" data_sessionid="_SESSIONID_">
+	                <div class="checkboxDiv">
+	                  <input type="checkbox" id="_ID_" class="modSelection"><label for="_ID_">_NAME_</label></input>
+	                </div>
+	                <p class="modInfo">_DESCRIPTION_</p>
+	                <p class="modErrorMessage">_ERROR_</p>
+	                <p class="modMessage">_MESSAGE_</p>
+	                <div class="modControls">
+	                  <span _class="${hideUnless(hasWorkshopSupport())}">
+	                    <button class="boxButton modUpload" onclick="mods.uploadModAsk('_ID_');">Upload to workshop</button>
+	                    <button class="boxButton modEdit" onclick="mods.uploadModAsk('_ID_');">Upload Edit</button>
+	                    
+	                    <button class="boxButton modView" onclick="mods.viewMod('_ID_');">View in workshop</button>
+	                  </span>
+	                  
+	                  <button class="boxButton modMapView" onclick="open('levelSelect.rml', 'mod/_ID_')">View Maps</button>
+	                  
+	                  <button class="boxButton modDelete" onclick="mods.deleteModPopup('_ID_');">Delete Mod</button>
+	                  
+	                  
+	                </div>
+	              </div>
+	            </div>
+	            
+	            <div id="modList">
+	          
+	            </div>
+	            
+	            <div id="filterStatus" style="color: #876e09; padding:10px;">
+	          
+	            </div>
+	            
+	            
+	            <button class="boxButton" onclick="mods.disableAllAsk();">Disable all mods</button>
+	            
+	            
+	            <span _class="${hideUnless( isMobile() ) }" >
+                  <button class="boxButton" onclick="importFilePopup()" ><span>Import mod</span></button>
+              </span>
+	            
+	            <!--
+	            <div _class="${hideUnless(isDesktop())}">
+	              <p>Note: You can enable loading of disabled mods for joining a multiplayer servers in the game settings</p>
+	            </div>
+	            -->
+	            
+	          </div>
+	          
+	          
+	        </form>
+		      
+		      <br/>
+		      
+	        
+	      </div>
+	      
+	      <div class="mainButtons">
+	      
+	        <button onclick="backOrClose()">Back</button>
+	        
+	        <button onclick="mods.saveMods(); mods.loadMods()">Save</button>
+	        
+	        <span> | </span>
+	        
+	        
+	        
+	        <button onclick="mods.reloadModDataAsk();">Reload</button>
+	        
+	        
+	      </div> 
+	      
+		  </div><!-- scrollDivWrap -->
+		  
+		</div>
+		
+		
+	</body>
+</rml>
