@@ -4,8 +4,6 @@ import com.corrodinggames.rts.game.PlayerTeam;
 import com.corrodinggames.rts.game.units.BaseUnit;
 import com.corrodinggames.rts.game.units.OrderableUnit;
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
-import com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean;
-import com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBooleanLoader;
 import com.corrodinggames.rts.gameFramework.Utility;
 import com.corrodinggames.rts.gameFramework.utility.ConfigException;
 import com.corrodinggames.rts.gameFramework.utility.StringUtils;
@@ -486,8 +484,8 @@ public abstract class LogicNumberFunction extends LogicBoolean.LogicNumberOnly {
             if (customUnitConfig == null) {
                 throw new ConfigException("FunctionRnd requires metadata");
             }
-            customUnitConfig.shadowOffsetY++;
-            this.randomIndex = customUnitConfig.shadowOffsetY;
+            customUnitConfig.number++;
+            this.randomIndex = customUnitConfig.number;
         }
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.LogicNumberOnly

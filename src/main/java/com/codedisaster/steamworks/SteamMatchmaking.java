@@ -292,7 +292,7 @@ public class SteamMatchmaking extends SteamInterface {
         return deleteLobbyData(this.pointer, steamID.handle, str);
     }
 
-    public boolean sendLobbyChatMsg(SteamID steamID, ByteBuffer byteBuffer) {
+    public boolean sendLobbyChatMsg(SteamID steamID, ByteBuffer byteBuffer) throws SteamException {
         int iPosition = byteBuffer.position();
         return sendLobbyChatMsg(steamID, byteBuffer, iPosition, byteBuffer.limit() - iPosition);
     }
@@ -311,7 +311,7 @@ public class SteamMatchmaking extends SteamInterface {
         return sendLobbyChatMsg(this.pointer, steamID.handle, str);
     }
 
-    public int getLobbyChatEntry(SteamID steamID, int i, ChatEntry chatEntry, ByteBuffer byteBuffer) {
+    public int getLobbyChatEntry(SteamID steamID, int i, ChatEntry chatEntry, ByteBuffer byteBuffer) throws SteamException {
         int iPosition = byteBuffer.position();
         return getLobbyChatEntry(steamID, i, chatEntry, byteBuffer, iPosition, byteBuffer.limit() - iPosition);
     }

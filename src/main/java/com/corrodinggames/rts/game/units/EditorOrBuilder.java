@@ -6,13 +6,7 @@ import com.corrodinggames.rts.R;
 import com.corrodinggames.rts.game.PlayerTeam;
 import com.corrodinggames.rts.game.Projectile;
 import com.corrodinggames.rts.game.ai.AIController;
-import com.corrodinggames.rts.game.units.actions.AbstractUnitAction;
-import com.corrodinggames.rts.game.units.actions.ActionDisplayType;
-import com.corrodinggames.rts.game.units.actions.ActionFilter;
-import com.corrodinggames.rts.game.units.actions.ActionType;
-import com.corrodinggames.rts.game.units.actions.FilteredUnitAction;
-import com.corrodinggames.rts.game.units.actions.NoneAction;
-import com.corrodinggames.rts.game.units.actions.PlaceBuildingAction;
+import com.corrodinggames.rts.game.units.actions.*;
 import com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface;
 import com.corrodinggames.rts.game.units.buildings.NukeLauncher;
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
@@ -37,6 +31,7 @@ import com.corrodinggames.rts.gameFramework.ui.widgets.MenuDialog;
 import com.corrodinggames.rts.gameFramework.ui.widgets.UIEvent;
 import com.corrodinggames.rts.gameFramework.ui.widgets.UIEventHandler;
 import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1907,7 +1902,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return 0;
         });
         for (UnitType unitType : arrayList3) {
-            if (unitType != UnitTypeEnum.wall_v && !unitType.getUnitTypeDescriptionShort().equals("test_tank") && !unitType.getUnitTypeDescriptionShort().equals("missing") && unitType != UnitTypeEnum.tankDestroyer && unitType != UnitTypeEnum.megaTank && unitType != UnitTypeEnum.fogRevealer && unitType != UnitTypeEnum.crystalResource && unitType != UnitTypeEnum.damagingBorder && unitType != UnitTypeEnum.zoneMarker && unitType != UnitTypeEnum.editorOrBuilder && unitType != UnitTypeEnum.dummyNonUnitWithTeam && unitType != UnitTypeEnum.supplyDepot && (BaseUnit.canAttack(unitType) instanceof OrderableUnit) && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).transportUnitsKillOnDeath)) {
+            if (unitType != UnitTypeEnum.wall_v && !unitType.getUnitTypeDescriptionShort().equals("test_tank") && !unitType.getUnitTypeDescriptionShort().equals("missing") && unitType != UnitTypeEnum.tankDestroyer && unitType != UnitTypeEnum.megaTank && unitType != UnitTypeEnum.fogRevealer && unitType != UnitTypeEnum.crystalResource && unitType != UnitTypeEnum.damagingBorder && unitType != UnitTypeEnum.zoneMarker && unitType != UnitTypeEnum.editorOrBuilder && unitType != UnitTypeEnum.dummyNonUnitWithTeam && unitType != UnitTypeEnum.supplyDepot && (BaseUnit.canAttack(unitType) instanceof OrderableUnit) && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).showInEditor)) {
                 FilteredUnitAction filteredUnitAction = new FilteredUnitAction(new PlaceBuildingAction(unitType, 1, null), K);
                 boolean z2 = false;
                 Iterator it2 = D.iterator();

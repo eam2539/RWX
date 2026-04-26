@@ -38,7 +38,7 @@ public class AnimationConfig {
         for (CustomUnitAnimationSet customUnitAnimationSet : this.l) {
             if (customUnitAnimationSet.animationType == CustomUnitAnimationType.legX || customUnitAnimationSet.animationType == CustomUnitAnimationType.legY || customUnitAnimationSet.animationType == CustomUnitAnimationType.legHeight || customUnitAnimationSet.animationType == CustomUnitAnimationType.legDir || customUnitAnimationSet.animationType == CustomUnitAnimationType.legAlpha) {
                 boolean z = false;
-                LegConfig[] legConfigArr = customUnitConfig.energyDisplayName;
+                LegConfig[] legConfigArr = customUnitConfig.legConfig;
                 int length = legConfigArr.length;
                 int i = 0;
                 while (true) {

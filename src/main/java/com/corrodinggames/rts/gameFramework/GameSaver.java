@@ -1,16 +1,8 @@
 package com.corrodinggames.rts.gameFramework;
 
-import com.corrodinggames.rts.game.AIPlayer;
-import com.corrodinggames.rts.game.GameTeam;
-import com.corrodinggames.rts.game.PlayerTeam;
-import com.corrodinggames.rts.game.Projectile;
-import com.corrodinggames.rts.game.ScorchMark;
+import com.corrodinggames.rts.game.*;
 import com.corrodinggames.rts.game.ai.AIController;
-import com.corrodinggames.rts.game.units.BaseUnit;
-import com.corrodinggames.rts.game.units.EditorOrBuilder;
-import com.corrodinggames.rts.game.units.OrderableUnit;
-import com.corrodinggames.rts.game.units.UnitType;
-import com.corrodinggames.rts.game.units.UnitTypeEnum;
+import com.corrodinggames.rts.game.units.*;
 import com.corrodinggames.rts.game.units.custom.ConfigValidationException;
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfigParser;
@@ -24,15 +16,8 @@ import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
 import com.corrodinggames.rts.gameFramework.network.NetworkEngine;
 import com.corrodinggames.rts.gameFramework.utility.AssetInputStream;
 import com.corrodinggames.rts.gameFramework.utility.TransactionalArrayList;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -237,7 +222,7 @@ public class GameSaver {
                         gameOutputStream.writeEnumOrdinal((Enum) baseUnit.r());
                     } else if (baseUnit.r() instanceof CustomUnitConfig) {
                         gameOutputStream.writeByte(3);
-                        gameOutputStream.writeStringUTF(((CustomUnitConfig) baseUnit.r()).onNewMapSpawn);
+                        gameOutputStream.writeStringUTF(((CustomUnitConfig) baseUnit.r()).name);
                     } else {
                         throw new IOException("Unhandled getUnitType on save:" + baseUnit.r().getClass().toString());
                     }

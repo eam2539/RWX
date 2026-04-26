@@ -11,7 +11,8 @@ import com.corrodinggames.rts.gameFramework.local.Locale;
 import com.corrodinggames.rts.gameFramework.network.PasswordHandler;
 import com.corrodinggames.rts.gameFramework.utility.BooleanHolder;
 import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
-import java.awt.Desktop;
+
+import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -272,9 +273,13 @@ public abstract class GameMainManager {
     /* JADX INFO: renamed from: a */
     public void showPasswordPrompt(PasswordHandler passwordHandler) {
         GameEngine.getInstance();
+        GameEngine.isInSpace("[relay-debug] GameMainManager.showPasswordPrompt prompt=" + passwordHandler.promptMessage + " title=" + passwordHandler.dialogTitle + " relayQuestion=" + passwordHandler.d);
         ScriptEngine scriptEngine = ScriptEngine.getInstance();
         if (scriptEngine != null) {
+            GameEngine.isInSpace("[relay-debug] GameMainManager.showPasswordPrompt queueing script runnable");
             scriptEngine.addRunnableToQueue(new AnonymousClass2(scriptEngine, passwordHandler));
+        } else {
+            GameEngine.isInSpace("[relay-debug] GameMainManager.showPasswordPrompt scriptEngine is null");
         }
     }
 
@@ -292,6 +297,7 @@ public abstract class GameMainManager {
 
         @Override // java.lang.Runnable
         public void run() {
+            GameEngine.isInSpace("[relay-debug] GameMainManager password runnable running");
             final Root root = this.b.getRoot();
             ButtonAction buttonAction = new ButtonAction(this.c.confirmButtonLabel != null ? this.c.confirmButtonLabel : "Join", new Runnable() { // from class: com.corrodinggames.librocket.a.2.1
                 @Override // java.lang.Runnable
@@ -337,6 +343,7 @@ public abstract class GameMainManager {
             dialogData.button2 = buttonAction;
             dialogData.showBackButton = false;
             dialogData.onClose = runnable;
+            GameEngine.isInSpace("[relay-debug] GameMainManager creating password dialog title=" + str + " message=" + strConvertInlineBlocks);
             GameMainManager.this.libRocketManager.createAndShowDialog(dialogData);
         }
     }

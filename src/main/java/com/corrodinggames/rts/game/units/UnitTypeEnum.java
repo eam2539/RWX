@@ -5,25 +5,9 @@ import com.corrodinggames.rts.game.Projectile;
 import com.corrodinggames.rts.game.units.actions.AbstractUnitAction;
 import com.corrodinggames.rts.game.units.actions.ActionId;
 import com.corrodinggames.rts.game.units.actions.SelectUnitTypeAction;
-import com.corrodinggames.rts.game.units.air.AirShip;
-import com.corrodinggames.rts.game.units.air.AmphibiousJet;
-import com.corrodinggames.rts.game.units.air.Dropship;
-import com.corrodinggames.rts.game.units.air.Gunship;
-import com.corrodinggames.rts.game.units.air.Helicopter;
+import com.corrodinggames.rts.game.units.air.*;
 import com.corrodinggames.rts.game.units.bug.Ladybug;
-import com.corrodinggames.rts.game.units.buildings.AirFactory;
-import com.corrodinggames.rts.game.units.buildings.AntiNukeLauncher;
-import com.corrodinggames.rts.game.units.buildings.CommandCenter;
-import com.corrodinggames.rts.game.units.buildings.ExperimentalLandFactory;
-import com.corrodinggames.rts.game.units.buildings.LandFactory;
-import com.corrodinggames.rts.game.units.buildings.LaserDefense;
-import com.corrodinggames.rts.game.units.buildings.NukeLauncher;
-import com.corrodinggames.rts.game.units.buildings.PowerFabricator;
-import com.corrodinggames.rts.game.units.buildings.RepairBay;
-import com.corrodinggames.rts.game.units.buildings.ResourceExtractor;
-import com.corrodinggames.rts.game.units.buildings.SeaFactory;
-import com.corrodinggames.rts.game.units.buildings.SupplyDepot;
-import com.corrodinggames.rts.game.units.buildings.WallVertical;
+import com.corrodinggames.rts.game.units.buildings.*;
 import com.corrodinggames.rts.game.units.buildings.turrets.AntiAirTurret;
 import com.corrodinggames.rts.game.units.buildings.turrets.TurretFactory;
 import com.corrodinggames.rts.game.units.custom.AnimationSet;
@@ -32,31 +16,15 @@ import com.corrodinggames.rts.game.units.custom.PlacementRules;
 import com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope;
 import com.corrodinggames.rts.game.units.custom.price.UnitPrice;
 import com.corrodinggames.rts.game.units.custom.resources.StoredResources;
-import com.corrodinggames.rts.game.units.land.Artillery;
-import com.corrodinggames.rts.game.units.land.BuilderUnit;
-import com.corrodinggames.rts.game.units.land.ExperimentalHoverTank;
-import com.corrodinggames.rts.game.units.land.ExperimentalTank;
-import com.corrodinggames.rts.game.units.land.HeavyHoverTank;
-import com.corrodinggames.rts.game.units.land.HeavyTankUnit;
-import com.corrodinggames.rts.game.units.land.HoverTankUnit;
-import com.corrodinggames.rts.game.units.land.HovercraftUnit;
-import com.corrodinggames.rts.game.units.land.LaserTankUnit;
-import com.corrodinggames.rts.game.units.land.MammothTank;
-import com.corrodinggames.rts.game.units.land.MegaTankUnit;
-import com.corrodinggames.rts.game.units.land.TankDestroyer;
-import com.corrodinggames.rts.game.units.land.TankUnit;
-import com.corrodinggames.rts.game.units.sea.AttackSubmarine;
-import com.corrodinggames.rts.game.units.sea.BattleShip;
-import com.corrodinggames.rts.game.units.sea.BuilderShip;
-import com.corrodinggames.rts.game.units.sea.GunBoat;
-import com.corrodinggames.rts.game.units.sea.MissileShip;
+import com.corrodinggames.rts.game.units.land.*;
+import com.corrodinggames.rts.game.units.sea.*;
 import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine;
 import com.corrodinggames.rts.gameFramework.graphics.Texture;
 import com.corrodinggames.rts.gameFramework.local.Locale;
+
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.ar */
@@ -2087,7 +2055,7 @@ public enum UnitTypeEnum implements UnitType {
         String[] strArr = {"carrier", "experimentalGunship", "experimentalGunshipLanded", "mech_gun", "ladybug", "spiderBot", "wall_v", "crystalResource", "test_tank", "missing", "fogRevealer", "supplyDepot", "tankDestroyer", "megaTank", "crystal_mid", "mechFlyingLanded"};
         for (UnitType unitType : ae) {
             BaseUnit baseUnitFindTurretPosition = BaseUnit.findTurretPosition(unitType);
-            if ((baseUnitFindTurretPosition instanceof OrderableUnit) && !unitType.getUnitTypeDescriptionShort().startsWith("bug") && CustomUnitConfig.c(unitType) == null && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).transportUnitsKillOnDeath)) {
+            if ((baseUnitFindTurretPosition instanceof OrderableUnit) && !unitType.getUnitTypeDescriptionShort().startsWith("bug") && CustomUnitConfig.c(unitType) == null && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).showInEditor)) {
                 boolean z = false;
                 for (String str : strArr) {
                     if (str.equals(unitType.getUnitTypeDescriptionShort())) {
@@ -2126,7 +2094,7 @@ public enum UnitTypeEnum implements UnitType {
         arrayList.sort(Comparator.comparing(UnitType::u));
         for (UnitType unitType : arrayList) {
             BaseUnit baseUnitFindTurretPosition = BaseUnit.findTurretPosition(unitType);
-            if ((baseUnitFindTurretPosition instanceof OrderableUnit) && !unitType.getUnitTypeDescriptionShort().startsWith("bug") && CustomUnitConfig.c(unitType) == null && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).transportUnitsKillOnDeath)) {
+            if ((baseUnitFindTurretPosition instanceof OrderableUnit) && !unitType.getUnitTypeDescriptionShort().startsWith("bug") && CustomUnitConfig.c(unitType) == null && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).showInEditor)) {
                 if (unitType != editorOrBuilder) {
                     OrderableUnit orderableUnit = (OrderableUnit) baseUnitFindTurretPosition;
                     boolean z = false;

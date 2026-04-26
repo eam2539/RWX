@@ -227,7 +227,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                         }
                     }
                     DecalImageSlice decalImageSlice2 = new DecalImageSlice();
-                    decalImageSlice2.a = customUnitConfig.a(customUnitConfig.generation_free_in_sandbox, str4, customUnitConfig.turretMultiTargeting, str2, "imageStack");
+                    decalImageSlice2.a = customUnitConfig.a(customUnitConfig.generation_free_in_sandbox, str4, customUnitConfig.imageSmoothing, str2, "imageStack");
                     if (decalImageSlice2.a == null) {
                         throw new ConfigParseException("[" + str2 + "]failed to load image " + str4);
                     }
@@ -523,7 +523,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                         float var44;
                         if (var14.ae != -1) {
                             LegInstance[] var20 = jx.legInstances;
-                            LegConfig[] var21 = jx.unitConfig.energyDisplayName;
+                            LegConfig[] var21 = jx.unitConfig.legConfig;
                             if (var20 == null || var20.length <= var14.ae || var21 == null || var21.length <= var14.ae) {
                                 continue;
                             }
@@ -537,8 +537,8 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                             var19 = var22.i + var22.r + var23.R;
                             if (var14.af) {
                                 float var24 = jx.rotationSpeed;
-                                if (jx.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogic) {
-                                    var24 = jx.movementLevels[jx.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].targetX;
+                                if (jx.unitConfig.lockLegRotationWithMainTurret) {
+                                    var24 = jx.movementLevels[jx.unitConfig.defaultTurretRotationSpeed].targetX;
                                 }
 
                                 float var25 = Utility.fastCos(var24);
@@ -584,8 +584,8 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
 
                             var18 = ((BaseUnit)var50).rotationSpeed + 90.0F;
                             var19 = ((BaseUnit)var50).rotationSpeed;
-                            if (var14.ac == null && jx.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTags) {
-                                float var56 = jx.movementLevels[jx.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].targetX;
+                            if (var14.ac == null && jx.unitConfig.lockBodyRotationWithMainTurret) {
+                                float var56 = jx.movementLevels[jx.unitConfig.defaultTurretRotationSpeed].targetX;
                                 var18 = var56 + 90.0F;
                                 var19 = var56;
                             }

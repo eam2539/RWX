@@ -430,6 +430,8 @@
 		          <div class="buttonSpacer"></div>
 	            <button childclone onclick="openIfNotDemo('multiplayerLobby.rml', null, 'Sorry multiplayer is not available in the demo')" id="multiplayerButton" _class="${fullVersionOnlyStyle()}"><p>${i:menus.front.multiplayer}</p></button>
 	            <div class="buttonSpacer"></div>
+	            <button childclone onclick="openIfNotDemo('multiplayerP2PLobby.rml', null, 'Sorry multiplayer is not available in the demo')" id="p2pMultiplayerButton" _class="${fullVersionOnlyStyle()}"><p>P2P Multiplayer</p></button>
+	            <div class="buttonSpacer"></div>
 	            <button childclone onclick="open('settingsPlaceholder.rml')" id="settingsButton" ><p>${i:menus.front.settings}</p></button>
 	            <div class="buttonSpacer"></div>
 	            <button childclone onclick="open('mods.rml')" id="modsButton" _class="${hideUnless(usingMods())}"><p>${i:menus.front.mods}</p></button>

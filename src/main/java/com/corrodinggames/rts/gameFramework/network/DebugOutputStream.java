@@ -12,11 +12,8 @@ import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.GameObject;
 import com.corrodinggames.rts.gameFramework.file.FileHelper;
 import com.corrodinggames.rts.gameFramework.utility.AssetInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
+
+import java.io.*;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -241,7 +238,7 @@ public class DebugOutputStream extends GameOutputStream {
             this.activePrintStream.println(-1);
         } else if (unitType instanceof CustomUnitConfig) {
             this.activePrintStream.println(-2);
-            writeStringUTF(((CustomUnitConfig) unitType).onNewMapSpawn);
+            writeStringUTF(((CustomUnitConfig) unitType).name);
         } else {
             this.activePrintStream.println(((UnitTypeEnum) unitType).ordinal());
         }

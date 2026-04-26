@@ -311,8 +311,8 @@ public class TurretConfig {
             }
             turretConfig.a(turretConfigFindProjectileConfigByName);
         } else {
-            turretConfig.shootDelay2 = customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogicAndTags;
-            turretConfig.shootSpeed2 = customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTagsAndLogic;
+            turretConfig.shootDelay2 = customUnitConfig.aimOffsetSpread;
+            turretConfig.shootSpeed2 = customUnitConfig.turretSize;
         }
         turretConfig.range = fValueOf.floatValue();
         turretConfig.minRange = fValueOf2.floatValue();
@@ -331,7 +331,7 @@ public class TurretConfig {
             turretConfig.m = time.floatValue();
         }
         if (turretConfig.m == -1.0f) {
-            turretConfig.m = customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogic;
+            turretConfig.m = customUnitConfig.shootDelay;
         }
         Float time2 = iniFile.getTime(str, "warmup", (Float) null);
         if (time2 != null) {
@@ -474,7 +474,7 @@ public class TurretConfig {
         if (turretConfig.ab < 99999.0f) {
             turretConfig.range2 = turretConfig.ab;
         } else {
-            turretConfig.range2 = customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxAttackRange;
+            turretConfig.range2 = customUnitConfig.unitStats.maxAttackRange;
         }
         turretConfig.minRange2 = turretConfig.range2 * turretConfig.range2;
         if (turretConfig.ag > 0.0f) {

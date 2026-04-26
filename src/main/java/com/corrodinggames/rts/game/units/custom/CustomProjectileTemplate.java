@@ -117,7 +117,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             if (!customProjectileTemplate.L) {
                 throw new RuntimeException("[" + str + "]instantReuseLast_alsoChangeTurretAim also requires instantReuseLast");
             }
-            customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogicOrTags = true;
+            customUnitConfig.moveYAxisScaleInverted = true;
         }
         customProjectileTemplate.N = iniFile.getBoolean(str, "instantReuseLast_keepAreaDamageList", Boolean.valueOf(customProjectileTemplate.N)).booleanValue();
         customProjectileTemplate.T = iniFile.getBoolean(str, "moveWithParent", Boolean.valueOf(customProjectileTemplate.T)).booleanValue();

@@ -40,7 +40,7 @@ public class SteamAPI {
 
     static native long getSteamUtilsPointer();
 
-    public static boolean init() {
+    public static boolean init() throws SteamException {
         return init(null);
     }
 

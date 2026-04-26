@@ -48,7 +48,7 @@ public class UnitStats implements Cloneable {
 
     /* JADX INFO: renamed from: l */
     public float armour;
-    public boolean m;
+    public boolean isVisibleToEnemies;
 
     /* JADX INFO: renamed from: n */
     public int fogOfWarSightRange;
@@ -393,13 +393,13 @@ public class UnitStats implements Cloneable {
     }
 
     public static void a(CustomUnit customUnit, UnitStats unitStats, CustomUnitConfig customUnitConfig) {
-        if (!(unitStats != customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic)) {
+        if (!(unitStats != customUnitConfig.unitStats)) {
             return;
         }
         Iterator it = t.keySet().iterator();
         while (it.hasNext()) {
             CustomUnitDataField customUnitDataField = (CustomUnitDataField) t.get((String) it.next());
-            double dA = customUnitDataField.a(customUnit, customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic);
+            double dA = customUnitDataField.a(customUnit, customUnitConfig.unitStats);
             double dA2 = customUnitDataField.a(customUnit, unitStats);
             if (dA != dA2) {
                 customUnit.dJ();
@@ -410,7 +410,7 @@ public class UnitStats implements Cloneable {
 
     public static void a(UnitStats unitStats, CustomUnit customUnit, GameOutputStream gameOutputStream) throws IOException {
         CustomUnitConfig customUnitConfig = customUnit.unitConfig;
-        if (!(unitStats != customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic)) {
+        if (!(unitStats != customUnitConfig.unitStats)) {
             gameOutputStream.writeBoolean(true);
             return;
         }
@@ -419,7 +419,7 @@ public class UnitStats implements Cloneable {
         Iterator it = t.keySet().iterator();
         while (it.hasNext()) {
             CustomUnitDataField customUnitDataField = (CustomUnitDataField) t.get((String) it.next());
-            if (customUnitDataField.a(customUnit, customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic) != customUnitDataField.a(customUnit, unitStats)) {
+            if (customUnitDataField.a(customUnit, customUnitConfig.unitStats) != customUnitDataField.a(customUnit, unitStats)) {
                 s2 = (short) (s2 + 1);
             }
         }
@@ -428,7 +428,7 @@ public class UnitStats implements Cloneable {
         Iterator it2 = t.keySet().iterator();
         while (it2.hasNext()) {
             CustomUnitDataField customUnitDataField2 = (CustomUnitDataField) t.get((String) it2.next());
-            double dA = customUnitDataField2.a(customUnit, customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic);
+            double dA = customUnitDataField2.a(customUnit, customUnitConfig.unitStats);
             double dA2 = customUnitDataField2.a(customUnit, unitStats);
             if (dA != dA2) {
                 i++;

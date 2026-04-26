@@ -613,17 +613,25 @@ extern "C" JNIEXPORT void JNICALL Java_com_Element_setAttribute(JNIEnv* env, job
     Rocket::Core::Element* element = requireElement(env, object);
     if (env->ExceptionCheck()) return;
     std::string keyValue = toStdString(env, key);
+    std::string valueText = value == nullptr ? "" : toStdString(env, value);
     if (keyValue == "value") {
         Rocket::Controls::ElementFormControl* control = getFormControl(element);
         if (control != nullptr) {
-            control->SetValue(value == nullptr ? "" : toStdString(env, value).c_str());
+            control->SetValue(valueText.c_str());
             return;
         }
     }
     if (value == nullptr) {
         element->RemoveAttribute(keyValue.c_str());
     } else {
-        element->SetAttribute(keyValue.c_str(), toStdString(env, value).c_str());
+        element->SetAttribute(keyValue.c_str(), valueText.c_str());
+        if (keyValue.size() > 2 && keyValue.compare(0, 2, "on") == 0 && eventInstancer != nullptr) {
+            Rocket::Core::String eventName(keyValue.substr(2).c_str());
+            Rocket::Core::EventListener* listener = eventInstancer->InstanceEventListener(valueText.c_str(), element);
+            if (listener != nullptr) {
+                element->AddEventListener(eventName, listener);
+            }
+        }
     }
 }
 

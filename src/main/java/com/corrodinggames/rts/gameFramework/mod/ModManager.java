@@ -526,7 +526,7 @@ public class ModManager {
             int i = 0;
             for (CustomUnitConfig customUnitConfig : arrayList) {
                 if (customUnitConfig.modInfo != null && !customUnitConfig.modInfo.disabled && customUnitConfig.modInfo.firstError != null && CustomUnitConfig.a(customUnitConfig) == null) {
-                    GameEngine.isInSpace("Was missing: " + customUnitConfig.onNewMapSpawn);
+                    GameEngine.isInSpace("Was missing: " + customUnitConfig.name);
                     CustomUnitConfig.activeConfigs.add(customUnitConfig);
                     i++;
                 }

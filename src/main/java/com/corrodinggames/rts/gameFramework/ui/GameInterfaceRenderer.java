@@ -1,35 +1,14 @@
 package com.corrodinggames.rts.gameFramework.ui;
 
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.Rect;
-import android.graphics.RectF;
+import android.graphics.*;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.corrodinggames.rts.R;
 import com.corrodinggames.rts.appFramework.GameView;
 import com.corrodinggames.rts.appFramework.InGameActivity;
 import com.corrodinggames.rts.game.PlayerTeam;
-import com.corrodinggames.rts.game.units.BaseUnit;
-import com.corrodinggames.rts.game.units.EditorOrBuilder;
-import com.corrodinggames.rts.game.units.OrderableUnit;
-import com.corrodinggames.rts.game.units.UnitBase;
-import com.corrodinggames.rts.game.units.UnitStatistics;
-import com.corrodinggames.rts.game.units.UnitType;
-import com.corrodinggames.rts.game.units.UnitTypeEnum;
-import com.corrodinggames.rts.game.units.actions.AbstractUnitAction;
-import com.corrodinggames.rts.game.units.actions.ActionDisplayType;
-import com.corrodinggames.rts.game.units.actions.ActionId;
-import com.corrodinggames.rts.game.units.actions.ActionType;
-import com.corrodinggames.rts.game.units.actions.AttackModeAction;
-import com.corrodinggames.rts.game.units.actions.FilteredUnitAction;
-import com.corrodinggames.rts.game.units.actions.PopupQueueAction;
-import com.corrodinggames.rts.game.units.actions.RepairTargetAction;
-import com.corrodinggames.rts.game.units.actions.SelectUnitTypeAction;
-import com.corrodinggames.rts.game.units.actions.UnitInfoAction;
-import com.corrodinggames.rts.game.units.actions.WrapperUnitAction;
+import com.corrodinggames.rts.game.units.*;
+import com.corrodinggames.rts.game.units.actions.*;
 import com.corrodinggames.rts.game.units.custom.AnimationTag;
 import com.corrodinggames.rts.game.units.custom.CustomUnit;
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
@@ -38,12 +17,7 @@ import com.corrodinggames.rts.game.units.custom.price.UnitPrice;
 import com.corrodinggames.rts.game.units.custom.resources.StoredResourceEntry;
 import com.corrodinggames.rts.game.units.custom.resources.StoredResources;
 import com.corrodinggames.rts.game.units.g.SpecialActionBlockEffect;
-import com.corrodinggames.rts.gameFramework.Command;
-import com.corrodinggames.rts.gameFramework.GameEngine;
-import com.corrodinggames.rts.gameFramework.GameObject;
-import com.corrodinggames.rts.gameFramework.KeyBinding;
-import com.corrodinggames.rts.gameFramework.Serializable;
-import com.corrodinggames.rts.gameFramework.Utility;
+import com.corrodinggames.rts.gameFramework.*;
 import com.corrodinggames.rts.gameFramework.audio.SoundEngine;
 import com.corrodinggames.rts.gameFramework.graphics.GamePaint;
 import com.corrodinggames.rts.gameFramework.graphics.Texture;
@@ -1022,10 +996,10 @@ public class GameInterfaceRenderer extends Serializable {
             if (customUnitConfig.relatedUnits.contains(unitTypeR2)) {
                 return true;
             }
-            if (customUnitConfig.f48fO != null && AnimationTag.a(customUnitConfig.f48fO, customUnitConfig2.x())) {
+            if (customUnitConfig.showActionsWithMixedSelectionIfOtherUnitsHaveTag != null && AnimationTag.a(customUnitConfig.showActionsWithMixedSelectionIfOtherUnitsHaveTag, customUnitConfig2.x())) {
                 return true;
             }
-            if (customUnitConfig2.f48fO != null && AnimationTag.a(customUnitConfig2.f48fO, customUnitConfig.x())) {
+            if (customUnitConfig2.showActionsWithMixedSelectionIfOtherUnitsHaveTag != null && AnimationTag.a(customUnitConfig2.showActionsWithMixedSelectionIfOtherUnitsHaveTag, customUnitConfig.x())) {
                 return true;
             }
             return false;
@@ -2216,7 +2190,7 @@ public class GameInterfaceRenderer extends Serializable {
         if (z) {
             str2 = str2 + baseUnit.r().getUnitName() + str;
         }
-        if (customUnitConfig == null || !customUnitConfig.transportSwitchToSlots) {
+        if (customUnitConfig == null || !customUnitConfig.canNotBeDirectlyAttacked) {
             if (!z3) {
                 str2 = str2 + "HP: " + ((int) Math.ceil(baseUnit.currentHealth)) + "/" + ((int) baseUnit.maxHealth) + str;
             } else {

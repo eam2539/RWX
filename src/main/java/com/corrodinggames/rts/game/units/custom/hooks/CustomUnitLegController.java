@@ -22,6 +22,108 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
     static final RectF c = new RectF();
     static final Paint d = new Paint();
 
+    public static void a(CustomUnit customUnit, float f, boolean z, boolean z2) {
+        LegInstance[] legInstanceArr = customUnit.legInstances;
+        if (legInstanceArr == null) {
+            return;
+        }
+        CustomUnitConfig customUnitConfig = customUnit.unitConfig;
+        float f2 = customUnit.rotationSpeed;
+        if (customUnitConfig.lockLegRotationWithMainTurret) {
+            f2 = customUnit.movementLevels[customUnitConfig.defaultTurretRotationSpeed].targetX;
+        }
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (customUnit.isUnitInvulnerable || customUnit.isUnitParalyzed) {
+            for (int i = 0; i < customUnitConfig.legConfig.length; i++) {
+                legInstanceArr[i].m = true;
+            }
+            customUnit.dv();
+        }
+        float maxHealth = customUnit.getMaxHealth();
+        Paint renderPaint = null;
+        boolean z3 = gameEngine.mousePressed || customUnit.isUnitParalyzed;
+        for (int i2 = 0; i2 < legInstanceArr.length; i2++) {
+            LegConfig legConfig = customUnitConfig.legConfig[i2];
+            if ((legConfig.P == z || legConfig.D != null) && legConfig.Q == z2 && !legConfig.p && (legConfig.q == null || !legConfig.q.read(customUnit))) {
+                LegInstance legInstance = legInstanceArr[i2];
+                if (legInstance.s > 0.0f) {
+                    float f3 = customUnit.posZ + legInstance.d;
+                    if (renderPaint == null) {
+                        renderPaint = customUnit.getRenderPaint();
+                    }
+                    Paint paint = renderPaint;
+                    float fL = 1.0f;
+                    if (f3 < -0.3f) {
+                        fL = customUnit.getSubmergedRenderAlpha(f3) * 0.003921569f;
+                    }
+                    if (legInstance.s < 1.0f) {
+                        fL *= legInstance.s;
+                    }
+                    if (fL < 1.0f) {
+                        int i3 = (int) (255.0f * fL);
+                        if (paint.f() != i3) {
+                            d.a(paint);
+                            int iF = d.f();
+                            if (iF < i3) {
+                                i3 = iF;
+                            }
+                            d.c(i3);
+                            paint = d;
+                        }
+                    }
+                    float f4 = (customUnit.posX + legInstance.b) - gameEngine.viewpointXSnapped;
+                    float f5 = (((customUnit.posY + legInstance.c) - gameEngine.viewpointYSnapped) - legInstance.d) - customUnit.posZ;
+                    GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
+                    if (maxHealth != 1.0f) {
+                        graphicsEngine.k();
+                        graphicsEngine.a(maxHealth, maxHealth, f4, f5);
+                    }
+                    if (legConfig.D != null && !z && gameEngine.mouseWorldY && legInstance.d + customUnit.posZ > 0.0f) {
+                        graphicsEngine.a(legConfig.D, f4, f5 + legInstance.d + customUnit.posZ, legInstance.i + legInstance.r + legConfig.R, customUnit.getSelectionPaint());
+                    }
+                    if (legConfig.P == z) {
+                        Texture texture = legConfig.B;
+                        if (legConfig.C != null) {
+                            texture = legConfig.C[customUnit.team.getTeamColorIndex()];
+                        }
+                        if (!legConfig.H && ((z3 || legConfig.G) && texture != null)) {
+                            graphicsEngine.a(texture, f4, f5, legInstance.i + legInstance.r + legConfig.R, paint);
+                        }
+                        Texture texture2 = legConfig.x;
+                        if (legConfig.y != null) {
+                            texture2 = legConfig.y[customUnit.team.getTeamColorIndex()];
+                        }
+                        if (texture2 != null && (z3 || legConfig.F)) {
+                            float f6 = texture2.u;
+                            float fSqrt = f6;
+                            float fFastCos = Utility.fastCos(f2);
+                            float fFastSin = Utility.fastSin(f2);
+                            float f7 = (fFastCos * legConfig.k) - (fFastSin * legConfig.j);
+                            float f8 = (fFastSin * legConfig.k) + (fFastCos * legConfig.j);
+                            float angleBetweenPoints = Utility.getAngleBetweenPoints(legInstance.b, legInstance.c, f7, f8);
+                            float fDistanceSq = Utility.distanceSq(legInstance.b, legInstance.c, f7, f8);
+                            if (fDistanceSq < (f6 - 2.0f) * (f6 - 2.0f)) {
+                                fSqrt = Utility.sqrt((int) fDistanceSq);
+                            }
+                            graphicsEngine.k();
+                            graphicsEngine.a(angleBetweenPoints + 90.0f, f4, f5);
+                            b.a(0, (int) (f6 - fSqrt), texture2.p, (int) (f6 + fSqrt));
+                            c.a(f4 - texture2.r, f5 - fSqrt, f4 + texture2.r, f5 + fSqrt);
+                            graphicsEngine.a(texture2, b, c, paint);
+                            graphicsEngine.l();
+                        }
+                        if (legConfig.H && ((z3 || legConfig.G) && texture != null)) {
+                            graphicsEngine.a(texture, f4, f5, legInstance.i + legInstance.r + legConfig.R, paint);
+                        }
+                    }
+                    if (maxHealth != 1.0f) {
+                        graphicsEngine.l();
+                    }
+                }
+            }
+        }
+    }
+
     @Override // com.corrodinggames.rts.game.units.custom.hooks.CustomUnitRenderHook
     public void b(CustomUnit customUnit, float f) {
         Effect effectCreateMuzzleFlash;
@@ -45,8 +147,8 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
         }
         GameEngine gameEngine = GameEngine.getInstance();
         float f2 = customUnit.rotationSpeed;
-        if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogic) {
-            f2 = customUnit.movementLevels[customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].targetX;
+        if (customUnitConfig.lockLegRotationWithMainTurret) {
+            f2 = customUnit.movementLevels[customUnitConfig.defaultTurretRotationSpeed].targetX;
         }
         float f3 = customUnit.posX - customUnit.dP;
         float f4 = customUnit.posY - customUnit.dQ;
@@ -75,7 +177,7 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
         int i2 = 0;
         for (int i3 = 0; i3 < legInstanceArr.length; i3++) {
             LegInstance legInstance2 = legInstanceArr[i3];
-            LegConfig legConfig = customUnitConfig.energyDisplayName[i3];
+            LegConfig legConfig = customUnitConfig.legConfig[i3];
             boolean z2 = false;
             boolean z3 = false;
             if (legInstance2.m) {
@@ -144,7 +246,7 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
         }
         for (int i4 = 0; i4 < legInstanceArr.length; i4++) {
             LegInstance legInstance3 = legInstanceArr[i4];
-            LegConfig legConfig2 = customUnitConfig.energyDisplayName[i4];
+            LegConfig legConfig2 = customUnitConfig.legConfig[i4];
             if (!legConfig2.p) {
                 float f11 = legConfig2.g;
                 if (!legConfig2.h) {
@@ -232,108 +334,6 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
                     legInstance3.e += f;
                 } else {
                     legInstance3.d += f * legConfig2.v;
-                }
-            }
-        }
-    }
-
-    public static void a(CustomUnit customUnit, float f, boolean z, boolean z2) {
-        LegInstance[] legInstanceArr = customUnit.legInstances;
-        if (legInstanceArr == null) {
-            return;
-        }
-        CustomUnitConfig customUnitConfig = customUnit.unitConfig;
-        float f2 = customUnit.rotationSpeed;
-        if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogic) {
-            f2 = customUnit.movementLevels[customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].targetX;
-        }
-        GameEngine gameEngine = GameEngine.getInstance();
-        if (customUnit.isUnitInvulnerable || customUnit.isUnitParalyzed) {
-            for (int i = 0; i < customUnitConfig.energyDisplayName.length; i++) {
-                legInstanceArr[i].m = true;
-            }
-            customUnit.dv();
-        }
-        float maxHealth = customUnit.getMaxHealth();
-        Paint renderPaint = null;
-        boolean z3 = gameEngine.mousePressed || customUnit.isUnitParalyzed;
-        for (int i2 = 0; i2 < legInstanceArr.length; i2++) {
-            LegConfig legConfig = customUnitConfig.energyDisplayName[i2];
-            if ((legConfig.P == z || legConfig.D != null) && legConfig.Q == z2 && !legConfig.p && (legConfig.q == null || !legConfig.q.read(customUnit))) {
-                LegInstance legInstance = legInstanceArr[i2];
-                if (legInstance.s > 0.0f) {
-                    float f3 = customUnit.posZ + legInstance.d;
-                    if (renderPaint == null) {
-                        renderPaint = customUnit.getRenderPaint();
-                    }
-                    Paint paint = renderPaint;
-                    float fL = 1.0f;
-                    if (f3 < -0.3f) {
-                        fL = customUnit.getSubmergedRenderAlpha(f3) * 0.003921569f;
-                    }
-                    if (legInstance.s < 1.0f) {
-                        fL *= legInstance.s;
-                    }
-                    if (fL < 1.0f) {
-                        int i3 = (int) (255.0f * fL);
-                        if (paint.f() != i3) {
-                            d.a(paint);
-                            int iF = d.f();
-                            if (iF < i3) {
-                                i3 = iF;
-                            }
-                            d.c(i3);
-                            paint = d;
-                        }
-                    }
-                    float f4 = (customUnit.posX + legInstance.b) - gameEngine.viewpointXSnapped;
-                    float f5 = (((customUnit.posY + legInstance.c) - gameEngine.viewpointYSnapped) - legInstance.d) - customUnit.posZ;
-                    GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
-                    if (maxHealth != 1.0f) {
-                        graphicsEngine.k();
-                        graphicsEngine.a(maxHealth, maxHealth, f4, f5);
-                    }
-                    if (legConfig.D != null && !z && gameEngine.mouseWorldY && legInstance.d + customUnit.posZ > 0.0f) {
-                        graphicsEngine.a(legConfig.D, f4, f5 + legInstance.d + customUnit.posZ, legInstance.i + legInstance.r + legConfig.R, customUnit.getSelectionPaint());
-                    }
-                    if (legConfig.P == z) {
-                        Texture texture = legConfig.B;
-                        if (legConfig.C != null) {
-                            texture = legConfig.C[customUnit.team.getTeamColorIndex()];
-                        }
-                        if (!legConfig.H && ((z3 || legConfig.G) && texture != null)) {
-                            graphicsEngine.a(texture, f4, f5, legInstance.i + legInstance.r + legConfig.R, paint);
-                        }
-                        Texture texture2 = legConfig.x;
-                        if (legConfig.y != null) {
-                            texture2 = legConfig.y[customUnit.team.getTeamColorIndex()];
-                        }
-                        if (texture2 != null && (z3 || legConfig.F)) {
-                            float f6 = texture2.u;
-                            float fSqrt = f6;
-                            float fFastCos = Utility.fastCos(f2);
-                            float fFastSin = Utility.fastSin(f2);
-                            float f7 = (fFastCos * legConfig.k) - (fFastSin * legConfig.j);
-                            float f8 = (fFastSin * legConfig.k) + (fFastCos * legConfig.j);
-                            float angleBetweenPoints = Utility.getAngleBetweenPoints(legInstance.b, legInstance.c, f7, f8);
-                            float fDistanceSq = Utility.distanceSq(legInstance.b, legInstance.c, f7, f8);
-                            if (fDistanceSq < (f6 - 2.0f) * (f6 - 2.0f)) {
-                                fSqrt = Utility.sqrt((int) fDistanceSq);
-                            }
-                            graphicsEngine.k();
-                            graphicsEngine.a(angleBetweenPoints + 90.0f, f4, f5);
-                            b.a(0, (int) (f6 - fSqrt), texture2.p, (int) (f6 + fSqrt));
-                            c.a(f4 - texture2.r, f5 - fSqrt, f4 + texture2.r, f5 + fSqrt);
-                            graphicsEngine.a(texture2, b, c, paint);
-                            graphicsEngine.l();
-                        }
-                        if (legConfig.H && ((z3 || legConfig.G) && texture != null)) {
-                            graphicsEngine.a(texture, f4, f5, legInstance.i + legInstance.r + legConfig.R, paint);
-                        }
-                    }
-                    if (maxHealth != 1.0f) {
-                        graphicsEngine.l();
-                    }
                 }
             }
         }

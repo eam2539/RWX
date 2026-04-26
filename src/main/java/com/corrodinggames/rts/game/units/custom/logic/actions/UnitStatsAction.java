@@ -4,11 +4,7 @@ import android.graphics.PointF;
 import com.corrodinggames.rts.game.PlayerTeam;
 import com.corrodinggames.rts.game.units.BaseUnit;
 import com.corrodinggames.rts.game.units.actions.AbstractUnitAction;
-import com.corrodinggames.rts.game.units.custom.ConfigParseException;
-import com.corrodinggames.rts.game.units.custom.CustomUnit;
-import com.corrodinggames.rts.game.units.custom.CustomUnitActionHandler;
-import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
-import com.corrodinggames.rts.game.units.custom.UnitStats;
+import com.corrodinggames.rts.game.units.custom.*;
 import com.corrodinggames.rts.game.units.custom.logic.CustomActionDef;
 import com.corrodinggames.rts.game.units.custom.logic.LogicAction;
 import com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean;
@@ -18,6 +14,7 @@ import com.corrodinggames.rts.game.units.g.SpecialActionBlockEffect;
 import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.utility.IniFile;
 import com.corrodinggames.rts.gameFramework.utility.Vector3D;
+
 import java.util.Iterator;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.custom.a.a.j */
@@ -163,7 +160,7 @@ public class UnitStatsAction extends LogicAction {
         BaseUnit unit;
         PlayerTeam playerTeamK;
         if (this.resetUnitStats) {
-            customUnit.y = customUnit.unitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic;
+            customUnit.y = customUnit.unitConfig.unitStats;
             customUnit.maxHealth = customUnit.y.maxHp;
             if (customUnit.currentHealth > customUnit.maxHealth) {
                 customUnit.o(customUnit.maxHealth);

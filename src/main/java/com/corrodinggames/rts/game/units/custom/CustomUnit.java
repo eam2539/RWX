@@ -1,39 +1,17 @@
 package com.corrodinggames.rts.game.units.custom;
 
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PointF;
-import android.graphics.Rect;
-import android.graphics.RectF;
+import android.graphics.*;
 import com.corrodinggames.rts.game.PlayerTeam;
 import com.corrodinggames.rts.game.Projectile;
 import com.corrodinggames.rts.game.ScorchMark;
-import com.corrodinggames.rts.game.units.AttackMode;
-import com.corrodinggames.rts.game.units.BaseUnit;
-import com.corrodinggames.rts.game.units.CommandType;
-import com.corrodinggames.rts.game.units.FireUnit;
-import com.corrodinggames.rts.game.units.MovableUnit;
-import com.corrodinggames.rts.game.units.OrderableUnit;
-import com.corrodinggames.rts.game.units.TransportUnitInterface;
-import com.corrodinggames.rts.game.units.UnitBehaviorType;
-import com.corrodinggames.rts.game.units.UnitCommand;
-import com.corrodinggames.rts.game.units.UnitCommandType;
-import com.corrodinggames.rts.game.units.UnitMovementData;
-import com.corrodinggames.rts.game.units.UnitMovementType;
-import com.corrodinggames.rts.game.units.UnitPathPoints;
-import com.corrodinggames.rts.game.units.UnitSize;
-import com.corrodinggames.rts.game.units.UnitType;
+import com.corrodinggames.rts.game.units.*;
 import com.corrodinggames.rts.game.units.actions.AbstractUnitAction;
 import com.corrodinggames.rts.game.units.actions.ActionId;
 import com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface;
 import com.corrodinggames.rts.game.units.buildings.FactoryQueueManager;
 import com.corrodinggames.rts.game.units.buildings.FactoryWithQueue;
 import com.corrodinggames.rts.game.units.buildings.NukeLauncher;
-import com.corrodinggames.rts.game.units.custom.hooks.AttachmentManagerHook;
-import com.corrodinggames.rts.game.units.custom.hooks.AttachmentSlotDefinition;
-import com.corrodinggames.rts.game.units.custom.hooks.CustomUnitLegController;
-import com.corrodinggames.rts.game.units.custom.hooks.CustomUnitRenderHook;
-import com.corrodinggames.rts.game.units.custom.hooks.LegInstance;
+import com.corrodinggames.rts.game.units.custom.hooks.*;
 import com.corrodinggames.rts.game.units.custom.logic.ActionType;
 import com.corrodinggames.rts.game.units.custom.logic.CustomAction;
 import com.corrodinggames.rts.game.units.custom.logic.CustomActionDef;
@@ -62,6 +40,7 @@ import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
 import com.corrodinggames.rts.gameFramework.utility.Vector3D;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,9 +185,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         gameOutputStream.writeFloat(this.unknownFloat2);
         gameOutputStream.writeBoolean(this.isUnloading);
         gameOutputStream.writeInt(this.transportedUnits.size());
-        Iterator it = this.transportedUnits.iterator();
-        while (it.hasNext()) {
-            gameOutputStream.writeUnitIdOrNullBaseUnit((BaseUnit) it.next());
+        for (BaseUnit transportedUnit : this.transportedUnits) {
+            gameOutputStream.writeUnitIdOrNullBaseUnit(transportedUnit);
         }
         gameOutputStream.writeBoolean(this.r);
         gameOutputStream.writeFloat(this.o);
@@ -341,7 +319,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cr */
     public boolean getUnitAIPathfindCost() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags > 0;
+        return this.unitConfig.maxTransportingUnits > 0;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.TransportUnitInterface
@@ -358,18 +336,18 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean d(BaseUnit baseUnit, boolean z) {
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags == 0 || this.isUnloading || this.deceleration < 1.0f || !getUnitArmor(baseUnit) || baseUnit == this) {
+        if (this.unitConfig.maxTransportingUnits == 0 || this.isUnloading || this.deceleration < 1.0f || !getUnitArmor(baseUnit) || baseUnit == this) {
             return false;
         }
-        if (this.team != baseUnit.team && !z && (!this.unitConfig.canBeBuiltByOrTagsAndLogicAndTags || this.team != PlayerTeam.TEAM_ALL)) {
+        if (this.team != baseUnit.team && !z && (!this.unitConfig.whileNeutralTransportAnyTeam || this.team != PlayerTeam.TEAM_ALL)) {
             return false;
         }
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicAndTags != null && !this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicAndTags.a() && !AnimationTag.a(this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicAndTags, baseUnit.getUnitCombatAnimation())) {
+        if (this.unitConfig.transportUnitsRequireTag != null && !this.unitConfig.transportUnitsRequireTag.a() && !AnimationTag.a(this.unitConfig.transportUnitsRequireTag, baseUnit.getUnitCombatAnimation())) {
             return false;
         }
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogicOrTags.size() > 0) {
+        if (this.unitConfig.transportUnitsRequireMovementType.size() > 0) {
             boolean z2 = false;
-            Iterator it = this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogicOrTags.iterator();
+            Iterator it = this.unitConfig.transportUnitsRequireMovementType.iterator();
             while (true) {
                 if (!it.hasNext()) {
                     break;
@@ -383,7 +361,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 return false;
             }
         }
-        return GameViewUtils.a(baseUnit, this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogicAndTags, this.unitConfig.f8eS);
+        return GameViewUtils.a(baseUnit, this.unitConfig.transportUnitsBlockAirAndWaterUnits, this.unitConfig.transportUnitsBlockOtherTransports);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -399,7 +377,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public void loadTransportedUnit(BaseUnit baseUnit) {
         baseUnit.unitTransportTarget = this;
         this.transportedUnits.add(baseUnit);
-        if (this.unitConfig.canBeBuiltByAndTagsAndLogicOrTags && this.team == PlayerTeam.TEAM_ALL) {
+        if (this.unitConfig.whileNeutralConvertToTransportedTeam && this.team == PlayerTeam.TEAM_ALL) {
             isSelectable(baseUnit.team);
         }
         a(UnitEventType.transportingNewUnit, baseUnit);
@@ -411,7 +389,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public void unloadTransportedUnit(BaseUnit baseUnit) {
         a(UnitEventType.transportUnloadedOrRemovedUnit, baseUnit);
         baseUnit.a(UnitEventType.leftTransport, this);
-        if (this.unitConfig.canBeBuiltByAndTagsAndLogicAndTags && this.transportedUnits.size() == 0) {
+        if (this.unitConfig.convertToNeutralIfNotTransporting && this.transportedUnits.size() == 0) {
             isSelectable(PlayerTeam.TEAM_ALL);
         }
     }
@@ -429,7 +407,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     /* JADX INFO: renamed from: L */
     public void getTransportedUnits() {
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags == 0) {
+        if (this.unitConfig.maxTransportingUnits == 0) {
             return;
         }
         this.isUnloading = true;
@@ -438,7 +416,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     /* JADX INFO: renamed from: M */
     public void getLoadedUnits() {
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags == 0) {
+        if (this.unitConfig.maxTransportingUnits == 0) {
             return;
         }
         this.isUnloading = false;
@@ -460,15 +438,15 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     private boolean b(BaseUnit baseUnit, boolean z, boolean z2) {
         boolean z3;
         float fFloatValue = 180.0f;
-        if (this.unitConfig.spawnAngleOffset != null) {
-            fFloatValue = this.unitConfig.spawnAngleOffset.floatValue();
+        if (this.unitConfig.exit_dirOffset != null) {
+            fFloatValue = this.unitConfig.exit_dirOffset.floatValue();
         }
         float fFloatValue2 = 70.0f;
-        if (this.unitConfig.spawnSideOffset != null) {
-            fFloatValue2 = this.unitConfig.spawnSideOffset.floatValue();
+        if (this.unitConfig.exit_moveAwayAmount != null) {
+            fFloatValue2 = this.unitConfig.exit_moveAwayAmount.floatValue();
         }
-        float f = this.unitConfig.spawnOffsetLocalX;
-        float f2 = this.unitConfig.spawnOffsetLocalY;
+        float f = this.unitConfig.exit_x;
+        float f2 = this.unitConfig.exit_y;
         float fFastCos = (this.posX + (Utility.fastCos(this.rotationSpeed + fFloatValue) * f2)) - (Utility.fastSin(this.rotationSpeed + fFloatValue) * f);
         float fFastSin = this.posY + (Utility.fastSin(this.rotationSpeed + fFloatValue) * f2) + (Utility.fastCos(this.rotationSpeed + fFloatValue) * f);
         float fFastCos2 = fFastCos + (Utility.fastCos(this.rotationSpeed + 90.0f) * (z2 ? -7.0f : 7.0f));
@@ -527,7 +505,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 if (!z4) {
                     orderableUnit2.j(baseUnit.rotationSpeed);
                 }
-                if (!this.unitConfig.f12eW.read(this)) {
+                if (!this.unitConfig.transportUnitsKeepWaypoints.read(this)) {
                     orderableUnit2.clearAllWaypoints();
                     if (fFloatValue2 != 0.0f) {
                         orderableUnit2.appendMoveWaypoint(baseUnit.posX + (Utility.fastCos(f3 + (z2 ? -7.0f : 7.0f)) * fFloatValue2), baseUnit.posY + (Utility.fastSin(f3 + (z2 ? -7.0f : 7.0f)) * fFloatValue2));
@@ -538,10 +516,10 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 }
             }
             if (!z4) {
-                if (!this.unitConfig.keepOriginalZOnSpawn) {
+                if (!this.unitConfig.exitHeightIgnoreParent) {
                     baseUnit.posZ = this.posZ;
                 }
-                baseUnit.posZ += this.unitConfig.spawnOffsetZ;
+                baseUnit.posZ += this.unitConfig.exit_heightOffset;
             }
             if (baseUnit instanceof CustomUnit) {
                 ((CustomUnit) baseUnit).dF();
@@ -558,7 +536,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: bY */
     public int getTransportedUnitsWeight() {
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags == 0 || !this.unitConfig.canBuildOnWater) {
+        if (this.unitConfig.maxTransportingUnits == 0 || !this.unitConfig.showTransportBar) {
             return -1;
         }
         return dI();
@@ -567,15 +545,15 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: bZ */
     public int getMaxTransportWeight() {
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags == 0 || !this.unitConfig.canBuildOnWater) {
+        if (this.unitConfig.maxTransportingUnits == 0 || !this.unitConfig.showTransportBar) {
             return -1;
         }
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags;
+        return this.unitConfig.maxTransportingUnits;
     }
 
     public void ds() {
         if (this.transportedUnits.size > 0) {
-            h(this.unitConfig.f11eV.read(this));
+            h(this.unitConfig.transportUnitsKillOnDeath.read(this));
         }
     }
 
@@ -633,7 +611,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: aR */
     public boolean canExecuteMovementCommands() {
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogic) {
+        if (this.unitConfig.ignoreMoveOrders) {
             return false;
         }
         AttachmentSlotDefinition attachmentSlotDefinitionDn = dn();
@@ -698,10 +676,10 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed && this.unitConfig.maxShield != null) {
-            return this.unitConfig.maxShield;
+        if (this.isDestroyed && this.unitConfig.image_wreak != null) {
+            return this.unitConfig.image_wreak;
         }
-        return this.unitConfig.startShieldAtZero[this.team.getTeamColorIndex()];
+        return this.unitConfig.textures[this.team.getTeamColorIndex()];
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -730,7 +708,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (this.unitConfig.maxEnergy != null) {
             return this.unitConfig.maxEnergy[this.team.getTeamColorIndex()];
         }
-        return this.unitConfig.shieldRegen;
+        return this.unitConfig.image_turret;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -751,77 +729,77 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             gameEngine.pathfindingEngine.a(this);
         }
         if (this.deceleration < 1.0f) {
-            if (this.unitConfig.canPatrol != null && this.unitConfig.canPatrol.b()) {
-                this.unitConfig.canPatrol.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
+            if (this.unitConfig.effectOnDeathIfUnbuilt != null && this.unitConfig.effectOnDeathIfUnbuilt.b()) {
+                this.unitConfig.effectOnDeathIfUnbuilt.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
                 return false;
             }
-            if (this.unitConfig.canAttack != null && this.unitConfig.canAttack.b()) {
-                this.unitConfig.canAttack.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
+            if (this.unitConfig.effectOnDeath != null && this.unitConfig.effectOnDeath.b()) {
+                this.unitConfig.effectOnDeath.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
                 return false;
             }
             a(UnitSize.verysmall);
             return false;
         }
-        if (!this.unitConfig.f20fi) {
+        if (!this.unitConfig.slowDeathFall) {
             S(0);
         }
-        if (this.unitConfig.canAttack != null && this.unitConfig.canAttack.b()) {
-            this.unitConfig.canAttack.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
+        if (this.unitConfig.effectOnDeath != null && this.unitConfig.effectOnDeath.b()) {
+            this.unitConfig.effectOnDeath.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
         }
         if (this.unitConfig.canAttackUnderwater != -1) {
             a((BaseUnit) null, this.posX, this.posY, this.unitConfig.canAttackUnderwater, (CustomProjectileTemplate) null, 0);
         }
-        if (this.unitConfig.canAttackNotTouchingWater != null) {
-            if (this.unitConfig.targetGround && this.unitTarget1 != null && this.unitTarget1.team != null) {
+        if (this.unitConfig.unitsSpawnedOnDeath != null) {
+            if (this.unitConfig.unitsSpawnedOnDeath_setToTeamOfLastAttacker && this.unitTarget1 != null && this.unitTarget1.team != null) {
                 playerTeam = this.unitTarget1.team;
             } else {
                 playerTeam = this.team;
             }
             if (!playerTeam.isTeamVictory) {
-                this.unitConfig.canAttackNotTouchingWater.a(this.posX, this.posY, this.posZ, this.rotationSpeed, playerTeam, this.isSelected, this);
+                this.unitConfig.unitsSpawnedOnDeath.a(this.posX, this.posY, this.posZ, this.rotationSpeed, playerTeam, this.isSelected, this);
             }
         }
         this.isAttacking = false;
-        if (!this.unitConfig.f20fi) {
+        if (!this.unitConfig.slowDeathFall) {
             ds();
         }
-        if (this.unitConfig.displayFootprint) {
+        if (this.unitConfig.nukeOnDeath) {
             boolean z = false;
-            if (this.unitConfig.pylonBuildWith && gameEngine.isInGameOrLobby() && gameEngine.networkEngine.roomSettings.noNukes) {
+            if (this.unitConfig.nukeOnDeathDisableWhenNoNuke && gameEngine.isInGameOrLobby() && gameEngine.networkEngine.roomSettings.noNukes) {
                 z = true;
             }
             if (!z) {
                 Projectile projectileA = NukeLauncher.a(this, this.posX, this.posY, this.posX, this.posY);
                 projectileA.aH = false;
-                projectileA.Z = this.unitConfig.constructionPylon;
-                projectileA.Y = this.unitConfig.pylonRadius;
+                projectileA.Z = this.unitConfig.nukeOnDeathRange;
+                projectileA.Y = this.unitConfig.nukeOnDeathDamage;
             }
         }
-        if (this.unitConfig.footprint != 0) {
+        if (this.unitConfig.fireOnDeath != 0) {
             FireUnit fireUnit = new FireUnit(false);
             fireUnit.posX = this.posX;
             fireUnit.posY = this.posY;
             fireUnit.setUnitTeam(PlayerTeam.TEAM_UNKNOWN);
             PlayerTeam.c(fireUnit);
         }
-        if (this.unitConfig.canAttackFlying != null) {
-            this.unitConfig.canAttackFlying.a(this.posX, this.posY, 1.0f);
+        if (this.unitConfig.soundOnDeath != null) {
+            this.unitConfig.soundOnDeath.a(this.posX, this.posY, 1.0f);
         }
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicAndTags) {
-            if (this.unitConfig.canAttackFlying == null) {
+        if (this.unitConfig.isBio) {
+            if (this.unitConfig.soundOnDeath == null) {
                 gameEngine.soundEngine.playSound(SoundEngine.bugDieSound, 0.8f, this.posX, this.posY);
             }
-            if (this.unitConfig.softRadius) {
-                if (!i() && !this.unitConfig.f6eJ) {
+            if (this.unitConfig.explodeOnDeath) {
+                if (!i() && !this.unitConfig.hideScorchMark) {
                     ScorchMark.a(this, 1);
                 }
-                if (this.unitConfig.unitSize != null) {
-                    a(this.unitConfig.unitSize, true);
-                } else if (this.unitConfig.isConstructionBox) {
+                if (this.unitConfig.explodeTypeOnDeath != null) {
+                    a(this.unitConfig.explodeTypeOnDeath, true);
+                } else if (this.unitConfig.dieOnAttack) {
                     a(UnitSize.large);
                 }
             }
-            if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicOrTags) {
+            if (this.unitConfig.isBug) {
                 for (int i = 0; i < bp(); i++) {
                     gameEngine.effectManager.createBloodEffect(this.posX, this.posY, this.posZ);
                 }
@@ -831,11 +809,11 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 dv();
                 for (int i2 = 0; i2 < this.legInstances.length; i2++) {
                     LegInstance legInstance = this.legInstances[i2];
-                    LegConfig legConfig = this.unitConfig.energyDisplayName[i2];
+                    LegConfig legConfig = this.unitConfig.legConfig[i2];
                     float f = this.posX + legInstance.b;
                     float f2 = this.posY + legInstance.c;
                     if (legConfig.J && !legConfig.p && (legConfig.q == null || !legConfig.q.read(this))) {
-                        if (!GameViewUtils.d(f, f2) && !this.unitConfig.f6eJ) {
+                        if (!GameViewUtils.d(f, f2) && !this.unitConfig.hideScorchMark) {
                             ScorchMark.a(f, f2);
                         }
                         gameEngine.effectManager.createSmallExplosion(f, f2, 0.0f);
@@ -843,17 +821,17 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 }
             }
             if (!i()) {
-                if (this.unitConfig.softRadius) {
-                    if (this.unitConfig.unitSize != null) {
-                        a(this.unitConfig.unitSize, true);
+                if (this.unitConfig.explodeOnDeath) {
+                    if (this.unitConfig.explodeTypeOnDeath != null) {
+                        a(this.unitConfig.explodeTypeOnDeath, true);
                     } else {
                         a(UnitSize.small);
                     }
                 }
             } else {
-                if (this.unitConfig.softRadius) {
-                    if (this.unitConfig.unitSize != null) {
-                        a(this.unitConfig.unitSize, false);
+                if (this.unitConfig.explodeOnDeath) {
+                    if (this.unitConfig.explodeTypeOnDeath != null) {
+                        a(this.unitConfig.explodeTypeOnDeath, false);
                     } else {
                         gameEngine.effectManager.createSmallExplosion(this.posX, this.posY, this.posZ);
                     }
@@ -863,11 +841,11 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 }
             }
         }
-        if (this.unitConfig.f20fi) {
+        if (this.unitConfig.slowDeathFall) {
             return true;
         }
-        if (this.unitConfig.maxShield != null) {
-            this.baseTexture = this.unitConfig.maxShield;
+        if (this.unitConfig.image_wreak != null) {
+            this.baseTexture = this.unitConfig.image_wreak;
             this.animationFrameIndex = 0;
             this.ew = true;
             return true;
@@ -877,7 +855,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public void bq() {
-        if (!this.unitConfig.f6eJ) {
+        if (!this.unitConfig.hideScorchMark) {
             super.bq();
         }
     }
@@ -906,7 +884,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         UnitStats unitStats = this.y;
         this.unitConfig = customUnitConfig;
         this.unitType = this.unitConfig;
-        this.y = customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic;
+        this.y = customUnitConfig.unitStats;
         if (z2) {
             UnitStats.a(this, unitStats, customUnitConfig2);
         } else if (customUnitDataFieldArr != null) {
@@ -982,16 +960,16 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             U(this.unitConfig.mass);
         }
         this.ew = false;
-        this.speed = this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogic;
-        this.maxSpeed = this.unitConfig.canBeBuiltByOrTagsAndLogicAndTagsAndLogicAndTags;
+        this.speed = this.unitConfig.radius;
+        this.maxSpeed = this.unitConfig.displayRadius;
         if (this.isDestroyed) {
             this.animationFrameIndex = 0;
         } else {
-            this.animationFrameIndex = this.unitConfig.lockTurretWithBody;
+            this.animationFrameIndex = this.unitConfig.default_frame;
         }
         this.frameAnimationLooping = false;
         if (z) {
-            this.posZ += this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogic;
+            this.posZ += this.unitConfig.startingHeightOffset;
         }
         float f = this.maxHealth;
         this.maxHealth = this.y.maxHp;
@@ -1002,7 +980,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         float f2 = this.unitEnergyMax;
         this.unitEnergyMax = this.y.maxShield;
-        if (this.unitConfig.canBeBuiltByAndTagsAndLogicOrTagsAndLogic) {
+        if (this.unitConfig.startShieldAtZero) {
             if (this.shield > this.unitEnergyMax) {
                 this.shield = this.unitEnergyMax;
             }
@@ -1011,12 +989,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         } else {
             this.shield = (this.shield / f2) * this.unitEnergyMax;
         }
-        if (this.unitConfig.canBeBuiltByAndTagsAndLogicAndTagsAndLogic) {
+        if (this.unitConfig.startEnergyAtZero) {
             if (this.f0cB > this.y.maxEnergy) {
                 this.f0cB = this.y.maxEnergy;
             }
         } else if (z) {
-            this.f0cB = this.y.maxEnergy * this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogic;
+            this.f0cB = this.y.maxEnergy * this.unitConfig.energyStartingPercentage;
         } else if (unitStats.maxEnergy == 0.0f) {
             this.f0cB = this.y.maxEnergy;
         } else {
@@ -1031,7 +1009,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             this.rotationSpeed = -90.0f;
         }
         f_();
-        if (!z && ((this.unitData1 != null || this.unitData2 != null) && (!UnitPrice.b(this.unitConfig.buildPrice, customUnitConfig2.buildPrice) || !UnitPrice.b(this.unitConfig.streamingPrice, customUnitConfig2.streamingPrice)))) {
+        if (!z && ((this.unitData1 != null || this.unitData2 != null) && (!UnitPrice.b(this.unitConfig.price, customUnitConfig2.price) || !UnitPrice.b(this.unitConfig.streamingCost, customUnitConfig2.streamingCost)))) {
             this.unitData1 = null;
             this.unitData2 = null;
         }
@@ -1040,7 +1018,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             if (this.unitConfig.j()) {
                 this.velocityY = 0.0f;
                 this.velocityX = 0.0f;
-                if (customUnitConfig2.j() && !this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogic.equals(customUnitConfig2.canBeBuiltByAndTagsOrLogicAndTagsOrLogic)) {
+                if (customUnitConfig2.j() && !this.unitConfig.footprint.equals(customUnitConfig2.footprint)) {
                     z4 = true;
                 }
             }
@@ -1049,12 +1027,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             }
         }
         this.unknownFloat1 = 1.0f;
-        if (this.unitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic != -2) {
+        if (this.unitConfig.drawLayer != -2) {
         }
         if (!this.isDestroyed) {
             dF();
         }
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicAndTags) {
+        if (this.unitConfig.isMelee) {
         }
         du();
         getUnitCombatCooldown().a(this.unitConfig);
@@ -1081,7 +1059,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 clearPathData();
             }
         }
-        if (this.unitConfig.canBeBuiltByAndTagsAndLogicAndTags && this.transportedUnits.size() == 0) {
+        if (this.unitConfig.convertToNeutralIfNotTransporting && this.transportedUnits.size() == 0) {
             setUnitTeam(PlayerTeam.TEAM_ALL);
         }
         if (this.isSelected && !gameEngine.gameUI.canUnitBeSelected(this)) {
@@ -1097,13 +1075,13 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                     c(false);
                 }
             } else {
-                if ((this.unitConfig.canBeBuiltByAndTagsAndLogicOrTagsAndLogicAndTags != -1 ? this.unitConfig.canBeBuiltByAndTagsAndLogicOrTagsAndLogicAndTags : this.y.fogOfWarSightRange) > (customUnitConfig2.canBeBuiltByAndTagsAndLogicOrTagsAndLogicAndTags != -1 ? customUnitConfig2.canBeBuiltByAndTagsAndLogicOrTagsAndLogicAndTags : unitStats.fogOfWarSightRange)) {
+                if ((this.unitConfig.fogOfWarSightRangeWhileNotBuilt2 != -1 ? this.unitConfig.fogOfWarSightRangeWhileNotBuilt2 : this.y.fogOfWarSightRange) > (customUnitConfig2.fogOfWarSightRangeWhileNotBuilt2 != -1 ? customUnitConfig2.fogOfWarSightRangeWhileNotBuilt2 : unitStats.fogOfWarSightRange)) {
                     c(false);
                 }
             }
         }
-        if (this.frameAnimationReverse && this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTags != null) {
-            this.animationController.a(this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTags, 7, true);
+        if (this.frameAnimationReverse && this.unitConfig.createdAnimation != null) {
+            this.animationController.a(this.unitConfig.createdAnimation, 7, true);
         }
     }
 
@@ -1111,7 +1089,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public void f_() {
         if (!this.unitConfig.isBuildingUnit && !this.isDestroyed) {
             this.isAttacking = true;
-            if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicOrTags) {
+            if (this.unitConfig.disableAllUnitCollisions2) {
                 this.isAttacking = false;
             }
         } else {
@@ -1165,7 +1143,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         super.update(f);
         if (this.isDestroyed && !this.unknownBoolean2) {
             if (this.posZ > 0.0f) {
-                if (customUnitConfig.f20fi && !(this.rotation == 0.0f && this.velocityX == 0.0f && this.velocityY == 0.0f)) {
+                if (customUnitConfig.slowDeathFall && !(this.rotation == 0.0f && this.velocityX == 0.0f && this.velocityY == 0.0f)) {
                     this.frameAnimationDelay += 0.017f * f;
                     this.posZ -= this.frameAnimationDelay * f;
                     PointF pointFN = getMovementDeltaOffset(f);
@@ -1175,7 +1153,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                         GameEngine gameEngine = GameEngine.getInstance();
                         this.unitAnimationRotation += f;
                         this.unitAnimationOffset += f;
-                        if (customUnitConfig.f21fj && this.unitAnimationRotation > 9.0f) {
+                        if (customUnitConfig.slowDeathFallSmoke && this.unitAnimationRotation > 9.0f) {
                             this.unitAnimationRotation = Utility.randomFloatInRange(1.0f, 3.0f);
                             Effect effectCreateEffectInternal = gameEngine.effectManager.createEffectInternal(this.posX, this.posY, this.posZ, EffectType.custom, false, EffectQuality.low);
                             if (effectCreateEffectInternal != null) {
@@ -1209,16 +1187,16 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                         }
                     }
                 } else {
-                    this.frameAnimationDelay += customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTagsAndLogic * f;
+                    this.frameAnimationDelay += customUnitConfig.fallingAccelerationDead * f;
                     this.posZ -= this.frameAnimationDelay * f;
                 }
             } else if (!this.unknownBoolean1) {
                 this.unknownBoolean1 = true;
-                if (customUnitConfig.f20fi) {
+                if (customUnitConfig.slowDeathFall) {
                     ds();
                     S(0);
-                    if (customUnitConfig.maxShield != null) {
-                        this.baseTexture = customUnitConfig.maxShield;
+                    if (customUnitConfig.image_wreak != null) {
+                        this.baseTexture = customUnitConfig.image_wreak;
                         this.animationFrameIndex = 0;
                         this.ew = true;
                     } else {
@@ -1226,17 +1204,17 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                     }
                 }
                 if (this.frameAnimationDelay > 0.5d) {
-                    if (customUnitConfig.canGuard != null && customUnitConfig.canGuard.a()) {
-                        customUnitConfig.canGuard.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
+                    if (customUnitConfig.effectOnDeathGroundCollision != null && customUnitConfig.effectOnDeathGroundCollision.a()) {
+                        customUnitConfig.effectOnDeathGroundCollision.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
                     }
                     if (isMoving()) {
-                        if (customUnitConfig.canRepair) {
+                        if (customUnitConfig.explodeOnDeathGroundCollision) {
                             a(UnitSize.verysmall);
                         }
                         if (m147cJ()) {
                             GameEngine.getInstance().effectManager.createDirectedExplosion(this.posX, this.posY, 0.0f, 0, 0.0f, 0.0f, this.rotationSpeed);
                         }
-                    } else if (customUnitConfig.canRepair) {
+                    } else if (customUnitConfig.explodeOnDeathGroundCollision) {
                         a(UnitSize.small);
                     }
                 }
@@ -1265,8 +1243,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             return;
         }
         GameEngine gameEngine2 = GameEngine.getInstance();
-        if (customUnitConfig.isExtractor != 0.0f && this.deceleration < 1.0f) {
-            float f3 = this.deceleration + (customUnitConfig.isExtractor * f);
+        if (customUnitConfig.selfBuildRate != 0.0f && this.deceleration < 1.0f) {
+            float f3 = this.deceleration + (customUnitConfig.selfBuildRate * f);
             if (f3 >= 1.0f) {
                 PlayerTeam.b((BaseUnit) this);
                 this.deceleration = 1.0f;
@@ -1279,11 +1257,11 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         if (!isAlive()) {
             if (this.deceleration < 1.0f) {
-                if (customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTags != null) {
-                    this.animationController.a(customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTags, 8);
+                if (customUnitConfig.underConstructionAnimation != null) {
+                    this.animationController.a(customUnitConfig.underConstructionAnimation, 8);
                     this.animationController.a(f);
-                } else if (customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTags != null) {
-                    this.animationController.a(customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTags, 99);
+                } else if (customUnitConfig.underConstructionWithLinkedBuiltTimeAnimation != null) {
+                    this.animationController.a(customUnitConfig.underConstructionWithLinkedBuiltTimeAnimation, 99);
                     this.animationController.currentTime = this.deceleration;
                     this.animationController.speedMultiplier = 0.0f;
                     this.animationController.a(f);
@@ -1294,7 +1272,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 ((CustomUnitRenderHook) objArrA2[i2]).a(this, f);
             }
             boolean z2 = true;
-            if ((this.deceleration < 1.0f && !customUnitConfig.canBeBuiltByUnit) || (this.unitTransportTarget != null && !customUnitConfig.canBeBuiltBy)) {
+            if ((this.deceleration < 1.0f && !customUnitConfig.autoTriggerCheckWhileNotBuilt) || (this.unitTransportTarget != null && !customUnitConfig.canBeBuiltBy)) {
                 z2 = false;
             }
             if (z2) {
@@ -1320,9 +1298,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         if (this.y.maxEnergy != 0.0f) {
             if (!this.v) {
-                f2 = customUnitConfig.canBeBuiltByAndTagsAndLogicAndTagsOrLogic;
+                f2 = customUnitConfig.energyRegen;
             } else {
-                f2 = customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogic;
+                f2 = customUnitConfig.energyRegenWhenRecharging;
             }
             if (this.f0cB < this.y.maxEnergy || f2 < 0.0f) {
                 this.f0cB += f2 * f;
@@ -1332,7 +1310,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 this.v = false;
             }
             if (this.f0cB <= 0.0f) {
-                if (customUnitConfig.canNotBeGivenOrdersByPlayer) {
+                if (customUnitConfig.dieOnZeroEnergy) {
                     bv();
                     return;
                 }
@@ -1351,7 +1329,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             }
             if (this.unitShieldMax != 0.0f) {
                 this.unitShieldMax -= (this.unitShieldMax * 0.02f) * f;
-                this.unitShieldMax = Utility.distanceSq(this.unitShieldMax, 0.0f, customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogic * f);
+                this.unitShieldMax = Utility.distanceSq(this.unitShieldMax, 0.0f, customUnitConfig.shieldDeflectionDisplayRate * f);
                 if (this.unitShieldMax > 50.0f) {
                     this.unitShieldMax = 50.0f;
                 }
@@ -1359,14 +1337,14 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         this.unitEffectManager.a(f);
         CustomUnitConfig customUnitConfig3 = this.unitConfig;
-        if (customUnitConfig3.isFlying) {
+        if (customUnitConfig3.isBuilder) {
             BuilderUnit.updateTargetPriorityPoints(f, this);
         }
-        if (customUnitConfig3.canBeBuiltByBuilder) {
+        if (customUnitConfig3.hasGenerationCondition) {
             this.o += f;
-            if (this.o > customUnitConfig3.canBeBuiltByNotTags - 0.1f) {
-                this.o -= customUnitConfig3.canBeBuiltByNotTags;
-                boolean z3 = customUnitConfig3.canBeBuiltByOrTagsOrLogic.read(this);
+            if (this.o > customUnitConfig3.generationDelay - 0.1f) {
+                this.o -= customUnitConfig3.generationDelay;
+                boolean z3 = customUnitConfig3.generationActive.read(this);
                 if (this.p != z3) {
                     PlayerTeam.a((BaseUnit) this);
                     this.p = z3;
@@ -1385,13 +1363,13 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             }
         }
         if (this.isRepairing) {
-            this.animationController.a(customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTags, 3);
-        } else if (!this.animationController.animationPlaying || this.animationController.currentAnimation == customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTags) {
-            this.animationController.a(customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTags, 2);
+            this.animationController.a(customUnitConfig3.movingAnimation, 3);
+        } else if (!this.animationController.animationPlaying || this.animationController.currentAnimation == customUnitConfig3.idleAnimation) {
+            this.animationController.a(customUnitConfig3.idleAnimation, 2);
         }
-        if (customUnitConfig3.targetGroundOnlyLast) {
-            if (customUnitConfig3.targetAllyTeam && gameEngine2.mouseScreenY) {
-                if (this.rotation > 0.0f || (this.rotation < 0.0f && customUnitConfig3.targetEnemyTeam)) {
+        if (customUnitConfig3.internalEffect) {
+            if (customUnitConfig3.splastEffect && gameEngine2.mouseScreenY) {
+                if (this.rotation > 0.0f || (this.rotation < 0.0f && customUnitConfig3.splastEffectReverse)) {
                     this.t += f;
                 }
                 if (this.t > 10.0f) {
@@ -1411,20 +1389,20 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             }
             if (gameEngine2.mouseScreenX && ((this.rotation > 0.0f || this.rotation < 0.0f) && this.flag3)) {
                 this.frameAnimationSpeed += f;
-                if (this.frameAnimationSpeed > customUnitConfig3.showOnMinimapToEnemies) {
+                if (this.frameAnimationSpeed > customUnitConfig3.movementEffectRate) {
                     this.frameAnimationSpeed = 0.0f;
                     if (this.rotation > 0.0f) {
-                        if (customUnitConfig3.canBeAttacked != null) {
-                            customUnitConfig3.canBeAttacked.a(this.posX, this.posY, this.posZ, this.rotationSpeed, this);
+                        if (customUnitConfig3.list1 != null) {
+                            customUnitConfig3.list1.a(this.posX, this.posY, this.posZ, this.rotationSpeed, this);
                         }
-                    } else if (customUnitConfig3.isSelectable != null) {
+                    } else if (customUnitConfig3.list2 != null) {
                         float f6 = this.rotationSpeed;
-                        if (customUnitConfig3.showOnMinimap) {
+                        if (customUnitConfig3.movementEffectReverseFlipEffects) {
                             f6 += 180.0f;
                         }
-                        customUnitConfig3.isSelectable.a(this.posX, this.posY, this.posZ, f6, this);
+                        customUnitConfig3.list2.a(this.posX, this.posY, this.posZ, f6, this);
                     }
-                    if (customUnitConfig3.canAttackCondition && ((this.rotation > 0.0f || customUnitConfig3.canAttackWhileGarrisoned) && !m147cJ())) {
+                    if (customUnitConfig3.dustEffect && ((this.rotation > 0.0f || customUnitConfig3.dustEffectReverse) && !m147cJ())) {
                         int i4 = 0;
                         while (i4 <= 1) {
                             float f7 = i4 == 0 ? -20 : 20;
@@ -1444,23 +1422,23 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 }
             }
         }
-        if (customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags > 0) {
-            if (customUnitConfig3.f14eY != 0.0f && this.transportedUnits.size > 0) {
+        if (customUnitConfig3.maxTransportingUnits > 0) {
+            if (customUnitConfig3.transportUnitsHealBy != 0.0f && this.transportedUnits.size > 0) {
                 Object[] objArrA4 = this.transportedUnits.a();
                 for (int i5 = 0; i5 < this.transportedUnits.size; i5++) {
                     BaseUnit baseUnit = (BaseUnit) objArrA4[i5];
-                    if (baseUnit.currentHealth < baseUnit.maxHealth || customUnitConfig3.f14eY < 0.0f) {
-                        baseUnit.currentHealth += customUnitConfig3.f14eY * f;
+                    if (baseUnit.currentHealth < baseUnit.maxHealth || customUnitConfig3.transportUnitsHealBy < 0.0f) {
+                        baseUnit.currentHealth += customUnitConfig3.transportUnitsHealBy * f;
                         if (baseUnit.currentHealth > baseUnit.maxHealth) {
                             baseUnit.currentHealth = baseUnit.maxHealth;
                         }
                     }
                 }
             }
-            if (this.isUnloading && customUnitConfig3.f16fc.read(this)) {
+            if (this.isUnloading && customUnitConfig3.transportUnitsCanUnloadUnits.read(this)) {
                 this.unknownFloat2 = Utility.moveTowardsZero(this.unknownFloat2, f);
                 if (this.unknownFloat2 == 0.0f) {
-                    this.unknownFloat2 = customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicAndTags;
+                    this.unknownFloat2 = customUnitConfig3.transportUnitsUnloadDelayBetweenEachUnit;
                     if (this.transportedUnits.size() == 0) {
                         this.isUnloading = false;
                     } else {
@@ -1494,26 +1472,26 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             }
             boolean zI = i();
             boolean z4 = false;
-            if (customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogic) {
+            if (customUnitConfig3.bool8) {
                 boolean zCK = isMoving();
-                if (!this.isRepairing && !zCK && this.s > 3.0f && (!customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogic || hasNoCurrentWaypoint())) {
+                if (!this.isRepairing && !zCK && this.s > 3.0f && (!customUnitConfig3.bool9 || hasNoCurrentWaypoint())) {
                     z4 = true;
                 }
             }
             if (this.parentEntity == null) {
                 if (z4) {
-                    if (customUnitConfig3.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsAndLogic < 0.0f) {
+                    if (customUnitConfig3.heightChangeRate < 0.0f) {
                         fAbs3 = (Utility.abs(this.posZ - 2.0f) * 0.05f * 0.4f) + 0.2f;
                     } else {
-                        fAbs3 = customUnitConfig3.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsAndLogic;
+                        fAbs3 = customUnitConfig3.heightChangeRate;
                     }
                     this.posZ = Utility.distanceSq(this.posZ, 2.0f, fAbs3 * f);
                 } else {
-                    float fFastSin = this.y.targetHeight + (Utility.fastSin(this.frameAnimationTimer) * customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic);
-                    if (customUnitConfig3.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsAndLogic < 0.0f) {
+                    float fFastSin = this.y.targetHeight + (Utility.fastSin(this.frameAnimationTimer) * customUnitConfig3.targetHeightDrift);
+                    if (customUnitConfig3.heightChangeRate < 0.0f) {
                         fAbs2 = (Utility.abs(this.posZ - 2.0f) * 0.05f * 0.4f) + 0.2f;
                     } else {
-                        fAbs2 = customUnitConfig3.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsAndLogic;
+                        fAbs2 = customUnitConfig3.heightChangeRate;
                     }
                     this.posZ = Utility.distanceSq(this.posZ, fFastSin, Utility.clamp(fAbs2, (Utility.abs(this.posZ - fFastSin) * 0.05f * 0.3f) + 0.1f) * f);
                 }
@@ -1523,31 +1501,31 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 }
             }
         } else {
-            float f9 = this.y.targetHeight - customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic;
+            float f9 = this.y.targetHeight - customUnitConfig3.targetHeightDrift;
             if (this.posZ < f9) {
                 this.posZ += 0.2f * f;
                 if (this.posZ >= f9) {
                     this.posZ = f9;
                 }
             }
-            if ((this.y.targetHeight != 0.0f || customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic != 0.0f || this.posZ > 0.0f) && this.parentEntity == null) {
+            if ((this.y.targetHeight != 0.0f || customUnitConfig3.targetHeightDrift != 0.0f || this.posZ > 0.0f) && this.parentEntity == null) {
                 float fFastSin2 = this.y.targetHeight;
-                if (customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic != 0.0f) {
+                if (customUnitConfig3.targetHeightDrift != 0.0f) {
                     this.frameAnimationTimer += 2.0f * f;
                     if (this.frameAnimationTimer > 360.0f) {
                         this.frameAnimationTimer -= 360.0f;
                     }
-                    fFastSin2 += Utility.fastSin(this.frameAnimationTimer) * customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic;
+                    fFastSin2 += Utility.fastSin(this.frameAnimationTimer) * customUnitConfig3.targetHeightDrift;
                 }
-                if (customUnitConfig3.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsAndLogic < 0.0f) {
+                if (customUnitConfig3.heightChangeRate < 0.0f) {
                     fAbs = (Utility.abs(this.posZ - 2.0f) * 0.05f * 0.4f) + 0.2f;
                 } else {
-                    fAbs = customUnitConfig3.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsAndLogic;
+                    fAbs = customUnitConfig3.heightChangeRate;
                 }
                 this.posZ = Utility.distanceSq(this.posZ, fFastSin2, Utility.clamp(fAbs, (Utility.abs(this.posZ - fFastSin2) * 0.05f * 0.3f) + 0.1f) * f);
                 boolean z5 = false;
-                if (this.posZ > this.y.targetHeight + customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic + 1.0f) {
-                    this.frameAnimationDelay += customUnitConfig3.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsOrLogic * f;
+                if (this.posZ > this.y.targetHeight + customUnitConfig3.targetHeightDrift + 1.0f) {
+                    this.frameAnimationDelay += customUnitConfig3.fallingAcceleration * f;
                     if (this.posZ < 0.0f) {
                         this.frameAnimationDelay = Utility.clamp(this.frameAnimationDelay, 0.2f);
                     }
@@ -1579,12 +1557,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                             }
                         }
                     }
-                    if (this.posZ <= this.y.targetHeight + customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic + 1.0f) {
+                    if (this.posZ <= this.y.targetHeight + customUnitConfig3.targetHeightDrift + 1.0f) {
                         if (this.frameAnimationDelay > 2.0f) {
                             z5 = true;
                         }
-                        if (this.posZ < this.y.targetHeight + customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic) {
-                            this.posZ = this.y.targetHeight + customUnitConfig3.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic;
+                        if (this.posZ < this.y.targetHeight + customUnitConfig3.targetHeightDrift) {
+                            this.posZ = this.y.targetHeight + customUnitConfig3.targetHeightDrift;
                         }
                         this.frameAnimationDelay = 0.0f;
                     }
@@ -1679,8 +1657,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                         this.unitEffectManager.e = 0.0f;
                     }
                 }
-                if (customUnitConfig3.canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTags != null && abstractUnitActionD.getUnitType() != null && this.unitEffectManager.e >= customUnitConfig3.canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTags.q) {
-                    this.animationController.a(customUnitConfig3.canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTags, 5);
+                if (customUnitConfig3.queuedUnitsAnimation != null && abstractUnitActionD.getUnitType() != null && this.unitEffectManager.e >= customUnitConfig3.queuedUnitsAnimation.q) {
+                    this.animationController.a(customUnitConfig3.queuedUnitsAnimation, 5);
                 }
             }
             this.frameAnimationLooping = zL;
@@ -1709,7 +1687,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (!this.p) {
             return 0.0f;
         }
-        return i * this.unitConfig.canBeBuiltByOrTags;
+        return i * this.unitConfig.generationRate;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -1824,7 +1802,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 this.movementLevels[turretConfig.w].rotation = b(turretConfig.w) + t(turretConfig.w);
             }
         }
-        this.animationController.a(this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTags, 11, true);
+        this.animationController.a(this.unitConfig.attackAnimation, 11, true);
         b(turretConfig);
         a(baseUnit, -1.0f, -1.0f, i, (CustomProjectileTemplate) null, 0);
     }
@@ -1842,7 +1820,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public void b(TurretConfig turretConfig) {
         if (turretConfig.u > 0.0f) {
             this.f0cB -= turretConfig.u;
-            if (this.f0cB < turretConfig.u && this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogic) {
+            if (this.f0cB < turretConfig.u && this.unitConfig.energyNeedsToRechargeToFull) {
                 this.v = true;
             }
         }
@@ -2083,16 +2061,16 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (turretConfig.sound != null) {
             turretConfig.sound.a(vector3DD.a, vector3DD.b, 1.0f + Utility.randomFloatInRange(-0.07f, 0.07f));
         }
-        if (this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTagsAndLogic) {
+        if (this.unitConfig.stopTargetingAfterFiring) {
             this.attackTarget = null;
         }
         if (turretConfig.canTargetAir3) {
             this.movementLevels[i].targetUnit = null;
         }
-        if (this.unitConfig.isConstructionBox && !this.isDestroyed) {
+        if (this.unitConfig.dieOnAttack && !this.isDestroyed) {
             bv();
         }
-        if (this.unitConfig.canNotBeDirectlyAttacked && !this.isDestroyed) {
+        if (this.unitConfig.removeOnAttack && !this.isDestroyed) {
             remove();
             this.isDestroyed = true;
         }
@@ -2116,15 +2094,15 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     /* JADX INFO: renamed from: u */
     public int setHeight(BaseUnit baseUnit) {
         int iA = baseUnit.r().a(this);
-        if (this.unitConfig.f3aX != -1) {
-            if (this.unitConfig.f4aY) {
-                int i = (int) (this.unitConfig.f3aX + this.speed);
+        if (this.unitConfig.nanoRangeForRepair != -1) {
+            if (this.unitConfig.nanoRangeForRepairIsMelee) {
+                int i = (int) (this.unitConfig.nanoRangeForRepair + this.speed);
                 if (baseUnit != null) {
                     i = (int) (i + baseUnit.speed);
                 }
                 return i + iA;
             }
-            return this.unitConfig.f3aX + iA;
+            return this.unitConfig.nanoRangeForRepair + iA;
         }
         return y() + iA;
     }
@@ -2132,27 +2110,27 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public int v(BaseUnit baseUnit) {
         int iA = baseUnit.r().a(this);
-        if (this.unitConfig.isExperimental != -1) {
-            if (this.unitConfig.isBuilding) {
-                int i = (int) (this.unitConfig.isExperimental + this.speed);
+        if (this.unitConfig.nanoRangeForReclaim != -1) {
+            if (this.unitConfig.nanoRangeForReclaimIsMelee) {
+                int i = (int) (this.unitConfig.nanoRangeForReclaim + this.speed);
                 if (baseUnit != null) {
                     i = (int) (i + baseUnit.speed);
                 }
                 return i + iA;
             }
-            return this.unitConfig.isExperimental + iA;
+            return this.unitConfig.nanoRangeForReclaim + iA;
         }
         return y() + iA;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean w(BaseUnit baseUnit) {
-        return this.unitConfig.isBuilding;
+        return this.unitConfig.nanoRangeForReclaimIsMelee;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean x(BaseUnit baseUnit) {
-        return this.unitConfig.f4aY;
+        return this.unitConfig.nanoRangeForRepairIsMelee;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -2163,15 +2141,15 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public float c(BaseUnit baseUnit) {
-        return this.unitConfig.fogOfWarSightRange;
+        return this.unitConfig.nanoRepairSpeed;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: z */
     public float calculateUnitSpeed(BaseUnit baseUnit) {
-        float unitHealthPercent = this.unitConfig.fogOfWarSightRangeWhileNotBuilt;
+        float unitHealthPercent = this.unitConfig.nanoReclaimSpeed;
         if (baseUnit.getUnitHealthPercent() > 0.0f) {
-            unitHealthPercent = baseUnit.getUnitHealthPercent() * this.unitConfig.useBuildingSmoke;
+            unitHealthPercent = baseUnit.getUnitHealthPercent() * this.unitConfig.resourceReclaimMultiplier;
         }
         return unitHealthPercent;
     }
@@ -2179,13 +2157,13 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: f */
     public float getReclaimRate(BaseUnit baseUnit) {
-        return this.unitConfig.buildingToFootprintOffsetX;
+        return this.unitConfig.nanoUnbuildSpeed;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: b */
     public float getDistanceToTarget(BaseUnit baseUnit) {
-        return this.unitConfig.buildingToFootprintOffsetY;
+        return this.unitConfig.nanoBuildSpeed;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -2197,13 +2175,13 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: aZ */
     public float getMoveYAxisScaling() {
-        return this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTagsOrLogic;
+        return this.unitConfig.moveYAxisScaling;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: ba */
     public float getMoveYAxisScalingInverse() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogicOrTags;
+        return this.unitConfig.float2;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -2218,7 +2196,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (turretConfig.rotationSpeed2 != null) {
             return turretConfig.rotationSpeed2.floatValue();
         }
-        return this.unitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTagsOrLogic;
+        return this.unitConfig.turretTurnSpeed;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -2238,7 +2216,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public float B() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicOrTags;
+        return this.unitConfig.turnAcceleration;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -2255,14 +2233,14 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: d */
     public float getUnitArmorRating(boolean z) {
-        if (!this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogicAndTags) {
+        if (!this.unitConfig.rotateWithDirection) {
             return 0.0f;
         }
-        if (z && this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTags) {
-            return this.movementLevels[this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].targetX + 90.0f;
+        if (z && this.unitConfig.lockShadowRotationWithMainTurret) {
+            return this.movementLevels[this.unitConfig.defaultTurretRotationSpeed].targetX + 90.0f;
         }
-        if (this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTags) {
-            return this.movementLevels[this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].targetX + 90.0f;
+        if (this.unitConfig.lockBodyRotationWithMainTurret) {
+            return this.movementLevels[this.unitConfig.defaultTurretRotationSpeed].targetX + 90.0f;
         }
         return super.getUnitArmorRating(z);
     }
@@ -2285,8 +2263,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public PointF getUnitAIPosition() {
         PointF pointF = H;
         CustomUnitConfig customUnitConfig = this.unitConfig;
-        if (customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTags && this.movementLevels[customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].rotation != 0.0f && customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogic.p != 0.0f) {
-            pointF.a(G(customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic));
+        if (customUnitConfig.lockBodyRotationWithMainTurret && this.movementLevels[customUnitConfig.defaultTurretRotationSpeed].rotation != 0.0f && customUnitConfig.defaultTurret2.p != 0.0f) {
+            pointF.a(G(customUnitConfig.defaultTurretRotationSpeed));
             pointF.b(-this.posX, -this.posY);
             return pointF;
         }
@@ -2300,8 +2278,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public PointF getShadowOffset() {
         CustomUnitConfig customUnitConfig = this.unitConfig;
         PointF unitAIPosition = getUnitAIPosition();
-        I.x = unitAIPosition.x + customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsOrLogic;
-        I.y = unitAIPosition.y + customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsAndLogic;
+        I.x = unitAIPosition.x + customUnitConfig.shadowOffsetX;
+        I.y = unitAIPosition.y + customUnitConfig.shadowOffsetY;
         return I;
     }
 
@@ -2373,7 +2351,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             if (fE != 0.0f) {
                 boolean z2 = true;
                 boolean zY = isCurrentCommandReclaim();
-                if (zY && customUnitConfig.createNeutral) {
+                if (zY && customUnitConfig.bool2) {
                     z2 = false;
                 } else if (!zY && customUnitConfig.showActionsAndWaypoints) {
                     z2 = false;
@@ -2403,7 +2381,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             }
         }
         if (!z && this.shield > 0.0f && this.energy == 0.0f && (textureT = T()) != null) {
-            if (!customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogic) {
+            if (!customUnitConfig.shieldDisplayOnlyDeflection) {
                 fClamp = 0.0f + 0.09f + ((this.shield / this.unitEnergyMax) * 0.4f) + ((Utility.clamp(this.unitShieldMax, 50.0f) / 50.0f) * 0.5f);
             } else {
                 float fClamp2 = 0.0f + ((Utility.clamp(this.unitShieldMax, 50.0f) / 50.0f) * 0.5f);
@@ -2424,10 +2402,10 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 paint.a((int) (fClamp * 255.0f), 255, 255, 255);
                 float f10 = this.posX - gameEngine.viewpointXSnapped;
                 float f11 = (this.posY - gameEngine.viewpointYSnapped) - this.posZ;
-                if (!customUnitConfig.energyRegenWhenRecharging) {
-                    f2 = ((customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogicAndTags * 2) / 87.0f) * 1.25f;
+                if (!customUnitConfig.bool5) {
+                    f2 = ((customUnitConfig.shieldRenderRadius * 2) / 87.0f) * 1.25f;
                 } else {
-                    f2 = ((customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogicAndTags * 2) / textureT.p) * 1.25f;
+                    f2 = ((customUnitConfig.shieldRenderRadius * 2) / textureT.p) * 1.25f;
                 }
                 gameEngine.graphicsEngine2.k();
                 gameEngine.graphicsEngine2.a(f2, f2, f10, f11);
@@ -2447,76 +2425,76 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture T() {
-        return this.unitConfig.energyRegen;
+        return this.unitConfig.texture;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: C */
     public float getMoveAccelerationSpeed() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogic;
+        return this.unitConfig.moveAccelerationSpeed;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public float D() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogic;
+        return this.unitConfig.moveDecelerationSpeed;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: bi */
     public boolean isSlidingMovement() {
-        return this.unitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTagsOrLogic;
+        return this.unitConfig.moveSlidingMode;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: bj */
     public boolean isIgnoreMoveOrders() {
-        return this.unitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTagsAndLogic;
+        return this.unitConfig.moveIgnoringBody;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: l */
     public boolean canAttack() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicAndTags;
+        return this.unitConfig.canAttack;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: ag */
     public boolean canAttackSurfaceUnits() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogicAndTags.read(this);
+        return this.unitConfig.canAttackLandUnits.read(this);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: af */
     public boolean canAttackFlyingUnits() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogicOrTags.read(this);
+        return this.unitConfig.canAttackFlyingUnits.read(this);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: ae */
     public boolean canAttackSubmergedUnits() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicOrTags.read(this);
+        return this.unitConfig.canAttackUnderwaterUnits.read(this);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public boolean ah() {
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicAndTags == null) {
+        if (this.unitConfig.canAttackNotTouchingWaterUnits == null) {
             return true;
         }
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicAndTags.read(this);
+        return this.unitConfig.canAttackNotTouchingWaterUnits.read(this);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: k */
     public boolean canAttackUnitType(BaseUnit baseUnit) {
         CustomUnitConfig customUnitConfig = this.unitConfig;
-        if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicOrTags) {
-            if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicAndTags != null && !AnimationTag.a(customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicAndTags, baseUnit.getUnitCombatAnimation())) {
+        if (customUnitConfig.bool11) {
+            if (customUnitConfig.canOnlyAttackUnitsWithTags != null && !AnimationTag.a(customUnitConfig.canOnlyAttackUnitsWithTags, baseUnit.getUnitCombatAnimation())) {
                 return false;
             }
-            if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicOrTags != null && AnimationTag.a(customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicOrTags, baseUnit.getUnitCombatAnimation())) {
+            if (customUnitConfig.canOnlyAttackUnitsWithoutTags != null && AnimationTag.a(customUnitConfig.canOnlyAttackUnitsWithoutTags, baseUnit.getUnitCombatAnimation())) {
                 return false;
             }
-            if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicAndTags) {
+            if (customUnitConfig.bool12) {
                 boolean z = false;
                 for (int i = 0; i < customUnitConfig.turrets.length; i++) {
                     TurretConfig turretConfig = customUnitConfig.turrets[i];
@@ -2544,7 +2522,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public boolean E() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogicOrTags;
+        return this.unitConfig.isFixedFiring;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -2591,7 +2569,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public boolean bm() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogic;
+        return this.unitConfig.turretRotateWithBody;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -2669,17 +2647,17 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: s */
     public int getSoftCollisionDivisor(BaseUnit baseUnit) {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogicAndTags;
+        return this.unitConfig.softCollisionOnAll;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean bO() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicAndTags;
+        return this.unitConfig.isBio;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean bP() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicOrTags;
+        return this.unitConfig.isBug;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -2691,13 +2669,13 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cG */
     public boolean isUnitTransportWeight() {
-        return this.unitConfig.shieldDisplayOnlyDeflection;
+        return this.unitConfig.bool3;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public Rect a_(boolean z) {
         float f;
-        if (z && !this.unitConfig.shieldDisplayOnlyDeflection) {
+        if (z && !this.unitConfig.bool3) {
             return super.a_(z);
         }
         if (this.isDestroyed) {
@@ -2706,7 +2684,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         CustomUnitConfig customUnitConfig = this.unitConfig;
         int i = this.animationFrameIndex;
         int i2 = 0;
-        CustomUnitDirectionConfig customUnitDirectionConfig = customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogic;
+        CustomUnitDirectionConfig customUnitDirectionConfig = customUnitConfig.directionConfig;
         if (this.animationController.currentAnimation != null && this.animationController.currentAnimation.k != null) {
             customUnitDirectionConfig = this.animationController.currentAnimation.k;
         }
@@ -2716,12 +2694,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 f2 = -f2;
                 f = -this.rotationSpeed;
                 if (customUnitDirectionConfig.useMainTurret) {
-                    f = -this.movementLevels[customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].targetX;
+                    f = -this.movementLevels[customUnitConfig.defaultTurretRotationSpeed].targetX;
                 }
             } else {
                 f = this.rotationSpeed;
                 if (customUnitDirectionConfig.useMainTurret) {
-                    f = this.movementLevels[customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].targetX;
+                    f = this.movementLevels[customUnitConfig.defaultTurretRotationSpeed].targetX;
                 }
             }
             int i3 = (int) (360.0f / f2);
@@ -2736,9 +2714,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 i2 = 0 + (i4 * customUnitDirectionConfig.strideY);
             }
         }
-        if (i >= customUnitConfig.turretTurnSpeed) {
-            i2 += i / customUnitConfig.turretTurnSpeed;
-            i %= customUnitConfig.turretTurnSpeed;
+        if (i >= customUnitConfig.int2) {
+            i2 += i / customUnitConfig.int2;
+            i %= customUnitConfig.int2;
         }
         return super.a(z, i, i2);
     }
@@ -2747,8 +2725,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     /* JADX INFO: renamed from: cF */
     public RectF getUnitBounds() {
         RectF rectFCF = super.getUnitBounds();
-        if (this.unitConfig.armourMinDamageToKeep) {
-            rectFCF.a(this.unitConfig.maxMass, this.unitConfig.techLevel - this.unitConfig.armour);
+        if (this.unitConfig.bool4) {
+            rectFCF.a(this.unitConfig.image_offsetX, this.unitConfig.image_offsetY - this.unitConfig.image_offsetH);
         }
         return rectFCF;
     }
@@ -2854,7 +2832,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: V */
     public int getUpgradeLevel() {
-        return this.unitConfig.canBeBuiltByTurret;
+        return this.unitConfig.techLevel;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -3202,11 +3180,11 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             return;
         }
         float fFloatValue2 = 0.0f;
-        if (this.unitConfig.isBuildingUnit && this.unitConfig.spawnAngleOffset != null) {
-            fFloatValue2 = this.rotationSpeed + this.unitConfig.spawnAngleOffset.floatValue() + 90.0f;
+        if (this.unitConfig.isBuildingUnit && this.unitConfig.exit_dirOffset != null) {
+            fFloatValue2 = this.rotationSpeed + this.unitConfig.exit_dirOffset.floatValue() + 90.0f;
         }
-        if (this.unitConfig.spawnSideOffset != null) {
-            fFloatValue = this.unitConfig.spawnSideOffset.floatValue();
+        if (this.unitConfig.exit_moveAwayAmount != null) {
+            fFloatValue = this.unitConfig.exit_moveAwayAmount.floatValue();
         } else if (this.unitEffectManager.b != null) {
             fFloatValue = this.speed * 3.0f;
         } else {
@@ -3223,38 +3201,38 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     /* JADX INFO: renamed from: E */
     public void getAttackDamage(BaseUnit baseUnit) {
         float fFloatValue = 0.0f;
-        if (this.unitConfig.isBuildingUnit && this.unitConfig.spawnAngleOffset != null) {
-            fFloatValue = this.rotationSpeed + this.unitConfig.spawnAngleOffset.floatValue() + 90.0f;
+        if (this.unitConfig.isBuildingUnit && this.unitConfig.exit_dirOffset != null) {
+            fFloatValue = this.rotationSpeed + this.unitConfig.exit_dirOffset.floatValue() + 90.0f;
         }
         baseUnit.rotationSpeed = 90.0f + fFloatValue;
         float fFloatValue2 = 70.0f;
-        if (this.unitConfig.spawnSideOffset != null) {
-            fFloatValue2 = this.unitConfig.spawnSideOffset.floatValue();
+        if (this.unitConfig.exit_moveAwayAmount != null) {
+            fFloatValue2 = this.unitConfig.exit_moveAwayAmount.floatValue();
         }
         this.unitEffectManager.a(baseUnit, fFloatValue2, this.r);
     }
 
     public void F(BaseUnit baseUnit) {
-        baseUnit.posX = this.posX + this.unitConfig.spawnOffsetLocalX;
-        baseUnit.posY = this.posY + this.unitConfig.spawnOffsetLocalY;
+        baseUnit.posX = this.posX + this.unitConfig.exit_x;
+        baseUnit.posY = this.posY + this.unitConfig.exit_y;
         if (!this.unitConfig.isBuildingUnit) {
             float fFloatValue = 180.0f;
-            if (this.unitConfig.spawnAngleOffset != null) {
-                fFloatValue = this.unitConfig.spawnAngleOffset.floatValue();
+            if (this.unitConfig.exit_dirOffset != null) {
+                fFloatValue = this.unitConfig.exit_dirOffset.floatValue();
             }
             float fFloatValue2 = 70.0f;
-            if (this.unitConfig.spawnSideOffset != null) {
-                fFloatValue2 = this.unitConfig.spawnSideOffset.floatValue();
+            if (this.unitConfig.exit_moveAwayAmount != null) {
+                fFloatValue2 = this.unitConfig.exit_moveAwayAmount.floatValue();
             }
-            boolean zA = HovercraftUnit.a(this, baseUnit, this.r, 7.0f, fFloatValue, fFloatValue2, this.unitConfig.spawnOffsetLocalX, this.unitConfig.spawnOffsetLocalY);
-            if (!this.unitConfig.keepOriginalZOnSpawn) {
+            boolean zA = HovercraftUnit.a(this, baseUnit, this.r, 7.0f, fFloatValue, fFloatValue2, this.unitConfig.exit_x, this.unitConfig.exit_y);
+            if (!this.unitConfig.exitHeightIgnoreParent) {
                 baseUnit.posZ = this.posZ;
             }
-            baseUnit.posZ += this.unitConfig.spawnOffsetZ;
+            baseUnit.posZ += this.unitConfig.exit_heightOffset;
             if (baseUnit instanceof CustomUnit) {
                 ((CustomUnit) baseUnit).dF();
             }
-            if ((i() || !zA || this.unitConfig.f10eU.read(this)) && getUnitAIPathfindCost()) {
+            if ((i() || !zA || this.unitConfig.transportUnitsKeepBuiltUnits.read(this)) && getUnitAIPathfindCost()) {
                 loadTransportedUnit(baseUnit);
             }
         }
@@ -3296,7 +3274,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public boolean dA() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags > 0 && dI() > this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags;
+        return this.unitConfig.maxTransportingUnits > 0 && dI() > this.unitConfig.maxTransportingUnits;
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
@@ -3354,7 +3332,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public float x() {
-        if (!this.unitConfig.isBio) {
+        if (!this.unitConfig.showHealthBar) {
             return -1.0f;
         }
         return super.x();
@@ -3362,12 +3340,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean bU() {
-        return this.unitConfig.isBug;
+        return this.unitConfig.showHealthBarChanges;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public float bV() {
-        if (isAlive() && !this.unitEffectManager.a() && this.unitConfig.isAir) {
+        if (isAlive() && !this.unitEffectManager.a() && this.unitConfig.showQueueBar) {
             return this.unitEffectManager.e;
         }
         return super.bV();
@@ -3376,18 +3354,18 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: bW */
     public float getUnitTeamData() {
-        if (this.y.maxEnergy > 0.0f && this.f0cB < this.y.maxEnergy && this.unitConfig.isBuilder) {
+        if (this.y.maxEnergy > 0.0f && this.f0cB < this.y.maxEnergy && this.unitConfig.showEnergyBar) {
             return this.f0cB / this.y.maxEnergy;
         }
-        if (this.unitEnergyMax > 0.0f && this.shield < this.unitEnergyMax && this.unitConfig.canBuildOnGround) {
+        if (this.unitEnergyMax > 0.0f && this.shield < this.unitEnergyMax && this.unitConfig.showShieldBar) {
             return this.shield / this.unitEnergyMax;
         }
         if (this.y.maxEnergy == 0.0f && this.unitEnergyMax == 0.0f) {
-            if (this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicOrTags != -1 && this.movementLevels[this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicOrTags].rotation > 0.0f) {
-                return 1.0f - (this.movementLevels[this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicOrTags].rotation / b(this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicOrTags));
+            if (this.unitConfig.currentTurrentIndex != -1 && this.movementLevels[this.unitConfig.currentTurrentIndex].rotation > 0.0f) {
+                return 1.0f - (this.movementLevels[this.unitConfig.currentTurrentIndex].rotation / b(this.unitConfig.currentTurrentIndex));
             }
-            if (this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicAndTags != -1 && this.movementLevels[this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicAndTags].speed != 0.0f) {
-                return this.movementLevels[this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicAndTags].speed / e(this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicAndTags);
+            if (this.unitConfig.int3 != -1 && this.movementLevels[this.unitConfig.int3].speed != 0.0f) {
+                return this.movementLevels[this.unitConfig.int3].speed / e(this.unitConfig.int3);
             }
         }
         return super.getUnitTeamData();
@@ -3427,10 +3405,10 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public void cb() {
         boolean z = false;
-        if ((this.y.maxAttackRange > 70.0f && this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicAndTags && this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogic == null) || (this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogic != null && this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogic.booleanValue())) {
+        if ((this.y.maxAttackRange > 70.0f && this.unitConfig.canAttack && this.unitConfig.showRangeUIGuide == null) || (this.unitConfig.showRangeUIGuide != null && this.unitConfig.showRangeUIGuide.booleanValue())) {
             GameViewUtils.a((BaseUnit) this, m(), true);
             z = true;
-        } else if (this.unitConfig.isBuildingUnit && this.y.nanoRange > 50 && !this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicAndTags) {
+        } else if (this.unitConfig.isBuildingUnit && this.y.nanoRange > 50 && !this.unitConfig.canAttack) {
             GameViewUtils.a((BaseUnit) this, this.y.nanoRange, true);
             z = true;
         }
@@ -3462,7 +3440,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             return;
         }
         this.unitCustomComponents.a(f, this);
-        if (this.unitConfig.disableCustomShields != null) {
+        if (this.unitConfig.image_back != null) {
             GameEngine gameEngine = GameEngine.getInstance();
             float f2 = this.posX - gameEngine.viewpointXSnapped;
             float f3 = (this.posY - gameEngine.viewpointYSnapped) - this.posZ;
@@ -3471,9 +3449,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 gameEngine.graphicsEngine2.k();
                 gameEngine.graphicsEngine2.a(maxHealth, maxHealth, f2, f3);
             }
-            if (this.unitConfig.shield) {
-                int i = this.unitConfig.disableCustomShields.p;
-                int i2 = this.unitConfig.disableCustomShields.q;
+            if (this.unitConfig.image_back_always_use_full_image) {
+                int i = this.unitConfig.image_back.p;
+                int i2 = this.unitConfig.image_back.q;
                 int i3 = i / 2;
                 int i4 = i2 / 2;
                 du.a(f2 - i3, f3 - i4, f2 + i3, f3 + i4);
@@ -3482,7 +3460,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 du.a(f2 - this.eu, f3 - this.ev, f2 + this.eu, f3 + this.ev);
                 dv.a(0, 0, 0 + this.es, 0 + this.et);
             }
-            gameEngine.graphicsEngine2.a(this.unitConfig.disableCustomShields, dv, du, getRenderPaint());
+            gameEngine.graphicsEngine2.a(this.unitConfig.image_back, dv, du, getRenderPaint());
             if (maxHealth != 1.0f) {
                 gameEngine.graphicsEngine2.l();
             }
@@ -3495,7 +3473,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: aM */
     public float getPathStepScale() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogic;
+        return this.unitConfig.whenBeingBuiltMakeTransparentTill;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -3507,7 +3485,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: aV */
     public boolean useVelocityExtendedRange() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicAndTags;
+        return this.unitConfig.isMelee;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -3520,7 +3498,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (this.parentEntity != null && this.parentEntity.deceleration < 1.0f) {
             return true;
         }
-        return this.unitConfig.transportUnitsUnloadRight;
+        return this.unitConfig.isUnrepairableUnit;
     }
 
     /* JADX INFO: renamed from: H */
@@ -3529,12 +3507,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             return false;
         }
         if (baseUnit.bI()) {
-            if (this.unitConfig.flag_f1aU) {
+            if (this.unitConfig.canRepairBuildings) {
                 return true;
             }
             return false;
         }
-        if (this.unitConfig.f1aV) {
+        if (this.unitConfig.canRepairUnits) {
             return true;
         }
         return false;
@@ -3543,7 +3521,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: a */
     public boolean canRepairTarget(BaseUnit baseUnit) {
-        if (this.unitConfig.f26fo != null && !AnimationTag.a(this.unitConfig.f26fo, baseUnit.getUnitCombatAnimation())) {
+        if (this.unitConfig.canRepairUnitsOnlyWithTags != null && !AnimationTag.a(this.unitConfig.canRepairUnitsOnlyWithTags, baseUnit.getUnitCombatAnimation())) {
             return false;
         }
         return getTransportedUnitCount(baseUnit);
@@ -3555,7 +3533,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (baseUnit.getUnitHealthPercent() != 0.0f && h(baseUnit, true)) {
             return true;
         }
-        if (this.unitConfig.f25fn != null && !AnimationTag.a(this.unitConfig.f25fn, baseUnit.getUnitCombatAnimation())) {
+        if (this.unitConfig.canReclaimUnitsOnlyWithTags != null && !AnimationTag.a(this.unitConfig.canReclaimUnitsOnlyWithTags, baseUnit.getUnitCombatAnimation())) {
             return false;
         }
         return getTransportedUnitCount(baseUnit);
@@ -3564,7 +3542,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public void m(BaseUnit baseUnit) {
         FormationGroup formationGroup;
-        if (this.unitConfig.isTurret) {
+        if (this.unitConfig.dieOnConstruct) {
             UnitCommand unitCommandAr = getCurrentWaypoint();
             if (unitCommandAr != null && (formationGroup = unitCommandAr.transportTarget) != null) {
                 formationGroup.a(unitCommandAr);
@@ -3579,7 +3557,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: al */
     public boolean isTurretUnit() {
-        if (this.unitConfig.isTurret) {
+        if (this.unitConfig.dieOnConstruct) {
             return true;
         }
         return false;
@@ -3588,19 +3566,19 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: aj */
     public boolean canUnitAttack() {
-        return this.unitConfig.hasTransportCapability;
+        return this.unitConfig.useAsBuilder;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cu */
     public boolean getUnitAIPathfindMaxNodes() {
-        return this.unitConfig.f47fN;
+        return this.unitConfig.notPassivelyTargetedByOtherUnits;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: ak */
     public boolean canMove() {
-        return this.unitConfig.isFlying;
+        return this.unitConfig.isBuilder;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -3616,10 +3594,10 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean h(BaseUnit baseUnit, boolean z) {
-        if (!this.unitConfig.f22fk) {
+        if (!this.unitConfig.canReclaimResources) {
             return false;
         }
-        if (this.unitConfig.f23fl != null && !AnimationTag.a(this.unitConfig.f23fl, baseUnit.getUnitCombatAnimation())) {
+        if (this.unitConfig.canReclaimResourcesOnlyWithTags != null && !AnimationTag.a(this.unitConfig.canReclaimResourcesOnlyWithTags, baseUnit.getUnitCombatAnimation())) {
             return false;
         }
         return true;
@@ -3628,7 +3606,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cS */
     public int getUnitType() {
-        return this.unitConfig.f24fm;
+        return this.unitConfig.canReclaimResourcesNextSearchRange;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -3641,7 +3619,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         super.a(f, z);
         if (!this.isDestroyed && canMove()) {
             if (isCurrentCommandReclaim()) {
-                if (!this.unitConfig.createNeutral) {
+                if (!this.unitConfig.bool2) {
                     BuilderUnit.drawTargetPriorityPoints(f, this);
                 }
             } else if (!this.unitConfig.showActionsAndWaypoints) {
@@ -3652,25 +3630,25 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean o() {
-        return this.unitConfig.canBeBuiltByAndTagsAndLogic;
+        return this.unitConfig.stayNeutral;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean p() {
-        return this.unitConfig.canBeBuiltByAndTagsOrLogic;
+        return this.unitConfig.createNeutral;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cO */
     public boolean isUnitIcon() {
-        return this.unitConfig.canBeBuiltByOrTagsAndLogicOrTags;
+        return this.unitConfig.allowCaptureWhenNeutralByAI;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public void f(PlayerTeam playerTeam) {
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicOrTags) {
+        if (this.unitConfig.createOnAggressiveTeam) {
             setUnitTeam(PlayerTeam.TEAM_UNKNOWN);
-        } else if (this.unitConfig.canBeBuiltByAndTagsAndLogicAndTags && this.transportedUnits.size() == 0) {
+        } else if (this.unitConfig.convertToNeutralIfNotTransporting && this.transportedUnits.size() == 0) {
             setUnitTeam(PlayerTeam.TEAM_ALL);
         } else {
             super.f(playerTeam);
@@ -3686,25 +3664,25 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: g */
     public float getUnitHealthPercent() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTags;
+        return this.unitConfig.resourceRate;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cQ */
     public int getUnitTypeName() {
-        return this.unitConfig.canBeBuiltByAndTagsOrLogicOrTags;
+        return this.unitConfig.resourceMaxConcurrentReclaimingThis;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cR */
     public AnimationSet getUnitTypeId() {
-        return this.unitConfig.canBeBuiltByAndTagsOrLogicAndTags;
+        return this.unitConfig.similarResourcesHaveTag;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cP */
     public void getUnitCategory() {
-        if (this.unitConfig.isExtractor == 0.0f && getUnitHealthPercent() > 0.0f) {
+        if (this.unitConfig.selfBuildRate == 0.0f && getUnitHealthPercent() > 0.0f) {
             PlayerTeam.b((BaseUnit) this);
             this.deceleration = 1.0f;
             PlayerTeam.c(this);
@@ -3714,7 +3692,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cp */
     public ActionId getUnitAIPathfindPath() {
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags != 0) {
+        if (this.unitConfig.maxTransportingUnits != 0) {
             return HovercraftUnit.i.getActionId();
         }
         return super.getUnitAIPathfindPath();
@@ -3730,7 +3708,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public PointF getShadowTexture(int i) {
         Projectile projectile;
         PointF pointFK = super.getShadowTexture(i);
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogicOrTags) {
+        if (this.unitConfig.moveYAxisScaleInverted) {
             if (this.unitConfig.f50fR[this.unitConfig.turrets[i].a(this)].M && this.G != null && (projectile = this.G[i]) != null && !projectile.isDestroyed) {
                 pointFK.x += projectile.K;
                 pointFK.y += projectile.L;
@@ -3751,7 +3729,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public boolean bf() {
-        if (this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogicAndTagsOrLogic) {
+        if (this.unitConfig.disablePassiveTargeting) {
             return false;
         }
         if (this.unitConfig.attackMovementType == UnitBehaviorType.bomber) {
@@ -3772,12 +3750,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public boolean bg() {
-        return this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTagsAndLogic;
+        return this.unitConfig.joinsGroupFormations;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public float bc() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogicAndTags;
+        return this.unitConfig.reverseSpeedPercentage;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -3785,8 +3763,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         super.f(f, f2);
         a(UnitEventType.teleported);
         float f3 = this.rotationSpeed;
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogic) {
-            f3 = this.movementLevels[this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].targetX;
+        if (this.unitConfig.lockLegRotationWithMainTurret) {
+            f3 = this.movementLevels[this.unitConfig.defaultTurretRotationSpeed].targetX;
         }
         this.dP = this.posX;
         this.dQ = this.posY;
@@ -3795,33 +3773,33 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     }
 
     public void du() {
-        if (this.unitConfig.energyDisplayName == null && this.legInstances == null) {
+        if (this.unitConfig.legConfig == null && this.legInstances == null) {
             return;
         }
-        if (this.unitConfig.energyDisplayName == null || this.unitConfig.energyDisplayName.length == 0) {
+        if (this.unitConfig.legConfig == null || this.unitConfig.legConfig.length == 0) {
             this.legInstances = null;
             return;
         }
-        if (this.legInstances != null && this.legInstances.length == this.unitConfig.energyDisplayName.length) {
+        if (this.legInstances != null && this.legInstances.length == this.unitConfig.legConfig.length) {
             return;
         }
-        this.legInstances = new LegInstance[this.unitConfig.energyDisplayName.length];
-        for (int i = 0; i < this.unitConfig.energyDisplayName.length; i++) {
+        this.legInstances = new LegInstance[this.unitConfig.legConfig.length];
+        for (int i = 0; i < this.unitConfig.legConfig.length; i++) {
             LegInstance legInstance = new LegInstance();
             this.legInstances[i] = legInstance;
             legInstance.a = i;
-            legInstance.s = this.unitConfig.energyDisplayName[i].r;
+            legInstance.s = this.unitConfig.legConfig[i].r;
         }
         float f = this.rotationSpeed;
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogic) {
-            f = this.movementLevels[this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic].targetX;
+        if (this.unitConfig.lockLegRotationWithMainTurret) {
+            f = this.movementLevels[this.unitConfig.defaultTurretRotationSpeed].targetX;
         }
         this.dP = this.posX;
         this.dQ = this.posY;
         this.dR = this.posZ;
         this.dS = f;
         dv();
-        for (int i2 = 0; i2 < this.unitConfig.energyDisplayName.length; i2++) {
+        for (int i2 = 0; i2 < this.unitConfig.legConfig.length; i2++) {
             this.legInstances[i2].m = true;
         }
     }
@@ -3862,8 +3840,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             return;
         }
         int i = this.y.fogOfWarSightRange;
-        if (this.deceleration < 1.0f && customUnitConfig.canBeBuiltByAndTagsAndLogicOrTagsAndLogicAndTags != -1) {
-            i = customUnitConfig.canBeBuiltByAndTagsAndLogicOrTagsAndLogicAndTags;
+        if (this.deceleration < 1.0f && customUnitConfig.fogOfWarSightRangeWhileNotBuilt2 != -1) {
+            i = customUnitConfig.fogOfWarSightRangeWhileNotBuilt2;
         }
         if (i > 0) {
             gameEngine.tileMap.updateFogVisibilityForTeamsAtWorldPoint(this.posX, this.posY, i, this.team, z);
@@ -3872,18 +3850,18 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public Rect cc() {
-        return this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogic;
+        return this.unitConfig.footprint;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: ce */
     public Rect getUnitAIUpdateTime() {
-        return this.unitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogicAndTags;
+        return this.unitConfig.displayFootprint;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public Rect cd() {
-        return this.unitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogicOrTags;
+        return this.unitConfig.constructionFootprint;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -3942,7 +3920,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cw */
     public int getUnitAIPathfindIterations() {
-        return this.unitConfig.f15eZ;
+        return this.unitConfig.transportSlotsNeeded;
     }
 
     public ArrayList dC() {
@@ -4016,12 +3994,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: dd */
     public boolean getUnitAICombatTarget() {
-        return this.unitConfig.canBeBuiltByExtractor;
+        return this.unitConfig.experimental;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public int bp() {
-        return this.unitConfig.pylonRequiresPower;
+        return this.unitConfig.numBitsOnDeath;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -4040,7 +4018,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: db */
     public float getUnitAIPathfindError() {
-        return super.getUnitAIPathfindError() + this.unitConfig.canBeBuiltByAndTagsAndLogicOrTagsAndLogicOrTags;
+        return super.getUnitAIPathfindError() + this.unitConfig.buildingSelectionOffset;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -4081,7 +4059,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (mo193J()) {
             f = 0.0f;
         }
-        if (this.y.armour > 0.0f && f > this.unitConfig.canBeBuiltByAndTagsAndLogicOrTagsOrLogic) {
+        if (this.y.armour > 0.0f && f > this.unitConfig.armourMinDamageToKeep) {
             float f2 = this.y.armour;
             if (projectile != null) {
                 f2 -= projectile.an;
@@ -4090,8 +4068,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 f2 = 0.0f;
             }
             f -= f2;
-            if (f < this.unitConfig.canBeBuiltByAndTagsAndLogicOrTagsOrLogic) {
-                f = this.unitConfig.canBeBuiltByAndTagsAndLogicOrTagsOrLogic;
+            if (f < this.unitConfig.armourMinDamageToKeep) {
+                f = this.unitConfig.armourMinDamageToKeep;
             }
         }
         if (projectile != null) {
@@ -4105,13 +4083,13 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: aU */
     public float getBasePathingRange() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogic;
+        return this.unitConfig.maxAttackRange;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: ac */
     public boolean supportsIndependentTurretTargets() {
-        if (!this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTagsOrLogic) {
+        if (!this.unitConfig.turretMultiTargeting2) {
             return false;
         }
         return super.supportsIndependentTurretTargets();
@@ -4123,10 +4101,10 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             return this.unitConfig.f0do.a();
         }
         if (commandType == CommandType.move) {
-            return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTags.a();
+            return this.unitConfig.soundOnMoveOrder.a();
         }
         if (commandType == CommandType.newSelection) {
-            return this.unitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTags.a();
+            return this.unitConfig.soundOnNewSelection.a();
         }
         return false;
     }
@@ -4379,7 +4357,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 S(2);
             }
         } else if (this.spawnExitLockTimer == 0.0f) {
-            S(this.unitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic);
+            S(this.unitConfig.drawLayer);
         } else {
             S(2);
         }
@@ -4449,20 +4427,20 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public void a(BaseUnit baseUnit, float f, int i) {
-        if (this.unitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTags != null) {
-            this.animationController.a(this.unitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTags, 5);
+        if (this.unitConfig.repairAnimation != null) {
+            this.animationController.a(this.unitConfig.repairAnimation, 5);
         }
         if (this.unitConfig.showActionsAndWaypoints) {
             this.turretTurnSpeed = Utility.moveTowardsZero(this.turretTurnSpeed, f);
             if (this.turretTurnSpeed == 0.0f) {
-                this.turretTurnSpeed = this.unitConfig.showOnHpHover;
-                if (this.unitConfig.showInEditor != null) {
+                this.turretTurnSpeed = this.unitConfig.repairEffectRate;
+                if (this.unitConfig.list3 != null) {
                     UnitMovementData unitMovementData = this.movementLevels[i];
                     PointF pointFE = E(i);
-                    this.unitConfig.showInEditor.a(pointFE.x, pointFE.y, this.posZ, unitMovementData.targetX, this);
+                    this.unitConfig.list3.a(pointFE.x, pointFE.y, this.posZ, unitMovementData.targetX, this);
                 }
-                if (this.unitConfig.stayNeutral != null) {
-                    this.unitConfig.stayNeutral.a(baseUnit.posX, baseUnit.posY, baseUnit.posZ, baseUnit.rotationSpeed, baseUnit);
+                if (this.unitConfig.list4 != null) {
+                    this.unitConfig.list4.a(baseUnit.posX, baseUnit.posY, baseUnit.posZ, baseUnit.rotationSpeed, baseUnit);
                     return;
                 }
                 return;
@@ -4474,13 +4452,13 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public void b(BaseUnit baseUnit, float f, int i) {
-        if (this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogicOrTags != null) {
-            this.animationController.a(this.unitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogicOrTags, 5);
+        if (this.unitConfig.reclaimAnimation != null) {
+            this.animationController.a(this.unitConfig.reclaimAnimation, 5);
         }
-        if (this.unitConfig.createNeutral) {
+        if (this.unitConfig.bool2) {
             this.turretTurnSpeed = Utility.moveTowardsZero(this.turretTurnSpeed, f);
             if (this.turretTurnSpeed == 0.0f) {
-                this.turretTurnSpeed = this.unitConfig.createOnAggressiveTeam;
+                this.turretTurnSpeed = this.unitConfig.reclaimEffectRate;
                 if (this.unitConfig.createOnNeutralTeam != null) {
                     UnitMovementData unitMovementData = this.movementLevels[i];
                     PointF pointFE = E(i);
@@ -4500,14 +4478,14 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cg */
     public boolean getUnitAIPriority() {
-        return this.y.m;
+        return this.y.isVisibleToEnemies;
     }
 
     public boolean dG() {
-        if (this.unitConfig.lockTurretWithBody_ignoreBaseTurret != null && !this.unitConfig.lockTurretWithBody_ignoreBaseTurret.read(this)) {
+        if (this.unitConfig.isVisible != null && !this.unitConfig.isVisible.read(this)) {
             return false;
         }
-        if (!this.y.m) {
+        if (!this.y.isVisibleToEnemies) {
             GameEngine gameEngine = GameEngine.getInstance();
             if (gameEngine.playerTeam.c(this.team) && !gameEngine.playerTeam.addCredits()) {
                 return false;
@@ -4526,7 +4504,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (attachmentSlotDefinitionDn != null && attachmentSlotDefinitionDn.m) {
             return true;
         }
-        return this.unitConfig.transportUnitsUnloadAndGiveOrder;
+        return this.unitConfig.isUnselectable;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -4536,43 +4514,43 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (attachmentSlotDefinitionDn != null && attachmentSlotDefinitionDn.n) {
             return true;
         }
-        return this.unitConfig.transportSlotsNeeded;
+        return this.unitConfig.isUnselectableAsTarget;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean d(BaseUnit baseUnit) {
         CustomUnitConfig customUnitConfig = this.unitConfig;
-        return ((customUnitConfig.deathAnimation != null && !AnimationTag.a(customUnitConfig.deathAnimation, baseUnit.getUnitCombatAnimation())) || dH() || customUnitConfig.transportSwitchToSlots) ? false : true;
+        return ((customUnitConfig.deathAnimation != null && !AnimationTag.a(customUnitConfig.deathAnimation, baseUnit.getUnitCombatAnimation())) || dH() || customUnitConfig.canNotBeDirectlyAttacked) ? false : true;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cW */
     public boolean getUnitStatus() {
-        return this.unitConfig.showStatusBar;
+        return this.unitConfig.canNotBeGivenOrdersByPlayer;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cT */
     public boolean getUnitVersion() {
-        return this.unitConfig.transportSwitchToSlots || u() || (this.deceleration < 1.0f && this.unitConfig.isExtractor <= 0.0f);
+        return this.unitConfig.canNotBeDirectlyAttacked || u() || (this.deceleration < 1.0f && this.unitConfig.selfBuildRate <= 0.0f);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: dh */
     public AnimationSet getUnitAICombatTimer() {
-        return this.unitConfig.image_turret;
+        return this.unitConfig.tag2;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: am */
     public float getPassiveTargetSearchRangeBonus() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogicOrTags;
+        return this.unitConfig.meleeAttackRange;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: an */
     public boolean isChaseAttackMode() {
-        return super.isChaseAttackMode() || this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicAndTags;
+        return super.isChaseAttackMode() || this.unitConfig.isMelee;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
@@ -4684,7 +4662,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: J */
     public boolean mo193J() {
-        if (dH() || this.unitConfig.addResources) {
+        if (dH() || this.unitConfig.canNotBeDamaged) {
             return true;
         }
         return false;
@@ -4694,11 +4672,11 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     /* JADX INFO: renamed from: di */
     public void updateUnitCombatTimer() {
         CustomUnitConfig customUnitConfig = this.unitConfig;
-        if (!customUnitConfig.canBeBuiltByAndLogic.c()) {
-            customUnitConfig.canBeBuiltByAndLogic.a(this);
+        if (!customUnitConfig.borrowResourcesWhileAlive.c()) {
+            customUnitConfig.borrowResourcesWhileAlive.a(this);
         }
-        if (!customUnitConfig.canBeBuiltByOrTagsAndLogic.c() && this.deceleration >= 1.0f) {
-            customUnitConfig.canBeBuiltByOrTagsAndLogic.a(this);
+        if (!customUnitConfig.borrowResourcesWhileBuilt.c() && this.deceleration >= 1.0f) {
+            customUnitConfig.borrowResourcesWhileBuilt.a(this);
         }
         super.updateUnitCombatTimer();
     }
@@ -4707,11 +4685,11 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     /* JADX INFO: renamed from: dj */
     public void getUnitAICombatStateTime() {
         CustomUnitConfig customUnitConfig = this.unitConfig;
-        if (!customUnitConfig.canBeBuiltByAndLogic.c()) {
-            customUnitConfig.canBeBuiltByAndLogic.h(this);
+        if (!customUnitConfig.borrowResourcesWhileAlive.c()) {
+            customUnitConfig.borrowResourcesWhileAlive.h(this);
         }
-        if (!customUnitConfig.canBeBuiltByOrTagsAndLogic.c() && this.deceleration >= 1.0f) {
-            customUnitConfig.canBeBuiltByOrTagsAndLogic.h(this);
+        if (!customUnitConfig.borrowResourcesWhileBuilt.c() && this.deceleration >= 1.0f) {
+            customUnitConfig.borrowResourcesWhileBuilt.h(this);
         }
         super.getUnitAICombatStateTime();
     }
@@ -4731,35 +4709,35 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean c_() {
         CustomUnitConfig customUnitConfig = this.unitConfig;
-        if (!customUnitConfig.cloakHiddenFromAllies && GameEngine.getInstance().playerTeam.c(this.team)) {
+        if (!customUnitConfig.showOnMinimapToEnemies && GameEngine.getInstance().playerTeam.c(this.team)) {
             return false;
         }
-        return customUnitConfig.isCloaked;
+        return customUnitConfig.showOnMinimap;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean dk() {
-        return this.unitConfig.alsoUseTurretImageForOtherSide;
+        return this.unitConfig.imageSmoothingWhenZoomedIn;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean dl() {
-        return this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogicOrTags;
+        return this.unitConfig.disableLowHpFire;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean dm() {
-        return this.unitConfig.f7eL;
+        return this.unitConfig.disableLowHpSmoke;
     }
 
     /* JADX INFO: renamed from: G */
     public boolean getUnitArmor(BaseUnit baseUnit) {
         int iDI = dI();
         int unitAIPathfindIterations = baseUnit.getUnitAIPathfindIterations();
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicOrTags) {
+        if (this.unitConfig.transportUnitsEachUnitAlwaysUsesSingleSlot) {
             unitAIPathfindIterations = 1;
         }
-        if (iDI + unitAIPathfindIterations <= this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags) {
+        if (iDI + unitAIPathfindIterations <= this.unitConfig.maxTransportingUnits) {
             return true;
         }
         return false;
@@ -4767,7 +4745,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     public int dI() {
         int unitAIPathfindIterations = 0;
-        if (this.unitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicOrTags) {
+        if (this.unitConfig.transportUnitsEachUnitAlwaysUsesSingleSlot) {
             unitAIPathfindIterations = 0 + this.transportedUnits.size();
         } else if (this.transportedUnits.size > 0) {
             Iterator it = this.transportedUnits.iterator();
@@ -4786,7 +4764,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             return;
         }
         super.isSelectable(playerTeam);
-        if (this.transportedUnits != null && !this.unitConfig.f13eX) {
+        if (this.transportedUnits != null && !this.unitConfig.transportUnitsOnTeamChangeKeepCurrentTeam) {
             Iterator it = this.transportedUnits.iterator();
             while (it.hasNext()) {
                 ((BaseUnit) it.next()).isSelectable(playerTeam);
@@ -4805,13 +4783,13 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cN */
     public UnitPrice getUnitDisplayName() {
-        return this.unitConfig.generationResources;
+        return this.unitConfig.reclaimPrice;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: ch */
     public void updateUnitAI() {
-        if (!this.unitConfig.pylonBuildWithOr) {
+        if (!this.unitConfig.disableDeathOnZeroHp) {
             super.updateUnitAI();
         } else if (this.currentHealth <= -1.0f) {
             this.currentHealth = -1.0f;
@@ -4839,12 +4817,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: do */
     public float mo145do() {
-        return this.unitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogicOrTags;
+        return this.unitConfig.uiTargetRadius;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean dp() {
-        return this.unitConfig.isLand;
+        return this.unitConfig.showSelectionIndicator;
     }
 
     public void dJ() {

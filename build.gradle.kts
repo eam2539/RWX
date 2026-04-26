@@ -1,10 +1,7 @@
-import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.tasks.Exec
-import org.gradle.api.tasks.Sync
-
 plugins {
     id("java")
     id("application")
+    id("org.jetbrains.kotlin.jvm") version "2.0.21"
 }
 
 version = "1.0.0"
@@ -12,26 +9,12 @@ group = "com.corrodinggames.rts"
 
 repositories {
     mavenCentral()
+    maven("https://dl.cloudsmith.io/public/libp2p/jvm-libp2p/maven/")
+    maven("https://artifacts.consensys.net/public/maven/maven/")
+    maven("https://jitpack.io")
 }
 
-sourceSets {
-    named("main") {
-        java {
-            exclude { element ->
-                val rel = element.path.replace('\\', '/')
 
-                if (
-                    rel.startsWith("com/codedisaster/steamworks/") &&
-                    rel != "com/codedisaster/steamworks/SteamNetworking\$P2PSessionState.java" &&
-                    rel != "com/codedisaster/steamworks/SteamRemoteStorage\$RemoteStoragePlatform.java"
-                ) {
-                    return@exclude true
-                }
-                false
-            }
-        }
-    }
-}
 
 dependencies {
     compileOnly(files("libs/android.jar"))
@@ -40,16 +23,15 @@ dependencies {
     implementation(files("libs/jogg-0.0.7.jar"))
     implementation(files("libs/jorbis-0.0.15.jar"))
     implementation(files("libs/android-platform-lib.jar"))
-    implementation("com.code-disaster.steamworks4j:steamworks4j:1.6.2")
     implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    implementation("io.libp2p:jvm-libp2p:1.2.0-RELEASE")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
     implementation("org.lwjgl.lwjgl:lwjgl:2.9.3")
     implementation("org.lwjgl.lwjgl:lwjgl_util:2.9.3")
     runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-linux")
     runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-windows")
     runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-osx")
-    testImplementation(platform("org.junit:junit-bom:6.0.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 application {
@@ -104,14 +86,19 @@ tasks.test {
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.release = 8
+    options.release = 11
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
+    compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
 }
 
 tasks.named<Jar>("jar") {
-    dependsOn(extractNatives, buildRocketConnectorNative, "compileJava")
+    dependsOn(extractNatives, buildRocketConnectorNative, "compileJava", "compileKotlin")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from(tasks.named<JavaCompile>("compileJava").map { it.outputs.files })
+    from(tasks.named("compileKotlin").map { it.outputs.files })
     from(layout.buildDirectory.dir("libs/natives")) {
         into("natives")
     }

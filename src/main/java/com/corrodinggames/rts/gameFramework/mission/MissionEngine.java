@@ -8,17 +8,12 @@ import com.corrodinggames.rts.game.ai.AIController;
 import com.corrodinggames.rts.game.map.MapLoadException;
 import com.corrodinggames.rts.game.map.MapObject;
 import com.corrodinggames.rts.game.map.MapObjectLayer;
-import com.corrodinggames.rts.game.units.BaseUnit;
-import com.corrodinggames.rts.game.units.OrderableUnit;
-import com.corrodinggames.rts.game.units.Tree;
-import com.corrodinggames.rts.game.units.UnitType;
-import com.corrodinggames.rts.game.units.UnitTypeEnum;
+import com.corrodinggames.rts.game.units.*;
 import com.corrodinggames.rts.game.units.buildings.CommandCenter;
 import com.corrodinggames.rts.game.units.buildings.ResourceExtractor;
 import com.corrodinggames.rts.game.units.buildings.turrets.TurretFactory;
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
 import com.corrodinggames.rts.game.units.custom.LocaleString;
-import com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope;
 import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.Serializable;
 import com.corrodinggames.rts.gameFramework.Utility;
@@ -27,6 +22,7 @@ import com.corrodinggames.rts.gameFramework.effects.SpriteSheet;
 import com.corrodinggames.rts.gameFramework.network.GameInputStream;
 import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
 import com.corrodinggames.rts.gameFramework.network.NetworkEngine;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -1067,43 +1063,49 @@ public class MissionEngine extends Serializable {
         }
     }
 
+
     public boolean h() {
-        boolean z;
-        boolean z2 = false;
-        GameEngine gameEngine = GameEngine.getInstance();
-        BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
-        int size = BaseUnit.bE.size();
-        for (int i = 0; i < size; i++) {
-            BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit.team == PlayerTeam.TEAM_ALL && (baseUnit instanceof OrderableUnit) && baseUnit.isAlive() && !baseUnit.o()) {
-                int i2 = 0;
-                int size2 = BaseUnit.bE.size();
-                while (true) {
-                    if (i2 < size2) {
-                        BaseUnit baseUnit2 = baseUnitArrA[i2];
-                        if (!gameEngine.isInNetworkOrReplay()) {
-                            z = baseUnit2.team == gameEngine.playerTeam;
-                        } else {
-                            z = !baseUnit2.team.isTeamSpectator;
-                            if (baseUnit.isUnitIcon()) {
-                                z = true;
-                            }
+        boolean var1 = false;
+        GameEngine var2 = GameEngine.getInstance();
+        BaseUnit[] var3 = BaseUnit.bE.a();
+        int var4 = 0;
+
+        for (int var5 = BaseUnit.bE.size(); var4 < var5; var4++) {
+            BaseUnit var6 = var3[var4];
+            if (var6.team == PlayerTeam.TEAM_ALL && var6 instanceof OrderableUnit && var6.isAlive() && !var6.o()) {
+                int var7 = 0;
+
+                for (int var8 = BaseUnit.bE.size(); var7 < var8; var7++) {
+                    BaseUnit var9 = var3[var7];
+                    boolean var10;
+                    if (!var2.isInNetworkOrReplay()) {
+                        var10 = var9.team == var2.playerTeam;
+                    } else {
+                        var10 = !var9.team.isTeamSpectator;
+                        if (var6.isUnitIcon()) {
+                            var10 = true;
                         }
-                        if (baseUnit2.team != null && baseUnit2.team.teamId < 0) {
-                            z = false;
-                        }
-                        if (!z || baseUnit2.team == baseUnit.team || !(baseUnit2 instanceof OrderableUnit) || baseUnit2.i() || !baseUnit2.isAlive() || Utility.distanceSq(baseUnit2.posX, baseUnit2.posY, baseUnit.posX, baseUnit.posY) >= 28900.0f) {
-                            i2++;
-                        } else {
-                            baseUnit.isSelectable(baseUnit2.team);
-                            baseUnit.unitBuildProgress = 60.0f;
-                            z2 = true;
-                            break;
-                        }
+                    }
+
+                    if (var9.team != null && var9.team.teamId < 0) {
+                        var10 = false;
+                    }
+
+                    if (var10
+                            && var9.team != var6.team
+                            && var9 instanceof OrderableUnit
+                            && !var9.i()
+                            && var9.isAlive()
+                            && Utility.distanceSq(var9.posX, var9.posY, var6.posX, var6.posY) < 28900.0F) {
+                        var6.isSelectable(var9.team);
+                        var6.unitBuildProgress = 60.0F;
+                        var1 = true;
+                        break;
                     }
                 }
             }
         }
-        return z2;
+
+        return var1;
     }
 }

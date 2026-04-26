@@ -8,15 +8,11 @@ import com.corrodinggames.rts.game.units.BaseUnit;
 import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.GameObject;
 import com.corrodinggames.rts.gameFramework.Utility;
-import com.corrodinggames.rts.gameFramework.effects.Effect;
-import com.corrodinggames.rts.gameFramework.effects.EffectEmitter;
-import com.corrodinggames.rts.gameFramework.effects.EffectManager;
-import com.corrodinggames.rts.gameFramework.effects.EffectQuality;
-import com.corrodinggames.rts.gameFramework.effects.EffectType;
-import com.corrodinggames.rts.gameFramework.effects.SpriteSheet;
+import com.corrodinggames.rts.gameFramework.effects.*;
 import com.corrodinggames.rts.gameFramework.graphics.Texture;
 import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import com.corrodinggames.rts.gameFramework.utility.IniFile;
+
 import java.util.ArrayList;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.custom.ay */
@@ -461,7 +457,7 @@ public class EffectTemplate {
             this.imageStrip.g = this.imageStrip.c;
             String string4 = iniFile.getString(str, "imageShadow", (String) null);
             if (string4 != null) {
-                this.imageStrip.j = CustomUnitConfigParser.cacheTexture(customUnitConfig.generation_free_in_sandbox, string4, customUnitConfig.turretMultiTargeting, customUnitConfig, str, "imageShadow");
+                this.imageStrip.j = CustomUnitConfigParser.cacheTexture(customUnitConfig.generation_free_in_sandbox, string4, customUnitConfig.imageSmoothing, customUnitConfig, str, "imageShadow");
                 this.shadow = true;
             }
             if (this.shadow && this.imageStrip.j == null) {

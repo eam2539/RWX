@@ -23,10 +23,8 @@
 - [ ] 复原项目结构
     - [x] Desktop build
     - [ ] Android build
-- [ ] Java/Kotlin模组
+- [ ] JVM模组系统
 - [ ] 基于P2P的联机系统
-- [ ] 连通Tiled地图
-- [ ] 基于波函数坍缩算法的地图生成器
 - [ ] 合作模式支持
 - [ ] 强化学习AI支持
 
@@ -46,7 +44,7 @@
 
 ### rocketConnector Native 库
 
-rocketConnector 原生库依赖 libRocket。由于许可证限制，libRocket 不能包含在本仓库中。
+rocketConnector 原生库依赖 libRocket。
 
 **1. 克隆 libRocket：**
 
@@ -56,19 +54,30 @@ git clone https://github.com/libRocket/libRocket.git
 
 **2. 编译 libRocket：**
 
+Linux 或 macOS:
+
 ```bash
-cd libRocket/Build
+cd path/to/libRocket/Build
 cmake . -DBUILD_SHARED_LIBS=OFF
-cmake --build . -j$(nproc)
+#for linux
+cmake --build . -j$(nproc) 
+#for macOS
+cmake --build . -j$(sysctl -n hw.logicalcpu)
+```
+
+Windows :
+
+```bat
+cd path\to\libRocket\Build
+cmake --build . --parallel
 ```
 
 **3. 编译 rocketConnector：**
 
 ```bash
-export LIBROCKET_ROOT=/path/to/libRocket   # 指向 libRocket 源码目录
-cd native/rocketConnector
-cmake -B build -S .
-cmake --build build
+# Point to libRocket source directory
+export LIBROCKET_ROOT=/path/to/libRocket   # for Windows: set LIBROCKET_ROOT=C:\path\to\libRocket 
+,/gradlew buildRocketConnectorNative # for Windows: gradlew.bat buildRocketConnectorNative
 ```
 
 ## 免责声明

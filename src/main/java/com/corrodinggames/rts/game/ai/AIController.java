@@ -7,27 +7,13 @@ import android.graphics.PointF;
 import com.corrodinggames.rts.game.PlayerTeam;
 import com.corrodinggames.rts.game.ai.behaviors.AIBehavior;
 import com.corrodinggames.rts.game.ai.behaviors.AIBehaviorType;
-import com.corrodinggames.rts.game.units.AttackMode;
-import com.corrodinggames.rts.game.units.BaseUnit;
-import com.corrodinggames.rts.game.units.DamageZone;
-import com.corrodinggames.rts.game.units.FireUnit;
-import com.corrodinggames.rts.game.units.OrderableUnit;
-import com.corrodinggames.rts.game.units.PathfindingUtils;
-import com.corrodinggames.rts.game.units.UnitBehaviorType;
-import com.corrodinggames.rts.game.units.UnitCommand;
-import com.corrodinggames.rts.game.units.UnitCommandType;
-import com.corrodinggames.rts.game.units.UnitMovementType;
-import com.corrodinggames.rts.game.units.UnitType;
+import com.corrodinggames.rts.game.units.*;
 import com.corrodinggames.rts.game.units.actions.AbstractUnitAction;
 import com.corrodinggames.rts.game.units.actions.ActionId;
 import com.corrodinggames.rts.game.units.actions.ActionType;
 import com.corrodinggames.rts.game.units.actions.PopupQueueAction;
 import com.corrodinggames.rts.game.units.air.AmphibiousJet;
-import com.corrodinggames.rts.game.units.buildings.AirFactory;
-import com.corrodinggames.rts.game.units.buildings.CommandCenter;
-import com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface;
-import com.corrodinggames.rts.game.units.buildings.LandFactory;
-import com.corrodinggames.rts.game.units.buildings.SeaFactory;
+import com.corrodinggames.rts.game.units.buildings.*;
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
 import com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope;
 import com.corrodinggames.rts.game.units.custom.price.UnitPrice;
@@ -41,6 +27,7 @@ import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
 import com.corrodinggames.rts.gameFramework.utility.UnitList;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -602,27 +589,6 @@ public final class AIController extends PlayerTeam {
         }
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    /* JADX INFO: renamed from: a */
-    public boolean shouldIssueActionForUnitType(UnitType unitType) {
-        BaseUnit baseUnitFindAttackDamageSource = BaseUnit.findAttackDamageSource(unitType);
-        if (!baseUnitFindAttackDamageSource.bI() && (baseUnitFindAttackDamageSource instanceof OrderableUnit) && !isNonCombatCustomUnit(baseUnitFindAttackDamageSource) && !baseUnitFindAttackDamageSource.canUnitAttack() && ((OrderableUnit) baseUnitFindAttackDamageSource).canAttack()) {
-            if (unitType instanceof CustomUnitConfig) {
-                CustomUnitConfig customUnitConfig = (CustomUnitConfig) unitType;
-                if (customUnitConfig.f31fw || !customUnitConfig.f27fs) {
-                    return false;
-                }
-                return true;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public AIController(int i) {
-        this(i, true);
-    }
-
     public AIController(int i, boolean z) {
         super(i, z);
         this.PATHFINDING_OVERLOAD_THRESHOLD = 3000;
@@ -669,7 +635,7 @@ public final class AIController extends PlayerTeam {
             /* JADX INFO: renamed from: a */
             public boolean canBuildUnit(UnitType unitType) {
                 if (BaseUnit.findAttackDamageSource(unitType).bI()) {
-                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).f31fw) {
+                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
                         return false;
                     }
                     return true;
@@ -682,7 +648,7 @@ public final class AIController extends PlayerTeam {
             /* JADX INFO: renamed from: a */
             public boolean canBuildUnit(UnitType unitType) {
                 if (AIController.this.isNonCombatCustomUnit(BaseUnit.findAttackDamageSource(unitType))) {
-                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).f31fw) {
+                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
                         return false;
                     }
                     if (unitType.o() == UnitMovementType.AIR || unitType.o() == UnitMovementType.HOVER || unitType.o() == UnitMovementType.OVER_CLIFF_WATER) {
@@ -718,7 +684,7 @@ public final class AIController extends PlayerTeam {
             /* JADX INFO: renamed from: a */
             public boolean canBuildUnit(UnitType unitType) {
                 if (unitType.m()) {
-                    if ((!(unitType instanceof CustomUnitConfig) || !((CustomUnitConfig) unitType).f31fw) && unitType.o() != UnitMovementType.WATER) {
+                    if ((!(unitType instanceof CustomUnitConfig) || !((CustomUnitConfig) unitType).disableUse) && unitType.o() != UnitMovementType.WATER) {
                         return true;
                     }
                     return false;
@@ -732,7 +698,7 @@ public final class AIController extends PlayerTeam {
             public boolean canBuildUnit(UnitType unitType) {
                 BaseUnit.findAttackDamageSource(unitType);
                 if (unitType.n()) {
-                    if ((!(unitType instanceof CustomUnitConfig) || !((CustomUnitConfig) unitType).f31fw) && unitType.o() != UnitMovementType.WATER) {
+                    if ((!(unitType instanceof CustomUnitConfig) || !((CustomUnitConfig) unitType).disableUse) && unitType.o() != UnitMovementType.WATER) {
                         return true;
                     }
                     return false;
@@ -745,7 +711,7 @@ public final class AIController extends PlayerTeam {
             /* JADX INFO: renamed from: a */
             public boolean canBuildUnit(UnitType unitType) {
                 if (BaseUnit.findAttackDamageSource(unitType).bI() && unitType.p()) {
-                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).f31fw) {
+                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
                         return false;
                     }
                     return true;
@@ -760,7 +726,7 @@ public final class AIController extends PlayerTeam {
                 UnitType unitTypeI;
                 BaseUnit baseUnitFindAttackDamageSource = BaseUnit.findAttackDamageSource(unitType);
                 if (baseUnitFindAttackDamageSource.bI()) {
-                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).f31fw) {
+                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
                         return false;
                     }
                     boolean z2 = false;
@@ -787,7 +753,7 @@ public final class AIController extends PlayerTeam {
                 UnitType unitTypeI;
                 BaseUnit baseUnitFindAttackDamageSource = BaseUnit.findAttackDamageSource(unitType);
                 if (baseUnitFindAttackDamageSource.bI()) {
-                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).f31fw) {
+                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
                         return false;
                     }
                     boolean z2 = false;
@@ -812,6 +778,27 @@ public final class AIController extends PlayerTeam {
         this.unitsToProcess = new ArrayList();
         this.aiBehaviors = new FastArrayList();
         initializeController();
+    }
+
+    public AIController(int i) {
+        this(i, true);
+    }
+
+    /* JADX INFO: Access modifiers changed from: private */
+    /* JADX INFO: renamed from: a */
+    public boolean shouldIssueActionForUnitType(UnitType unitType) {
+        BaseUnit baseUnitFindAttackDamageSource = BaseUnit.findAttackDamageSource(unitType);
+        if (!baseUnitFindAttackDamageSource.bI() && (baseUnitFindAttackDamageSource instanceof OrderableUnit) && !isNonCombatCustomUnit(baseUnitFindAttackDamageSource) && !baseUnitFindAttackDamageSource.canUnitAttack() && ((OrderableUnit) baseUnitFindAttackDamageSource).canAttack()) {
+            if (unitType instanceof CustomUnitConfig) {
+                CustomUnitConfig customUnitConfig = (CustomUnitConfig) unitType;
+                if (customUnitConfig.disableUse || !customUnitConfig.useAsAttacker) {
+                    return false;
+                }
+                return true;
+            }
+            return true;
+        }
+        return false;
     }
 
     /* JADX INFO: renamed from: av */
@@ -1060,7 +1047,7 @@ public final class AIController extends PlayerTeam {
             OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
             if (orderableUnit.getUnitAIPathfindCost()) {
                 UnitType unitTypeR = orderableUnit.r();
-                if ((unitTypeR instanceof CustomUnitConfig) && !((CustomUnitConfig) unitTypeR).f28ft) {
+                if ((unitTypeR instanceof CustomUnitConfig) && !((CustomUnitConfig) unitTypeR).useAsTransport) {
                     return false;
                 }
                 return true;
@@ -1076,7 +1063,7 @@ public final class AIController extends PlayerTeam {
             OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
             if (!orderableUnit.bI() && orderableUnit.canAttack() && !isNonCombatCustomUnit(orderableUnit) && !orderableUnit.canUnitAttack()) {
                 UnitType unitTypeR = orderableUnit.r();
-                if ((unitTypeR instanceof CustomUnitConfig) && !((CustomUnitConfig) unitTypeR).f27fs) {
+                if ((unitTypeR instanceof CustomUnitConfig) && !((CustomUnitConfig) unitTypeR).useAsAttacker) {
                     return false;
                 }
                 return true;

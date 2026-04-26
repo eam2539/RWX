@@ -5,14 +5,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import com.corrodinggames.rts.game.ColorMode;
 import com.corrodinggames.rts.game.PlayerTeam;
-import com.corrodinggames.rts.game.units.BaseUnit;
-import com.corrodinggames.rts.game.units.OrderableUnit;
-import com.corrodinggames.rts.game.units.UnitBehaviorType;
-import com.corrodinggames.rts.game.units.UnitContainer;
-import com.corrodinggames.rts.game.units.UnitMovementType;
-import com.corrodinggames.rts.game.units.UnitSize;
-import com.corrodinggames.rts.game.units.UnitType;
-import com.corrodinggames.rts.game.units.UnitTypeEnum;
+import com.corrodinggames.rts.game.units.*;
 import com.corrodinggames.rts.game.units.actions.AbstractUnitAction;
 import com.corrodinggames.rts.game.units.actions.ActionId;
 import com.corrodinggames.rts.game.units.actions.SelectUnitTypeAction;
@@ -40,6 +33,7 @@ import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import com.corrodinggames.rts.gameFramework.utility.IniFile;
 import com.corrodinggames.rts.gameFramework.utility.RwmodFileLoader;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,25 +51,25 @@ public final class CustomUnitConfig implements UnitType {
     public boolean teamColorsOnTurret;
 
     /* JADX INFO: renamed from: t */
-    public boolean isBio;
+    public boolean showHealthBar;
 
     /* JADX INFO: renamed from: u */
-    public boolean isBug;
+    public boolean showHealthBarChanges;
 
     /* JADX INFO: renamed from: v */
-    public boolean isBuilder;
+    public boolean showEnergyBar;
 
     /* JADX INFO: renamed from: w */
-    public boolean isBuilderNonAssist;
+    public boolean showShotDelayBar;
 
     /* JADX INFO: renamed from: x */
-    public boolean canBuildOnWater;
+    public boolean showTransportBar;
 
     /* JADX INFO: renamed from: y */
-    public boolean canBuildOnGround;
+    public boolean showShieldBar;
 
     /* JADX INFO: renamed from: z */
-    public boolean isAir;
+    public boolean showQueueBar;
 
     /* JADX INFO: renamed from: B */
     public boolean isHover;
@@ -108,37 +102,37 @@ public final class CustomUnitConfig implements UnitType {
     public String onNewMapSpawn_ifUnitIsPresent;
 
     /* JADX INFO: renamed from: M */
-    public String onNewMapSpawn;
+    public String name;
 
     /* JADX INFO: renamed from: O */
     public AnimationSet image_shield;
 
     /* JADX INFO: renamed from: P */
-    public AnimationSet image_turret;
+    public AnimationSet tag2;
 
     /* JADX INFO: renamed from: Q */
     public String image_shadow;
 
     /* JADX INFO: renamed from: R */
-    public int shadowOffsetX;
+    public int strictLevel;
 
     /* JADX INFO: renamed from: S */
-    public int shadowOffsetY;
+    public int number;
 
     /* JADX INFO: renamed from: T */
-    public SpawnPointType teamColors;
+    public SpawnPointType onNewMapSpawn;
 
     /* JADX INFO: renamed from: Y */
-    public int lockTurretWithBody;
+    public int default_frame;
 
     /* JADX INFO: renamed from: Z */
-    public LogicBoolean lockTurretWithBody_ignoreBaseTurret;
+    public LogicBoolean isVisible;
 
     /* JADX INFO: renamed from: aa */
-    public boolean alsoUseTurretImageForOtherSide;
+    public boolean imageSmoothingWhenZoomedIn;
 
     /* JADX INFO: renamed from: ab */
-    public boolean turretMultiTargeting;
+    public boolean imageSmoothing;
 
     /* JADX INFO: renamed from: ac */
     public ColorMode baseDamage;
@@ -150,175 +144,175 @@ public final class CustomUnitConfig implements UnitType {
     public int mass;
 
     /* JADX INFO: renamed from: ah */
-    public int maxMass;
+    public int image_offsetX;
 
     /* JADX INFO: renamed from: ai */
-    public int techLevel;
+    public int image_offsetY;
 
     /* JADX INFO: renamed from: aj */
-    public float armour;
+    public float image_offsetH;
 
     /* JADX INFO: renamed from: ak */
-    public boolean armourMinDamageToKeep;
+    public boolean bool4;
 
     /* JADX INFO: renamed from: am */
-    public boolean shield;
+    public boolean image_back_always_use_full_image;
 
     /* JADX INFO: renamed from: aq */
-    public boolean shieldDisplayOnlyDeflection;
+    public boolean bool3;
 
     /* JADX INFO: renamed from: as */
     public Texture[] energy;
 
     /* JADX INFO: renamed from: aw */
-    public Texture energyNeedsToRechargeToFull;
+    public Texture icon_build;
 
     /* JADX INFO: renamed from: aB */
-    public boolean showTransportBar;
+    public boolean attachmentBool;
 
     /* JADX INFO: renamed from: aC */
-    public LocaleString internalName;
+    public LocaleString displayText;
 
     /* JADX INFO: renamed from: aD */
-    public LocaleString displayName;
+    public LocaleString displayDescription;
 
     /* JADX INFO: renamed from: aE */
-    public String baseClassName;
+    public String displayLocaleKey;
 
     /* JADX INFO: renamed from: aF */
-    public boolean transportUnitsKillOnDeath;
+    public boolean showInEditor;
 
     /* JADX INFO: renamed from: aH */
     public boolean isBuildingUnit;
 
     /* JADX INFO: renamed from: aI */
-    public boolean isMobileUnit;
+    public boolean ignoreInUnitCapCalculation;
 
     /* JADX INFO: renamed from: aJ */
-    public boolean transportUnitsCanLoadUnitWithTags;
+    public boolean placeOnlyOnResPool;
 
     /* JADX INFO: renamed from: aK */
-    public boolean transportUnitsUnloadRight;
+    public boolean isUnrepairableUnit;
 
     /* JADX INFO: renamed from: aL */
-    public float transportUnitsUnloadLeft;
+    public float extraBuildRangeWhenBuildingThis;
 
     /* JADX INFO: renamed from: aM */
-    public boolean transportUnitsUnloadAndGiveOrder;
+    public boolean isUnselectable;
 
     /* JADX INFO: renamed from: aN */
-    public boolean transportSlotsNeeded;
+    public boolean isUnselectableAsTarget;
 
     /* JADX INFO: renamed from: aO */
-    public boolean transportSwitchToSlots;
+    public boolean canNotBeDirectlyAttacked;
 
     /* JADX INFO: renamed from: aP */
-    public boolean addResources;
+    public boolean canNotBeDamaged;
 
     /* JADX INFO: renamed from: aQ */
-    public boolean isCloaked;
+    public boolean showOnMinimap;
 
     /* JADX INFO: renamed from: aR */
-    public boolean cloakHiddenFromAllies;
+    public boolean showOnMinimapToEnemies;
 
     /* JADX INFO: renamed from: aS */
     public AnimationSet deathAnimation;
 
     /* JADX INFO: renamed from: aT */
-    public boolean showStatusBar;
+    public boolean canNotBeGivenOrdersByPlayer;
 
     /* JADX INFO: renamed from: aU */
-    public boolean flag_f1aU;
+    public boolean canRepairBuildings;
 
     /* JADX INFO: renamed from: aV */
-    public boolean f1aV;
+    public boolean canRepairUnits;
 
     /* JADX INFO: renamed from: aW */
-    public boolean f2aW;
+    public boolean autoRepair;
 
     /* JADX INFO: renamed from: aY */
-    public boolean f4aY;
+    public boolean nanoRangeForRepairIsMelee;
 
     /* JADX INFO: renamed from: ba */
-    public boolean isBuilding;
+    public boolean nanoRangeForReclaimIsMelee;
 
     /* JADX INFO: renamed from: bb */
-    public float fogOfWarSightRange;
+    public float nanoRepairSpeed;
 
     /* JADX INFO: renamed from: bc */
-    public float fogOfWarSightRangeWhileNotBuilt;
+    public float nanoReclaimSpeed;
 
     /* JADX INFO: renamed from: be */
-    public float buildingToFootprintOffsetX;
+    public float nanoUnbuildSpeed;
 
     /* JADX INFO: renamed from: bf */
-    public float buildingToFootprintOffsetY;
+    public float nanoBuildSpeed;
 
     /* JADX INFO: renamed from: bg */
     public boolean isFactory;
 
     /* JADX INFO: renamed from: bh */
-    public float isExtractor;
+    public float selfBuildRate;
 
     /* JADX INFO: renamed from: bi */
-    public boolean isTurret;
+    public boolean dieOnConstruct;
 
     /* JADX INFO: renamed from: bj */
-    public boolean isConstructionBox;
+    public boolean dieOnAttack;
 
     /* JADX INFO: renamed from: bk */
-    public boolean canNotBeGivenOrdersByPlayer;
+    public boolean dieOnZeroEnergy;
 
     /* JADX INFO: renamed from: bl */
-    public boolean canNotBeDirectlyAttacked;
+    public boolean removeOnAttack;
 
     /* JADX INFO: renamed from: bm */
-    public int footprint;
+    public int fireOnDeath;
 
     /* JADX INFO: renamed from: bn */
-    public boolean displayFootprint;
+    public boolean nukeOnDeath;
 
     /* JADX INFO: renamed from: bo */
-    public float constructionPylon;
+    public float nukeOnDeathRange;
 
     /* JADX INFO: renamed from: bp */
-    public float pylonRadius;
+    public float nukeOnDeathDamage;
 
     /* JADX INFO: renamed from: bq */
-    public int pylonRequiresPower;
+    public int numBitsOnDeath;
 
     /* JADX INFO: renamed from: br */
-    public boolean pylonBuildWith;
+    public boolean nukeOnDeathDisableWhenNoNuke;
 
     /* JADX INFO: renamed from: bs */
-    public boolean pylonBuildWithOr;
+    public boolean disableDeathOnZeroHp;
 
     /* JADX INFO: renamed from: bt */
-    public UnitSize unitSize;
+    public UnitSize explodeTypeOnDeath;
 
     /* JADX INFO: renamed from: bu */
-    public boolean softRadius;
+    public boolean explodeOnDeath;
 
     /* JADX INFO: renamed from: bv */
-    public boolean canRepair;
+    public boolean explodeOnDeathGroundCollision;
 
     /* JADX INFO: renamed from: bw */
-    public CustomUnitSpawnList canGuard;
+    public CustomUnitSpawnList effectOnDeathGroundCollision;
 
     /* JADX INFO: renamed from: bx */
-    public CustomUnitSpawnList canPatrol;
+    public CustomUnitSpawnList effectOnDeathIfUnbuilt;
 
     /* JADX INFO: renamed from: by */
-    public CustomUnitSpawnList canAttack;
+    public CustomUnitSpawnList effectOnDeath;
 
     /* JADX INFO: renamed from: bz */
-    public SoundList canAttackFlying;
+    public SoundList soundOnDeath;
 
     /* JADX INFO: renamed from: bC */
-    public UnitSpawner canAttackNotTouchingWater;
+    public UnitSpawner unitsSpawnedOnDeath;
 
     /* JADX INFO: renamed from: bD */
-    public boolean targetGround;
+    public boolean unitsSpawnedOnDeath_setToTeamOfLastAttacker;
 
     /* JADX INFO: renamed from: bE */
     public boolean targetAir;
@@ -328,51 +322,37 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: bG */
     public boolean targetProjectiles;
-
-    /* JADX INFO: renamed from: bJ */
-    boolean targetAllyTeam;
-
-    /* JADX INFO: renamed from: bK */
-    boolean targetEnemyTeam;
-
-    /* JADX INFO: renamed from: bL */
-    boolean targetGroundOnlyLast;
-
-    /* JADX INFO: renamed from: bM */
-    boolean canAttackCondition;
-
-    /* JADX INFO: renamed from: bN */
-    boolean canAttackWhileGarrisoned;
-
-    /* JADX INFO: renamed from: bO */
-    CustomUnitSpawnList canBeAttacked;
-
-    /* JADX INFO: renamed from: bP */
-    CustomUnitSpawnList isSelectable;
-
-    /* JADX INFO: renamed from: bQ */
-    boolean showOnMinimap;
-
-    /* JADX INFO: renamed from: bR */
-    float showOnMinimapToEnemies;
+    /* JADX INFO: renamed from: cd */
+    public boolean autoTriggerCheckWhileNotBuilt;
+    /* JADX INFO: renamed from: ce */
+    public boolean availableInDemo;
+    /* JADX INFO: renamed from: cf */
+    public boolean isLocked;
+    /* JADX INFO: renamed from: cg */
+    public boolean isLockedIfGameModeNoNuke;
+    /* JADX INFO: renamed from: ch */
+    public UnitPrice price;
+    /* JADX INFO: renamed from: ci */
+    public UnitPrice reclaimPrice;
+    /* JADX INFO: renamed from: cj */
+    public UnitPrice streamingCost;
+    /* JADX INFO: renamed from: cl */
+    public int techLevel;
+    /* JADX INFO: renamed from: cm */
+    public boolean experimental;
 
     /* JADX INFO: renamed from: bS */
     boolean showActionsAndWaypoints;
-
-    /* JADX INFO: renamed from: bT */
-    float showOnHpHover;
-
-    /* JADX INFO: renamed from: bU */
-    CustomUnitSpawnList showInEditor;
-
-    /* JADX INFO: renamed from: bV */
-    CustomUnitSpawnList stayNeutral;
-
-    /* JADX INFO: renamed from: bW */
-    boolean createNeutral;
-
-    /* JADX INFO: renamed from: bX */
-    float createOnAggressiveTeam;
+    /* JADX INFO: renamed from: cn */
+    public boolean hasGenerationCondition;
+    /* JADX INFO: renamed from: cr */
+    public int generationDelay;
+    /* JADX INFO: renamed from: cs */
+    public float generationRate;
+    /* JADX INFO: renamed from: cx */
+    public LogicBoolean generationActive;
+    /* JADX INFO: renamed from: cy */
+    public boolean stayNeutral;
 
     /* JADX INFO: renamed from: bY */
     CustomUnitSpawnList createOnNeutralTeam;
@@ -382,114 +362,78 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: cc */
     public boolean canBeBuiltBy;
-
-    /* JADX INFO: renamed from: cd */
-    public boolean canBeBuiltByUnit;
-
-    /* JADX INFO: renamed from: ce */
-    public boolean canBeBuiltByFactory;
-
-    /* JADX INFO: renamed from: cf */
-    public boolean canBeBuiltByBuilding;
-
-    /* JADX INFO: renamed from: cg */
-    public boolean canBeBuiltByAir;
-
-    /* JADX INFO: renamed from: ch */
-    public UnitPrice buildPrice;
-
-    /* JADX INFO: renamed from: ci */
-    public UnitPrice generationResources;
-
-    /* JADX INFO: renamed from: cj */
-    public UnitPrice streamingPrice;
-
-    /* JADX INFO: renamed from: cl */
-    public int canBeBuiltByTurret;
-
-    /* JADX INFO: renamed from: cm */
-    public boolean canBeBuiltByExtractor;
-
-    /* JADX INFO: renamed from: cn */
-    public boolean canBeBuiltByBuilder;
-
-    /* JADX INFO: renamed from: cr */
-    public int canBeBuiltByNotTags;
-
-    /* JADX INFO: renamed from: cs */
-    public float canBeBuiltByOrTags;
-
-    /* JADX INFO: renamed from: cx */
-    public LogicBoolean canBeBuiltByOrTagsOrLogic;
-
-    /* JADX INFO: renamed from: cy */
-    public boolean canBeBuiltByAndTagsAndLogic;
-
     /* JADX INFO: renamed from: cz */
-    public boolean canBeBuiltByAndTagsOrLogic;
-
+    public boolean createNeutral;
     /* JADX INFO: renamed from: cA */
-    public boolean canBeBuiltByOrTagsAndLogicOrTags;
-
+    public boolean allowCaptureWhenNeutralByAI;
     /* JADX INFO: renamed from: cB */
-    public boolean canBeBuiltByOrTagsAndLogicAndTags;
-
+    public boolean whileNeutralTransportAnyTeam;
     /* JADX INFO: renamed from: cC */
-    public boolean canBeBuiltByAndTagsAndLogicOrTags;
-
+    public boolean whileNeutralConvertToTransportedTeam;
     /* JADX INFO: renamed from: cD */
-    public boolean canBeBuiltByAndTagsAndLogicAndTags;
-
+    public boolean convertToNeutralIfNotTransporting;
     /* JADX INFO: renamed from: cE */
-    public boolean canBeBuiltByOrTagsOrLogicOrTags;
-
+    public boolean createOnAggressiveTeam;
     /* JADX INFO: renamed from: cF */
-    public float canBeBuiltByOrTagsOrLogicAndTags;
-
+    public float resourceRate;
     /* JADX INFO: renamed from: cG */
-    public int canBeBuiltByAndTagsOrLogicOrTags;
-
+    public int resourceMaxConcurrentReclaimingThis;
     /* JADX INFO: renamed from: cH */
-    public AnimationSet canBeBuiltByAndTagsOrLogicAndTags;
-
+    public AnimationSet similarResourcesHaveTag;
     /* JADX INFO: renamed from: cJ */
-    public float canBeBuiltByOrTagsAndLogicOrTagsOrLogic;
-
+    public float shadowOffsetX;
     /* JADX INFO: renamed from: cK */
-    public float canBeBuiltByOrTagsAndLogicAndTagsAndLogic;
-
+    public float shadowOffsetY;
     /* JADX INFO: renamed from: cM */
-    public boolean canBeBuiltByAndTagsAndLogicOrTagsAndLogic;
-
+    public boolean startShieldAtZero;
     /* JADX INFO: renamed from: cN */
-    public float canBeBuiltByAndTagsAndLogicOrTagsOrLogic;
-
+    public float armourMinDamageToKeep;
     /* JADX INFO: renamed from: cO */
-    public boolean canBeBuiltByAndTagsAndLogicAndTagsAndLogic;
-
+    public boolean startEnergyAtZero;
     /* JADX INFO: renamed from: cP */
-    public float canBeBuiltByAndTagsAndLogicAndTagsOrLogic;
-
+    public float energyRegen;
     /* JADX INFO: renamed from: cQ */
-    public float canBeBuiltByOrTagsOrLogicOrTagsAndLogic;
-
+    public float energyRegenWhenRecharging;
     /* JADX INFO: renamed from: cR */
-    public boolean canBeBuiltByOrTagsOrLogicOrTagsOrLogic;
-
+    public boolean energyNeedsToRechargeToFull;
     /* JADX INFO: renamed from: cS */
-    public float canBeBuiltByOrTagsOrLogicAndTagsAndLogic;
-
+    public float energyStartingPercentage;
     /* JADX INFO: renamed from: cT */
-    public LocaleString canBeBuiltByOrTagsOrLogicAndTagsOrLogic;
-
+    public LocaleString energyDisplayName;
     /* JADX INFO: renamed from: cU */
-    public boolean canBeBuiltByAndTagsOrLogicOrTagsAndLogic;
-
+    public boolean shieldDisplayOnlyDeflection;
     /* JADX INFO: renamed from: cV */
-    public float canBeBuiltByAndTagsOrLogicOrTagsOrLogic;
-
+    public float shieldDeflectionDisplayRate;
     /* JADX INFO: renamed from: cW */
-    public int canBeBuiltByAndTagsOrLogicAndTagsAndLogic;
+    public int radius;
+    /* JADX INFO: renamed from: dd */
+    public int displayRadius;
+    /* JADX INFO: renamed from: de */
+    public float uiTargetRadius;
+    /* JADX INFO: renamed from: df */
+    public int shieldRenderRadius;
+    /* JADX INFO: renamed from: dg */
+    public int buildingSelectionOffset;
+    /* JADX INFO: renamed from: dh */
+    public int fogOfWarSightRangeWhileNotBuilt2;
+    /* JADX INFO: renamed from: di */
+    public float exit_x;
+    /* JADX INFO: renamed from: dj */
+    public float exit_y;
+    /* JADX INFO: renamed from: dk */
+    public Float exit_dirOffset;
+    /* JADX INFO: renamed from: dl */
+    public float exit_heightOffset;
+    /* JADX INFO: renamed from: dm */
+    public boolean exitHeightIgnoreParent;
+    /* JADX INFO: renamed from: dn */
+    public Float exit_moveAwayAmount;
+    /* JADX INFO: renamed from: dp */
+    public SoundList soundOnMoveOrder;
+    /* JADX INFO: renamed from: dq */
+    public SoundList soundOnNewSelection;
+    /* JADX INFO: renamed from: dB */
+    public boolean rotateWithDirection;
 
     /* JADX INFO: renamed from: da */
     public float canBeBuiltByOrTagsAndLogicOrTagsOrLogicOrTags;
@@ -499,135 +443,93 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: dc */
     public boolean canBeBuiltByOrTagsAndLogicAndTagsAndLogicOrTags;
-
-    /* JADX INFO: renamed from: dd */
-    public int canBeBuiltByOrTagsAndLogicAndTagsAndLogicAndTags;
-
-    /* JADX INFO: renamed from: de */
-    public float canBeBuiltByOrTagsAndLogicAndTagsOrLogicOrTags;
-
-    /* JADX INFO: renamed from: df */
-    public int canBeBuiltByOrTagsAndLogicAndTagsOrLogicAndTags;
-
-    /* JADX INFO: renamed from: dg */
-    public int canBeBuiltByAndTagsAndLogicOrTagsAndLogicOrTags;
-
-    /* JADX INFO: renamed from: dh */
-    public int canBeBuiltByAndTagsAndLogicOrTagsAndLogicAndTags;
-
-    /* JADX INFO: renamed from: di */
-    public float spawnOffsetLocalX;
-
-    /* JADX INFO: renamed from: dj */
-    public float spawnOffsetLocalY;
-
-    /* JADX INFO: renamed from: dk */
-    public Float spawnAngleOffset;
-
-    /* JADX INFO: renamed from: dl */
-    public float spawnOffsetZ;
-
-    /* JADX INFO: renamed from: dm */
-    public boolean keepOriginalZOnSpawn;
-
-    /* JADX INFO: renamed from: dn */
-    public Float spawnSideOffset;
+    /* JADX INFO: renamed from: dC */
+    public boolean lockBodyRotationWithMainTurret;
+    /* JADX INFO: renamed from: dD */
+    public boolean lockShadowRotationWithMainTurret;
+    /* JADX INFO: renamed from: dE */
+    public boolean lockLegRotationWithMainTurret;
+    /* JADX INFO: renamed from: dF */
+    public TurretConfig defaultTurret2;
+    /* JADX INFO: renamed from: dG */
+    public int defaultTurretRotationSpeed;
+    /* JADX INFO: renamed from: dH */
+    public float whenBeingBuiltMakeTransparentTill;
+    /* JADX INFO: renamed from: dJ */
+    public float maxAttackRange;
+    /* JADX INFO: renamed from: dK */
+    public Boolean showRangeUIGuide;
+    /* JADX INFO: renamed from: dL */
+    public boolean turretRotateWithBody;
+    /* JADX INFO: renamed from: dM */
+    public float shootDelay;
+    /* JADX INFO: renamed from: dN */
+    public float moveAccelerationSpeed;
 
     /* JADX INFO: renamed from: do, reason: not valid java name */
     public SoundList f0do;
-
-    /* JADX INFO: renamed from: dp */
-    public SoundList canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTags;
-
-    /* JADX INFO: renamed from: dq */
-    public SoundList canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTags;
-
-    /* JADX INFO: renamed from: dv */
-    AnimationConfig canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTags;
-
-    /* JADX INFO: renamed from: dw */
-    AnimationConfig canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTags;
-
-    /* JADX INFO: renamed from: dx */
-    AnimationConfig canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTags;
-
-    /* JADX INFO: renamed from: dy */
-    AnimationConfig canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTags;
-
-    /* JADX INFO: renamed from: dz */
-    AnimationConfig canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTags;
-
-    /* JADX INFO: renamed from: dA */
-    AnimationConfig canBeBuiltByAndTagsOrLogicAndTagsAndLogicOrTags;
-
-    /* JADX INFO: renamed from: dB */
-    public boolean canBeBuiltByAndTagsOrLogicAndTagsAndLogicAndTags;
-
-    /* JADX INFO: renamed from: dC */
-    public boolean canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTags;
-
-    /* JADX INFO: renamed from: dD */
-    public boolean canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTags;
-
-    /* JADX INFO: renamed from: dE */
-    public boolean canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogic;
-
-    /* JADX INFO: renamed from: dF */
-    public TurretConfig canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogic;
-
-    /* JADX INFO: renamed from: dG */
-    public int canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic;
-
-    /* JADX INFO: renamed from: dH */
-    public float canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogic;
-
-    /* JADX INFO: renamed from: dI */
-    CustomUnitDirectionConfig canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogic;
-
-    /* JADX INFO: renamed from: dJ */
-    public float canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogic;
-
-    /* JADX INFO: renamed from: dK */
-    public Boolean canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogic;
-
-    /* JADX INFO: renamed from: dL */
-    public boolean canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogic;
-
-    /* JADX INFO: renamed from: dM */
-    public float canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogic;
-
-    /* JADX INFO: renamed from: dN */
-    public float canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogic;
-
     /* JADX INFO: renamed from: dO */
-    public float canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogic;
-
+    public float moveDecelerationSpeed;
     /* JADX INFO: renamed from: dP */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogic;
-
+    public boolean ignoreMoveOrders;
     /* JADX INFO: renamed from: dQ */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogic;
-
+    public boolean bool8;
     /* JADX INFO: renamed from: dR */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogic;
-
+    public boolean bool9;
     /* JADX INFO: renamed from: dT */
-    public float canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic;
-
+    public float targetHeightDrift;
     /* JADX INFO: renamed from: dX */
-    public boolean canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTagsOrLogic;
-
+    public boolean moveSlidingMode;
     /* JADX INFO: renamed from: dY */
-    public boolean canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTagsAndLogic;
-
+    public boolean moveIgnoringBody;
     /* JADX INFO: renamed from: dZ */
-    public int canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTagsOrLogic;
-
+    public int moveSlidingDir;
     /* JADX INFO: renamed from: ea */
-    public float canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTagsAndLogic;
-
+    public float turretSize;
     /* JADX INFO: renamed from: eb */
-    public float canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTagsOrLogic;
+    public float turretTurnSpeed;
+    /* JADX INFO: renamed from: ef */
+    public boolean disablePassiveTargeting;
+    /* JADX INFO: renamed from: eg */
+    public boolean stopTargetingAfterFiring;
+    /* JADX INFO: renamed from: eh */
+    public boolean turretMultiTargeting2;
+    /* JADX INFO: renamed from: ei */
+    public boolean joinsGroupFormations;
+    /* JADX INFO: renamed from: ej */
+    public float moveYAxisScaling;
+    /* JADX INFO: renamed from: ek */
+    public float float2;
+    /* JADX INFO: renamed from: el */
+    public float reverseSpeedPercentage;
+    /* JADX INFO: renamed from: eo */
+    public float turnAcceleration;
+    /* JADX INFO: renamed from: ep */
+    public boolean canAttack;
+    /* JADX INFO: renamed from: eq */
+    public LogicBoolean canAttackFlyingUnits;
+    /* JADX INFO: renamed from: er */
+    public LogicBoolean canAttackLandUnits;
+    /* JADX INFO: renamed from: es */
+    public LogicBoolean canAttackUnderwaterUnits;
+    /* JADX INFO: renamed from: et */
+    public LogicBoolean canAttackNotTouchingWaterUnits;
+    /* JADX INFO: renamed from: eu */
+    public boolean bool11;
+    /* JADX INFO: renamed from: ev */
+    public AnimationSet canOnlyAttackUnitsWithTags;
+    /* JADX INFO: renamed from: ew */
+    public AnimationSet canOnlyAttackUnitsWithoutTags;
+    /* JADX INFO: renamed from: ex */
+    public boolean bool12;
+    /* JADX INFO: renamed from: ey */
+    public boolean isFixedFiring;
+    /* JADX INFO: renamed from: ez */
+    public float aimOffsetSpread;
+    /* JADX INFO: renamed from: eA */
+    public boolean moveYAxisScaleInverted;
+    /* JADX INFO: renamed from: eB */
+    public int softCollisionOnAll;
 
     /* JADX INFO: renamed from: ec */
     public UnitBehaviorType attackMovementType;
@@ -637,126 +539,86 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: ee */
     public float attackMovementSpread;
-
-    /* JADX INFO: renamed from: ef */
-    public boolean canBeBuiltByAndTagsOrLogicAndTagsAndLogicAndTagsOrLogic;
-
-    /* JADX INFO: renamed from: eg */
-    public boolean canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTagsAndLogic;
-
-    /* JADX INFO: renamed from: eh */
-    public boolean canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTagsOrLogic;
-
-    /* JADX INFO: renamed from: ei */
-    public boolean canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTagsAndLogic;
-
-    /* JADX INFO: renamed from: ej */
-    public float canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTagsOrLogic;
-
-    /* JADX INFO: renamed from: ek */
-    public float canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogicOrTags;
-
-    /* JADX INFO: renamed from: el */
-    public float canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogicAndTags;
-
-    /* JADX INFO: renamed from: eo */
-    public float canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicOrTags;
-
-    /* JADX INFO: renamed from: ep */
-    public boolean canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicAndTags;
-
-    /* JADX INFO: renamed from: eq */
-    public LogicBoolean canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogicOrTags;
-
-    /* JADX INFO: renamed from: er */
-    public LogicBoolean canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogicAndTags;
-
-    /* JADX INFO: renamed from: es */
-    public LogicBoolean canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicOrTags;
-
-    /* JADX INFO: renamed from: et */
-    public LogicBoolean canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicAndTags;
-
-    /* JADX INFO: renamed from: eu */
-    public boolean canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicOrTags;
-
-    /* JADX INFO: renamed from: ev */
-    public AnimationSet canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicAndTags;
-
-    /* JADX INFO: renamed from: ew */
-    public AnimationSet canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicOrTags;
-
-    /* JADX INFO: renamed from: ex */
-    public boolean canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicAndTags;
-
-    /* JADX INFO: renamed from: ey */
-    public boolean canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogicOrTags;
-
-    /* JADX INFO: renamed from: ez */
-    public float canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogicAndTags;
-
-    /* JADX INFO: renamed from: eA */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogicOrTags;
-
-    /* JADX INFO: renamed from: eB */
-    public int canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogicAndTags;
-
     /* JADX INFO: renamed from: eC */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicOrTags;
-
+    public boolean disableAllUnitCollisions2;
     /* JADX INFO: renamed from: eD */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicAndTags;
-
+    public boolean isBio;
     /* JADX INFO: renamed from: eE */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicOrTags;
-
+    public boolean isBug;
     /* JADX INFO: renamed from: eF */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicAndTags;
-
+    public boolean isMelee;
     /* JADX INFO: renamed from: eG */
-    public float canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogicOrTags;
-
+    public float meleeAttackRange;
     /* JADX INFO: renamed from: eH */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogicAndTags;
-
+    public boolean isPickableStartingUnit;
     /* JADX INFO: renamed from: eI */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogicAndTags;
-
+    public boolean startFallingWhenStartingUnit;
     /* JADX INFO: renamed from: eN */
-    public float canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicAndTags;
-
+    public float transportUnitsUnloadDelayBetweenEachUnit;
     /* JADX INFO: renamed from: eO */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicOrTags;
-
+    public boolean transportUnitsEachUnitAlwaysUsesSingleSlot;
     /* JADX INFO: renamed from: eP */
-    public AnimationSet canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicAndTags;
-
+    public AnimationSet transportUnitsRequireTag;
     /* JADX INFO: renamed from: eR */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogicAndTags;
-
+    public boolean transportUnitsBlockAirAndWaterUnits;
     /* JADX INFO: renamed from: eS */
-    public boolean f8eS;
-
+    public boolean transportUnitsBlockOtherTransports;
     /* JADX INFO: renamed from: eT */
-    public boolean f9eT;
-
+    public boolean transportUnitsAddUnloadOption;
     /* JADX INFO: renamed from: eU */
-    public LogicBoolean f10eU;
-
+    public LogicBoolean transportUnitsKeepBuiltUnits;
     /* JADX INFO: renamed from: eV */
-    public LogicBoolean f11eV;
-
+    public LogicBoolean transportUnitsKillOnDeath;
     /* JADX INFO: renamed from: eW */
-    public LogicBoolean f12eW;
-
+    public LogicBoolean transportUnitsKeepWaypoints;
     /* JADX INFO: renamed from: eX */
-    public boolean f13eX;
-
+    public boolean transportUnitsOnTeamChangeKeepCurrentTeam;
     /* JADX INFO: renamed from: eY */
-    public float f14eY;
-
+    public float transportUnitsHealBy;
     /* JADX INFO: renamed from: fc */
-    public LogicBoolean f16fc;
+    public LogicBoolean transportUnitsCanUnloadUnits;
+    /* JADX INFO: renamed from: fi */
+    public boolean slowDeathFall;
+    /* JADX INFO: renamed from: fj */
+    public boolean slowDeathFallSmoke;
+    /* JADX INFO: renamed from: fk */
+    public boolean canReclaimResources;
+    /* JADX INFO: renamed from: fl */
+    public AnimationSet canReclaimResourcesOnlyWithTags;
+    /* JADX INFO: renamed from: fm */
+    public int canReclaimResourcesNextSearchRange;
+    /* JADX INFO: renamed from: fn */
+    public AnimationSet canReclaimUnitsOnlyWithTags;
+    /* JADX INFO: renamed from: fo */
+    public AnimationSet canRepairUnitsOnlyWithTags;
+    /* JADX INFO: renamed from: fp */
+    public boolean isBuilder;
+    /* JADX INFO: renamed from: fq */
+    public boolean useAsBuilder;
+    /* JADX INFO: renamed from: fr */
+    public boolean useAsHarvester;
+    /* JADX INFO: renamed from: fs */
+    public boolean useAsAttacker;
+    /* JADX INFO: renamed from: ft */
+    public boolean useAsTransport;
+    /* JADX INFO: renamed from: fv */
+    public AnimationSet aiTags;
+    /* JADX INFO: renamed from: fw */
+    public boolean disableUse;
+    /* JADX INFO: renamed from: fx */
+    public int maxGlobal;
+    /* JADX INFO: renamed from: fy */
+    public int maxEachBase;
+    /* JADX INFO: renamed from: fz */
+    public float buildPriority;
+    /* JADX INFO: renamed from: fA */
+    public int recommendedInEachBaseNum;
+    /* JADX INFO: renamed from: fB */
+    public float recommendedInEachBasePriorityIfUnmet;
+    /* JADX INFO: renamed from: fC */
+    public float nonInBaseExtraPriority;
+    /* JADX INFO: renamed from: fD */
+    public float nonGlobalExtraPriority;
 
     /* JADX INFO: renamed from: fd */
     public LogicBoolean f17fd;
@@ -769,99 +631,70 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: fh */
     public UnitMovementType f19fh;
-
-    /* JADX INFO: renamed from: fi */
-    public boolean f20fi;
-
-    /* JADX INFO: renamed from: fj */
-    public boolean f21fj;
-
-    /* JADX INFO: renamed from: fk */
-    public boolean f22fk;
-
-    /* JADX INFO: renamed from: fl */
-    public AnimationSet f23fl;
-
-    /* JADX INFO: renamed from: fm */
-    public int f24fm;
-
-    /* JADX INFO: renamed from: fn */
-    public AnimationSet f25fn;
-
-    /* JADX INFO: renamed from: fo */
-    public AnimationSet f26fo;
-
-    /* JADX INFO: renamed from: fp */
-    public boolean isFlying;
-
-    /* JADX INFO: renamed from: fq */
-    public boolean hasTransportCapability;
-
-    /* JADX INFO: renamed from: fr */
-    public boolean isUnselectable;
-
-    /* JADX INFO: renamed from: fs */
-    public boolean f27fs;
-
-    /* JADX INFO: renamed from: ft */
-    public boolean f28ft;
+    /* JADX INFO: renamed from: fE */
+    public int whenUsingAsHarvester_recommendedInEachBase;
+    /* JADX INFO: renamed from: fF */
+    public int whenUsingAsHarvester_recommendedGlobal;
+    /* JADX INFO: renamed from: fG */
+    public boolean whenUsingAsHarvester_includeOtherHarvesterCounts;
+    /* JADX INFO: renamed from: fH */
+    public AnimationSet onlyUseAsHarvester_ifBaseHasUnitTagged;
+    /* JADX INFO: renamed from: fM */
+    public boolean lowPriorityTargetForOtherUnits;
+    /* JADX INFO: renamed from: fN */
+    public boolean notPassivelyTargetedByOtherUnits;
+    /* JADX INFO: renamed from: fO */
+    public AnimationSet showActionsWithMixedSelectionIfOtherUnitsHaveTag;
+    /* JADX INFO: renamed from: A */
+    public boolean showSelectionIndicator = true;
+    /* JADX INFO: renamed from: U */
+    public int total_frames = 1;
+    /* JADX INFO: renamed from: V */
+    public int int2 = Integer.MAX_VALUE;
+    /* JADX INFO: renamed from: W */
+    public int frame_width = -1;
+    public int frame_height = -1;
 
     /* JADX INFO: renamed from: fu */
     public boolean f29fu;
-
-    /* JADX INFO: renamed from: fv */
-    public AnimationSet f30fv;
-
-    /* JADX INFO: renamed from: fw */
-    public boolean f31fw;
-
-    /* JADX INFO: renamed from: fx */
-    public int f32fx;
-
-    /* JADX INFO: renamed from: fy */
-    public int f33fy;
-
-    /* JADX INFO: renamed from: fz */
-    public float f34fz;
-
-    /* JADX INFO: renamed from: fA */
-    public int f35fA;
-
-    /* JADX INFO: renamed from: fB */
-    public float f36fB;
-
-    /* JADX INFO: renamed from: fC */
-    public float f37fC;
-
-    /* JADX INFO: renamed from: fD */
-    public float f38fD;
-
-    /* JADX INFO: renamed from: fE */
-    public int f39fE;
-
-    /* JADX INFO: renamed from: fF */
-    public int f40fF;
-
-    /* JADX INFO: renamed from: fG */
-    public boolean f41fG;
-
-    /* JADX INFO: renamed from: fH */
-    public AnimationSet f42fH;
+    /* JADX INFO: renamed from: al */
+    public Texture image_back = null;
+    /* JADX INFO: renamed from: an */
+    public Texture image_wreak = null;
+    /* JADX INFO: renamed from: ao */
+    public Texture image_turret = null;
+    /* JADX INFO: renamed from: ar */
+    public Texture[] textures = new Texture[10];
+    /* JADX INFO: renamed from: au */
+    public Texture texture = null;
+    /* JADX INFO: renamed from: av */
+    public boolean bool5 = false;
+    /* JADX INFO: renamed from: ax */
+    public LegConfig[] legConfig = null;
+    /* JADX INFO: renamed from: aG */
+    public float globalScale = 1.0f;
+    /* JADX INFO: renamed from: aX */
+    public int nanoRangeForRepair = -1;
+    /* JADX INFO: renamed from: aZ */
+    public int nanoRangeForReclaim = -1;
+    /* JADX INFO: renamed from: bd */
+    public float resourceReclaimMultiplier = 1.0f;
+    /* JADX INFO: renamed from: ck */
+    public float buildSpeed = 0.001f;
+    /* JADX INFO: renamed from: cv */
+    public UnitPrice borrowResourcesWhileAlive = UnitPrice.a;
 
     /* JADX INFO: renamed from: fI */
     public String f43fI;
 
     /* JADX INFO: renamed from: fJ */
     public boolean f44fJ;
-
-    /* JADX INFO: renamed from: fM */
-    public boolean f46fM;
-
-    /* JADX INFO: renamed from: fN */
-    public boolean f47fN;
-
-    /* JADX INFO: renamed from: fO */
-    public AnimationSet f48fO;
+    /* JADX INFO: renamed from: cw */
+    public UnitPrice borrowResourcesWhileBuilt = UnitPrice.a;
+    /* JADX INFO: renamed from: cI */
+    public int drawLayer = -2;
+    /* JADX INFO: renamed from: cL */
+    public UnitStats unitStats = new UnitStats(true);
 
     /* JADX INFO: renamed from: fP */
     public boolean f49fP;
@@ -964,58 +797,48 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: r */
     public final VariableScope.VariableMapping variableMapping = new VariableScope.VariableMapping();
-
-    /* JADX INFO: renamed from: A */
-    public boolean isLand = true;
+    /* JADX INFO: renamed from: cX */
+    public Rect footprint = new Rect();
 
     /* JADX INFO: renamed from: G */
     public boolean generation_repeat = true;
 
     /* JADX INFO: renamed from: N */
     public FastArrayList autoTriggerAction = new FastArrayList();
-
-    /* JADX INFO: renamed from: U */
-    public int turretSize = 1;
-
-    /* JADX INFO: renamed from: V */
-    public int turretTurnSpeed = Integer.MAX_VALUE;
-
-    /* JADX INFO: renamed from: W */
-    public int turretRotateWithBody = -1;
-    public int X = -1;
+    /* JADX INFO: renamed from: cY */
+    public Rect constructionFootprint = new Rect();
+    /* JADX INFO: renamed from: cZ */
+    public Rect displayFootprint = new Rect();
+    /* JADX INFO: renamed from: dS */
+    public float startingHeightOffset = 0.0f;
+    /* JADX INFO: renamed from: dU */
+    public float heightChangeRate = -1.0f;
 
     /* JADX INFO: renamed from: ad */
     public Texture baseTexture = null;
 
     /* JADX INFO: renamed from: ae */
     public boolean hp = true;
-
-    /* JADX INFO: renamed from: al */
-    public Texture disableCustomShields = null;
-
-    /* JADX INFO: renamed from: an */
-    public Texture maxShield = null;
-
-    /* JADX INFO: renamed from: ao */
-    public Texture shieldRegen = null;
+    /* JADX INFO: renamed from: dV */
+    public float fallingAcceleration = 0.03f;
+    /* JADX INFO: renamed from: dW */
+    public float fallingAccelerationDead = 0.06f;
+    /* JADX INFO: renamed from: em */
+    public int currentTurrentIndex = -1;
 
     /* JADX INFO: renamed from: ap */
     public Texture shieldRegenMoving = null;
-
-    /* JADX INFO: renamed from: ar */
-    public Texture[] startShieldAtZero = new Texture[10];
+    /* JADX INFO: renamed from: en */
+    public int int3 = -1;
 
     /* JADX INFO: renamed from: at */
     public Texture[] maxEnergy = null;
-
-    /* JADX INFO: renamed from: au */
-    public Texture energyRegen = null;
-
-    /* JADX INFO: renamed from: av */
-    public boolean energyRegenWhenRecharging = false;
-
-    /* JADX INFO: renamed from: ax */
-    public LegConfig[] energyDisplayName = null;
+    /* JADX INFO: renamed from: eJ */
+    public boolean hideScorchMark = false;
+    /* JADX INFO: renamed from: eK */
+    public boolean disableLowHpFire = false;
+    /* JADX INFO: renamed from: eL */
+    public boolean disableLowHpSmoke = false;
 
     /* JADX INFO: renamed from: ay */
     public boolean energyStartPercentage = false;
@@ -1025,18 +848,14 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: aA */
     public final FastArrayList<AttachmentSlotDefinition> energyCanTransferToOtherUnits = new FastArrayList();
-
-    /* JADX INFO: renamed from: aG */
-    public float transportUnitsHealBy = 1.0f;
-
-    /* JADX INFO: renamed from: aX */
-    public int f3aX = -1;
-
-    /* JADX INFO: renamed from: aZ */
-    public int isExperimental = -1;
-
-    /* JADX INFO: renamed from: bd */
-    public float useBuildingSmoke = 1.0f;
+    /* JADX INFO: renamed from: eM */
+    public int maxTransportingUnits = 0;
+    /* JADX INFO: renamed from: eQ */
+    public FastArrayList transportUnitsRequireMovementType = new FastArrayList();
+    /* JADX INFO: renamed from: eZ */
+    public int transportSlotsNeeded = 1;
+    /* JADX INFO: renamed from: bJ */
+    boolean splastEffect;
 
     /* JADX INFO: renamed from: bA */
     public int canAttackLand = -1;
@@ -1055,9 +874,8 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: cb */
     public UpdateFrequency autoTriggerCheckRate = UpdateFrequency.everyFrame;
-
-    /* JADX INFO: renamed from: ck */
-    public float buildTimeSeconds = 0.001f;
+    /* JADX INFO: renamed from: bK */
+    boolean splastEffectReverse;
 
     /* JADX INFO: renamed from: co */
     public UnitPrice generationTemplate = UnitPrice.a;
@@ -1073,75 +891,52 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: cu */
     public float updateUnitMemoryRate = 1.0f;
-
-    /* JADX INFO: renamed from: cv */
-    public UnitPrice canBeBuiltByAndLogic = UnitPrice.a;
-
-    /* JADX INFO: renamed from: cw */
-    public UnitPrice canBeBuiltByOrTagsAndLogic = UnitPrice.a;
-
-    /* JADX INFO: renamed from: cI */
-    public int canBeBuiltByOrTagsAndLogicOrTagsAndLogic = -2;
-
-    /* JADX INFO: renamed from: cL */
-    public UnitStats canBeBuiltByOrTagsAndLogicAndTagsOrLogic = new UnitStats(true);
-
-    /* JADX INFO: renamed from: cX */
-    public Rect canBeBuiltByAndTagsOrLogicAndTagsOrLogic = new Rect();
-
-    /* JADX INFO: renamed from: cY */
-    public Rect canBeBuiltByOrTagsAndLogicOrTagsAndLogicOrTags = new Rect();
-
-    /* JADX INFO: renamed from: cZ */
-    public Rect canBeBuiltByOrTagsAndLogicOrTagsAndLogicAndTags = new Rect();
-
+    /* JADX INFO: renamed from: bL */
+    boolean internalEffect;
+    /* JADX INFO: renamed from: bM */
+    boolean dustEffect;
+    /* JADX INFO: renamed from: bN */
+    boolean dustEffectReverse;
+    /* JADX INFO: renamed from: bO */
+    CustomUnitSpawnList list1;
+    /* JADX INFO: renamed from: bP */
+    CustomUnitSpawnList list2;
+    /* JADX INFO: renamed from: bQ */
+    boolean movementEffectReverseFlipEffects;
+    /* JADX INFO: renamed from: bR */
+    float movementEffectRate;
+    /* JADX INFO: renamed from: bT */
+    float repairEffectRate;
+    /* JADX INFO: renamed from: bU */
+    CustomUnitSpawnList list3;
+    /* JADX INFO: renamed from: bV */
+    CustomUnitSpawnList list4;
+    /* JADX INFO: renamed from: bW */
+    boolean bool2;
+    /* JADX INFO: renamed from: bX */
+    float reclaimEffectRate;
+    /* JADX INFO: renamed from: dv */
+    AnimationConfig createdAnimation;
+    /* JADX INFO: renamed from: dw */
+    AnimationConfig underConstructionAnimation;
+    /* JADX INFO: renamed from: dx */
+    AnimationConfig underConstructionWithLinkedBuiltTimeAnimation;
+    /* JADX INFO: renamed from: dy */
+    AnimationConfig queuedUnitsAnimation;
+    /* JADX INFO: renamed from: dz */
+    AnimationConfig repairAnimation;
+    /* JADX INFO: renamed from: dA */
+    AnimationConfig reclaimAnimation;
+    /* JADX INFO: renamed from: dI */
+    CustomUnitDirectionConfig directionConfig;
     /* JADX INFO: renamed from: dr */
-    FastArrayList<AnimationConfig> canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTags = new FastArrayList();
-
+    FastArrayList<AnimationConfig> animations = new FastArrayList();
     /* JADX INFO: renamed from: ds */
-    AnimationConfig canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTags = new AnimationConfig("moving");
-
+    AnimationConfig movingAnimation = new AnimationConfig("moving");
     /* JADX INFO: renamed from: dt */
-    AnimationConfig canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTags = new AnimationConfig("idle");
-
+    AnimationConfig idleAnimation = new AnimationConfig("idle");
     /* JADX INFO: renamed from: du */
-    AnimationConfig canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTags = new AnimationConfig("attack");
-
-    /* JADX INFO: renamed from: dS */
-    public float canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogic = 0.0f;
-
-    /* JADX INFO: renamed from: dU */
-    public float canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsAndLogic = -1.0f;
-
-    /* JADX INFO: renamed from: dV */
-    public float canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsOrLogic = 0.03f;
-
-    /* JADX INFO: renamed from: dW */
-    public float canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTagsAndLogic = 0.06f;
-
-    /* JADX INFO: renamed from: em */
-    public int canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicOrTags = -1;
-
-    /* JADX INFO: renamed from: en */
-    public int canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicAndTags = -1;
-
-    /* JADX INFO: renamed from: eJ */
-    public boolean f6eJ = false;
-
-    /* JADX INFO: renamed from: eK */
-    public boolean canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogicOrTags = false;
-
-    /* JADX INFO: renamed from: eL */
-    public boolean f7eL = false;
-
-    /* JADX INFO: renamed from: eM */
-    public int canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags = 0;
-
-    /* JADX INFO: renamed from: eQ */
-    public FastArrayList canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogicOrTags = new FastArrayList();
-
-    /* JADX INFO: renamed from: eZ */
-    public int f15eZ = 1;
+    AnimationConfig attackAnimation = new AnimationConfig("attack");
 
     /* JADX INFO: renamed from: fe */
     public boolean f18fe = true;
@@ -1260,28 +1055,103 @@ public final class CustomUnitConfig implements UnitType {
         return strTrim;
     }
 
-    /* JADX INFO: renamed from: b */
-    public int getConfigDisplayPath(String str) {
-        String strLoadData = loadData(str);
-        GameEngine.isInSpace("name:" + strLoadData);
-        for (int i = 0; i < this.energyDisplayName.length; i++) {
-            GameEngine.isInSpace("checking:" + this.energyDisplayName[i].b);
-            if (strLoadData.equals(this.energyDisplayName[i].b)) {
-                GameEngine.isInSpace("got");
-                return i;
+    public static void a(GameOutputStream gameOutputStream) throws IOException {
+        gameOutputStream.startBlock("customUnits");
+        gameOutputStream.writeInt(1);
+        gameOutputStream.writeInt(activeConfigs.size());
+        for (CustomUnitConfig customUnitConfig : activeConfigs) {
+            gameOutputStream.writeStringUTF(customUnitConfig.name);
+            gameOutputStream.writeInt(customUnitConfig.generation_unit);
+            gameOutputStream.writeBoolean(true);
+            gameOutputStream.writeStringNullable(customUnitConfig.getOwningModDisplayTitle());
+            long j = 0;
+            if (customUnitConfig.modInfo != null && customUnitConfig.modInfo.steamId != 0) {
+                j = customUnitConfig.modInfo.steamId;
             }
+            gameOutputStream.writeLong(j);
+            gameOutputStream.writeLong(0L);
         }
-        return -1;
+        gameOutputStream.endBlock("customUnits");
     }
 
     /* JADX INFO: renamed from: a */
-    AnimationConfig findAnimationForAction(CustomUnitAction customUnitAction) {
-        for (AnimationConfig animationConfig : this.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTags) {
-            if (animationConfig.a(customUnitAction)) {
-                return animationConfig;
+    public static void loadAndValidateCustomUnits(GameInputStream inputStream) throws IOException, ConfigValidationException {
+        inputStream.startBlockNamed("customUnits");
+        try {
+            ArrayList arrayList = new ArrayList();
+            ArrayList<UnitCompatibilityReport> arrayList2 = new ArrayList();
+            HashMap<String,LanguageValue> map = new HashMap();
+            boolean z = false;
+            if (inputStream.readInt() >= 2) {
+                z = inputStream.readBoolean();
+                inputStream.readBoolean();
             }
+            int i = inputStream.readInt();
+            for (int i2 = 0; i2 < i; i2++) {
+                String utf = inputStream.readUTF();
+                int i3 = inputStream.readInt();
+                inputStream.readBoolean();
+                String nullableString = inputStream.readNullableString();
+                inputStream.readLong();
+                inputStream.readLong();
+                String nullableString2 = null;
+                if (z) {
+                    nullableString2 = inputStream.readNullableString();
+                }
+                CustomUnitConfig customUnitConfig = null;
+                int i4 = -1;
+                CustomUnitConfig customUnitConfig2 = null;
+                synchronized (allConfigs) {
+                    for (CustomUnitConfig customUnitConfig3 : allConfigs) {
+                        if (utf.equals(customUnitConfig3.name)) {
+                            if (i3 == customUnitConfig3.generation_unit) {
+                                customUnitConfig = customUnitConfig3;
+                            } else {
+                                customUnitConfig2 = customUnitConfig3;
+                                i4 = customUnitConfig3.generation_unit;
+                            }
+                        }
+                    }
+                }
+                LanguageValue languageValue = (LanguageValue) map.get(nullableString);
+                if (languageValue == null) {
+                    languageValue = new LanguageValue(nullableString);
+                    map.put(nullableString, languageValue);
+                }
+                if (customUnitConfig == null) {
+                    if (customUnitConfig2 != null) {
+                        languageValue.d++;
+                    } else {
+                        languageValue.c++;
+                    }
+                    UnitCompatibilityReport unitCompatibilityReport = new UnitCompatibilityReport();
+                    unitCompatibilityReport.modIdentifier = nullableString;
+                    unitCompatibilityReport.unitName = utf;
+                    unitCompatibilityReport.clientChecksum = i4;
+                    unitCompatibilityReport.serverChecksum = i3;
+                    unitCompatibilityReport.serverUnitConfig = customUnitConfig2;
+                    unitCompatibilityReport.clientUnitConfig = nullableString2;
+                    arrayList2.add(unitCompatibilityReport);
+                    GameEngine.updatePaintTextSizeIfNeeded(unitCompatibilityReport.generateErrorMessage());
+                } else {
+                    languageValue.b++;
+                    arrayList.add(customUnitConfig);
+                }
+            }
+            if (arrayList2.size() > 0) {
+                for (UnitCompatibilityReport unitCompatibilityReport2 : arrayList2) {
+                    if (unitCompatibilityReport2.modIdentifier == null) {
+                        validateUnitCompatibility(unitCompatibilityReport2, map);
+                    }
+                }
+                validateUnitCompatibility((UnitCompatibilityReport) arrayList2.get(0), map);
+            }
+            validUnitsForSync = arrayList;
+            inputStream.d("customUnits");
+        } catch (Throwable th) {
+            inputStream.d("customUnits");
+            throw th;
         }
-        return null;
     }
 
     /* JADX INFO: renamed from: a */
@@ -1372,50 +1242,158 @@ public final class CustomUnitConfig implements UnitType {
         throw new ConfigParseException("Failed to find built-in or custom effect with the name:" + str);
     }
 
+    public static CustomUnitConfig a(CustomUnitConfig customUnitConfig) {
+        for (CustomUnitConfig customUnitConfig2 : activeConfigs) {
+            if (customUnitConfig.configPath.equals(customUnitConfig2.configPath)) {
+                return customUnitConfig2;
+            }
+        }
+        for (CustomUnitConfig customUnitConfig3 : activeConfigs) {
+            if (customUnitConfig.name.equals(customUnitConfig3.name)) {
+                return customUnitConfig3;
+            }
+        }
+        return null;
+    }
+
+    /* JADX INFO: renamed from: n */
+    public static CustomUnitConfig findConfigByName(String str) {
+        for (CustomUnitConfig customUnitConfig : activeConfigs) {
+            if (str.equals(customUnitConfig.name)) {
+                return customUnitConfig;
+            }
+        }
+        for (CustomUnitConfig customUnitConfig2 : activeConfigs) {
+            if (customUnitConfig2.autoTriggerAction.contains(str)) {
+                return customUnitConfig2;
+            }
+        }
+        return null;
+    }
+
+    /* JADX INFO: renamed from: E */
+    public static String getAllUnitAndTriggerNames() {
+        String str = VariableScope.nullOrMissingString;
+        Iterator it = activeConfigs.iterator();
+        while (it.hasNext()) {
+            str = str + ((CustomUnitConfig) it.next()).name + ", ";
+        }
+        Iterator it2 = activeConfigs.iterator();
+        while (it2.hasNext()) {
+            Iterator it3 = ((CustomUnitConfig) it2.next()).autoTriggerAction.iterator();
+            while (it3.hasNext()) {
+                str = str + ((String) it3.next()) + ", ";
+            }
+        }
+        return str;
+    }
+
+    /* JADX INFO: renamed from: F */
+    public static void spawnOnNewMapAccordingToTeamColors() {
+        GameEngine gameEngine = GameEngine.getInstance();
+        for (CustomUnitConfig customUnitConfig : activeConfigs) {
+            SpawnPointType spawnPointType = customUnitConfig.onNewMapSpawn;
+            if (spawnPointType != null) {
+                if (spawnPointType == SpawnPointType.emptyResourcePools_asNeutral || spawnPointType == SpawnPointType.emptyOrOccupiedResourcePools_asNeutral) {
+                    for (Point point : gameEngine.tileMap.unitObjects) {
+                        BaseUnit baseUnitA = customUnitConfig.a();
+                        baseUnitA.setUnitTeam(PlayerTeam.TEAM_ALL);
+                        gameEngine.tileMap.setCursorTileIndexFromTileIndex(point.worldX, point.worldY);
+                        baseUnitA.posX = gameEngine.tileMap.cursorTileX;
+                        baseUnitA.posY = gameEngine.tileMap.cursorTileY;
+                        baseUnitA.posX += baseUnitA.getUnitAIState();
+                        baseUnitA.posY += baseUnitA.getUnitAIPathfindStatus();
+                        if (spawnPointType == SpawnPointType.emptyResourcePools_asNeutral && (baseUnitA instanceof OrderableUnit) && ((OrderableUnit) baseUnitA).hasBlockingUnitNearby((BaseUnit) null, (PlayerTeam) null)) {
+                            baseUnitA.getUnitAICondition();
+                        } else {
+                            PlayerTeam.c(baseUnitA);
+                        }
+                    }
+                } else if (spawnPointType == SpawnPointType.mapCenter_asNeutral || spawnPointType == SpawnPointType.mapCenter_eachActiveTeam) {
+                    if (spawnPointType == SpawnPointType.mapCenter_asNeutral) {
+                        BaseUnit baseUnitA2 = customUnitConfig.a();
+                        baseUnitA2.setUnitTeam(PlayerTeam.TEAM_ALL);
+                        gameEngine.tileMap.exportTmxToFile(gameEngine.tileMap.getWorldWidth() / 2.0f, gameEngine.tileMap.getWorldHeight() / 2.0f);
+                        baseUnitA2.posX = gameEngine.tileMap.cursorTileX;
+                        baseUnitA2.posY = gameEngine.tileMap.cursorTileY;
+                        baseUnitA2.posX += baseUnitA2.getUnitAIState();
+                        baseUnitA2.posY += baseUnitA2.getUnitAIPathfindStatus();
+                        PlayerTeam.c(baseUnitA2);
+                    }
+                    if (spawnPointType == SpawnPointType.mapCenter_eachActiveTeam) {
+                        for (PlayerTeam playerTeam : PlayerTeam.addEnergy()) {
+                            if (playerTeam.addUnitToTeam(true, false) > 0) {
+                                BaseUnit baseUnitA3 = customUnitConfig.a();
+                                baseUnitA3.setUnitTeam(playerTeam);
+                                gameEngine.tileMap.exportTmxToFile(gameEngine.tileMap.getWorldWidth() / 2.0f, gameEngine.tileMap.getWorldHeight() / 2.0f);
+                                baseUnitA3.posX = gameEngine.tileMap.cursorTileX;
+                                baseUnitA3.posY = gameEngine.tileMap.cursorTileY;
+                                baseUnitA3.posX += baseUnitA3.getUnitAIState();
+                                baseUnitA3.posY += baseUnitA3.getUnitAIPathfindStatus();
+                                PlayerTeam.c(baseUnitA3);
+                            }
+                        }
+                    }
+                } else if (spawnPointType == SpawnPointType.spawnPoint_eachActiveTeam) {
+                    for (PlayerTeam playerTeam2 : PlayerTeam.addEnergy()) {
+                        if (playerTeam2.addUnitToTeam(true, false) > 0) {
+                            PointF pointF = new PointF();
+                            GameViewUtils.a(playerTeam2, pointF);
+                            BaseUnit baseUnitA4 = customUnitConfig.a();
+                            baseUnitA4.setUnitTeam(playerTeam2);
+                            gameEngine.tileMap.exportTmxToFile(pointF.x, pointF.y);
+                            baseUnitA4.posX = gameEngine.tileMap.cursorTileX;
+                            baseUnitA4.posY = gameEngine.tileMap.cursorTileY;
+                            baseUnitA4.posX += baseUnitA4.getUnitAIState();
+                            baseUnitA4.posY += baseUnitA4.getUnitAIPathfindStatus();
+                            PlayerTeam.c(baseUnitA4);
+                        }
+                    }
+                } else {
+                    GameEngine.updatePaintTextSizeIfNeeded("onNewMapSpawn unhandled: " + customUnitConfig.onNewMapSpawn);
+                }
+            }
+        }
+    }
+
+    /* JADX INFO: renamed from: b */
+    public int getConfigDisplayPath(String str) {
+        String strLoadData = loadData(str);
+        GameEngine.isInSpace("name:" + strLoadData);
+        for (int i = 0; i < this.legConfig.length; i++) {
+            GameEngine.isInSpace("checking:" + this.legConfig[i].b);
+            if (strLoadData.equals(this.legConfig[i].b)) {
+                GameEngine.isInSpace("got");
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /* JADX INFO: renamed from: a */
+    AnimationConfig findAnimationForAction(CustomUnitAction customUnitAction) {
+        for (AnimationConfig animationConfig : this.animations) {
+            if (animationConfig.a(customUnitAction)) {
+                return animationConfig;
+            }
+        }
+        return null;
+    }
+
     @Override // com.corrodinggames.rts.game.units.UnitType
     public boolean C() {
-        return this.canBeBuiltByFactory;
+        return this.availableInDemo;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
     public boolean w() {
-        if (this.canBeBuiltByAir) {
+        if (this.isLockedIfGameModeNoNuke) {
             GameEngine gameEngine = GameEngine.getInstance();
             if (gameEngine.isInGameOrLobby() && gameEngine.networkEngine.roomSettings.noNukes) {
                 return true;
             }
         }
-        return this.canBeBuiltByBuilding;
-    }
-
-    @Override // com.corrodinggames.rts.game.units.UnitType
-    public int c() {
-        return this.buildPrice.a();
-    }
-
-    @Override // com.corrodinggames.rts.game.units.UnitType
-    public UnitPrice u() {
-        return this.buildPrice;
-    }
-
-    @Override // com.corrodinggames.rts.game.units.UnitType
-    public UnitPrice B() {
-        return this.streamingPrice;
-    }
-
-    @Override // com.corrodinggames.rts.game.units.UnitType
-    public UnitPrice d(int i) {
-        return this.buildPrice;
-    }
-
-    @Override // com.corrodinggames.rts.game.units.UnitType
-    public float D() {
-        return this.buildTimeSeconds;
-    }
-
-    @Override // com.corrodinggames.rts.game.units.UnitType
-    public int g() {
-        return this.canBeBuiltByTurret;
+        return this.isLocked;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1429,32 +1407,13 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    /* JADX INFO: renamed from: e */
-    public String getUnitName() {
-        if (this.localeReloadCount != com.corrodinggames.rts.gameFramework.local.Locale.reloadCount || this.cachedUnitName == null) {
-            this.localeReloadCount = com.corrodinggames.rts.gameFramework.local.Locale.reloadCount;
-            String strResolveText = this.internalName != null ? this.internalName.resolveText() : this.onNewMapSpawn;
-            String str = this.onNewMapSpawn;
-            if (this.baseClassName != null) {
-                str = this.baseClassName;
-            }
-            this.cachedUnitName = com.corrodinggames.rts.gameFramework.local.Locale.getFormattedString("units." + str + ".name", strResolveText, new Object[0]);
-        }
-        return this.cachedUnitName;
+    public int c() {
+        return this.price.a();
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public String f() {
-        if (this.localeReloadCount != com.corrodinggames.rts.gameFramework.local.Locale.reloadCount || this.cachedDescription == null) {
-            this.localeReloadCount = com.corrodinggames.rts.gameFramework.local.Locale.reloadCount;
-            String strResolveText = this.displayName != null ? this.displayName.resolveText() : this.onNewMapSpawn;
-            String str = this.onNewMapSpawn;
-            if (this.baseClassName != null) {
-                str = this.baseClassName;
-            }
-            this.cachedDescription = com.corrodinggames.rts.gameFramework.local.Locale.getFormattedString("units." + str + ".description", strResolveText, new Object[0]);
-        }
-        return this.cachedDescription;
+    public UnitPrice u() {
+        return this.price;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1463,23 +1422,23 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public boolean k() {
-        return this.isMobileUnit;
+    public UnitPrice B() {
+        return this.streamingCost;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public boolean m() {
-        return this.hasTransportCapability;
+    public UnitPrice d(int i) {
+        return this.price;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public boolean n() {
-        return this.isUnselectable;
+    public float D() {
+        return this.buildSpeed;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public boolean l() {
-        return this.isFlying;
+    public int g() {
+        return this.techLevel;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1488,8 +1447,18 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public boolean p() {
-        return this.transportUnitsCanLoadUnitWithTags;
+    /* JADX INFO: renamed from: e */
+    public String getUnitName() {
+        if (this.localeReloadCount != com.corrodinggames.rts.gameFramework.local.Locale.reloadCount || this.cachedUnitName == null) {
+            this.localeReloadCount = com.corrodinggames.rts.gameFramework.local.Locale.reloadCount;
+            String strResolveText = this.displayText != null ? this.displayText.resolveText() : this.name;
+            String str = this.name;
+            if (this.displayLocaleKey != null) {
+                str = this.displayLocaleKey;
+            }
+            this.cachedUnitName = com.corrodinggames.rts.gameFramework.local.Locale.getFormattedString("units." + str + ".name", strResolveText, new Object[0]);
+        }
+        return this.cachedUnitName;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1497,12 +1466,18 @@ public final class CustomUnitConfig implements UnitType {
         return this.customUnitMetadata;
     }
 
-    /* JADX INFO: renamed from: a */
-    public void addEditorActionsForUnit(ArrayList arrayList, int i) {
-        if (this.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags != 0 && this.f9eT) {
-            arrayList.add(HovercraftUnit.i);
-            arrayList.add(HovercraftUnit.j);
+    @Override // com.corrodinggames.rts.game.units.UnitType
+    public String f() {
+        if (this.localeReloadCount != com.corrodinggames.rts.gameFramework.local.Locale.reloadCount || this.cachedDescription == null) {
+            this.localeReloadCount = com.corrodinggames.rts.gameFramework.local.Locale.reloadCount;
+            String strResolveText = this.displayDescription != null ? this.displayDescription.resolveText() : this.name;
+            String str = this.name;
+            if (this.displayLocaleKey != null) {
+                str = this.displayLocaleKey;
+            }
+            this.cachedDescription = com.corrodinggames.rts.gameFramework.local.Locale.getFormattedString("units." + str + ".description", strResolveText, new Object[0]);
         }
+        return this.cachedDescription;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1517,54 +1492,28 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public ArrayList<AbstractUnitAction> a(int i) {
-        if (this.specialActionLists == null) {
-            GameEngine gameEngine = GameEngine.getInstance();
-            throw new RuntimeException("specialActionLists==null for:" + this.onNewMapSpawn + " t:" + i + " networked:" + gameEngine.isNetworkConnected() + " replay:" + gameEngine.replayEngine.j() + " sandbox:" + gameEngine.isGameStarted + " active: " + activeConfigs.contains(this));
-        }
-        return this.specialActionLists[i - 1].a;
-    }
-
-    /* JADX INFO: renamed from: r */
-    public void rebuildActionIdCache() {
-        ArrayList arrayListA = a(this.canBeBuiltByTurret);
-        if (arrayListA.size() > 4) {
-            this.actionIdCache = new HashMap();
-            int size = arrayListA.size();
-            for (int i = 0; i < size; i++) {
-                AbstractUnitAction abstractUnitAction = (AbstractUnitAction) arrayListA.get(i);
-                if (this.actionIdCache.get(abstractUnitAction.getActionId()) == null) {
-                    this.actionIdCache.put(abstractUnitAction.getActionId(), abstractUnitAction);
-                }
-            }
-        }
-    }
-
-    /* JADX INFO: renamed from: a */
-    public AbstractUnitAction findActionById(ActionId actionId) {
-        if (this.actionIdCache != null) {
-            return (AbstractUnitAction) this.actionIdCache.get(actionId);
-        }
-        ArrayList arrayListA = a(this.canBeBuiltByTurret);
-        int size = arrayListA.size();
-        for (int i = 0; i < size; i++) {
-            AbstractUnitAction abstractUnitAction = (AbstractUnitAction) arrayListA.get(i);
-            if (abstractUnitAction.isAvailableForUnit(actionId)) {
-                return abstractUnitAction;
-            }
-        }
-        return null;
+    public boolean k() {
+        return this.ignoreInUnitCapCalculation;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    /* JADX INFO: renamed from: i */
-    public String getUnitTypeDescriptionShort() {
-        return this.onNewMapSpawn;
+    public boolean m() {
+        return this.useAsBuilder;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public String v() {
-        return this.onNewMapSpawn;
+    public boolean n() {
+        return this.useAsHarvester;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.UnitType
+    public boolean l() {
+        return this.isBuilder;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.UnitType
+    public boolean p() {
+        return this.placeOnlyOnResPool;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1683,17 +1632,12 @@ public final class CustomUnitConfig implements UnitType {
         return null;
     }
 
-    /* JADX INFO: renamed from: h */
-    public AbstractUnitAction findCustomActionByDisplayName(String str) {
-        for (AbstractUnitAction abstractUnitAction : a(this.canBeBuiltByTurret)) {
-            if (abstractUnitAction instanceof CustomAction) {
-                CustomAction customAction = (CustomAction) abstractUnitAction;
-                if (customAction.a.displayName.equalsIgnoreCase(str)) {
-                    return customAction;
-                }
-            }
+    /* JADX INFO: renamed from: a */
+    public void addEditorActionsForUnit(ArrayList arrayList, int i) {
+        if (this.maxTransportingUnits != 0 && this.transportUnitsAddUnloadOption) {
+            arrayList.add(HovercraftUnit.i);
+            arrayList.add(HovercraftUnit.j);
         }
-        return null;
     }
 
     public void a(CustomUnitRenderHook customUnitRenderHook) {
@@ -1787,23 +1731,13 @@ public final class CustomUnitConfig implements UnitType {
         return null;
     }
 
-    public static void a(GameOutputStream gameOutputStream) throws IOException {
-        gameOutputStream.startBlock("customUnits");
-        gameOutputStream.writeInt(1);
-        gameOutputStream.writeInt(activeConfigs.size());
-        for (CustomUnitConfig customUnitConfig : activeConfigs) {
-            gameOutputStream.writeStringUTF(customUnitConfig.onNewMapSpawn);
-            gameOutputStream.writeInt(customUnitConfig.generation_unit);
-            gameOutputStream.writeBoolean(true);
-            gameOutputStream.writeStringNullable(customUnitConfig.getOwningModDisplayTitle());
-            long j = 0;
-            if (customUnitConfig.modInfo != null && customUnitConfig.modInfo.steamId != 0) {
-                j = customUnitConfig.modInfo.steamId;
-            }
-            gameOutputStream.writeLong(j);
-            gameOutputStream.writeLong(0L);
+    @Override // com.corrodinggames.rts.game.units.UnitType
+    public ArrayList<AbstractUnitAction> a(int i) {
+        if (this.specialActionLists == null) {
+            GameEngine gameEngine = GameEngine.getInstance();
+            throw new RuntimeException("specialActionLists==null for:" + this.name + " t:" + i + " networked:" + gameEngine.isNetworkConnected() + " replay:" + gameEngine.replayEngine.j() + " sandbox:" + gameEngine.isGameStarted + " active: " + activeConfigs.contains(this));
         }
-        gameOutputStream.endBlock("customUnits");
+        return this.specialActionLists[i - 1].a;
     }
 
     /* JADX INFO: renamed from: a */
@@ -1884,83 +1818,18 @@ public final class CustomUnitConfig implements UnitType {
         throw new ConfigValidationException("Found unit:" + report.unitName + " but it does not match the server's copy " + str6, "checksum c:" + report.clientChecksum + " s:" + report.serverChecksum);
     }
 
-    /* JADX INFO: renamed from: a */
-    public static void loadAndValidateCustomUnits(GameInputStream inputStream) throws IOException, ConfigValidationException {
-        inputStream.startBlockNamed("customUnits");
-        try {
-            ArrayList arrayList = new ArrayList();
-            ArrayList<UnitCompatibilityReport> arrayList2 = new ArrayList();
-            HashMap<String,LanguageValue> map = new HashMap();
-            boolean z = false;
-            if (inputStream.readInt() >= 2) {
-                z = inputStream.readBoolean();
-                inputStream.readBoolean();
-            }
-            int i = inputStream.readInt();
-            for (int i2 = 0; i2 < i; i2++) {
-                String utf = inputStream.readUTF();
-                int i3 = inputStream.readInt();
-                inputStream.readBoolean();
-                String nullableString = inputStream.readNullableString();
-                inputStream.readLong();
-                inputStream.readLong();
-                String nullableString2 = null;
-                if (z) {
-                    nullableString2 = inputStream.readNullableString();
-                }
-                CustomUnitConfig customUnitConfig = null;
-                int i4 = -1;
-                CustomUnitConfig customUnitConfig2 = null;
-                synchronized (allConfigs) {
-                    for (CustomUnitConfig customUnitConfig3 : allConfigs) {
-                        if (utf.equals(customUnitConfig3.onNewMapSpawn)) {
-                            if (i3 == customUnitConfig3.generation_unit) {
-                                customUnitConfig = customUnitConfig3;
-                            } else {
-                                customUnitConfig2 = customUnitConfig3;
-                                i4 = customUnitConfig3.generation_unit;
-                            }
-                        }
-                    }
-                }
-                LanguageValue languageValue = (LanguageValue) map.get(nullableString);
-                if (languageValue == null) {
-                    languageValue = new LanguageValue(nullableString);
-                    map.put(nullableString, languageValue);
-                }
-                if (customUnitConfig == null) {
-                    if (customUnitConfig2 != null) {
-                        languageValue.d++;
-                    } else {
-                        languageValue.c++;
-                    }
-                    UnitCompatibilityReport unitCompatibilityReport = new UnitCompatibilityReport();
-                    unitCompatibilityReport.modIdentifier = nullableString;
-                    unitCompatibilityReport.unitName = utf;
-                    unitCompatibilityReport.clientChecksum = i4;
-                    unitCompatibilityReport.serverChecksum = i3;
-                    unitCompatibilityReport.serverUnitConfig = customUnitConfig2;
-                    unitCompatibilityReport.clientUnitConfig = nullableString2;
-                    arrayList2.add(unitCompatibilityReport);
-                    GameEngine.updatePaintTextSizeIfNeeded(unitCompatibilityReport.generateErrorMessage());
-                } else {
-                    languageValue.b++;
-                    arrayList.add(customUnitConfig);
+    /* JADX INFO: renamed from: r */
+    public void rebuildActionIdCache() {
+        ArrayList arrayListA = a(this.techLevel);
+        if (arrayListA.size() > 4) {
+            this.actionIdCache = new HashMap();
+            int size = arrayListA.size();
+            for (int i = 0; i < size; i++) {
+                AbstractUnitAction abstractUnitAction = (AbstractUnitAction) arrayListA.get(i);
+                if (this.actionIdCache.get(abstractUnitAction.getActionId()) == null) {
+                    this.actionIdCache.put(abstractUnitAction.getActionId(), abstractUnitAction);
                 }
             }
-            if (arrayList2.size() > 0) {
-                for (UnitCompatibilityReport unitCompatibilityReport2 : arrayList2) {
-                    if (unitCompatibilityReport2.modIdentifier == null) {
-                        validateUnitCompatibility(unitCompatibilityReport2, map);
-                    }
-                }
-                validateUnitCompatibility((UnitCompatibilityReport) arrayList2.get(0), map);
-            }
-            validUnitsForSync = arrayList;
-            inputStream.d("customUnits");
-        } catch (Throwable th) {
-            inputStream.d("customUnits");
-            throw th;
         }
     }
 
@@ -1977,15 +1846,17 @@ public final class CustomUnitConfig implements UnitType {
         }
     }
 
-    public static CustomUnitConfig a(CustomUnitConfig customUnitConfig) {
-        for (CustomUnitConfig customUnitConfig2 : activeConfigs) {
-            if (customUnitConfig.configPath.equals(customUnitConfig2.configPath)) {
-                return customUnitConfig2;
-            }
+    /* JADX INFO: renamed from: a */
+    public AbstractUnitAction findActionById(ActionId actionId) {
+        if (this.actionIdCache != null) {
+            return (AbstractUnitAction) this.actionIdCache.get(actionId);
         }
-        for (CustomUnitConfig customUnitConfig3 : activeConfigs) {
-            if (customUnitConfig.onNewMapSpawn.equals(customUnitConfig3.onNewMapSpawn)) {
-                return customUnitConfig3;
+        ArrayList arrayListA = a(this.techLevel);
+        int size = arrayListA.size();
+        for (int i = 0; i < size; i++) {
+            AbstractUnitAction abstractUnitAction = (AbstractUnitAction) arrayListA.get(i);
+            if (abstractUnitAction.isAvailableForUnit(actionId)) {
+                return abstractUnitAction;
             }
         }
         return null;
@@ -2010,26 +1881,15 @@ public final class CustomUnitConfig implements UnitType {
         }
     }
 
-    public Texture[] a(Texture texture, ColorMode colorMode) {
-        boolean z = false;
-        if ((this.modInfo != null || this.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicOrTags) && !GameEngine.getInstance().settingsEngine.disableModLazyLoad) {
-            z = true;
-        }
-        if ((this.canBeBuiltByAndTagsAndLogic && this.canBeBuiltByAndTagsOrLogic) || this.canBeBuiltByOrTagsOrLogicOrTags) {
-            z = true;
-        }
-        Texture[] textureArrCompareToNew = PlayerTeam.compareToNew(texture, colorMode, z);
-        for (int i = 0; i < textureArrCompareToNew.length; i++) {
-            if (z && this.modInfo != null && this.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicOrTags && i == 1) {
-                textureArrCompareToNew[i].w();
-            }
-        }
-        CustomUnitConfigParser.a_texture_array(textureArrCompareToNew);
-        return textureArrCompareToNew;
+    @Override // com.corrodinggames.rts.game.units.UnitType
+    /* JADX INFO: renamed from: i */
+    public String getUnitTypeDescriptionShort() {
+        return this.name;
     }
 
-    public Texture a(IniFile iniFile, String str, String str2) {
-        return a(iniFile, str, str2, this.turretMultiTargeting);
+    @Override // com.corrodinggames.rts.game.units.UnitType
+    public String v() {
+        return this.name;
     }
 
     public Texture a(IniFile iniFile, String str, String str2, boolean z) {
@@ -2054,36 +1914,35 @@ public final class CustomUnitConfig implements UnitType {
         return (UnitType) unitTypeOverrides.get(unitType);
     }
 
-    /* JADX INFO: renamed from: n */
-    public static CustomUnitConfig findConfigByName(String str) {
-        for (CustomUnitConfig customUnitConfig : activeConfigs) {
-            if (str.equals(customUnitConfig.onNewMapSpawn)) {
-                return customUnitConfig;
-            }
-        }
-        for (CustomUnitConfig customUnitConfig2 : activeConfigs) {
-            if (customUnitConfig2.autoTriggerAction.contains(str)) {
-                return customUnitConfig2;
+    /* JADX INFO: renamed from: h */
+    public AbstractUnitAction findCustomActionByDisplayName(String str) {
+        for (AbstractUnitAction abstractUnitAction : a(this.techLevel)) {
+            if (abstractUnitAction instanceof CustomAction) {
+                CustomAction customAction = (CustomAction) abstractUnitAction;
+                if (customAction.a.displayName.equalsIgnoreCase(str)) {
+                    return customAction;
+                }
             }
         }
         return null;
     }
 
-    /* JADX INFO: renamed from: E */
-    public static String getAllUnitAndTriggerNames() {
-        String str = VariableScope.nullOrMissingString;
-        Iterator it = activeConfigs.iterator();
-        while (it.hasNext()) {
-            str = str + ((CustomUnitConfig) it.next()).onNewMapSpawn + ", ";
+    public Texture[] a(Texture texture, ColorMode colorMode) {
+        boolean z = false;
+        if ((this.modInfo != null || this.isBug) && !GameEngine.getInstance().settingsEngine.disableModLazyLoad) {
+            z = true;
         }
-        Iterator it2 = activeConfigs.iterator();
-        while (it2.hasNext()) {
-            Iterator it3 = ((CustomUnitConfig) it2.next()).autoTriggerAction.iterator();
-            while (it3.hasNext()) {
-                str = str + ((String) it3.next()) + ", ";
+        if ((this.stayNeutral && this.createNeutral) || this.createOnAggressiveTeam) {
+            z = true;
+        }
+        Texture[] textureArrCompareToNew = PlayerTeam.compareToNew(texture, colorMode, z);
+        for (int i = 0; i < textureArrCompareToNew.length; i++) {
+            if (z && this.modInfo != null && this.isBug && i == 1) {
+                textureArrCompareToNew[i].w();
             }
         }
-        return str;
+        CustomUnitConfigParser.a_texture_array(textureArrCompareToNew);
+        return textureArrCompareToNew;
     }
 
     public static CustomUnit a(boolean z, CustomUnitConfig customUnitConfig) {
@@ -2133,86 +1992,22 @@ public final class CustomUnitConfig implements UnitType {
         this.modInfo.addWarning(str2);
     }
 
-    @Override // com.corrodinggames.rts.game.units.UnitType
-    public Texture z() {
-        return this.energyNeedsToRechargeToFull;
+    public Texture a(IniFile iniFile, String str, String str2) {
+        return a(iniFile, str, str2, this.imageSmoothing);
     }
 
-    /* JADX INFO: renamed from: F */
-    public static void spawnOnNewMapAccordingToTeamColors() {
-        GameEngine gameEngine = GameEngine.getInstance();
-        for (CustomUnitConfig customUnitConfig : activeConfigs) {
-            SpawnPointType spawnPointType = customUnitConfig.teamColors;
-            if (spawnPointType != null) {
-                if (spawnPointType == SpawnPointType.emptyResourcePools_asNeutral || spawnPointType == SpawnPointType.emptyOrOccupiedResourcePools_asNeutral) {
-                    for (Point point : gameEngine.tileMap.unitObjects) {
-                        BaseUnit baseUnitA = customUnitConfig.a();
-                        baseUnitA.setUnitTeam(PlayerTeam.TEAM_ALL);
-                        gameEngine.tileMap.setCursorTileIndexFromTileIndex(point.worldX, point.worldY);
-                        baseUnitA.posX = gameEngine.tileMap.cursorTileX;
-                        baseUnitA.posY = gameEngine.tileMap.cursorTileY;
-                        baseUnitA.posX += baseUnitA.getUnitAIState();
-                        baseUnitA.posY += baseUnitA.getUnitAIPathfindStatus();
-                        if (spawnPointType == SpawnPointType.emptyResourcePools_asNeutral && (baseUnitA instanceof OrderableUnit) && ((OrderableUnit) baseUnitA).hasBlockingUnitNearby((BaseUnit) null, (PlayerTeam) null)) {
-                            baseUnitA.getUnitAICondition();
-                        } else {
-                            PlayerTeam.c(baseUnitA);
-                        }
-                    }
-                } else if (spawnPointType == SpawnPointType.mapCenter_asNeutral || spawnPointType == SpawnPointType.mapCenter_eachActiveTeam) {
-                    if (spawnPointType == SpawnPointType.mapCenter_asNeutral) {
-                        BaseUnit baseUnitA2 = customUnitConfig.a();
-                        baseUnitA2.setUnitTeam(PlayerTeam.TEAM_ALL);
-                        gameEngine.tileMap.exportTmxToFile(gameEngine.tileMap.getWorldWidth() / 2.0f, gameEngine.tileMap.getWorldHeight() / 2.0f);
-                        baseUnitA2.posX = gameEngine.tileMap.cursorTileX;
-                        baseUnitA2.posY = gameEngine.tileMap.cursorTileY;
-                        baseUnitA2.posX += baseUnitA2.getUnitAIState();
-                        baseUnitA2.posY += baseUnitA2.getUnitAIPathfindStatus();
-                        PlayerTeam.c(baseUnitA2);
-                    }
-                    if (spawnPointType == SpawnPointType.mapCenter_eachActiveTeam) {
-                        for (PlayerTeam playerTeam : PlayerTeam.addEnergy()) {
-                            if (playerTeam.addUnitToTeam(true, false) > 0) {
-                                BaseUnit baseUnitA3 = customUnitConfig.a();
-                                baseUnitA3.setUnitTeam(playerTeam);
-                                gameEngine.tileMap.exportTmxToFile(gameEngine.tileMap.getWorldWidth() / 2.0f, gameEngine.tileMap.getWorldHeight() / 2.0f);
-                                baseUnitA3.posX = gameEngine.tileMap.cursorTileX;
-                                baseUnitA3.posY = gameEngine.tileMap.cursorTileY;
-                                baseUnitA3.posX += baseUnitA3.getUnitAIState();
-                                baseUnitA3.posY += baseUnitA3.getUnitAIPathfindStatus();
-                                PlayerTeam.c(baseUnitA3);
-                            }
-                        }
-                    }
-                } else if (spawnPointType == SpawnPointType.spawnPoint_eachActiveTeam) {
-                    for (PlayerTeam playerTeam2 : PlayerTeam.addEnergy()) {
-                        if (playerTeam2.addUnitToTeam(true, false) > 0) {
-                            PointF pointF = new PointF();
-                            GameViewUtils.a(playerTeam2, pointF);
-                            BaseUnit baseUnitA4 = customUnitConfig.a();
-                            baseUnitA4.setUnitTeam(playerTeam2);
-                            gameEngine.tileMap.exportTmxToFile(pointF.x, pointF.y);
-                            baseUnitA4.posX = gameEngine.tileMap.cursorTileX;
-                            baseUnitA4.posY = gameEngine.tileMap.cursorTileY;
-                            baseUnitA4.posX += baseUnitA4.getUnitAIState();
-                            baseUnitA4.posY += baseUnitA4.getUnitAIPathfindStatus();
-                            PlayerTeam.c(baseUnitA4);
-                        }
-                    }
-                } else {
-                    GameEngine.updatePaintTextSizeIfNeeded("onNewMapSpawn unhandled: " + customUnitConfig.teamColors);
-                }
-            }
-        }
+    @Override // com.corrodinggames.rts.game.units.UnitType
+    public Texture z() {
+        return this.icon_build;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
     public int a(BaseUnit baseUnit) {
         int i = 0;
-        if (this.transportUnitsUnloadLeft > 0.0f) {
-            return (int) this.transportUnitsUnloadLeft;
+        if (this.extraBuildRangeWhenBuildingThis > 0.0f) {
+            return (int) this.extraBuildRangeWhenBuildingThis;
         }
-        if (this.transportUnitsCanLoadUnitWithTags && this.isBuildingUnit && baseUnit.y() < 20) {
+        if (this.placeOnlyOnResPool && this.isBuildingUnit && baseUnit.y() < 20) {
             i = 0 + 17;
         }
         return i;

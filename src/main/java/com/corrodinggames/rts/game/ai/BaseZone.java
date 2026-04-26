@@ -2,14 +2,7 @@ package com.corrodinggames.rts.game.ai;
 
 import android.graphics.PointF;
 import com.corrodinggames.rts.game.map.MapTile;
-import com.corrodinggames.rts.game.units.BaseUnit;
-import com.corrodinggames.rts.game.units.FireUnit;
-import com.corrodinggames.rts.game.units.OrderableUnit;
-import com.corrodinggames.rts.game.units.UnitCommand;
-import com.corrodinggames.rts.game.units.UnitCommandType;
-import com.corrodinggames.rts.game.units.UnitMovementType;
-import com.corrodinggames.rts.game.units.UnitType;
-import com.corrodinggames.rts.game.units.UnitTypeEnum;
+import com.corrodinggames.rts.game.units.*;
 import com.corrodinggames.rts.game.units.actions.AbstractUnitAction;
 import com.corrodinggames.rts.game.units.buildings.BaseBuilding;
 import com.corrodinggames.rts.game.units.buildings.CommandCenter;
@@ -28,6 +21,7 @@ import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
 import com.corrodinggames.rts.gameFramework.utility.UnitList;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -437,16 +431,16 @@ public class BaseZone extends AIStrategyNode {
                 }
                 if (z) {
                     CustomUnitConfig customUnitConfig2 = (CustomUnitConfig) unitType2;
-                    if (!customUnitConfig2.f31fw && ((iAssignTaskToUnitTypeOnCommand < customUnitConfig2.f32fx || customUnitConfig2.f32fx == -1) && (iCountUnitsOfType < customUnitConfig2.f33fy || customUnitConfig2.f33fy == -1))) {
-                        f2 = customUnitConfig2.f34fz;
-                        if (iCountUnitsOfType < customUnitConfig2.f35fA) {
-                            f2 = customUnitConfig2.f36fB;
+                    if (!customUnitConfig2.disableUse && ((iAssignTaskToUnitTypeOnCommand < customUnitConfig2.maxGlobal || customUnitConfig2.maxGlobal == -1) && (iCountUnitsOfType < customUnitConfig2.maxEachBase || customUnitConfig2.maxEachBase == -1))) {
+                        f2 = customUnitConfig2.buildPriority;
+                        if (iCountUnitsOfType < customUnitConfig2.recommendedInEachBaseNum) {
+                            f2 = customUnitConfig2.recommendedInEachBasePriorityIfUnmet;
                         }
                         if (iCountUnitsOfType == 0) {
-                            f2 += customUnitConfig2.f37fC;
+                            f2 += customUnitConfig2.nonInBaseExtraPriority;
                         }
                         if (iAssignTaskToUnitTypeOnCommand == 0) {
-                            f2 += customUnitConfig2.f38fD;
+                            f2 += customUnitConfig2.nonGlobalExtraPriority;
                         }
                         if (unitType2.p() && findClosestResource() == null) {
                             f2 = -2.0f;
@@ -707,7 +701,7 @@ public class BaseZone extends AIStrategyNode {
                             boolean var14 = false;
                             if (var11 instanceof CustomUnitConfig) {
                                 CustomUnitConfig var15 = (CustomUnitConfig)var11;
-                                if (var15.f42fH != null && !this.a(var15.f42fH)) {
+                                if (var15.onlyUseAsHarvester_ifBaseHasUnitTagged != null && !this.a(var15.onlyUseAsHarvester_ifBaseHasUnitTagged)) {
                                     continue;
                                 }
                             }
@@ -991,12 +985,12 @@ public class BaseZone extends AIStrategyNode {
             return false;
         } else {
             CustomUnitConfig var2 = (CustomUnitConfig)as;
-            if (var2.f39fE == -1 && var2.f40fF == -1) {
+            if (var2.whenUsingAsHarvester_recommendedInEachBase == -1 && var2.whenUsingAsHarvester_recommendedGlobal == -1) {
                 return false;
             } else {
                 int var3 = 0;
                 int var4 = 0;
-                boolean var5 = var2.f41fG;
+                boolean var5 = var2.whenUsingAsHarvester_includeOtherHarvesterCounts;
                 BaseUnit[] var6 = BaseUnit.bE.a();
                 int var7 = 0;
 
@@ -1014,10 +1008,10 @@ public class BaseZone extends AIStrategyNode {
                     }
                 }
 
-                if (var2.f39fE != -1 && var3 >= var2.f39fE) {
+                if (var2.whenUsingAsHarvester_recommendedInEachBase != -1 && var3 >= var2.whenUsingAsHarvester_recommendedInEachBase) {
                     return false;
                 } else {
-                    return var2.f40fF != -1 && var4 >= var2.f40fF ? false : this.a(var2, true);
+                    return var2.whenUsingAsHarvester_recommendedGlobal != -1 && var4 >= var2.whenUsingAsHarvester_recommendedGlobal ? false : this.a(var2, true);
                 }
             }
         }

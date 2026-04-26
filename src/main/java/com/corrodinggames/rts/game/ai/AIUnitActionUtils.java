@@ -45,7 +45,7 @@ public class AIUnitActionUtils {
 
     public static boolean a(OrderableUnit orderableUnit, AnimationTag animationTag) {
         UnitType unitTypeR = orderableUnit.r();
-        if ((unitTypeR instanceof CustomUnitConfig) && AnimationTag.a(animationTag, ((CustomUnitConfig) unitTypeR).f30fv)) {
+        if ((unitTypeR instanceof CustomUnitConfig) && AnimationTag.a(animationTag, ((CustomUnitConfig) unitTypeR).aiTags)) {
             return true;
         }
         return false;

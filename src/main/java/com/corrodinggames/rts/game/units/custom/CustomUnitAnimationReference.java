@@ -30,7 +30,7 @@ public class CustomUnitAnimationReference {
         if (this.animationConfig != null) {
             return this.animationConfig;
         }
-        for (AnimationConfig animationConfig : this.customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTags) {
+        for (AnimationConfig animationConfig : this.customUnitConfig.animations) {
             if (animationConfig.animationName.equalsIgnoreCase(this.animationName)) {
                 this.animationConfig = animationConfig;
                 return animationConfig;

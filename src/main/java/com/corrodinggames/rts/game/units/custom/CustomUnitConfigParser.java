@@ -5,47 +5,14 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import com.corrodinggames.rts.game.ColorMode;
 import com.corrodinggames.rts.game.PlayerTeam;
-import com.corrodinggames.rts.game.units.BaseUnit;
-import com.corrodinggames.rts.game.units.OrderableUnit;
-import com.corrodinggames.rts.game.units.UnitBehaviorType;
-import com.corrodinggames.rts.game.units.UnitMovementType;
-import com.corrodinggames.rts.game.units.UnitSize;
-import com.corrodinggames.rts.game.units.UnitType;
-import com.corrodinggames.rts.game.units.UnitTypeEnum;
-import com.corrodinggames.rts.game.units.actions.AbstractUnitAction;
-import com.corrodinggames.rts.game.units.actions.ActionDisplayType;
+import com.corrodinggames.rts.game.units.*;
+import com.corrodinggames.rts.game.units.actions.*;
 import com.corrodinggames.rts.game.units.actions.ActionType;
-import com.corrodinggames.rts.game.units.actions.PlaceBuildingAction;
-import com.corrodinggames.rts.game.units.actions.QueueUnitAction;
-import com.corrodinggames.rts.game.units.actions.ReclaimTargetAction;
-import com.corrodinggames.rts.game.units.actions.RepairTargetAction;
-import com.corrodinggames.rts.game.units.actions.SetRallyAction;
 import com.corrodinggames.rts.game.units.air.AirUnit;
 import com.corrodinggames.rts.game.units.buildings.BaseBuilding;
-import com.corrodinggames.rts.game.units.custom.hooks.AttachmentManagerHook;
-import com.corrodinggames.rts.game.units.custom.hooks.AutoRepairRenderHook;
-import com.corrodinggames.rts.game.units.custom.hooks.CustomUnitDecalRenderer;
-import com.corrodinggames.rts.game.units.custom.hooks.CustomUnitLegController;
-import com.corrodinggames.rts.game.units.custom.hooks.RandomMovementHook;
-import com.corrodinggames.rts.game.units.custom.hooks.RepelFromUnitsMovementHook;
-import com.corrodinggames.rts.game.units.custom.logic.ActionWithCost;
-import com.corrodinggames.rts.game.units.custom.logic.BuildType;
-import com.corrodinggames.rts.game.units.custom.logic.ConfigurableCustomAction;
-import com.corrodinggames.rts.game.units.custom.logic.CustomAction;
-import com.corrodinggames.rts.game.units.custom.logic.CustomActionDef;
-import com.corrodinggames.rts.game.units.custom.logic.actions.AnimationAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.AttachmentAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.ConvertResourceAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.MemoryAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.MessageAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.ResourceAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.SendMessageAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.SpawnUnitAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.TagAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.TakeResourcesAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.TransportAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.UnitStatsAction;
-import com.corrodinggames.rts.game.units.custom.logic.actions.WaypointAction;
+import com.corrodinggames.rts.game.units.custom.hooks.*;
+import com.corrodinggames.rts.game.units.custom.logic.*;
+import com.corrodinggames.rts.game.units.custom.logic.actions.*;
 import com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean;
 import com.corrodinggames.rts.game.units.custom.logicBooleans.UnitReference;
 import com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope;
@@ -69,22 +36,14 @@ import com.corrodinggames.rts.gameFramework.graphics.TeamColorTexture;
 import com.corrodinggames.rts.gameFramework.graphics.Texture;
 import com.corrodinggames.rts.gameFramework.mod.ModInfo;
 import com.corrodinggames.rts.gameFramework.ui.GameUI;
-import com.corrodinggames.rts.gameFramework.utility.AssetInputStream;
-import com.corrodinggames.rts.gameFramework.utility.ConfigKeyValue;
-import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
-import com.corrodinggames.rts.gameFramework.utility.IniFile;
-import com.corrodinggames.rts.gameFramework.utility.StringUtils;
+import com.corrodinggames.rts.gameFramework.utility.*;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
+import java.util.*;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.custom.ag */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/custom/ag.class */
@@ -211,13 +170,13 @@ public class CustomUnitConfigParser {
             CustomUnitConfig customUnitConfig = (CustomUnitConfig) it.next();
             CustomUnitConfig pathForModError = formatPathForModError(customUnitConfig);
             if (pathForModError == null) {
-                GameEngine.isInSpace("Failed to apply changes to unit type: " + customUnitConfig.onNewMapSpawn);
+                GameEngine.isInSpace("Failed to apply changes to unit type: " + customUnitConfig.name);
                 z = true;
                 if (str == null && lastErrorMessage != null) {
                     str = lastErrorMessage;
                 }
             } else {
-                GameEngine.isInSpace("Changes applied to unit type: " + customUnitConfig.onNewMapSpawn);
+                GameEngine.isInSpace("Changes applied to unit type: " + customUnitConfig.name);
                 z2 = true;
                 fastArrayList2.add(pathForModError);
             }
@@ -592,7 +551,7 @@ public class CustomUnitConfigParser {
         }
         for (CustomUnitConfig customUnitConfig2 : CustomUnitConfig.activeConfigs) {
             arrayList.add(customUnitConfig2);
-            if (customUnitConfig2.onNewMapSpawn.equals("missing") && customUnitConfig2.modInfo == null) {
+            if (customUnitConfig2.name.equals("missing") && customUnitConfig2.modInfo == null) {
                 customUnitConfig = customUnitConfig2;
             }
         }
@@ -604,7 +563,7 @@ public class CustomUnitConfigParser {
         if (customUnitConfig == null) {
             GameEngine.isInSpace("missingPlaceHolder is not an active unit, searching for new target");
             for (CustomUnitConfig customUnitConfig3 : CustomUnitConfig.activeConfigs) {
-                if (customUnitConfig3.onNewMapSpawn.equals("missing")) {
+                if (customUnitConfig3.name.equals("missing")) {
                     GameEngine.isInSpace("Found a missing placeholder");
                     customUnitConfig = customUnitConfig3;
                 }
@@ -617,7 +576,7 @@ public class CustomUnitConfigParser {
         float f = 50.0f;
         float f2 = 50.0f;
         for (CustomUnitConfig customUnitConfig : CustomUnitConfig.activeConfigs) {
-            float f3 = customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogic;
+            float f3 = customUnitConfig.radius;
             if (f3 > 250.0f) {
                 f3 = 250.0f;
             }
@@ -662,7 +621,7 @@ public class CustomUnitConfigParser {
                 while (it.hasNext()) {
                     ((UnitTypeReference) it.next()).a();
                 }
-                if (customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogicAndTags) {
+                if (customUnitConfig.isPickableStartingUnit) {
                     CustomUnitConfig.configsById.add(customUnitConfig);
                 }
             }
@@ -677,7 +636,7 @@ public class CustomUnitConfigParser {
                     if (customUnitTrigger.triggerName.equalsIgnoreCase(unitType.getUnitTypeDescriptionShort())) {
                         customUnitTrigger.runOnce = true;
                         boolean z = false;
-                        for (int i = customUnitConfig2.canBeBuiltByTurret; i <= 3; i++) {
+                        for (int i = customUnitConfig2.techLevel; i <= 3; i++) {
                             ArrayList arrayListA = unitType.a(i);
                             if (customUnitConfig2.isBuildingUnit || customUnitTrigger.enabled) {
                                 placeBuildingAction = new PlaceBuildingAction(customUnitConfig2);
@@ -898,8 +857,8 @@ public class CustomUnitConfigParser {
                 if (!var28.runOnce) {
                     String var30 = var28.condition + " failed to find target:" + var28.triggerName;
                     var19.logWarning(var30);
-                    if (var19.shadowOffsetX >= 1) {
-                        GameEngine.isInSpace("Converting warning to error (meta.strictLevel=" + var19.shadowOffsetX + ")");
+                    if (var19.strictLevel >= 1) {
+                        GameEngine.isInSpace("Converting warning to error (meta.strictLevel=" + var19.strictLevel + ")");
                         var19.throwConfigError(var30);
                     }
                 }
@@ -1243,11 +1202,11 @@ public class CustomUnitConfigParser {
                     mergeAndApplyUnitChanges(customUnitConfig, iniFile, customUnitConfig.onNewMapSpawn_ifUnitIsPresent + "/all-units.template", "AUTO units.template", true);
                 }
                 iniFile.trackRead("core", "copyFrom");
-                customUnitConfig.shadowOffsetX = iniFile.getLogicBooleanUnit("core", "strictLevel", (Integer) 0).intValue();
-                if (customUnitConfig.shadowOffsetX < 0) {
+                customUnitConfig.strictLevel = iniFile.getLogicBooleanUnit("core", "strictLevel", (Integer) 0).intValue();
+                if (customUnitConfig.strictLevel < 0) {
                     throw new ConfigParseException("[core]strictLevel cannot be < 0");
                 }
-                if (customUnitConfig.shadowOffsetX > 1) {
+                if (customUnitConfig.strictLevel > 1) {
                     throw new ConfigParseException("[core]strictLevel cannot yet be > 1");
                 }
                 customUnitConfig.debugCreditResourceUsage = iniFile.getBoolean("core", "logIfCreditResourceUsed", (Boolean) false).booleanValue();
@@ -1266,12 +1225,12 @@ public class CustomUnitConfigParser {
                     customUnitConfig.generation_free_in_sandbox = loadOrGetTexture(customUnitConfig, str, string);
                 }
                 getLocaleString(jA2, LoadPhase.iniSetup);
-                customUnitConfig.onNewMapSpawn = iniFile.getValueStrict("core", "name");
+                customUnitConfig.name = iniFile.getValueStrict("core", "name");
                 customUnitConfig.generation_unit = iniFile.getHash();
-                if (customUnitConfig.onNewMapSpawn.equals("self")) {
-                    throw new ConfigParseException("Unit name: " + customUnitConfig.onNewMapSpawn + " is reserved");
+                if (customUnitConfig.name.equals("self")) {
+                    throw new ConfigParseException("Unit name: " + customUnitConfig.name + " is reserved");
                 }
-                if (customUnitConfig.onNewMapSpawn.startsWith("self.")) {
+                if (customUnitConfig.name.startsWith("self.")) {
                     throw new ConfigParseException("Unit name cannot start with self.");
                 }
                 String string2 = iniFile.getString("core", "altNames", (String) null);
@@ -1281,7 +1240,7 @@ public class CustomUnitConfigParser {
                     }
                 }
                 customUnitConfig.image_shield = AnimationTag.a(iniFile.getString("core", "tags", (String) null));
-                if (customUnitConfig.shadowOffsetX >= 1 && customUnitConfig.image_shield != null) {
+                if (customUnitConfig.strictLevel >= 1 && customUnitConfig.image_shield != null) {
                     for (AnimationTag animationTag : customUnitConfig.image_shield.a) {
                         if (animationTag.tagName.contains(" ")) {
                             throw new ConfigParseException("(strictLevel 1) [core]tags: space in tag: '" + animationTag.tagName + "'");
@@ -1313,10 +1272,10 @@ public class CustomUnitConfigParser {
                         }
                     }
                 }
-                customUnitConfig.teamColors = (SpawnPointType) iniFile.getEnum("core", "onNewMapSpawn", (Enum) null, SpawnPointType.class);
-                customUnitConfig.transportUnitsHealBy = iniFile.getFloat("core", "globalScale", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.onNewMapSpawn = (SpawnPointType) iniFile.getEnum("core", "onNewMapSpawn", (Enum) null, SpawnPointType.class);
+                customUnitConfig.globalScale = iniFile.getFloat("core", "globalScale", Float.valueOf(1.0f)).floatValue();
                 customUnitConfig.registerConfigWatcher(customUnitConfig.generation_delay);
-                if (customUnitConfig.onNewMapSpawn.equals("missing")) {
+                if (customUnitConfig.name.equals("missing")) {
                     if (modInfo == null) {
                         GameEngine.isInSpace("Setting missingPlaceHolder");
                         CustomUnitConfig.instance = customUnitConfig;
@@ -1324,39 +1283,39 @@ public class CustomUnitConfigParser {
                         GameEngine.isInSpace("Not setting missingPlaceHolder, as we are in a mod");
                     }
                 }
-                customUnitConfig.baseClassName = iniFile.getString("core", "displayLocaleKey", (String) null);
-                customUnitConfig.internalName = handleUnitLoadError(iniFile, "core", "displayText", (String) null);
-                customUnitConfig.displayName = handleUnitLoadError(iniFile, "core", "displayDescription", (String) null);
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicAndTags = iniFile.getBoolean("core", "isBio", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicOrTags = iniFile.getBoolean("core", "isBug", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogicAndTags = iniFile.getBoolean("core", "isPickableStartingUnit", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogicAndTags = iniFile.getBoolean("core", "startFallingWhenStartingUnit", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsAndLogic = iniFile.getBoolean("core", "stayNeutral", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogic = iniFile.getBoolean("core", "createNeutral", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicOrTags = iniFile.getBoolean("core", "allowCaptureWhenNeutralByAI", (Boolean) false).booleanValue();
+                customUnitConfig.displayLocaleKey = iniFile.getString("core", "displayLocaleKey", (String) null);
+                customUnitConfig.displayText = handleUnitLoadError(iniFile, "core", "displayText", (String) null);
+                customUnitConfig.displayDescription = handleUnitLoadError(iniFile, "core", "displayDescription", (String) null);
+                customUnitConfig.isBio = iniFile.getBoolean("core", "isBio", (Boolean) false).booleanValue();
+                customUnitConfig.isBug = iniFile.getBoolean("core", "isBug", (Boolean) false).booleanValue();
+                customUnitConfig.isPickableStartingUnit = iniFile.getBoolean("core", "isPickableStartingUnit", (Boolean) false).booleanValue();
+                customUnitConfig.startFallingWhenStartingUnit = iniFile.getBoolean("core", "startFallingWhenStartingUnit", (Boolean) false).booleanValue();
+                customUnitConfig.stayNeutral = iniFile.getBoolean("core", "stayNeutral", (Boolean) false).booleanValue();
+                customUnitConfig.createNeutral = iniFile.getBoolean("core", "createNeutral", (Boolean) false).booleanValue();
+                customUnitConfig.allowCaptureWhenNeutralByAI = iniFile.getBoolean("core", "allowCaptureWhenNeutralByAI", (Boolean) false).booleanValue();
                 if (iniFile.getBoolean("core", "createOnNeutralTeam", (Boolean) false).booleanValue()) {
-                    customUnitConfig.canBeBuiltByAndTagsOrLogic = true;
+                    customUnitConfig.createNeutral = true;
                 }
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTags = iniFile.getBoolean("core", "whileNeutralTransportAnyTeam", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsAndLogicOrTags = iniFile.getBoolean("core", "whileNeutralConvertToTransportedTeam", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsAndLogicAndTags = iniFile.getBoolean("core", "convertToNeutralIfNotTransporting", (Boolean) false).booleanValue();
-                if (customUnitConfig.canBeBuiltByAndTagsAndLogicAndTags) {
-                    customUnitConfig.canBeBuiltByAndTagsAndLogic = true;
+                customUnitConfig.whileNeutralTransportAnyTeam = iniFile.getBoolean("core", "whileNeutralTransportAnyTeam", (Boolean) false).booleanValue();
+                customUnitConfig.whileNeutralConvertToTransportedTeam = iniFile.getBoolean("core", "whileNeutralConvertToTransportedTeam", (Boolean) false).booleanValue();
+                customUnitConfig.convertToNeutralIfNotTransporting = iniFile.getBoolean("core", "convertToNeutralIfNotTransporting", (Boolean) false).booleanValue();
+                if (customUnitConfig.convertToNeutralIfNotTransporting) {
+                    customUnitConfig.stayNeutral = true;
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTags = iniFile.getBoolean("core", "createOnAggressiveTeam", (Boolean) false).booleanValue();
-                customUnitConfig.transportUnitsKillOnDeath = iniFile.getBoolean("core", "showInEditor", (Boolean) true).booleanValue();
-                customUnitConfig.turretSize = iniFile.getLogicBooleanUnit("graphics", "total_frames", (Integer) 1).intValue();
-                if (customUnitConfig.turretSize < 1) {
-                    throw new ConfigParseException("TOTAL_FRAMES cannot be: " + customUnitConfig.turretSize + " (must be 1 or more)");
+                customUnitConfig.createOnAggressiveTeam = iniFile.getBoolean("core", "createOnAggressiveTeam", (Boolean) false).booleanValue();
+                customUnitConfig.showInEditor = iniFile.getBoolean("core", "showInEditor", (Boolean) true).booleanValue();
+                customUnitConfig.total_frames = iniFile.getLogicBooleanUnit("graphics", "total_frames", (Integer) 1).intValue();
+                if (customUnitConfig.total_frames < 1) {
+                    throw new ConfigParseException("TOTAL_FRAMES cannot be: " + customUnitConfig.total_frames + " (must be 1 or more)");
                 }
-                customUnitConfig.turretRotateWithBody = iniFile.getLogicBooleanUnit("graphics", "frame_width", (Integer) (-1)).intValue();
-                customUnitConfig.X = iniFile.getLogicBooleanUnit("graphics", "frame_height", (Integer) (-1)).intValue();
-                customUnitConfig.lockTurretWithBody = iniFile.getLogicBooleanUnit("graphics", "default_frame", (Integer) 0).intValue();
-                customUnitConfig.maxMass = iniFile.getLogicBooleanUnit("graphics", "image_offsetX", (Integer) 0).intValue();
-                customUnitConfig.techLevel = iniFile.getLogicBooleanUnit("graphics", "image_offsetY", (Integer) 0).intValue();
-                customUnitConfig.armour = iniFile.getFloat("graphics", "image_offsetH", Float.valueOf(0.0f)).floatValue();
-                if (customUnitConfig.maxMass != 0 || customUnitConfig.techLevel != 0 || customUnitConfig.armour != 0.0f) {
-                    customUnitConfig.armourMinDamageToKeep = true;
+                customUnitConfig.frame_width = iniFile.getLogicBooleanUnit("graphics", "frame_width", (Integer) (-1)).intValue();
+                customUnitConfig.frame_height = iniFile.getLogicBooleanUnit("graphics", "frame_height", (Integer) (-1)).intValue();
+                customUnitConfig.default_frame = iniFile.getLogicBooleanUnit("graphics", "default_frame", (Integer) 0).intValue();
+                customUnitConfig.image_offsetX = iniFile.getLogicBooleanUnit("graphics", "image_offsetX", (Integer) 0).intValue();
+                customUnitConfig.image_offsetY = iniFile.getLogicBooleanUnit("graphics", "image_offsetY", (Integer) 0).intValue();
+                customUnitConfig.image_offsetH = iniFile.getFloat("graphics", "image_offsetH", Float.valueOf(0.0f)).floatValue();
+                if (customUnitConfig.image_offsetX != 0 || customUnitConfig.image_offsetY != 0 || customUnitConfig.image_offsetH != 0.0f) {
+                    customUnitConfig.bool4 = true;
                 }
                 customUnitConfig.baseDamage = ColorMode.pureGreen;
                 if (iniFile.getBoolean("graphics", "teamColorsUseHue", (Boolean) false).booleanValue()) {
@@ -1379,39 +1338,39 @@ public class CustomUnitConfigParser {
                         throw new ConfigParseException("Unknown teamColoringMode:" + string5);
                     }
                 }
-                customUnitConfig.turretMultiTargeting = iniFile.getBoolean("graphics", "imageSmoothing", (Boolean) false).booleanValue();
-                customUnitConfig.alsoUseTurretImageForOtherSide = iniFile.getBoolean("graphics", "imageSmoothingWhenZoomedIn", (Boolean) false).booleanValue();
-                customUnitConfig.lockTurretWithBody_ignoreBaseTurret = iniFile.getLogicBoolean(customUnitConfig, "graphics", "isVisible", (LogicBoolean) null);
-                if (customUnitConfig.lockTurretWithBody_ignoreBaseTurret == LogicBoolean.trueBoolean) {
-                    customUnitConfig.lockTurretWithBody_ignoreBaseTurret = null;
+                customUnitConfig.imageSmoothing = iniFile.getBoolean("graphics", "imageSmoothing", (Boolean) false).booleanValue();
+                customUnitConfig.imageSmoothingWhenZoomedIn = iniFile.getBoolean("graphics", "imageSmoothingWhenZoomedIn", (Boolean) false).booleanValue();
+                customUnitConfig.isVisible = iniFile.getLogicBoolean(customUnitConfig, "graphics", "isVisible", null);
+                if (customUnitConfig.isVisible == LogicBoolean.trueBoolean) {
+                    customUnitConfig.isVisible = null;
                 }
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.m = iniFile.getBoolean("graphics", "isVisibleToEnemies", (Boolean) true).booleanValue();
-                customUnitConfig.baseTexture = customUnitConfig.a(customUnitConfig.generation_free_in_sandbox, iniFile.getValueStrict("graphics", "image"), customUnitConfig.turretMultiTargeting, "graphics", "image");
+                customUnitConfig.unitStats.isVisibleToEnemies = iniFile.getBoolean("graphics", "isVisibleToEnemies", (Boolean) true).booleanValue();
+                customUnitConfig.baseTexture = customUnitConfig.a(customUnitConfig.generation_free_in_sandbox, iniFile.getValueStrict("graphics", "image"), customUnitConfig.imageSmoothing, "graphics", "image");
                 if (customUnitConfig.baseTexture == null) {
                     throw new ConfigParseException("Main unit image must be set on custom unit");
                 }
                 customUnitConfig.hp = iniFile.getBoolean("graphics", "image_floatingPointSize", (Boolean) false).booleanValue();
-                customUnitConfig.maxHp = customUnitConfig.baseTexture.m() / customUnitConfig.turretSize;
+                customUnitConfig.maxHp = customUnitConfig.baseTexture.m() / customUnitConfig.total_frames;
                 customUnitConfig.mass = customUnitConfig.baseTexture.l();
                 if (customUnitConfig.maxHp < 1) {
                     customUnitConfig.maxHp = 1;
                 }
-                if (customUnitConfig.turretRotateWithBody > 0) {
-                    customUnitConfig.maxHp = customUnitConfig.turretRotateWithBody;
+                if (customUnitConfig.frame_width > 0) {
+                    customUnitConfig.maxHp = customUnitConfig.frame_width;
                 }
-                if (customUnitConfig.X > 0) {
-                    customUnitConfig.mass = customUnitConfig.X;
+                if (customUnitConfig.frame_height > 0) {
+                    customUnitConfig.mass = customUnitConfig.frame_height;
                     if (customUnitConfig.mass < customUnitConfig.baseTexture.l()) {
-                        customUnitConfig.turretTurnSpeed = customUnitConfig.baseTexture.m() / customUnitConfig.maxHp;
-                        if (customUnitConfig.turretTurnSpeed < 1) {
-                            customUnitConfig.turretTurnSpeed = 1;
+                        customUnitConfig.int2 = customUnitConfig.baseTexture.m() / customUnitConfig.maxHp;
+                        if (customUnitConfig.int2 < 1) {
+                            customUnitConfig.int2 = 1;
                         }
                     }
                 }
-                customUnitConfig.disableCustomShields = customUnitConfig.a(iniFile, "graphics", "image_back");
-                customUnitConfig.shield = iniFile.getBoolean("graphics", "image_back_always_use_full_image", (Boolean) false).booleanValue();
-                customUnitConfig.maxShield = customUnitConfig.a(iniFile, "graphics", "image_wreak");
-                customUnitConfig.shieldRegen = customUnitConfig.a(iniFile, "graphics", "image_turret");
+                customUnitConfig.image_back = customUnitConfig.a(iniFile, "graphics", "image_back");
+                customUnitConfig.image_back_always_use_full_image = iniFile.getBoolean("graphics", "image_back_always_use_full_image", (Boolean) false).booleanValue();
+                customUnitConfig.image_wreak = customUnitConfig.a(iniFile, "graphics", "image_wreak");
+                customUnitConfig.image_turret = customUnitConfig.a(iniFile, "graphics", "image_turret");
                 customUnitConfig.energy = LandUnit.landUnitIconTextures;
                 String string6 = iniFile.getString("graphics", "image_shadow", "NONE");
                 if (string6.equalsIgnoreCase("AUTO")) {
@@ -1438,21 +1397,21 @@ public class CustomUnitConfigParser {
                             parseCustomActionDef(str8, customUnitConfig.shieldRegenMoving);
                         }
                     }
-                    customUnitConfig.shieldDisplayOnlyDeflection = true;
+                    customUnitConfig.bool3 = true;
                 } else {
-                    customUnitConfig.shieldRegenMoving = customUnitConfig.a(customUnitConfig.generation_free_in_sandbox, string6, customUnitConfig.turretMultiTargeting, "graphics", "image_shadow");
+                    customUnitConfig.shieldRegenMoving = customUnitConfig.a(customUnitConfig.generation_free_in_sandbox, string6, customUnitConfig.imageSmoothing, "graphics", "image_shadow");
                 }
                 if (iniFile.getBoolean("graphics", "image_shadow_frames", (Boolean) false).booleanValue()) {
-                    customUnitConfig.shieldDisplayOnlyDeflection = true;
+                    customUnitConfig.bool3 = true;
                 }
-                customUnitConfig.startShieldAtZero = customUnitConfig.a(customUnitConfig.baseTexture, customUnitConfig.baseDamage);
+                customUnitConfig.textures = customUnitConfig.a(customUnitConfig.baseTexture, customUnitConfig.baseDamage);
                 customUnitConfig.teamColorsOnTurret = iniFile.getBoolean("graphics", "teamColorsOnTurret", (Boolean) false).booleanValue();
-                if (customUnitConfig.teamColorsOnTurret && customUnitConfig.shieldRegen != null) {
-                    customUnitConfig.maxEnergy = customUnitConfig.a(customUnitConfig.shieldRegen, customUnitConfig.baseDamage);
+                if (customUnitConfig.teamColorsOnTurret && customUnitConfig.image_turret != null) {
+                    customUnitConfig.maxEnergy = customUnitConfig.a(customUnitConfig.image_turret, customUnitConfig.baseDamage);
                 }
                 float fFloatValue = iniFile.getFloat("graphics", "scaleImagesTo", Float.valueOf(-1.0f)).floatValue();
                 if (fFloatValue > 0.0f) {
-                    customUnitConfig.targetOwnTeam = (fFloatValue * customUnitConfig.transportUnitsHealBy) / customUnitConfig.maxHp;
+                    customUnitConfig.targetOwnTeam = (fFloatValue * customUnitConfig.globalScale) / customUnitConfig.maxHp;
                 }
                 float fFloatValue2 = iniFile.getFloat("graphics", "imageScale", Float.valueOf(1.0f)).floatValue();
                 if (fFloatValue2 != 1.0f) {
@@ -1460,23 +1419,23 @@ public class CustomUnitConfigParser {
                 }
                 float fFloatValue3 = iniFile.getFloat("graphics", "scaleTurretImagesTo", Float.valueOf(-1.0f)).floatValue();
                 if (fFloatValue3 > 0.0f) {
-                    float f = fFloatValue3 * customUnitConfig.transportUnitsHealBy;
-                    if (customUnitConfig.shieldRegen == null) {
+                    float f = fFloatValue3 * customUnitConfig.globalScale;
+                    if (customUnitConfig.image_turret == null) {
                         throw new RuntimeException("scaleTurretImagesTo needs image_turret set");
                     }
-                    customUnitConfig.targetNeutralTeam = f / customUnitConfig.shieldRegen.p;
+                    customUnitConfig.targetNeutralTeam = f / customUnitConfig.image_turret.p;
                 }
                 float fFloatValue4 = iniFile.getFloat("graphics", "turretImageScale", Float.valueOf(1.0f)).floatValue();
                 if (fFloatValue4 != 1.0f) {
                     customUnitConfig.targetNeutralTeam *= fFloatValue4;
                 }
-                customUnitConfig.energyRegen = ExperimentalHoverTank.e;
+                customUnitConfig.texture = ExperimentalHoverTank.e;
                 Texture textureA = customUnitConfig.a(iniFile, "graphics", "image_shield");
                 if (textureA != null) {
-                    customUnitConfig.energyRegen = textureA;
-                    customUnitConfig.energyRegenWhenRecharging = true;
+                    customUnitConfig.texture = textureA;
+                    customUnitConfig.bool5 = true;
                 }
-                customUnitConfig.energyNeedsToRechargeToFull = customUnitConfig.a(iniFile, "graphics", "icon_build", false);
+                customUnitConfig.icon_build = customUnitConfig.a(iniFile, "graphics", "icon_build", false);
                 float fM = customUnitConfig.baseTexture.m() * customUnitConfig.targetOwnTeam;
                 float fL = customUnitConfig.baseTexture.l() * customUnitConfig.targetOwnTeam;
                 if (fM / 2.0f > 90.0f || fL / 2.0f > 90.0f) {
@@ -1509,9 +1468,8 @@ public class CustomUnitConfigParser {
                     }
                     customUnitConfig.customResourcesList.add(resourceDefinition);
                 }
-                Iterator it2 = customUnitConfig.customResourcesList.iterator();
-                while (it2.hasNext()) {
-                    ((ResourceDefinition) it2.next()).a(customUnitConfig);
+                for (ResourceDefinition o : customUnitConfig.customResourcesList) {
+                    o.a(customUnitConfig);
                 }
                 if (gameEngine.isModdingEnabled()) {
                     RandomMovementHook.a(customUnitConfig, iniFile);
@@ -1529,51 +1487,51 @@ public class CustomUnitConfigParser {
                     throw new RuntimeException("autoTriggerCooldownTime cannot be this low (without override). Note this cooldown is only applied after triggering an action not for the detection.");
                 }
                 customUnitConfig.autoTriggerCheckRate = (UpdateFrequency) iniFile.getEnum("core", "autoTriggerCheckRate", UpdateFrequency.everyFrame, UpdateFrequency.class);
-                customUnitConfig.canBeBuiltByUnit = iniFile.getBoolean("core", "autoTriggerCheckWhileNotBuilt", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.mass = iniFile.getIntStrict("core", "mass");
-                customUnitConfig.canBeBuiltByFactory = iniFile.getBoolean("core", "availableInDemo", (Boolean) true).booleanValue();
-                customUnitConfig.canBeBuiltByBuilding = iniFile.getBoolean("core", "isLocked", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAir = iniFile.getBoolean("core", "isLockedIfGameModeNoNuke", (Boolean) false).booleanValue();
-                customUnitConfig.buildPrice = UnitPrice.a(customUnitConfig, iniFile, "core", "price", false);
-                customUnitConfig.generationResources = UnitPrice.a(customUnitConfig, iniFile, "core", "reclaimPrice", (UnitPrice) null);
-                customUnitConfig.streamingPrice = UnitPrice.b(customUnitConfig, iniFile, "core", "streamingCost", null);
+                customUnitConfig.autoTriggerCheckWhileNotBuilt = iniFile.getBoolean("core", "autoTriggerCheckWhileNotBuilt", (Boolean) false).booleanValue();
+                customUnitConfig.unitStats.mass = iniFile.getIntStrict("core", "mass");
+                customUnitConfig.availableInDemo = iniFile.getBoolean("core", "availableInDemo", (Boolean) true).booleanValue();
+                customUnitConfig.isLocked = iniFile.getBoolean("core", "isLocked", (Boolean) false).booleanValue();
+                customUnitConfig.isLockedIfGameModeNoNuke = iniFile.getBoolean("core", "isLockedIfGameModeNoNuke", (Boolean) false).booleanValue();
+                customUnitConfig.price = UnitPrice.a(customUnitConfig, iniFile, "core", "price", false);
+                customUnitConfig.reclaimPrice = UnitPrice.a(customUnitConfig, iniFile, "core", "reclaimPrice", (UnitPrice) null);
+                customUnitConfig.streamingCost = UnitPrice.b(customUnitConfig, iniFile, "core", "streamingCost", null);
                 boolean zBooleanValue = iniFile.getBoolean("core", "switchPriceWithStreamingCost", (Boolean) false).booleanValue();
                 if (zBooleanValue) {
-                    if (customUnitConfig.streamingPrice != null) {
+                    if (customUnitConfig.streamingCost != null) {
                         throw new RuntimeException("[core]streamingCost and switchPriceWithStreamingCost=true cannot be used at the same time");
                     }
-                    customUnitConfig.streamingPrice = UnitPrice.b(customUnitConfig, iniFile, "core", "price", null);
-                    customUnitConfig.buildPrice = UnitPrice.a;
+                    customUnitConfig.streamingCost = UnitPrice.b(customUnitConfig, iniFile, "core", "price", null);
+                    customUnitConfig.price = UnitPrice.a;
                 }
-                customUnitConfig.buildTimeSeconds = iniFile.getInvertedTime("core", "buildSpeed", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.canBeBuiltByTurret = iniFile.getLogicBooleanUnit("core", "techLevel", (Integer) 1).intValue();
-                if (customUnitConfig.canBeBuiltByTurret > 3) {
+                customUnitConfig.buildSpeed = iniFile.getInvertedTime("core", "buildSpeed", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.techLevel = iniFile.getLogicBooleanUnit("core", "techLevel", (Integer) 1).intValue();
+                if (customUnitConfig.techLevel > 3) {
                     throw new RuntimeException("techLevel cannot be greater than max tech level of:3");
                 }
-                if (customUnitConfig.canBeBuiltByTurret < 1) {
-                    throw new RuntimeException("techLevel cannot be less than 1, it is:" + customUnitConfig.canBeBuiltByTurret);
+                if (customUnitConfig.techLevel < 1) {
+                    throw new RuntimeException("techLevel cannot be less than 1, it is:" + customUnitConfig.techLevel);
                 }
-                customUnitConfig.canBeBuiltByExtractor = iniFile.getBoolean("core", "experimental", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndLogic = UnitPrice.a(customUnitConfig, iniFile, "core", "borrowResourcesWhileAlive", true);
-                customUnitConfig.canBeBuiltByOrTagsAndLogic = UnitPrice.a(customUnitConfig, iniFile, "core", "borrowResourcesWhileBuilt", true);
+                customUnitConfig.experimental = iniFile.getBoolean("core", "experimental", (Boolean) false).booleanValue();
+                customUnitConfig.borrowResourcesWhileAlive = UnitPrice.a(customUnitConfig, iniFile, "core", "borrowResourcesWhileAlive", true);
+                customUnitConfig.borrowResourcesWhileBuilt = UnitPrice.a(customUnitConfig, iniFile, "core", "borrowResourcesWhileBuilt", true);
                 customUnitConfig.generationTemplate = UnitPrice.a(customUnitConfig, iniFile, "core", "generation_resources", true);
                 int iIntValue = iniFile.getLogicBooleanUnit("core", "generation_credits", (Integer) 0).intValue();
                 if (iIntValue != 0) {
                     customUnitConfig.generationTemplate = UnitPrice.a(customUnitConfig.generationTemplate, UnitPrice.a(iIntValue));
                 }
-                customUnitConfig.canBeBuiltByNotTags = iniFile.getLogicBooleanUnit("core", "generation_delay", (Integer) 40).intValue();
-                if (customUnitConfig.canBeBuiltByNotTags == 0) {
-                    customUnitConfig.canBeBuiltByNotTags = 1;
+                customUnitConfig.generationDelay = iniFile.getLogicBooleanUnit("core", "generation_delay", (Integer) 40).intValue();
+                if (customUnitConfig.generationDelay == 0) {
+                    customUnitConfig.generationDelay = 1;
                 }
-                if (customUnitConfig.canBeBuiltByNotTags < 0) {
+                if (customUnitConfig.generationDelay < 0) {
                     throw new RuntimeException("[core]generation_delay cannot be < 0");
                 }
-                customUnitConfig.canBeBuiltByOrTags = 40.0f / customUnitConfig.canBeBuiltByNotTags;
+                customUnitConfig.generationRate = 40.0f / customUnitConfig.generationDelay;
                 if (!customUnitConfig.generationTemplate.c()) {
                     customUnitConfig.generationCondition = new StoredResources();
                     customUnitConfig.generationCondition.a(customUnitConfig.generationTemplate);
-                    customUnitConfig.generationCondition.a(customUnitConfig.canBeBuiltByOrTags);
-                    customUnitConfig.canBeBuiltByBuilder = true;
+                    customUnitConfig.generationCondition.a(customUnitConfig.generationRate);
+                    customUnitConfig.hasGenerationCondition = true;
                 }
                 if (!customUnitConfig.generationCondition.c()) {
                     for (StoredResourceEntry storedResourceEntry : customUnitConfig.generationCondition.b) {
@@ -1585,10 +1543,10 @@ public class CustomUnitConfigParser {
                         }
                     }
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogic = iniFile.getLogicBoolean(customUnitConfig, "core", "generation_active", LogicBoolean.trueBoolean);
+                customUnitConfig.generationActive = iniFile.getLogicBoolean(customUnitConfig, "core", "generation_active", LogicBoolean.trueBoolean);
                 customUnitConfig.a(customUnitConfig.generationTemplate);
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTags = iniFile.getFloat("core", "resourceRate", Float.valueOf(0.0f)).floatValue();
-                if (zBooleanValue && customUnitConfig.canBeBuiltByOrTagsOrLogicAndTags != 0.0f) {
+                customUnitConfig.resourceRate = iniFile.getFloat("core", "resourceRate", Float.valueOf(0.0f)).floatValue();
+                if (zBooleanValue && customUnitConfig.resourceRate != 0.0f) {
                     throw new RuntimeException("To avoid mistakes [core]resourceRate cannot be used with switchPriceWithStreamingCost=true");
                 }
                 String string7 = iniFile.getString("core", "updateUnitMemory", (String) null);
@@ -1596,39 +1554,39 @@ public class CustomUnitConfigParser {
                     customUnitConfig.updateUnitMemoryWriter = VariableScope.createMemoryWriter(string7, customUnitConfig, "core", "updateUnitMemory");
                 }
                 customUnitConfig.updateUnitMemoryRate = iniFile.getTime("core", "updateUnitMemoryRate", Float.valueOf(60.0f)).floatValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTags = iniFile.getLogicBooleanUnit("core", "resourceMaxConcurrentReclaimingThis", (Integer) Integer.MAX_VALUE).intValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTags = iniFile.getAnimationSet(customUnitConfig, "core", "similarResourcesHaveTag", (AnimationSet) null);
+                customUnitConfig.resourceMaxConcurrentReclaimingThis = iniFile.getLogicBooleanUnit("core", "resourceMaxConcurrentReclaimingThis", (Integer) Integer.MAX_VALUE).intValue();
+                customUnitConfig.similarResourcesHaveTag = iniFile.getAnimationSet(customUnitConfig, "core", "similarResourcesHaveTag", (AnimationSet) null);
                 customUnitConfig.f0do = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnAttackOrder", (String) null));
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTags = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnMoveOrder", (String) null));
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTags = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnNewSelection", (String) null));
+                customUnitConfig.soundOnMoveOrder = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnMoveOrder", (String) null));
+                customUnitConfig.soundOnNewSelection = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnNewSelection", (String) null));
                 String string8 = iniFile.getString("graphics", "drawLayer", (String) null);
                 if (string8 != null) {
                     if (string8.equals("experimentals")) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 4;
+                        customUnitConfig.drawLayer = 4;
                     } else if (string8.equals("underwater") || string8.equals("bottom")) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 1;
+                        customUnitConfig.drawLayer = 1;
                     } else if (string8.equals("ground")) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 2;
+                        customUnitConfig.drawLayer = 2;
                     } else if (string8.equals("ground2")) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 3;
+                        customUnitConfig.drawLayer = 3;
                     } else if (string8.equals("air")) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 5;
+                        customUnitConfig.drawLayer = 5;
                     } else if (string8.equals("top")) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 10;
+                        customUnitConfig.drawLayer = 10;
                     } else if (string8.equals("wreaks")) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 0;
+                        customUnitConfig.drawLayer = 0;
                     } else {
                         throw new RuntimeException("unknown drawLayer:" + string8);
                     }
                 }
-                customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsOrLogic = iniFile.getFloat("graphics", "shadowOffsetX", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsAndLogic = iniFile.getFloat("graphics", "shadowOffsetY", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogicAndTags = iniFile.getBoolean("graphics", "rotate_with_direction", (Boolean) true).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTags = iniFile.getBoolean("graphics", "lock_body_rotation_with_main_turret", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTags = iniFile.getBoolean("graphics", "lock_shadow_rotation_with_main_turret", Boolean.valueOf(customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTags)).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogic = iniFile.getBoolean("graphics", "lock_leg_rotation_with_main_turret", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogic = iniFile.getFloat("graphics", "whenBeingBuiltMakeTransparentTill", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogic = CustomUnitDirectionConfig.a(customUnitConfig, iniFile, "graphics", "animation_", false);
+                customUnitConfig.shadowOffsetX = iniFile.getFloat("graphics", "shadowOffsetX", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.shadowOffsetY = iniFile.getFloat("graphics", "shadowOffsetY", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.rotateWithDirection = iniFile.getBoolean("graphics", "rotate_with_direction", (Boolean) true).booleanValue();
+                customUnitConfig.lockBodyRotationWithMainTurret = iniFile.getBoolean("graphics", "lock_body_rotation_with_main_turret", (Boolean) false).booleanValue();
+                customUnitConfig.lockShadowRotationWithMainTurret = iniFile.getBoolean("graphics", "lock_shadow_rotation_with_main_turret", Boolean.valueOf(customUnitConfig.lockBodyRotationWithMainTurret)).booleanValue();
+                customUnitConfig.lockLegRotationWithMainTurret = iniFile.getBoolean("graphics", "lock_leg_rotation_with_main_turret", (Boolean) false).booleanValue();
+                customUnitConfig.whenBeingBuiltMakeTransparentTill = iniFile.getFloat("graphics", "whenBeingBuiltMakeTransparentTill", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.directionConfig = CustomUnitDirectionConfig.a(customUnitConfig, iniFile, "graphics", "animation_", false);
                 for (String str10 : iniFile.getSectionsStartingWith("effect_")) {
                     EffectTemplate effectTemplate = new EffectTemplate(str10.substring("effect_".length()));
                     effectTemplate.a(customUnitConfig, iniFile, str10);
@@ -1648,246 +1606,246 @@ public class CustomUnitConfigParser {
                         effectTemplate2.trailEffect.c();
                     }
                 }
-                customUnitConfig.targetAllyTeam = iniFile.getBoolean("graphics", "splastEffect", (Boolean) false).booleanValue();
-                customUnitConfig.canAttackCondition = iniFile.getBoolean("graphics", "dustEffect", (Boolean) false).booleanValue();
-                customUnitConfig.targetEnemyTeam = iniFile.getBoolean("graphics", "splastEffectReverse", (Boolean) true).booleanValue();
-                customUnitConfig.canAttackWhileGarrisoned = iniFile.getBoolean("graphics", "dustEffectReverse", (Boolean) true).booleanValue();
-                customUnitConfig.targetGroundOnlyLast = customUnitConfig.canAttackCondition || customUnitConfig.targetAllyTeam;
+                customUnitConfig.splastEffect = iniFile.getBoolean("graphics", "splastEffect", (Boolean) false).booleanValue();
+                customUnitConfig.dustEffect = iniFile.getBoolean("graphics", "dustEffect", (Boolean) false).booleanValue();
+                customUnitConfig.splastEffectReverse = iniFile.getBoolean("graphics", "splastEffectReverse", (Boolean) true).booleanValue();
+                customUnitConfig.dustEffectReverse = iniFile.getBoolean("graphics", "dustEffectReverse", (Boolean) true).booleanValue();
+                customUnitConfig.internalEffect = customUnitConfig.dustEffect || customUnitConfig.splastEffect;
                 String string9 = iniFile.getString("graphics", "movementEffect", (String) null);
                 if (string9 != null) {
-                    customUnitConfig.canBeAttacked = customUnitConfig.addConfigExtension(string9, (CustomUnitSpawnList) null);
-                    if (customUnitConfig.canBeAttacked != null && customUnitConfig.canBeAttacked.a()) {
-                        customUnitConfig.targetGroundOnlyLast = true;
+                    customUnitConfig.list1 = customUnitConfig.addConfigExtension(string9, null);
+                    if (customUnitConfig.list1 != null && customUnitConfig.list1.a()) {
+                        customUnitConfig.internalEffect = true;
                     }
                 }
                 String string10 = iniFile.getString("graphics", "movementEffectReverse", (String) null);
                 if (string10 != null) {
-                    customUnitConfig.isSelectable = customUnitConfig.addConfigExtension(string10, (CustomUnitSpawnList) null);
-                    if (customUnitConfig.isSelectable != null && customUnitConfig.isSelectable.a()) {
-                        customUnitConfig.targetGroundOnlyLast = true;
+                    customUnitConfig.list2 = customUnitConfig.addConfigExtension(string10, (CustomUnitSpawnList) null);
+                    if (customUnitConfig.list2 != null && customUnitConfig.list2.a()) {
+                        customUnitConfig.internalEffect = true;
                     }
                 }
-                customUnitConfig.showOnMinimapToEnemies = iniFile.getFloat("graphics", "movementEffectRate", Float.valueOf(11.0f)).floatValue();
-                customUnitConfig.showOnMinimap = iniFile.getBoolean("graphics", "movementEffectReverseFlipEffects", (Boolean) false).booleanValue();
-                customUnitConfig.showOnHpHover = iniFile.getFloat("graphics", "repairEffectRate", Float.valueOf(5.0f)).floatValue();
+                customUnitConfig.movementEffectRate = iniFile.getFloat("graphics", "movementEffectRate", Float.valueOf(11.0f)).floatValue();
+                customUnitConfig.movementEffectReverseFlipEffects = iniFile.getBoolean("graphics", "movementEffectReverseFlipEffects", (Boolean) false).booleanValue();
+                customUnitConfig.repairEffectRate = iniFile.getFloat("graphics", "repairEffectRate", Float.valueOf(5.0f)).floatValue();
                 String string11 = iniFile.getString("graphics", "repairEffect", (String) null);
                 if (string11 != null) {
-                    customUnitConfig.showInEditor = customUnitConfig.addConfigExtension(string11, (CustomUnitSpawnList) null);
-                    if (customUnitConfig.showInEditor != null && customUnitConfig.showInEditor.b()) {
+                    customUnitConfig.list3 = customUnitConfig.addConfigExtension(string11, null);
+                    if (customUnitConfig.list3 != null && customUnitConfig.list3.b()) {
                         customUnitConfig.showActionsAndWaypoints = true;
                     }
                 }
                 String string12 = iniFile.getString("graphics", "repairEffectAtTarget", (String) null);
                 if (string12 != null) {
-                    customUnitConfig.stayNeutral = customUnitConfig.addConfigExtension(string12, (CustomUnitSpawnList) null);
-                    if (customUnitConfig.stayNeutral != null && customUnitConfig.stayNeutral.b()) {
+                    customUnitConfig.list4 = customUnitConfig.addConfigExtension(string12, (CustomUnitSpawnList) null);
+                    if (customUnitConfig.list4 != null && customUnitConfig.list4.b()) {
                         customUnitConfig.showActionsAndWaypoints = true;
                     }
                 }
-                customUnitConfig.createOnAggressiveTeam = iniFile.getFloat("graphics", "reclaimEffectRate", Float.valueOf(5.0f)).floatValue();
+                customUnitConfig.reclaimEffectRate = iniFile.getFloat("graphics", "reclaimEffectRate", Float.valueOf(5.0f)).floatValue();
                 String string13 = iniFile.getString("graphics", "reclaimEffect", (String) null);
                 if (string13 != null) {
                     customUnitConfig.createOnNeutralTeam = customUnitConfig.addConfigExtension(string13, (CustomUnitSpawnList) null);
                     if (customUnitConfig.createOnNeutralTeam != null && customUnitConfig.createOnNeutralTeam.b()) {
-                        customUnitConfig.createNeutral = true;
+                        customUnitConfig.bool2 = true;
                     }
                 }
                 String string14 = iniFile.getString("graphics", "reclaimEffectAtTarget", (String) null);
                 if (string14 != null) {
                     customUnitConfig.createOnSameTeamAsParent = customUnitConfig.addConfigExtension(string14, (CustomUnitSpawnList) null);
                     if (customUnitConfig.createOnSameTeamAsParent != null && customUnitConfig.createOnSameTeamAsParent.b()) {
-                        customUnitConfig.createNeutral = true;
+                        customUnitConfig.bool2 = true;
                     }
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTags.a(customUnitConfig, iniFile, "graphics", "animation_" + customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTags.animationName + "_");
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTags.a(customUnitConfig, iniFile, "graphics", "animation_" + customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTags.animationName + "_");
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTags.a(customUnitConfig, iniFile, "graphics", "animation_" + customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTags.animationName + "_");
+                customUnitConfig.movingAnimation.a(customUnitConfig, iniFile, "graphics", "animation_" + customUnitConfig.movingAnimation.animationName + "_");
+                customUnitConfig.idleAnimation.a(customUnitConfig, iniFile, "graphics", "animation_" + customUnitConfig.idleAnimation.animationName + "_");
+                customUnitConfig.attackAnimation.a(customUnitConfig, iniFile, "graphics", "animation_" + customUnitConfig.attackAnimation.animationName + "_");
                 for (String str11 : iniFile.getSectionsStartingWith("animation_")) {
                     AnimationConfig animationConfig = new AnimationConfig(str11.substring("animation_".length()));
                     animationConfig.a(customUnitConfig, iniFile, str11, VariableScope.nullOrMissingString);
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTags.add(animationConfig);
+                    customUnitConfig.animations.add(animationConfig);
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTags = customUnitConfig.loadData(CustomUnitAction.move, customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTags, true);
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTags = customUnitConfig.loadData(CustomUnitAction.idle, customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTags, true);
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTags = customUnitConfig.loadData(CustomUnitAction.attack, customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTags, true);
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTags = customUnitConfig.findAnimationForAction(CustomUnitAction.underConstruction);
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTags = customUnitConfig.findAnimationForAction(CustomUnitAction.underConstructionWithLinkedBuiltTime);
-                if (customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTags != null && customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTags != null) {
+                customUnitConfig.movingAnimation = customUnitConfig.loadData(CustomUnitAction.move, customUnitConfig.movingAnimation, true);
+                customUnitConfig.idleAnimation = customUnitConfig.loadData(CustomUnitAction.idle, customUnitConfig.idleAnimation, true);
+                customUnitConfig.attackAnimation = customUnitConfig.loadData(CustomUnitAction.attack, customUnitConfig.attackAnimation, true);
+                customUnitConfig.underConstructionAnimation = customUnitConfig.findAnimationForAction(CustomUnitAction.underConstruction);
+                customUnitConfig.underConstructionWithLinkedBuiltTimeAnimation = customUnitConfig.findAnimationForAction(CustomUnitAction.underConstructionWithLinkedBuiltTime);
+                if (customUnitConfig.underConstructionAnimation != null && customUnitConfig.underConstructionWithLinkedBuiltTimeAnimation != null) {
                     throw new RuntimeException("Cannot use underConstruction and underConstructionWithLinkedBuiltTime animations at the same time");
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTags = customUnitConfig.findAnimationForAction(CustomUnitAction.created);
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTags = customUnitConfig.findAnimationForAction(CustomUnitAction.queuedUnits);
-                if (customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTags != null) {
+                customUnitConfig.createdAnimation = customUnitConfig.findAnimationForAction(CustomUnitAction.created);
+                customUnitConfig.queuedUnitsAnimation = customUnitConfig.findAnimationForAction(CustomUnitAction.queuedUnits);
+                if (customUnitConfig.queuedUnitsAnimation != null) {
                     customUnitConfig.isFactory = true;
                 }
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTags = customUnitConfig.findAnimationForAction(CustomUnitAction.repair);
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogicOrTags = customUnitConfig.findAnimationForAction(CustomUnitAction.reclaim);
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxHp = iniFile.getIntStrict("core", "maxHp");
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxShield = iniFile.getLogicBooleanUnit("core", "maxShield", (Integer) 0).intValue();
-                customUnitConfig.canBeBuiltByAndTagsAndLogicOrTagsAndLogic = iniFile.getBoolean("core", "startShieldAtZero", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.shieldRegen = iniFile.getFloat("core", "shieldRegen", Float.valueOf(0.25f)).floatValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogic = iniFile.getBoolean("core", "shieldDisplayOnlyDeflection", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogic = iniFile.getFloat("core", "shieldDeflectionDisplayRate", Float.valueOf(4.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.armour = iniFile.getFloat("core", "armour", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.canBeBuiltByAndTagsAndLogicOrTagsOrLogic = iniFile.getFloat("core", "armourMinDamageToKeep", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxEnergy = iniFile.getFloat("core", "energyMax", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.canBeBuiltByAndTagsAndLogicAndTagsAndLogic = iniFile.getBoolean("core", "startEnergyAtZero", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsAndLogicAndTagsOrLogic = iniFile.getFloat("core", "energyRegen", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogic = iniFile.getFloat("core", "energyStartingPercentage", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogic = iniFile.getBoolean("core", "energyNeedsToRechargeToFull", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogic = iniFile.getFloat("core", "energyRegenWhenRecharging", Float.valueOf(customUnitConfig.canBeBuiltByAndTagsAndLogicAndTagsOrLogic)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogic = handleUnitLoadError(iniFile, "core", "energyDisplayName", (String) null);
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogic = iniFile.getIntStrict("core", "radius");
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsAndLogicAndTags = iniFile.getLogicBooleanUnit("core", "displayRadius", Integer.valueOf(customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogic)).intValue();
-                float f2 = customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogic;
+                customUnitConfig.repairAnimation = customUnitConfig.findAnimationForAction(CustomUnitAction.repair);
+                customUnitConfig.reclaimAnimation = customUnitConfig.findAnimationForAction(CustomUnitAction.reclaim);
+                customUnitConfig.unitStats.maxHp = iniFile.getIntStrict("core", "maxHp");
+                customUnitConfig.unitStats.maxShield = iniFile.getLogicBooleanUnit("core", "maxShield", (Integer) 0).intValue();
+                customUnitConfig.startShieldAtZero = iniFile.getBoolean("core", "startShieldAtZero", (Boolean) false).booleanValue();
+                customUnitConfig.unitStats.shieldRegen = iniFile.getFloat("core", "shieldRegen", Float.valueOf(0.25f)).floatValue();
+                customUnitConfig.shieldDisplayOnlyDeflection = iniFile.getBoolean("core", "shieldDisplayOnlyDeflection", (Boolean) false).booleanValue();
+                customUnitConfig.shieldDeflectionDisplayRate = iniFile.getFloat("core", "shieldDeflectionDisplayRate", Float.valueOf(4.0f)).floatValue();
+                customUnitConfig.unitStats.armour = iniFile.getFloat("core", "armour", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.armourMinDamageToKeep = iniFile.getFloat("core", "armourMinDamageToKeep", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.unitStats.maxEnergy = iniFile.getFloat("core", "energyMax", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.startEnergyAtZero = iniFile.getBoolean("core", "startEnergyAtZero", (Boolean) false).booleanValue();
+                customUnitConfig.energyRegen = iniFile.getFloat("core", "energyRegen", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.energyStartingPercentage = iniFile.getFloat("core", "energyStartingPercentage", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.energyNeedsToRechargeToFull = iniFile.getBoolean("core", "energyNeedsToRechargeToFull", (Boolean) false).booleanValue();
+                customUnitConfig.energyRegenWhenRecharging = iniFile.getFloat("core", "energyRegenWhenRecharging", Float.valueOf(customUnitConfig.energyRegen)).floatValue();
+                customUnitConfig.energyDisplayName = handleUnitLoadError(iniFile, "core", "energyDisplayName", (String) null);
+                customUnitConfig.radius = iniFile.getIntStrict("core", "radius");
+                customUnitConfig.displayRadius = iniFile.getLogicBooleanUnit("core", "displayRadius", Integer.valueOf(customUnitConfig.radius)).intValue();
+                float f2 = customUnitConfig.radius;
                 if (f2 < 6.0f) {
                     f2 = 6.0f;
                 }
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogicOrTags = iniFile.getFloat("core", "uiTargetRadius", Float.valueOf(f2)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogicAndTags = iniFile.getLogicBooleanUnit("core", "shieldRenderRadius", Integer.valueOf(customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogic)).intValue();
-                customUnitConfig.canBeBuiltByAndTagsAndLogicOrTagsAndLogicOrTags = iniFile.getLogicBooleanUnit("core", "buildingSelectionOffset", (Integer) 0).intValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogic = iniFile.getRect("core", "footprint", customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogic);
-                customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogicOrTags = iniFile.getRect("core", "constructionFootprint", customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogicOrTags);
-                customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogicAndTags.a(customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogic);
-                customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogicAndTags = iniFile.getRect("core", "displayFootprint", customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogicAndTags);
+                customUnitConfig.uiTargetRadius = iniFile.getFloat("core", "uiTargetRadius", Float.valueOf(f2)).floatValue();
+                customUnitConfig.shieldRenderRadius = iniFile.getLogicBooleanUnit("core", "shieldRenderRadius", Integer.valueOf(customUnitConfig.radius)).intValue();
+                customUnitConfig.buildingSelectionOffset = iniFile.getLogicBooleanUnit("core", "buildingSelectionOffset", (Integer) 0).intValue();
+                customUnitConfig.footprint = iniFile.getRect("core", "footprint", customUnitConfig.footprint);
+                customUnitConfig.constructionFootprint = iniFile.getRect("core", "constructionFootprint", customUnitConfig.constructionFootprint);
+                customUnitConfig.displayFootprint.a(customUnitConfig.footprint);
+                customUnitConfig.displayFootprint = iniFile.getRect("core", "displayFootprint", customUnitConfig.displayFootprint);
                 customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsOrLogicOrTags = iniFile.getFloat("core", "buildingToFootprintOffsetX", Float.valueOf(10.0f)).floatValue();
                 customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsOrLogicAndTags = iniFile.getFloat("core", "buildingToFootprintOffsetY", Float.valueOf(10.0f)).floatValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogic = (int) (customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogic * customUnitConfig.transportUnitsHealBy);
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsAndLogicAndTags = (int) (customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsAndLogicAndTags * customUnitConfig.transportUnitsHealBy);
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.fogOfWarSightRange = iniFile.getLogicBooleanUnit("core", "fogOfWarSightRange", (Integer) 15).intValue();
-                customUnitConfig.canBeBuiltByAndTagsAndLogicOrTagsAndLogicAndTags = iniFile.getLogicBooleanUnit("core", "fogOfWarSightRangeWhileNotBuilt", (Integer) (-1)).intValue();
-                customUnitConfig.spawnOffsetLocalX = iniFile.getFloat("core", "exit_x", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.spawnOffsetLocalY = iniFile.getFloat("core", "exit_y", Float.valueOf(9.0f)).floatValue();
-                customUnitConfig.spawnAngleOffset = iniFile.getFloat("core", "exit_dirOffset", (Float) null);
-                customUnitConfig.spawnOffsetZ = iniFile.getFloat("core", "exit_heightOffset", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.keepOriginalZOnSpawn = iniFile.getBoolean("core", "exitHeightIgnoreParent", (Boolean) false).booleanValue();
-                customUnitConfig.spawnSideOffset = iniFile.getFloat("core", "exit_moveAwayAmount", Float.valueOf(70.0f));
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogicAndTags = iniFile.getLogicBooleanUnit("core", "softCollisionOnAll", (Integer) 0).intValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicOrTags = iniFile.getBoolean("core", "disableAllUnitCollisions", (Boolean) false).booleanValue();
-                if (customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicOrTags) {
-                    customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogic.a(0, 0, -1, -1);
+                customUnitConfig.radius = (int) (customUnitConfig.radius * customUnitConfig.globalScale);
+                customUnitConfig.displayRadius = (int) (customUnitConfig.displayRadius * customUnitConfig.globalScale);
+                customUnitConfig.unitStats.fogOfWarSightRange = iniFile.getLogicBooleanUnit("core", "fogOfWarSightRange", (Integer) 15).intValue();
+                customUnitConfig.fogOfWarSightRangeWhileNotBuilt2 = iniFile.getLogicBooleanUnit("core", "fogOfWarSightRangeWhileNotBuilt", (Integer) (-1)).intValue();
+                customUnitConfig.exit_x = iniFile.getFloat("core", "exit_x", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.exit_y = iniFile.getFloat("core", "exit_y", Float.valueOf(9.0f)).floatValue();
+                customUnitConfig.exit_dirOffset = iniFile.getFloat("core", "exit_dirOffset", (Float) null);
+                customUnitConfig.exit_heightOffset = iniFile.getFloat("core", "exit_heightOffset", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.exitHeightIgnoreParent = iniFile.getBoolean("core", "exitHeightIgnoreParent", (Boolean) false).booleanValue();
+                customUnitConfig.exit_moveAwayAmount = iniFile.getFloat("core", "exit_moveAwayAmount", Float.valueOf(70.0f));
+                customUnitConfig.softCollisionOnAll = iniFile.getLogicBooleanUnit("core", "softCollisionOnAll", (Integer) 0).intValue();
+                customUnitConfig.disableAllUnitCollisions2 = iniFile.getBoolean("core", "disableAllUnitCollisions", (Boolean) false).booleanValue();
+                if (customUnitConfig.disableAllUnitCollisions2) {
+                    customUnitConfig.footprint.a(0, 0, -1, -1);
                 }
-                customUnitConfig.f6eJ = iniFile.getBoolean("core", "hideScorchMark", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogicOrTags = iniFile.getBoolean("graphics", "disableLowHpFire", Boolean.valueOf(customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicAndTags)).booleanValue();
-                customUnitConfig.f7eL = iniFile.getBoolean("graphics", "disableLowHpSmoke", Boolean.valueOf(customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicAndTags)).booleanValue();
+                customUnitConfig.hideScorchMark = iniFile.getBoolean("core", "hideScorchMark", (Boolean) false).booleanValue();
+                customUnitConfig.disableLowHpFire = iniFile.getBoolean("graphics", "disableLowHpFire", Boolean.valueOf(customUnitConfig.isBio)).booleanValue();
+                customUnitConfig.disableLowHpSmoke = iniFile.getBoolean("graphics", "disableLowHpSmoke", Boolean.valueOf(customUnitConfig.isBio)).booleanValue();
                 customUnitConfig.isBuildingUnit = iniFile.getBoolean("core", "isBuilding", (Boolean) false).booleanValue();
-                customUnitConfig.isMobileUnit = iniFile.getBoolean("core", "ignoreInUnitCapCalculation", Boolean.valueOf(customUnitConfig.isBuildingUnit)).booleanValue();
-                customUnitConfig.transportUnitsCanLoadUnitWithTags = iniFile.getBoolean("core", "placeOnlyOnResPool", (Boolean) false).booleanValue();
-                customUnitConfig.transportUnitsUnloadRight = iniFile.getBoolean("core", "isUnrepairableUnit", (Boolean) false).booleanValue();
-                customUnitConfig.transportUnitsUnloadLeft = iniFile.getFloat("core", "extraBuildRangeWhenBuildingThis", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.transportUnitsUnloadAndGiveOrder = iniFile.getBoolean("core", "isUnselectable", (Boolean) false).booleanValue();
-                customUnitConfig.transportSlotsNeeded = iniFile.getBoolean("core", "isUnselectableAsTarget", Boolean.valueOf(customUnitConfig.transportUnitsUnloadAndGiveOrder)).booleanValue();
-                customUnitConfig.f48fO = iniFile.getAnimationSet(customUnitConfig, "core", "showActionsWithMixedSelectionIfOtherUnitsHaveTag", (AnimationSet) null);
-                customUnitConfig.transportSwitchToSlots = iniFile.getBoolean("core", "canNotBeDirectlyAttacked", (Boolean) false).booleanValue();
-                customUnitConfig.addResources = iniFile.getBoolean("core", "canNotBeDamaged", Boolean.valueOf(customUnitConfig.transportSwitchToSlots)).booleanValue();
-                customUnitConfig.isCloaked = iniFile.getBoolean("core", "showOnMinimap", (Boolean) true).booleanValue();
-                customUnitConfig.cloakHiddenFromAllies = iniFile.getBoolean("core", "showOnMinimapToEnemies", Boolean.valueOf(customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.m)).booleanValue();
+                customUnitConfig.ignoreInUnitCapCalculation = iniFile.getBoolean("core", "ignoreInUnitCapCalculation", Boolean.valueOf(customUnitConfig.isBuildingUnit)).booleanValue();
+                customUnitConfig.placeOnlyOnResPool = iniFile.getBoolean("core", "placeOnlyOnResPool", (Boolean) false).booleanValue();
+                customUnitConfig.isUnrepairableUnit = iniFile.getBoolean("core", "isUnrepairableUnit", (Boolean) false).booleanValue();
+                customUnitConfig.extraBuildRangeWhenBuildingThis = iniFile.getFloat("core", "extraBuildRangeWhenBuildingThis", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.isUnselectable = iniFile.getBoolean("core", "isUnselectable", (Boolean) false).booleanValue();
+                customUnitConfig.isUnselectableAsTarget = iniFile.getBoolean("core", "isUnselectableAsTarget", Boolean.valueOf(customUnitConfig.isUnselectable)).booleanValue();
+                customUnitConfig.showActionsWithMixedSelectionIfOtherUnitsHaveTag = iniFile.getAnimationSet(customUnitConfig, "core", "showActionsWithMixedSelectionIfOtherUnitsHaveTag", (AnimationSet) null);
+                customUnitConfig.canNotBeDirectlyAttacked = iniFile.getBoolean("core", "canNotBeDirectlyAttacked", (Boolean) false).booleanValue();
+                customUnitConfig.canNotBeDamaged = iniFile.getBoolean("core", "canNotBeDamaged", Boolean.valueOf(customUnitConfig.canNotBeDirectlyAttacked)).booleanValue();
+                customUnitConfig.showOnMinimap = iniFile.getBoolean("core", "showOnMinimap", (Boolean) true).booleanValue();
+                customUnitConfig.showOnMinimapToEnemies = iniFile.getBoolean("core", "showOnMinimapToEnemies", Boolean.valueOf(customUnitConfig.unitStats.isVisibleToEnemies)).booleanValue();
                 customUnitConfig.deathAnimation = iniFile.getAnimationSet(customUnitConfig, "core", "canOnlyBeAttackedByUnitsWithTags", (AnimationSet) null);
-                if (customUnitConfig.transportSwitchToSlots && customUnitConfig.deathAnimation != null) {
+                if (customUnitConfig.canNotBeDirectlyAttacked && customUnitConfig.deathAnimation != null) {
                     throw new RuntimeException("canNotBeDirectlyAttacked and canOnlyBeAttackedByUnitsWithTags cannot be used at the same time");
                 }
-                customUnitConfig.showStatusBar = iniFile.getBoolean("core", "canNotBeGivenOrdersByPlayer", (Boolean) false).booleanValue();
-                customUnitConfig.flag_f1aU = iniFile.getBoolean("core", "canRepairBuildings", (Boolean) false).booleanValue();
-                customUnitConfig.f1aV = iniFile.getBoolean("core", "canRepairUnits", (Boolean) false).booleanValue();
-                customUnitConfig.f2aW = iniFile.getBoolean("core", "autoRepair", (Boolean) false).booleanValue();
-                if (customUnitConfig.f2aW) {
+                customUnitConfig.canNotBeGivenOrdersByPlayer = iniFile.getBoolean("core", "canNotBeGivenOrdersByPlayer", (Boolean) false).booleanValue();
+                customUnitConfig.canRepairBuildings = iniFile.getBoolean("core", "canRepairBuildings", (Boolean) false).booleanValue();
+                customUnitConfig.canRepairUnits = iniFile.getBoolean("core", "canRepairUnits", false).booleanValue();
+                customUnitConfig.autoRepair = iniFile.getBoolean("core", "autoRepair", false).booleanValue();
+                if (customUnitConfig.autoRepair) {
                     customUnitConfig.a(AutoRepairRenderHook.a);
                 }
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.nanoRange = iniFile.getLogicBooleanUnit("core", "nanoRange", (Integer) (-1)).intValue();
-                if (customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.nanoRange != -1) {
-                    customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.nanoRange = (int) (customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.nanoRange * customUnitConfig.transportUnitsHealBy);
+                customUnitConfig.unitStats.nanoRange = iniFile.getLogicBooleanUnit("core", "nanoRange", (Integer) (-1)).intValue();
+                if (customUnitConfig.unitStats.nanoRange != -1) {
+                    customUnitConfig.unitStats.nanoRange = (int) (customUnitConfig.unitStats.nanoRange * customUnitConfig.globalScale);
                 }
-                customUnitConfig.f4aY = iniFile.getBoolean("core", "nanoRangeForRepairIsMelee", (Boolean) false).booleanValue();
-                if (customUnitConfig.f4aY) {
-                    customUnitConfig.f3aX = 5;
+                customUnitConfig.nanoRangeForRepairIsMelee = iniFile.getBoolean("core", "nanoRangeForRepairIsMelee", (Boolean) false).booleanValue();
+                if (customUnitConfig.nanoRangeForRepairIsMelee) {
+                    customUnitConfig.nanoRangeForRepair = 5;
                 }
                 int iIntValue2 = iniFile.getLogicBooleanUnit("core", "nanoRangeForRepair", (Integer) (-1)).intValue();
                 if (iIntValue2 != -1) {
-                    customUnitConfig.f3aX = iIntValue2;
-                    customUnitConfig.f3aX = (int) (customUnitConfig.f3aX * customUnitConfig.transportUnitsHealBy);
+                    customUnitConfig.nanoRangeForRepair = iIntValue2;
+                    customUnitConfig.nanoRangeForRepair = (int) (customUnitConfig.nanoRangeForRepair * customUnitConfig.globalScale);
                 }
-                customUnitConfig.isBuilding = iniFile.getBoolean("core", "nanoRangeForReclaimIsMelee", (Boolean) false).booleanValue();
-                if (customUnitConfig.isBuilding) {
-                    customUnitConfig.isExperimental = 5;
+                customUnitConfig.nanoRangeForReclaimIsMelee = iniFile.getBoolean("core", "nanoRangeForReclaimIsMelee", (Boolean) false).booleanValue();
+                if (customUnitConfig.nanoRangeForReclaimIsMelee) {
+                    customUnitConfig.nanoRangeForReclaim = 5;
                 }
                 int iIntValue3 = iniFile.getLogicBooleanUnit("core", "nanoRangeForReclaim", (Integer) (-1)).intValue();
                 if (iIntValue3 != -1) {
-                    customUnitConfig.isExperimental = iIntValue3;
-                    customUnitConfig.isExperimental = (int) (customUnitConfig.isExperimental * customUnitConfig.transportUnitsHealBy);
+                    customUnitConfig.nanoRangeForReclaim = iIntValue3;
+                    customUnitConfig.nanoRangeForReclaim = (int) (customUnitConfig.nanoRangeForReclaim * customUnitConfig.globalScale);
                 }
-                customUnitConfig.fogOfWarSightRange = iniFile.getFloat("core", "nanoRepairSpeed", Float.valueOf(0.2f)).floatValue();
-                customUnitConfig.fogOfWarSightRangeWhileNotBuilt = iniFile.getFloat("core", "nanoReclaimSpeed", Float.valueOf(customUnitConfig.fogOfWarSightRange * 5.1f)).floatValue();
-                customUnitConfig.useBuildingSmoke = iniFile.getFloat("core", "resourceReclaimMultiplier", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.buildingToFootprintOffsetX = iniFile.getFloat("core", "nanoUnbuildSpeed", Float.valueOf(1.0f)).floatValue() * 0.001f * 5.1f;
-                customUnitConfig.buildingToFootprintOffsetY = iniFile.getFloat("core", "nanoBuildSpeed", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.nanoFactorySpeed = iniFile.getFloat("core", "nanoFactorySpeed", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.selfRegenRate = iniFile.getFloat("core", "selfRegenRate", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.isExtractor = iniFile.getInvertedTime("core", "selfBuildRate", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.isTurret = iniFile.getBoolean("core", "dieOnConstruct", (Boolean) false).booleanValue();
-                customUnitConfig.canNotBeGivenOrdersByPlayer = iniFile.getBoolean("core", "dieOnZeroEnergy", (Boolean) false).booleanValue();
+                customUnitConfig.nanoRepairSpeed = iniFile.getFloat("core", "nanoRepairSpeed", Float.valueOf(0.2f)).floatValue();
+                customUnitConfig.nanoReclaimSpeed = iniFile.getFloat("core", "nanoReclaimSpeed", Float.valueOf(customUnitConfig.nanoRepairSpeed * 5.1f)).floatValue();
+                customUnitConfig.resourceReclaimMultiplier = iniFile.getFloat("core", "resourceReclaimMultiplier", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.nanoUnbuildSpeed = iniFile.getFloat("core", "nanoUnbuildSpeed", Float.valueOf(1.0f)).floatValue() * 0.001f * 5.1f;
+                customUnitConfig.nanoBuildSpeed = iniFile.getFloat("core", "nanoBuildSpeed", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.unitStats.nanoFactorySpeed = iniFile.getFloat("core", "nanoFactorySpeed", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.unitStats.selfRegenRate = iniFile.getFloat("core", "selfRegenRate", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.selfBuildRate = iniFile.getInvertedTime("core", "selfBuildRate", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.dieOnConstruct = iniFile.getBoolean("core", "dieOnConstruct", (Boolean) false).booleanValue();
+                customUnitConfig.dieOnZeroEnergy = iniFile.getBoolean("core", "dieOnZeroEnergy", (Boolean) false).booleanValue();
                 int i = 4;
-                if (customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.mass > 30000.0f) {
+                if (customUnitConfig.unitStats.mass > 30000.0f) {
                     i = 8;
                 }
                 if (customUnitConfig.isBuildingUnit) {
                     i = 7;
                 }
-                customUnitConfig.pylonRequiresPower = iniFile.getLogicBooleanUnit("core", "numBitsOnDeath", Integer.valueOf(i)).intValue();
-                customUnitConfig.displayFootprint = iniFile.getBoolean("core", "nukeOnDeath", (Boolean) false).booleanValue();
-                customUnitConfig.constructionPylon = iniFile.getFloat("core", "nukeOnDeathRange", Float.valueOf(250.0f)).floatValue();
-                customUnitConfig.pylonRadius = iniFile.getFloat("core", "nukeOnDeathDamage", Float.valueOf(5400.0f)).floatValue();
-                customUnitConfig.pylonBuildWith = iniFile.getBoolean("core", "nukeOnDeathDisableWhenNoNuke", (Boolean) false).booleanValue();
-                customUnitConfig.footprint = iniFile.getLogicBooleanUnit("core", "fireOnDeath", (Integer) 0).intValue();
-                customUnitConfig.unitSize = (UnitSize) iniFile.getEnum("core", "explodeTypeOnDeath", (Enum) null, UnitSize.class);
-                customUnitConfig.softRadius = iniFile.getBoolean("core", "explodeOnDeath", (Boolean) true).booleanValue();
-                customUnitConfig.pylonBuildWithOr = iniFile.getBoolean("core", "disableDeathOnZeroHp", (Boolean) false).booleanValue();
-                customUnitConfig.canRepair = iniFile.getBoolean("core", "explodeOnDeathGroundCollision", Boolean.valueOf(iniFile.getBoolean("core", "explodeOnDeathGroundCollosion", (Boolean) true).booleanValue())).booleanValue();
-                customUnitConfig.canAttack = customUnitConfig.addConfigExtension(iniFile.getString("core", "effectOnDeath", (String) null), (CustomUnitSpawnList) null);
-                customUnitConfig.canPatrol = customUnitConfig.addConfigExtension(iniFile.getString("core", "effectOnDeathIfUnbuilt", (String) null), (CustomUnitSpawnList) null);
-                customUnitConfig.canAttackFlying = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnDeath", (String) null));
-                customUnitConfig.canGuard = customUnitConfig.addConfigExtension(iniFile.getString("core", "effectOnDeathGroundCollision", iniFile.getString("core", "effectOnDeathGroundCollosion", (String) null)), (CustomUnitSpawnList) null);
-                customUnitConfig.canAttackNotTouchingWater = UnitSpawner.a(customUnitConfig, iniFile, "core", "unitsSpawnedOnDeath");
-                customUnitConfig.targetGround = iniFile.getBoolean("core", "unitsSpawnedOnDeath_setToTeamOfLastAttacker", (Boolean) false).booleanValue();
-                customUnitConfig.f22fk = iniFile.getBoolean("core", "canReclaimResources", (Boolean) false).booleanValue();
-                customUnitConfig.f23fl = iniFile.getAnimationSet(customUnitConfig, "core", "canReclaimResourcesOnlyWithTags", (AnimationSet) null);
-                customUnitConfig.f24fm = iniFile.getLogicBooleanUnit("core", "canReclaimResourcesNextSearchRange", (Integer) 500).intValue();
-                customUnitConfig.f25fn = iniFile.getAnimationSet(customUnitConfig, "core", "canReclaimUnitsOnlyWithTags", (AnimationSet) null);
-                customUnitConfig.f26fo = iniFile.getAnimationSet(customUnitConfig, "core", "canRepairUnitsOnlyWithTags", (AnimationSet) null);
-                if (customUnitConfig.f25fn != null && !customUnitConfig.f1aV && !customUnitConfig.flag_f1aU) {
+                customUnitConfig.numBitsOnDeath = iniFile.getLogicBooleanUnit("core", "numBitsOnDeath", Integer.valueOf(i)).intValue();
+                customUnitConfig.nukeOnDeath = iniFile.getBoolean("core", "nukeOnDeath", (Boolean) false).booleanValue();
+                customUnitConfig.nukeOnDeathRange = iniFile.getFloat("core", "nukeOnDeathRange", Float.valueOf(250.0f)).floatValue();
+                customUnitConfig.nukeOnDeathDamage = iniFile.getFloat("core", "nukeOnDeathDamage", Float.valueOf(5400.0f)).floatValue();
+                customUnitConfig.nukeOnDeathDisableWhenNoNuke = iniFile.getBoolean("core", "nukeOnDeathDisableWhenNoNuke", (Boolean) false).booleanValue();
+                customUnitConfig.fireOnDeath = iniFile.getLogicBooleanUnit("core", "fireOnDeath", (Integer) 0).intValue();
+                customUnitConfig.explodeTypeOnDeath = (UnitSize) iniFile.getEnum("core", "explodeTypeOnDeath", (Enum) null, UnitSize.class);
+                customUnitConfig.explodeOnDeath = iniFile.getBoolean("core", "explodeOnDeath", (Boolean) true).booleanValue();
+                customUnitConfig.disableDeathOnZeroHp = iniFile.getBoolean("core", "disableDeathOnZeroHp", (Boolean) false).booleanValue();
+                customUnitConfig.explodeOnDeathGroundCollision = iniFile.getBoolean("core", "explodeOnDeathGroundCollision", Boolean.valueOf(iniFile.getBoolean("core", "explodeOnDeathGroundCollosion", (Boolean) true).booleanValue())).booleanValue();
+                customUnitConfig.effectOnDeath = customUnitConfig.addConfigExtension(iniFile.getString("core", "effectOnDeath", (String) null), (CustomUnitSpawnList) null);
+                customUnitConfig.effectOnDeathIfUnbuilt = customUnitConfig.addConfigExtension(iniFile.getString("core", "effectOnDeathIfUnbuilt", (String) null), (CustomUnitSpawnList) null);
+                customUnitConfig.soundOnDeath = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnDeath", (String) null));
+                customUnitConfig.effectOnDeathGroundCollision = customUnitConfig.addConfigExtension(iniFile.getString("core", "effectOnDeathGroundCollision", iniFile.getString("core", "effectOnDeathGroundCollosion", (String) null)), (CustomUnitSpawnList) null);
+                customUnitConfig.unitsSpawnedOnDeath = UnitSpawner.a(customUnitConfig, iniFile, "core", "unitsSpawnedOnDeath");
+                customUnitConfig.unitsSpawnedOnDeath_setToTeamOfLastAttacker = iniFile.getBoolean("core", "unitsSpawnedOnDeath_setToTeamOfLastAttacker", (Boolean) false).booleanValue();
+                customUnitConfig.canReclaimResources = iniFile.getBoolean("core", "canReclaimResources", false).booleanValue();
+                customUnitConfig.canReclaimResourcesOnlyWithTags = iniFile.getAnimationSet(customUnitConfig, "core", "canReclaimResourcesOnlyWithTags", (AnimationSet) null);
+                customUnitConfig.canReclaimResourcesNextSearchRange = iniFile.getLogicBooleanUnit("core", "canReclaimResourcesNextSearchRange", (Integer) 500).intValue();
+                customUnitConfig.canReclaimUnitsOnlyWithTags = iniFile.getAnimationSet(customUnitConfig, "core", "canReclaimUnitsOnlyWithTags", (AnimationSet) null);
+                customUnitConfig.canRepairUnitsOnlyWithTags = iniFile.getAnimationSet(customUnitConfig, "core", "canRepairUnitsOnlyWithTags", (AnimationSet) null);
+                if (customUnitConfig.canReclaimUnitsOnlyWithTags != null && !customUnitConfig.canRepairUnits && !customUnitConfig.canRepairBuildings) {
                     throw new RuntimeException("canReclaimUnitsOnlyWithTags requires canRepairUnits:true or canRepairBuildings:true");
                 }
-                if (customUnitConfig.f26fo != null && !customUnitConfig.f1aV && !customUnitConfig.flag_f1aU) {
+                if (customUnitConfig.canRepairUnitsOnlyWithTags != null && !customUnitConfig.canRepairUnits && !customUnitConfig.canRepairBuildings) {
                     throw new RuntimeException("canRepairUnitsOnlyWithTags requires canRepairUnits:true or canRepairBuildings:true");
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags = iniFile.getLogicBooleanUnit("core", "maxTransportingUnits", (Integer) 0).intValue();
-                if (customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags < 0) {
+                customUnitConfig.maxTransportingUnits = iniFile.getLogicBooleanUnit("core", "maxTransportingUnits", (Integer) 0).intValue();
+                if (customUnitConfig.maxTransportingUnits < 0) {
                     throw new RuntimeException("maxTransportingUnits cannot be < 0");
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicAndTags = iniFile.getTime("core", "transportUnitsUnloadDelayBetweenEachUnit", Float.valueOf(30.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicAndTags = AnimationTag.a(iniFile.getString("core", "transportUnitsRequireTag", (String) null));
+                customUnitConfig.transportUnitsUnloadDelayBetweenEachUnit = iniFile.getTime("core", "transportUnitsUnloadDelayBetweenEachUnit", Float.valueOf(30.0f)).floatValue();
+                customUnitConfig.transportUnitsRequireTag = AnimationTag.a(iniFile.getString("core", "transportUnitsRequireTag", (String) null));
                 String string15 = iniFile.getString("core", "transportUnitsRequireMovementType", (String) null);
                 if (string15 != null) {
                     for (String str12 : string15.split(",")) {
-                        customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogicOrTags.add(UnitMovementType.a(str12.trim(), "transportUnitsRequireMovementType"));
+                        customUnitConfig.transportUnitsRequireMovementType.add(UnitMovementType.a(str12.trim(), "transportUnitsRequireMovementType"));
                     }
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicOrTags = iniFile.getBoolean("core", "transportUnitsEachUnitAlwaysUsesSingleSlot", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogicAndTags = iniFile.getBoolean("core", "transportUnitsBlockAirAndWaterUnits", Boolean.valueOf(customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogicOrTags.size() == 0)).booleanValue();
-                customUnitConfig.f8eS = iniFile.getBoolean("core", "transportUnitsBlockOtherTransports", (Boolean) true).booleanValue();
-                customUnitConfig.f10eU = iniFile.getLogicBoolean(customUnitConfig, "core", "transportUnitsKeepBuiltUnits", LogicBoolean.falseBoolean);
-                customUnitConfig.f11eV = iniFile.getLogicBoolean(customUnitConfig, "core", "transportUnitsKillOnDeath", LogicBoolean.trueBoolean);
-                customUnitConfig.f12eW = iniFile.getLogicBoolean(customUnitConfig, "core", "transportUnitsKeepWaypoints", LogicBoolean.falseBoolean);
-                customUnitConfig.f14eY = iniFile.getFloat("core", "transportUnitsHealBy", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.f16fc = iniFile.getLogicBoolean(customUnitConfig, "core", "transportUnitsCanUnloadUnits", (LogicBoolean) null);
-                if (customUnitConfig.f16fc != null) {
-                    customUnitConfig.f17fd = customUnitConfig.f16fc;
+                customUnitConfig.transportUnitsEachUnitAlwaysUsesSingleSlot = iniFile.getBoolean("core", "transportUnitsEachUnitAlwaysUsesSingleSlot", (Boolean) false).booleanValue();
+                customUnitConfig.transportUnitsBlockAirAndWaterUnits = iniFile.getBoolean("core", "transportUnitsBlockAirAndWaterUnits", Boolean.valueOf(customUnitConfig.transportUnitsRequireMovementType.size() == 0)).booleanValue();
+                customUnitConfig.transportUnitsBlockOtherTransports = iniFile.getBoolean("core", "transportUnitsBlockOtherTransports", (Boolean) true).booleanValue();
+                customUnitConfig.transportUnitsKeepBuiltUnits = iniFile.getLogicBoolean(customUnitConfig, "core", "transportUnitsKeepBuiltUnits", LogicBoolean.falseBoolean);
+                customUnitConfig.transportUnitsKillOnDeath = iniFile.getLogicBoolean(customUnitConfig, "core", "transportUnitsKillOnDeath", LogicBoolean.trueBoolean);
+                customUnitConfig.transportUnitsKeepWaypoints = iniFile.getLogicBoolean(customUnitConfig, "core", "transportUnitsKeepWaypoints", LogicBoolean.falseBoolean);
+                customUnitConfig.transportUnitsHealBy = iniFile.getFloat("core", "transportUnitsHealBy", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.transportUnitsCanUnloadUnits = iniFile.getLogicBoolean(customUnitConfig, "core", "transportUnitsCanUnloadUnits", (LogicBoolean) null);
+                if (customUnitConfig.transportUnitsCanUnloadUnits != null) {
+                    customUnitConfig.f17fd = customUnitConfig.transportUnitsCanUnloadUnits;
                 } else {
-                    customUnitConfig.f16fc = CustomUnitConfig.logic_notOverLiquidAndNotMoving;
+                    customUnitConfig.transportUnitsCanUnloadUnits = CustomUnitConfig.logic_notOverLiquidAndNotMoving;
                     customUnitConfig.f17fd = CustomUnitConfig.logic_notOverLiquid;
                 }
-                customUnitConfig.f9eT = iniFile.getBoolean("core", "transportUnitsAddUnloadOption", Boolean.valueOf(customUnitConfig.f16fc != LogicBoolean.falseBoolean)).booleanValue();
-                customUnitConfig.f13eX = iniFile.getBoolean("core", "transportUnitsOnTeamChangeKeepCurrentTeam", Boolean.valueOf(customUnitConfig.f13eX)).booleanValue();
-                customUnitConfig.f15eZ = iniFile.getLogicBooleanUnit("core", "transportSlotsNeeded", (Integer) 1).intValue();
+                customUnitConfig.transportUnitsAddUnloadOption = iniFile.getBoolean("core", "transportUnitsAddUnloadOption", Boolean.valueOf(customUnitConfig.transportUnitsCanUnloadUnits != LogicBoolean.falseBoolean)).booleanValue();
+                customUnitConfig.transportUnitsOnTeamChangeKeepCurrentTeam = iniFile.getBoolean("core", "transportUnitsOnTeamChangeKeepCurrentTeam", Boolean.valueOf(customUnitConfig.transportUnitsOnTeamChangeKeepCurrentTeam)).booleanValue();
+                customUnitConfig.transportSlotsNeeded = iniFile.getLogicBooleanUnit("core", "transportSlotsNeeded", (Integer) 1).intValue();
                 for (int i2 = -1; i2 <= 29; i2++) {
                     String str13 = "builtFrom_" + i2 + "_";
                     if (i2 == -1) {
@@ -1921,9 +1879,8 @@ public class CustomUnitConfigParser {
                         parseCanBuildEntry(customUnitConfig, iniFile, "core", "canBuild_" + i3 + "_", false);
                     }
                 }
-                Iterator it3 = iniFile.getSectionsStartingWith("canBuild_").iterator();
-                while (it3.hasNext()) {
-                    parseCanBuildEntry(customUnitConfig, iniFile, (String) it3.next(), VariableScope.nullOrMissingString, true);
+                for (String o : iniFile.getSectionsStartingWith("canBuild_")) {
+                    parseCanBuildEntry(customUnitConfig, iniFile, o, VariableScope.nullOrMissingString, true);
                 }
                 customUnitConfig.customUnitMetadata = PlacementRules.a(customUnitConfig, iniFile);
                 customUnitConfig.movementType = UnitMovementType.a(iniFile.getValueStrict("movement", "movementType"), "movementType");
@@ -1933,7 +1890,7 @@ public class CustomUnitConfigParser {
                     customUnitConfig.f19fh = UnitMovementType.NONE;
                 }
                 Boolean bool = iniFile.getBoolean("ai", "useAsBuilder", (Boolean) null);
-                customUnitConfig.f27fs = iniFile.getBoolean("ai", "useAsAttacker", (Boolean) true).booleanValue();
+                customUnitConfig.useAsAttacker = iniFile.getBoolean("ai", "useAsAttacker", (Boolean) true).booleanValue();
                 Boolean bool2 = iniFile.getBoolean("core", "isBuilder", (Boolean) null);
                 if (bool2 == null) {
                     bool2 = bool == null ? false : bool;
@@ -1943,26 +1900,26 @@ public class CustomUnitConfigParser {
                 if (bool == null) {
                     bool = false;
                 }
-                customUnitConfig.isFlying = bool2.booleanValue();
-                customUnitConfig.hasTransportCapability = bool.booleanValue();
-                if (!customUnitConfig.isFlying && customUnitConfig.hasTransportCapability) {
-                    throw new RuntimeException("Cannot tell AI to use a non-builder as builder [ai]useAsBuilder:" + customUnitConfig.hasTransportCapability + " [core]isBuilder:" + customUnitConfig.isFlying);
+                customUnitConfig.isBuilder = bool2.booleanValue();
+                customUnitConfig.useAsBuilder = bool.booleanValue();
+                if (!customUnitConfig.isBuilder && customUnitConfig.useAsBuilder) {
+                    throw new RuntimeException("Cannot tell AI to use a non-builder as builder [ai]useAsBuilder:" + customUnitConfig.useAsBuilder + " [core]isBuilder:" + customUnitConfig.isBuilder);
                 }
-                if (customUnitConfig.f22fk) {
-                    customUnitConfig.isUnselectable = true;
+                if (customUnitConfig.canReclaimResources) {
+                    customUnitConfig.useAsHarvester = true;
                 }
                 Boolean bool3 = iniFile.getBoolean("ai", "useAsHarvester", (Boolean) null);
                 if (bool3 != null) {
-                    customUnitConfig.isUnselectable = bool3.booleanValue();
+                    customUnitConfig.useAsHarvester = bool3.booleanValue();
                 }
                 Boolean boolValueOf = iniFile.getBoolean("ai", "useAsTransport", (Boolean) null);
                 if (boolValueOf == null) {
-                    boolValueOf = Boolean.valueOf((customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags <= 0 || customUnitConfig.hasTransportCapability || customUnitConfig.isBuildingUnit) ? false : true);
-                    if (!customUnitConfig.f9eT) {
+                    boolValueOf = Boolean.valueOf((customUnitConfig.maxTransportingUnits <= 0 || customUnitConfig.useAsBuilder || customUnitConfig.isBuildingUnit) ? false : true);
+                    if (!customUnitConfig.transportUnitsAddUnloadOption) {
                         boolValueOf = false;
                     }
                 }
-                customUnitConfig.f28ft = boolValueOf.booleanValue();
+                customUnitConfig.useAsTransport = boolValueOf.booleanValue();
                 if (customUnitConfig.isBuildingUnit) {
                     customUnitConfig.energy = BaseBuilding.teamColoredIconTextures;
                 } else if (customUnitConfig.movementType == UnitMovementType.AIR) {
@@ -1970,14 +1927,14 @@ public class CustomUnitConfigParser {
                 } else if (customUnitConfig.movementType == UnitMovementType.WATER) {
                     customUnitConfig.energy = WaterUnit.waterUnitIconTextures;
                 } else if (customUnitConfig.movementType == UnitMovementType.HOVER) {
-                    if (customUnitConfig.canBeBuiltByExtractor) {
+                    if (customUnitConfig.experimental) {
                         customUnitConfig.energy = LandUnit.landUnitIconTexturesExp;
                     } else if (customUnitConfig.l()) {
                         customUnitConfig.energy = BuilderUnit.builderIconTexture_teamColors;
                     } else {
                         customUnitConfig.energy = HoverLandUnit.n;
                     }
-                } else if (customUnitConfig.canBeBuiltByExtractor) {
+                } else if (customUnitConfig.experimental) {
                     customUnitConfig.energy = LandUnit.landUnitIconTexturesExp;
                 } else if (customUnitConfig.l()) {
                     customUnitConfig.energy = BuilderUnit.builderIconTexture_teamColors;
@@ -1991,47 +1948,47 @@ public class CustomUnitConfigParser {
                 if (iniFile.getBoolean("graphics", "icon_zoomed_out_neverShow", (Boolean) false).booleanValue()) {
                     customUnitConfig.energy = null;
                 }
-                customUnitConfig.isBio = iniFile.getBoolean("graphics", "showHealthBar", (Boolean) true).booleanValue();
-                customUnitConfig.isBug = iniFile.getBoolean("graphics", "showHealthBarChanges", (Boolean) true).booleanValue();
-                customUnitConfig.isBuilder = iniFile.getBoolean("graphics", "showEnergyBar", (Boolean) true).booleanValue();
-                customUnitConfig.isBuilderNonAssist = iniFile.getBoolean("graphics", "showShotDelayBar", (Boolean) true).booleanValue();
-                customUnitConfig.canBuildOnWater = iniFile.getBoolean("graphics", "showTransportBar", (Boolean) true).booleanValue();
-                customUnitConfig.canBuildOnGround = iniFile.getBoolean("graphics", "showShieldBar", (Boolean) true).booleanValue();
-                customUnitConfig.isAir = iniFile.getBoolean("graphics", "showQueueBar", (Boolean) true).booleanValue();
-                customUnitConfig.isLand = iniFile.getBoolean("graphics", "showSelectionIndicator", (Boolean) true).booleanValue();
-                customUnitConfig.f20fi = iniFile.getBoolean("movement", "slowDeathFall", (Boolean) false).booleanValue();
-                customUnitConfig.f21fj = iniFile.getBoolean("movement", "slowDeathFallSmoke", (Boolean) true).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.moveSpeed = iniFile.getFloat("movement", "moveSpeed", Float.valueOf(1.0f)).floatValue() * customUnitConfig.transportUnitsHealBy;
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogic = iniFile.getFloat("movement", "moveAccelerationSpeed", Float.valueOf(1.0f)).floatValue() * customUnitConfig.transportUnitsHealBy;
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogic = iniFile.getFloat("movement", "moveDecelerationSpeed", Float.valueOf(1.0f)).floatValue() * customUnitConfig.transportUnitsHealBy;
+                customUnitConfig.showHealthBar = iniFile.getBoolean("graphics", "showHealthBar", (Boolean) true).booleanValue();
+                customUnitConfig.showHealthBarChanges = iniFile.getBoolean("graphics", "showHealthBarChanges", (Boolean) true).booleanValue();
+                customUnitConfig.showEnergyBar = iniFile.getBoolean("graphics", "showEnergyBar", (Boolean) true).booleanValue();
+                customUnitConfig.showShotDelayBar = iniFile.getBoolean("graphics", "showShotDelayBar", (Boolean) true).booleanValue();
+                customUnitConfig.showTransportBar = iniFile.getBoolean("graphics", "showTransportBar", (Boolean) true).booleanValue();
+                customUnitConfig.showShieldBar = iniFile.getBoolean("graphics", "showShieldBar", (Boolean) true).booleanValue();
+                customUnitConfig.showQueueBar = iniFile.getBoolean("graphics", "showQueueBar", (Boolean) true).booleanValue();
+                customUnitConfig.showSelectionIndicator = iniFile.getBoolean("graphics", "showSelectionIndicator", (Boolean) true).booleanValue();
+                customUnitConfig.slowDeathFall = iniFile.getBoolean("movement", "slowDeathFall", (Boolean) false).booleanValue();
+                customUnitConfig.slowDeathFallSmoke = iniFile.getBoolean("movement", "slowDeathFallSmoke", (Boolean) true).booleanValue();
+                customUnitConfig.unitStats.moveSpeed = iniFile.getFloat("movement", "moveSpeed", Float.valueOf(1.0f)).floatValue() * customUnitConfig.globalScale;
+                customUnitConfig.moveAccelerationSpeed = iniFile.getFloat("movement", "moveAccelerationSpeed", Float.valueOf(1.0f)).floatValue() * customUnitConfig.globalScale;
+                customUnitConfig.moveDecelerationSpeed = iniFile.getFloat("movement", "moveDecelerationSpeed", Float.valueOf(1.0f)).floatValue() * customUnitConfig.globalScale;
                 Boolean bool4 = iniFile.getBoolean("movement", "ignoreMoveOrders", (Boolean) null);
                 if (customUnitConfig.isBuildingUnit) {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogic = true;
+                    customUnitConfig.ignoreMoveOrders = true;
                 }
                 if (bool4 != null) {
                     if (bool4.booleanValue()) {
-                        customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogic = true;
-                        if (customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.moveSpeed > 0.0f) {
+                        customUnitConfig.ignoreMoveOrders = true;
+                        if (customUnitConfig.unitStats.moveSpeed > 0.0f) {
                             throw new RuntimeException("[movement]ignoreMoveOrders expects moveSpeed=0");
                         }
                     } else if (customUnitConfig.isBuildingUnit) {
                         throw new RuntimeException("[movement]ignoreMoveOrders=false not yet supported on buildings");
                     }
                 }
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTagsOrLogic = iniFile.getFloat("movement", "moveYAxisScaling", Float.valueOf(1.0f)).floatValue();
-                if (customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTagsOrLogic <= 0.0f) {
+                customUnitConfig.moveYAxisScaling = iniFile.getFloat("movement", "moveYAxisScaling", Float.valueOf(1.0f)).floatValue();
+                if (customUnitConfig.moveYAxisScaling <= 0.0f) {
                     throw new RuntimeException("[movement]moveYAxisScaling must be > 0");
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogicOrTags = 1.0f / customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTagsOrLogic;
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogicAndTags = iniFile.getFloat("movement", "reverseSpeedPercentage", Float.valueOf(0.6f)).floatValue();
+                customUnitConfig.float2 = 1.0f / customUnitConfig.moveYAxisScaling;
+                customUnitConfig.reverseSpeedPercentage = iniFile.getFloat("movement", "reverseSpeedPercentage", Float.valueOf(0.6f)).floatValue();
                 String string17 = iniFile.getString("movement", "landOnGround", "false");
                 if (string17.equalsIgnoreCase("false")) {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogic = false;
+                    customUnitConfig.bool8 = false;
                 } else if (string17.equalsIgnoreCase("onlyIdle")) {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogic = true;
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogic = true;
+                    customUnitConfig.bool8 = true;
+                    customUnitConfig.bool9 = true;
                 } else if (string17.equalsIgnoreCase("true")) {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogic = true;
+                    customUnitConfig.bool8 = true;
                 } else {
                     throw new RuntimeException("landOnGround expected:true, false, onlyIdle, not:" + string17);
                 }
@@ -2041,24 +1998,24 @@ public class CustomUnitConfigParser {
                     f3 = 35.0f;
                     f4 = 1.5f;
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogic = iniFile.getFloat("movement", "startingHeightOffset", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.targetHeight = iniFile.getFloat("movement", "targetHeight", Float.valueOf(f3)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic = iniFile.getFloat("movement", "targetHeightDrift", Float.valueOf(f4)).floatValue();
-                if (customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.targetHeight > 80.0f) {
+                customUnitConfig.startingHeightOffset = iniFile.getFloat("movement", "startingHeightOffset", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.unitStats.targetHeight = iniFile.getFloat("movement", "targetHeight", Float.valueOf(f3)).floatValue();
+                customUnitConfig.targetHeightDrift = iniFile.getFloat("movement", "targetHeightDrift", Float.valueOf(f4)).floatValue();
+                if (customUnitConfig.unitStats.targetHeight > 80.0f) {
                     customUnitConfig.isHover = true;
                 }
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsAndLogic = iniFile.getFloat("movement", "heightChangeRate", Float.valueOf(customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsAndLogic)).floatValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsOrLogic = iniFile.getFloat("movement", "fallingAcceleration", Float.valueOf(customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsOrLogic)).floatValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTagsAndLogic = iniFile.getFloat("movement", "fallingAccelerationDead", Float.valueOf(customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTagsAndLogic)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxTurnSpeed = iniFile.getFloat("movement", "maxTurnSpeed", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicOrTags = iniFile.getFloat("movement", "turnAcceleration", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTagsOrLogic = iniFile.getBoolean("movement", "moveSlidingMode", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTagsAndLogic = iniFile.getBoolean("movement", "moveIgnoringBody", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTagsOrLogic = iniFile.getLogicBooleanUnit("movement", "moveSlidingDir", (Integer) (-1)).intValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTagsAndLogic = iniFile.getBoolean("movement", "joinsGroupFormations", (Boolean) true).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTagsAndLogic = iniFile.getFloat("attack", "turretSize", Float.valueOf(1.0f)).floatValue() * customUnitConfig.transportUnitsHealBy;
-                customUnitConfig.canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTagsOrLogic = iniFile.getFloat("attack", "turretTurnSpeed", Float.valueOf(8.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogic = iniFile.getBoolean("attack", "turretRotateWithBody", (Boolean) true).booleanValue();
+                customUnitConfig.heightChangeRate = iniFile.getFloat("movement", "heightChangeRate", Float.valueOf(customUnitConfig.heightChangeRate)).floatValue();
+                customUnitConfig.fallingAcceleration = iniFile.getFloat("movement", "fallingAcceleration", Float.valueOf(customUnitConfig.fallingAcceleration)).floatValue();
+                customUnitConfig.fallingAccelerationDead = iniFile.getFloat("movement", "fallingAccelerationDead", Float.valueOf(customUnitConfig.fallingAccelerationDead)).floatValue();
+                customUnitConfig.unitStats.maxTurnSpeed = iniFile.getFloat("movement", "maxTurnSpeed", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.turnAcceleration = iniFile.getFloat("movement", "turnAcceleration", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.moveSlidingMode = iniFile.getBoolean("movement", "moveSlidingMode", (Boolean) false).booleanValue();
+                customUnitConfig.moveIgnoringBody = iniFile.getBoolean("movement", "moveIgnoringBody", (Boolean) false).booleanValue();
+                customUnitConfig.moveSlidingDir = iniFile.getLogicBooleanUnit("movement", "moveSlidingDir", (Integer) (-1)).intValue();
+                customUnitConfig.joinsGroupFormations = iniFile.getBoolean("movement", "joinsGroupFormations", (Boolean) true).booleanValue();
+                customUnitConfig.turretSize = iniFile.getFloat("attack", "turretSize", Float.valueOf(1.0f)).floatValue() * customUnitConfig.globalScale;
+                customUnitConfig.turretTurnSpeed = iniFile.getFloat("attack", "turretTurnSpeed", Float.valueOf(8.0f)).floatValue();
+                customUnitConfig.turretRotateWithBody = iniFile.getBoolean("attack", "turretRotateWithBody", (Boolean) true).booleanValue();
                 String string18 = iniFile.getString("attack", "attackMovement", "normal");
                 customUnitConfig.attackMovementType = UnitBehaviorType.normal;
                 if (string18.equalsIgnoreCase("normal")) {
@@ -2070,31 +2027,31 @@ public class CustomUnitConfigParser {
                 if (string18.equalsIgnoreCase("bomber")) {
                     customUnitConfig.attackMovementType = UnitBehaviorType.bomber;
                 }
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogicAndTagsOrLogic = iniFile.getBoolean("attack", "disablePassiveTargeting", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTagsAndLogic = iniFile.getBoolean("attack", "stopTargetingAfterFiring", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTagsOrLogic = iniFile.getBoolean("attack", "turretMultiTargeting", (Boolean) false).booleanValue();
+                customUnitConfig.disablePassiveTargeting = iniFile.getBoolean("attack", "disablePassiveTargeting", (Boolean) false).booleanValue();
+                customUnitConfig.stopTargetingAfterFiring = iniFile.getBoolean("attack", "stopTargetingAfterFiring", (Boolean) false).booleanValue();
+                customUnitConfig.turretMultiTargeting2 = iniFile.getBoolean("attack", "turretMultiTargeting", (Boolean) false).booleanValue();
                 customUnitConfig.attackMovementSpeed = iniFile.getFloat("attack", "attackMovementSpeed", Float.valueOf(1.0f)).floatValue();
                 customUnitConfig.attackMovementSpread = iniFile.getFloat("attack", "attackMovementSpread", Float.valueOf(1.0f)).floatValue();
                 Float f5 = iniFile.getFloat("attack", "maxAttackRange", (Float) null);
                 if (f5 != null) {
                     z = true;
-                    customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxAttackRange = f5.floatValue() * customUnitConfig.transportUnitsHealBy;
+                    customUnitConfig.unitStats.maxAttackRange = f5 * customUnitConfig.globalScale;
                 } else {
                     z = false;
-                    customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxAttackRange = 100.0f * customUnitConfig.transportUnitsHealBy;
+                    customUnitConfig.unitStats.maxAttackRange = 100.0f * customUnitConfig.globalScale;
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogicAndTags = iniFile.getFloat("attack", "aimOffsetSpread", Float.valueOf(0.6f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogic = iniFile.getTime("attack", "shootDelay", Float.valueOf(50.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.shootDelayMultiplier = iniFile.getFloat("attack", "shootDelayMultiplier", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.shootDamageMultiplier = iniFile.getFloat("attack", "shootDamageMultiplier", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogic = iniFile.getBoolean("attack", "showRangeUIGuide", (Boolean) null);
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicAndTags = iniFile.getBoolean("attack", "isMelee", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogicOrTags = 0.0f;
+                customUnitConfig.aimOffsetSpread = iniFile.getFloat("attack", "aimOffsetSpread", Float.valueOf(0.6f)).floatValue();
+                customUnitConfig.shootDelay = iniFile.getTime("attack", "shootDelay", Float.valueOf(50.0f)).floatValue();
+                customUnitConfig.unitStats.shootDelayMultiplier = iniFile.getFloat("attack", "shootDelayMultiplier", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.unitStats.shootDamageMultiplier = iniFile.getFloat("attack", "shootDamageMultiplier", Float.valueOf(1.0f)).floatValue();
+                customUnitConfig.showRangeUIGuide = iniFile.getBoolean("attack", "showRangeUIGuide", (Boolean) null);
+                customUnitConfig.isMelee = iniFile.getBoolean("attack", "isMelee", (Boolean) false).booleanValue();
+                customUnitConfig.meleeAttackRange = 0.0f;
                 Float f6 = iniFile.getFloat("attack", "meleeEngangementDistance", (Float) null);
-                if (customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicAndTags) {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogicOrTags = 250.0f;
+                if (customUnitConfig.isMelee) {
+                    customUnitConfig.meleeAttackRange = 250.0f;
                     if (f6 != null) {
-                        customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogicOrTags = f6.floatValue();
+                        customUnitConfig.meleeAttackRange = f6.floatValue();
                     }
                 } else if (f6 != null) {
                     throw new RuntimeException("[attack]meleeEngangementDistance can only be used with isMelee:true");
@@ -2116,16 +2073,16 @@ public class CustomUnitConfigParser {
                 }
                 customUnitConfig.f50fR = new CustomProjectileTemplate[size];
                 for (int i4 = 0; i4 < customUnitConfig.projectileTemplates.size(); i4++) {
-                    CustomProjectileTemplate customProjectileTemplate2 = (CustomProjectileTemplate) customUnitConfig.projectileTemplates.get(i4);
+                    CustomProjectileTemplate customProjectileTemplate2 = customUnitConfig.projectileTemplates.get(i4);
                     customProjectileTemplate2.projectileId = i4;
                     customUnitConfig.f50fR[i4] = customProjectileTemplate2;
                 }
                 for (int i5 = 0; i5 < customUnitConfig.f50fR.length; i5++) {
                     CustomProjectileTemplate customProjectileTemplate3 = customUnitConfig.f50fR[i5];
                     if (customProjectileTemplate3 != null) {
-                        customProjectileTemplate3.w *= customUnitConfig.transportUnitsHealBy;
-                        customProjectileTemplate3.au *= customUnitConfig.transportUnitsHealBy;
-                        customProjectileTemplate3.aF *= customUnitConfig.transportUnitsHealBy;
+                        customProjectileTemplate3.w *= customUnitConfig.globalScale;
+                        customProjectileTemplate3.au *= customUnitConfig.globalScale;
+                        customProjectileTemplate3.aF *= customUnitConfig.globalScale;
                     }
                 }
                 if (customUnitConfig.f50fR[0] == null) {
@@ -2150,22 +2107,22 @@ public class CustomUnitConfigParser {
                 for (TurretConfig turretConfig2 : arrayList) {
                     TurretConfig.a(turretConfig2, customUnitConfig, iniFile, turretConfig2.copyFrom);
                 }
-                if (arrayList.size() == 0) {
+                if (arrayList.isEmpty()) {
                     TurretConfig turretConfig3 = new TurretConfig();
                     turretConfig3.range = 0.0f;
                     turretConfig3.minRange = 0.0f;
                     turretConfig3.name = "1";
-                    turretConfig3.m = customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogic;
+                    turretConfig3.m = customUnitConfig.shootDelay;
                     arrayList.add(turretConfig3);
                 }
                 for (int size2 = arrayList.size() - 1; size2 >= 0; size2--) {
                     if (arrayList.get(size2) != null) {
-                        ((TurretConfig) arrayList.get(size2)).rotationSpeed = size2;
+                        arrayList.get(size2).rotationSpeed = size2;
                     }
                 }
                 for (int size3 = arrayList.size() - 1; size3 >= 0; size3--) {
                     if (arrayList.get(size3) != null) {
-                        TurretConfig turretConfig4 = (TurretConfig) arrayList.get(size3);
+                        TurretConfig turretConfig4 = arrayList.get(size3);
                         if (turretConfig4.parentTurret != null) {
                             turretConfig4.w = turretConfig4.parentTurret.rotationSpeed;
                             if (turretConfig4.parentTurret.parentTurret != null) {
@@ -2183,30 +2140,30 @@ public class CustomUnitConfigParser {
                 if (arrayList.size() > 31) {
                     throw new RuntimeException("Turret max count per unit is: 31");
                 }
-                customUnitConfig.turrets = (TurretConfig[]) arrayList.toArray(new TurretConfig[0]);
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogic = customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxAttackRange;
+                customUnitConfig.turrets = arrayList.toArray(new TurretConfig[0]);
+                customUnitConfig.maxAttackRange = customUnitConfig.unitStats.maxAttackRange;
                 float f7 = -1.0f;
                 boolean z3 = true;
                 boolean z4 = false;
                 for (TurretConfig turretConfig5 : arrayList) {
-                    turretConfig5.shootSpeed2 *= customUnitConfig.transportUnitsHealBy;
-                    turretConfig5.range *= customUnitConfig.transportUnitsHealBy;
-                    turretConfig5.minRange *= customUnitConfig.transportUnitsHealBy;
-                    turretConfig5.shootAccuracy2 *= customUnitConfig.transportUnitsHealBy;
-                    turretConfig5.Z *= customUnitConfig.transportUnitsHealBy;
+                    turretConfig5.shootSpeed2 *= customUnitConfig.globalScale;
+                    turretConfig5.range *= customUnitConfig.globalScale;
+                    turretConfig5.minRange *= customUnitConfig.globalScale;
+                    turretConfig5.shootAccuracy2 *= customUnitConfig.globalScale;
+                    turretConfig5.Z *= customUnitConfig.globalScale;
                     boolean zBooleanValue2 = false;
                     if (turretConfig5.B) {
                         if (turretConfig5.ab >= 99999.0f) {
                             z3 = false;
                         } else {
                             z4 = true;
-                            if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogic > turretConfig5.ab) {
-                                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogic = turretConfig5.ab;
+                            if (customUnitConfig.maxAttackRange > turretConfig5.ab) {
+                                customUnitConfig.maxAttackRange = turretConfig5.ab;
                             }
                             if (f7 < turretConfig5.ab) {
                                 f7 = turretConfig5.ab;
                             }
-                            if (Utility.abs(turretConfig5.ab - customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxAttackRange) > 5.0f) {
+                            if (Utility.abs(turretConfig5.ab - customUnitConfig.unitStats.maxAttackRange) > 5.0f) {
                                 boolean z5 = false;
                                 Iterator it4 = customUnitConfig.customArms.iterator();
                                 while (it4.hasNext()) {
@@ -2231,24 +2188,24 @@ public class CustomUnitConfigParser {
                 }
                 if (z4 && z3) {
                     if (!z) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxAttackRange = f7;
-                    } else if (f7 < customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.maxAttackRange) {
+                        customUnitConfig.unitStats.maxAttackRange = f7;
+                    } else if (f7 < customUnitConfig.unitStats.maxAttackRange) {
                         throw new RuntimeException("limitingRange as been applied to all turrets but is less than maxAttackRange (hint: unset maxAttackRange or a limitingRange, or make values match)");
                     }
                 }
                 String string19 = iniFile.getString("attack", "setMainTurretAs", (String) null);
                 if (string19 != null) {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogic = customUnitConfig.findProjectileConfigByName(string19);
-                    if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogic == null) {
+                    customUnitConfig.defaultTurret2 = customUnitConfig.findProjectileConfigByName(string19);
+                    if (customUnitConfig.defaultTurret2 == null) {
                         throw new RuntimeException("[attack] Could not find setMainTurretAs with name: " + string19);
                     }
                 } else {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogic = customUnitConfig.findProjectileConfigByName("1");
-                    if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogic == null) {
-                        customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogic = customUnitConfig.turrets[0];
+                    customUnitConfig.defaultTurret2 = customUnitConfig.findProjectileConfigByName("1");
+                    if (customUnitConfig.defaultTurret2 == null) {
+                        customUnitConfig.defaultTurret2 = customUnitConfig.turrets[0];
                     }
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic = customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogic.rotationSpeed;
+                customUnitConfig.defaultTurretRotationSpeed = customUnitConfig.defaultTurret2.rotationSpeed;
                 getLocaleString(jA, LoadPhase.unitParsePartB);
                 long jA3 = PerformanceProfiler.a();
                 if (iniFile.hasKeyStartingWith("core", "action_")) {
@@ -2303,11 +2260,11 @@ public class CustomUnitConfigParser {
                 for (int size4 = arrayList5.size() - 1; size4 >= 0; size4--) {
                     ((LegConfig) arrayList5.get(size4)).a = size4;
                 }
-                customUnitConfig.energyDisplayName = (LegConfig[]) arrayList5.toArray(new LegConfig[0]);
-                if (customUnitConfig.energyDisplayName.length > 0) {
+                customUnitConfig.legConfig = (LegConfig[]) arrayList5.toArray(new LegConfig[0]);
+                if (customUnitConfig.legConfig.length > 0) {
                     customUnitConfig.a(CustomUnitLegController.a);
                 }
-                Iterator it5 = customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTags.iterator();
+                Iterator it5 = customUnitConfig.animations.iterator();
                 while (it5.hasNext()) {
                     ((AnimationConfig) it5.next()).a(customUnitConfig);
                 }
@@ -2321,34 +2278,34 @@ public class CustomUnitConfigParser {
                     customUnitConfig.canAttackUnderwater = turretConfigFindProjectileConfigByName.rotationSpeed;
                 }
                 CustomUnitDecalRenderer.a(customUnitConfig, iniFile);
-                customUnitConfig.isConstructionBox = iniFile.getBoolean("attack", "dieOnAttack", (Boolean) false).booleanValue();
-                customUnitConfig.canNotBeDirectlyAttacked = iniFile.getBoolean("attack", "removeOnAttack", (Boolean) false).booleanValue();
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicAndTags = iniFile.getBooleanStrict("attack", "canAttack");
-                if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicAndTags) {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogicOrTags = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackFlyingUnits");
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogicAndTags = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackLandUnits");
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicOrTags = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackUnderwaterUnits");
+                customUnitConfig.dieOnAttack = iniFile.getBoolean("attack", "dieOnAttack", (Boolean) false).booleanValue();
+                customUnitConfig.removeOnAttack = iniFile.getBoolean("attack", "removeOnAttack", (Boolean) false).booleanValue();
+                customUnitConfig.canAttack = iniFile.getBooleanStrict("attack", "canAttack");
+                if (customUnitConfig.canAttack) {
+                    customUnitConfig.canAttackFlyingUnits = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackFlyingUnits");
+                    customUnitConfig.canAttackLandUnits = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackLandUnits");
+                    customUnitConfig.canAttackUnderwaterUnits = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackUnderwaterUnits");
                 } else {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogicOrTags = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackFlyingUnits", LogicBoolean.falseBoolean);
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogicAndTags = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackLandUnits", LogicBoolean.falseBoolean);
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicOrTags = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackUnderwaterUnits", LogicBoolean.falseBoolean);
+                    customUnitConfig.canAttackFlyingUnits = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackFlyingUnits", LogicBoolean.falseBoolean);
+                    customUnitConfig.canAttackLandUnits = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackLandUnits", LogicBoolean.falseBoolean);
+                    customUnitConfig.canAttackUnderwaterUnits = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackUnderwaterUnits", LogicBoolean.falseBoolean);
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicAndTags = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackNotTouchingWaterUnits", (LogicBoolean) null);
-                if (LogicBoolean.isStaticTrue(customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicAndTags)) {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicAndTags = null;
+                customUnitConfig.canAttackNotTouchingWaterUnits = iniFile.getLogicBoolean(customUnitConfig, "attack", "canAttackNotTouchingWaterUnits", (LogicBoolean) null);
+                if (LogicBoolean.isStaticTrue(customUnitConfig.canAttackNotTouchingWaterUnits)) {
+                    customUnitConfig.canAttackNotTouchingWaterUnits = null;
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicAndTags = iniFile.getAnimationSet(customUnitConfig, "attack", "canOnlyAttackUnitsWithTags", (AnimationSet) null);
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicOrTags = iniFile.getAnimationSet(customUnitConfig, "attack", "canOnlyAttackUnitsWithoutTags", (AnimationSet) null);
-                if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicAndTags != null || customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicOrTags != null) {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicOrTags = true;
+                customUnitConfig.canOnlyAttackUnitsWithTags = iniFile.getAnimationSet(customUnitConfig, "attack", "canOnlyAttackUnitsWithTags", (AnimationSet) null);
+                customUnitConfig.canOnlyAttackUnitsWithoutTags = iniFile.getAnimationSet(customUnitConfig, "attack", "canOnlyAttackUnitsWithoutTags", (AnimationSet) null);
+                if (customUnitConfig.canOnlyAttackUnitsWithTags != null || customUnitConfig.canOnlyAttackUnitsWithoutTags != null) {
+                    customUnitConfig.bool11 = true;
                 }
                 boolean z7 = false;
                 boolean z8 = false;
                 for (TurretConfig turretConfig6 : arrayList) {
-                    if (turretConfig6.animationSet != null && turretConfig6.animationSet.a(customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicAndTags)) {
+                    if (turretConfig6.animationSet != null && turretConfig6.animationSet.a(customUnitConfig.canOnlyAttackUnitsWithTags)) {
                         turretConfig6.animationSet = null;
                     }
-                    if (turretConfig6.animationSet2 != null && turretConfig6.animationSet2.a(customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicOrTags)) {
+                    if (turretConfig6.animationSet2 != null && turretConfig6.animationSet2.a(customUnitConfig.canOnlyAttackUnitsWithoutTags)) {
                         turretConfig6.animationSet2 = null;
                     }
                     if (turretConfig6.B) {
@@ -2360,23 +2317,23 @@ public class CustomUnitConfigParser {
                     }
                 }
                 if (z7 && !z8) {
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicAndTags = true;
-                    customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicOrTags = true;
+                    customUnitConfig.bool12 = true;
+                    customUnitConfig.bool11 = true;
                 }
-                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogicOrTags = iniFile.getBoolean("attack", "isFixedFiring", (Boolean) false).booleanValue();
-                customUnitConfig.f46fM = iniFile.getBoolean("ai", "lowPriorityTargetForOtherUnits", (Boolean) false).booleanValue();
-                customUnitConfig.f47fN = iniFile.getBoolean("ai", "notPassivelyTargetedByOtherUnits", (Boolean) false).booleanValue();
-                if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicAndTags && customUnitConfig.f47fN) {
+                customUnitConfig.isFixedFiring = iniFile.getBoolean("attack", "isFixedFiring", (Boolean) false).booleanValue();
+                customUnitConfig.lowPriorityTargetForOtherUnits = iniFile.getBoolean("ai", "lowPriorityTargetForOtherUnits", (Boolean) false).booleanValue();
+                customUnitConfig.notPassivelyTargetedByOtherUnits = iniFile.getBoolean("ai", "notPassivelyTargetedByOtherUnits", (Boolean) false).booleanValue();
+                if (customUnitConfig.canAttack && customUnitConfig.notPassivelyTargetedByOtherUnits) {
                     throw new RuntimeException("[ai]notPassivelyTargetedByOtherUnits is cannot currently supported on units that can attack");
                 }
-                customUnitConfig.f30fv = iniFile.getAnimationSet(customUnitConfig, "ai", "aiTags", (AnimationSet) null);
-                customUnitConfig.f31fw = iniFile.getBoolean("ai", "disableUse", (Boolean) false).booleanValue();
-                customUnitConfig.f34fz = iniFile.getFloat("ai", "buildPriority", Float.valueOf(0.05f)).floatValue();
-                customUnitConfig.f35fA = iniFile.getLogicBooleanUnit("ai", "recommendedInEachBaseNum", (Integer) 0).intValue();
-                customUnitConfig.f36fB = iniFile.getFloat("ai", "recommendedInEachBasePriorityIfUnmet", Float.valueOf(0.5f)).floatValue();
-                customUnitConfig.f33fy = iniFile.getLogicBooleanUnit("ai", "maxEachBase", Integer.valueOf(Utility.max(2, customUnitConfig.f35fA))).intValue();
-                customUnitConfig.f32fx = iniFile.getLogicBooleanUnit("ai", "maxGlobal", (Integer) (-1)).intValue();
-                if (customUnitConfig.f33fy < customUnitConfig.f35fA) {
+                customUnitConfig.aiTags = iniFile.getAnimationSet(customUnitConfig, "ai", "aiTags", (AnimationSet) null);
+                customUnitConfig.disableUse = iniFile.getBoolean("ai", "disableUse", (Boolean) false).booleanValue();
+                customUnitConfig.buildPriority = iniFile.getFloat("ai", "buildPriority", Float.valueOf(0.05f)).floatValue();
+                customUnitConfig.recommendedInEachBaseNum = iniFile.getLogicBooleanUnit("ai", "recommendedInEachBaseNum", (Integer) 0).intValue();
+                customUnitConfig.recommendedInEachBasePriorityIfUnmet = iniFile.getFloat("ai", "recommendedInEachBasePriorityIfUnmet", Float.valueOf(0.5f)).floatValue();
+                customUnitConfig.maxEachBase = iniFile.getLogicBooleanUnit("ai", "maxEachBase", Integer.valueOf(Utility.max(2, customUnitConfig.recommendedInEachBaseNum))).intValue();
+                customUnitConfig.maxGlobal = iniFile.getLogicBooleanUnit("ai", "maxGlobal", (Integer) (-1)).intValue();
+                if (customUnitConfig.maxEachBase < customUnitConfig.recommendedInEachBaseNum) {
                     throw new RuntimeException("[ai]recommendedInEachBaseNum is smaller than maxEachBase");
                 }
                 if (!customUnitConfig.isBuildingUnit) {
@@ -2387,14 +2344,14 @@ public class CustomUnitConfigParser {
                         throw new RuntimeException("[ai]recommendedInEachBasePriorityIfUnmet currently only applies to buildings");
                     }
                 }
-                customUnitConfig.f39fE = iniFile.getLogicBooleanUnit("ai", "whenUsingAsHarvester_recommendedInEachBase", (Integer) (-1)).intValue();
-                customUnitConfig.f40fF = iniFile.getLogicBooleanUnit("ai", "whenUsingAsHarvester_recommendedGlobal", (Integer) (-1)).intValue();
-                customUnitConfig.f41fG = iniFile.getBoolean("ai", "whenUsingAsHarvester_includeOtherHarvesterCounts", (Boolean) false).booleanValue();
-                customUnitConfig.f42fH = iniFile.getAnimationSet(customUnitConfig, "ai", "onlyUseAsHarvester_ifBaseHasUnitTagged", (AnimationSet) null);
-                customUnitConfig.f37fC = iniFile.getFloat("ai", "nonInBaseExtraPriority", Float.valueOf(0.04f)).floatValue();
-                customUnitConfig.f37fC = iniFile.getFloat("ai", "noneInBaseExtraPriority", Float.valueOf(customUnitConfig.f37fC)).floatValue();
-                customUnitConfig.f38fD = iniFile.getFloat("ai", "nonGlobalExtraPriority", Float.valueOf(0.0f)).floatValue();
-                customUnitConfig.f38fD = iniFile.getFloat("ai", "noneGlobalExtraPriority", Float.valueOf(customUnitConfig.f38fD)).floatValue();
+                customUnitConfig.whenUsingAsHarvester_recommendedInEachBase = iniFile.getLogicBooleanUnit("ai", "whenUsingAsHarvester_recommendedInEachBase", (Integer) (-1)).intValue();
+                customUnitConfig.whenUsingAsHarvester_recommendedGlobal = iniFile.getLogicBooleanUnit("ai", "whenUsingAsHarvester_recommendedGlobal", (Integer) (-1)).intValue();
+                customUnitConfig.whenUsingAsHarvester_includeOtherHarvesterCounts = iniFile.getBoolean("ai", "whenUsingAsHarvester_includeOtherHarvesterCounts", (Boolean) false).booleanValue();
+                customUnitConfig.onlyUseAsHarvester_ifBaseHasUnitTagged = iniFile.getAnimationSet(customUnitConfig, "ai", "onlyUseAsHarvester_ifBaseHasUnitTagged", (AnimationSet) null);
+                customUnitConfig.nonInBaseExtraPriority = iniFile.getFloat("ai", "nonInBaseExtraPriority", Float.valueOf(0.04f)).floatValue();
+                customUnitConfig.nonInBaseExtraPriority = iniFile.getFloat("ai", "noneInBaseExtraPriority", Float.valueOf(customUnitConfig.nonInBaseExtraPriority)).floatValue();
+                customUnitConfig.nonGlobalExtraPriority = iniFile.getFloat("ai", "nonGlobalExtraPriority", Float.valueOf(0.0f)).floatValue();
+                customUnitConfig.nonGlobalExtraPriority = iniFile.getFloat("ai", "noneGlobalExtraPriority", Float.valueOf(customUnitConfig.nonGlobalExtraPriority)).floatValue();
                 customUnitConfig.f43fI = iniFile.getString("ai", "upgradedFrom", (String) null);
                 Float f8 = iniFile.getFloat("ai", "ai_upgradePriority", (Float) null);
                 if (f8 != null && f8.floatValue() != -1.0f) {
@@ -2404,34 +2361,34 @@ public class CustomUnitConfigParser {
                         throw new RuntimeException("[ai]ai_upgradePriority: " + customUnitConfig.f45fK + " must be between 0-1 or -1 for default");
                     }
                 }
-                if (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicAndTags) {
+                if (customUnitConfig.canAttack) {
                     for (int i9 = 0; i9 < customUnitConfig.turrets.length; i9++) {
                         TurretConfig turretConfig7 = customUnitConfig.turrets[i9];
-                        if (turretConfig7.B && turretConfig7.linkedTurret == null && customUnitConfig.isBuilderNonAssist) {
-                            if (turretConfig7.m > 140.0f && (customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicOrTags == -1 || customUnitConfig.turrets[customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicOrTags].m < turretConfig7.m)) {
-                                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicOrTags = i9;
+                        if (turretConfig7.B && turretConfig7.linkedTurret == null && customUnitConfig.showShotDelayBar) {
+                            if (turretConfig7.m > 140.0f && (customUnitConfig.currentTurrentIndex == -1 || customUnitConfig.turrets[customUnitConfig.currentTurrentIndex].m < turretConfig7.m)) {
+                                customUnitConfig.currentTurrentIndex = i9;
                             }
                             if (turretConfig7.n > 80.0f) {
-                                customUnitConfig.canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicAndTags = i9;
+                                customUnitConfig.int3 = i9;
                             }
                         }
                     }
                 }
-                if (customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic == -2) {
+                if (customUnitConfig.drawLayer == -2) {
                     if (customUnitConfig.movementType == UnitMovementType.AIR) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 5;
+                        customUnitConfig.drawLayer = 5;
                     } else if (customUnitConfig.j()) {
-                        if (customUnitConfig.disableCustomShields != null) {
-                            customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 3;
+                        if (customUnitConfig.image_back != null) {
+                            customUnitConfig.drawLayer = 3;
                         } else {
-                            customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 2;
+                            customUnitConfig.drawLayer = 2;
                         }
-                    } else if (customUnitConfig.canBeBuiltByOrTagsAndLogicAndTagsOrLogic.targetHeight < -2.0f) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 1;
-                    } else if (customUnitConfig.canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags > 0) {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 3;
+                    } else if (customUnitConfig.unitStats.targetHeight < -2.0f) {
+                        customUnitConfig.drawLayer = 1;
+                    } else if (customUnitConfig.maxTransportingUnits > 0) {
+                        customUnitConfig.drawLayer = 3;
                     } else {
-                        customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic = 2;
+                        customUnitConfig.drawLayer = 2;
                     }
                 }
                 if (customUnitConfig.autoTriggerConditions.size() > 0) {
@@ -2475,8 +2432,8 @@ public class CustomUnitConfigParser {
                     }
                     String str21 = "Repeated key " + configKeyValue;
                     customUnitConfig.logWarningToMod(str21);
-                    if (customUnitConfig.shadowOffsetX >= 1) {
-                        GameEngine.isInSpace("Converting warning to error (meta.strictLevel=" + customUnitConfig.shadowOffsetX + ")");
+                    if (customUnitConfig.strictLevel >= 1) {
+                        GameEngine.isInSpace("Converting warning to error (meta.strictLevel=" + customUnitConfig.strictLevel + ")");
                         throw new ConfigParseException(str21);
                     }
                 }
@@ -2484,8 +2441,8 @@ public class CustomUnitConfigParser {
                 while (it8.hasNext()) {
                     String str22 = "Skipping line, unexpected format: '" + ((String) it8.next()) + "'";
                     customUnitConfig.logWarningToMod(str22);
-                    if (customUnitConfig.shadowOffsetX >= 1) {
-                        GameEngine.isInSpace("Converting warning to error (meta.strictLevel=" + customUnitConfig.shadowOffsetX + ")");
+                    if (customUnitConfig.strictLevel >= 1) {
+                        GameEngine.isInSpace("Converting warning to error (meta.strictLevel=" + customUnitConfig.strictLevel + ")");
                         throw new ConfigParseException(str22);
                     }
                 }
@@ -2830,7 +2787,7 @@ public class CustomUnitConfigParser {
             }
             customActionDef.iconUnitType2 = customUnitConfig.reloadAllCustomUnits(iniFile.getString(str, str2 + "ai_considerSameAsBuilding", (String) null), str2 + "ai_considerSameAsBuilding", str);
             customActionDef.condition10 = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isGuiBlinking", (LogicBoolean) null);
-            customActionDef.texture = cacheTexture(customUnitConfig.generation_free_in_sandbox, iniFile.getString(str, str2 + "iconImage", "NONE"), customUnitConfig.turretMultiTargeting, customUnitConfig, str, str2 + "iconImage");
+            customActionDef.texture = cacheTexture(customUnitConfig.generation_free_in_sandbox, iniFile.getString(str, str2 + "iconImage", "NONE"), customUnitConfig.imageSmoothing, customUnitConfig, str, str2 + "iconImage");
             customActionDef.condition9 = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "iconExtraIsVisible", (LogicBoolean) null);
             if (customActionDef.condition9 == LogicBoolean.trueBoolean) {
                 customActionDef.condition9 = null;
@@ -3383,7 +3340,7 @@ public class CustomUnitConfigParser {
     }
 
     public static void b(CustomUnitConfig customUnitConfig) {
-        LegConfig[] legConfigArr = customUnitConfig.energyDisplayName;
+        LegConfig[] legConfigArr = customUnitConfig.legConfig;
         for (LegConfig legConfig : legConfigArr) {
             float f = -1.0f;
             LegConfig legConfig2 = null;

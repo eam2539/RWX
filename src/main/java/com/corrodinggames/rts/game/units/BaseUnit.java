@@ -1,12 +1,6 @@
 package com.corrodinggames.rts.game.units;
 
-import android.graphics.Color;
-import android.graphics.LightingColorFilter;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.PointF;
-import android.graphics.Rect;
-import android.graphics.RectF;
+import android.graphics.*;
 import com.corrodinggames.rts.game.PlayerTeam;
 import com.corrodinggames.rts.game.Projectile;
 import com.corrodinggames.rts.game.map.MapLoadException;
@@ -34,26 +28,15 @@ import com.corrodinggames.rts.game.units.sea.WaterUnit;
 import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.SizedObject;
 import com.corrodinggames.rts.gameFramework.Utility;
-import com.corrodinggames.rts.gameFramework.effects.BuildPreview;
-import com.corrodinggames.rts.gameFramework.effects.Effect;
-import com.corrodinggames.rts.gameFramework.effects.EffectEmitter;
-import com.corrodinggames.rts.gameFramework.effects.EffectQuality;
-import com.corrodinggames.rts.gameFramework.effects.EffectType;
+import com.corrodinggames.rts.gameFramework.effects.*;
 import com.corrodinggames.rts.gameFramework.graphics.GamePaint;
 import com.corrodinggames.rts.gameFramework.graphics.Texture;
 import com.corrodinggames.rts.gameFramework.network.GameInputStream;
 import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
-import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
-import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
-import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
-import com.corrodinggames.rts.gameFramework.utility.TransactionalArrayList;
-import com.corrodinggames.rts.gameFramework.utility.UnitList;
+import com.corrodinggames.rts.gameFramework.utility.*;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.am */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/am.class */
@@ -829,7 +812,7 @@ public abstract class BaseUnit extends SizedObject {
             }
             baseUnit = (BaseUnit) bG.get(CustomUnitConfig.instance);
             if (baseUnit == null) {
-                GameEngine.isInSpace("name: " + CustomUnitConfig.instance.onNewMapSpawn);
+                GameEngine.isInSpace("name: " + CustomUnitConfig.instance.name);
                 GameEngine.isInSpace("contains:" + bG.containsKey(CustomUnitConfig.instance));
                 Iterator it = bG.keySet().iterator();
                 while (it.hasNext()) {

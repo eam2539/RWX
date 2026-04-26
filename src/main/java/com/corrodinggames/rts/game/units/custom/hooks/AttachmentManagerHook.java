@@ -110,7 +110,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
         attachmentSlotDefinition.M = iniFile.getBoolean(str, "canAttack", Boolean.valueOf(attachmentSlotDefinition.M)).booleanValue();
         attachmentSlotDefinition.O = iniFile.getBoolean(str, "keepWaypointsNeedingMovement", Boolean.valueOf(attachmentSlotDefinition.O)).booleanValue();
         if (attachmentSlotDefinition.D) {
-            customUnitConfig.showTransportBar = true;
+            customUnitConfig.attachmentBool = true;
         }
     }
 
@@ -128,7 +128,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
         if (fastArrayList.size == 0) {
             return;
         }
-        if (customUnitConfig.showTransportBar) {
+        if (customUnitConfig.attachmentBool) {
             Object[] objArrA = fastArrayList.a();
             for (int i = 0; i < fastArrayList.size; i++) {
                 AttachmentSlotDefinition attachmentSlotDefinition = (AttachmentSlotDefinition) objArrA[i];
@@ -193,7 +193,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                         if (orderableUnit.syncType <= customUnit.syncType) {
                             int i3 = 0;
                             if (orderableUnit instanceof CustomUnit) {
-                                i3 = ((CustomUnit) orderableUnit).unitConfig.canBeBuiltByOrTagsAndLogicOrTagsAndLogic;
+                                i3 = ((CustomUnit) orderableUnit).unitConfig.drawLayer;
                             }
                             orderableUnit.syncType = customUnit.syncType;
                             orderableUnit.value2 = customUnit.value2 + 1 + i3;

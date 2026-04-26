@@ -16,12 +16,7 @@ import com.corrodinggames.rts.game.units.custom.condition.ResourceConditionCheck
 import com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope;
 import com.corrodinggames.rts.game.units.custom.resources.Resource;
 import com.corrodinggames.rts.game.units.custom.resources.StoredResources;
-import com.corrodinggames.rts.gameFramework.Command;
-import com.corrodinggames.rts.gameFramework.GameEngine;
-import com.corrodinggames.rts.gameFramework.PerformanceProfiler;
-import com.corrodinggames.rts.gameFramework.ProfilerSection;
-import com.corrodinggames.rts.gameFramework.Serializable;
-import com.corrodinggames.rts.gameFramework.Utility;
+import com.corrodinggames.rts.gameFramework.*;
 import com.corrodinggames.rts.gameFramework.graphics.GamePaint;
 import com.corrodinggames.rts.gameFramework.graphics.TeamColorTexture;
 import com.corrodinggames.rts.gameFramework.graphics.Texture;
@@ -32,6 +27,7 @@ import com.corrodinggames.rts.gameFramework.network.NetworkEngine;
 import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1678,7 +1674,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                         if (z6 && !baseUnit2.isDestroyed && baseUnit2.getUnitVersion()) {
                             UnitType unitTypeR = baseUnit2.r();
                             String str = baseUnit2.getUnitShortName() + " Warning: This unit got ignored in defeated check and now being removed";
-                            if ((unitTypeR instanceof CustomUnitConfig) && ((CustomUnitConfig) unitTypeR).transportSwitchToSlots) {
+                            if ((unitTypeR instanceof CustomUnitConfig) && ((CustomUnitConfig) unitTypeR).canNotBeDirectlyAttacked) {
                                 str = str + " (Likely due to canNotBeDirectlyAttacked:true)";
                             }
                             NetworkEngine.a((String) null, str);

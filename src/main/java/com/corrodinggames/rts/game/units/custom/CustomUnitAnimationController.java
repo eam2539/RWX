@@ -259,10 +259,10 @@ public final class CustomUnitAnimationController {
                     if (customUnitAnimationType == CustomUnitAnimationType.scale) {
                         fB = 1.0f;
                     } else if (customUnitAnimationType == CustomUnitAnimationType.frame) {
-                        fB = this.unitInstance.unitConfig.lockTurretWithBody;
+                        fB = this.unitInstance.unitConfig.default_frame;
                     } else if (customUnitAnimationType == CustomUnitAnimationType.legAlpha) {
                         fB = 1.0f;
-                        LegConfig[] legConfigArr = this.unitInstance.unitConfig.energyDisplayName;
+                        LegConfig[] legConfigArr = this.unitInstance.unitConfig.legConfig;
                         if (legConfigArr != null && customUnitAnimationSet.animationId < legConfigArr.length) {
                             fB = legConfigArr[customUnitAnimationSet.animationId].r;
                         }

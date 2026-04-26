@@ -30,7 +30,7 @@ public class SteamGameServerAPI {
 
     static native long getSteamGameServerHTTPPointer();
 
-    public static boolean init(int i, short s, short s2, short s3, ServerMode serverMode, String str) {
+    public static boolean init(int i, short s, short s2, short s3, ServerMode serverMode, String str) throws SteamException {
         return init(null, i, s, s2, s3, serverMode, str);
     }
 

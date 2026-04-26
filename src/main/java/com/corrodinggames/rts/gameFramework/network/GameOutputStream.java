@@ -14,11 +14,8 @@ import com.corrodinggames.rts.gameFramework.GameObject;
 import com.corrodinggames.rts.gameFramework.file.FileHelper;
 import com.corrodinggames.rts.gameFramework.utility.AssetInputStream;
 import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+
+import java.io.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -259,7 +256,7 @@ public class GameOutputStream {
             this.currentDataOutput.writeInt(-1);
         } else if (unitType instanceof CustomUnitConfig) {
             this.currentDataOutput.writeInt(-2);
-            writeStringUTF(((CustomUnitConfig) unitType).onNewMapSpawn);
+            writeStringUTF(((CustomUnitConfig) unitType).name);
         } else {
             this.currentDataOutput.writeInt(((UnitTypeEnum) unitType).ordinal());
         }

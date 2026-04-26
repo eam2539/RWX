@@ -207,10 +207,10 @@ public class LegConfig {
             legConfig.E = true;
         }
         if (!legConfig.E && !legConfig.l && !legConfig.P) {
-            if (customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogic < 30) {
+            if (customUnitConfig.radius < 30) {
                 legConfig.F = false;
             }
-            if (customUnitConfig.canBeBuiltByAndTagsOrLogicAndTagsAndLogic < 20) {
+            if (customUnitConfig.radius < 20) {
                 legConfig.G = false;
             }
         }

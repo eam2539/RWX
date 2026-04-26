@@ -21,10 +21,8 @@ English, [简体中文](README_zh.md)
 - [ ] Reconstruct project structure
     - [x] Desktop build
     - [ ] Android build
-- [ ] Java/Kotlin modding
+- [ ] JVM modding system
 - [ ] P2P-based multiplayer system
-- [ ] Connected Tiled Map
-- [ ] Map generator based on Wave Function Collapse algorithm
 - [ ] Co-op mode support
 - [ ] Reinforcement learning AI support
 
@@ -43,7 +41,7 @@ English, [简体中文](README_zh.md)
 
 ### rocketConnector Native Library
 
-The rocketConnector native library requires libRocket. Due to license restrictions, libRocket cannot be included in this repository.
+The rocketConnector native library requires libRocket.
 
 **1. Clone libRocket:**
 
@@ -53,19 +51,30 @@ git clone https://github.com/libRocket/libRocket.git
 
 **2. Build libRocket:**
 
+Linux or macOS:
+
 ```bash
-cd libRocket/Build
+cd path/to/libRocket/Build
 cmake . -DBUILD_SHARED_LIBS=OFF
+#for linux
 cmake --build . -j$(nproc)
+#for macOS
+cmake --build . -j$(sysctl -n hw.logicalcpu)
+```
+
+Windows:
+
+```bat
+cd path\to\libRocket\Build
+cmake --build . --parallel
 ```
 
 **3. Build rocketConnector:**
 
 ```bash
-export LIBROCKET_ROOT=/path/to/libRocket   # Point to libRocket source directory
-cd native/rocketConnector
-cmake -B build -S .
-cmake --build build
+# Point to libRocket source directory
+export LIBROCKET_ROOT=/path/to/libRocket   # for Windows: set LIBROCKET_ROOT=C:\path\to\libRocket 
+,/gradlew buildRocketConnectorNative # for Windows: gradlew.bat buildRocketConnectorNative
 ```
 
 ## Disclaimer
