@@ -1723,7 +1723,7 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	FIELD bt unitTarget1 Lcom/corrodinggames/rts/game/units/am;
 	FIELD bT isAttacking Z
 	FIELD bu unitTarget2 Lcom/corrodinggames/rts/game/units/am;
-	FIELD bU attackCooldown I
+	FIELD bU collisionGroup I
 	FIELD bv unitTarget3 Lcom/corrodinggames/rts/game/units/am;
 	FIELD bV isDestroyed Z
 	FIELD bw unitVariables Lcom/corrodinggames/rts/game/units/custom/logicBooleans/VariableScope;
@@ -1751,9 +1751,9 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	FIELD cH lastSelectedTick I
 	FIELD ci isRotating Z
 	FIELD cI isUnitBuilt Z
-	FIELD cj speed F
+	FIELD cj radius F
 	FIELD cJ unitBuildProgress F
-	FIELD ck maxSpeed F
+	FIELD ck displayRadius F
 	FIELD cK isRepairing Z
 	FIELD cl acceleration F
 	FIELD cL movementLevels [Lcom/corrodinggames/rts/game/units/ap;
@@ -2668,327 +2668,327 @@ CLASS com/corrodinggames/rts/game/units/custom/k com/corrodinggames/rts/game/uni
 	FIELD e variableScope Lcom/corrodinggames/rts/game/units/custom/logicBooleans/VariableScope;
 CLASS com/corrodinggames/rts/game/units/custom/l com/corrodinggames/rts/game/units/custom/CustomUnitConfig
 	FIELD a tempRect Landroid/graphics/Rect;
-	FIELD A isLand Z
-	FIELD aa alsoUseTurretImageForOtherSide Z
+	FIELD A showSelectionIndicator Z
+	FIELD aa imageSmoothingWhenZoomedIn Z
 	FIELD aA energyCanTransferToOtherUnits Lcom/corrodinggames/rts/gameFramework/utility/m;
-	FIELD ab turretMultiTargeting Z
-	FIELD aB showTransportBar Z
+	FIELD ab imageSmoothing Z
+	FIELD aB attachmentBool Z
 	FIELD ac baseDamage Lcom/corrodinggames/rts/game/o;
-	FIELD aC internalName Lcom/corrodinggames/rts/game/units/custom/bb;
+	FIELD aC displayText Lcom/corrodinggames/rts/game/units/custom/bb;
 	FIELD ad baseTexture Lcom/corrodinggames/rts/gameFramework/m/e;
-	FIELD aD displayName Lcom/corrodinggames/rts/game/units/custom/bb;
+	FIELD aD displayDescription Lcom/corrodinggames/rts/game/units/custom/bb;
 	FIELD ae hp Z
-	FIELD aE baseClassName Ljava/lang/String;
+	FIELD aE displayLocaleKey Ljava/lang/String;
 	FIELD af maxHp I
-	FIELD aF transportUnitsKillOnDeath Z
+	FIELD aF showInEditor Z
 	FIELD ag mass I
-	FIELD aG transportUnitsHealBy F
-	FIELD ah maxMass I
+	FIELD aG globalScale F
+	FIELD ah image_offsetX I
 	FIELD aH isBuildingUnit Z
-	FIELD ai techLevel I
-	FIELD aI isMobileUnit Z
-	FIELD aj armour F
-	FIELD aJ transportUnitsCanLoadUnitWithTags Z
-	FIELD ak armourMinDamageToKeep Z
-	FIELD aK transportUnitsUnloadRight Z
-	FIELD al disableCustomShields Lcom/corrodinggames/rts/gameFramework/m/e;
-	FIELD aL transportUnitsUnloadLeft F
-	FIELD am shield Z
-	FIELD aM transportUnitsUnloadAndGiveOrder Z
-	FIELD an maxShield Lcom/corrodinggames/rts/gameFramework/m/e;
-	FIELD aN transportSlotsNeeded Z
-	FIELD ao shieldRegen Lcom/corrodinggames/rts/gameFramework/m/e;
-	FIELD aO transportSwitchToSlots Z
+	FIELD ai image_offsetY I
+	FIELD aI ignoreInUnitCapCalculation Z
+	FIELD aj image_offsetH F
+	FIELD aJ placeOnlyOnResPool Z
+	FIELD ak bool4 Z
+	FIELD aK isUnrepairableUnit Z
+	FIELD al image_back Lcom/corrodinggames/rts/gameFramework/m/e;
+	FIELD aL extraBuildRangeWhenBuildingThis F
+	FIELD am image_back_always_use_full_image Z
+	FIELD aM isUnselectable Z
+	FIELD an image_wreak Lcom/corrodinggames/rts/gameFramework/m/e;
+	FIELD aN isUnselectableAsTarget Z
+	FIELD ao image_turret Lcom/corrodinggames/rts/gameFramework/m/e;
+	FIELD aO canNotBeDirectlyAttacked Z
 	FIELD ap shieldRegenMoving Lcom/corrodinggames/rts/gameFramework/m/e;
-	FIELD aP addResources Z
-	FIELD aq shieldDisplayOnlyDeflection Z
-	FIELD aQ isCloaked Z
-	FIELD ar startShieldAtZero [Lcom/corrodinggames/rts/gameFramework/m/e;
-	FIELD aR cloakHiddenFromAllies Z
+	FIELD aP canNotBeDamaged Z
+	FIELD aq bool3 Z
+	FIELD aQ showOnMinimap Z
+	FIELD ar textures [Lcom/corrodinggames/rts/gameFramework/m/e;
+	FIELD aR showOnMinimapToEnemies Z
 	FIELD as energy [Lcom/corrodinggames/rts/gameFramework/m/e;
 	FIELD aS deathAnimation Lcom/corrodinggames/rts/game/units/custom/h;
 	FIELD at maxEnergy [Lcom/corrodinggames/rts/gameFramework/m/e;
-	FIELD aT showStatusBar Z
-	FIELD au energyRegen Lcom/corrodinggames/rts/gameFramework/m/e;
-	FIELD aU flag_f1aU Z
-	FIELD av energyRegenWhenRecharging Z
-	FIELD aV f1aV Z
-	FIELD aw energyNeedsToRechargeToFull Lcom/corrodinggames/rts/gameFramework/m/e;
-	FIELD aW f2aW Z
-	FIELD ax energyDisplayName [Lcom/corrodinggames/rts/game/units/custom/ba;
-	FIELD aX f3aX I
+	FIELD aT canNotBeGivenOrdersByPlayer Z
+	FIELD au texture Lcom/corrodinggames/rts/gameFramework/m/e;
+	FIELD aU canRepairBuildings Z
+	FIELD av bool5 Z
+	FIELD aV canRepairUnits Z
+	FIELD aw icon_build Lcom/corrodinggames/rts/gameFramework/m/e;
+	FIELD aW autoRepair Z
+	FIELD ax legConfig [Lcom/corrodinggames/rts/game/units/custom/ba;
+	FIELD aX nanoRangeForRepair I
 	FIELD ay energyStartPercentage Z
-	FIELD aY f4aY Z
+	FIELD aY nanoRangeForRepairIsMelee Z
 	FIELD az energyCanBeRecievedFromInAnotherUnit Z
-	FIELD aZ isExperimental I
+	FIELD aZ nanoRangeForReclaim I
 	FIELD b instance Lcom/corrodinggames/rts/game/units/custom/l;
 	FIELD B isHover Z
-	FIELD ba isBuilding Z
+	FIELD ba nanoRangeForReclaimIsMelee Z
 	FIELD bA canAttackLand I
-	FIELD bb fogOfWarSightRange F
+	FIELD bb nanoRepairSpeed F
 	FIELD bB canAttackUnderwater I
-	FIELD bc fogOfWarSightRangeWhileNotBuilt F
-	FIELD bC canAttackNotTouchingWater Lcom/corrodinggames/rts/game/units/custom/bp;
-	FIELD bd useBuildingSmoke F
-	FIELD bD targetGround Z
-	FIELD be buildingToFootprintOffsetX F
+	FIELD bc nanoReclaimSpeed F
+	FIELD bC unitsSpawnedOnDeath Lcom/corrodinggames/rts/game/units/custom/bp;
+	FIELD bd resourceReclaimMultiplier F
+	FIELD bD unitsSpawnedOnDeath_setToTeamOfLastAttacker Z
+	FIELD be nanoUnbuildSpeed F
 	FIELD bE targetAir Z
-	FIELD bf buildingToFootprintOffsetY F
+	FIELD bf nanoBuildSpeed F
 	FIELD bF targetBuildings Z
 	FIELD bg isFactory Z
 	FIELD bG targetProjectiles Z
-	FIELD bh isExtractor F
+	FIELD bh selfBuildRate F
 	FIELD bH targetOwnTeam F
-	FIELD bi isTurret Z
+	FIELD bi dieOnConstruct Z
 	FIELD bI targetNeutralTeam F
-	FIELD bj isConstructionBox Z
-	FIELD bJ targetAllyTeam Z
-	FIELD bk canNotBeGivenOrdersByPlayer Z
-	FIELD bK targetEnemyTeam Z
-	FIELD bl canNotBeDirectlyAttacked Z
-	FIELD bL targetGroundOnlyLast Z
-	FIELD bm footprint I
-	FIELD bM canAttackCondition Z
-	FIELD bn displayFootprint Z
-	FIELD bN canAttackWhileGarrisoned Z
-	FIELD bo constructionPylon F
-	FIELD bO canBeAttacked Lcom/corrodinggames/rts/game/units/custom/z;
-	FIELD bp pylonRadius F
-	FIELD bP isSelectable Lcom/corrodinggames/rts/game/units/custom/z;
-	FIELD bq pylonRequiresPower I
-	FIELD bQ showOnMinimap Z
-	FIELD br pylonBuildWith Z
-	FIELD bR showOnMinimapToEnemies F
-	FIELD bs pylonBuildWithOr Z
+	FIELD bj dieOnAttack Z
+	FIELD bJ splastEffect Z
+	FIELD bk dieOnZeroEnergy Z
+	FIELD bK splastEffectReverse Z
+	FIELD bl removeOnAttack Z
+	FIELD bL internalEffect Z
+	FIELD bm fireOnDeath I
+	FIELD bM dustEffect Z
+	FIELD bn nukeOnDeath Z
+	FIELD bN dustEffectReverse Z
+	FIELD bo nukeOnDeathRange F
+	FIELD bO list1 Lcom/corrodinggames/rts/game/units/custom/z;
+	FIELD bp nukeOnDeathDamage F
+	FIELD bP list2 Lcom/corrodinggames/rts/game/units/custom/z;
+	FIELD bq numBitsOnDeath I
+	FIELD bQ movementEffectReverseFlipEffects Z
+	FIELD br nukeOnDeathDisableWhenNoNuke Z
+	FIELD bR movementEffectRate F
+	FIELD bs disableDeathOnZeroHp Z
 	FIELD bS showActionsAndWaypoints Z
-	FIELD bt unitSize Lcom/corrodinggames/rts/game/units/ab;
-	FIELD bT showOnHpHover F
-	FIELD bu softRadius Z
-	FIELD bU showInEditor Lcom/corrodinggames/rts/game/units/custom/z;
-	FIELD bv canRepair Z
-	FIELD bV stayNeutral Lcom/corrodinggames/rts/game/units/custom/z;
-	FIELD bw canGuard Lcom/corrodinggames/rts/game/units/custom/z;
-	FIELD bW createNeutral Z
-	FIELD bx canPatrol Lcom/corrodinggames/rts/game/units/custom/z;
-	FIELD bX createOnAggressiveTeam F
-	FIELD by canAttack Lcom/corrodinggames/rts/game/units/custom/z;
+	FIELD bt explodeTypeOnDeath Lcom/corrodinggames/rts/game/units/ab;
+	FIELD bT repairEffectRate F
+	FIELD bu explodeOnDeath Z
+	FIELD bU list3 Lcom/corrodinggames/rts/game/units/custom/z;
+	FIELD bv explodeOnDeathGroundCollision Z
+	FIELD bV list4 Lcom/corrodinggames/rts/game/units/custom/z;
+	FIELD bw effectOnDeathGroundCollision Lcom/corrodinggames/rts/game/units/custom/z;
+	FIELD bW bool2 Z
+	FIELD bx effectOnDeathIfUnbuilt Lcom/corrodinggames/rts/game/units/custom/z;
+	FIELD bX reclaimEffectRate F
+	FIELD by effectOnDeath Lcom/corrodinggames/rts/game/units/custom/z;
 	FIELD bY createOnNeutralTeam Lcom/corrodinggames/rts/game/units/custom/z;
-	FIELD bz canAttackFlying Lcom/corrodinggames/rts/game/units/custom/bl;
+	FIELD bz soundOnDeath Lcom/corrodinggames/rts/game/units/custom/bl;
 	FIELD bZ createOnSameTeamAsParent Lcom/corrodinggames/rts/game/units/custom/z;
 	FIELD c allConfigs Ljava/util/ArrayList;
 	FIELD C tech Landroid/graphics/Rect;
 	FIELD ca autoTriggerCooldownTime F
-	FIELD cA canBeBuiltByOrTagsAndLogicOrTags Z
+	FIELD cA allowCaptureWhenNeutralByAI Z
 	FIELD cb autoTriggerCheckRate Lcom/corrodinggames/rts/game/units/custom/s;
-	FIELD cB canBeBuiltByOrTagsAndLogicAndTags Z
+	FIELD cB whileNeutralTransportAnyTeam Z
 	FIELD cc canBeBuiltBy Z
-	FIELD cC canBeBuiltByAndTagsAndLogicOrTags Z
-	FIELD cd canBeBuiltByUnit Z
-	FIELD cD canBeBuiltByAndTagsAndLogicAndTags Z
-	FIELD ce canBeBuiltByFactory Z
-	FIELD cE canBeBuiltByOrTagsOrLogicOrTags Z
-	FIELD cf canBeBuiltByBuilding Z
-	FIELD cF canBeBuiltByOrTagsOrLogicAndTags F
-	FIELD cg canBeBuiltByAir Z
-	FIELD cG canBeBuiltByAndTagsOrLogicOrTags I
-	FIELD ch buildPrice Lcom/corrodinggames/rts/game/units/custom/d/b;
-	FIELD cH canBeBuiltByAndTagsOrLogicAndTags Lcom/corrodinggames/rts/game/units/custom/h;
-	FIELD ci generationResources Lcom/corrodinggames/rts/game/units/custom/d/b;
-	FIELD cI canBeBuiltByOrTagsAndLogicOrTagsAndLogic I
-	FIELD cj streamingPrice Lcom/corrodinggames/rts/game/units/custom/d/b;
-	FIELD cJ canBeBuiltByOrTagsAndLogicOrTagsOrLogic F
-	FIELD ck buildTimeSeconds F
-	FIELD cK canBeBuiltByOrTagsAndLogicAndTagsAndLogic F
-	FIELD cl canBeBuiltByTurret I
-	FIELD cL canBeBuiltByOrTagsAndLogicAndTagsOrLogic Lcom/corrodinggames/rts/game/units/custom/as;
-	FIELD cm canBeBuiltByExtractor Z
-	FIELD cM canBeBuiltByAndTagsAndLogicOrTagsAndLogic Z
-	FIELD cn canBeBuiltByBuilder Z
-	FIELD cN canBeBuiltByAndTagsAndLogicOrTagsOrLogic F
+	FIELD cC whileNeutralConvertToTransportedTeam Z
+	FIELD cd autoTriggerCheckWhileNotBuilt Z
+	FIELD cD convertToNeutralIfNotTransporting Z
+	FIELD ce availableInDemo Z
+	FIELD cE createOnAggressiveTeam Z
+	FIELD cf isLocked Z
+	FIELD cF resourceRate F
+	FIELD cg isLockedIfGameModeNoNuke Z
+	FIELD cG resourceMaxConcurrentReclaimingThis I
+	FIELD ch price Lcom/corrodinggames/rts/game/units/custom/d/b;
+	FIELD cH similarResourcesHaveTag Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD ci reclaimPrice Lcom/corrodinggames/rts/game/units/custom/d/b;
+	FIELD cI drawLayer I
+	FIELD cj streamingCost Lcom/corrodinggames/rts/game/units/custom/d/b;
+	FIELD cJ shadowOffsetX F
+	FIELD ck buildSpeed F
+	FIELD cK shadowOffsetY F
+	FIELD cl techLevel I
+	FIELD cL unitStats Lcom/corrodinggames/rts/game/units/custom/as;
+	FIELD cm experimental Z
+	FIELD cM startShieldAtZero Z
+	FIELD cn hasGenerationCondition Z
+	FIELD cN armourMinDamageToKeep F
 	FIELD co generationTemplate Lcom/corrodinggames/rts/game/units/custom/d/b;
-	FIELD cO canBeBuiltByAndTagsAndLogicAndTagsAndLogic Z
+	FIELD cO startEnergyAtZero Z
 	FIELD cp generationCondition Lcom/corrodinggames/rts/game/units/custom/e/f;
-	FIELD cP canBeBuiltByAndTagsAndLogicAndTagsOrLogic F
+	FIELD cP energyRegen F
 	FIELD cq generationTagTemplate Lcom/corrodinggames/rts/game/units/custom/e/f;
-	FIELD cQ canBeBuiltByOrTagsOrLogicOrTagsAndLogic F
-	FIELD cr canBeBuiltByNotTags I
-	FIELD cR canBeBuiltByOrTagsOrLogicOrTagsOrLogic Z
-	FIELD cs canBeBuiltByOrTags F
-	FIELD cS canBeBuiltByOrTagsOrLogicAndTagsAndLogic F
+	FIELD cQ energyRegenWhenRecharging F
+	FIELD cr generationDelay I
+	FIELD cR energyNeedsToRechargeToFull Z
+	FIELD cs generationRate F
+	FIELD cS energyStartingPercentage F
 	FIELD ct updateUnitMemoryWriter Lcom/corrodinggames/rts/game/units/custom/logicBooleans/VariableScope$CachedWriter;
-	FIELD cT canBeBuiltByOrTagsOrLogicAndTagsOrLogic Lcom/corrodinggames/rts/game/units/custom/bb;
+	FIELD cT energyDisplayName Lcom/corrodinggames/rts/game/units/custom/bb;
 	FIELD cu updateUnitMemoryRate F
-	FIELD cU canBeBuiltByAndTagsOrLogicOrTagsAndLogic Z
-	FIELD cv canBeBuiltByAndLogic Lcom/corrodinggames/rts/game/units/custom/d/b;
-	FIELD cV canBeBuiltByAndTagsOrLogicOrTagsOrLogic F
-	FIELD cw canBeBuiltByOrTagsAndLogic Lcom/corrodinggames/rts/game/units/custom/d/b;
-	FIELD cW canBeBuiltByAndTagsOrLogicAndTagsAndLogic I
-	FIELD cx canBeBuiltByOrTagsOrLogic Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD cX canBeBuiltByAndTagsOrLogicAndTagsOrLogic Landroid/graphics/Rect;
-	FIELD cy canBeBuiltByAndTagsAndLogic Z
-	FIELD cY canBeBuiltByOrTagsAndLogicOrTagsAndLogicOrTags Landroid/graphics/Rect;
-	FIELD cz canBeBuiltByAndTagsOrLogic Z
-	FIELD cZ canBeBuiltByOrTagsAndLogicOrTagsAndLogicAndTags Landroid/graphics/Rect;
+	FIELD cU shieldDisplayOnlyDeflection Z
+	FIELD cv borrowResourcesWhileAlive Lcom/corrodinggames/rts/game/units/custom/d/b;
+	FIELD cV shieldDeflectionDisplayRate F
+	FIELD cw borrowResourcesWhileBuilt Lcom/corrodinggames/rts/game/units/custom/d/b;
+	FIELD cW radius I
+	FIELD cx generationActive Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
+	FIELD cX footprint Landroid/graphics/Rect;
+	FIELD cy stayNeutral Z
+	FIELD cY constructionFootprint Landroid/graphics/Rect;
+	FIELD cz createNeutral Z
+	FIELD cZ displayFootprint Landroid/graphics/Rect;
 	FIELD d activeConfigs Ljava/util/ArrayList;
 	FIELD D configPath Ljava/lang/String;
 	FIELD da canBeBuiltByOrTagsAndLogicOrTagsOrLogicOrTags F
-	FIELD dA canBeBuiltByAndTagsOrLogicAndTagsAndLogicOrTags Lcom/corrodinggames/rts/game/units/custom/f;
+	FIELD dA reclaimAnimation Lcom/corrodinggames/rts/game/units/custom/f;
 	FIELD db canBeBuiltByOrTagsAndLogicOrTagsOrLogicAndTags F
-	FIELD dB canBeBuiltByAndTagsOrLogicAndTagsAndLogicAndTags Z
+	FIELD dB rotateWithDirection Z
 	FIELD dc canBeBuiltByOrTagsAndLogicAndTagsAndLogicOrTags Z
-	FIELD dC canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTags Z
-	FIELD dd canBeBuiltByOrTagsAndLogicAndTagsAndLogicAndTags I
-	FIELD dD canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTags Z
-	FIELD de canBeBuiltByOrTagsAndLogicAndTagsOrLogicOrTags F
-	FIELD dE canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogic Z
-	FIELD df canBeBuiltByOrTagsAndLogicAndTagsOrLogicAndTags I
-	FIELD dF canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogic Lcom/corrodinggames/rts/game/units/custom/bn;
-	FIELD dg canBeBuiltByAndTagsAndLogicOrTagsAndLogicOrTags I
-	FIELD dG canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogic I
-	FIELD dh canBeBuiltByAndTagsAndLogicOrTagsAndLogicAndTags I
-	FIELD dH canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogic F
-	FIELD di spawnOffsetLocalX F
-	FIELD dI canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogic Lcom/corrodinggames/rts/game/units/custom/m;
-	FIELD dj spawnOffsetLocalY F
-	FIELD dJ canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogic F
-	FIELD dk spawnAngleOffset Ljava/lang/Float;
-	FIELD dK canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogic Ljava/lang/Boolean;
-	FIELD dl spawnOffsetZ F
-	FIELD dL canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogic Z
-	FIELD dm keepOriginalZOnSpawn Z
-	FIELD dM canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogic F
-	FIELD dn spawnSideOffset Ljava/lang/Float;
-	FIELD dN canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogic F
-	FIELD dO canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogic F
-	FIELD dp canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTags Lcom/corrodinggames/rts/game/units/custom/bl;
-	FIELD dP canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogic Z
-	FIELD dq canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTags Lcom/corrodinggames/rts/game/units/custom/bl;
-	FIELD dQ canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogic Z
-	FIELD dr canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTags Lcom/corrodinggames/rts/gameFramework/utility/m;
-	FIELD dR canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogic Z
-	FIELD ds canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTags Lcom/corrodinggames/rts/game/units/custom/f;
-	FIELD dS canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogic F
-	FIELD dt canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTags Lcom/corrodinggames/rts/game/units/custom/f;
-	FIELD dT canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogic F
-	FIELD du canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTags Lcom/corrodinggames/rts/game/units/custom/f;
-	FIELD dU canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsAndLogic F
-	FIELD dv canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTags Lcom/corrodinggames/rts/game/units/custom/f;
-	FIELD dV canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTagsOrLogic F
-	FIELD dw canBeBuiltByAndTagsOrLogicOrTagsAndLogicOrTags Lcom/corrodinggames/rts/game/units/custom/f;
-	FIELD dW canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTagsAndLogic F
-	FIELD dx canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTags Lcom/corrodinggames/rts/game/units/custom/f;
-	FIELD dX canBeBuiltByAndTagsOrLogicOrTagsAndLogicAndTagsOrLogic Z
-	FIELD dy canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTags Lcom/corrodinggames/rts/game/units/custom/f;
-	FIELD dY canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTagsAndLogic Z
-	FIELD dz canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTags Lcom/corrodinggames/rts/game/units/custom/f;
-	FIELD dZ canBeBuiltByAndTagsOrLogicOrTagsOrLogicOrTagsOrLogic I
+	FIELD dC lockBodyRotationWithMainTurret Z
+	FIELD dd displayRadius I
+	FIELD dD lockShadowRotationWithMainTurret Z
+	FIELD de uiTargetRadius F
+	FIELD dE lockLegRotationWithMainTurret Z
+	FIELD df shieldRenderRadius I
+	FIELD dF defaultTurret2 Lcom/corrodinggames/rts/game/units/custom/bn;
+	FIELD dg buildingSelectionOffset I
+	FIELD dG defaultTurretRotationSpeed I
+	FIELD dh fogOfWarSightRangeWhileNotBuilt2 I
+	FIELD dH whenBeingBuiltMakeTransparentTill F
+	FIELD di exit_x F
+	FIELD dI directionConfig Lcom/corrodinggames/rts/game/units/custom/m;
+	FIELD dj exit_y F
+	FIELD dJ maxAttackRange F
+	FIELD dk exit_dirOffset Ljava/lang/Float;
+	FIELD dK showRangeUIGuide Ljava/lang/Boolean;
+	FIELD dl exit_heightOffset F
+	FIELD dL turretRotateWithBody Z
+	FIELD dm exitHeightIgnoreParent Z
+	FIELD dM shootDelay F
+	FIELD dn exit_moveAwayAmount Ljava/lang/Float;
+	FIELD dN moveAccelerationSpeed F
+	FIELD dO moveDecelerationSpeed F
+	FIELD dp soundOnMoveOrder Lcom/corrodinggames/rts/game/units/custom/bl;
+	FIELD dP ignoreMoveOrders Z
+	FIELD dq soundOnNewSelection Lcom/corrodinggames/rts/game/units/custom/bl;
+	FIELD dQ bool8 Z
+	FIELD dr animations Lcom/corrodinggames/rts/gameFramework/utility/m;
+	FIELD dR bool9 Z
+	FIELD ds movingAnimation Lcom/corrodinggames/rts/game/units/custom/f;
+	FIELD dS startingHeightOffset F
+	FIELD dt idleAnimation Lcom/corrodinggames/rts/game/units/custom/f;
+	FIELD dT targetHeightDrift F
+	FIELD du attackAnimation Lcom/corrodinggames/rts/game/units/custom/f;
+	FIELD dU heightChangeRate F
+	FIELD dv createdAnimation Lcom/corrodinggames/rts/game/units/custom/f;
+	FIELD dV fallingAcceleration F
+	FIELD dw underConstructionAnimation Lcom/corrodinggames/rts/game/units/custom/f;
+	FIELD dW fallingAccelerationDead F
+	FIELD dx underConstructionWithLinkedBuiltTimeAnimation Lcom/corrodinggames/rts/game/units/custom/f;
+	FIELD dX moveSlidingMode Z
+	FIELD dy queuedUnitsAnimation Lcom/corrodinggames/rts/game/units/custom/f;
+	FIELD dY moveIgnoringBody Z
+	FIELD dz repairAnimation Lcom/corrodinggames/rts/game/units/custom/f;
+	FIELD dZ moveSlidingDir I
 	FIELD e validUnitsForSync Ljava/util/ArrayList;
 	FIELD E generation_delay Ljava/lang/String;
-	FIELD ea canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTagsAndLogic F
-	FIELD eA canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogicOrTags Z
-	FIELD eb canBeBuiltByAndTagsOrLogicOrTagsOrLogicAndTagsOrLogic F
-	FIELD eB canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsAndLogicAndTags I
+	FIELD ea turretSize F
+	FIELD eA moveYAxisScaleInverted Z
+	FIELD eb turretTurnSpeed F
+	FIELD eB softCollisionOnAll I
 	FIELD ec attackMovementType Lcom/corrodinggames/rts/game/units/b;
-	FIELD eC canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicOrTags Z
+	FIELD eC disableAllUnitCollisions2 Z
 	FIELD ed attackMovementSpeed F
-	FIELD eD canBeBuiltByOrTagsOrLogicAndTagsAndLogicOrTagsOrLogicAndTags Z
+	FIELD eD isBio Z
 	FIELD ee attackMovementSpread F
-	FIELD eE canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicOrTags Z
-	FIELD ef canBeBuiltByAndTagsOrLogicAndTagsAndLogicAndTagsOrLogic Z
-	FIELD eF canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsAndLogicAndTags Z
-	FIELD eg canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTagsAndLogic Z
-	FIELD eG canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogicOrTags F
-	FIELD eh canBeBuiltByAndTagsOrLogicAndTagsOrLogicOrTagsOrLogic Z
-	FIELD eH canBeBuiltByOrTagsOrLogicAndTagsAndLogicAndTagsOrLogicAndTags Z
-	FIELD ei canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTagsAndLogic Z
-	FIELD eI canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogicAndTags Z
-	FIELD ej canBeBuiltByAndTagsOrLogicAndTagsOrLogicAndTagsOrLogic F
-	FIELD eJ f6eJ Z
-	FIELD ek canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogicOrTags F
-	FIELD eK canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsAndLogicOrTags Z
-	FIELD el canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsAndLogicAndTags F
-	FIELD eL f7eL Z
-	FIELD em canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicOrTags I
-	FIELD eM canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicOrTags I
-	FIELD en canBeBuiltByOrTagsOrLogicOrTagsAndLogicOrTagsOrLogicAndTags I
-	FIELD eN canBeBuiltByOrTagsOrLogicAndTagsOrLogicOrTagsOrLogicAndTags F
-	FIELD eo canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicOrTags F
-	FIELD eO canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicOrTags Z
-	FIELD ep canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsAndLogicAndTags Z
-	FIELD eP canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsAndLogicAndTags Lcom/corrodinggames/rts/game/units/custom/h;
-	FIELD eq canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogicOrTags Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD eQ canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogicOrTags Lcom/corrodinggames/rts/gameFramework/utility/m;
-	FIELD er canBeBuiltByOrTagsOrLogicOrTagsAndLogicAndTagsOrLogicAndTags Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD eR canBeBuiltByOrTagsOrLogicAndTagsOrLogicAndTagsOrLogicAndTags Z
-	FIELD es canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicOrTags Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD eS f8eS Z
-	FIELD et canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsAndLogicAndTags Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD eT f9eT Z
-	FIELD eu canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicOrTags Z
-	FIELD eU f10eU Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD ev canBeBuiltByOrTagsOrLogicOrTagsOrLogicOrTagsOrLogicAndTags Lcom/corrodinggames/rts/game/units/custom/h;
-	FIELD eV f11eV Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD ew canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicOrTags Lcom/corrodinggames/rts/game/units/custom/h;
-	FIELD eW f12eW Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD ex canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsAndLogicAndTags Z
-	FIELD eX f13eX Z
-	FIELD ey canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogicOrTags Z
-	FIELD eY f14eY F
-	FIELD ez canBeBuiltByOrTagsOrLogicOrTagsOrLogicAndTagsOrLogicAndTags F
-	FIELD eZ f15eZ I
+	FIELD eE isBug Z
+	FIELD ef disablePassiveTargeting Z
+	FIELD eF isMelee Z
+	FIELD eg stopTargetingAfterFiring Z
+	FIELD eG meleeAttackRange F
+	FIELD eh turretMultiTargeting2 Z
+	FIELD eH isPickableStartingUnit Z
+	FIELD ei joinsGroupFormations Z
+	FIELD eI startFallingWhenStartingUnit Z
+	FIELD ej moveYAxisScaling F
+	FIELD eJ hideScorchMark Z
+	FIELD ek float2 F
+	FIELD eK disableLowHpFire Z
+	FIELD el reverseSpeedPercentage F
+	FIELD eL disableLowHpSmoke Z
+	FIELD em currentTurrentIndex I
+	FIELD eM maxTransportingUnits I
+	FIELD en int3 I
+	FIELD eN transportUnitsUnloadDelayBetweenEachUnit F
+	FIELD eo turnAcceleration F
+	FIELD eO transportUnitsEachUnitAlwaysUsesSingleSlot Z
+	FIELD ep canAttack Z
+	FIELD eP transportUnitsRequireTag Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD eq canAttackFlyingUnits Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
+	FIELD eQ transportUnitsRequireMovementType Lcom/corrodinggames/rts/gameFramework/utility/m;
+	FIELD er canAttackLandUnits Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
+	FIELD eR transportUnitsBlockAirAndWaterUnits Z
+	FIELD es canAttackUnderwaterUnits Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
+	FIELD eS transportUnitsBlockOtherTransports Z
+	FIELD et canAttackNotTouchingWaterUnits Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
+	FIELD eT transportUnitsAddUnloadOption Z
+	FIELD eu bool11 Z
+	FIELD eU transportUnitsKeepBuiltUnits Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
+	FIELD ev canOnlyAttackUnitsWithTags Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD eV transportUnitsKillOnDeath Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
+	FIELD ew canOnlyAttackUnitsWithoutTags Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD eW transportUnitsKeepWaypoints Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
+	FIELD ex bool12 Z
+	FIELD eX transportUnitsOnTeamChangeKeepCurrentTeam Z
+	FIELD ey isFixedFiring Z
+	FIELD eY transportUnitsHealBy F
+	FIELD ez aimOffsetSpread F
+	FIELD eZ transportSlotsNeeded I
 	FIELD f unitTypeOverrides Ljava/util/HashMap;
 	FIELD F generation_free_in_sandbox Ljava/lang/String;
 	FIELD fa logic_notOverLiquidAndNotMoving Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD fA f35fA I
+	FIELD fA recommendedInEachBaseNum I
 	FIELD fb logic_notOverLiquid Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD fB f36fB F
-	FIELD fc f16fc Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD fC f37fC F
+	FIELD fB recommendedInEachBasePriorityIfUnmet F
+	FIELD fc transportUnitsCanUnloadUnits Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
+	FIELD fC nonInBaseExtraPriority F
 	FIELD fd f17fd Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
-	FIELD fD f38fD F
+	FIELD fD nonGlobalExtraPriority F
 	FIELD fe f18fe Z
-	FIELD fE f39fE I
+	FIELD fE whenUsingAsHarvester_recommendedInEachBase I
 	FIELD ff customUnitMetadata Lcom/corrodinggames/rts/game/units/custom/be;
-	FIELD fF f40fF I
+	FIELD fF whenUsingAsHarvester_recommendedGlobal I
 	FIELD fg movementType Lcom/corrodinggames/rts/game/units/ao;
-	FIELD fG f41fG Z
+	FIELD fG whenUsingAsHarvester_includeOtherHarvesterCounts Z
 	FIELD fh f19fh Lcom/corrodinggames/rts/game/units/ao;
-	FIELD fH f42fH Lcom/corrodinggames/rts/game/units/custom/h;
-	FIELD fi f20fi Z
+	FIELD fH onlyUseAsHarvester_ifBaseHasUnitTagged Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD fi slowDeathFall Z
 	FIELD fI f43fI Ljava/lang/String;
-	FIELD fj f21fj Z
+	FIELD fj slowDeathFallSmoke Z
 	FIELD fJ f44fJ Z
-	FIELD fk f22fk Z
+	FIELD fk canReclaimResources Z
 	FIELD fK f45fK F
-	FIELD fl f23fl Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD fl canReclaimResourcesOnlyWithTags Lcom/corrodinggames/rts/game/units/custom/h;
 	FIELD fL relatedUnits Lcom/corrodinggames/rts/gameFramework/utility/m;
-	FIELD fm f24fm I
-	FIELD fM f46fM Z
-	FIELD fn f25fn Lcom/corrodinggames/rts/game/units/custom/h;
-	FIELD fN f47fN Z
-	FIELD fo f26fo Lcom/corrodinggames/rts/game/units/custom/h;
-	FIELD fO f48fO Lcom/corrodinggames/rts/game/units/custom/h;
-	FIELD fp isFlying Z
+	FIELD fm canReclaimResourcesNextSearchRange I
+	FIELD fM lowPriorityTargetForOtherUnits Z
+	FIELD fn canReclaimUnitsOnlyWithTags Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD fN notPassivelyTargetedByOtherUnits Z
+	FIELD fo canRepairUnitsOnlyWithTags Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD fO showActionsWithMixedSelectionIfOtherUnitsHaveTag Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD fp isBuilder Z
 	FIELD fP f49fP Z
-	FIELD fq hasTransportCapability Z
+	FIELD fq useAsBuilder Z
 	FIELD fQ turrets [Lcom/corrodinggames/rts/game/units/custom/bn;
-	FIELD fr isUnselectable Z
+	FIELD fr useAsHarvester Z
 	FIELD fR f50fR [Lcom/corrodinggames/rts/game/units/custom/bh;
-	FIELD fs f27fs Z
+	FIELD fs useAsAttacker Z
 	FIELD fS projectileConfigs Ljava/util/ArrayList;
-	FIELD ft f28ft Z
+	FIELD ft useAsTransport Z
 	FIELD fT projectileTemplates Ljava/util/ArrayList;
 	FIELD fu f29fu Z
 	FIELD fU f51fU Z
-	FIELD fv f30fv Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD fv aiTags Lcom/corrodinggames/rts/game/units/custom/h;
 	FIELD fV defaultTurret Lcom/corrodinggames/rts/game/units/custom/bn;
-	FIELD fw f31fw Z
+	FIELD fw disableUse Z
 	FIELD fW autoTriggerConditions Lcom/corrodinggames/rts/gameFramework/utility/m;
-	FIELD fx f32fx I
+	FIELD fx maxGlobal I
 	FIELD fX f52fX Z
-	FIELD fy f33fy I
+	FIELD fy maxEachBase I
 	FIELD fY autoTriggerConditionsEveryFrame [Lcom/corrodinggames/rts/game/units/custom/r;
-	FIELD fz f34fz F
+	FIELD fz buildPriority F
 	FIELD fZ autoTriggerConditionsEvery4Frames [Lcom/corrodinggames/rts/game/units/custom/r;
 	FIELD g configsById Ljava/util/ArrayList;
 	FIELD G generation_repeat Z
@@ -3023,32 +3023,32 @@ CLASS com/corrodinggames/rts/game/units/custom/l com/corrodinggames/rts/game/uni
 	FIELD l animationChannels Lcom/corrodinggames/rts/gameFramework/utility/m;
 	FIELD L onNewMapSpawn_ifUnitIsPresent Ljava/lang/String;
 	FIELD m customTurrets Lcom/corrodinggames/rts/gameFramework/utility/m;
-	FIELD M onNewMapSpawn Ljava/lang/String;
+	FIELD M name Ljava/lang/String;
 	FIELD n customLegs Lcom/corrodinggames/rts/gameFramework/utility/m;
 	FIELD N autoTriggerAction Lcom/corrodinggames/rts/gameFramework/utility/m;
 	FIELD o customArms Lcom/corrodinggames/rts/gameFramework/utility/m;
 	FIELD O image_shield Lcom/corrodinggames/rts/game/units/custom/h;
 	FIELD p unitTypeReferences Lcom/corrodinggames/rts/gameFramework/utility/m;
-	FIELD P image_turret Lcom/corrodinggames/rts/game/units/custom/h;
+	FIELD P tag2 Lcom/corrodinggames/rts/game/units/custom/h;
 	FIELD q customAttachments Lcom/corrodinggames/rts/gameFramework/utility/m;
 	FIELD Q image_shadow Ljava/lang/String;
 	FIELD r variableMapping Lcom/corrodinggames/rts/game/units/custom/logicBooleans/VariableScope$VariableMapping;
-	FIELD R shadowOffsetX I
+	FIELD R strictLevel I
 	FIELD s teamColorsOnTurret Z
-	FIELD S shadowOffsetY I
-	FIELD t isBio Z
-	FIELD T teamColors Lcom/corrodinggames/rts/game/units/custom/ad;
-	FIELD u isBug Z
-	FIELD U turretSize I
-	FIELD v isBuilder Z
-	FIELD V turretTurnSpeed I
-	FIELD w isBuilderNonAssist Z
-	FIELD W turretRotateWithBody I
-	FIELD x canBuildOnWater Z
-	FIELD y canBuildOnGround Z
-	FIELD Y lockTurretWithBody I
-	FIELD z isAir Z
-	FIELD Z lockTurretWithBody_ignoreBaseTurret Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
+	FIELD S number I
+	FIELD t showHealthBar Z
+	FIELD T onNewMapSpawn Lcom/corrodinggames/rts/game/units/custom/ad;
+	FIELD u showHealthBarChanges Z
+	FIELD U total_frames I
+	FIELD v showEnergyBar Z
+	FIELD V int2 I
+	FIELD w showShotDelayBar Z
+	FIELD W frame_width I
+	FIELD x showTransportBar Z
+	FIELD y showShieldBar Z
+	FIELD Y default_frame I
+	FIELD z showQueueBar Z
+	FIELD Z isVisible Lcom/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean;
 	METHOD a findActionById (Lcom/corrodinggames/rts/game/units/a/c;)Lcom/corrodinggames/rts/game/units/a/s;
 	METHOD a validateUnitCompatibility (Lcom/corrodinggames/rts/game/units/custom/ab;Ljava/util/HashMap;)V
 		ARG 0 report
@@ -3578,7 +3578,7 @@ CLASS com/corrodinggames/rts/game/units/u com/corrodinggames/rts/game/units/FogR
 CLASS com/corrodinggames/rts/game/units/v com/corrodinggames/rts/game/units/NaturalUnit
 CLASS com/corrodinggames/rts/game/units/w com/corrodinggames/rts/game/units/MovableUnit
 CLASS com/corrodinggames/rts/game/units/x com/corrodinggames/rts/game/units/DummyUnit
-CLASS com/corrodinggames/rts/game/units/y com/corrodinggames/rts/game/units/UnitEntity
+CLASS com/corrodinggames/rts/game/units/y com/corrodinggames/rts/game/units/OrderableUnit
 	FIELD a blockedRecoveryMisses I
 	FIELD A cachedSelectedPaintColor I
 	FIELD ad transportedBy Lcom/corrodinggames/rts/game/units/y;
@@ -3625,7 +3625,7 @@ CLASS com/corrodinggames/rts/game/units/y com/corrodinggames/rts/game/units/Unit
 	FIELD p lastPathTargetY F
 	FIELD P attackMode Lcom/corrodinggames/rts/game/units/a;
 	FIELD q pathRetryCount B
-	FIELD Q attackCooldown I
+	FIELD Q lastAttackTick I
 	FIELD r repathDistanceThreshold I
 	FIELD R attackTarget Lcom/corrodinggames/rts/game/units/am;
 	FIELD S turretRotation F
@@ -3634,7 +3634,7 @@ CLASS com/corrodinggames/rts/game/units/y com/corrodinggames/rts/game/units/Unit
 	FIELD u isVisible Z
 	FIELD U turretTurnSpeed F
 	FIELD V wayPointTimer F
-	FIELD W radius F
+	FIELD W pathRetryTimer F
 	FIELD x cachedBasePaint Lcom/corrodinggames/rts/gameFramework/m/ag;
 	FIELD X health F
 	FIELD y cachedBasePaintColor I
@@ -5762,25 +5762,25 @@ CLASS com/corrodinggames/rts/gameFramework/j/x com/corrodinggames/rts/gameFramew
 	FIELD b UNKNOWN_ERROR Lcom/corrodinggames/rts/gameFramework/j/x;
 CLASS com/corrodinggames/rts/gameFramework/j/y com/corrodinggames/rts/gameFramework/network/CreateServerRunnable
 CLASS com/corrodinggames/rts/gameFramework/j/z com/corrodinggames/rts/gameFramework/network/RemoveServerRunnable
-CLASS com/corrodinggames/rts/gameFramework/k com/corrodinggames/rts/gameFramework/path
-CLASS com/corrodinggames/rts/gameFramework/k/a com/corrodinggames/rts/gameFramework/pathfinding/DirectAccessPathNodeArrayList
+CLASS com/corrodinggames/rts/gameFramework/k com/corrodinggames/rts/gameFramework/pathfinding
+CLASS com/corrodinggames/rts/gameFramework/k/a com/corrodinggames/rts/gameFramework/pathfindingfinding/DirectAccessPathNodeArrayList
 	CLASS 1 AnonymousClass1
-CLASS com/corrodinggames/rts/gameFramework/k/b com/corrodinggames/rts/gameFramework/pathfinding/DirectAccessPathNodeArrayListIterator
-CLASS com/corrodinggames/rts/gameFramework/k/c com/corrodinggames/rts/gameFramework/pathfinding/PathPositionProvider
-CLASS com/corrodinggames/rts/gameFramework/k/d com/corrodinggames/rts/gameFramework/pathfinding/FastNodeQueue
-CLASS com/corrodinggames/rts/gameFramework/k/e com/corrodinggames/rts/gameFramework/pathfinding/FastNodeQueue2
-CLASS com/corrodinggames/rts/gameFramework/k/f com/corrodinggames/rts/gameFramework/pathfinding/DynamicUnitPath
-CLASS com/corrodinggames/rts/gameFramework/k/g com/corrodinggames/rts/gameFramework/pathfinding/FlowField
-CLASS com/corrodinggames/rts/gameFramework/k/h com/corrodinggames/rts/gameFramework/pathfinding/FlowFieldPathPositionProvider
-CLASS com/corrodinggames/rts/gameFramework/k/i com/corrodinggames/rts/gameFramework/pathfinding/PathCostMap
-CLASS com/corrodinggames/rts/gameFramework/k/j com/corrodinggames/rts/gameFramework/pathfinding/NodeQueue
-CLASS com/corrodinggames/rts/gameFramework/k/k com/corrodinggames/rts/gameFramework/pathfinding/Path
-CLASS com/corrodinggames/rts/gameFramework/k/l com/corrodinggames/rts/gameFramework/path/PathEngine
+CLASS com/corrodinggames/rts/gameFramework/k/b com/corrodinggames/rts/gameFramework/pathfindingfinding/DirectAccessPathNodeArrayListIterator
+CLASS com/corrodinggames/rts/gameFramework/k/c com/corrodinggames/rts/gameFramework/pathfindingfinding/PathPositionProvider
+CLASS com/corrodinggames/rts/gameFramework/k/d com/corrodinggames/rts/gameFramework/pathfindingfinding/FastNodeQueue
+CLASS com/corrodinggames/rts/gameFramework/k/e com/corrodinggames/rts/gameFramework/pathfindingfinding/FastNodeQueue2
+CLASS com/corrodinggames/rts/gameFramework/k/f com/corrodinggames/rts/gameFramework/pathfindingfinding/DynamicUnitPath
+CLASS com/corrodinggames/rts/gameFramework/k/g com/corrodinggames/rts/gameFramework/pathfindingfinding/FlowField
+CLASS com/corrodinggames/rts/gameFramework/k/h com/corrodinggames/rts/gameFramework/pathfindingfinding/FlowFieldPathPositionProvider
+CLASS com/corrodinggames/rts/gameFramework/k/i com/corrodinggames/rts/gameFramework/pathfindingfinding/PathCostMap
+CLASS com/corrodinggames/rts/gameFramework/k/j com/corrodinggames/rts/gameFramework/pathfindingfinding/NodeQueue
+CLASS com/corrodinggames/rts/gameFramework/k/k com/corrodinggames/rts/gameFramework/pathfindingfinding/Path
+CLASS com/corrodinggames/rts/gameFramework/k/l com/corrodinggames/rts/gameFramework/pathfinding/PathEngine
 	METHOD a a (Lcom/corrodinggames/rts/game/units/ao;II)Z
-CLASS com/corrodinggames/rts/gameFramework/k/m com/corrodinggames/rts/gameFramework/pathfinding/PathOpenListPool
-CLASS com/corrodinggames/rts/gameFramework/k/n com/corrodinggames/rts/gameFramework/pathfinding/PathOpenListNode
-CLASS com/corrodinggames/rts/gameFramework/k/o com/corrodinggames/rts/gameFramework/pathfinding/PathSolver
-CLASS com/corrodinggames/rts/gameFramework/k/p com/corrodinggames/rts/gameFramework/pathfinding/PathPoint
+CLASS com/corrodinggames/rts/gameFramework/k/m com/corrodinggames/rts/gameFramework/pathfindingfinding/PathOpenListPool
+CLASS com/corrodinggames/rts/gameFramework/k/n com/corrodinggames/rts/gameFramework/pathfindingfinding/PathOpenListNode
+CLASS com/corrodinggames/rts/gameFramework/k/o com/corrodinggames/rts/gameFramework/pathfindingfinding/PathSolver
+CLASS com/corrodinggames/rts/gameFramework/k/p com/corrodinggames/rts/gameFramework/pathfindingfinding/PathPoint
 CLASS com/corrodinggames/rts/gameFramework/l com/corrodinggames/rts/gameFramework/GameEngine
 	FIELD a showToastRunnable Ljava/lang/Runnable;
 	FIELD aA isPausedStatic Z
@@ -6085,7 +6085,7 @@ CLASS com/corrodinggames/rts/gameFramework/l com/corrodinggames/rts/gameFramewor
 	METHOD e stopAndReset ()V
 	METHOD e toScreenPixels (F)I
 	METHOD e isMouseButtonPressed (I)Z
-	METHOD e isInSpace (Ljava/lang/String;)V
+	METHOD e log (Ljava/lang/String;)V
 	METHOD e writeCrashToFile (Ljava/lang/String;Ljava/lang/String;)V
 	METHOD E logMessage ()Z
 	METHOD f isInDebug (I)I
