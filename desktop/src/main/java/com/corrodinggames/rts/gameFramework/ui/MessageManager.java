@@ -55,11 +55,8 @@ public class MessageManager {
 
     /* JADX INFO: renamed from: c */
     public synchronized void pruneMessages() {
-        Iterator it = this.messages.iterator();
-        while (it.hasNext()) {
-            if (this.messages.size() > 15) {
-                it.remove();
-            }
+        while (this.messages.size() > MAX_MESSAGES) {
+            this.messages.remove(0);
         }
     }
 

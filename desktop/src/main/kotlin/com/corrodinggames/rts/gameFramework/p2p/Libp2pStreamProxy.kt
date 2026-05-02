@@ -95,9 +95,8 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
 
                 hostInstance = libp2pHost
 
-                val handler = GameTunnelHandler(localPort)
+                val handler = HostSideProtocolHandler(localPort)
 
-                @Suppress("UNCHECKED_CAST")
                 val binding: StrictProtocolBinding<GameTunnelController> =
                     object : StrictProtocolBinding<GameTunnelController>(
                         GAME_TUNNEL_PROTOCOL,
@@ -322,49 +321,101 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                 return
             }
 
-            @Suppress("UNCHECKED_CAST")
-            val streamPromise = libp2pHost.newStream<GameTunnelController>(
-                listOf(GAME_TUNNEL_PROTOCOL), peerId
-            )
+            configureSocket(clientSocket)
 
-            val stream = try {
-                streamPromise.stream.orTimeout(config.streamOpenTimeoutMs, TimeUnit.MILLISECONDS).get()
+            // Build a per-connection ProtocolBinding. The handler will associate the
+            // already-accepted client socket with the freshly negotiated stream
+            // *synchronously* inside onStartInitiator – that guarantees the stream's
+            // pipeline has our handler registered before any peer data arrives.
+            val handler = ClientSideProtocolHandler(connectionId, hostPeerId, clientSocket)
+            val perConnBinding =
+                object : StrictProtocolBinding<GameTunnelController>(
+                    GAME_TUNNEL_PROTOCOL, handler
+                ) {}
+
+            // Establish (or reuse) the underlying libp2p connection to the host peer.
+            // We can't go through libp2pHost.newStream(...) because that path requires
+            // the protocol to be globally registered via addProtocolHandler – we don't
+            // want that on the client side because every accepted socket needs its own
+            // handler instance to relay to the right Socket.
+            val p2pConnection = try {
+                libp2pHost.network.connect(peerId)
+                    .orTimeout(config.streamOpenTimeoutMs, TimeUnit.MILLISECONDS).get()
             } catch (e: Exception) {
-                val msg = "Failed to open stream to host"
+                val msg = "Failed to establish libp2p connection to host"
                 GameEngine.log("$msg: ${e.message}")
                 notifyConnectionError(connectionId, hostPeerId, msg)
-                clientSocket.close()
+                runCatching { clientSocket.close() }
                 return
             }
 
-            configureSocket(clientSocket)
-
-            val connection = TunnelConnection(
-                id = connectionId,
-                stream = stream,
-                socket = clientSocket,
-                remotePeerId = hostPeerId,
-                cfg = config,
-                bytesSentCounter = totalBytesSent,
-                bytesReceivedCounter = totalBytesReceived
+            // Open a new multiplexed stream on the connection, advertising our protocol.
+            val streamPromise = p2pConnection.muxerSession().createStream(
+                listOf(perConnBinding.toInitiator(listOf(GAME_TUNNEL_PROTOCOL)))
             )
-            connections.add(connection)
-            notifyConnectionOpened(connectionId, hostPeerId)
 
-            executor.execute {
-                try {
-                    connection.relaySocketToStream()
-                } finally {
-                    connection.close()
-                    connections.remove(connection)
-                    notifyConnectionClosed(connectionId, hostPeerId)
-                }
+            // Wait until controller is complete – this guarantees that:
+            //  1) multistream protocol negotiation succeeded
+            //  2) ClientSideProtocolHandler.onStartInitiator() has run synchronously
+            //     (so stream.pushHandler(...) is in the pipeline before any inbound bytes)
+            try {
+                streamPromise.controller
+                    .orTimeout(config.streamOpenTimeoutMs, TimeUnit.MILLISECONDS).get()
+            } catch (e: Exception) {
+                val msg = "Failed to negotiate game tunnel stream with host"
+                GameEngine.log("$msg: ${e.message}")
+                notifyConnectionError(connectionId, hostPeerId, msg)
+                // onStartInitiator may have already attached the connection, so let
+                // it clean up via close()
+                runCatching { clientSocket.close() }
+                runCatching { streamPromise.stream.getNow(null)?.close() }
+                return
             }
+
+            // From here on, data flows in both directions via the TunnelConnection
+            // created inside onStartInitiator. Nothing left to do here.
         }.onFailure { e ->
             GameEngine.log("Error handling client connection [$connectionId]: ${e.message}")
             notifyConnectionError(connectionId, hostPeerId, e.message ?: "Unknown error")
             runCatching { clientSocket.close() }
         }
+    }
+
+    /**
+     * Synchronously wires a Stream and a Socket together as a TunnelConnection and starts
+     * the socket → stream relay on a worker thread. Must be called from the libp2p Netty
+     * event loop (within onStartInitiator/onStartResponder) so the pushHandler call lands
+     * before any peer data is dispatched to the pipeline.
+     */
+    private fun setupTunnel(
+        stream: Stream,
+        socket: Socket,
+        connectionId: String,
+        remotePeerId: String?
+    ): GameTunnelController {
+        val connection = TunnelConnection(
+            id = connectionId,
+            stream = stream,
+            socket = socket,
+            remotePeerId = remotePeerId,
+            cfg = config,
+            bytesSentCounter = totalBytesSent,
+            bytesReceivedCounter = totalBytesReceived
+        )
+        connections.add(connection)
+        notifyConnectionOpened(connectionId, remotePeerId)
+
+        executor.execute {
+            try {
+                connection.relaySocketToStream()
+            } finally {
+                connection.close()
+                connections.remove(connection)
+                notifyConnectionClosed(connectionId, remotePeerId)
+            }
+        }
+
+        return GameTunnelController(stream, connection)
     }
 
     private inner class TunnelConnection(
@@ -389,6 +440,9 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
         private val streamHandler = TunnelStreamHandler(socket, this)
 
         init {
+            // CRITICAL: must be called synchronously from the libp2p event loop
+            // so peer data arriving immediately after multistream negotiation is
+            // delivered to our handler instead of being dropped.
             stream.pushHandler(streamHandler)
         }
 
@@ -400,13 +454,25 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                         if (bytesRead < 0) {
                             break
                         }
+                        if (bytesRead == 0) {
+                            continue
+                        }
 
                         lastActivityAt = System.currentTimeMillis()
                         bytesSent.addAndGet(bytesRead.toLong())
                         bytesSentCounter.addAndGet(bytesRead.toLong())
 
+                        // Unpooled.copiedBuffer copies the bytes so we can keep
+                        // reusing `buffer` on the next iteration safely.
                         val data = Unpooled.copiedBuffer(buffer, 0, bytesRead)
-                        stream.writeAndFlush(data)
+                        try {
+                            stream.writeAndFlush(data)
+                        } catch (e: Exception) {
+                            if (!closed.get()) {
+                                GameEngine.log("Stream write error [$id]: ${e.message}")
+                            }
+                            break
+                        }
                     } catch (e: SocketTimeoutException) {
                         if (closed.get()) break
                         continue
@@ -465,18 +531,20 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
 
         override fun onMessage(stream: Stream, msg: ByteBuf) {
             try {
-                val data = ByteArray(msg.readableBytes())
+                val length = msg.readableBytes()
+                if (length <= 0) return
+                val data = ByteArray(length)
                 msg.readBytes(data)
                 socket.outputStream.write(data)
                 socket.outputStream.flush()
-                connection.onStreamDataReceived(data.size)
+                connection.onStreamDataReceived(length)
             } catch (e: Exception) {
                 GameEngine.log("Socket write error [${connection.id}]: ${e.message}")
                 notifyConnectionError(
                     connection.id, connection.remotePeerId,
                     e.message ?: "Socket write error"
                 )
-                stream.reset()
+                connection.close()
             }
         }
 
@@ -495,73 +563,81 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
         }
     }
 
-    private inner class GameTunnelHandler(
+    /**
+     * Server-side handler. Activated when a remote peer opens a tunnel stream to us.
+     * Synchronously connects to the local game-server port and wires the tunnel up
+     * before returning the controller so that no inbound peer data is missed.
+     */
+    private inner class HostSideProtocolHandler(
         private val gameServerPort: Int
     ) : ProtocolHandler<GameTunnelController>(Long.MAX_VALUE, Long.MAX_VALUE) {
 
         override fun onStartResponder(stream: Stream): CompletableFuture<GameTunnelController> {
-            return handleStream(stream)
-        }
-
-        private fun handleStream(stream: Stream): CompletableFuture<GameTunnelController> {
-            val result = CompletableFuture<GameTunnelController>()
             val connectionId = "conn-${totalConnectionsCounter.incrementAndGet()}"
             val peerId = runCatching { stream.remotePeerId().toBase58() }.getOrNull()
 
-            executor.execute {
-                runCatching {
-                    GameEngine.log("Libp2pStreamProxy: Incoming stream from ${peerId ?: "unknown"} [$connectionId]")
+            GameEngine.log("Libp2pStreamProxy: Incoming stream from ${peerId ?: "unknown"} [$connectionId]")
 
-                    val gameSocket = try {
-                        Socket().apply {
-                            connect(InetSocketAddress("127.0.0.1", gameServerPort), config.connectTimeoutMs)
-                            configureSocket(this)
-                        }
-                    } catch (e: Exception) {
-                        val msg = "Failed to connect to game server on port $gameServerPort"
-                        GameEngine.log("$msg: ${e.message}")
-                        notifyConnectionError(connectionId, peerId, msg)
-                        stream.close()
-                        result.completeExceptionally(e)
-                        return@execute
-                    }
-
-                    val connection = TunnelConnection(
-                        id = connectionId,
-                        stream = stream,
-                        socket = gameSocket,
-                        remotePeerId = peerId,
-                        cfg = config,
-                        bytesSentCounter = totalBytesSent,
-                        bytesReceivedCounter = totalBytesReceived
-                    )
-                    connections.add(connection)
-                    notifyConnectionOpened(connectionId, peerId)
-
-                    executor.execute {
-                        try {
-                            connection.relaySocketToStream()
-                        } finally {
-                            connection.close()
-                            connections.remove(connection)
-                            notifyConnectionClosed(connectionId, peerId)
-                        }
-                    }
-
-                    result.complete(GameTunnelController(stream))
-                }.onFailure { e ->
-                    GameEngine.log("Error handling incoming stream [$connectionId]: ${e.message}")
-                    notifyConnectionError(connectionId, peerId, e.message ?: "Unknown error")
-                    result.completeExceptionally(e)
-                    runCatching { stream.close() }
+            // Synchronously connect to the local game server. Loopback connect is
+            // typically sub-millisecond, so blocking the libp2p event loop here is
+            // acceptable and avoids the race where peer bytes arrive before we
+            // pushHandler() onto the stream pipeline.
+            val gameSocket = try {
+                Socket().apply {
+                    connect(InetSocketAddress("127.0.0.1", gameServerPort), config.connectTimeoutMs)
+                    configureSocket(this)
+                }
+            } catch (e: Exception) {
+                val msg = "Failed to connect to game server on port $gameServerPort"
+                GameEngine.log("$msg: ${e.message}")
+                notifyConnectionError(connectionId, peerId, msg)
+                runCatching { stream.close() }
+                return CompletableFuture<GameTunnelController>().apply {
+                    completeExceptionally(IOException(msg, e))
                 }
             }
 
-            return result
+            return try {
+                val controller = setupTunnel(stream, gameSocket, connectionId, peerId)
+                CompletableFuture.completedFuture(controller)
+            } catch (e: Exception) {
+                GameEngine.log("Error setting up host-side tunnel [$connectionId]: ${e.message}")
+                notifyConnectionError(connectionId, peerId, e.message ?: "Setup error")
+                runCatching { gameSocket.close() }
+                runCatching { stream.close() }
+                CompletableFuture<GameTunnelController>().apply { completeExceptionally(e) }
+            }
         }
     }
 
-    class GameTunnelController(val stream: Stream) {
+    /**
+     * Client-side handler. Each accepted local socket gets its own handler instance,
+     * which it then drives via a per-connection binding fed into muxerSession.createStream.
+     */
+    private inner class ClientSideProtocolHandler(
+        private val connectionId: String,
+        private val hostPeerId: String,
+        private val clientSocket: Socket
+    ) : ProtocolHandler<GameTunnelController>(Long.MAX_VALUE, Long.MAX_VALUE) {
+
+        override fun onStartInitiator(stream: Stream): CompletableFuture<GameTunnelController> {
+            return try {
+                val controller = setupTunnel(stream, clientSocket, connectionId, hostPeerId)
+                CompletableFuture.completedFuture(controller)
+            } catch (e: Exception) {
+                GameEngine.log("Error setting up client-side tunnel [$connectionId]: ${e.message}")
+                notifyConnectionError(connectionId, hostPeerId, e.message ?: "Setup error")
+                runCatching { clientSocket.close() }
+                runCatching { stream.close() }
+                CompletableFuture<GameTunnelController>().apply { completeExceptionally(e) }
+            }
+        }
+    }
+
+    class GameTunnelController(
+        val stream: Stream,
+        private val connection: Any? = null
+    ) {
         private val closed = AtomicBoolean(false)
 
         fun close() {
