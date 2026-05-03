@@ -74,6 +74,7 @@ jobs:
           cmake -S /tmp/libRocket/Build -B /tmp/libRocket/Build/build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -DBUILD_SHARED_LIBS=OFF \
             -DBUILD_SAMPLES=OFF \
             -Wno-dev
@@ -90,6 +91,7 @@ jobs:
           git clone --depth 1 https://github.com/libRocket/libRocket.git C:\libRocket
           cmake -S C:\libRocket\Build -B C:\libRocket\Build\build `
             -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 `
             -DBUILD_SHARED_LIBS=OFF `
             -DBUILD_SAMPLES=OFF `
             -Wno-dev `

@@ -61,8 +61,8 @@ val configureRocketConnectorNative by tasks.registering(Exec::class) {
             ?: throw GradleException("LIBROCKET_ROOT environment variable is not set")
         environment("LIBROCKET_ROOT", librocketRoot)
     }
-    val javaHome = System.getProperty("java.home")
-    var cmakeArgs = mutableListOf(
+    val javaHome = System.getProperty("java.home").replace("\\", "/")
+    val cmakeArgs = mutableListOf(
         "cmake",
         "-S", rocketConnectorSourceDir.asFile.absolutePath,
         "-B", rocketConnectorNativeDir.get().asFile.absolutePath,
