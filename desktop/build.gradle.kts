@@ -48,6 +48,26 @@ val platformId = when {
     else -> "linux-x64"
 }
 
+fun patchLinuxSharedObjects(rootDir: File) {
+    if (!os.contains("linux") || !rootDir.exists()) return
+
+    rootDir.walkTopDown()
+        .filter { it.isFile && it.extension == "so" }
+        .forEach { soFile ->
+            runCatching {
+                ProcessBuilder(
+                    "patchelf",
+                    "--clear-symbol-version",
+                    "SUNWprivate_1.1",
+                    soFile.absolutePath
+                )
+                    .inheritIO()
+                    .start()
+                    .waitFor()
+            }
+        }
+}
+
 // ======================== rocketConnector Native Build ========================
 
 val rocketConnectorNativeDir = layout.buildDirectory.dir("native/rocketConnector")
@@ -246,21 +266,7 @@ val stageJpackageInput by tasks.registering(Sync::class) {
             into(nativesTarget)
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         }
-        if (os.contains("linux")) {
-            nativesTarget.listFiles()?.filter { it.extension == "so" }?.forEach { soFile ->
-                runCatching {
-                    ProcessBuilder(
-                        "patchelf",
-                        "--clear-symbol-version",
-                        "SUNWprivate_1.1",
-                        soFile.absolutePath
-                    )
-                        .inheritIO()
-                        .start()
-                        .waitFor()
-                }
-            }
-        }
+        patchLinuxSharedObjects(nativesTarget)
     }
 }
 
@@ -311,6 +317,10 @@ val createJpackageImage by tasks.registering(Exec::class) {
         }
 
         commandLine(jpackageExecutable.absolutePath, *args.toTypedArray())
+    }
+
+    doLast {
+        patchLinuxSharedObjects(jpackageImageDir.get().asFile)
     }
 }
 

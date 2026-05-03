@@ -89,6 +89,7 @@ jobs:
         shell: pwsh
         run: |
           vcpkg install freetype:x64-windows
+          echo "CMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" >> $env:GITHUB_ENV
           git clone --depth 1 https://github.com/libRocket/libRocket.git C:\libRocket
           cmake -S C:\libRocket\Build -B C:\libRocket\Build\build `
             -DCMAKE_BUILD_TYPE=Release `
