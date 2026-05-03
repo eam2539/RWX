@@ -74,8 +74,11 @@ jobs:
           cmake -S /tmp/libRocket/Build -B /tmp/libRocket/Build/build \
             -DCMAKE_BUILD_TYPE=Release \
             -DBUILD_SHARED_LIBS=OFF \
-            -DBUILD_SAMPLES=OFF
+            -DBUILD_SAMPLES=OFF \
+            -Wno-dev
           cmake --build /tmp/libRocket/Build/build --config Release -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          mkdir -p /tmp/libRocket/Build/lib
+          cp /tmp/libRocket/Build/build/libRocket*.a /tmp/libRocket/Build/lib/
           echo "LIBROCKET_ROOT=/tmp/libRocket" >> "$GITHUB_ENV"
 
       - name: Build & install libRocket (Windows)
@@ -88,8 +91,11 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release `
             -DBUILD_SHARED_LIBS=OFF `
             -DBUILD_SAMPLES=OFF `
+            -Wno-dev `
             "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
           cmake --build C:\libRocket\Build\build --config Release
+          New-Item -ItemType Directory -Force -Path C:\libRocket\Build\Lib
+          Copy-Item C:\libRocket\Build\build\Release\*.lib C:\libRocket\Build\Lib\
           echo "LIBROCKET_ROOT=C:\libRocket" >> $env:GITHUB_ENV
 
       - name: Ensure Gradle wrapper is executable
