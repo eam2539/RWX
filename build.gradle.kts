@@ -1,5 +1,5 @@
-group = "com.corrodinggames.rts"
-version = "1.0.0"
+group = property("group") as String
+version = property("version") as String
 
 allprojects {
     group = rootProject.group

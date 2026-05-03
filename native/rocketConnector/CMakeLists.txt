@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 
 project(rocketConnector LANGUAGES CXX)
 
+if(POLICY CMP0144)
+    cmake_policy(SET CMP0144 NEW)
+endif()
+
 find_package(JNI REQUIRED)
 
 set(LIBROCKET_ROOT "$ENV{LIBROCKET_ROOT}" CACHE PATH "Root directory of libRocket source directory")
@@ -36,7 +40,7 @@ else()
 endif()
 
 if(MSVC)
-    target_compile_options(rocketConnector PRIVATE /W4)
+    target_compile_options(rocketConnector PRIVATE /W4 /wd4458)
 else()
     target_compile_options(rocketConnector PRIVATE -Wall -Wextra -Wpedantic)
 endif()

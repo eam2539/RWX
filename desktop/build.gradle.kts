@@ -1,4 +1,6 @@
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.jvm.toolchain.JavaLanguageVersion.of
+import java.util.Locale.getDefault
 
 plugins {
     id("java")
@@ -11,7 +13,36 @@ kotlin {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
+enum class PlatformType {
+    WINDOWS_X64,
+    WINDOWS_ARM64,
+    MACOS_X64,
+    MACOS_ARM64,
+    LINUX_X64,
+    LINUX_ARM64;
+}
 
+enum class OSType {
+    WINDOWS,
+    MACOS,
+    LINUX
+}
+
+val os: String = System.getProperty("os.name").lowercase()
+val arch: String = System.getProperty("os.arch").lowercase()
+val platformType = when {
+    os.contains("win") && (arch.contains("aarch") || arch.contains("arm")) -> PlatformType.WINDOWS_ARM64
+    os.contains("win") -> PlatformType.WINDOWS_X64
+    os.contains("mac") && (arch.contains("aarch") || arch.contains("arm")) -> PlatformType.MACOS_ARM64
+    os.contains("mac") -> PlatformType.MACOS_X64
+    os.contains("linux") && (arch.contains("aarch") || arch.contains("arm")) -> PlatformType.LINUX_ARM64
+    else -> PlatformType.LINUX_X64
+}
+val osType = when (platformType) {
+    PlatformType.WINDOWS_X64, PlatformType.WINDOWS_ARM64 -> OSType.WINDOWS
+    PlatformType.MACOS_X64, PlatformType.MACOS_ARM64 -> OSType.MACOS
+    PlatformType.LINUX_X64, PlatformType.LINUX_ARM64 -> OSType.LINUX
+}
 dependencies {
     implementation(project(":core"))
     compileOnly(files("../libs/android.jar"))
@@ -25,31 +56,29 @@ dependencies {
     implementation(libs.jackson.databind)
     implementation(libs.lwjgl)
     implementation(libs.lwjgl.util)
-    runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-linux")
-    runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-windows")
-    runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-osx")
+    when (osType) {
+        OSType.WINDOWS -> runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-windows")
+        OSType.LINUX -> runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-linux")
+        OSType.MACOS -> runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-osx")
+    }
 }
 
-val appName = "RWX"
+val appName: String by project
+
 val appVersion: String = project.version.toString()
-val mainClassName = "com.corrodinggames.rts.java.Main"
+val mainClassName = "${project.group}.java.Main"
 
 application {
+    applicationName = appName
     mainClass = mainClassName
+    applicationDefaultJvmArgs = listOf(
+        "-Djava.library.path=lib/natives"
+    )
 }
 
-val os: String = System.getProperty("os.name").lowercase()
-val arch: String = System.getProperty("os.arch").lowercase()
-val platformId = when {
-    os.contains("win") -> "windows-x64"
-    os.contains("mac") && (arch.contains("aarch") || arch.contains("arm")) -> "macos-arm64"
-    os.contains("mac") -> "macos-x64"
-    os.contains("linux") && (arch.contains("aarch") || arch.contains("arm")) -> "linux-arm64"
-    else -> "linux-x64"
-}
-
+val platformId = platformType.name.lowercase(getDefault()).replace("_", "-")
 fun patchLinuxSharedObjects(rootDir: File) {
-    if (!os.contains("linux") || !rootDir.exists()) return
+    if (osType != OSType.LINUX || !rootDir.exists()) return
 
     rootDir.walkTopDown()
         .filter { it.isFile && it.extension == "so" }
@@ -108,8 +137,7 @@ val buildRocketConnectorNative by tasks.registering(Exec::class) {
         val soFile = buildDir.resolve("librocketConnector.so")
         val dllFile = buildDir.resolve("rocketConnector.dll")
         val dylibFile = buildDir.resolve("librocketConnector.dylib")
-        val releaseDll = buildDir.resolve("Release/rocketConnector.dll")
-        !soFile.exists() && !dllFile.exists() && !dylibFile.exists() && !releaseDll.exists()
+        !soFile.exists() && !dllFile.exists() && !dylibFile.exists()
     }
     doFirst {
         val librocketRoot = System.getenv("LIBROCKET_ROOT")
@@ -143,11 +171,6 @@ tasks.named<Jar>("jar") {
     exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
     manifest {
         attributes["Main-Class"] = mainClassName
-        val classPath = configurations.runtimeClasspath.get()
-            .filter { it.extension == "jar" && !it.name.contains("natives-") }
-            .map { "lib/${it.name}" }
-            .joinToString(" ")
-        attributes["Class-Path"] = classPath
     }
 }
 
@@ -164,74 +187,41 @@ tasks.named<JavaExec>("run") {
     jvmArgs("-Djava.library.path=$nativePaths")
 }
 
-// ======================== Zip Distribution ========================
+// ======================== Tar/Zip Distribution ========================
 
-val distributionLibsDir = layout.buildDirectory.dir("distribution-libs")
+distributions {
+    main {
+        contents {
 
-val prepareDistributionLibs by tasks.registering {
-    dependsOn("extractNatives", buildRocketConnectorNative)
-    val libsTarget = distributionLibsDir.get().asFile
-    libsTarget.mkdirs()
-
-    configurations.runtimeClasspath.get()
-        .filter { it.extension == "jar" && !it.name.contains("natives-") }
-        .forEach { file ->
-            project.copy {
-                from(file)
-                into(libsTarget)
+            from(layout.buildDirectory.dir("libs/natives")) {
+                when (osType) {
+                    OSType.WINDOWS -> include("*.dll")
+                    OSType.LINUX -> include("*.so")
+                    OSType.MACOS -> include("*.dylib")
+                }
+                into("lib/natives")
             }
+            from(rocketConnectorNativeDir) {
+                when (osType) {
+                    OSType.WINDOWS -> include("*.dll")
+                    OSType.LINUX -> include("*.so")
+                    OSType.MACOS -> include("*.dylib")
+                }
+                into("lib/natives")
+            }
+            from(rocketConnectorNativeDir.map { it.dir("Release") }) {
+                when (osType) {
+                    OSType.WINDOWS -> include("*.dll")
+                    OSType.LINUX -> include("*.so")
+                    OSType.MACOS -> include("*.dylib")
+                }
+                into("lib/natives")
+            }
+            from(project.file("../res")) { into("res") }
+            from(project.file("../assets")) { into("assets") }
+            from(project.file("../font")) { into("font") }
         }
-}
-
-tasks.register<Zip>("distribution") {
-    dependsOn(prepareDistributionLibs, "jar")
-    archiveFileName.set("$appName-$appVersion.zip")
-    destinationDirectory.set(layout.buildDirectory.dir("distributions"))
-
-    from(distributionLibsDir) { into("lib") }
-    from(layout.buildDirectory.dir("libs/natives")) { into("lib/natives") }
-    from(rocketConnectorNativeDir) {
-        include("*.dll", "*.dylib", "*.so")
-        into("lib/natives")
     }
-    from(rocketConnectorNativeDir.map { it.dir("Release") }) {
-        include("*.dll", "*.dylib", "*.so")
-        into("lib/natives")
-    }
-    from(tasks.named<Jar>("jar").map { it.archiveFile }) { into("lib") }
-    from(project.file("../res")) { into("res") }
-    from(project.file("../assets")) { into("assets") }
-    from(project.file("../font")) { into("font") }
-
-    val cpJars = (listOf("lib/desktop-$appVersion.jar") +
-            configurations.runtimeClasspath.get()
-                .filter { it.extension == "jar" && !it.name.contains("natives-") }
-                .map { "lib/${it.name}" })
-        .joinToString(":")
-    val winCpJars = cpJars.replace(":", ";")
-
-    val scriptsDir = layout.buildDirectory.dir("scripts").get().asFile
-    scriptsDir.mkdirs()
-
-    val unixScriptFile = scriptsDir.resolve(appName)
-    unixScriptFile.writeText(buildString {
-        appendLine("#!/bin/bash")
-        appendLine("SCRIPT_DIR=\"\$(cd \"\$(dirname \"\$0\")\" && pwd)\"")
-        appendLine("cd \"\$SCRIPT_DIR\"")
-        appendLine("java -Djava.library.path=lib/natives -cp \"$cpJars\" $mainClassName \"\$@\"")
-    })
-    unixScriptFile.setExecutable(true)
-
-    val windowsScriptFile = scriptsDir.resolve("$appName.bat")
-    windowsScriptFile.writeText(buildString {
-        appendLine("@echo off")
-        appendLine("set SCRIPT_DIR=%~dp0")
-        appendLine("cd /d %SCRIPT_DIR%")
-        appendLine("java -Djava.library.path=lib\\natives -cp \"$winCpJars\" $mainClassName %*")
-    })
-
-    from(unixScriptFile)
-    from(windowsScriptFile)
 }
 
 // ======================== Jpackage Distribution ========================
@@ -256,13 +246,27 @@ val stageJpackageInput by tasks.registering(Sync::class) {
         val nativesTarget = jpackageInputDir.get().asFile.resolve("natives")
         nativesTarget.mkdirs()
         project.copy {
-            from(layout.buildDirectory.dir("libs/natives"))
-            into(nativesTarget)
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        }
-        project.copy {
-            from(rocketConnectorNativeDir) { include("*.dll", "*.dylib", "*.so") }
-            from(rocketConnectorNativeDir.map { it.dir("Release") }) { include("*.dll", "*.dylib", "*.so") }
+            from(layout.buildDirectory.dir("libs/natives/")) {
+                when (osType) {
+                    OSType.WINDOWS -> include("*.dll")
+                    OSType.LINUX -> include("*.so")
+                    OSType.MACOS -> include("*.dylib")
+                }
+            }
+            from(rocketConnectorNativeDir) {
+                when (osType) {
+                    OSType.WINDOWS -> include("*.dll")
+                    OSType.LINUX -> include("*.so")
+                    OSType.MACOS -> include("*.dylib")
+                }
+            }
+            from(rocketConnectorNativeDir.map { it.dir("Release") }) {
+                when (osType) {
+                    OSType.WINDOWS -> include("*.dll")
+                    OSType.LINUX -> include("*.so")
+                    OSType.MACOS -> include("*.dylib")
+                }
+            }
             into(nativesTarget)
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         }
@@ -299,18 +303,18 @@ val createJpackageImage by tasks.registering(Exec::class) {
         )
 
         val iconDir = file("src/main/resources/icons")
-        when {
-            os.contains("win") -> {
+        when (osType) {
+            OSType.WINDOWS -> {
                 val ico = iconDir.resolve("logo.ico")
                 if (ico.exists()) args += listOf("--icon", ico.absolutePath)
             }
 
-            os.contains("mac") -> {
+            OSType.MACOS -> {
                 val icns = iconDir.resolve("logo.icns")
                 if (icns.exists()) args += listOf("--icon", icns.absolutePath)
             }
 
-            os.contains("linux") -> {
+            OSType.LINUX -> {
                 val png = iconDir.resolve("logo.png")
                 if (png.exists()) args += listOf("--icon", png.absolutePath)
             }
@@ -320,7 +324,18 @@ val createJpackageImage by tasks.registering(Exec::class) {
     }
 
     doLast {
-        patchLinuxSharedObjects(jpackageImageDir.get().asFile)
+        val imageAppDir = jpackageImageDir.get().asFile.resolve(if (os.contains("mac")) "$appName.app" else appName)
+        listOf("res", "assets", "font").forEach { resDir ->
+            val srcDir = rootProject.file(resDir)
+            if (srcDir.exists() && srcDir.isDirectory) {
+                project.copy {
+                    from(srcDir)
+                    into(imageAppDir.resolve(resDir))
+                }
+            }
+        }
+
+
     }
 }
 
@@ -328,16 +343,57 @@ tasks.register<Sync>("stageDesktopDistribution") {
     group = "distribution"
     description = "Stage the jpackage app image and metadata for packaging."
     dependsOn(createJpackageImage)
+    doFirst {
+        val existing = stagedDesktopDistDir.get().asFile
+        if (existing.exists()) {
+            existing.deleteRecursively()
+        }
+    }
     from(jpackageImageDir.map { it.dir(if (os.contains("mac")) "$appName.app" else appName) })
     from(rootProject.file("LICENSE"))
-    into(stagedDesktopDistDir)
+    into(stagedDesktopDistDir.map { it.dir(appName) })
+    
+
 }
 
-tasks.register<Zip>("packageDesktopDistribution") {
-    group = "distribution"
-    description = "Create a zip archive for the current platform jpackage app image."
-    dependsOn("stageDesktopDistribution")
-    destinationDirectory.set(layout.buildDirectory.dir("distributions"))
-    archiveFileName.set("$appName-$appVersion-$platformId-desktop.zip")
-    from(stagedDesktopDistDir)
+if (osType == OSType.WINDOWS) {
+    tasks.register<Zip>("packageDesktopDistribution") {
+        group = "distribution"
+        description = "Create a zip archive for the current platform jpackage app image."
+        dependsOn("stageDesktopDistribution")
+        destinationDirectory.set(layout.buildDirectory.dir("distributions"))
+        archiveFileName.set("$appName-$appVersion-$platformId-desktop.zip")
+
+        from(stagedDesktopDistDir) {
+            into(appName)
+        }
+    }
+} else {
+    tasks.register<Exec>("packageDesktopDistribution") {
+        group = "distribution"
+        description =
+            "Create a zip archive for the current platform jpackage app image using system zip to preserve Unix permissions."
+        dependsOn("stageDesktopDistribution")
+
+        val stagedAppDir = stagedDesktopDistDir.get().asFile.resolve(appName)
+        val outputZip = layout.buildDirectory.dir("distributions")
+            .get().asFile.resolve("$appName-$appVersion-$platformId-desktop.zip")
+
+        workingDir(stagedAppDir.parentFile)
+        outputs.file(outputZip)
+
+        doFirst {
+            val outputDir = layout.buildDirectory.dir("distributions").get().asFile
+            outputDir.mkdirs()
+            if (outputZip.exists()) {
+                outputZip.delete()
+            }
+        }
+
+        commandLine(
+            "zip", "-qr",
+            outputZip.absolutePath,
+            appName
+        )
+    }
 }

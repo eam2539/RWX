@@ -27,7 +27,7 @@ bin/
 !**/src/test/**/bin/
 
 ### rocketConnector ###
-native/rocketConnector/build/
+desktop/native/rocketConnector/build/
 
 ### NetBeans ###
 /nbproject/private/
