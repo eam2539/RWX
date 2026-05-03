@@ -33,14 +33,13 @@
 * [QQ群组](https://qun.qq.com/universal-share/share?ac=1&authKey=EQ73b%2BVCr5a5mUrJR1yOhp0oJFmDHuBglEPrHJEWmHxSyMZjH4xI2H0hgqXZ%2B3dW&busi_data=eyJncm91cENvZGUiOiI5ODI4MzgwODYiLCJ0b2tlbiI6ImZaMHZqZDJ2UllsZnpHTEQxRHBtanhiZDgwTFVZdXcwV1N6a1dZMm1oQVNaUEZNR1cxSWptV0VBOW9aYXVIYlAiLCJ1aW4iOiIzMDYwMzA5MzQwIn0%3D&data=Maw6iUgqhXNqLNXmhH7V6FVNDiLqVgvN6paLZrQeSiDxJLu8IxDpAhmmCqdXJsJNViI0SCU-oM5_h-buAOY00Q&svctype=4&tempid=h5_group_info)
 * [Discord 群组](https://discord.gg/q2amh4Gt3f)
 
-
-## 🔨 编译
+## 🔨 编译桌面端
 
 ### 前置要求
 
 - CMake 3.16+
 - C++17 编译器
-- JDK (用于 JNI)
+- JDK 11+ (用于 JNI)
 
 ### rocketConnector Native 库
 
@@ -77,7 +76,7 @@ cmake --build . --parallel
 ```bash
 # Point to libRocket source directory
 export LIBROCKET_ROOT=/path/to/libRocket   # for Windows: set LIBROCKET_ROOT=C:\path\to\libRocket 
-,/gradlew buildRocketConnectorNative # for Windows: gradlew.bat buildRocketConnectorNative
+./gradlew desktop:buildRocketConnectorNative # for Windows: gradlew.bat buildRocketConnectorNative
 ```
 
 ## 免责声明
