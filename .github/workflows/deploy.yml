@@ -37,7 +37,7 @@ jobs:
             artifact_name: RWX-windows-x64-desktop
             gradle_max_workers: 4
           - name: macOS x64
-            runner: macos-13
+            runner: macos-26-intel
             platform_id: macos-x64
             artifact_name: RWX-macos-x64-desktop
             gradle_max_workers: 4
@@ -73,6 +73,7 @@ jobs:
           git clone --depth 1 https://github.com/libRocket/libRocket.git /tmp/libRocket
           cmake -S /tmp/libRocket/Build -B /tmp/libRocket/Build/build \
             -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
             -DBUILD_SHARED_LIBS=OFF \
             -DBUILD_SAMPLES=OFF \
             -Wno-dev
