@@ -76,7 +76,7 @@ cmake --build . --parallel
 ```bash
 # Point to libRocket source directory
 export LIBROCKET_ROOT=/path/to/libRocket   # for Windows: set LIBROCKET_ROOT=C:\path\to\libRocket 
-./gradlew desktop:buildRocketConnectorNative # for Windows: gradlew.bat buildRocketConnectorNative
+./gradlew desktop:buildRocketConnectorNative # for Windows: gradlew.bat desktop:buildRocketConnectorNative
 ```
 
 ## 免责声明
