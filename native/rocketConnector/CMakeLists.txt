@@ -11,6 +11,7 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 find_package(LibRocket REQUIRED)
+find_package(Freetype REQUIRED)
 
 add_library(rocketConnector SHARED
     src/rocket_connector.cpp
@@ -24,6 +25,7 @@ target_include_directories(rocketConnector PRIVATE
 )
 target_link_libraries(rocketConnector PRIVATE
     ${libRocket_LIBRARIES}
+    Freetype::Freetype
     ${JNI_LIBRARIES}
 )
 

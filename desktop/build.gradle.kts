@@ -62,7 +62,7 @@ val configureRocketConnectorNative by tasks.registering(Exec::class) {
         environment("LIBROCKET_ROOT", librocketRoot)
     }
     val javaHome = System.getProperty("java.home").replace("\\", "/")
-    val cmakeArgs = mutableListOf(
+    var cmakeArgs = mutableListOf(
         "cmake",
         "-S", rocketConnectorSourceDir.asFile.absolutePath,
         "-B", rocketConnectorNativeDir.get().asFile.absolutePath,
@@ -245,6 +245,21 @@ val stageJpackageInput by tasks.registering(Sync::class) {
             from(rocketConnectorNativeDir.map { it.dir("Release") }) { include("*.dll", "*.dylib", "*.so") }
             into(nativesTarget)
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
+        if (os.contains("linux")) {
+            nativesTarget.listFiles()?.filter { it.extension == "so" }?.forEach { soFile ->
+                runCatching {
+                    ProcessBuilder(
+                        "patchelf",
+                        "--clear-symbol-version",
+                        "SUNWprivate_1.1",
+                        soFile.absolutePath
+                    )
+                        .inheritIO()
+                        .start()
+                        .waitFor()
+                }
+            }
         }
     }
 }
