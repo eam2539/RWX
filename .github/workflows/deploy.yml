@@ -60,11 +60,11 @@ jobs:
 
       - name: Install native build dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y cmake build-essential
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential libfreetype-dev
 
       - name: Install native build dependencies (macOS)
         if: runner.os == 'macOS'
-        run: brew install cmake
+        run: brew install cmake freetype
 
       - name: Build & install libRocket (Unix)
         if: runner.os != 'Windows'
@@ -82,11 +82,13 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
+          vcpkg install freetype:x64-windows
           git clone --depth 1 https://github.com/libRocket/libRocket.git C:\libRocket
           cmake -S C:\libRocket\Build -B C:\libRocket\Build\build `
             -DCMAKE_BUILD_TYPE=Release `
             -DBUILD_SHARED_LIBS=OFF `
-            -DBUILD_SAMPLES=OFF
+            -DBUILD_SAMPLES=OFF `
+            "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
           cmake --build C:\libRocket\Build\build --config Release
           echo "LIBROCKET_ROOT=C:\libRocket" >> $env:GITHUB_ENV
 
