@@ -87,7 +87,7 @@ fun patchLinuxSharedObjects(rootDir: File) {
                 ProcessBuilder(
                     "patchelf",
                     "--clear-symbol-version",
-                    "SUNWprivate_1.1",
+                    "JAWT_GetAWT",
                     soFile.absolutePath
                 )
                     .inheritIO()
