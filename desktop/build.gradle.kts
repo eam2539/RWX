@@ -1,5 +1,4 @@
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.jvm.toolchain.JavaLanguageVersion.of
 import java.util.Locale.getDefault
 
 plugins {
@@ -286,9 +285,14 @@ val createJpackageImage by tasks.registering(Exec::class) {
 
         val mainJarName = tasks.named<Jar>("jar").get().archiveFileName.get()
         val jpackageBinary = if (os.contains("win")) "jpackage.exe" else "jpackage"
-        val jpackageExecutable = javaToolchains.launcherFor {
-            this.languageVersion.set(of(21))
-        }.get().metadata.installationPath.file("bin/$jpackageBinary").asFile
+        val currentJavaHome = File(System.getProperty("java.home"))
+        val currentJpackage = currentJavaHome.resolve("bin/$jpackageBinary")
+        val jpackageExecutable = if (currentJpackage.exists()) {
+            currentJpackage
+        } else
+            throw GradleException(
+                "jpackage not found. Install a JDK that includes jpackage (17+)"
+            )
 
         val args = mutableListOf(
             "--type", "app-image",

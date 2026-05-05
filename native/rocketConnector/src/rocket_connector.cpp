@@ -322,6 +322,7 @@ public:
         std::vector<jfloat> xyValues(numVertices * 2);
         std::vector<jfloat> uvValues(numVertices * 2);
         std::vector<jint> colorValues(numVertices);
+        std::vector<jint> indexValues(indices,indices+numIndices);
         for (int i = 0; i < numVertices; ++i) {
             xyValues[(i * 2) + 0] = vertices[i].position.x;
             xyValues[(i * 2) + 1] = vertices[i].position.y;
@@ -332,7 +333,7 @@ public:
         localEnv->SetFloatArrayRegion(xy, 0, static_cast<jsize>(xyValues.size()), xyValues.data());
         localEnv->SetFloatArrayRegion(uv, 0, static_cast<jsize>(uvValues.size()), uvValues.data());
         localEnv->SetIntArrayRegion(colors, 0, static_cast<jsize>(colorValues.size()), colorValues.data());
-        localEnv->SetIntArrayRegion(indexArray, 0, numIndices, indices);
+        localEnv->SetIntArrayRegion(indexArray, 0, numIndices, indexValues.data());
         localEnv->CallVoidMethod(owner, renderGeometryMethod, xy, uv, colors, indexArray, static_cast<jint>(texture), translation.x, translation.y);
         localEnv->DeleteLocalRef(xy);
         localEnv->DeleteLocalRef(uv);
@@ -352,6 +353,7 @@ public:
         std::vector<jfloat> xyValues(numVertices * 2);
         std::vector<jfloat> uvValues(numVertices * 2);
         std::vector<jint> colorValues(numVertices);
+        std::vector<jint> indexValues(indices,indices+numIndices);
         for (int i = 0; i < numVertices; ++i) {
             xyValues[(i * 2) + 0] = vertices[i].position.x;
             xyValues[(i * 2) + 1] = vertices[i].position.y;
@@ -362,7 +364,7 @@ public:
         localEnv->SetFloatArrayRegion(xy, 0, static_cast<jsize>(xyValues.size()), xyValues.data());
         localEnv->SetFloatArrayRegion(uv, 0, static_cast<jsize>(uvValues.size()), uvValues.data());
         localEnv->SetIntArrayRegion(colors, 0, static_cast<jsize>(colorValues.size()), colorValues.data());
-        localEnv->SetIntArrayRegion(indexArray, 0, numIndices, indices);
+        localEnv->SetIntArrayRegion(indexArray, 0, numIndices, indexValues.data());
         jint handle = localEnv->CallIntMethod(owner, compileGeometryMethod, xy, uv, colors, indexArray, static_cast<jint>(texture));
         localEnv->DeleteLocalRef(xy);
         localEnv->DeleteLocalRef(uv);

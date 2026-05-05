@@ -7,9 +7,15 @@ allprojects {
 }
 
 subprojects {
-    tasks.withType<JavaCompile>().configureEach {
-        options.encoding = "UTF-8"
-        options.release = 11
+    if (project.name != "android") {
+        tasks.withType<JavaCompile>().configureEach {
+            options.encoding = "UTF-8"
+            options.release = 11
+        }
+    } else {
+        tasks.withType<JavaCompile>().configureEach {
+            options.encoding = "UTF-8"
+        }
     }
 
     tasks.withType<Test>().configureEach {

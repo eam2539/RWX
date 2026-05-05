@@ -30,13 +30,13 @@ English, [简体中文](README_zh.md)
 
 * [Discord Server](https://discord.gg/q2amh4Gt3f)
 
-## 🔨 Building Desktop
+## 🔨 Building Native Library
 
 ### Prerequisites
 
 - CMake 3.16+
 - C++17 compiler
-- JDK 11+ (for JNI)
+- JDK 17+ (for JNI)
 
 ### rocketConnector Native Library
 
@@ -72,8 +72,10 @@ cmake --build . --parallel
 
 ```bash
 # Point to libRocket source directory
-export LIBROCKET_ROOT=/path/to/libRocket   # for Windows: set LIBROCKET_ROOT=C:\path\to\libRocket 
-./gradlew desktop:buildRocketConnectorNative # for Windows: gradlew.bat desktop:buildRocketConnectorNative
+export LIBROCKET_ROOT=/path/to/libRocket   
+# for Windows: set LIBROCKET_ROOT=C:\path\to\libRocket 
+./gradlew desktop:buildRocketConnectorNative 
+# for Windows: gradlew.bat desktop:buildRocketConnectorNative
 ```
 
 ## Disclaimer
