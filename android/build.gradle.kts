@@ -9,17 +9,18 @@ dependencies {
 }
 
 android {
-    namespace = "com.corrodinggames.rts.android"
+    namespace = project.group.toString()
     compileSdk = 36
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 29
         targetSdk = 36
     }
 
     sourceSets {
         named("main") {
-            resources.srcDirs("../assets", "../res", "../font")
+            resources.srcDirs("../res")
+            assets.srcDirs("../assets")
             java.srcDirs(
                 "src/main/java",
                 "../core/src/main/java"

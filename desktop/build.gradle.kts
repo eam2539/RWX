@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.bundling.Zip
+import org.gradle.jvm.toolchain.JavaLanguageVersion.of
 import java.util.Locale.getDefault
 
 plugins {
@@ -43,6 +44,7 @@ val osType = when (platformType) {
     PlatformType.LINUX_X64, PlatformType.LINUX_ARM64 -> OSType.LINUX
 }
 dependencies {
+    implementation(project(":mod-api"))
     implementation(project(":core"))
     compileOnly(files("../libs/android.jar"))
     runtimeOnly(files("../libs/android.jar"))

@@ -36,11 +36,6 @@ jobs:
             platform_id: windows-x64
             artifact_name: RWX-windows-x64-desktop
             gradle_max_workers: 4
-          - name: macOS x64
-            runner: macos-26-intel
-            platform_id: macos-x64
-            artifact_name: RWX-macos-x64-desktop
-            gradle_max_workers: 4
           - name: macOS arm64
             runner: macos-latest
             platform_id: macos-arm64

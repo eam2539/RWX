@@ -21,5 +21,6 @@ dependencyResolutionManagement {
 }
 
 include(":core")
+include(":mod-api")
 include(":desktop")
 include(":android")

@@ -6,14 +6,9 @@ import java.util.Date;
 
 /* JADX INFO: loaded from: game-lib.jar:android/util/Log.class */
 public final class Log {
-    private static final ThreadLocal a = new ThreadLocal() { // from class: android.util.Log.1
-        /* JADX INFO: Access modifiers changed from: protected */
-        @Override // java.lang.ThreadLocal
-        /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
-        public SimpleDateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        }
-    };
+    // from class: android.util.Log.1
+    /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
+    private static final ThreadLocal<SimpleDateFormat> a = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"));
 
     /* JADX INFO: loaded from: game-lib.jar:android/util/Log$TerribleFailureHandler.class */
     public interface TerribleFailureHandler {

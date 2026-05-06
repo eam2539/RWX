@@ -1,18 +1,22 @@
 # FindLibRocket.cmake
 # CMake module to find libRocket libraries
 
-if(NOT DEFINED LIBROCKET_ROOT)
-    if(DEFINED ENV{LIBROCKET_ROOT})
-        set(LIBROCKET_ROOT $ENV{LIBROCKET_ROOT})
-    else()
-        message(FATAL_ERROR "LIBROCKET_ROOT is not set. Please set the LIBROCKET_ROOT environment variable or use cmake -DLIBROCKET_ROOT=<path>")
+if(NOT DEFINED LibRocket_ROOT)
+    if(DEFINED LIBROCKET_ROOT)
+        set(LibRocket_ROOT "${LIBROCKET_ROOT}")
+    elseif(DEFINED ENV{LIBROCKET_ROOT})
+        set(LibRocket_ROOT "$ENV{LIBROCKET_ROOT}")
     endif()
+endif()
+
+if(NOT DEFINED LibRocket_ROOT)
+    message(FATAL_ERROR "LibRocket_ROOT is not set. Please set the LIBROCKET_ROOT environment variable or use cmake -DLibRocket_ROOT=<path>")
 endif()
 
 # Search paths - check Build subdir (where cmake outputs libraries), then root
 set(LIBROCKET_SEARCH_PATHS
-    "${LIBROCKET_ROOT}/Build"
-    "${LIBROCKET_ROOT}"
+    "${LibRocket_ROOT}/Build"
+    "${LibRocket_ROOT}"
 )
 
 # Find include directory

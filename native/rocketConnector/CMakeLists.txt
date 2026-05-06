@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(rocketConnector LANGUAGES CXX)
-
 if(POLICY CMP0144)
     cmake_policy(SET CMP0144 NEW)
 endif()
 
+project(rocketConnector LANGUAGES CXX)
+
 find_package(JNI REQUIRED)
 
-set(LIBROCKET_ROOT "$ENV{LIBROCKET_ROOT}" CACHE PATH "Root directory of libRocket source directory")
-if(NOT LIBROCKET_ROOT)
-    message(FATAL_ERROR "LIBROCKET_ROOT is not set. Please set the LIBROCKET_ROOT environment variable or use cmake -DLIBROCKET_ROOT=<path>")
+set(LibRocket_ROOT "$ENV{LIBROCKET_ROOT}" CACHE PATH "Root directory of libRocket source directory")
+if(NOT LibRocket_ROOT)
+    message(FATAL_ERROR "LibRocket_ROOT is not set. Please set the LIBROCKET_ROOT environment variable or use cmake -DLibRocket_ROOT=<path>")
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")

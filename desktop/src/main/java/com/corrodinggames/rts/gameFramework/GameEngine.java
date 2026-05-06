@@ -1108,7 +1108,7 @@ public abstract class GameEngine {
         Matcher matcher = Pattern.compile("^l(\\d*);.*").matcher(filename);
         if (matcher.matches()) {
             log("getMapLevel:" + str + ":" + Integer.parseInt(matcher.group(1)));
-            return Integer.valueOf(Integer.parseInt(matcher.group(1)));
+            return Integer.parseInt(matcher.group(1));
         }
         return null;
     }
@@ -1120,6 +1120,7 @@ public abstract class GameEngine {
         } else {
             Log.b("RustedWarfare", str);
         }
+        //GlobalLogger.INSTANCE.writeToFile(() -> str);
     }
 
     /* JADX INFO: renamed from: d */

@@ -1,6 +1,6 @@
 package com.corrodinggames.rts.gameFramework.p2p
 
-import com.corrodinggames.rts.gameFramework.GameEngine
+import com.corrodinggames.rts.gameFramework.logger
 import io.libp2p.core.Host
 import io.libp2p.core.PeerId
 import io.libp2p.core.Stream
@@ -109,8 +109,10 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                 hostSideRunning.set(true)
                 startIdleCheck()
 
-                GameEngine.log("Libp2pStreamProxy (host side) registered protocol handler for $GAME_TUNNEL_PROTOCOL")
-                GameEngine.log("Game server port: $localPort")
+                logger.info {
+                    "Libp2pStreamProxy (host side) registered protocol handler for $GAME_TUNNEL_PROTOCOL" +
+                            "\nGame server port: $localPort"
+                }
             }.onFailure { e ->
                 hostInstance = null
                 throw IOException("Failed to register stream handler: ${e.message}", e)
@@ -144,9 +146,10 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
 
                 clientSideRunning.set(true)
                 startIdleCheck()
-
-                GameEngine.log("Libp2pStreamProxy (client side) listening on port $boundPort")
-                GameEngine.log("Will forward connections to host $hostPeerId via libp2p")
+                logger.info {
+                    "Libp2pStreamProxy (client side) listening on port $boundPort\n" +
+                            "Will forward connections to host $hostPeerId via libp2p"
+                }
                 boundPort
             }.onFailure { e ->
                 clientSideServerSocket?.close()
@@ -181,7 +184,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
 
             shutdownAndResetExecutor()
 
-            GameEngine.log("Libp2pStreamProxy stopped")
+            logger.info { "Libp2pStreamProxy stopped" }
         }
     }
 
@@ -224,7 +227,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
             if (!old.awaitTermination(SHUTDOWN_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
                 val dropped = old.shutdownNow()
                 if (dropped.isNotEmpty()) {
-                    GameEngine.log("Libp2pStreamProxy: Forced executor shutdown, ${dropped.size} tasks dropped")
+                    logger.warn { "Libp2pStreamProxy: Forced executor shutdown, ${dropped.size} tasks dropped" }
                 }
             }
         } catch (e: InterruptedException) {
@@ -244,7 +247,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
         val now = System.currentTimeMillis()
         connections.forEach { conn ->
             if (conn.isIdleTooLong(now)) {
-                GameEngine.log("Libp2pStreamProxy: Closing idle connection ${conn.id} (idle ${now - conn.lastActivityAt}ms)")
+                logger.warn { "Libp2pStreamProxy: Closing idle connection ${conn.id} (idle ${now - conn.lastActivityAt}ms)" }
                 conn.close()
             }
         }
@@ -279,7 +282,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
     private fun acceptClientConnections(libp2pHost: Host, hostPeerId: String) {
         val serverSocket = clientSideServerSocket
         if (serverSocket == null) {
-            GameEngine.log("Client side server socket is null")
+            logger.error { "Client side server socket is null" }
             return
         }
 
@@ -289,7 +292,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                     serverSocket.accept()
                 } catch (e: Exception) {
                     if (!serverSocket.isClosed && clientSideRunning.get()) {
-                        GameEngine.log("Error accepting client connection: ${e.message}")
+                        logger.error(e) { "Error accepting client connection: ${e.message}" }
                     }
                     continue
                 }
@@ -300,7 +303,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
             }
         }.onFailure { e ->
             if (!serverSocket.isClosed && clientSideRunning.get()) {
-                GameEngine.log("Client connection acceptor error: ${e.message}")
+                logger.error(e) { "Client connection acceptor error: ${e.message}" }
             }
         }
     }
@@ -309,13 +312,13 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
         val connectionId = "conn-${totalConnectionsCounter.incrementAndGet()}"
 
         runCatching {
-            GameEngine.log("Libp2pStreamProxy: Game client connected from ${clientSocket.inetAddress.hostAddress} [$connectionId]")
+            logger.info { "Libp2pStreamProxy: Game client connected from ${clientSocket.inetAddress.hostAddress} [$connectionId]" }
 
             val peerId = try {
                 PeerId.fromBase58(hostPeerId)
             } catch (e: Exception) {
                 val msg = "Invalid host peer ID: $hostPeerId"
-                GameEngine.log("$msg - ${e.message}")
+                logger.error(e) { "$msg - ${e.message}" }
                 notifyConnectionError(connectionId, hostPeerId, msg)
                 clientSocket.close()
                 return
@@ -343,7 +346,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                     .orTimeout(config.streamOpenTimeoutMs, TimeUnit.MILLISECONDS).get()
             } catch (e: Exception) {
                 val msg = "Failed to establish libp2p connection to host"
-                GameEngine.log("$msg: ${e.message}")
+                logger.error(e) { "$msg: ${e.message}" }
                 notifyConnectionError(connectionId, hostPeerId, msg)
                 runCatching { clientSocket.close() }
                 return
@@ -363,7 +366,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                     .orTimeout(config.streamOpenTimeoutMs, TimeUnit.MILLISECONDS).get()
             } catch (e: Exception) {
                 val msg = "Failed to negotiate game tunnel stream with host"
-                GameEngine.log("$msg: ${e.message}")
+                logger.error(e) { "$msg: ${e.message}" }
                 notifyConnectionError(connectionId, hostPeerId, msg)
                 // onStartInitiator may have already attached the connection, so let
                 // it clean up via close()
@@ -375,7 +378,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
             // From here on, data flows in both directions via the TunnelConnection
             // created inside onStartInitiator. Nothing left to do here.
         }.onFailure { e ->
-            GameEngine.log("Error handling client connection [$connectionId]: ${e.message}")
+            logger.error(e) { "Error handling client connection [$connectionId]: ${e.message}" }
             notifyConnectionError(connectionId, hostPeerId, e.message ?: "Unknown error")
             runCatching { clientSocket.close() }
         }
@@ -469,7 +472,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                             stream.writeAndFlush(data)
                         } catch (e: Exception) {
                             if (!closed.get()) {
-                                GameEngine.log("Stream write error [$id]: ${e.message}")
+                                logger.error(e) { "Stream write error [$id]: ${e.message}" }
                             }
                             break
                         }
@@ -478,13 +481,13 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                         continue
                     } catch (e: IOException) {
                         if (!closed.get() && !isSocketClosedException(e)) {
-                            GameEngine.log("Socket read error [$id]: ${e.message}")
+                            logger.error(e) { "Socket read error [$id]: ${e.message}" }
                         }
                         break
                     }
                 }
             }.onFailure { e ->
-                GameEngine.log("Socket relay error [$id]: ${e.message}")
+                logger.error(e) { "Socket relay error [$id]: ${e.message}" }
             }.also {
                 close()
             }
@@ -526,7 +529,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
     ) : ProtocolMessageHandler<ByteBuf> {
 
         override fun onActivated(stream: Stream) {
-            GameEngine.log("Stream activated [${connection.id}]")
+            logger.info { "Stream activated [${connection.id}]" }
         }
 
         override fun onMessage(stream: Stream, msg: ByteBuf) {
@@ -539,7 +542,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                 socket.outputStream.flush()
                 connection.onStreamDataReceived(length)
             } catch (e: Exception) {
-                GameEngine.log("Socket write error [${connection.id}]: ${e.message}")
+                logger.error(e) { "Socket write error [${connection.id}]: ${e.message}" }
                 notifyConnectionError(
                     connection.id, connection.remotePeerId,
                     e.message ?: "Socket write error"
@@ -549,12 +552,12 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
         }
 
         override fun onClosed(stream: Stream) {
-            GameEngine.log("Stream closed [${connection.id}]")
+            logger.info { "Stream closed [${connection.id}]" }
             connection.close()
         }
 
         override fun onException(cause: Throwable?) {
-            GameEngine.log("Stream exception [${connection.id}]: ${cause?.message}")
+            logger.error(cause) { "Stream exception [${connection.id}]: ${cause?.message}" }
             notifyConnectionError(
                 connection.id, connection.remotePeerId,
                 cause?.message ?: "Stream exception"
@@ -576,7 +579,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
             val connectionId = "conn-${totalConnectionsCounter.incrementAndGet()}"
             val peerId = runCatching { stream.remotePeerId().toBase58() }.getOrNull()
 
-            GameEngine.log("Libp2pStreamProxy: Incoming stream from ${peerId ?: "unknown"} [$connectionId]")
+            logger.info { "Libp2pStreamProxy: Incoming stream from ${peerId ?: "unknown"} [$connectionId]" }
 
             // Synchronously connect to the local game server. Loopback connect is
             // typically sub-millisecond, so blocking the libp2p event loop here is
@@ -589,7 +592,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                 }
             } catch (e: Exception) {
                 val msg = "Failed to connect to game server on port $gameServerPort"
-                GameEngine.log("$msg: ${e.message}")
+                logger.error(e) { msg }
                 notifyConnectionError(connectionId, peerId, msg)
                 runCatching { stream.close() }
                 return CompletableFuture<GameTunnelController>().apply {
@@ -601,7 +604,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                 val controller = setupTunnel(stream, gameSocket, connectionId, peerId)
                 CompletableFuture.completedFuture(controller)
             } catch (e: Exception) {
-                GameEngine.log("Error setting up host-side tunnel [$connectionId]: ${e.message}")
+                logger.error(e) { "Error setting up host-side tunnel [$connectionId]: ${e.message}" }
                 notifyConnectionError(connectionId, peerId, e.message ?: "Setup error")
                 runCatching { gameSocket.close() }
                 runCatching { stream.close() }
@@ -625,7 +628,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                 val controller = setupTunnel(stream, clientSocket, connectionId, hostPeerId)
                 CompletableFuture.completedFuture(controller)
             } catch (e: Exception) {
-                GameEngine.log("Error setting up client-side tunnel [$connectionId]: ${e.message}")
+                logger.error(e) { "Error setting up client-side tunnel [$connectionId]: ${e.message}" }
                 notifyConnectionError(connectionId, hostPeerId, e.message ?: "Setup error")
                 runCatching { clientSocket.close() }
                 runCatching { stream.close() }
