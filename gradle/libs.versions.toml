@@ -9,6 +9,7 @@ legacySupportV4Version = "1.0.0"
 lwjglVersion = "2.9.3"
 lwjgl_utilVersion = "2.9.3"
 tomlktVersion = "0.5.0"
+webrtcJavaVersion = "0.10.0"
 [libraries]
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclientVersion" }
@@ -18,6 +19,7 @@ legacy-support-v4 = { module = "androidx.legacy:legacy-support-v4", version.ref 
 lwjgl_util = { module = "org.lwjgl.lwjgl:lwjgl_util", version.ref = "lwjgl_utilVersion" }
 lwjgl = { module = "org.lwjgl.lwjgl:lwjgl", version.ref = "lwjglVersion" }
 tomlkt = { module = "net.peanuuutz.tomlkt:tomlkt", version.ref = "tomlktVersion" }
+webrtc-java = { module = "dev.onvoid.webrtc:webrtc-java", version.ref = "webrtcJavaVersion" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradleVersion" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }

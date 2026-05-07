@@ -248,16 +248,7 @@ public class Root extends ScriptContext {
 
     public void loadP2PConfig() {
         String savedPeerConfig = P2PLobbyService.getInstance().getSavedPeerConfig();
-        setValueById("p2pLibp2pPeers", savedPeerConfig);
-    }
-
-    public void saveP2PConfig() {
-        String valueById = getValueById("p2pLibp2pPeers");
-        try {
-            P2PLobbyService.getInstance().startIfNeeded(valueById == null ? VariableScope.nullOrMissingString : valueById);
-        } catch (IOException e) {
-            logWarn("saveP2PConfig failed: " + e.getMessage());
-        }
+        setValueById("p2pConfigPath", savedPeerConfig);
     }
 
     public void joinServer(String str) {
@@ -481,26 +472,20 @@ public class Root extends ScriptContext {
             }
         }
         boolean checkbox = topmostDocument.getElementById("useMods").getCheckbox();
-        String value2 = topmostDocument.getElementById("libp2pPeers").getValue();
         closePopup();
-        hostP2PStartWithPasswordAndMods(str, checkbox, value2);
+        hostP2PStartWithPasswordAndMods(str, checkbox);
     }
 
     public void loadP2PHostPopup() {
-        String savedPeerConfig = P2PLobbyService.getInstance().getSavedPeerConfig();
-        if (savedPeerConfig != null) {
-            setValueById("libp2pPeers", savedPeerConfig);
-        }
     }
 
-    public void hostP2PStartWithPasswordAndMods(String str, boolean z, String str2) throws ConfigParseException {
+    public void hostP2PStartWithPasswordAndMods(String str, boolean z) throws ConfigParseException {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.networkEngine.disconnectNetworking("starting new p2p");
         gameEngine.networkEngine.n = str;
         gameEngine.networkEngine.o = z;
         gameEngine.networkEngine.q = false;
         gameEngine.networkEngine.useMasterServer = false;
-        P2PLobbyService.getInstance().savePeerConfig(str2);
         if (!gameEngine.networkEngine.startServerHosting(false)) {
             logWarn("p2p hosting failed");
             return;
@@ -515,8 +500,8 @@ public class Root extends ScriptContext {
             gameEngine.networkEngine.roomSettings.mapPath = "[p8]Many Islands (8p).tmx";
         }
         try {
-            P2PLobbyService.getInstance().startIfNeeded(str2);
-            P2PLobbyService.getInstance().hostCurrentServer(str2);
+            P2PLobbyService.getInstance().startIfNeeded();
+            P2PLobbyService.getInstance().hostCurrentServer();
             this.libRocket.setDocument("battleroom.rml", null);
         } catch (IOException e) {
             gameEngine.networkEngine.disconnectNetworking("p2p host setup failed");
@@ -1269,11 +1254,7 @@ public class Root extends ScriptContext {
             activeElementById.setText("Refreshing");
         }
         try {
-            String valueById = getValueById("p2pLibp2pPeers");
-            if (valueById == null) {
-                valueById = VariableScope.nullOrMissingString;
-            }
-            P2PLobbyService.getInstance().startIfNeeded(valueById);
+            P2PLobbyService.getInstance().startIfNeeded();
             P2PLobbyService.getInstance().requestRefresh();
         } catch (IOException e) {
             showPopup("P2P refresh failed", e.getMessage(), true, (String) null, (String) null);
@@ -1343,9 +1324,9 @@ public class Root extends ScriptContext {
                 activeElementById.appendChild(elementM29clone);
                 elementM29clone.removeReference();
                 elementM29clone.addClass("serverRowMessage");
-                elementM29clone.setText("No P2P rooms found. Add bootstrap peers above or host a room on this device.");
+                elementM29clone.setText("No P2P rooms found. Edit p2p.toml for libp2p peers and WebRTC ICE servers, or host a room on this device.");
             } else {
-                child2.setText("No P2P rooms found. Add bootstrap peers above or host a room on this device.");
+                child2.setText("No P2P rooms found. Edit p2p.toml for libp2p peers and WebRTC ICE servers, or host a room on this device.");
             }
         }
         if (str3 != null) {

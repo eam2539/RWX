@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.httpclient)
 
     implementation(libs.jackson.databind)
+    implementation(libs.webrtc.java)
     implementation(libs.lwjgl)
     implementation(libs.lwjgl.util)
     when (osType) {

@@ -12,7 +12,7 @@ data class P2PRoomAdvertisement(
     var gameVersionCode: Int = 0,
     var gameVersionString: String? = null,
     var requiresPassword: Boolean = false,
-    var transport: String = "libp2p-stream-tunnel",
+    var transport: String = "webrtc-datachannel",
     var gamePort: Int = 5123,
     var mapPath: String? = null,
     var gameMode: String? = null,
@@ -23,6 +23,9 @@ data class P2PRoomAdvertisement(
     var modsRequired: String? = null,
     var libp2pBootstrapPeers: MutableList<String> = mutableListOf(),
     var libp2pDirectAddresses: MutableList<String> = mutableListOf(),
+    var libp2pMappedAddresses: MutableList<String> = mutableListOf(),
+    var webrtcSignaling: String? = null,
+    var webrtcIceServers: MutableList<String> = mutableListOf(),
     var expiresAtMs: Long = 0,
     var seq: Long = 0,
     @Transient var lastSeenTimeMs: Long = 0,
@@ -38,7 +41,7 @@ data class P2PRoomAdvertisement(
         return gameEngine.getVersionCode(true) == gameVersionCode
     }
 
-    fun getConnectAddress(): String = "127.0.0.1:$gamePort"  // libp2p 代理本地地址
+    fun getConnectAddress(): String = "127.0.0.1:$gamePort"
 
     fun getMapDisplayName(): String {
         val value = mapPath ?: return "<No Map>"
@@ -64,13 +67,15 @@ data class P2PRoomAdvertisement(
         if (hasMods && !modsRequired.isNullOrBlank()) {
             parts += "Mods Needed: $modsRequired"
         }
-        if (libp2pBootstrapPeers.isNotEmpty()) {
-            parts += "Libp2p Peers:"
-            libp2pBootstrapPeers.forEach { parts += " - $it" }
+        if (!webrtcSignaling.isNullOrBlank()) {
+            parts += "WebRTC DataChannel: available"
         }
-        if (libp2pDirectAddresses.isNotEmpty()) {
-            parts += "Host Addresses:"
-            libp2pDirectAddresses.forEach { parts += " - $it" }
+        if (webrtcIceServers.isNotEmpty()) {
+            parts += "ICE Servers:"
+            webrtcIceServers.forEach { parts += " - $it" }
+        }
+        if (libp2pMappedAddresses.isNotEmpty()) {
+            parts += "Direct fallback: available"
         }
         return parts.joinToString("\n")
     }

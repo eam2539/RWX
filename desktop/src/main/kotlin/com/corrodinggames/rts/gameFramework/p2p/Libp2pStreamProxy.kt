@@ -332,22 +332,11 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
             }
 
             configureSocket(clientSocket)
-
-            // Build a per-connection ProtocolBinding. The handler will associate the
-            // already-accepted client socket with the freshly negotiated stream
-            // *synchronously* inside onStartInitiator – that guarantees the stream's
-            // pipeline has our handler registered before any peer data arrives.
             val handler = ClientSideProtocolHandler(connectionId, hostPeerId, clientSocket)
             val perConnBinding =
                 object : StrictProtocolBinding<GameTunnelController>(
                     GAME_TUNNEL_PROTOCOL, handler
                 ) {}
-
-            // Establish (or reuse) the underlying libp2p connection to the host peer.
-            // We can't go through libp2pHost.newStream(...) because that path requires
-            // the protocol to be globally registered via addProtocolHandler – we don't
-            // want that on the client side because every accepted socket needs its own
-            // handler instance to relay to the right Socket.
             val p2pConnection = try {
                 libp2pHost.network.connect(peerId, *hostAddresses.toTypedArray())
                     .orTimeout(config.streamOpenTimeoutMs, TimeUnit.MILLISECONDS).get()
@@ -358,16 +347,10 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                 runCatching { clientSocket.close() }
                 return
             }
-
-            // Open a new multiplexed stream on the connection, advertising our protocol.
             val streamPromise = p2pConnection.muxerSession().createStream(
                 listOf(perConnBinding.toInitiator(listOf(GAME_TUNNEL_PROTOCOL)))
             )
 
-            // Wait until controller is complete – this guarantees that:
-            //  1) multistream protocol negotiation succeeded
-            //  2) ClientSideProtocolHandler.onStartInitiator() has run synchronously
-            //     (so stream.pushHandler(...) is in the pipeline before any inbound bytes)
             try {
                 streamPromise.controller
                     .orTimeout(config.streamOpenTimeoutMs, TimeUnit.MILLISECONDS).get()
@@ -588,10 +571,6 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
 
             logger.info { "Libp2pStreamProxy: Incoming stream from ${peerId ?: "unknown"} [$connectionId]" }
 
-            // Synchronously connect to the local game server. Loopback connect is
-            // typically sub-millisecond, so blocking the libp2p event loop here is
-            // acceptable and avoids the race where peer bytes arrive before we
-            // pushHandler() onto the stream pipeline.
             val gameSocket = try {
                 Socket().apply {
                     connect(InetSocketAddress("127.0.0.1", gameServerPort), config.connectTimeoutMs)

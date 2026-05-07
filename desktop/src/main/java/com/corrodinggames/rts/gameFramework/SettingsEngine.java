@@ -17,7 +17,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/SettingsEngine.class */
@@ -201,10 +200,7 @@ public class SettingsEngine {
 
     public boolean highGraphics = true;
 
-    // P2P networking settings
-    public String p2pLibp2pPeers = "";
-    
-    HashMap<String,Field> settingFields = new HashMap();
+    HashMap<String, Field> settingFields = new HashMap<>();
 
     public static SettingsEngine getInstance(Context context) {
         if (settingsEngine == null) {
@@ -398,7 +394,6 @@ public class SettingsEngine {
         this.mouseOrders = getIntPref("mouseOrders", 1);
         this.mousePlacement = getIntPref("mousePlacement", 1);
         this.autosaving = getBooleanPref("autosaving", true);
-        this.p2pLibp2pPeers = getStringPref("p2pLibp2pPeers", null);
         if (GameEngine.isAndroidVersionStatic2) {
             loadFromFileSystem();
         }
@@ -643,8 +638,6 @@ public class SettingsEngine {
         editorEdit.putInt("mouseOrders", this.mouseOrders);
         editorEdit.putInt("mousePlacement", this.mousePlacement);
         editorEdit.putBoolean("autosaving", this.autosaving);
-        //Custom Setting
-        editorEdit.putString("p2pLibp2pPeers", this.p2pLibp2pPeers);
         editorEdit.apply();
         return true;
     }

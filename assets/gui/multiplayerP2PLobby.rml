@@ -23,7 +23,8 @@
 			.panelMainContent { position: relative; top:0px; bottom:90px; padding:2px; }
 			.bottomButtons { position: absolute; bottom:10px; padding:6px; }
 			#serverScrollDiv { display:block; overflow-y:auto; width:100%; height:62%; }
-			#username, #p2pBootstrapPeers { text-align:center; font-size: 18; }
+			#username { text-align:center; font-size: 18; }
+			#p2pConfigPath { font-size: 12; text-align:center; }
 			.versionNumberHeader { display:block; position:absolute; top:0; right:0; text-align:right; font-size:14; }
 		</style>
 	</head>
@@ -39,8 +40,8 @@
 								<input id="username" type="text" name="username" value="Unnamed" onblur="mp.getUsernameFromInterface();"/>
 							</div>
 							<div class="nameSection" style="width:26em; padding-top:6px;">
-								<input id="p2pLibp2pPeers" type="text" name="libp2pPeers" value="" onblur="saveP2PConfig(); refreshP2PServerList();"/>
-								<p style="font-size:12; text-align:center;">Libp2p bootstrap peers (optional): /ip4/.../tcp/.../p2p/...</p>
+								<p id="p2pConfigPath">P2P config: p2p.toml</p>
+								<p style="font-size:12; text-align:center;">Edit p2p.toml for libp2p peers and WebRTC STUN/TURN servers.</p>
 							</div>
 							<div class="formSection joinSection">
 								<button onclick="directJoinPopup()">Direct Join</button>
