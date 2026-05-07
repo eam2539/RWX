@@ -4,6 +4,7 @@ import com.corrodinggames.rts.gameFramework.logger
 import io.libp2p.core.Host
 import io.libp2p.core.PeerId
 import io.libp2p.core.Stream
+import io.libp2p.core.multiformats.Multiaddr
 import io.libp2p.core.multistream.StrictProtocolBinding
 import io.libp2p.protocol.ProtocolHandler
 import io.libp2p.protocol.ProtocolMessageHandler
@@ -124,6 +125,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
     fun startClientSide(
         libp2pHost: Host,
         hostPeerId: String,
+        hostAddresses: List<Multiaddr> = emptyList(),
         localPort: Int = 0
     ): Int {
         synchronized(this) {
@@ -141,7 +143,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                 val boundPort = clientSideServerSocket!!.localPort
 
                 executor.execute {
-                    acceptClientConnections(libp2pHost, hostPeerId)
+                    acceptClientConnections(libp2pHost, hostPeerId, hostAddresses)
                 }
 
                 clientSideRunning.set(true)
@@ -279,7 +281,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
         }
     }
 
-    private fun acceptClientConnections(libp2pHost: Host, hostPeerId: String) {
+    private fun acceptClientConnections(libp2pHost: Host, hostPeerId: String, hostAddresses: List<Multiaddr>) {
         val serverSocket = clientSideServerSocket
         if (serverSocket == null) {
             logger.error { "Client side server socket is null" }
@@ -298,7 +300,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
                 }
 
                 executor.execute {
-                    handleClientConnection(libp2pHost, hostPeerId, clientSocket)
+                    handleClientConnection(libp2pHost, hostPeerId, hostAddresses, clientSocket)
                 }
             }
         }.onFailure { e ->
@@ -308,7 +310,12 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
         }
     }
 
-    private fun handleClientConnection(libp2pHost: Host, hostPeerId: String, clientSocket: Socket) {
+    private fun handleClientConnection(
+        libp2pHost: Host,
+        hostPeerId: String,
+        hostAddresses: List<Multiaddr>,
+        clientSocket: Socket
+    ) {
         val connectionId = "conn-${totalConnectionsCounter.incrementAndGet()}"
 
         runCatching {
@@ -342,7 +349,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
             // want that on the client side because every accepted socket needs its own
             // handler instance to relay to the right Socket.
             val p2pConnection = try {
-                libp2pHost.network.connect(peerId)
+                libp2pHost.network.connect(peerId, *hostAddresses.toTypedArray())
                     .orTimeout(config.streamOpenTimeoutMs, TimeUnit.MILLISECONDS).get()
             } catch (e: Exception) {
                 val msg = "Failed to establish libp2p connection to host"

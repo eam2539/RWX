@@ -22,6 +22,7 @@ data class P2PRoomAdvertisement(
     var hasMods: Boolean = false,
     var modsRequired: String? = null,
     var libp2pBootstrapPeers: MutableList<String> = mutableListOf(),
+    var libp2pDirectAddresses: MutableList<String> = mutableListOf(),
     var expiresAtMs: Long = 0,
     var seq: Long = 0,
     @Transient var lastSeenTimeMs: Long = 0,
@@ -66,6 +67,10 @@ data class P2PRoomAdvertisement(
         if (libp2pBootstrapPeers.isNotEmpty()) {
             parts += "Libp2p Peers:"
             libp2pBootstrapPeers.forEach { parts += " - $it" }
+        }
+        if (libp2pDirectAddresses.isNotEmpty()) {
+            parts += "Host Addresses:"
+            libp2pDirectAddresses.forEach { parts += " - $it" }
         }
         return parts.joinToString("\n")
     }

@@ -37,6 +37,8 @@ class P2PLobbyService private constructor() {
         private const val LOBBY_TOPIC = "rwx.p2p.lobby.v1"
         private const val ROOM_ANNOUNCE_INTERVAL_MS = 3000L
         private const val ROOM_TTL_MS = 15000L
+        private const val PEER_ADDR_TTL_MS = 10 * 60 * 1000L
+        private const val CONNECT_TIMEOUT_MS = 10000L
         private val singleton: P2PLobbyService = P2PLobbyService()
 
         @JvmStatic
@@ -111,6 +113,7 @@ class P2PLobbyService private constructor() {
             libp2pBootstrapPeers = parseLibp2pPeers(libp2pPeers).toMutableList().also {
                 it += IPFS_BOOTSTRAP_PEERS
             }
+            libp2pDirectAddresses = getHostDirectAddresses(host!!).toMutableList()
         }
         updateRoomFromNetworkState(room)
 
@@ -132,10 +135,14 @@ class P2PLobbyService private constructor() {
 
         GameEngine.log("Starting libp2p stream proxy to connect to host")
         val hostPeerId = room.hostPeerId ?: throw IOException("Missing host peer ID")
+        val hostAddresses = parseMultiaddrs(room.libp2pDirectAddresses)
+        addPeerAddresses(host!!, hostPeerId, hostAddresses)
+        connectRoomPeers(room)
 
         val localPort = libp2pProxy.startClientSide(
             host!!,
             hostPeerId,
+            hostAddresses,
             localPort = 0  // 自动选择可用端口
         )
         
@@ -157,6 +164,7 @@ class P2PLobbyService private constructor() {
                     type = "room_close",
                     roomId = room.roomId,
                     hostPeerId = room.hostPeerId,
+                    libp2pDirectAddresses = room.libp2pDirectAddresses,
                 )
             )
             discoveredRooms.remove(room.roomId)
@@ -241,6 +249,7 @@ class P2PLobbyService private constructor() {
             maxPlayers = PlayerTeam.TEAM_NEUTRAL
             hasMods = networkEngine.o
             modsRequired = if (networkEngine.o) "Active mods required" else ""
+            libp2pDirectAddresses = getHostDirectAddresses(host).toMutableList()
             seq += 1
             lastSeenTimeMs = System.currentTimeMillis()
             expiresAtMs = room.lastSeenTimeMs + ROOM_TTL_MS
@@ -272,6 +281,7 @@ class P2PLobbyService private constructor() {
                 return
             }
             room.lastSeenTimeMs = System.currentTimeMillis()
+            addPeerAddresses(host, room.hostPeerId, parseMultiaddrs(room.libp2pDirectAddresses))
             val previous = discoveredRooms[room.roomId]
             if (previous == null || previous.seq <= room.seq) {
                 discoveredRooms[room.roomId!!] = room
@@ -291,11 +301,45 @@ class P2PLobbyService private constructor() {
         val currentHost = host ?: return
         peers.forEach { peer ->
             try {
-                currentHost.network.connect(Multiaddr(peer))
+                currentHost.network.connect(Multiaddr(peer)).orTimeout(CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
             } catch (e: Exception) {
                 GameEngine.log("Failed bootstrap connect: $peer - ${e.message}")
             }
         }
+    }
+
+    private fun connectRoomPeers(room: P2PRoomAdvertisement) {
+        connectBootstrapPeers(room.libp2pBootstrapPeers)
+        val hostPeerId = room.hostPeerId ?: return
+        val hostPeer = runCatching { io.libp2p.core.PeerId.fromBase58(hostPeerId) }.getOrNull() ?: return
+        val addresses = parseMultiaddrs(room.libp2pDirectAddresses)
+        if (addresses.isEmpty()) return
+        try {
+            host?.network?.connect(hostPeer, *addresses.toTypedArray())
+                ?.orTimeout(CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+        } catch (e: Exception) {
+            GameEngine.log("Failed direct P2P connect: ${e.message}")
+        }
+    }
+
+    private fun addPeerAddresses(currentHost: Host?, peerIdText: String?, addresses: List<Multiaddr>) {
+        if (currentHost == null || peerIdText.isNullOrBlank() || addresses.isEmpty()) return
+        val peerId = runCatching { io.libp2p.core.PeerId.fromBase58(peerIdText) }.getOrNull() ?: return
+        currentHost.addressBook.addAddrs(peerId, PEER_ADDR_TTL_MS, *addresses.toTypedArray())
+    }
+
+    private fun getHostDirectAddresses(currentHost: Host?): List<String> {
+        if (currentHost == null) return emptyList()
+        return currentHost.listenAddresses()
+            .map { it.toString() }
+            .filterNot { it.contains("/ip4/0.0.0.0/") || it.contains("/ip6/::/") }
+            .distinct()
+    }
+
+    private fun parseMultiaddrs(values: List<String>?): List<Multiaddr> {
+        return values.orEmpty().mapNotNull { value ->
+            runCatching { Multiaddr(value) }.getOrNull()
+        }.distinct()
     }
 
     private fun handleMdnsPeerFound(peerInfo: PeerInfo) {
