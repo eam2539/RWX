@@ -39,10 +39,14 @@ jobs:
         run: node tools/p2p-github-dist.js
 
       - name: Publish P2P discovery index
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ github.token }}
-          publish_branch: p2p-dist
-          publish_dir: ./p2p-dist-worktree/public
-          force_orphan: true
-          commit_message: 'Update P2P discovery dist'
+        working-directory: p2p-dist-worktree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/rooms.json
+          if git diff --cached --quiet; then
+            echo "P2P discovery index unchanged"
+          else
+            git commit -m "Update P2P discovery dist"
+            git push origin HEAD:p2p-dist
+          fi
