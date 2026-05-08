@@ -12,14 +12,21 @@ import dev.onvoid.webrtc.RTCDataChannelInit
 import dev.onvoid.webrtc.RTCDataChannelObserver
 import dev.onvoid.webrtc.RTCDataChannelState
 import dev.onvoid.webrtc.RTCIceCandidate
+import dev.onvoid.webrtc.RTCIceConnectionState
+import dev.onvoid.webrtc.RTCIceGatheringState
 import dev.onvoid.webrtc.RTCIceServer
+import dev.onvoid.webrtc.RTCPeerConnectionIceErrorEvent
 import dev.onvoid.webrtc.RTCOfferOptions
 import dev.onvoid.webrtc.RTCPeerConnection
 import dev.onvoid.webrtc.RTCPeerConnectionState
 import dev.onvoid.webrtc.RTCSessionDescription
 import dev.onvoid.webrtc.RTCSdpType
 import dev.onvoid.webrtc.SetSessionDescriptionObserver
+import dev.onvoid.webrtc.media.audio.AudioDeviceModule
+import dev.onvoid.webrtc.media.audio.AudioLayer
 import java.io.IOException
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.net.InetSocketAddress
 import java.net.URI
 import java.net.ServerSocket
@@ -305,6 +312,7 @@ class WebRtcTunnelProxy(private val config: ProxyConfig = ProxyConfig()) {
     ): ClientSession {
         val peerConnection = factory!!.createPeerConnection(createRtcConfig(), object : PeerConnectionObserver {
             override fun onIceCandidate(candidate: RTCIceCandidate) {
+                GameEngine.log("WebRTC ICE candidate session=$sessionId mid=${candidate.sdpMid} index=${candidate.sdpMLineIndex} server=${candidate.serverUrl} sdp=${candidate.sdp}")
                 signalSender?.invoke(
                     Signal(
                         roomId = roomId,
@@ -326,9 +334,22 @@ class WebRtcTunnelProxy(private val config: ProxyConfig = ProxyConfig()) {
             }
 
             override fun onConnectionChange(state: RTCPeerConnectionState) {
+                GameEngine.log("WebRTC peer connection state session=$sessionId state=$state")
                 if (state == RTCPeerConnectionState.FAILED || state == RTCPeerConnectionState.CLOSED) {
                     sessions[sessionId]?.let { closeSession(it) }
                 }
+            }
+
+            override fun onIceConnectionChange(state: RTCIceConnectionState) {
+                GameEngine.log("WebRTC ICE connection state session=$sessionId state=$state")
+            }
+
+            override fun onIceGatheringChange(state: RTCIceGatheringState) {
+                GameEngine.log("WebRTC ICE gathering state session=$sessionId state=$state")
+            }
+
+            override fun onIceCandidateError(event: RTCPeerConnectionIceErrorEvent) {
+                GameEngine.log("WebRTC ICE candidate error session=$sessionId url=${event.url} address=${event.address}:${event.port} code=${event.errorCode} text=${event.errorText}")
             }
         })
         return ClientSession(roomId, sessionId, localPeerId, remotePeerId, peerConnection)
@@ -339,18 +360,28 @@ class WebRtcTunnelProxy(private val config: ProxyConfig = ProxyConfig()) {
             override fun onBufferedAmountChange(previousAmount: Long) {}
 
             override fun onStateChange() {
-                if (dataChannel.getState() == RTCDataChannelState.OPEN) {
+                if (session.closed.get()) return
+                val state = runCatching { dataChannel.getState() }.getOrNull() ?: return
+                GameEngine.log("WebRTC DataChannel state session=${session.sessionId} state=$state")
+                if (state == RTCDataChannelState.OPEN) {
                     if (session.socket == null && hostGamePort > 0) {
-                        session.socket = Socket().apply {
-                            connect(InetSocketAddress("127.0.0.1", hostGamePort), config.socketConnectTimeoutMs)
-                            soTimeout = config.socketReadTimeoutMs
-                            tcpNoDelay = true
+                        try {
+                            session.socket = Socket().apply {
+                                connect(InetSocketAddress("127.0.0.1", hostGamePort), config.socketConnectTimeoutMs)
+                                soTimeout = config.socketReadTimeoutMs
+                                tcpNoDelay = true
+                            }
+                        } catch (_: Exception) {
+                            closeSession(session)
+                            return
                         }
                     }
                     session.openFuture.complete(Unit)
                     session.socket?.let {
                         executor.execute { relaySocketToDataChannel(session) }
                     }
+                } else if (state == RTCDataChannelState.CLOSED) {
+                    closeSession(session)
                 }
             }
 
@@ -390,6 +421,7 @@ class WebRtcTunnelProxy(private val config: ProxyConfig = ProxyConfig()) {
     }
 
     private fun sendSessionDescription(session: ClientSession, type: String, description: RTCSessionDescription) {
+        GameEngine.log("WebRTC sending $type session=${session.sessionId} from=${session.localPeerId} to=${session.remotePeerId}")
         signalSender?.invoke(
             Signal(
                 roomId = session.roomId,
@@ -407,18 +439,18 @@ class WebRtcTunnelProxy(private val config: ProxyConfig = ProxyConfig()) {
         if (!session.closed.compareAndSet(false, true)) return
         sessions.remove(session.sessionId)
         pendingIceSignals.remove(session.sessionId)
+        session.openFuture.cancel(false)
         runCatching { session.socket?.close() }
-        runCatching { session.dataChannel?.close() }
-        runCatching { session.dataChannel?.dispose() }
         runCatching { session.peerConnection.close() }
     }
 
     private fun ensureFactory() {
         if (factory == null) {
             factory = try {
-                PeerConnectionFactory()
+                PeerConnectionFactory(AudioDeviceModule(AudioLayer.kDummyAudio))
             } catch (e: Throwable) {
-                throw IOException("Failed to initialize WebRTC native library: ${e.message}", e)
+                GameEngine.log("Failed to initialize WebRTC native library:\n${stackTraceToString(e)}")
+                throw IOException("Failed to initialize WebRTC native library: ${rootCauseMessage(e)}", e)
             }
         }
         if (executor.isShutdown) {
@@ -470,5 +502,17 @@ class WebRtcTunnelProxy(private val config: ProxyConfig = ProxyConfig()) {
             .filter { it.startsWith("stun:") || it.startsWith("turn:") || it.startsWith("turns:") }
             .distinct()
         return servers.ifEmpty { DEFAULT_ICE_SERVERS }
+    }
+
+    private fun stackTraceToString(throwable: Throwable): String {
+        val writer = StringWriter()
+        throwable.printStackTrace(PrintWriter(writer))
+        return writer.toString()
+    }
+
+    private fun rootCauseMessage(throwable: Throwable): String {
+        var current = throwable
+        while (current.cause != null) current = current.cause!!
+        return current.message ?: current.javaClass.name
     }
 }

@@ -9,12 +9,7 @@ import com.corrodinggames.rts.appFramework.MultiplayerBattleroomActivity;
 import com.corrodinggames.rts.debug.DebugSocketServer;
 import com.corrodinggames.rts.game.GameLogic;
 import com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope;
-import com.corrodinggames.rts.gameFramework.GameEngine;
-import com.corrodinggames.rts.gameFramework.InputController;
-import com.corrodinggames.rts.gameFramework.MissionEngine;
-import com.corrodinggames.rts.gameFramework.MusicManager;
-import com.corrodinggames.rts.gameFramework.NullMusicFactory;
-import com.corrodinggames.rts.gameFramework.PerformanceProfiler;
+import com.corrodinggames.rts.gameFramework.*;
 import com.corrodinggames.rts.gameFramework.audio.NullSound;
 import com.corrodinggames.rts.gameFramework.audio.SoundEngine;
 import com.corrodinggames.rts.gameFramework.graphics.SoftwareGraphicsInterface;
@@ -73,6 +68,7 @@ public class Main extends NetworkCallbacks {
 
     public static void main(String[] strArr) {
         m = new Main();
+        GlobalLogger.storage = new DesktopPlatformBridge().getStorage();
         m.a(strArr);
         new Runnable() { // from class: com.corrodinggames.rts.java.Main.1
             @Override // java.lang.Runnable

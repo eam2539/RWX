@@ -3,18 +3,26 @@ package com.corrodinggames.rts.gameFramework
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-
+//removed in the future
 enum class LogLevel { DEBUG, INFO, WARN, ERROR }
 
 object GlobalLogger {
 
     var TAG = "RWX"
+
+    @JvmField
     var writeToFile = true
 
     @Volatile
     var minimumLevel: LogLevel = LogLevel.INFO
 
-    //    private val logFile: File by lazy { resolveLogFile() }
+    @JvmField
+    @Volatile
+    var storage: PlatformStorage? = null
+
+    private val logFile: PlatformFile?
+        get() = storage?.rootDir?.resolve("rwx.log")
+
     private var isFirstWrite = true
 
     inline fun debug(crossinline message: () -> Any) = log(LogLevel.DEBUG, msg = message)
@@ -46,37 +54,32 @@ object GlobalLogger {
             }
         )
         val content = "[$levelPrefix] [$timestamp] [$caller] ${msg()}"
-//        val logEntry = content + if (throwable != null) "\n${throwable.stackTraceToString()}" else "" + '\n'
-
-//            if (writeToFile) {
-//                writeToFile(logEntry)
-//            }
-
+        val logEntry = content + if (throwable != null) "\n${throwable.stackTraceToString()}" else "" + '\n'
+        if (writeToFile) {
+            writeToFile(logEntry)
+        }
         System.err.println(content)
         throwable?.printStackTrace()
 
     }
 
     @PublishedApi
-    internal inline fun logToFile(crossinline msg: () -> Any) {
+    @Synchronized
+    internal fun writeToFile(logEntry: String) {
+        runCatching {
+            val file = logFile ?: return
+            if (isFirstWrite) {
+                file.writeText(logEntry, Charsets.UTF_8)
+            } else {
+                file.appendText(logEntry, Charsets.UTF_8)
+            }
+            if (isFirstWrite) isFirstWrite = false
 
+        }.onFailure { e ->
+            System.err.println("Failed to write log to file: ${e.message}")
+            e.printStackTrace()
+        }
     }
-    /*  @PublishedApi
-      @Synchronized
-      internal fun writeToFile(logEntry: String) {
-          runCatching {
-              if (isFirstWrite) {
-                  logFile.writeText(logEntry, Charsets.UTF_8)
-              } else {
-                  logFile.appendText(logEntry, Charsets.UTF_8)
-              }
-              if (isFirstWrite) isFirstWrite = false
-
-          } .onFailure { e->
-              System.err.println( "Failed to write log to file: ${e.message}")
-              e.printStackTrace()
-          }
-      }*/
 
     @PublishedApi
     internal fun resolveCaller(): String {
@@ -90,15 +93,6 @@ object GlobalLogger {
         }
         return ""
     }
-
-    /*private fun resolveLogFile(): File {
-
-        return if (localStorage.exists()) {
-            File(localStorage, "rwx.log")
-        } else {
-            File(System.getProperty("java.io.tmpdir"), "rwx.log")
-        }
-    }*/
 
 }
 

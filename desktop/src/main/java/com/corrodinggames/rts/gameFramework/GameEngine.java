@@ -54,6 +54,8 @@ import com.corrodinggames.rts.gameFramework.utility.AssetIndex;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -794,7 +796,7 @@ public abstract class GameEngine {
     public abstract void loadLevel(boolean z, boolean z2, GameMode gameMode) throws IOException;
 
     /* JADX INFO: renamed from: a */
-    public abstract void loadGame(boolean z, GameMode gameMode) ;
+    public abstract void loadGame(boolean z, GameMode gameMode);
 
     /* JADX INFO: renamed from: e */
     public abstract void stopAndReset();
@@ -1120,7 +1122,8 @@ public abstract class GameEngine {
         } else {
             Log.b("RustedWarfare", str);
         }
-        //GlobalLogger.INSTANCE.writeToFile(() -> str);
+        if ((GlobalLogger.writeToFile))
+            GlobalLogger.INSTANCE.writeToFile(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + ":  " + str + "\n");
     }
 
     /* JADX INFO: renamed from: d */

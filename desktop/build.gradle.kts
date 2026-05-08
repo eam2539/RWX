@@ -1,11 +1,10 @@
-import org.gradle.api.tasks.bundling.Zip
-import org.gradle.jvm.toolchain.JavaLanguageVersion.of
 import java.util.Locale.getDefault
 
 plugins {
     id("java")
     id("application")
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -53,9 +52,15 @@ dependencies {
     implementation(files("../libs/jorbis-0.0.15.jar"))
     implementation(files("../libs/android-platform-lib.jar"))
     implementation(libs.httpclient)
-
     implementation(libs.jackson.databind)
     implementation(libs.webrtc.java)
+    when (platformType) {
+        PlatformType.WINDOWS_X64 -> runtimeOnly("dev.onvoid.webrtc:webrtc-java:${libs.versions.webrtcJavaVersion}:windows-x86_64")
+        PlatformType.MACOS_X64 -> runtimeOnly("dev.onvoid.webrtc:webrtc-java:${libs.versions.webrtcJavaVersion}:macos-x86_64")
+        PlatformType.MACOS_ARM64 -> runtimeOnly("dev.onvoid.webrtc:webrtc-java:${libs.versions.webrtcJavaVersion}:macos-aarch64")
+        PlatformType.LINUX_X64 -> runtimeOnly("dev.onvoid.webrtc:webrtc-java:${libs.versions.webrtcJavaVersion}:linux-x86_64")
+        PlatformType.WINDOWS_ARM64, PlatformType.LINUX_ARM64 -> {}
+    }
     implementation(libs.lwjgl)
     implementation(libs.lwjgl.util)
     when (osType) {
@@ -77,6 +82,7 @@ application {
         "-Djava.library.path=lib/natives"
     )
 }
+
 
 val platformId = platformType.name.lowercase(getDefault()).replace("_", "-")
 fun patchLinuxSharedObjects(rootDir: File) {
@@ -104,13 +110,28 @@ fun patchLinuxSharedObjects(rootDir: File) {
 val rocketConnectorNativeDir = layout.buildDirectory.dir("native/rocketConnector")
 val rocketConnectorSourceDir = layout.projectDirectory.dir("../native/rocketConnector")
 
+
+fun isRocketConnectorBuilt(buildDir: File): Boolean {
+    val files = listOf(
+        buildDir.resolve("librocketConnector.so"),
+        buildDir.resolve("rocketConnector.dll"),
+        buildDir.resolve("librocketConnector.dylib")
+    )
+    return files.any { it.exists() }
+}
+
+fun getLibrocketRoot(): String = System.getenv("LIBROCKET_ROOT")
+    ?: throw GradleException("LIBROCKET_ROOT environment variable is not set")
+
+
 val configureRocketConnectorNative by tasks.registering(Exec::class) {
     inputs.dir(rocketConnectorSourceDir)
     outputs.dir(rocketConnectorNativeDir)
+    onlyIf {
+        !isRocketConnectorBuilt(rocketConnectorNativeDir.get().asFile)
+    }
     doFirst {
-        val librocketRoot = System.getenv("LIBROCKET_ROOT")
-            ?: throw GradleException("LIBROCKET_ROOT environment variable is not set")
-        environment("LIBROCKET_ROOT", librocketRoot)
+        environment("LIBROCKET_ROOT", getLibrocketRoot())
     }
     val javaHome = System.getProperty("java.home").replace("\\", "/")
     var cmakeArgs = mutableListOf(
@@ -135,16 +156,10 @@ val buildRocketConnectorNative by tasks.registering(Exec::class) {
     inputs.dir(rocketConnectorSourceDir)
     outputs.dir(rocketConnectorNativeDir)
     onlyIf {
-        val buildDir = rocketConnectorNativeDir.get().asFile
-        val soFile = buildDir.resolve("librocketConnector.so")
-        val dllFile = buildDir.resolve("rocketConnector.dll")
-        val dylibFile = buildDir.resolve("librocketConnector.dylib")
-        !soFile.exists() && !dllFile.exists() && !dylibFile.exists()
+        !isRocketConnectorBuilt(rocketConnectorNativeDir.get().asFile)
     }
     doFirst {
-        val librocketRoot = System.getenv("LIBROCKET_ROOT")
-            ?: throw GradleException("LIBROCKET_ROOT environment variable is not set")
-        environment("LIBROCKET_ROOT", librocketRoot)
+        environment("LIBROCKET_ROOT", getLibrocketRoot())
     }
     commandLine("cmake", "--build", rocketConnectorNativeDir.get().asFile.absolutePath, "--config", "Release")
 }
@@ -402,5 +417,50 @@ if (osType == OSType.WINDOWS) {
             outputZip.absolutePath,
             appName
         )
+    }
+}
+
+// ================== P2P Config========================
+tasks.register<JavaExec>("p2pDiagnostics") {
+    group = "verification"
+    description = "Runs headless P2P discovery/join diagnostics."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass = "com.corrodinggames.rts.gameFramework.p2p.P2PDiagnosticsMain"
+    workingDir = rootProject.projectDir
+    args(project.findProperty("p2pDiagArgs")?.toString()?.split(" ")?.filter { it.isNotBlank() } ?: listOf(
+        "discover",
+        "60000"
+    ))
+}
+
+tasks.register<JavaExec>("p2pRendezvous") {
+    group = "verification"
+    description = "Runs a public RWX P2P rendezvous/relay node."
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass = "com.corrodinggames.rts.gameFramework.p2p.P2PRendezvousMain"
+    workingDir = rootProject.projectDir
+    args(project.findProperty("p2pRendezvousArgs")?.toString()?.split(" ")?.filter { it.isNotBlank() }
+        ?: listOf("4001"))
+}
+
+tasks.register("writeP2PRendezvousArgfile") {
+    group = "verification"
+    description = "Writes a Java argfile for running the RWX P2P rendezvous node."
+    val outputFile = rootProject.layout.buildDirectory.file("p2p/rendezvous.args")
+    outputs.file(outputFile)
+    doLast {
+        val file = outputFile.get().asFile
+        file.parentFile.mkdirs()
+        val classpath = sourceSets.main.get().runtimeClasspath.asPath
+        file.writeText(
+            listOf(
+                "-Dfile.encoding=UTF-8",
+                "-cp",
+                classpath,
+                "com.corrodinggames.rts.gameFramework.p2p.P2PRendezvousMain"
+            ).joinToString(System.lineSeparator()) + System.lineSeparator(),
+            Charsets.UTF_8
+        )
+        println(file.absolutePath)
     }
 }

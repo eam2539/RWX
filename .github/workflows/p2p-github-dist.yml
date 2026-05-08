@@ -1,0 +1,48 @@
+name: P2P GitHub Discovery Dist
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'p2p-github-gists.json'
+      - 'tools/p2p-github-dist.js'
+      - '.github/workflows/p2p-github-dist.yml'
+
+concurrency:
+  group: p2p-github-discovery-dist
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-dist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: p2p-dist
+          path: p2p-dist-worktree
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Build P2P discovery index
+        working-directory: p2p-dist-worktree
+        run: node tools/p2p-github-dist.js
+
+      - name: Publish P2P discovery index
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ github.token }}
+          publish_branch: p2p-dist
+          publish_dir: ./p2p-dist-worktree/public
+          force_orphan: true
+          commit_message: 'Update P2P discovery dist'

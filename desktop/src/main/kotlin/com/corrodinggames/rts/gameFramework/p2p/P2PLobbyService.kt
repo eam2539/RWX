@@ -16,8 +16,11 @@ import io.libp2p.core.pubsub.Topic
 import io.libp2p.discovery.MDnsDiscovery
 import io.libp2p.pubsub.gossip.Gossip
 import io.libp2p.pubsub.gossip.builders.GossipRouterBuilder
+import io.libp2p.transport.tcp.TcpTransport
 import io.netty.buffer.Unpooled
 import java.io.IOException
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
@@ -50,6 +53,14 @@ class P2PLobbyService private constructor() {
     private var libp2pPortMapping: NatPortMapper.Mapping? = null
     private val natPortMapper = NatPortMapper()
     private var webRtcProxy = WebRtcTunnelProxy(p2pConfig.webRtcProxy)
+    private var relaySupport: Libp2pRelaySupport.Components? = null
+    private var githubDiscovery = P2PGithubDiscoveryProvider(p2pConfig.discovery.github, objectMapper)
+    private var githubPublisher = P2PGithubGistPublisher(p2pConfig.discovery.github.publish, objectMapper)
+    private var dhtDiscovery = P2PDhtDiscoveryProvider(p2pConfig.discovery.dht)
+    private var bootstrapNodeSource = P2PBootstrapNodeSource(p2pConfig.libp2pPeerSources, objectMapper)
+    private var lastGithubDiscoveryMs = 0L
+    private var lastDhtDiscoveryMs = 0L
+    private var lastGithubPublishMs = 0L
 
     @Synchronized
     @Throws(IOException::class)
@@ -58,24 +69,49 @@ class P2PLobbyService private constructor() {
         if (!started) {
             libp2pProxy = Libp2pStreamProxy(p2pConfig.libp2pProxy)
             webRtcProxy = WebRtcTunnelProxy(p2pConfig.webRtcProxy)
+            githubDiscovery = P2PGithubDiscoveryProvider(p2pConfig.discovery.github, objectMapper)
+            githubPublisher = P2PGithubGistPublisher(p2pConfig.discovery.github.publish, objectMapper)
+            dhtDiscovery = P2PDhtDiscoveryProvider(p2pConfig.discovery.dht)
+            bootstrapNodeSource = P2PBootstrapNodeSource(p2pConfig.libp2pPeerSources, objectMapper)
             val gossipProtocol = Gossip(GossipRouterBuilder().build())
             gossip = gossipProtocol
-            host = HostBuilder().listen("/ip4/0.0.0.0/tcp/0").protocol(gossipProtocol).build().also {
+            val builtHost = runCatching {
+                val hostBuilder = HostBuilder()
+                    .transport(::TcpTransport)
+                    .listen("/ip4/0.0.0.0/tcp/${p2pConfig.libp2pListenPort}")
+                    .protocol(gossipProtocol)
+                relaySupport = Libp2pRelaySupport(p2pConfig.relay).applyTo(hostBuilder)
+                hostBuilder.build()
+            }.getOrElse { e ->
+                GameEngine.log("Failed to build libp2p host:\n${stackTraceToString(e)}")
+                throw IOException("Failed to build libp2p host: ${rootCauseMessage(e)}", e)
+            }
+            host = builtHost.also {
                 it.addConnectionHandler(gossipProtocol)
                 runCatching {
                     it.start().get(15L, TimeUnit.SECONDS)
                 }.onFailure { e ->
-                    throw IOException("Failed to start libp2p host", e)
+                    GameEngine.log("Failed to start libp2p host:\n${stackTraceToString(e)}")
+                    throw IOException("Failed to start libp2p host: ${rootCauseMessage(e)}", e)
                 }
             }
-            gossipProtocol.subscribe(this::handleMessage, lobbyTopic)
-            gossipProtocol.subscribe(this::handleWebRtcSignal, webrtcTopic)
             val currentHost = host ?: throw IOException("Libp2p host was not created")
-            mDnsDiscovery =
-                MDnsDiscovery(currentHost, MDnsDiscovery.ServiceTagLocal, MDnsDiscovery.QueryInterval, null).also {
-                    it.addHandler(this::handleMdnsPeerFound)
-                    it.start()
-                }
+            GameEngine.log(
+                "P2P libp2p host started peer=${currentHost.peerId.toBase58()} addrs=${
+                    currentHost.listenAddresses().joinToString(",")
+                }"
+            )
+            if (p2pConfig.discovery.enableGossipSub) {
+                gossipProtocol.subscribe(this::handleMessage, lobbyTopic)
+            }
+            gossipProtocol.subscribe(this::handleWebRtcSignal, webrtcTopic)
+            if (p2pConfig.discovery.enableMdns) {
+                mDnsDiscovery =
+                    MDnsDiscovery(currentHost, MDnsDiscovery.ServiceTagLocal, MDnsDiscovery.QueryInterval, null).also {
+                        it.addHandler(this::handleMdnsPeerFound)
+                        it.start()
+                    }
+            }
             scheduler.scheduleAtFixedRate(
                 ::tick,
                 1000L,
@@ -84,7 +120,7 @@ class P2PLobbyService private constructor() {
             )
             started = true
         }
-        connectBootstrapPeers(p2pConfig.libp2pPeers)
+        connectBootstrapPeers((p2pConfig.libp2pPeers + bootstrapNodeSource.fetchPeers()).distinct())
     }
 
     fun getSavedPeerConfig(): String {
@@ -121,8 +157,18 @@ class P2PLobbyService private constructor() {
         
         hostedRoom = room
         joinedRoom = null
-        discoveredRooms[room.roomId!!] = room
+        mergeDiscoveredRoom(P2PDiscoveryResult(room, P2PDiscoverySource.MANUAL, trustScore = 100))
+        GameEngine.log(
+            "P2P hosted room id=${room.roomId} host=${room.hostPeerId} direct=${
+                room.libp2pDirectAddresses.joinToString(
+                    ","
+                )
+            } mapped=${room.libp2pMappedAddresses.joinToString(",")}"
+        )
         publishRoom(room)
+        githubPublisher.publishRoom(room)
+        lastGithubPublishMs = System.currentTimeMillis()
+        dhtDiscovery.publishRoom(room)
         queueRoomListRefresh()
     }
 
@@ -160,6 +206,7 @@ class P2PLobbyService private constructor() {
     @Synchronized
     fun stopSession() {
         hostedRoom?.let { room ->
+            githubPublisher.closeRoom(room)
             publishRoom(
                 P2PRoomAdvertisement(
                     magic = room.magic,
@@ -214,9 +261,32 @@ class P2PLobbyService private constructor() {
             hostedRoom?.let {
                 updateRoomFromNetworkState(it)
                 publishRoom(it)
+                publishExternalRoom(it)
+                dhtDiscovery.publishRoom(it)
             }
+            refreshExternalDiscovery()
         } catch (e: Exception) {
             GameEngine.log("P2P tick failed: ${e.message}")
+        }
+    }
+
+    private fun refreshExternalDiscovery() {
+        val now = System.currentTimeMillis()
+        if (p2pConfig.discovery.github.enable && now - lastGithubDiscoveryMs >= p2pConfig.discovery.github.refreshIntervalMs) {
+            lastGithubDiscoveryMs = now
+            githubDiscovery.fetchRooms().forEach { mergeDiscoveredRoom(it) }
+        }
+        if (p2pConfig.discovery.dht.enable && now - lastDhtDiscoveryMs >= p2pConfig.discovery.dht.queryIntervalMs) {
+            lastDhtDiscoveryMs = now
+            dhtDiscovery.fetchRooms().forEach { mergeDiscoveredRoom(it) }
+        }
+    }
+
+    private fun publishExternalRoom(room: P2PRoomAdvertisement) {
+        val now = System.currentTimeMillis()
+        if (now - lastGithubPublishMs >= p2pConfig.discovery.github.publish.updateIntervalMs) {
+            lastGithubPublishMs = now
+            githubPublisher.publishRoom(room)
         }
     }
 
@@ -280,6 +350,7 @@ class P2PLobbyService private constructor() {
     private fun publishWebRtcSignal(signal: WebRtcTunnelProxy.Signal) {
         if (!started) return
         try {
+            GameEngine.log("Publishing WebRTC signal type=${signal.type} session=${signal.sessionId} from=${signal.fromPeerId} to=${signal.toPeerId}")
             gossip?.createPublisher(null, System.currentTimeMillis())
                 ?.publish(Unpooled.wrappedBuffer(objectMapper.writeValueAsBytes(signal)), webrtcTopic)
         } catch (e: Exception) {
@@ -301,14 +372,37 @@ class P2PLobbyService private constructor() {
                 }
                 return
             }
-            room.lastSeenTimeMs = System.currentTimeMillis()
-            val previous = discoveredRooms[room.roomId]
-            if (previous == null || previous.seq <= room.seq) {
-                discoveredRooms[room.roomId!!] = room
-                queueRoomListRefresh()
-            }
+            mergeDiscoveredRoom(P2PDiscoveryResult(room, P2PDiscoverySource.GOSSIPSUB, trustScore = 60))
         } catch (e: Exception) {
             GameEngine.log("Failed to decode P2P room: ${e.message}")
+        }
+    }
+
+    private fun mergeDiscoveredRoom(result: P2PDiscoveryResult) {
+        val room = result.room
+        if (!room.isValid()) return
+        val roomId = room.roomId ?: return
+        val now = result.receivedAtMs
+        if (room.isExpired(now)) return
+        room.lastSeenTimeMs = now
+        if (!room.discoverySources.contains(result.source.id)) {
+            room.discoverySources.add(result.source.id)
+        }
+        val previous = discoveredRooms[roomId]
+        if (previous == null) {
+            discoveredRooms[roomId] = room
+            queueRoomListRefresh()
+            return
+        }
+        previous.discoverySources.forEach {
+            if (!room.discoverySources.contains(it)) room.discoverySources.add(it)
+        }
+        if (previous.seq <= room.seq) {
+            discoveredRooms[roomId] = room
+            queueRoomListRefresh()
+        } else if (!previous.discoverySources.contains(result.source.id)) {
+            previous.discoverySources.add(result.source.id)
+            queueRoomListRefresh()
         }
     }
 
@@ -318,8 +412,10 @@ class P2PLobbyService private constructor() {
             val bytes = ByteArray(data.readableBytes())
             data.getBytes(data.readerIndex(), bytes)
             val signal = objectMapper.readValue(bytes, WebRtcTunnelProxy.Signal::class.java)
-            if (signal.fromPeerId == host?.peerId?.toBase58()) return
-            if (signal.toPeerId != host?.peerId?.toBase58()) return
+            val localPeerId = host?.peerId?.toBase58()
+            GameEngine.log("Received WebRTC signal type=${signal.type} session=${signal.sessionId} from=${signal.fromPeerId} to=${signal.toPeerId} local=$localPeerId")
+            if (signal.fromPeerId == localPeerId) return
+            if (signal.toPeerId != localPeerId) return
             webRtcProxy.handleSignal(signal)
         } catch (e: Exception) {
             GameEngine.log("Failed to decode WebRTC signal: ${e.message}")
@@ -337,6 +433,14 @@ class P2PLobbyService private constructor() {
             try {
                 currentHost.network.connect(Multiaddr(peer))
                     .orTimeout(p2pConfig.lobby.bootstrapConnectTimeoutMs, TimeUnit.MILLISECONDS)
+                    .whenComplete { _, error ->
+                        if (error == null) {
+                            GameEngine.log("P2P bootstrap connected: $peer")
+                        } else {
+                            GameEngine.log("P2P bootstrap connect failed: $peer - ${rootCauseMessage(error)}")
+                        }
+                    }
+                GameEngine.log("P2P bootstrap connect started: $peer")
             } catch (e: Exception) {
                 GameEngine.log("Failed bootstrap connect: $peer - ${e.message}")
             }
@@ -352,18 +456,25 @@ class P2PLobbyService private constructor() {
     }
 
     private fun ensureLibp2pPortMapping() {
-        if (!p2pConfig.nat.enableUpnp) return
+        if (!p2pConfig.nat.enablePcp && !p2pConfig.nat.enableUpnp) return
         if (libp2pPortMapping != null) return
         val localPort = getHostTcpListenPort(host) ?: return
-        GameEngine.log("Trying UPnP port mapping for libp2p TCP port $localPort")
+        GameEngine.log("Trying NAT port mapping for libp2p TCP port $localPort")
         libp2pPortMapping = runCatching {
-            natPortMapper.mapTcpPort(localPort, p2pConfig.nat.mappingDescription)
+            natPortMapper.mapTcpPort(
+                localPort,
+                p2pConfig.nat.mappingDescription,
+                enablePcp = p2pConfig.nat.enablePcp,
+                enableUpnp = p2pConfig.nat.enableUpnp,
+                pcpLifetimeSeconds = p2pConfig.nat.pcpLifetimeSeconds,
+                pcpTimeoutMs = p2pConfig.nat.pcpTimeoutMs
+            )
         }.onFailure { e ->
-            GameEngine.log("UPnP port mapping failed: ${e.message}")
+            GameEngine.log("NAT port mapping failed: ${e.message}")
         }.getOrNull()
 
         libp2pPortMapping?.let {
-            GameEngine.log("UPnP mapped libp2p TCP ${it.internalPort} -> ${it.externalIp}:${it.externalPort}")
+            GameEngine.log("${it.method} mapped libp2p TCP ${it.internalPort} -> ${it.externalIp}:${it.externalPort}")
         }
     }
 
@@ -405,6 +516,18 @@ class P2PLobbyService private constructor() {
         } catch (e: Exception) {
             GameEngine.log("Failed mDNS connect: ${e.message}")
         }
+    }
+
+    private fun stackTraceToString(throwable: Throwable): String {
+        val writer = StringWriter()
+        throwable.printStackTrace(PrintWriter(writer))
+        return writer.toString()
+    }
+
+    private fun rootCauseMessage(throwable: Throwable): String {
+        var current = throwable
+        while (current.cause != null) current = current.cause!!
+        return current.message ?: current.javaClass.name
     }
 
 }

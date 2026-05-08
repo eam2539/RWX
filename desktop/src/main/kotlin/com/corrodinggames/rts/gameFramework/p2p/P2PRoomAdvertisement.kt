@@ -1,6 +1,7 @@
 package com.corrodinggames.rts.gameFramework.p2p
 
 import com.corrodinggames.rts.gameFramework.GameEngine
+import com.fasterxml.jackson.annotation.JsonIgnore
 
 data class P2PRoomAdvertisement(
     var magic: String = "rwx-p2p-lobby",
@@ -26,29 +27,36 @@ data class P2PRoomAdvertisement(
     var libp2pMappedAddresses: MutableList<String> = mutableListOf(),
     var webrtcSignaling: String? = null,
     var webrtcIceServers: MutableList<String> = mutableListOf(),
+    var discoverySources: MutableList<String> = mutableListOf(),
     var expiresAtMs: Long = 0,
     var seq: Long = 0,
     @Transient var lastSeenTimeMs: Long = 0,
 ) {
+    @JsonIgnore
     fun isValid(): Boolean {
         return magic == "rwx-p2p-lobby" && schema == 1 && !roomId.isNullOrBlank() && !hostPeerId.isNullOrBlank()
     }
 
+    @JsonIgnore
     fun isExpired(nowMs: Long): Boolean = expiresAtMs in 1..<nowMs
 
+    @JsonIgnore
     fun isVersionCompatible(): Boolean {
         val gameEngine = GameEngine.getInstance() ?: return false
         return gameEngine.getVersionCode(true) == gameVersionCode
     }
 
+    @JsonIgnore
     fun getConnectAddress(): String = "127.0.0.1:$gamePort"
 
+    @JsonIgnore
     fun getMapDisplayName(): String {
         val value = mapPath ?: return "<No Map>"
         val fileName = value.substringAfterLast('/').substringAfterLast('\\')
         return fileName.ifBlank { value }
     }
 
+    @JsonIgnore
     fun getInfoText(): String {
         val parts = mutableListOf<String>()
         parts += "Host: ${createdBy ?: "?"}"
@@ -69,6 +77,9 @@ data class P2PRoomAdvertisement(
         }
         if (!webrtcSignaling.isNullOrBlank()) {
             parts += "WebRTC DataChannel: available"
+        }
+        if (discoverySources.isNotEmpty()) {
+            parts += "Discovery: ${discoverySources.joinToString(", ")}"
         }
         if (webrtcIceServers.isNotEmpty()) {
             parts += "ICE Servers:"
