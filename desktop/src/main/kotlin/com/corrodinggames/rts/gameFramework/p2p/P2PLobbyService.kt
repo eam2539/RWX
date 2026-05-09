@@ -8,6 +8,7 @@ import com.corrodinggames.rts.gameFramework.network.NetworkEngine
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.libp2p.core.Host
+import io.libp2p.core.PeerId
 import io.libp2p.core.PeerInfo
 import io.libp2p.core.dsl.HostBuilder
 import io.libp2p.core.multiformats.Multiaddr
@@ -38,6 +39,7 @@ class P2PLobbyService private constructor() {
 
     private val objectMapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     private val discoveredRooms = ConcurrentHashMap<String, P2PRoomAdvertisement>()
+    private val mdnsPeers = ConcurrentHashMap<String, Long>()
     private val scheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
     private val lobbyTopic = Topic(LOBBY_TOPIC)
     private val webrtcTopic = Topic("$LOBBY_TOPIC.webrtc")
@@ -54,13 +56,17 @@ class P2PLobbyService private constructor() {
     private val natPortMapper = NatPortMapper()
     private var webRtcProxy = WebRtcTunnelProxy(p2pConfig.webRtcProxy)
     private var relaySupport: Libp2pRelaySupport.Components? = null
-    private var githubDiscovery = P2PGithubDiscoveryProvider(p2pConfig.discovery.github, objectMapper)
-    private var githubPublisher = P2PGithubGistPublisher(p2pConfig.discovery.github.publish, objectMapper)
+    private var serviceDiscovery = P2PServiceDiscoveryProvider(p2pConfig.discovery.service, objectMapper)
+    private var servicePublisher = P2PServicePublisher(
+        p2pConfig.discovery.service.publish,
+        p2pConfig.discovery.service.urls,
+        objectMapper
+    )
     private var dhtDiscovery = P2PDhtDiscoveryProvider(p2pConfig.discovery.dht)
     private var bootstrapNodeSource = P2PBootstrapNodeSource(p2pConfig.libp2pPeerSources, objectMapper)
-    private var lastGithubDiscoveryMs = 0L
+    private var lastServiceDiscoveryMs = 0L
     private var lastDhtDiscoveryMs = 0L
-    private var lastGithubPublishMs = 0L
+    private var lastServicePublishMs = 0L
 
     @Synchronized
     @Throws(IOException::class)
@@ -69,8 +75,12 @@ class P2PLobbyService private constructor() {
         if (!started) {
             libp2pProxy = Libp2pStreamProxy(p2pConfig.libp2pProxy)
             webRtcProxy = WebRtcTunnelProxy(p2pConfig.webRtcProxy)
-            githubDiscovery = P2PGithubDiscoveryProvider(p2pConfig.discovery.github, objectMapper)
-            githubPublisher = P2PGithubGistPublisher(p2pConfig.discovery.github.publish, objectMapper)
+            serviceDiscovery = P2PServiceDiscoveryProvider(p2pConfig.discovery.service, objectMapper)
+            servicePublisher = P2PServicePublisher(
+                p2pConfig.discovery.service.publish,
+                p2pConfig.discovery.service.urls,
+                objectMapper
+            )
             dhtDiscovery = P2PDhtDiscoveryProvider(p2pConfig.discovery.dht)
             bootstrapNodeSource = P2PBootstrapNodeSource(p2pConfig.libp2pPeerSources, objectMapper)
             val gossipProtocol = Gossip(GossipRouterBuilder().build())
@@ -166,8 +176,8 @@ class P2PLobbyService private constructor() {
             } mapped=${room.libp2pMappedAddresses.joinToString(",")}"
         )
         publishRoom(room)
-        githubPublisher.publishRoom(room)
-        lastGithubPublishMs = System.currentTimeMillis()
+        servicePublisher.publishRoom(room)
+        lastServicePublishMs = System.currentTimeMillis()
         dhtDiscovery.publishRoom(room)
         queueRoomListRefresh()
     }
@@ -206,7 +216,7 @@ class P2PLobbyService private constructor() {
     @Synchronized
     fun stopSession() {
         hostedRoom?.let { room ->
-            githubPublisher.closeRoom(room)
+            servicePublisher.closeRoom(room)
             publishRoom(
                 P2PRoomAdvertisement(
                     magic = room.magic,
@@ -272,9 +282,9 @@ class P2PLobbyService private constructor() {
 
     private fun refreshExternalDiscovery() {
         val now = System.currentTimeMillis()
-        if (p2pConfig.discovery.github.enable && now - lastGithubDiscoveryMs >= p2pConfig.discovery.github.refreshIntervalMs) {
-            lastGithubDiscoveryMs = now
-            githubDiscovery.fetchRooms().forEach { mergeDiscoveredRoom(it) }
+        if (p2pConfig.discovery.service.enable && now - lastServiceDiscoveryMs >= p2pConfig.discovery.service.refreshIntervalMs) {
+            lastServiceDiscoveryMs = now
+            serviceDiscovery.fetchRooms().forEach { mergeDiscoveredRoom(it) }
         }
         if (p2pConfig.discovery.dht.enable && now - lastDhtDiscoveryMs >= p2pConfig.discovery.dht.queryIntervalMs) {
             lastDhtDiscoveryMs = now
@@ -284,9 +294,9 @@ class P2PLobbyService private constructor() {
 
     private fun publishExternalRoom(room: P2PRoomAdvertisement) {
         val now = System.currentTimeMillis()
-        if (now - lastGithubPublishMs >= p2pConfig.discovery.github.publish.updateIntervalMs) {
-            lastGithubPublishMs = now
-            githubPublisher.publishRoom(room)
+        if (now - lastServicePublishMs >= p2pConfig.discovery.service.publish.updateIntervalMs) {
+            lastServicePublishMs = now
+            servicePublisher.publishRoom(room)
         }
     }
 
@@ -372,7 +382,13 @@ class P2PLobbyService private constructor() {
                 }
                 return
             }
-            mergeDiscoveredRoom(P2PDiscoveryResult(room, P2PDiscoverySource.GOSSIPSUB, trustScore = 60))
+            val now = System.currentTimeMillis()
+            val fromPeerId = runCatching { messageApi.from?.let { PeerId(it) }?.toBase58() }.getOrNull()
+            val mdnsTtlMs = p2pConfig.lobby.mdnsPeerAddressTtlMs.coerceAtLeast(1000L)
+            val isMdnsPeer = fromPeerId?.let { mdnsPeers[it] }?.let { now - it <= mdnsTtlMs } == true
+            val source = if (isMdnsPeer) P2PDiscoverySource.MDNS else P2PDiscoverySource.GOSSIPSUB
+            val trustScore = if (isMdnsPeer) 70 else 60
+            mergeDiscoveredRoom(P2PDiscoveryResult(room, source, trustScore = trustScore, receivedAtMs = now))
         } catch (e: Exception) {
             GameEngine.log("Failed to decode P2P room: ${e.message}")
         }
@@ -505,6 +521,7 @@ class P2PLobbyService private constructor() {
     private fun handleMdnsPeerFound(peerInfo: PeerInfo) {
         try {
             val currentHost = host ?: return
+            mdnsPeers[peerInfo.peerId.toBase58()] = System.currentTimeMillis()
             if (peerInfo.addresses.isNotEmpty()) {
                 currentHost.addressBook.addAddrs(
                     peerInfo.peerId,

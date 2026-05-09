@@ -476,9 +476,6 @@ public class Root extends ScriptContext {
         hostP2PStartWithPasswordAndMods(str, checkbox);
     }
 
-    public void loadP2PHostPopup() {
-    }
-
     public void hostP2PStartWithPasswordAndMods(String str, boolean z) throws ConfigParseException {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.networkEngine.disconnectNetworking("starting new p2p");

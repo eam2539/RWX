@@ -53,8 +53,10 @@ data class P2PConfig(
         @TomlComment("Used for lobby discovery and WebRTC signaling over GossipSub. 0 means random ephemeral TCP port.")
         val listenPort: Int = 0,
         val peers: List<String> = DEFAULT_LIBP2P_PEERS,
-        @TomlComment("Optional JSON node lists. Useful for unstable/testing rendezvous-bootstrap nodes.")
-        val peerSources: List<String> = emptyList(),
+        @TomlComment("Optional JSON node lists or lobby service /nodes endpoints.")
+        val peerSources: List<String> = listOf(
+            "https://p2p-lobby-services.shuangx339.workers.dev"
+        ),
         val proxy: Libp2pProxyConfig = Libp2pProxyConfig()
     )
 
@@ -110,33 +112,32 @@ data class P2PConfig(
     data class DiscoveryConfig(
         val enableGossipSub: Boolean = true,
         val enableMdns: Boolean = true,
-        val github: GithubDiscoveryConfig = GithubDiscoveryConfig(),
+        val service: ServiceDiscoveryConfig = ServiceDiscoveryConfig(),
         val dht: DhtDiscoveryConfig = DhtDiscoveryConfig()
     )
 
     @Serializable
-    data class GithubDiscoveryConfig(
-        @TomlComment("Read-only static room indexes. The default project workflow publishes rooms.json to the p2p-dist branch.")
-        val enable: Boolean = false,
-        val urls: List<String> = emptyList(),
+    data class ServiceDiscoveryConfig(
+        @TomlComment("HTTP lobby service endpoints for room discovery. Each URL can be a base URL or /rooms.")
+        val enable: Boolean = true,
+        val urls: List<String> = listOf(
+            "https://p2p-lobby-services.shuangx339.workers.dev"
+        ),
         val refreshIntervalMs: Long = 15000L,
         val timeoutMs: Int = 5000,
         val maxBytes: Int = 262144,
         val maxRoomsPerUrl: Int = 200,
-        val publish: GithubGistPublishConfig = GithubGistPublishConfig()
+        val publish: ServicePublishConfig = ServicePublishConfig()
     )
 
     @Serializable
-    data class GithubGistPublishConfig(
-        @TomlComment("Optional: publish this client's hosted room request to the user's own Gist. Prefer tokenEnv over putting a token in this file.")
-        val enable: Boolean = false,
-        val token: String = "",
-        val gistId: String = "",
-        val gistIdFile: String = "p2p-github-gist.id",
-        val fileName: String = "rwx-p2p-room.json",
+    data class ServicePublishConfig(
+        @TomlComment("Optional: publish this client's hosted room to the lobby service.")
+        val enable: Boolean = true,
+        val timeoutMs: Int = 5000,
         val updateIntervalMs: Long = 15000L,
-        val deleteOnClose: Boolean = true,
-        val publicGist: Boolean = false
+        val roomTtlMs: Long = 600000L,
+        val deleteOnClose: Boolean = true
     )
 
     @Serializable
@@ -164,11 +165,7 @@ data class P2PConfig(
                 listenPort = libp2p.listenPort.coerceIn(0, 65535),
                 peers = libp2p.peers.filter { it.startsWith("/") }.distinct().ifEmpty { DEFAULT_LIBP2P_PEERS },
                 peerSources = libp2p.peerSources
-                    .filter {
-                        it.startsWith("https://api.github.com/gists/") || it.startsWith("https://gist.github.com/") || it.startsWith(
-                            "https://gist.githubusercontent.com/"
-                        )
-                    }
+                    .filter { it.startsWith("http://") || it.startsWith("https://") }
                     .distinct()
             ),
             webrtc = webrtc.copy(
@@ -180,13 +177,9 @@ data class P2PConfig(
                 bootstrapRelays = relay.bootstrapRelays.filter { it.startsWith("/") }.distinct()
             ),
             discovery = discovery.copy(
-                github = discovery.github.copy(
-                    urls = discovery.github.urls
-                        .filter {
-                            it.startsWith("https://raw.githubusercontent.com/") || it.startsWith("https://gist.githubusercontent.com/") || it.startsWith(
-                                "https://github.com/"
-                            )
-                        }
+                service = discovery.service.copy(
+                    urls = discovery.service.urls
+                        .filter { it.startsWith("http://") || it.startsWith("https://") }
                         .distinct()
                 )
             )

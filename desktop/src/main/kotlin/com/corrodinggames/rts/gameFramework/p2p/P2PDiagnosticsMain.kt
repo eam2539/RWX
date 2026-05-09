@@ -11,10 +11,10 @@ object P2PDiagnosticsMain {
         when (mode) {
             "discover" -> discover(timeoutMs)
             "join-first" -> joinFirst(timeoutMs)
-            "github-publish-test" -> githubPublishTest(timeoutMs)
-            "github-delete-test" -> githubDeleteTest(timeoutMs)
+            "service-publish-test" -> servicePublishTest(timeoutMs)
+            "service-delete-test" -> serviceDeleteTest(timeoutMs)
             else -> {
-                println("Usage: p2pDiagnostics [discover|join-first|github-publish-test|github-delete-test] [timeoutMs]")
+                println("Usage: p2pDiagnostics [discover|join-first|service-publish-test|service-delete-test] [timeoutMs]")
                 exitProcess(2)
             }
         }
@@ -79,37 +79,43 @@ object P2PDiagnosticsMain {
         return lobby.getRooms()
     }
 
-    private fun githubPublishTest(timeoutMs: Long) {
-        val room = createGithubDiagnosticRoom(timeoutMs)
-        val publisher = githubPublisherOrExit()
-        publisher.publishRoom(room)
-        println("P2P_DIAG github publish requested room=${room.roomId}")
-        exitProcess(0)
+    private fun servicePublishTest(timeoutMs: Long) {
+        val room = createServiceDiagnosticRoom(timeoutMs)
+        val publisher = servicePublisherOrExit()
+        if (publisher.publishRoom(room)) {
+            println("P2P_DIAG service publish succeeded room=${room.roomId}")
+            exitProcess(0)
+        }
+        println("P2P_DIAG service publish failed room=${room.roomId}")
+        exitProcess(1)
     }
 
-    private fun githubDeleteTest(timeoutMs: Long) {
-        val room = createGithubDiagnosticRoom(timeoutMs)
-        val publisher = githubPublisherOrExit()
-        publisher.closeRoom(room)
-        println("P2P_DIAG github delete requested room=${room.roomId}")
-        exitProcess(0)
+    private fun serviceDeleteTest(timeoutMs: Long) {
+        val room = createServiceDiagnosticRoom(timeoutMs)
+        val publisher = servicePublisherOrExit()
+        if (publisher.closeRoom(room)) {
+            println("P2P_DIAG service delete succeeded room=${room.roomId}")
+            exitProcess(0)
+        }
+        println("P2P_DIAG service delete failed room=${room.roomId}")
+        exitProcess(1)
     }
 
-    private fun githubPublisherOrExit(): P2PGithubGistPublisher {
-        val config = P2PConfigLoader.load().discovery.github.publish
-        val publisher = P2PGithubGistPublisher(config)
+    private fun servicePublisherOrExit(): P2PServicePublisher {
+        val serviceConfig = P2PConfigLoader.load().discovery.service
+        val publisher = P2PServicePublisher(serviceConfig.publish, serviceConfig.urls)
         if (!publisher.isEnabled()) {
-            println("P2P_DIAG github publish disabled or missing token")
+            println("P2P_DIAG lobby service publish disabled or missing urls")
             exitProcess(1)
         }
         return publisher
     }
 
-    private fun createGithubDiagnosticRoom(timeoutMs: Long): P2PRoomAdvertisement {
+    private fun createServiceDiagnosticRoom(timeoutMs: Long): P2PRoomAdvertisement {
         val now = System.currentTimeMillis()
         return P2PRoomAdvertisement().apply {
             roomId = "diag-${now}"
-            hostPeerId = "QmDiagGithubPublishTest"
+            hostPeerId = "QmDiagLobbyServiceTest"
             createdBy = "diagnostics"
             gameVersionCode = 1
             gameVersionString = "diagnostics"

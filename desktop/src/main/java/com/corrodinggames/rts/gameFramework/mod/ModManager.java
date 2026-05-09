@@ -36,10 +36,10 @@ public class ModManager {
     Object listLock = new Object();
 
     /* JADX INFO: renamed from: e */
-    ArrayList<ModInfo> mods = new ArrayList();
+    ArrayList<ModInfo> mods = new ArrayList<>();
 
     /* JADX INFO: renamed from: f */
-    ArrayList<LegacyDisabledMod> invalidMods = new ArrayList();
+    ArrayList<LegacyDisabledMod> invalidMods = new ArrayList<>();
 
     public ModManager() {
         try {

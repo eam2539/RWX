@@ -1,22 +1,19 @@
 package com.corrodinggames.rts.gameFramework.p2p
 
 import com.corrodinggames.rts.gameFramework.GameEngine
+import com.corrodinggames.rts.gameFramework.logger
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.IOException
+import java.io.InputStream
 import java.net.HttpURLConnection
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.net.URL
 
 enum class P2PDiscoverySource(val id: String) {
     GOSSIPSUB("gossipsub"),
     MDNS("mdns"),
-    GITHUB("github"),
+    SERVICE("service"),
     DHT("dht"),
     MANUAL("manual")
 }
@@ -26,19 +23,6 @@ data class P2PDiscoveryResult(
     val source: P2PDiscoverySource,
     val trustScore: Int = 0,
     val receivedAtMs: Long = System.currentTimeMillis()
-)
-
-data class P2PGithubRoomIndex(
-    var schema: Int = 1,
-    var generatedAt: Long = 0,
-    var ttlMs: Long = 30000L,
-    var rooms: MutableList<P2PRoomAdvertisement> = mutableListOf()
-)
-
-data class P2PBootstrapNodeIndex(
-    var schema: Int = 1,
-    var generatedAt: Long = 0,
-    var nodes: MutableList<P2PBootstrapNode> = mutableListOf()
 )
 
 data class P2PBootstrapNode(
@@ -55,23 +39,23 @@ class P2PBootstrapNodeSource(
         false
     )
 ) {
+    companion object {
+        private const val MAX_BYTES = 262144
+    }
+
     fun fetchPeers(): List<String> {
+        if (urls.isEmpty()) return emptyList()
         return urls.flatMap { fetchPeers(it) }.filter { it.startsWith("/") }.distinct()
     }
 
     private fun fetchPeers(url: String): List<String> {
         return runCatching {
-            val apiUrl = normalizeGistApiUrl(url)
+            val apiUrl = normalizeNodesUrl(url)
             val bytes = fetchBytes(apiUrl)
-            val json = objectMapper.readTree(bytes)
-            val content = if (apiUrl.startsWith("https://api.github.com/gists/")) {
-                json.path("files").path("rwx-p2p-nodes.json").path("content").asText()
-            } else {
-                bytes.toString(Charsets.UTF_8)
-            }
-            val index = objectMapper.readValue(content, P2PBootstrapNodeIndex::class.java)
-            if (index.schema != 1) return emptyList()
-            index.nodes.flatMap { it.addresses }
+            val listType = objectMapper.typeFactory
+                .constructCollectionType(List::class.java, P2PBootstrapNode::class.java)
+            val nodes: List<P2PBootstrapNode> = objectMapper.readValue(bytes, listType)
+            nodes.flatMap { it.addresses }
         }.onFailure { e ->
             GameEngine.log("P2P bootstrap node source failed: $url - ${e.message}")
         }.getOrDefault(emptyList())
@@ -84,34 +68,12 @@ class P2PBootstrapNodeSource(
         connection.instanceFollowRedirects = true
         connection.setRequestProperty("Accept", "application/json")
         connection.setRequestProperty("User-Agent", "RWX-P2P-Discovery")
-        return connection.inputStream.use { it.readBytes() }
-    }
-
-    private fun normalizeGistApiUrl(url: String): String {
-        if (url.startsWith("https://api.github.com/gists/")) return url
-        if (url.startsWith("https://gist.github.com/")) {
-            val parts = url.removePrefix("https://gist.github.com/").split('/').filter { it.isNotBlank() }
-            if (parts.size >= 2) return "https://api.github.com/gists/${parts[1]}"
-        }
-        return url
+        return connection.inputStream.use { readBytesLimited(it, MAX_BYTES) }
     }
 }
 
-data class P2PGithubRoomRequest(
-    var magic: String = "rwx-p2p-github-request",
-    var schema: Int = 1,
-    var action: String = "upsert",
-    var generatedAt: Long = 0,
-    var room: P2PRoomAdvertisement? = null
-) {
-    fun isValid(nowMs: Long): Boolean {
-        val currentRoom = room ?: return false
-        return magic == "rwx-p2p-github-request" && schema == 1 && currentRoom.isValid() && !currentRoom.isExpired(nowMs)
-    }
-}
-
-class P2PGithubDiscoveryProvider(
-    private val config: P2PConfig.GithubDiscoveryConfig,
+class P2PServiceDiscoveryProvider(
+    private val config: P2PConfig.ServiceDiscoveryConfig,
     private val objectMapper: ObjectMapper = ObjectMapper().configure(
         DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
         false
@@ -129,157 +91,129 @@ class P2PGithubDiscoveryProvider(
     private fun fetchRooms(url: String): List<P2PDiscoveryResult> {
         return runCatching {
             val bytes = fetchBytes(url)
-            val index = objectMapper.readValue(bytes, P2PGithubRoomIndex::class.java)
-            if (index.schema != 1) return emptyList()
+            val rooms = parseRooms(bytes)
             val now = System.currentTimeMillis()
-            index.rooms
+            rooms
                 .asSequence()
                 .take(config.maxRoomsPerUrl.coerceAtLeast(1))
                 .filter { it.isValid() }
                 .filterNot { it.isExpired(now) }
                 .map {
                     it.lastSeenTimeMs = now
-                    P2PDiscoveryResult(it, P2PDiscoverySource.GITHUB, trustScore = 30, receivedAtMs = now)
+                    P2PDiscoveryResult(it, P2PDiscoverySource.SERVICE, trustScore = 30, receivedAtMs = now)
                 }
                 .toList()
         }.onFailure { e ->
-            GameEngine.log("GitHub P2P discovery failed: $url - ${e.message}")
+            GameEngine.log("Lobby service discovery failed: $url - ${e.message}")
         }.getOrDefault(emptyList())
     }
 
     private fun fetchBytes(url: String): ByteArray {
-        val connection = URL(normalizeGithubUrl(url)).openConnection() as HttpURLConnection
+        val connection = URL(normalizeRoomsUrl(url)).openConnection() as HttpURLConnection
         connection.connectTimeout = config.timeoutMs.coerceAtLeast(1000)
         connection.readTimeout = config.timeoutMs.coerceAtLeast(1000)
         connection.instanceFollowRedirects = true
         connection.setRequestProperty("Accept", "application/json")
         connection.setRequestProperty("User-Agent", "RWX-P2P-Discovery")
-        connection.inputStream.use { input ->
-            val output = ByteArrayOutputStream()
-            val buffer = ByteArray(8192)
-            var total = 0
-            while (true) {
-                val read = input.read(buffer)
-                if (read < 0) break
-                total += read
-                if (total > config.maxBytes.coerceAtLeast(1024)) {
-                    throw IllegalArgumentException("GitHub discovery response is too large")
-                }
-                output.write(buffer, 0, read)
-            }
-            return output.toByteArray()
-        }
+        return connection.inputStream.use { readBytesLimited(it, config.maxBytes.coerceAtLeast(1024)) }
     }
 
-    private fun normalizeGithubUrl(url: String): String {
-        if (!url.startsWith("https://github.com/") || !url.contains("/blob/")) return url
-        return url.replace("https://github.com/", "https://raw.githubusercontent.com/").replace("/blob/", "/")
+    private fun parseRooms(bytes: ByteArray): List<P2PRoomAdvertisement> {
+        val listType = objectMapper.typeFactory
+            .constructCollectionType(List::class.java, P2PRoomAdvertisement::class.java)
+        return objectMapper.readValue(bytes, listType)
     }
 }
 
-class P2PGithubGistPublisher(
-    private val config: P2PConfig.GithubGistPublishConfig,
+class P2PServicePublisher(
+    private val config: P2PConfig.ServicePublishConfig,
+    private val serviceUrls: List<String>,
     private val objectMapper: ObjectMapper = ObjectMapper().configure(
         DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
         false
     )
 ) {
-    companion object {
-        const val DEFAULT_GITHUB_TOKEN = "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"
-    }
-
-    private var cachedGistId: String? = null
-    private val httpClient: HttpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build()
-
     fun isEnabled(): Boolean {
-        return config.enable && resolveToken().isNotBlank() && config.fileName.isNotBlank()
+        return config.enable && serviceUrls.isNotEmpty()
     }
 
-    fun publishRoom(room: P2PRoomAdvertisement?) {
-        if (!isEnabled() || room == null) return
-        val request = P2PGithubRoomRequest(
-            action = "upsert",
-            generatedAt = System.currentTimeMillis(),
-            room = room
+    fun publishRoom(room: P2PRoomAdvertisement?): Boolean {
+        if (!isEnabled() || room == null) return false
+        val now = System.currentTimeMillis()
+        val payload = room.copy(
+            lastSeenTimeMs = now,
+            expiresAtMs = now + config.roomTtlMs.coerceAtLeast(config.updateIntervalMs * 3)
         )
-        val gistId = ensureGistId() ?: return
-        updateGist(gistId, request)
-    }
-
-    fun closeRoom(room: P2PRoomAdvertisement?) {
-        if (!isEnabled() || !config.deleteOnClose || room == null) return
-        val request = P2PGithubRoomRequest(
-            action = "delete",
-            generatedAt = System.currentTimeMillis(),
-            room = room
-        )
-        val gistId = ensureGistId() ?: return
-        updateGist(gistId, request)
-    }
-
-    private fun ensureGistId(): String? {
-        cachedGistId?.let { return it }
-        if (config.gistId.isNotBlank()) return config.gistId.also { cachedGistId = it }
-        val file = File(config.gistIdFile)
-        if (file.exists()) {
-            val id = file.readText(Charsets.UTF_8).trim()
-            if (id.isNotBlank()) return id.also { cachedGistId = it }
-        }
-        return runCatching {
-            val body = mapOf(
-                "description" to "RWX P2P room discovery request",
-                "public" to config.publicGist,
-                "files" to mapOf(config.fileName to mapOf("content" to "{}"))
-            )
-            val bytes = request("https://api.github.com/gists", "POST", objectMapper.writeValueAsBytes(body))
-            val tree = objectMapper.readTree(bytes)
-            val gistId = tree.get("id")?.asText().orEmpty()
-            if (gistId.isBlank()) null else gistId.also {
-                cachedGistId = it
-                runCatching { file.writeText(it, Charsets.UTF_8) }
-                GameEngine.log("Created RWX P2P GitHub Gist id=$it; saved to ${file.absolutePath}")
+        var success = false
+        for (url in serviceUrls) {
+            if (upsertRoom(url, payload)) {
+                success = true
             }
-        }.onFailure { e ->
-            GameEngine.log("Failed to create RWX P2P GitHub Gist: ${e.message}")
-        }.getOrNull()
-    }
-
-    private fun updateGist(gistId: String, request: P2PGithubRoomRequest) {
-        runCatching {
-            val body = mapOf(
-                "files" to mapOf(
-                    config.fileName to mapOf(
-                        "content" to objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(request)
-                    )
-                )
-            )
-            request("https://api.github.com/gists/$gistId", "PATCH", objectMapper.writeValueAsBytes(body))
-        }.onFailure { e ->
-            GameEngine.log("Failed to update RWX P2P GitHub Gist: ${e.message}")
         }
+        logger.debug { "room schema:\n $payload" }
+        return success
     }
 
-    private fun request(url: String, method: String, body: ByteArray): ByteArray {
-        val request = HttpRequest.newBuilder(URI.create(url))
-            .timeout(java.time.Duration.ofSeconds(10))
-            .header("Accept", "application/vnd.github+json")
-            .header("Content-Type", "application/json")
-            .header("Authorization", "Bearer ${resolveToken()}")
-            .header("X-GitHub-Api-Version", "2022-11-28")
-            .header("User-Agent", "RWX-P2P-Discovery")
-            .method(method, HttpRequest.BodyPublishers.ofByteArray(body))
-            .build()
-        val response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray())
-        val status = response.statusCode()
-        val bytes = response.body() ?: ByteArray(0)
+    fun closeRoom(room: P2PRoomAdvertisement?): Boolean {
+        if (!isEnabled() || !config.deleteOnClose || room == null) return false
+        val roomId = room.roomId ?: return false
+        var success = false
+        for (url in serviceUrls) {
+            if (deleteRoom(url, roomId)) {
+                success = true
+            }
+        }
+        return success
+    }
+
+    private fun upsertRoom(baseUrl: String, room: P2PRoomAdvertisement): Boolean {
+        val roomId = room.roomId ?: return false
+        return runCatching {
+            val url = buildRoomUrl(baseUrl, roomId, upsert = true)
+            request(url, "PUT", objectMapper.writeValueAsBytes(room))
+            true
+        }.onFailure { e ->
+            GameEngine.log("Lobby service publish failed: $baseUrl - ${e.message}")
+        }.getOrDefault(false)
+    }
+
+    private fun deleteRoom(baseUrl: String, roomId: String): Boolean {
+        return runCatching {
+            val url = buildRoomUrl(baseUrl, roomId, upsert = false)
+            request(url, "DELETE", null)
+            true
+        }.onFailure { e ->
+            GameEngine.log("Lobby service delete failed: $baseUrl - ${e.message}")
+        }.getOrDefault(false)
+    }
+
+    private fun buildRoomUrl(baseUrl: String, roomId: String, upsert: Boolean): String {
+        val roomsUrl = normalizeRoomsUrl(baseUrl)
+        val suffix = "/$roomId"
+        val query = if (upsert) "?upsert=1" else ""
+        return roomsUrl + suffix + query
+    }
+
+    private fun request(url: String, method: String, body: ByteArray?): ByteArray {
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.requestMethod = method
+        connection.connectTimeout = config.timeoutMs.coerceAtLeast(1000)
+        connection.readTimeout = config.timeoutMs.coerceAtLeast(1000)
+        connection.instanceFollowRedirects = true
+        connection.setRequestProperty("Accept", "application/json")
+        connection.setRequestProperty("User-Agent", "RWX-P2P-Discovery")
+        if (body != null) {
+            connection.doOutput = true
+            connection.setRequestProperty("Content-Type", "application/json")
+            connection.outputStream.use { it.write(body) }
+        }
+        val status = connection.responseCode
+        val stream = if (status in 200..299) connection.inputStream else connection.errorStream
+        val bytes = stream?.use { readBytesLimited(it, 65536) } ?: ByteArray(0)
         if (status !in 200..299) {
-            throw IOException("GitHub API HTTP $status: ${bytes.toString(Charsets.UTF_8).take(300)}")
+            throw IOException("Lobby service HTTP $status: ${bytes.toString(Charsets.UTF_8).take(300)}")
         }
         return bytes
-    }
-
-    private fun resolveToken(): String {
-        return config.token.ifBlank { DEFAULT_GITHUB_TOKEN }
     }
 }
 
@@ -302,4 +236,37 @@ class P2PDhtDiscoveryProvider(private val config: P2PConfig.DhtDiscoveryConfig) 
             GameEngine.log("DHT P2P publish skipped: jvm-libp2p 1.2.0 does not expose Kad-DHT provider APIs")
         }
     }
+}
+
+private fun normalizeBaseUrl(url: String): String {
+    return url.trim().trimEnd('/')
+}
+
+private fun normalizeRoomsUrl(url: String): String {
+    val base = normalizeBaseUrl(url)
+    if (base.isBlank()) return base
+    return if (base.endsWith("/rooms")) base else "$base/rooms"
+}
+
+private fun normalizeNodesUrl(url: String): String {
+    val base = normalizeBaseUrl(url)
+    if (base.isBlank()) return base
+    return if (base.endsWith("/nodes")) base else "$base/nodes"
+}
+
+private fun readBytesLimited(input: InputStream, maxBytes: Int): ByteArray {
+    val output = ByteArrayOutputStream()
+    val buffer = ByteArray(8192)
+    val limit = maxBytes.coerceAtLeast(1024)
+    var total = 0
+    while (true) {
+        val read = input.read(buffer)
+        if (read < 0) break
+        total += read
+        if (total > limit) {
+            throw IllegalArgumentException("Lobby service response is too large")
+        }
+        output.write(buffer, 0, read)
+    }
+    return output.toByteArray()
 }
