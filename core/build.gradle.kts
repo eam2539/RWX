@@ -18,8 +18,4 @@ dependencies {
     api(libs.tomlkt)
 }
 
-sourceSets {
-    named("main") {
-        resources.srcDirs("../assets", "../res", "../font")
-    }
-}
+

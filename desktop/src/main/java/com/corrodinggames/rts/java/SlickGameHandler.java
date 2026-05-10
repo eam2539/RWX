@@ -692,8 +692,8 @@ public class SlickGameHandler extends BasicGame {
             if (!GameEngine.isNetworkServerStatic) {
                 slickGraphicsEngine = (SlickGraphicsEngine) this.e.graphicsEngine2;
                 if (slickGraphicsEngine != null) {
-                    slickGraphicsEngine.f = graphics;
-                    slickGraphicsEngine.L = this.P;
+                    slickGraphicsEngine.slickGraphics = graphics;
+                    slickGraphicsEngine.uiScale = this.P;
                     z = true;
                     a(slickGraphicsEngine);
                 }

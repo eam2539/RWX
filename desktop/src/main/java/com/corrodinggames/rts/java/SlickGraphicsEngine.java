@@ -72,62 +72,62 @@ import org.newdawn.slick.util.ResourceLoader;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/java/e.class */
 public final class SlickGraphicsEngine implements GraphicsEngine {
     public boolean b;
-    public Graphics f;
-    public Texture g;
+    public Graphics slickGraphics;
+    public Texture renderTarget;
     public int h;
     public int i;
-    public TextureAtlas j;
-    public static SlickTextureWrapper r;
-    public static SlickTextureWrapper s;
-    public static SlickTextureWrapper t;
+    public TextureAtlas textureAtlas;
+    public static SlickTextureWrapper outOfMemoryImage;
+    public static SlickTextureWrapper generalErrorImage;
+    public static SlickTextureWrapper largeThumbnailImage;
     boolean y;
     static RectF J;
     static RectF K;
     static RectF M;
-    float Q;
-    float R;
-    float S;
-    private static LineStripRenderer X;
+    float circleAngleStep;
+    float cachedCosAngle;
+    float cachedSinAngle;
+    private static LineStripRenderer lineRenderer;
     public static final Color c = new Color(0, 0, 0, 255);
     public static final Color d = new Color(0, 0, 0, 255);
     public static final Color e = new Color(0, 0, 0, 255);
-    public static Graphics k = null;
-    static SlickGraphicsEngine l = null;
-    public static ShaderProgram m = null;
+    public static Graphics lastGraphics = null;
+    static SlickGraphicsEngine activeInstance = null;
+    public static ShaderProgram currentShader = null;
     private static SGL W = Renderer.get();
     public static final Color A = new Color(0, 0, 0, 255);
-    static float B = -1.0f;
-    static ArrayList E = new ArrayList();
+    static float lastLineWidth = -1.0f;
+    static ArrayList<SlickTexture> texturesToReload = new ArrayList<>();
     static Paint I = new GamePaint();
     static Paint H = new Paint();
-    public boolean a = true;
+    public boolean shaderSupport = true;
     final Rect n = new Rect();
     final Rect o = new Rect();
     final RectF p = new RectF();
     final PointF q = new PointF();
-    ArrayList<FontKey> u = new ArrayList();
-    int v = -1;
-    Paint w = null;
-    SlickTexture x = null;
+    ArrayList<FontKey> u = new ArrayList<>();
+    int lastDrawMode = -1;
+    Paint lastPaint = null;
+    SlickTexture lastTexture = null;
     final Paint z = new Paint();
     FontKey C = new FontKey(this);
     byte[] D = new byte[4];
     int F = 0;
     RectF G = new RectF();
-    public float L = 1.0f;
+    public float uiScale = 1.0f;
     FloatBuffer N = BufferUtils.createFloatBuffer(3);
     float[] O = new float[0];
     int P = -1;
-    GraphicsTransform T = new GraphicsTransform();
-    FastArrayList U = new FastArrayList();
-    FastArrayList V = new FastArrayList();
+    GraphicsTransform currentTransform = new GraphicsTransform();
+    FastArrayList<GraphicsTransform> transformStack = new FastArrayList<>();
+    FastArrayList<GraphicsTransform> transformPool = new FastArrayList<>();
 
     static {
         H.a(255, 255, 0, 0);
         H.a(Paint.Style.STROKE);
         J = new RectF();
         K = new RectF();
-        X = Renderer.getLineStripRenderer();
+        lineRenderer = Renderer.getLineStripRenderer();
     }
 
     public static void c() {
@@ -142,7 +142,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     /* JADX INFO: renamed from: c, reason: merged with bridge method [inline-methods] */
     public SlickGraphicsEngine a(Texture texture) {
         SlickGraphicsEngine slickGraphicsEngineB = b(texture);
-        slickGraphicsEngineB.j = this.j;
+        slickGraphicsEngineB.textureAtlas = this.textureAtlas;
         return slickGraphicsEngineB;
     }
 
@@ -151,8 +151,8 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     public SlickGraphicsEngine b(Texture texture) {
         SlickGraphicsEngine slickGraphicsEngine = new SlickGraphicsEngine();
         try {
-            slickGraphicsEngine.f = e(texture).C().getGraphics();
-            slickGraphicsEngine.g = texture;
+            slickGraphicsEngine.slickGraphics = e(texture).C().getGraphics();
+            slickGraphicsEngine.renderTarget = texture;
             if (texture != null) {
                 slickGraphicsEngine.h = texture.m();
                 slickGraphicsEngine.i = texture.l();
@@ -165,7 +165,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public int m() {
-        if (this.g != null) {
+        if (this.renderTarget != null) {
             return this.h;
         }
         return (int) GameEngine.getInstance().screenWidth;
@@ -173,7 +173,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public int n() {
-        if (this.g != null) {
+        if (this.renderTarget != null) {
             return this.i;
         }
         return (int) GameEngine.getInstance().viewpointWidthRaw;
@@ -196,14 +196,14 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void b() {
-        r = new SlickTextureWrapper((SlickTexture) a(com.corrodinggames.rts.R.drawable.error_outmem));
-        r.a("Out of memory");
-        s = new SlickTextureWrapper((SlickTexture) a(com.corrodinggames.rts.R.drawable.error_general));
-        s.a("General Error");
-        t = new SlickTextureWrapper((SlickTexture) a(com.corrodinggames.rts.R.drawable.error_toolargethumb));
-        s.a("Too Large Thumbnail Error");
+        outOfMemoryImage = new SlickTextureWrapper((SlickTexture) a(com.corrodinggames.rts.R.drawable.error_outmem));
+        outOfMemoryImage.a("Out of memory");
+        generalErrorImage = new SlickTextureWrapper((SlickTexture) a(com.corrodinggames.rts.R.drawable.error_general));
+        generalErrorImage.a("General Error");
+        largeThumbnailImage = new SlickTextureWrapper((SlickTexture) a(com.corrodinggames.rts.R.drawable.error_toolargethumb));
+        generalErrorImage.a("Too Large Thumbnail Error");
         if (!GameEngine.isDemoVersionStatic) {
-            this.j = new TextureAtlas(1024, 1024);
+            this.textureAtlas = new TextureAtlas(1024, 1024);
         }
     }
 
@@ -299,26 +299,26 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     public void u() {
         y();
-        Graphics.setCurrent(this.f);
+        Graphics.setCurrent(this.slickGraphics);
         b(true);
         this.b = true;
-        B = -1.0f;
+        lastLineWidth = -1.0f;
         Color.setRebindRequired();
-        this.w = this.z;
-        l = this;
+        this.lastPaint = this.z;
+        activeInstance = this;
     }
 
     public void a(Paint paint, boolean z, String str, SlickTexture slickTexture, Texture texture) {
         boolean zC;
         boolean z2 = false;
-        if (k != this.f) {
+        if (lastGraphics != this.slickGraphics) {
             u();
             z2 = true;
-            k = this.f;
+            lastGraphics = this.slickGraphics;
         }
-        if ((paint == null || (paint instanceof GamePaint)) && this.w == paint && this.x == slickTexture && !z) {
+        if ((paint == null || (paint instanceof GamePaint)) && this.lastPaint == paint && this.lastTexture == slickTexture && !z) {
             ShaderProgram shaderProgramB = null;
-            if (this.a) {
+            if (this.shaderSupport) {
                 if (paint != null && (paint instanceof GamePaint)) {
                     shaderProgramB = ((GamePaint) paint).q();
                 }
@@ -326,23 +326,23 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
                     shaderProgramB = texture.B();
                 }
             }
-            if (m == shaderProgramB) {
-                if (m != null && m.a(paint, texture)) {
-                    this.f.flushBuffer();
-                    b(m);
+            if (currentShader == shaderProgramB) {
+                if (currentShader != null && currentShader.a(paint, texture)) {
+                    this.slickGraphics.flushBuffer();
+                    b(currentShader);
                     return;
                 }
                 return;
             }
         }
-        this.w = paint;
-        this.x = slickTexture;
+        this.lastPaint = paint;
+        this.lastTexture = slickTexture;
         boolean z3 = slickTexture == null && !z;
-        if (this.v != Graphics.MODE_NORMAL) {
-            this.v = Graphics.MODE_NORMAL;
-            this.f.setDrawMode(this.v);
+        if (this.lastDrawMode != Graphics.MODE_NORMAL) {
+            this.lastDrawMode = Graphics.MODE_NORMAL;
+            this.slickGraphics.setDrawMode(this.lastDrawMode);
         }
-        if (z2 && this.g != null) {
+        if (z2 && this.renderTarget != null) {
             W.glEnable(3042);
             W.glColorMask(true, true, true, true);
             GL14.glBlendFuncSeparate(770, 771, 770, 1);
@@ -354,12 +354,12 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
                 a(1.0f);
             }
             if (z) {
-                this.f.resetFont();
+                this.slickGraphics.resetFont();
             }
         } else {
             zC = paint.c();
         }
-        if (this.a) {
+        if (this.shaderSupport) {
             ShaderProgram shaderProgramB2 = null;
             if (paint != null && (paint instanceof GamePaint)) {
                 shaderProgramB2 = ((GamePaint) paint).q();
@@ -367,14 +367,14 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
             if (texture != null && shaderProgramB2 == null) {
                 shaderProgramB2 = texture.B();
             }
-            if (m != shaderProgramB2) {
-                this.f.flushBuffer();
+            if (currentShader != shaderProgramB2) {
+                this.slickGraphics.flushBuffer();
                 if (shaderProgramB2 == null) {
                     v();
                 } else {
                     shaderProgramB2.f();
                     if (!c(shaderProgramB2)) {
-                        if (m != null) {
+                        if (currentShader != null) {
                             v();
                         }
                     } else {
@@ -382,15 +382,15 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
                         b(shaderProgramB2);
                     }
                 }
-                m = shaderProgramB2;
-            } else if (m != null && m.a(paint, texture)) {
-                this.f.flushBuffer();
-                b(m);
+                currentShader = shaderProgramB2;
+            } else if (currentShader != null && currentShader.a(paint, texture)) {
+                this.slickGraphics.flushBuffer();
+                b(currentShader);
             }
         }
         if (slickTexture != null) {
             if ((slickTexture.E == 1) != zC) {
-                this.f.flushBuffer();
+                this.slickGraphics.flushBuffer();
                 int i = zC ? 1 : 2;
                 slickTexture.C().setFilter(i);
                 slickTexture.E = i;
@@ -414,8 +414,8 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
                         d.b *= e.b;
                         d.a *= e.a;
                         a(d);
-                        this.v = Graphics.MODE_ADD;
-                        this.f.setDrawMode(this.v);
+                        this.lastDrawMode = Graphics.MODE_ADD;
+                        this.slickGraphics.setDrawMode(this.lastDrawMode);
                         W.glEnable(3042);
                         W.glColorMask(true, true, true, true);
                         W.glBlendFunc(770, 1);
@@ -425,14 +425,14 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
                     TeamColorFilter teamColorFilter = (TeamColorFilter) colorFilterH;
                     if (teamColorFilter.a == BlendMode.copy) {
                         f(paint.e());
-                        this.v = 99;
+                        this.lastDrawMode = 99;
                         W.glEnable(3042);
                         W.glColorMask(true, true, true, true);
                         W.glBlendFunc(1, 1);
                         z4 = false;
                     } else if (teamColorFilter.a == BlendMode.additive) {
                         f(paint.e());
-                        this.v = 99;
+                        this.lastDrawMode = 99;
                         W.glEnable(3042);
                         W.glColorMask(true, true, true, true);
                         W.glBlendFunc(774, 771);
@@ -451,7 +451,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
                 }
             }
             if (z) {
-                this.f.setFont(a(paint, str, true));
+                this.slickGraphics.setFont(a(paint, str, true));
             }
         }
     }
@@ -587,13 +587,13 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
         color2.r = color.r;
         color2.g = color.g;
         color2.b = color.b;
-        this.f.setColor(color2);
+        this.slickGraphics.setColor(color2);
     }
 
     public void a(float f) {
-        if (B != f) {
-            B = f;
-            this.f.setLineWidth(f);
+        if (lastLineWidth != f) {
+            lastLineWidth = f;
+            this.slickGraphics.setLineWidth(f);
         }
     }
 
@@ -601,7 +601,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
         FontKey fontKey = this.C;
         fontKey.a = (int) paint.k();
         if (x()) {
-            fontKey.a = (int) (fontKey.a * this.L);
+            fontKey.a = (int) (fontKey.a * this.uiScale);
         }
         Typeface typefaceI = paint.i();
         fontKey.b = false;
@@ -678,19 +678,19 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     }
 
     public static void w() {
-        if (E.size() == 0) {
+        if (texturesToReload.size() == 0) {
             return;
         }
-        Iterator it = E.iterator();
+        Iterator it = texturesToReload.iterator();
         while (it.hasNext()) {
             ((SlickTexture) it.next()).I();
         }
-        E.clear();
+        texturesToReload.clear();
     }
 
     public static void a(SlickTexture slickTexture) {
-        E.add(slickTexture);
-        if (E.size() > 15) {
+        texturesToReload.add(slickTexture);
+        if (texturesToReload.size() > 15) {
             w();
         }
     }
@@ -706,10 +706,10 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
             throw new RuntimeException(e2);
         } catch (OutOfMemoryError e3) {
             GameEngine.reportOOM(AssetType.gameImage, e3);
-            if (r == null) {
+            if (outOfMemoryImage == null) {
                 throw new RuntimeException("outOfMemoryErrorImage==null", e3);
             }
-            return r;
+            return outOfMemoryImage;
         }
     }
 
@@ -773,10 +773,10 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
             throw new RuntimeException(e2);
         } catch (OutOfMemoryError e3) {
             GameEngine.reportOOM(AssetType.gameImage, e3);
-            if (r == null) {
+            if (outOfMemoryImage == null) {
                 throw new RuntimeException("outOfMemoryErrorImage==null", e3);
             }
-            return r;
+            return outOfMemoryImage;
         }
     }
 
@@ -798,10 +798,10 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
             throw new RuntimeException((Throwable) e2);
         } catch (OutOfMemoryError e3) {
             GameEngine.reportOOM(AssetType.gameImageCreate, e3);
-            if (r == null) {
+            if (outOfMemoryImage == null) {
                 throw new RuntimeException("outOfMemoryErrorImage==null", e3);
             }
-            return r;
+            return outOfMemoryImage;
         }
     }
 
@@ -870,7 +870,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     private void a(Texture texture, float f, float f2, float f3, float f4, float f5, float f6, float f7, float f8, Paint paint) {
         AtlasRegion atlasRegionA;
-        GraphicsTransform graphicsTransform = this.T;
+        GraphicsTransform graphicsTransform = this.currentTransform;
         float f9 = f3 - f;
         float f10 = f4 - f2;
         if (graphicsTransform.c != -90.0f) {
@@ -892,7 +892,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
             }
         }
         SlickTexture slickTextureE = e(texture);
-        if (this.j != null && slickTextureE.m() < 450 && slickTextureE.l() < 100 && (atlasRegionA = this.j.a(slickTextureE)) != null) {
+        if (this.textureAtlas != null && slickTextureE.m() < 450 && slickTextureE.l() < 100 && (atlasRegionA = this.textureAtlas.a(slickTextureE)) != null) {
             slickTextureE = e(atlasRegionA.a);
             if (f5 < 0.0f) {
                 f += -f5;
@@ -941,7 +941,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
         float f15;
         float f16;
         float f17;
-        Graphics.setCurrent(this.f);
+        Graphics.setCurrent(this.slickGraphics);
         image.startUse();
         if (color != null) {
             color.bind();
@@ -989,7 +989,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
         W.glTexCoord2f(f20 + f22, f21);
         W.glVertex3f(f12, f13, 0.0f);
         image.endUse();
-        this.f.getColor().bind();
+        this.slickGraphics.getColor().bind();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
@@ -1029,32 +1029,32 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void b(int i) {
-        if (l != this) {
+        if (activeInstance != this) {
             u();
         }
         b(false);
-        this.w = null;
-        this.f.setBackground(a(i, e));
-        this.f.clear();
+        this.lastPaint = null;
+        this.slickGraphics.setBackground(a(i, e));
+        this.slickGraphics.clear();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void o() {
-        if (l != this) {
+        if (activeInstance != this) {
             u();
         }
-        this.w = null;
-        this.f.clearAlphaMap();
+        this.lastPaint = null;
+        this.slickGraphics.clearAlphaMap();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void a(int i, PorterDuff.Mode mode) {
-        this.w = null;
+        this.lastPaint = null;
         if (mode != PorterDuff.Mode.CLEAR) {
             b(i);
         } else {
             b(i);
-            this.f.clearAlphaMap();
+            this.slickGraphics.clearAlphaMap();
         }
     }
 
@@ -1072,10 +1072,10 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     }
 
     boolean x() {
-        if (!GameEngine.getInstance().settingsEngine.resizeFontWithUIScale || this.L == 1.0f) {
+        if (!GameEngine.getInstance().settingsEngine.resizeFontWithUIScale || this.uiScale == 1.0f) {
             return false;
         }
-        if (this.L < 1.0f) {
+        if (this.uiScale < 1.0f) {
             return true;
         }
         return true;
@@ -1085,23 +1085,23 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     public void a(String str, float f, float f2, Paint paint) {
         if (x()) {
             k();
-            float f3 = 1.0f / this.L;
+            float f3 = 1.0f / this.uiScale;
             a(f3, f3);
-            f *= this.L;
-            f2 *= this.L;
+            f *= this.uiScale;
+            f2 *= this.uiScale;
         }
-        float f4 = f * this.T.d;
-        float f5 = f2 * this.T.e;
-        float f6 = f4 + this.T.a;
-        float f7 = f5 + this.T.b;
+        float f4 = f * this.currentTransform.d;
+        float f5 = f2 * this.currentTransform.e;
+        float f6 = f4 + this.currentTransform.a;
+        float f7 = f5 + this.currentTransform.b;
         a(paint, str);
         int width = 0;
         if (paint.j() == Paint.Align.CENTER) {
-            width = 0 - (this.f.getFont().getWidth(str) / 2);
+            width = 0 - (this.slickGraphics.getFont().getWidth(str) / 2);
         } else if (paint.j() == Paint.Align.RIGHT) {
-            width = 0 - this.f.getFont().getWidth(str);
+            width = 0 - this.slickGraphics.getFont().getWidth(str);
         }
-        this.f.drawString(str, (int) (f6 + width), (int) (f7 + (0 - this.f.getFont().getLineHeight())));
+        this.slickGraphics.drawString(str, (int) (f6 + width), (int) (f7 + (0 - this.slickGraphics.getFont().getLineHeight())));
         if (x()) {
             l();
         }
@@ -1123,14 +1123,14 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
             float f2 = rectF.b;
             float f3 = rectF.c;
             float f4 = rectF.d;
-            float f5 = f * this.T.d;
-            float f6 = f2 * this.T.e;
-            float f7 = f5 + this.T.a;
-            float f8 = f6 + this.T.b;
-            float f9 = f3 * this.T.d;
-            float f10 = f4 * this.T.e;
-            float f11 = f9 + this.T.a;
-            float f12 = f10 + this.T.b;
+            float f5 = f * this.currentTransform.d;
+            float f6 = f2 * this.currentTransform.e;
+            float f7 = f5 + this.currentTransform.a;
+            float f8 = f6 + this.currentTransform.b;
+            float f9 = f3 * this.currentTransform.d;
+            float f10 = f4 * this.currentTransform.e;
+            float f11 = f9 + this.currentTransform.a;
+            float f12 = f10 + this.currentTransform.b;
             W.glVertex2f(f7, f8);
             W.glVertex2f(f11, f8);
             W.glVertex2f(f11, f12);
@@ -1142,34 +1142,34 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
         float f14 = rectF.b;
         float fB = rectF.b();
         float fC = rectF.c();
-        float f15 = f13 * this.T.d;
-        float f16 = f14 * this.T.e;
-        this.f.drawRect(f15 + this.T.a, f16 + this.T.b, fB * this.T.d, fC * this.T.e);
+        float f15 = f13 * this.currentTransform.d;
+        float f16 = f14 * this.currentTransform.e;
+        this.slickGraphics.drawRect(f15 + this.currentTransform.a, f16 + this.currentTransform.b, fB * this.currentTransform.d, fC * this.currentTransform.e);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void g() {
         e();
         M = null;
-        if (this.j != null) {
-            this.j.c();
+        if (this.textureAtlas != null) {
+            this.textureAtlas.c();
         }
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void h() {
         y();
-        if (this.j != null) {
-            this.j.d();
+        if (this.textureAtlas != null) {
+            this.textureAtlas.d();
         }
-        if (this.a && m != null) {
+        if (this.shaderSupport && currentShader != null) {
             v();
-            m = null;
+            currentShader = null;
         }
-        this.w = null;
+        this.lastPaint = null;
         M = null;
         this.b = true;
-        B = -1.0f;
+        lastLineWidth = -1.0f;
         this.y = false;
     }
 
@@ -1182,14 +1182,14 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void a(Rect rect) {
         if (rect != null) {
-            this.T.f = new RectF(rect);
-            this.T.f.a *= this.T.d;
-            this.T.f.c *= this.T.d;
-            this.T.f.b *= this.T.e;
-            this.T.f.d *= this.T.e;
-            this.T.f.a(this.T.a, this.T.b);
+            this.currentTransform.f = new RectF(rect);
+            this.currentTransform.f.a *= this.currentTransform.d;
+            this.currentTransform.f.c *= this.currentTransform.d;
+            this.currentTransform.f.b *= this.currentTransform.e;
+            this.currentTransform.f.d *= this.currentTransform.e;
+            this.currentTransform.f.a(this.currentTransform.a, this.currentTransform.b);
         } else {
-            this.T.f = null;
+            this.currentTransform.f = null;
         }
         b(false);
     }
@@ -1197,27 +1197,27 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void a(RectF rectF) {
         if (rectF != null) {
-            this.T.f = new RectF(rectF);
-            this.T.f.a *= this.T.d;
-            this.T.f.c *= this.T.d;
-            this.T.f.b *= this.T.e;
-            this.T.f.d *= this.T.e;
-            this.T.f.a(this.T.a, this.T.b);
+            this.currentTransform.f = new RectF(rectF);
+            this.currentTransform.f.a *= this.currentTransform.d;
+            this.currentTransform.f.c *= this.currentTransform.d;
+            this.currentTransform.f.b *= this.currentTransform.e;
+            this.currentTransform.f.d *= this.currentTransform.e;
+            this.currentTransform.f.a(this.currentTransform.a, this.currentTransform.b);
         } else {
-            this.T.f = null;
+            this.currentTransform.f = null;
         }
         b(false);
     }
 
     public void b(boolean z) {
-        RectF rectF = this.T.f;
+        RectF rectF = this.currentTransform.f;
         if (M == rectF && !z) {
             return;
         }
         y();
         if (rectF != null) {
             W.glEnable(3089);
-            W.glScissor((int) rectF.a, (int) ((n() * this.L) - rectF.d), (int) rectF.b(), (int) rectF.c());
+            W.glScissor((int) rectF.a, (int) ((n() * this.uiScale) - rectF.d), (int) rectF.b(), (int) rectF.c());
         } else {
             W.glDisable(3089);
         }
@@ -1226,11 +1226,11 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void b(float f, float f2, float f3, Paint paint) {
-        float f4 = f * this.T.d;
-        float f5 = f2 * this.T.e;
-        float f6 = f4 + this.T.a;
-        float f7 = f5 + this.T.b;
-        float f8 = f3 * this.T.d;
+        float f4 = f * this.currentTransform.d;
+        float f5 = f2 * this.currentTransform.e;
+        float f6 = f4 + this.currentTransform.a;
+        float f7 = f5 + this.currentTransform.b;
+        float f8 = f3 * this.currentTransform.d;
         b(paint);
         if (paint.d() == Paint.Style.STROKE) {
             int i = 40;
@@ -1240,12 +1240,12 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
             a(f6, f7, f8, i);
             return;
         }
-        this.f.fillOval(f6 - f8, f7 - f8, f8 * 2.0f, f8 * 2.0f);
+        this.slickGraphics.fillOval(f6 - f8, f7 - f8, f8 * 2.0f, f8 * 2.0f);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void a(float f, float f2, float f3, Paint paint) {
-        float f4 = this.T.d;
+        float f4 = this.currentTransform.d;
         if (f3 * f4 < 25.0f && paint.d() == Paint.Style.STROKE) {
             GraphicsUtils.a(this, f, f2, f3, paint, f4);
         } else {
@@ -1291,10 +1291,10 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
             f = 1.0f + ((fG - 1.0f) * 0.5f);
             f2 = 0.0f + ((fG - 1.0f) * 0.5f);
         }
-        float f3 = this.T.d;
-        float f4 = this.T.e;
-        float f5 = this.T.a;
-        float f6 = this.T.b;
+        float f3 = this.currentTransform.d;
+        float f4 = this.currentTransform.e;
+        float f5 = this.currentTransform.a;
+        float f6 = this.currentTransform.b;
         if (z) {
             float[] fArrD = d(i2 * 4);
             int i3 = i2 * 4;
@@ -1356,29 +1356,29 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     }
 
     public void a(float f, float f2, float f3, int i) {
-        Graphics.setCurrent(this.f);
+        Graphics.setCurrent(this.slickGraphics);
         TextureImpl.bindNone();
         if (this.P != i) {
             this.P = i;
-            this.Q = 6.283185f / i;
-            this.R = (float) FastTrig.cos(this.Q);
-            this.S = (float) FastTrig.sin(this.Q);
+            this.circleAngleStep = 6.283185f / i;
+            this.cachedCosAngle = (float) FastTrig.cos(this.circleAngleStep);
+            this.cachedSinAngle = (float) FastTrig.sin(this.circleAngleStep);
         }
-        float f4 = this.R;
-        float f5 = this.S;
+        float f4 = this.cachedCosAngle;
+        float f5 = this.cachedSinAngle;
         float f6 = f3;
         float f7 = 0.0f;
-        X.start();
+        lineRenderer.start();
         int i2 = i + 1;
         float f8 = f6 + f;
         float f9 = 0.0f + f2;
         for (int i3 = 0; i3 < i2; i3++) {
-            X.vertex(f6 + f, f7 + f2);
+            lineRenderer.vertex(f6 + f, f7 + f2);
             float f10 = f6;
             f6 = (f4 * f6) - (f5 * f7);
             f7 = (f5 * f10) + (f4 * f7);
         }
-        X.end();
+        lineRenderer.end();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
@@ -1403,9 +1403,9 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void a(float f, float f2, float f3) {
-        this.T.c += f;
-        this.T.g = f2;
-        this.T.h = f3;
+        this.currentTransform.c += f;
+        this.currentTransform.g = f2;
+        this.currentTransform.h = f3;
     }
 
     public static void a(float f, PointF pointF) {
@@ -1419,8 +1419,8 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void a(float f, float f2) {
-        this.T.d *= f;
-        this.T.e *= f2;
+        this.currentTransform.d *= f;
+        this.currentTransform.e *= f2;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
@@ -1432,8 +1432,8 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void b(float f, float f2) {
-        this.T.a += f * this.T.d;
-        this.T.b += f2 * this.T.e;
+        this.currentTransform.a += f * this.currentTransform.d;
+        this.currentTransform.b += f2 * this.currentTransform.e;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
@@ -1444,13 +1444,13 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void a(float f, float f2, float f3, float f4, Paint paint) {
         b(paint);
-        float f5 = f * this.T.d;
-        float f6 = f2 * this.T.e;
-        float f7 = f5 + this.T.a;
-        float f8 = f6 + this.T.b;
-        float f9 = f3 * this.T.d;
-        float f10 = f4 * this.T.e;
-        this.f.drawLine(f7, f8, f9 + this.T.a, f10 + this.T.b);
+        float f5 = f * this.currentTransform.d;
+        float f6 = f2 * this.currentTransform.e;
+        float f7 = f5 + this.currentTransform.a;
+        float f8 = f6 + this.currentTransform.b;
+        float f9 = f3 * this.currentTransform.d;
+        float f10 = f4 * this.currentTransform.e;
+        this.slickGraphics.drawLine(f7, f8, f9 + this.currentTransform.a, f10 + this.currentTransform.b);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
@@ -1460,38 +1460,38 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void a(ShaderProgram shaderProgram) {
-        if (this.a) {
+        if (this.shaderSupport) {
             c(shaderProgram);
             v();
-            m = null;
+            currentShader = null;
         }
     }
 
     public void y() {
-        this.f.flushBuffer();
+        this.slickGraphics.flushBuffer();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void p() {
-        this.f.flushBuffer();
-        this.w = null;
-        this.f.flush();
+        this.slickGraphics.flushBuffer();
+        this.lastPaint = null;
+        this.slickGraphics.flush();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public void q() {
-        if (this.f != null) {
-            this.f.destroy();
+        if (this.slickGraphics != null) {
+            this.slickGraphics.destroy();
         }
-        this.f = null;
+        this.slickGraphics = null;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public int a(String str, Paint paint) {
         a(paint, str);
-        int lineHeight = this.f.getFont().getLineHeight();
+        int lineHeight = this.slickGraphics.getFont().getLineHeight();
         if (x()) {
-            lineHeight = (int) (lineHeight / this.L);
+            lineHeight = (int) (lineHeight / this.uiScale);
         }
         return lineHeight;
     }
@@ -1499,16 +1499,16 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public int b(String str, Paint paint) {
         a(paint, str);
-        int width = this.f.getFont().getWidth(str);
+        int width = this.slickGraphics.getFont().getWidth(str);
         if (x()) {
-            width = (int) (width / this.L);
+            width = (int) (width / this.uiScale);
         }
         return width;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public Texture r() {
-        return r;
+        return outOfMemoryImage;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
@@ -1537,27 +1537,27 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
 
     public void z() {
         GraphicsTransform graphicsTransform;
-        this.U.add(this.T);
-        if (this.V.size == 0) {
+        this.transformStack.add(this.currentTransform);
+        if (this.transformPool.size == 0) {
             graphicsTransform = new GraphicsTransform();
         } else {
-            graphicsTransform = (GraphicsTransform) this.V.c();
+            graphicsTransform = (GraphicsTransform) this.transformPool.c();
         }
-        this.T.a(graphicsTransform);
-        this.T = graphicsTransform;
+        this.currentTransform.a(graphicsTransform);
+        this.currentTransform = graphicsTransform;
     }
 
     public void A() {
-        if (this.U.size() == 0) {
+        if (this.transformStack.size() == 0) {
             throw new RuntimeException("tranform stack is empty");
         }
-        this.V.add(this.T);
-        this.T = (GraphicsTransform) this.U.c();
+        this.transformPool.add(this.currentTransform);
+        this.currentTransform = (GraphicsTransform) this.transformStack.c();
         b(false);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
     public float s() {
-        return this.L;
+        return this.uiScale;
     }
 }

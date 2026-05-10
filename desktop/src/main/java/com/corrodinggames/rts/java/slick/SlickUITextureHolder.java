@@ -53,16 +53,16 @@ public class SlickUITextureHolder extends UITextureHolder {
             bufferedInputStream = new BufferedInputStream(fileInputStream);
         } catch (Exception e2) {
             GameEngine.log("Exception loading image: " + this.texturePath, (Throwable) e2);
-            this.h = SlickGraphicsEngine.s.C();
+            this.h = SlickGraphicsEngine.generalErrorImage.C();
             this.i = true;
         } catch (OutOfMemoryError e3) {
             GameEngine.reportOOM(AssetType.uiImage, e3);
-            this.h = SlickGraphicsEngine.r.C();
+            this.h = SlickGraphicsEngine.outOfMemoryImage.C();
             this.i = true;
         } catch (Throwable e4) {
             e4.printStackTrace();
             GameEngine.log("Exception loading image: " + this.texturePath, (Throwable) e4);
-            this.h = SlickGraphicsEngine.s.C();
+            this.h = SlickGraphicsEngine.generalErrorImage.C();
             this.i = true;
         }
         try {
@@ -75,7 +75,7 @@ public class SlickUITextureHolder extends UITextureHolder {
             if (this.isThumbnail) {
                 if (this.width > 500 || this.height > 500) {
                     GameEngine.log("Map thumbnail is too large. Size:(" + this.width + "," + this.height + ") (max:500 pixels)");
-                    this.h = SlickGraphicsEngine.t.C();
+                    this.h = SlickGraphicsEngine.largeThumbnailImage.C();
                     this.i = true;
                     this.width = this.h.getWidth();
                     this.height = this.h.getHeight();
