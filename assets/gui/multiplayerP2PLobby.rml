@@ -28,10 +28,10 @@
 			.versionNumberHeader { display:block; position:absolute; top:0; right:0; text-align:right; font-size:14; }
 		</style>
 	</head>
-	<body onshow="setPageMinWidthAndHeight(700, 900); onShowNewScreen(); mp.loadUsername(); loadP2PConfig(); refreshP2PServerList()">
+	<body onshow="setPageMinWidthAndHeight(700, 900); onShowNewScreen(); enterP2PLobby(); mp.loadUsername(); loadP2PConfig(); refreshP2PServerList()">
 		<div class="versionNumberHeader">${getVersionName()}</div>
 		<div class="panelMain">
-			<div class="panelCloseButton" onclick="open('mainMenu.rml')" click_on_escape="" />
+			<div class="panelCloseButton" onclick="leaveP2PLobby(); open('mainMenu.rml')" click_on_escape="" />
 			<div class="panelMainContent">
 				<div class="mainButtons">
 					<div class="centerDivOuter topSection">
@@ -50,7 +50,7 @@
 								<button onclick="createAndShowPopup('multiplayerP2PLobby_hostgame.rml', null, 'Host P2P game');">Host P2P</button>
 							</div>
 							<div class="formSection">
-								<button onclick="open('multiplayerLobby.rml')"><p>Classic MP</p></button>
+								<button onclick="leaveP2PLobby(); open('multiplayerLobby.rml')"><p>Classic MP</p></button>
 							</div>
 						</div>
 					</div>
@@ -89,7 +89,7 @@
 			<div class="bottomButtons">
 				<div class="mainButtons">
 					<button id="refreshButton" onclick="refreshP2PServerList()">Refresh</button><br/>
-					<button class="backButtonText" onclick="open('mainMenu.rml')" click_on_escape="">Back</button><br />
+					<button class="backButtonText" onclick="leaveP2PLobby(); open('mainMenu.rml');" click_on_escape="">Back</button><br />
 				</div>
 			</div>
 		</div>

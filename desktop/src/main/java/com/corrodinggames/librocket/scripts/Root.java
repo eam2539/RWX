@@ -240,6 +240,7 @@ public class Root extends ScriptContext {
             P2PLobbyService p2PLobbyService = P2PLobbyService.getInstance();
             String strPrepareJoin = p2PLobbyService.prepareJoin(str);
             GameEngine.getInstance().networkEngine.serverAddress = str;
+            p2PLobbyService.inLobby = false;
             joinServer(strPrepareJoin);
         } catch (IOException e) {
             showPopup("Connection failed", e.getMessage(), true, (String) null, (String) null);
@@ -249,6 +250,14 @@ public class Root extends ScriptContext {
     public void loadP2PConfig() {
         String savedPeerConfig = P2PLobbyService.getInstance().getSavedPeerConfig();
         setValueById("p2pConfigPath", savedPeerConfig);
+    }
+
+    public void enterP2PLobby() {
+        P2PLobbyService.getInstance().inLobby = true;
+    }
+
+    public void leaveP2PLobby() {
+        P2PLobbyService.getInstance().inLobby = false;
     }
 
     public void joinServer(String str) {
@@ -476,6 +485,9 @@ public class Root extends ScriptContext {
         hostP2PStartWithPasswordAndMods(str, checkbox);
     }
 
+    public void updateP2PStatus() {
+        P2PLobbyService.getInstance().inLobby = false;
+    }
     public void hostP2PStartWithPasswordAndMods(String str, boolean z) throws ConfigParseException {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.networkEngine.disconnectNetworking("starting new p2p");
@@ -499,6 +511,7 @@ public class Root extends ScriptContext {
         try {
             P2PLobbyService.getInstance().startIfNeeded();
             P2PLobbyService.getInstance().hostCurrentServer();
+            P2PLobbyService.getInstance().inLobby = false;
             this.libRocket.setDocument("battleroom.rml", null);
         } catch (IOException e) {
             gameEngine.networkEngine.disconnectNetworking("p2p host setup failed");

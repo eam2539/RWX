@@ -6,6 +6,7 @@
 
 ![GitHub Created At](https://img.shields.io/github/created-at/eam2539/RWX?color=blue)
 [![Discord](https://img.shields.io/discord/1352880561215246376?label=Discord)](https://discord.gg/q2amh4Gt3f)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/5c73d6b0-e2f9-46d7-a0d2-271b8f81b6b2/deploy-status)](https://app.netlify.com/projects/rwx-docs/deploys)
 
 **R**usted **W**arfare e**X**tension
 
@@ -23,10 +24,9 @@
 - [ ] 复原项目结构
     - [x] Desktop build
     - [ ] Android build
+- [x] 基于P2P的联机系统
 - [ ] JVM模组系统
-- [ ] 基于P2P的联机系统
 - [ ] 合作模式支持
-- [ ] 强化学习AI支持
 
 ## 💬 社区讨论
 

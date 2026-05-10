@@ -180,22 +180,18 @@ public class Multiplayer extends ScriptContext {
         boolean z = gameEngine.networkEngine.isServer || gameEngine.networkEngine.isProxyController;
         boolean z2 = gameEngine.networkEngine.isServer;
         boolean z3 = (z || gameEngine.networkEngine.roomSettings.teamLock) ? false : true;
-        Iterator it = activeDocument.findElementsByClassName("forHostOnly").iterator();
-        while (it.hasNext()) {
-            ((Element) it.next()).show(z);
+        for (Element item : activeDocument.findElementsByClassName("forHostOnly")) {
+            item.show(z);
         }
-        Iterator it2 = activeDocument.findElementsByClassName("forLocalHostOnly").iterator();
-        while (it2.hasNext()) {
-            ((Element) it2.next()).show(z2);
+        for (Element value : activeDocument.findElementsByClassName("forLocalHostOnly")) {
+            value.show(z2);
         }
-        Iterator it3 = activeDocument.findElementsByClassName("forUnlockedTeamsNonHost").iterator();
-        while (it3.hasNext()) {
-            ((Element) it3.next()).show(z3);
+        for (Element element : activeDocument.findElementsByClassName("forUnlockedTeamsNonHost")) {
+            element.show(z3);
         }
         if (gameEngine.loadLevelNetwork()) {
-            Iterator it4 = activeDocument.findElementsByClassName("forRealNetworkOnly").iterator();
-            while (it4.hasNext()) {
-                ((Element) it4.next()).show(false);
+            for (Element element : activeDocument.findElementsByClassName("forRealNetworkOnly")) {
+                element.show(false);
             }
         }
         activeElementById.compareAndSetText(gameEngine.networkEngine.getPublicIpStatusText());

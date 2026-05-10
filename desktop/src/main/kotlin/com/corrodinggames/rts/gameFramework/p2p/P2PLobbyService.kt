@@ -48,6 +48,9 @@ class P2PLobbyService private constructor() {
     private var host: Host? = null
     private var mDnsDiscovery: MDnsDiscovery? = null
     private var started = false
+
+    @JvmField
+    var inLobby = false
     private var p2pConfig: P2PConfig = P2PConfigLoader.load()
     private var hostedRoom: P2PRoomAdvertisement? = null
     private var joinedRoom: P2PRoomAdvertisement? = null
@@ -135,6 +138,10 @@ class P2PLobbyService private constructor() {
 
     fun getSavedPeerConfig(): String {
         return "P2P config: ${P2PConfigLoader.configPath()}"
+    }
+
+    fun leaveLobby() {
+        inLobby = false
     }
 
     @Synchronized
@@ -282,11 +289,11 @@ class P2PLobbyService private constructor() {
 
     private fun refreshExternalDiscovery() {
         val now = System.currentTimeMillis()
-        if (p2pConfig.discovery.service.enable && now - lastServiceDiscoveryMs >= p2pConfig.discovery.service.refreshIntervalMs) {
+        if (inLobby && p2pConfig.discovery.service.enable && now - lastServiceDiscoveryMs >= p2pConfig.discovery.service.refreshIntervalMs) {
             lastServiceDiscoveryMs = now
             serviceDiscovery.fetchRooms().forEach { mergeDiscoveredRoom(it) }
         }
-        if (p2pConfig.discovery.dht.enable && now - lastDhtDiscoveryMs >= p2pConfig.discovery.dht.queryIntervalMs) {
+        if (inLobby && p2pConfig.discovery.dht.enable && now - lastDhtDiscoveryMs >= p2pConfig.discovery.dht.queryIntervalMs) {
             lastDhtDiscoveryMs = now
             dhtDiscovery.fetchRooms().forEach { mergeDiscoveredRoom(it) }
         }
@@ -326,7 +333,7 @@ class P2PLobbyService private constructor() {
             requiresPassword = networkEngine.n != null
             gamePort = gameEngine.settingsEngine.networkPort
             mapPath = networkEngine.roomSettings.mapPath
-            gameMode = networkEngine.roomSettings.gameModeType?.name ?: GameModeType.values()[0].name
+            gameMode = networkEngine.roomSettings.gameModeType?.name ?: GameModeType.entries[0].name
             gameState = when {
                 networkEngine.v -> "chat"
                 networkEngine.gameHasBeenStarted -> "ingame"
