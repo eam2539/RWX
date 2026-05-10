@@ -12,6 +12,7 @@ kotlin {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
+
 enum class PlatformType {
     WINDOWS_X64,
     WINDOWS_ARM64,

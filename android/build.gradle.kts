@@ -22,8 +22,7 @@ android {
             resources.srcDirs("../res")
             assets.srcDirs("../assets")
             java.srcDirs(
-                "src/main/java",
-                "../core/src/main/java"
+                "src/main/java"
             )
         }
     }

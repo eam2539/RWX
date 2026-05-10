@@ -1,3 +1,8 @@
+plugins {
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+}
+
 group = property("group") as String
 version = property("version") as String
 
