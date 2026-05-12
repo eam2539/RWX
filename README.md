@@ -30,53 +30,9 @@ English, [简体中文](README_zh.md)
 
 * [Discord Server](https://discord.gg/q2amh4Gt3f)
 
-## 🔨 Building Native Library
+## 🔨 Building
 
-### Prerequisites
-
-- CMake 3.16+
-- C++17 compiler
-- JDK 17+ (for JNI)
-
-### rocketConnector Native Library
-
-The rocketConnector native library requires libRocket.
-
-**1. Clone libRocket:**
-
-```bash
-git clone https://github.com/libRocket/libRocket.git
-```
-
-**2. Build libRocket:**
-
-Linux or macOS:
-
-```bash
-cd path/to/libRocket/Build
-cmake . -DBUILD_SHARED_LIBS=OFF
-#for linux
-cmake --build . -j$(nproc)
-#for macOS
-cmake --build . -j$(sysctl -n hw.logicalcpu)
-```
-
-Windows:
-
-```bat
-cd path\to\libRocket\Build
-cmake --build . --parallel
-```
-
-**3. Build rocketConnector:**
-
-```bash
-# Point to libRocket source directory
-export LIBROCKET_ROOT=/path/to/libRocket   
-# for Windows: set LIBROCKET_ROOT=C:\path\to\libRocket 
-./gradlew desktop:buildRocketConnectorNative 
-# for Windows: gradlew.bat desktop:buildRocketConnectorNative
-```
+Please refer to [CI/CD configuration](.github/workflows/deploy.yml)
 
 ## Disclaimer
 

@@ -387,7 +387,7 @@ if (osType == OSType.WINDOWS) {
         destinationDirectory.set(layout.buildDirectory.dir("distributions"))
         archiveFileName.set("$appName-$appVersion-$platformId-desktop.zip")
 
-        from(stagedDesktopDistDir) {
+        from(stagedDesktopDistDir.map { it.dir(appName) }) {
             into(appName)
         }
     }

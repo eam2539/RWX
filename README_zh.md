@@ -33,53 +33,9 @@
 * [QQ群组](https://qun.qq.com/universal-share/share?ac=1&authKey=EQ73b%2BVCr5a5mUrJR1yOhp0oJFmDHuBglEPrHJEWmHxSyMZjH4xI2H0hgqXZ%2B3dW&busi_data=eyJncm91cENvZGUiOiI5ODI4MzgwODYiLCJ0b2tlbiI6ImZaMHZqZDJ2UllsZnpHTEQxRHBtanhiZDgwTFVZdXcwV1N6a1dZMm1oQVNaUEZNR1cxSWptV0VBOW9aYXVIYlAiLCJ1aW4iOiIzMDYwMzA5MzQwIn0%3D&data=Maw6iUgqhXNqLNXmhH7V6FVNDiLqVgvN6paLZrQeSiDxJLu8IxDpAhmmCqdXJsJNViI0SCU-oM5_h-buAOY00Q&svctype=4&tempid=h5_group_info)
 * [Discord 群组](https://discord.gg/q2amh4Gt3f)
 
-## 🔨 编译 Native 库
+## 🔨 编译
 
-### 前置要求
-
-- CMake 3.16+
-- C++17 编译器
-- JDK 17+ (用于 JNI)
-
-### rocketConnector Native 库
-
-rocketConnector 原生库依赖 libRocket。
-
-**1. 克隆 libRocket：**
-
-```bash
-git clone https://github.com/libRocket/libRocket.git
-```
-
-**2. 编译 libRocket：**
-
-Linux 或 macOS:
-
-```bash
-cd path/to/libRocket/Build
-cmake . -DBUILD_SHARED_LIBS=OFF
-#for linux
-cmake --build . -j$(nproc) 
-#for macOS
-cmake --build . -j$(sysctl -n hw.logicalcpu)
-```
-
-Windows :
-
-```bat
-cd path\to\libRocket\Build
-cmake --build . --parallel
-```
-
-**3. 编译 rocketConnector：**
-
-```bash
-# Point to libRocket source directory
-export LIBROCKET_ROOT=/path/to/libRocket   
-# for Windows: set LIBROCKET_ROOT=C:\path\to\libRocket 
-./gradlew desktop:buildRocketConnectorNative 
-# for Windows: gradlew.bat desktop:buildRocketConnectorNative
-```
+请参考 [CI/CD configuration](.github/workflows/deploy.yml)
 
 ## 免责声明
 
