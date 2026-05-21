@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="app_theme" parent="@android:style/Theme.NoTitleBar.Fullscreen">
+        <item name="android:windowFullscreen">true</item>
+    </style>
     
     
     <style name="SpinnerTheme" parent="android:Theme.Holo">
