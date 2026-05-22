@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="app_name">RWX</string>
     
     <string name="onscreenlocationaction_prompt">Action Location</string>
     <string name="onscreenlocationdpad_prompt">Dpad Location</string>
