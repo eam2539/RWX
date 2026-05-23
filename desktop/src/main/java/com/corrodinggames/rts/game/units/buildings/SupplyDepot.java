@@ -139,8 +139,8 @@ public class SupplyDepot extends FactoryWithQueue {
         this.depotLevel = 1;
         this.animationTimer = 0.0f;
         this.supplyCount = 0;
-        this.baseTexture = baseTexture;
-        a(this.baseTexture, 1);
+        super.baseTexture = baseTexture;
+        a(super.baseTexture, 1);
         this.radius = 20.0f;
         this.displayRadius = this.radius;
         this.maxHealth = 800.0f;
@@ -173,7 +173,7 @@ public class SupplyDepot extends FactoryWithQueue {
     public boolean onDeath() {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.effectManager.createExplosion(this.posX, this.posY, this.posZ);
-        this.baseTexture = deadTexture;
+        super.baseTexture = deadTexture;
         S(0);
         this.isAlive = false;
         gameEngine.soundEngine.playSound(SoundEngine.buildingExplodeSound, 0.8f, this.posX, this.posY);

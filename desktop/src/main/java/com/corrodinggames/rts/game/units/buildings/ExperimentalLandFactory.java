@@ -123,9 +123,9 @@ public class ExperimentalLandFactory extends FactoryWithQueue {
 
     public ExperimentalLandFactory(boolean z) {
         super(z);
-        this.baseTexture = baseTexture;
+        super.baseTexture = baseTexture;
         this.overlayTexture = backgroundTexture;
-        b(this.baseTexture);
+        b(super.baseTexture);
         this.radius = 55.0f;
         this.displayRadius = this.radius;
         this.maxHealth = 3200.0f;
@@ -173,7 +173,7 @@ public class ExperimentalLandFactory extends FactoryWithQueue {
     public boolean onDeath() {
         GameEngine.getInstance();
         this.overlayTexture = null;
-        this.baseTexture = deadTexture;
+        super.baseTexture = deadTexture;
         S(0);
         this.isAlive = false;
         a(UnitSize.verylargeBuilding);

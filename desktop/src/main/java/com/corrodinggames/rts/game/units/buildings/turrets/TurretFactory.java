@@ -504,7 +504,7 @@ public class TurretFactory extends FactoryWithQueue {
         this.displayRadius = this.radius;
         this.maxHealth = 700.0f;
         this.currentHealth = this.maxHealth;
-        this.baseTexture = baseTexture;
+        super.baseTexture = baseTexture;
         this.movementLevels[0].targetX = Utility.readStreamToString(this, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT);
         this.buildingTargetRect.a(0, 0, 1, 1);
         this.buildingVelocityRect.a(0, 0, 1, 1);
@@ -535,7 +535,7 @@ public class TurretFactory extends FactoryWithQueue {
     @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding
     /* JADX INFO: renamed from: L */
     public boolean onDeath() {
-        this.baseTexture = deadTexture;
+        super.baseTexture = deadTexture;
         S(0);
         this.isAlive = false;
         a(UnitSize.large);

@@ -53,7 +53,7 @@ public class WallVertical extends FactoryWithQueue {
         this.displayRadius = this.radius;
         this.maxHealth = 700.0f;
         this.currentHealth = this.maxHealth;
-        this.baseTexture = baseTexture;
+        super.baseTexture = baseTexture;
         this.buildingTargetRect.a(0, 0, 1, 0);
         this.buildingVelocityRect.a(0, 0, 1, 0);
     }

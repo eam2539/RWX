@@ -89,7 +89,7 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
         this.tempRect = new Rect();
         this.targetPriorityPoints = new PointF[6];
         this.hiddenPoints = new PointF[this.targetPriorityPoints.length];
-        this.baseTexture = baseTexture;
+        super.baseTexture = baseTexture;
         b(baseTexture);
         this.radius = 30.0f;
         this.displayRadius = this.radius;
@@ -127,7 +127,7 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
     @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding
     /* JADX INFO: renamed from: L */
     public boolean onDeath() {
-        this.baseTexture = deadTexture;
+        super.baseTexture = deadTexture;
         S(0);
         this.isAlive = false;
         a(UnitSize.normal);

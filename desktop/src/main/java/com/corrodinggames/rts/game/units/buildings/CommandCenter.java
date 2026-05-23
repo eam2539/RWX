@@ -96,7 +96,7 @@ public class CommandCenter extends FactoryWithQueue {
         super(z);
         this.frameTimer = 20.0f;
         this.frameIndex = 0;
-        this.baseTexture = baseTexture;
+        super.baseTexture = baseTexture;
         this.overlayTexture = backgroundTexture;
         T(53);
         U(68);
@@ -141,7 +141,7 @@ public class CommandCenter extends FactoryWithQueue {
     /* JADX INFO: renamed from: L */
     public boolean onDeath() {
         GameEngine gameEngine = GameEngine.getInstance();
-        this.baseTexture = deadTexture;
+        super.baseTexture = deadTexture;
         this.overlayTexture = null;
         S(0);
         this.isAlive = false;
