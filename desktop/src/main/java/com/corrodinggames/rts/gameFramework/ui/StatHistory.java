@@ -38,6 +38,6 @@ public class StatHistory {
         if (this.c == 0 || this.b[i] <= 0) {
             return 0.0f;
         }
-        return this.b[i] / this.c;
+        return this.b[i] / (float) this.c;
     }
 }

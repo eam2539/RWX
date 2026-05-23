@@ -320,8 +320,8 @@ public final class GraphicsUtils {
         if (iB == 0 || iC == 0) {
             return;
         }
-        int i10 = (int) ((i8 / iB) + 0.5f);
-        int i11 = (int) ((i9 / iC) + 0.5f);
+        int i10 = (int) ((i8 / (float) iB) + 0.5f);
+        int i11 = (int) ((i9 / (float) iC) + 0.5f);
         if (i10 < 1) {
             i10 = 1;
         }
@@ -331,8 +331,8 @@ public final class GraphicsUtils {
         if (i10 == 0 || i11 == 0) {
             return;
         }
-        float f3 = i8 / (i10 * iB);
-        float f4 = i9 / (i11 * iC);
+        float f3 = i8 / (float) (i10 * iB);
+        float f4 = i9 / (float) (i11 * iC);
         float fFromHexString = Utility.fromHexString(1.0f, f3, f2);
         float fFromHexString2 = Utility.fromHexString(1.0f, f4, f2);
         if (Math.abs(fFromHexString) < 0.0001f) {

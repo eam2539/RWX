@@ -30,8 +30,8 @@ public class NinePatchStyle extends UIStyle {
     public void a(Texture texture, int i2, int i3) {
         this.a = i2;
         this.b = i3;
-        this.c = i2 / texture.p;
-        this.d = i3 / texture.q;
+        this.c = i2 / (float) texture.p;
+        this.d = i3 / (float) texture.q;
     }
 
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
@@ -91,10 +91,10 @@ public class NinePatchStyle extends UIStyle {
             int i6 = iB / 2;
             int i7 = iC / 2;
             if (i4 * 1.0f > i6) {
-                f = i6 / i4;
+                f = i6 / (float) i4;
             }
             if (i5 * f > i7) {
-                f = i7 / i5;
+                f = i7 / (float) i5;
             }
             i4 = (int) (this.a * f);
             i5 = (int) (this.b * f);

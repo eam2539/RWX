@@ -279,7 +279,7 @@ public class StatsHistoryChart {
         y.a(var15, (float)rect.d(), (float)(rect.b + this.b.c()), var14);
         var12.b = rect.b + this.b.c() + 3;
         var12.d = rect.d - this.b.c() - 3;
-        int var37 = Math.max(1, var7.c - var7.b);
+        int var37 = Math.max(1, var7.b - var7.c);
         float var38 = (float)var12.c() / var37;
         String var16 = Utility.copyStream(0L);
         int var13 = y.b(var16, var10);
@@ -290,7 +290,7 @@ public class StatsHistoryChart {
         int var18 = this.b.c();
         if (z == ValueDisplayMode.absolute) {
             String var19 = TeamStats.formatValue(var7.a.a(), var7.b);
-            String var20 = TeamStats.formatValue(var7.a.a(), var7.b);
+            String var20 = TeamStats.formatValue(var7.a.a(), var7.c);
             var13 = Math.max(y.b(var19, var9), y.b(var20, var9));
             var12.c = rect.c - var13 - 2;
             int var21 = var18 / 2;
@@ -298,8 +298,8 @@ public class StatsHistoryChart {
             var11.b(-13619152);
 
             for (int var22 = 0; var22 <= 4; var22++) {
-                float var23 = var7.b + (float)var37 * var22 / 4.0F;
-                float var24 = var12.d - (var23 - var7.b) * var38;
+                float var23 = var7.c + (float) var37 * var22 / 4.0F;
+                float var24 = var12.d - (var23 - var7.c) * var38;
                 String var25 = TeamStats.formatValue(var7.a.a(), (int)var23);
                 y.a(var25, (float)(var12.c + 2), var24 + var21, var9);
                 if (var22 > 0 && var22 < 4) {
@@ -360,12 +360,12 @@ public class StatsHistoryChart {
                     if (var41 == 2 ? var47 == this.a : var41 != 1 || var47 != this.a) {
                         Point2i var27 = (Point2i)var50.get(0);
                         float var28 = var12.a;
-                        float var29 = var12.d - var38 * (var27.y - var7.b);
+                        float var29 = var12.d - var38 * (var27.y - var7.c);
 
                         for (int var30 = 1; var30 < var50.size(); var30++) {
                             var27 = (Point2i)var50.get(var30);
                             float var31 = var12.a + var40 * var27.x;
-                            float var32 = var12.d - var38 * (var27.y - var7.b);
+                            float var32 = var12.d - var38 * (var27.y - var7.c);
                             int var33 = (int)(var54 * Math.min(1.0F, Math.max(0.0F, var8 - (float)var27.x / var7.d)));
                             GamePaint var34 = var47.a(var33, var26);
                             y.a(var28, var29, var31, var29, var34);
@@ -382,8 +382,8 @@ public class StatsHistoryChart {
 
             for (int var48 = 1; var48 < var42.size(); var48++) {
                 StatHistory var51 = (StatHistory)var42.get(var48);
-                float var55 = var12.a + var40 * var45.a(0);
-                float var60 = var12.a + var40 * var51.a(0);
+                float var55 = var12.a + var40 * var45.a;
+                float var60 = var12.a + var40 * var51.a;
                 float var66 = var12.d;
 
                 for (int var70 = 0; var70 < this.l.size(); var70++) {
@@ -391,7 +391,7 @@ public class StatsHistoryChart {
                     float var76 = var66 - var12.c() * var73;
                     if (var73 > 0.0F) {
                         TeamHistoryChart var79 = this.l.get(var70);
-                        float var82 = Math.min(1.0F, Math.max(0.0F, var8 - (float)var45.a(0) / var7.d));
+                        float var82 = Math.min(1.0F, Math.max(0.0F, var8 - (float) var45.a / var7.d));
                         GamePaint var83 = var79.a((int)(var82 * 255.0F), false);
                         this.b.a((int)var55, (int)(var76 + 0.5F), (int)var60, (int)(var66 + 0.5F));
                         if (this.o != null) {
@@ -430,7 +430,7 @@ public class StatsHistoryChart {
                     for (TeamHistoryChart var67 : this.l) {
                         TeamHistory var71 = var67.a;
                         int var74 = var71.a(bj, this.u);
-                        float var77 = var12.d - var38 * (var74 - var7.b);
+                        float var77 = var12.d - var38 * (var74 - var7.c);
                         float var80 = Utility.abs(var77 - var6.selectionBoxStartY);
                         if (var80 < var56) {
                             var56 = var80;
