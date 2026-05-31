@@ -19,11 +19,10 @@ English, [简体中文](README_zh.md)
 
 ## 🗺️ Roadmap
 
-- [ ] Reconstruct project structure
+- [ ] Build
     - [x] Desktop build
     - [ ] Android build
 - [x] P2P-based multiplayer system
-- [ ] JVM modding system
 - [ ] Co-op mode support
 
 ## 💬 Community Discussion

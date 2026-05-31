@@ -21,11 +21,10 @@
 
 ## 🗺️ 开发路线图
 
-- [ ] 复原项目结构
+- [ ] Build
     - [x] Desktop build
     - [ ] Android build
 - [x] 基于P2P的联机系统
-- [ ] JVM模组系统
 - [ ] 合作模式支持
 
 ## 💬 社区讨论

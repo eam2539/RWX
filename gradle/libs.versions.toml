@@ -1,8 +1,8 @@
 [versions]
-androidGradleVersion = "8.13.2"
+androidGradleVersion = "9.0.1"
 appcompatVersion = "1.7.1"
 httpclientVersion = "4.5.14"
-jacksonDatabindVersion = "2.21.3"
+jacksonDatabindVersion = "2.21.4"
 jvmLibp2pVersion = "1.2.0-RELEASE"
 kotlinVersion = "2.3.21"
 legacySupportV4Version = "1.0.0"
