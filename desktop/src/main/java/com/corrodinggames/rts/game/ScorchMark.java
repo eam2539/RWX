@@ -158,7 +158,7 @@ public class ScorchMark extends GameObject {
         return n;
     }
 
-    public strictfp void a(final GraphicsEngine y, final int integer2, final int integer3, final float float4) {
+    public void a(final GraphicsEngine y, final int integer2, final int integer3, final float float4) {
         final int a = this.variant * this.width;
         final int b = 0;
         Texture e = null;

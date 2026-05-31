@@ -667,7 +667,7 @@ public final class PathSolver implements Runnable {
         g();
     }
 
-    public strictfp void g() {
+    public void g() {
         final DynamicUnitPath e = (DynamicUnitPath)this.D;
         final FlowField b = new FlowField(this.g, this.h);
         if (PathEngine.l && !GameEngine.getInstance().reloadMap) {

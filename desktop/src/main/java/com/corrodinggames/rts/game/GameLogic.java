@@ -1097,7 +1097,7 @@ public class GameLogic extends GameEngine {
     /* JADX WARN: Finally extract failed */
     /* JADX WARN: Removed duplicated region for block: B:314:0x0948 A[EXC_TOP_SPLITTER, SYNTHETIC] */
     /* JADX INFO: renamed from: b */
-    public strictfp void processEvent(float float1, int integer) throws IOException, ConfigParseException {
+    public void processEvent(float float1, int integer) throws IOException, ConfigParseException {
         if (this.currentTick == 2) {
             this.checkLowMemory();
         } else if (this.currentTick % 10000 == 0 && this.currentTick != 0) {
@@ -1815,7 +1815,7 @@ public class GameLogic extends GameEngine {
         To view partially-correct code enable 'Show inconsistent code' option in preferences
     */
 
-    public strictfp void drawGame(com.corrodinggames.rts.gameFramework.graphics.GraphicsInterface l, float float2) {
+    public void drawGame(com.corrodinggames.rts.gameFramework.graphics.GraphicsInterface l, float float2) {
         if (this.loadNewGame) {
             this.performanceProfiler.a(ProfilerSection.update_game_shouldDraw);
             this.renderListBuffer.b();

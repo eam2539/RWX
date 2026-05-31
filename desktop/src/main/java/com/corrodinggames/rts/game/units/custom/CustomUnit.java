@@ -3446,7 +3446,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: ca */
-    public strictfp void getUnitAISettings() {
+    public void getUnitAISettings() {
         if (this.unitEffectManager.b != null) {
             final GameEngine instance = GameEngine.getInstance();
             instance.graphicsEngine2.a((float)(int)(this.posX - instance.viewpointXSnapped), (float)(int)(this.posY - instance.viewpointYSnapped), (float)(int)(this.unitEffectManager.b.x - instance.viewpointXSnapped), (float)(int)(this.unitEffectManager.b.y - instance.viewpointYSnapped), FactoryWithQueue.y);

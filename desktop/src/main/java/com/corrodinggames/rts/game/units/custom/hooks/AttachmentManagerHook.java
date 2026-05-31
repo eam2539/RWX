@@ -281,7 +281,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
 
 
     @Override
-    public strictfp void a(CustomUnit j) {
+    public void a(CustomUnit j) {
         boolean var2 = false;
         FastArrayList var3 = j.unitConfig.energyCanTransferToOtherUnits;
         Object[] var4 = var3.a();

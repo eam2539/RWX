@@ -40,7 +40,7 @@ public abstract class TurretImplementation {
     }
 
     /* JADX INFO: renamed from: c */
-    public strictfp PointF getTurretType(final int integer) {
+    public PointF getTurretType(final int integer) {
         return this.a.E(integer);
     }
 

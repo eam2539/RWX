@@ -58,7 +58,7 @@ public final class PathCostMap {
     }
 
     /* JADX INFO: Access modifiers changed from: package-private */
-    public strictfp void a(OrderableUnit var_1_54) {
+    public void a(OrderableUnit var_1_54) {
         if (var_1_54 != null) {
             ++this.l;
             if (this.l > 50) {
@@ -149,7 +149,7 @@ public final class PathCostMap {
         }
     }
 
-    strictfp void b(OrderableUnit var_1_21) {
+    void b(OrderableUnit var_1_21) {
         long a = 0L;
         if (var_1_21 == null) {
             a = PerformanceProfiler.a();
@@ -228,7 +228,7 @@ public final class PathCostMap {
     }
 
     /* JADX INFO: Access modifiers changed from: package-private */
-    public strictfp void b() {
+    public void b() {
         final int b = this.b;
         final int c = this.c;
         this.g = new short[b * c];
@@ -429,7 +429,7 @@ public final class PathCostMap {
         }
     }
 
-    public strictfp void e() {
+    public void e() {
         GameEngine.getCurrentTimeMillis();
         final int c = this.c;
         this.f = new byte[this.b * c];

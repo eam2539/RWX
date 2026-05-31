@@ -466,7 +466,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
     }
 
 
-    public static final strictfp void a(
+    public static final void a(
             CustomUnit jx, float float2, DecalLayer fx, FastArrayList m, PointF pointF
     ) {
         int var5 = m.size;

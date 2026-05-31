@@ -17,6 +17,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import static java.lang.Integer.valueOf;
+
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.b.j */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/b/j.class */
 public class Tileset {
@@ -85,7 +87,7 @@ public class Tileset {
     public boolean containsUnits = false;
 
     /* JADX INFO: renamed from: x */
-    private HashMap<Integer,Properties> propertiesByTileId = new HashMap();
+    private HashMap<Integer, Properties> propertiesByTileId = new HashMap<>();
 
     /* JADX INFO: renamed from: v */
     Rect cachedRect = new Rect();
@@ -192,7 +194,7 @@ public class Tileset {
                     properties.setProperty(attribute, attribute2);
                 }
             }
-            this.propertiesByTileId.put(new Integer(i3), properties);
+            this.propertiesByTileId.put(i3, properties);
         }
     }
 
@@ -279,17 +281,16 @@ public class Tileset {
 
     /* JADX INFO: renamed from: a */
     public static void parseTileset() {
-        Iterator it = imageDescriptors.iterator();
-        while (it.hasNext()) {
-            ((TilesetImageDescriptor) it.next()).inUse = false;
+        for (TilesetImageDescriptor imageDescriptor : imageDescriptors) {
+            imageDescriptor.inUse = false;
         }
     }
 
     /* JADX INFO: renamed from: b */
     public static void getTileRectCached() {
-        Iterator it = imageDescriptors.iterator();
+        Iterator<TilesetImageDescriptor> it = imageDescriptors.iterator();
         while (it.hasNext()) {
-            TilesetImageDescriptor tilesetImageDescriptor = (TilesetImageDescriptor) it.next();
+            TilesetImageDescriptor tilesetImageDescriptor = it.next();
             if (!tilesetImageDescriptor.inUse) {
                 if (tilesetImageDescriptor.texture != null) {
                     tilesetImageDescriptor.texture.o();
@@ -313,7 +314,7 @@ public class Tileset {
 
     /* JADX INFO: renamed from: a */
     public Properties getEmbeddedPngBase64(int i) {
-        return (Properties) this.propertiesByTileId.get(new Integer(i));
+        return this.propertiesByTileId.get(i);
     }
 
     /* JADX INFO: renamed from: a */

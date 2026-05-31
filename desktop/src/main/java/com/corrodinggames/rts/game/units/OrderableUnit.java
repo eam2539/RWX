@@ -4548,7 +4548,7 @@ public abstract class OrderableUnit extends UnitBase {
     }
 
 
-    public strictfp ArrayList<UnitStatistics> collectMovementLevelStatistics() {
+    public ArrayList<UnitStatistics> collectMovementLevelStatistics() {
         ArrayList<UnitStatistics> var1 = new ArrayList();
         if (this.canAttack()) {
             int var2 = this.getTechLevel();

@@ -66,7 +66,7 @@ public class GunTurretT2 extends TurretImplementation {
 
     @Override // com.corrodinggames.rts.game.units.buildings.turrets.TurretImplementation
     /* JADX INFO: renamed from: c */
-    public strictfp PointF getTurretType(final int integer) {
+    public PointF getTurretType(final int integer) {
         final PointF b = this.turretFactory.E(integer);
         float n = this.turretFactory.E() ? this.turretFactory.rotationSpeed : this.turretFactory.movementLevels[integer].targetX;
         n += ((this.turretFactory.turretType == 1) ? -90 : 90);

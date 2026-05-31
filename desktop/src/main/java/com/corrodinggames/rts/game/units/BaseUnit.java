@@ -2339,7 +2339,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: db */
-    public strictfp float getUnitAIPathfindError() {
+    public float getUnitAIPathfindError() {
         final GameEngine instance = GameEngine.getInstance();
         return instance.tileMap.halfTileWorldSizeX + 2 + instance.gameUI.getUnitSelectionFadeEffect(this);
     }
