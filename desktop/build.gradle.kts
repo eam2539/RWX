@@ -43,14 +43,21 @@ val osType = when (platformType) {
     PlatformType.MACOS_X64, PlatformType.MACOS_ARM64 -> OSType.MACOS
     PlatformType.LINUX_X64, PlatformType.LINUX_ARM64 -> OSType.LINUX
 }
+
+val lwjglNatives = when (platformType) {
+    PlatformType.WINDOWS_X64 -> "natives-windows"
+    PlatformType.WINDOWS_ARM64 -> "natives-windows-arm64"
+    PlatformType.MACOS_X64 -> "natives-macos"
+    PlatformType.MACOS_ARM64 -> "natives-macos-arm64"
+    PlatformType.LINUX_X64 -> "natives-linux"
+    PlatformType.LINUX_ARM64 -> "natives-linux-arm64"
+}
+
 dependencies {
     implementation(project(":mod-api"))
     implementation(project(":core"))
     compileOnly(files("../libs/android.jar"))
     runtimeOnly(files("../libs/android.jar"))
-    implementation(files("../libs/slick.jar"))
-    implementation(files("../libs/jogg-0.0.7.jar"))
-    implementation(files("../libs/jorbis-0.0.15.jar"))
     implementation(files("../libs/android-platform-lib.jar"))
     implementation(libs.httpclient)
     implementation(libs.jackson.databind)
@@ -62,13 +69,18 @@ dependencies {
         PlatformType.LINUX_X64 -> runtimeOnly("dev.onvoid.webrtc:webrtc-java:${libs.versions.webrtcJavaVersion}:linux-x86_64")
         PlatformType.WINDOWS_ARM64, PlatformType.LINUX_ARM64 -> {}
     }
-    implementation(libs.lwjgl)
-    implementation(libs.lwjgl.util)
-    when (osType) {
-        OSType.WINDOWS -> runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-windows")
-        OSType.LINUX -> runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-linux")
-        OSType.MACOS -> runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-osx")
-    }
+
+    // LWJGL 3
+    api(libs.lwjgl.core)
+    api(libs.lwjgl.glfw)
+    api(libs.lwjgl.opengl)
+    api(libs.lwjgl.openal)
+    api(libs.lwjgl.stb)
+    runtimeOnly("org.lwjgl:lwjgl::${lwjglNatives}")
+    runtimeOnly("org.lwjgl:lwjgl-glfw::${lwjglNatives}")
+    runtimeOnly("org.lwjgl:lwjgl-opengl::${lwjglNatives}")
+    runtimeOnly("org.lwjgl:lwjgl-openal::${lwjglNatives}")
+    runtimeOnly("org.lwjgl:lwjgl-stb::${lwjglNatives}")
 }
 
 val appName: String by project
@@ -83,7 +95,6 @@ application {
         "-Djava.library.path=lib/natives"
     )
 }
-
 
 val platformId = platformType.name.lowercase(getDefault()).replace("_", "-")
 fun patchLinuxSharedObjects(rootDir: File) {
@@ -106,65 +117,6 @@ fun patchLinuxSharedObjects(rootDir: File) {
         }
 }
 
-// ======================== rocketConnector Native Build ========================
-
-val rocketConnectorNativeDir = layout.buildDirectory.dir("native/rocketConnector")
-val rocketConnectorSourceDir = layout.projectDirectory.dir("../native/rocketConnector")
-
-
-fun isRocketConnectorBuilt(buildDir: File): Boolean {
-    val files = listOf(
-        buildDir.resolve("librocketConnector.so"),
-        buildDir.resolve("rocketConnector.dll"),
-        buildDir.resolve("librocketConnector.dylib")
-    )
-    return files.any { it.exists() }
-}
-
-fun getLibrocketRoot(): String = System.getenv("LIBROCKET_ROOT")
-    ?: throw GradleException("LIBROCKET_ROOT environment variable is not set")
-
-
-val configureRocketConnectorNative by tasks.registering(Exec::class) {
-    inputs.dir(rocketConnectorSourceDir)
-    outputs.dir(rocketConnectorNativeDir)
-    onlyIf {
-        !isRocketConnectorBuilt(rocketConnectorNativeDir.get().asFile)
-    }
-    doFirst {
-        environment("LIBROCKET_ROOT", getLibrocketRoot())
-    }
-    val javaHome = System.getProperty("java.home").replace("\\", "/")
-    var cmakeArgs = mutableListOf(
-        "cmake",
-        "-S", rocketConnectorSourceDir.asFile.absolutePath,
-        "-B", rocketConnectorNativeDir.get().asFile.absolutePath,
-        "-DJAVA_HOME=$javaHome"
-    )
-    val toolchainFile = System.getenv("CMAKE_TOOLCHAIN_FILE")
-    if (toolchainFile != null) {
-        cmakeArgs += "-DCMAKE_TOOLCHAIN_FILE=$toolchainFile"
-    }
-    val cmakeGenerator = System.getenv("CMAKE_GENERATOR")
-    if (cmakeGenerator != null) {
-        cmakeArgs += listOf("-G", cmakeGenerator)
-    }
-    commandLine(cmakeArgs)
-}
-
-val buildRocketConnectorNative by tasks.registering(Exec::class) {
-    dependsOn(configureRocketConnectorNative)
-    inputs.dir(rocketConnectorSourceDir)
-    outputs.dir(rocketConnectorNativeDir)
-    onlyIf {
-        !isRocketConnectorBuilt(rocketConnectorNativeDir.get().asFile)
-    }
-    doFirst {
-        environment("LIBROCKET_ROOT", getLibrocketRoot())
-    }
-    commandLine("cmake", "--build", rocketConnectorNativeDir.get().asFile.absolutePath, "--config", "Release")
-}
-
 // ======================== Extract LWJGL Natives ========================
 
 val extractNatives by tasks.registering(Sync::class) {
@@ -180,7 +132,7 @@ val extractNatives by tasks.registering(Sync::class) {
 // ======================== Jar ========================
 
 tasks.named<Jar>("jar") {
-    dependsOn(extractNatives, buildRocketConnectorNative, "compileJava", "compileKotlin")
+    dependsOn(extractNatives, "compileJava", "compileKotlin")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from(tasks.named<JavaCompile>("compileJava").map { it.outputs.files })
@@ -195,12 +147,10 @@ tasks.named<Jar>("jar") {
 // ======================== Run ========================
 
 tasks.named<JavaExec>("run") {
-    dependsOn(extractNatives, buildRocketConnectorNative)
+    dependsOn(extractNatives)
     workingDir = project.file("..")
     val nativePaths = listOf(
         layout.buildDirectory.dir("libs/natives").get().asFile.absolutePath,
-        rocketConnectorNativeDir.get().asFile.absolutePath,
-        rocketConnectorNativeDir.get().asFile.resolve("Release").absolutePath
     ).joinToString(File.pathSeparator)
     jvmArgs("-Djava.library.path=$nativePaths")
 }
@@ -212,22 +162,6 @@ distributions {
         contents {
 
             from(layout.buildDirectory.dir("libs/natives")) {
-                when (osType) {
-                    OSType.WINDOWS -> include("*.dll")
-                    OSType.LINUX -> include("*.so")
-                    OSType.MACOS -> include("*.dylib")
-                }
-                into("lib/natives")
-            }
-            from(rocketConnectorNativeDir) {
-                when (osType) {
-                    OSType.WINDOWS -> include("*.dll")
-                    OSType.LINUX -> include("*.so")
-                    OSType.MACOS -> include("*.dylib")
-                }
-                into("lib/natives")
-            }
-            from(rocketConnectorNativeDir.map { it.dir("Release") }) {
                 when (osType) {
                     OSType.WINDOWS -> include("*.dll")
                     OSType.LINUX -> include("*.so")
@@ -251,7 +185,7 @@ val stagedDesktopDistDir = layout.buildDirectory.dir("jpackage/distributions/$pl
 val stageJpackageInput by tasks.registering(Sync::class) {
     group = "distribution"
     description = "Stage application jars and natives for jpackage."
-    dependsOn("jar", extractNatives, buildRocketConnectorNative)
+    dependsOn("jar", extractNatives)
 
     from(tasks.named<Jar>("jar"))
     from({
@@ -265,20 +199,6 @@ val stageJpackageInput by tasks.registering(Sync::class) {
         nativesTarget.mkdirs()
         project.copy {
             from(layout.buildDirectory.dir("libs/natives/")) {
-                when (osType) {
-                    OSType.WINDOWS -> include("*.dll")
-                    OSType.LINUX -> include("*.so")
-                    OSType.MACOS -> include("*.dylib")
-                }
-            }
-            from(rocketConnectorNativeDir) {
-                when (osType) {
-                    OSType.WINDOWS -> include("*.dll")
-                    OSType.LINUX -> include("*.so")
-                    OSType.MACOS -> include("*.dylib")
-                }
-            }
-            from(rocketConnectorNativeDir.map { it.dir("Release") }) {
                 when (osType) {
                     OSType.WINDOWS -> include("*.dll")
                     OSType.LINUX -> include("*.so")
@@ -357,8 +277,6 @@ val createJpackageImage by tasks.registering(Exec::class) {
                 }
             }
         }
-
-
     }
 }
 
@@ -375,8 +293,6 @@ tasks.register<Sync>("stageDesktopDistribution") {
     from(jpackageImageDir.map { it.dir(if (os.contains("mac")) "$appName.app" else appName) })
     from(rootProject.file("LICENSE"))
     into(stagedDesktopDistDir.map { it.dir(appName) })
-    
-
 }
 
 if (osType == OSType.WINDOWS) {

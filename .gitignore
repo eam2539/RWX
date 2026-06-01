@@ -21,14 +21,10 @@ out/
 .factorypath
 .project
 .settings
-.springBeans
 .sts4-cache
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-
-### rocketConnector ###
-desktop/native/rocketConnector/build/
 
 ### NetBeans ###
 /nbproject/private/
@@ -42,3 +38,16 @@ desktop/native/rocketConnector/build/
 
 ### Mac OS ###
 .DS_Store
+
+### Native builds (legacy rocketConnector - removed in kool-based) ###
+desktop/native/rocketConnector/build/
+
+### Native binaries ###
+*.so
+*.dll
+*.dylib
+*.jnilib
+
+### Gradle wrapper properties not tracked
+!gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
