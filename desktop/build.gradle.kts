@@ -44,7 +44,7 @@ val osType = when (platformType) {
     PlatformType.LINUX_X64, PlatformType.LINUX_ARM64 -> OSType.LINUX
 }
 
-val lwjglNatives = when (platformType) {
+val lwjgl3Natives = when (platformType) {
     PlatformType.WINDOWS_X64 -> "natives-windows"
     PlatformType.WINDOWS_ARM64 -> "natives-windows-arm64"
     PlatformType.MACOS_X64 -> "natives-macos"
@@ -58,6 +58,9 @@ dependencies {
     implementation(project(":core"))
     compileOnly(files("../libs/android.jar"))
     runtimeOnly(files("../libs/android.jar"))
+    implementation(files("../libs/slick.jar"))
+    implementation(files("../libs/jogg-0.0.7.jar"))
+    implementation(files("../libs/jorbis-0.0.15.jar"))
     implementation(files("../libs/android-platform-lib.jar"))
     implementation(libs.httpclient)
     implementation(libs.jackson.databind)
@@ -70,17 +73,26 @@ dependencies {
         PlatformType.WINDOWS_ARM64, PlatformType.LINUX_ARM64 -> {}
     }
 
-    // LWJGL 3
-    api(libs.lwjgl.core)
-    api(libs.lwjgl.glfw)
-    api(libs.lwjgl.opengl)
-    api(libs.lwjgl.openal)
-    api(libs.lwjgl.stb)
-    runtimeOnly("org.lwjgl:lwjgl::${lwjglNatives}")
-    runtimeOnly("org.lwjgl:lwjgl-glfw::${lwjglNatives}")
-    runtimeOnly("org.lwjgl:lwjgl-opengl::${lwjglNatives}")
-    runtimeOnly("org.lwjgl:lwjgl-openal::${lwjglNatives}")
-    runtimeOnly("org.lwjgl:lwjgl-stb::${lwjglNatives}")
+    // Legacy LWJGL 2 (for existing Slick2D-based Java code)
+    implementation(libs.lwjgl)
+    implementation(libs.lwjgl.util)
+    when (osType) {
+        OSType.WINDOWS -> runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-windows")
+        OSType.LINUX -> runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-linux")
+        OSType.MACOS -> runtimeOnly("org.lwjgl.lwjgl:lwjgl-platform:${libs.versions.lwjglVersion}:natives-osx")
+    }
+
+    // New LWJGL 3 (for kool-engine Kotlin code)
+    implementation(libs.lwjgl3.core)
+    implementation(libs.lwjgl3.glfw)
+    implementation(libs.lwjgl3.opengl)
+    implementation(libs.lwjgl3.openal)
+    implementation(libs.lwjgl3.stb)
+    runtimeOnly("org.lwjgl:lwjgl:${libs.versions.lwjgl3Version}:${lwjgl3Natives}")
+    runtimeOnly("org.lwjgl:lwjgl-glfw:${libs.versions.lwjgl3Version}:${lwjgl3Natives}")
+    runtimeOnly("org.lwjgl:lwjgl-opengl:${libs.versions.lwjgl3Version}:${lwjgl3Natives}")
+    runtimeOnly("org.lwjgl:lwjgl-openal:${libs.versions.lwjgl3Version}:${lwjgl3Natives}")
+    runtimeOnly("org.lwjgl:lwjgl-stb:${libs.versions.lwjgl3Version}:${lwjgl3Natives}")
 }
 
 val appName: String by project
@@ -95,6 +107,7 @@ application {
         "-Djava.library.path=lib/natives"
     )
 }
+
 
 val platformId = platformType.name.lowercase(getDefault()).replace("_", "-")
 fun patchLinuxSharedObjects(rootDir: File) {

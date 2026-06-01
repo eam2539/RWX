@@ -4,12 +4,13 @@ appcompatVersion = "1.7.1"
 httpclientVersion = "4.5.14"
 jacksonDatabindVersion = "2.21.4"
 jvmLibp2pVersion = "1.2.0-RELEASE"
-kotlinVersion = "2.1.0"
+kotlinVersion = "2.3.21"
 legacySupportV4Version = "1.0.0"
+lwjglVersion = "2.9.3"
+lwjgl_utilVersion = "2.9.3"
 tomlktVersion = "0.5.0"
 webrtcJavaVersion = "0.14.0"
-lwjglVersion = "3.3.6"
-lwjglNatives = "natives-linux"
+lwjgl3Version = "3.3.6"
 
 [libraries]
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -17,15 +18,17 @@ httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "h
 jvm-libp2p = { module = "io.libp2p:jvm-libp2p", version.ref = "jvmLibp2pVersion" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonDatabindVersion" }
 legacy-support-v4 = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacySupportV4Version" }
+lwjgl_util = { module = "org.lwjgl.lwjgl:lwjgl_util", version.ref = "lwjgl_utilVersion" }
+lwjgl = { module = "org.lwjgl.lwjgl:lwjgl", version.ref = "lwjglVersion" }
 tomlkt = { module = "net.peanuuutz.tomlkt:tomlkt", version.ref = "tomlktVersion" }
 webrtc-java = { module = "dev.onvoid.webrtc:webrtc-java", version.ref = "webrtcJavaVersion" }
 
-# LWJGL 3
-lwjgl-core = { module = "org.lwjgl:lwjgl", version.ref = "lwjglVersion" }
-lwjgl-glfw = { module = "org.lwjgl:lwjgl-glfw", version.ref = "lwjglVersion" }
-lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl", version.ref = "lwjglVersion" }
-lwjgl-openal = { module = "org.lwjgl:lwjgl-openal", version.ref = "lwjglVersion" }
-lwjgl-stb = { module = "org.lwjgl:lwjgl-stb", version.ref = "lwjglVersion" }
+# LWJGL 3 (new kool-engine backend)
+lwjgl3-core = { module = "org.lwjgl:lwjgl", version.ref = "lwjgl3Version" }
+lwjgl3-glfw = { module = "org.lwjgl:lwjgl-glfw", version.ref = "lwjgl3Version" }
+lwjgl3-opengl = { module = "org.lwjgl:lwjgl-opengl", version.ref = "lwjgl3Version" }
+lwjgl3-openal = { module = "org.lwjgl:lwjgl-openal", version.ref = "lwjgl3Version" }
+lwjgl3-stb = { module = "org.lwjgl:lwjgl-stb", version.ref = "lwjgl3Version" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradleVersion" }
