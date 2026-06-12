@@ -22,7 +22,6 @@ add_library(rocketConnector SHARED
 )
 
 target_compile_features(rocketConnector PRIVATE cxx_std_17)
-target_compile_definitions(rocketConnector PRIVATE ROCKET_STATIC_LIB)
 target_include_directories(rocketConnector PRIVATE
     ${JNI_INCLUDE_DIRS}
     ${libRocket_INCLUDE_DIR}
@@ -32,6 +31,12 @@ target_link_libraries(rocketConnector PRIVATE
     Freetype::Freetype
     ${JNI_LIBRARIES}
 )
+
+if(APPLE)
+    set_target_properties(rocketConnector PROPERTIES BUILD_RPATH "@loader_path")
+elseif(UNIX)
+    set_target_properties(rocketConnector PROPERTIES BUILD_RPATH "$ORIGIN")
+endif()
 
 if(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
     set_target_properties(rocketConnector PROPERTIES OUTPUT_NAME rocketConnector64)

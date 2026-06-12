@@ -15,8 +15,8 @@ endif()
 
 # Search paths - check Build subdir (where cmake outputs libraries), then root
 set(LIBROCKET_SEARCH_PATHS
-    "${LibRocket_ROOT}/Build"
-    "${LibRocket_ROOT}"
+    "${LibRocket_ROOT}/Build/build"
+    "${LibRocket_ROOT}/Build/build/Release"
 )
 
 # Find include directory
@@ -26,22 +26,42 @@ find_path(libRocket_INCLUDE_DIR
     PATH_SUFFIXES include Include
 )
 
-# Find libraries
-find_library(libRocket_Core_LIBRARY
-    NAMES RocketCore libRocketCore
-    HINTS ${LIBROCKET_SEARCH_PATHS}
-    PATH_SUFFIXES lib Lib
-)
-find_library(libRocket_Controls_LIBRARY
-    NAMES RocketControls libRocketControls
-    HINTS ${LIBROCKET_SEARCH_PATHS}
-    PATH_SUFFIXES lib Lib
-)
-find_library(libRocket_Debugger_LIBRARY
-    NAMES RocketDebugger libRocketDebugger
-    HINTS ${LIBROCKET_SEARCH_PATHS}
-    PATH_SUFFIXES lib Lib
-)
+# Find shared libraries
+set(_libRocket_ORIGINAL_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
+if(WIN32)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .dll.a .lib)
+    set(_libRocket_SHARED_LIBRARY_PATTERN "\\.(dll\\.a|lib)$")
+elseif(APPLE)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .dylib)
+    set(_libRocket_SHARED_LIBRARY_PATTERN "\\.dylib$")
+else()
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .so)
+    set(_libRocket_SHARED_LIBRARY_PATTERN "\\.so(\\.[0-9]+)*$")
+endif()
+
+function(_libRocket_find_shared_library output_var)
+    if(DEFINED ${output_var})
+        set(_libRocket_EXISTING_LIBRARY "${${output_var}}")
+        if(_libRocket_EXISTING_LIBRARY AND NOT _libRocket_EXISTING_LIBRARY MATCHES "${_libRocket_SHARED_LIBRARY_PATTERN}")
+            unset(${output_var} CACHE)
+            unset(${output_var})
+        endif()
+    endif()
+
+    find_library(${output_var}
+        NAMES ${ARGN}
+        HINTS ${LIBROCKET_SEARCH_PATHS}
+        PATH_SUFFIXES lib Lib
+    )
+endfunction()
+
+_libRocket_find_shared_library(libRocket_Core_LIBRARY RocketCore libRocketCore)
+_libRocket_find_shared_library(libRocket_Controls_LIBRARY RocketControls libRocketControls)
+_libRocket_find_shared_library(libRocket_Debugger_LIBRARY RocketDebugger libRocketDebugger)
+
+set(CMAKE_FIND_LIBRARY_SUFFIXES ${_libRocket_ORIGINAL_FIND_LIBRARY_SUFFIXES})
+unset(_libRocket_ORIGINAL_FIND_LIBRARY_SUFFIXES)
+unset(_libRocket_SHARED_LIBRARY_PATTERN)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(LibRocket
@@ -50,6 +70,7 @@ find_package_handle_standard_args(LibRocket
         libRocket_Core_LIBRARY
         libRocket_Controls_LIBRARY
         libRocket_Debugger_LIBRARY
+    REASON_FAILURE_MESSAGE "Shared libRocket libraries are required. Build libRocket with BUILD_SHARED_LIBS=ON and pass its root through LIBROCKET_ROOT or -DLibRocket_ROOT=<path>."
 )
 
 if(LibRocket_FOUND)

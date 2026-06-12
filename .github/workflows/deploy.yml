@@ -71,12 +71,10 @@ jobs:
             -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -DCMAKE_OSX_ARCHITECTURES="$(uname -m)" \
-            -DBUILD_SHARED_LIBS=OFF \
+            -DBUILD_SHARED_LIBS=ON \
             -DBUILD_SAMPLES=OFF \
             -Wno-dev
           cmake --build /tmp/libRocket/Build/build --config Release -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
-          mkdir -p /tmp/libRocket/Build/lib
-          cp /tmp/libRocket/Build/build/libRocket*.a /tmp/libRocket/Build/lib/
           echo "LIBROCKET_ROOT=/tmp/libRocket" >> "$GITHUB_ENV"
 
       - name: Build & install libRocket (Windows)
@@ -86,16 +84,18 @@ jobs:
           vcpkg install freetype:x64-windows
           echo "CMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" >> $env:GITHUB_ENV
           git clone --depth 1 https://github.com/libRocket/libRocket.git C:\libRocket
-          cmake -S C:\libRocket\Build -B C:\libRocket\Build\build `
-            -DCMAKE_BUILD_TYPE=Release `
-            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 `
-            -DBUILD_SHARED_LIBS=OFF `
-            -DBUILD_SAMPLES=OFF `
-            -Wno-dev `
+          $cmakeArgs = @(
+            "-S", "C:\libRocket\Build"
+            "-B", "C:\libRocket\Build\build"
+            "-DCMAKE_BUILD_TYPE=Release"
+            "-DCMAKE_POLICY_VERSION_MINIMUM=3.20"
+            "-DBUILD_SHARED_LIBS=ON"
+            "-DBUILD_SAMPLES=OFF"
+            "-Wno-dev"
             "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          )
+          cmake @cmakeArgs
           cmake --build C:\libRocket\Build\build --config Release
-          New-Item -ItemType Directory -Force -Path C:\libRocket\Build\Lib
-          Copy-Item C:\libRocket\Build\build\Release\*.lib C:\libRocket\Build\Lib\
           echo "LIBROCKET_ROOT=C:\libRocket" >> $env:GITHUB_ENV
 
       - name: Ensure Gradle wrapper is executable
