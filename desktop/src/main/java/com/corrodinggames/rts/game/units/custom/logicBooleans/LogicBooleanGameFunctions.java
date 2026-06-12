@@ -81,7 +81,7 @@ public class LogicBooleanGameFunctions {
         addBooleanType(new LastConvertedBoolean(), "self.lastConverted");
         addBooleanType(new CustomTimerBoolean(), "self.customTimer");
         addBooleanType(new HasTakenDamage(), "self.hasTakenDamage");
-        addBooleanType(new IsAttackingBoolean(), "self.isAlive");
+        addBooleanType(new IsAttackingBoolean(), "self.isAttacking");
         addBooleanType(new IsReversingBoolean(), "self.isReversing");
         addBooleanType(new IsOnTeam().with("team=-1").createLocked(), "self.isOnNeutralTeam");
         addBooleanType(new IsControlledByAI(), "self.isControlledByAI");
