@@ -6,9 +6,8 @@
 
 ![GitHub Created At](https://img.shields.io/github/created-at/eam2539/RWX?color=blue&style=for-the-badge)
 [![Discord](https://img.shields.io/discord/1352880561215246376?style=for-the-badge&logo=discord)](https://discord.gg/q2amh4Gt3f)
-![QQ](https://img.shields.io/badge/QQ-982838086-orange?style=for-the-badge&logo=qq)
+[![QQ](https://img.shields.io/badge/QQ-982838086-orange?style=for-the-badge&logo=qq)](https://qm.qq.com/cgi-bin/qm/qr?k=kupOkNOePIjHK4sSdiJE-9YRdh3ANwum&jump_from=webapi&authKey=/fjvR18rZdV+4fe6gmVlBQkSwLZxoT0L2MYpxl8G2yph2YtqseZn2RAO556LJooZ)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/5c73d6b0-e2f9-46d7-a0d2-271b8f81b6b2/deploy-status)](https://app.netlify.com/projects/rwx-docs/deploys)
-
 
 **R**usted **W**arfare e**X**tension
 
