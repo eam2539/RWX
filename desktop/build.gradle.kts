@@ -86,25 +86,6 @@ application {
 
 
 val platformId = platformType.name.lowercase(getDefault()).replace("_", "-")
-fun patchLinuxSharedObjects(rootDir: File) {
-    if (osType != OSType.LINUX || !rootDir.exists()) return
-
-    rootDir.walkTopDown()
-        .filter { it.isFile && it.extension == "so" }
-        .forEach { soFile ->
-            runCatching {
-                ProcessBuilder(
-                    "patchelf",
-                    "--clear-symbol-version",
-                    "JAWT_GetAWT",
-                    soFile.absolutePath
-                )
-                    .inheritIO()
-                    .start()
-                    .waitFor()
-            }
-        }
-}
 
 // ======================== rocketConnector Native Build ========================
 
@@ -302,7 +283,6 @@ val stageJpackageInput by tasks.registering(Sync::class) {
             into(nativesTarget)
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         }
-        patchLinuxSharedObjects(nativesTarget)
     }
 }
 

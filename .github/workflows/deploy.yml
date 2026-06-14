@@ -44,22 +44,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
-      - name: Set up Temurin 21
+      - name: Set up Corretto 21
         uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: corretto
           java-version: '21'
           cache: gradle
 
       - name: Install native build dependencies (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y cmake build-essential libfreetype-dev patchelf
-
-      - name: Install native build dependencies (macOS)
-        if: runner.os == 'macOS'
-        run: brew install cmake freetype
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential libfreetype-dev
 
       - name: Build & install libRocket (Unix)
         if: runner.os != 'Windows'
@@ -114,7 +110,7 @@ jobs:
         run: .\gradlew.bat --no-daemon --max-workers=${{ matrix.gradle_max_workers }} :desktop:packageDesktopDistribution 2>&1 | Tee-Object -FilePath desktop-package.log
 
       - name: Upload desktop artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.artifact_name }}
           path: desktop/build/distributions/*-${{ matrix.platform_id }}-desktop.zip
@@ -123,7 +119,7 @@ jobs:
 
       - name: Upload failure logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.artifact_name }}-logs
           path: |
@@ -146,10 +142,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Temurin 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
@@ -175,7 +171,7 @@ jobs:
           cp android/build/outputs/apk/release/*-release*.apk android-artifacts/RWX-android-release.apk
 
       - name: Upload Android APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: RWX-android-apk
           path: android-artifacts/*.apk
@@ -184,7 +180,7 @@ jobs:
 
       - name: Upload failure logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: RWX-android-apk-logs
           path: |
@@ -209,14 +205,14 @@ jobs:
 
     steps:
       - name: Download desktop artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: release-artifacts
           pattern: RWX-*-desktop
           merge-multiple: true
 
       - name: Download Android APK artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           path: release-artifacts
           pattern: RWX-android-apk
