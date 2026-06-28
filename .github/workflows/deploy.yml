@@ -1,0 +1,270 @@
+name: Build and release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: release-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-desktop:
+    name: Desktop ${{ matrix.platform_id }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform_id: linux-x64
+          - runner: ubuntu-24.04-arm
+            platform_id: linux-arm64
+          - runner: windows-latest
+            platform_id: windows-x64
+          - runner: macos-15-intel
+            platform_id: macos-x64
+          - runner: macos-latest
+            platform_id: macos-arm64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - name: Ensure Gradle wrapper is executable
+        if: runner.os != 'Windows'
+        run: chmod +x ./gradlew
+
+      - name: Resolve release version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="$(sed -n 's/^version=//p' gradle.properties)"
+          fi
+          echo "RWX_VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Build platform JAR and jpackage image
+        shell: bash
+        run: |
+          ./gradlew --no-daemon \
+            -Pversion="$RWX_VERSION" \
+            -PtargetPlatform=${{ matrix.platform_id }} \
+            :desktop:platformFatJar \
+            :desktop:packageDesktopDistribution
+
+      - name: Upload desktop artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: RWX-${{ matrix.platform_id }}
+          path: desktop/build/distributions/RWX-*-${{ matrix.platform_id }}-desktop.zip
+#            desktop/build/libs/RWX-*-${{ matrix.platform_id }}.jar
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload desktop failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: RWX-${{ matrix.platform_id }}-logs
+          path: |
+            desktop/build/jpackage/**
+            desktop/build/reports/**
+            build/reports/**
+            hs_err_pid*.log
+          if-no-files-found: warn
+          retention-days: 14
+
+  build-universal-jar:
+    name: Universal desktop JAR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - name: Ensure Gradle wrapper is executable
+        run: chmod +x ./gradlew
+
+      - name: Resolve release version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="$(sed -n 's/^version=//p' gradle.properties)"
+          fi
+          echo "RWX_VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Build universal JAR
+        run: ./gradlew --no-daemon -Pversion="$RWX_VERSION" :desktop:multiPlatformFatJar
+
+      - name: Upload universal JAR
+        uses: actions/upload-artifact@v6
+        with:
+          name: RWX-universal-jar
+          path: desktop/build/libs/RWX-*-all.jar
+          if-no-files-found: error
+          retention-days: 14
+
+  build-android:
+    name: Android release
+    runs-on: ubuntu-latest
+    env:
+      SIGNING_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      SIGNING_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - name: Ensure Gradle wrapper is executable
+        run: chmod +x ./gradlew
+
+      - name: Resolve release version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="$(sed -n 's/^version=//p' gradle.properties)"
+          fi
+          echo "RWX_VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Validate Android signing configuration
+        if: env.SIGNING_KEYSTORE_BASE64 != '' || env.SIGNING_KEYSTORE_PASSWORD != '' || env.SIGNING_KEY_ALIAS != '' || env.SIGNING_KEY_PASSWORD != ''
+        shell: bash
+        run: |
+          test -n "$SIGNING_KEYSTORE_BASE64"
+          test -n "$SIGNING_KEYSTORE_PASSWORD"
+          test -n "$SIGNING_KEY_ALIAS"
+          test -n "$SIGNING_KEY_PASSWORD"
+
+      - name: Restore Android signing keystore
+        if: env.SIGNING_KEYSTORE_BASE64 != ''
+        shell: bash
+        run: |
+          keystore="$RUNNER_TEMP/rwx-android-signing.p12"
+          printf '%s' "$SIGNING_KEYSTORE_BASE64" | base64 --decode > "$keystore"
+          echo "KEYSTORE_FILE=$keystore" >> "$GITHUB_ENV"
+          echo "KEYSTORE_PASSWORD=$SIGNING_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "KEY_ALIAS=$SIGNING_KEY_ALIAS" >> "$GITHUB_ENV"
+          echo "KEY_PASSWORD=$SIGNING_KEY_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Build Android app bundle
+        shell: bash
+        run: |
+          ./gradlew --no-daemon \
+            -Pversion="$RWX_VERSION" \
+            :android:bundleRelease
+
+      - name: Build per-ABI and universal APKs
+        shell: bash
+        run: |
+          ./gradlew --no-daemon \
+            -Pversion="$RWX_VERSION" \
+            -PandroidAbiSplits=true \
+            :android:assembleRelease
+
+      - name: Stage Android artifacts
+        shell: bash
+        run: |
+          mkdir -p android-artifacts
+          while IFS= read -r apk; do
+            name="$(basename "$apk")"
+            cp "$apk" "android-artifacts/RWX-$RWX_VERSION-$name"
+          done < <(find android/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | sort)
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: RWX-android
+          path: android-artifacts/*
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Android failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: RWX-android-logs
+          path: |
+            android/build/outputs/logs/**
+            android/build/reports/**
+            android/build/outputs/mapping/**
+            build/reports/**
+            hs_err_pid*.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Remove Android signing keystore
+        if: always() && env.KEYSTORE_FILE != ''
+        shell: bash
+        run: rm -f "$KEYSTORE_FILE"
+
+  publish-release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs:
+      - build-desktop
+      - build-universal-jar
+      - build-android
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download release artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release-artifacts
+          pattern: RWX-*
+          merge-multiple: true
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mapfile -d '' assets < <(find release-artifacts -type f -print0 | sort -z)
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" --generate-notes --verify-tag
+          fi

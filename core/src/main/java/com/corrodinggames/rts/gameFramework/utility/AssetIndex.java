@@ -1,0 +1,137 @@
+package com.corrodinggames.rts.gameFramework.utility;
+
+import com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope;
+import com.corrodinggames.rts.gameFramework.GameEngine;
+import io.github.rwx.LegacyAssetBridge;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+/* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.utility.i */
+/* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/utility/i.class */
+public final class AssetIndex {
+
+    /* JADX INFO: renamed from: c */
+    private ArrayList assetList;
+
+    /* JADX INFO: renamed from: b */
+    boolean firstLoad = true;
+
+    public AssetIndex() {
+        loadIndex();
+    }
+
+    /* JADX INFO: renamed from: a */
+    public void loadIndex() {
+        new Thread() { // from class: com.corrodinggames.rts.gameFramework.utility.i.1
+            @Override // java.lang.Thread, java.lang.Runnable
+            public void run() {
+                AssetIndex.this.buildIndex();
+            }
+        }.start();
+    }
+
+    /* JADX INFO: renamed from: b */
+    public void buildIndex() {
+        synchronized (this) {
+            if (this.assetList != null) {
+                return;
+            }
+            ArrayList arrayList = new ArrayList();
+            try {
+                GameEngine.log("------- createIndex -------");
+                arrayList.addAll(findIndexFiles(VariableScope.nullOrMissingString, 1));
+                this.assetList = arrayList;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /* JADX INFO: renamed from: a */
+    public ArrayList findIndexFiles(String str, int i) {
+        ArrayList arrayList = new ArrayList();
+        String[] strArrC;
+        try {
+            strArrC = LegacyAssetBridge.listAssets(str);
+        } catch (RuntimeException e) {
+            GameEngine.log("AssetIndex: failed to list assets under: " + str + " - " + e.getMessage());
+            return arrayList;
+        }
+        if (str.length() > 0) {
+            str = str + "/";
+        }
+        if (i > 140) {
+            throw new RuntimeException("dirLevel>140 for: " + str);
+        }
+        GameEngine.log("c:" + str);
+        for (String str2 : strArrC) {
+            String str3 = str + str2;
+            boolean z = false;
+            if (!str2.contains(".")) {
+                z = true;
+            }
+            if (!str2.equals(".") && !str2.equals("..") && !str2.equals(VariableScope.nullOrMissingString)) {
+                arrayList.add(str3);
+                if (z) {
+                    arrayList.addAll(findIndexFiles(str3, i + 1));
+                }
+            }
+        }
+        return arrayList;
+    }
+
+    /* JADX INFO: renamed from: c */
+    public ArrayList<String> getAssetList() {
+        if (this.assetList != null) {
+            if (this.firstLoad) {
+                GameEngine.log("assetIndex: getFile was not blocked on load");
+                this.firstLoad = false;
+            }
+            return this.assetList;
+        }
+        GameEngine.getCurrentTimeMillis();
+        buildIndex();
+        if (this.firstLoad) {
+            GameEngine.log("assetIndex: getFile is BLOCKED on load");
+            this.firstLoad = false;
+        }
+        return this.assetList;
+    }
+
+    /* JADX INFO: renamed from: a */
+    public boolean exists(String str) {
+        if (str.endsWith(File.separator)) {
+            str = str.substring(0, str.length() - 1);
+        }
+        String strReplace = str.replace("//", "/");
+        Iterator it = getAssetList().iterator();
+        while (it.hasNext()) {
+            if (((String) it.next()).equals(strReplace)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* JADX INFO: renamed from: b */
+    public String[] listDir(String str) {
+        ArrayList arrayList = new ArrayList();
+        String strSubstring = str;
+        if (strSubstring.endsWith(File.separator)) {
+            strSubstring = strSubstring.substring(0, strSubstring.length() - 1);
+        }
+        int i = 0;
+        for (String str2 : getAssetList()) {
+            if (str2.startsWith(strSubstring)) {
+                String strSubstring2 = str2.substring(strSubstring.length());
+                if (strSubstring2.length() != 0 && strSubstring2.charAt(0) == File.separatorChar && strSubstring2.indexOf(File.separator, 1) == -1) {
+                    i++;
+                    arrayList.add(str2.substring((strSubstring + "/").length()));
+                }
+            }
+        }
+        return (String[]) arrayList.toArray(new String[0]);
+    }
+}

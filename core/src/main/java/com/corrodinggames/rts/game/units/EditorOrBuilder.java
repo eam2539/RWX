@@ -1,0 +1,3054 @@
+package com.corrodinggames.rts.game.units;
+
+import com.corrodinggames.rts.R;
+import com.corrodinggames.rts.game.PlayerTeam;
+import com.corrodinggames.rts.game.Projectile;
+import com.corrodinggames.rts.game.ai.AIController;
+import com.corrodinggames.rts.game.units.actions.*;
+import com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface;
+import com.corrodinggames.rts.game.units.buildings.NukeLauncher;
+import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
+import com.corrodinggames.rts.game.units.custom.CustomUnitConfigParser;
+import com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope;
+import com.corrodinggames.rts.game.units.custom.price.UnitPrice;
+import com.corrodinggames.rts.game.units.land.BuilderUnit;
+import com.corrodinggames.rts.game.units.land.LandUnit;
+import com.corrodinggames.rts.gameFramework.GameEngine;
+import com.corrodinggames.rts.gameFramework.GameObject;
+import com.corrodinggames.rts.gameFramework.Utility;
+import com.corrodinggames.rts.gameFramework.audio.SoundEngine;
+import com.corrodinggames.rts.gameFramework.graphics.Texture;
+import com.corrodinggames.rts.gameFramework.local.Locale;
+import com.corrodinggames.rts.gameFramework.mission.AreaControlMode;
+import com.corrodinggames.rts.gameFramework.mission.MapPortalMode;
+import com.corrodinggames.rts.gameFramework.mod.ModInfo;
+import com.corrodinggames.rts.gameFramework.network.GameInputStream;
+import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
+import com.corrodinggames.rts.gameFramework.network.NetworkEngine;
+import com.corrodinggames.rts.gameFramework.network.PasswordHandler;
+import com.corrodinggames.rts.gameFramework.ui.GameUI;
+import com.corrodinggames.rts.gameFramework.ui.widgets.MenuDialog;
+import com.corrodinggames.rts.gameFramework.ui.widgets.UIEvent;
+import com.corrodinggames.rts.gameFramework.ui.widgets.UIEventHandler;
+import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
+import io.github.rwx.geometry.PointF;
+import io.github.rwx.map.LinkedMapAvailability;
+import io.github.rwx.render.canvas.KoolPaint;
+import io.github.rwx.ui.CoreUiEventQueue;
+import io.github.rwx.ui.FormDialogSubmitHandler;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+
+/* JADX INFO: renamed from: com.corrodinggames.rts.game.units.h */
+/* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/h.class */
+public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
+
+    /* JADX INFO: renamed from: a */
+    PointF[] controlPoints;
+
+    /* JADX INFO: renamed from: b */
+    PointF[] targetPoints;
+
+    /* JADX INFO: renamed from: c */
+    boolean controlPointPaints;
+
+    /* JADX INFO: renamed from: d */
+    static KoolPaint targetPointPaints;
+
+    /* JADX INFO: renamed from: e */
+    static KoolPaint editorSelectionPaint;
+
+    /* JADX INFO: renamed from: f */
+    static KoolPaint editorSelectionTexture;
+
+    /* JADX INFO: renamed from: g */
+    static Texture editorSelectionTexture2;
+
+    /* JADX INFO: renamed from: r */
+    String editorIconTexture10;
+    static ArrayList D;
+    ModInfo E;
+    EditorUnitTypeFilter F;
+    EditorTab G;
+    String H;
+    boolean I;
+    String J;
+    private static final float RWX_DEFAULT_CIRCLE_ZONE_SIZE = 320.0f;
+    private static final float RWX_DEFAULT_RECT_ZONE_WIDTH = 420.0f;
+    private static final float RWX_DEFAULT_RECT_ZONE_HEIGHT = 260.0f;
+
+    /* JADX INFO: renamed from: h */
+    static AbstractUnitAction editorSelectionTexture3 = new AbstractUnitAction("reloadUnits") { // from class: com.corrodinggames.rts.game.units.h.1
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            if (EditorOrBuilder.w()) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Reload all unit data from disk (for modding)";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Reload units";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: g_, reason: merged with bridge method [inline-methods] */
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.none;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: f */
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: g */
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h */
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+
+    /* JADX INFO: renamed from: i */
+    static AbstractUnitAction editorIconTexture = new AbstractUnitAction("reloadOnlyActiveUnits") { // from class: com.corrodinggames.rts.game.units.h.12
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            if (EditorOrBuilder.w()) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Reload data only for active units on map (for modding). This is a faster than reload but will FastArrayList incomplete.";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Quick reload";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: k, reason: merged with bridge method [inline-methods] */
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.none;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: f */
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: g */
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h */
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+
+    /* JADX INFO: renamed from: j */
+    static AbstractUnitAction editorIconTexture2 = new AbstractUnitAction("unitClone") { // from class: com.corrodinggames.rts.game.units.h.17
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Clones units at point x50";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Unit Clone";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: k, reason: merged with bridge method [inline-methods] */
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: f */
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: g */
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return true;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h */
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+
+    /* JADX INFO: renamed from: k */
+    static AbstractUnitAction editorIconTexture3 = new AbstractUnitAction("removeUnits") { // from class: com.corrodinggames.rts.game.units.h.18
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Delete all units at a point";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Delete units at";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h_ */
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: i_, reason: merged with bridge method [inline-methods] */
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: f */
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: g */
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return true;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h */
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+
+    /* JADX INFO: renamed from: l */
+    static AbstractUnitAction editorIconTexture4 = new AbstractUnitAction("killUnits") { // from class: com.corrodinggames.rts.game.units.h.19
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Kill units at a point";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Kill units at";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h_ */
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: j_, reason: merged with bridge method [inline-methods] */
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: f */
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: g */
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return true;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h */
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+
+    /* JADX INFO: renamed from: m */
+    static AbstractUnitAction editorIconTexture5 = new AbstractUnitAction("finishQueue") { // from class: com.corrodinggames.rts.game.units.h.20
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Finish all unit queues at";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Finish queue at";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h_ */
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: k_, reason: merged with bridge method [inline-methods] */
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: f */
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: g */
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return true;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h */
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+
+    /* JADX INFO: renamed from: n */
+    static AbstractUnitAction editorIconTexture6 = new AbstractUnitAction("nukeAt") { // from class: com.corrodinggames.rts.game.units.h.21
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Create a nuke at a point";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Nuke at";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h_ */
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: l_, reason: merged with bridge method [inline-methods] */
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: f */
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: g */
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return true;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: h */
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+
+    /* JADX INFO: renamed from: o */
+    static AbstractUnitAction editorIconTexture7 = new NoneAction("freezeAI") { // from class: com.corrodinggames.rts.game.units.h.22
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Freeze high level AI logic (120secs)";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Freeze AI";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String d() {
+            String str = "Freeze AI";
+            GameEngine.getInstance();
+            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+            if (editorOrBuilderL != null) {
+                int i = -1;
+                if (editorOrBuilderL.team instanceof AIController) {
+                    i = ((int) ((AIController) editorOrBuilderL.team).aiUnitManagementTimer) / 60;
+                }
+                if (i > 0) {
+                    str = str + "(" + i + ")";
+                }
+            }
+            return str;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return baseUnit.team instanceof AIController;
+        }
+    };
+
+    /* JADX INFO: renamed from: p */
+    static AbstractUnitAction editorIconTexture8 = new NoneAction("changeAlliance") { // from class: com.corrodinggames.rts.game.units.h.23
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Change selected player's alliance (players with the same letter are allied)";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Ally:";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String d() {
+            String str = "Ally";
+            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+            if (editorOrBuilderL != null) {
+                str = "Ally: " + editorOrBuilderL.team.getTeamSlotLabel();
+            }
+            return str;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return true;
+        }
+    };
+
+    /* JADX INFO: renamed from: q */
+    static AbstractUnitAction editorIconTexture9 = new NoneAction("startRecording") { // from class: com.corrodinggames.rts.game.units.h.2
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Start recording a replay to file";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Start Recording";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String d() {
+            String str;
+            if (!GameEngine.getInstance().replayEngine.k()) {
+                str = "Start Recording";
+            } else {
+                str = "Stop Recording";
+            }
+            return str;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            if (GameEngine.getInstance().replayEngine.j()) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean isTargetingGround(BaseUnit baseUnit) {
+            return GameEngine.getInstance().replayEngine.k();
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public boolean onClicked(BaseUnit baseUnit, boolean z2) {
+            GameEngine gameEngine = GameEngine.getInstance();
+            GameEngine.log("Start recording clicked");
+            if (gameEngine.replayEngine.j()) {
+                GameEngine.log("Already in a replay");
+                return false;
+            }
+            gameEngine.queueGameThreadTask(new Runnable() { // from class: com.corrodinggames.rts.game.units.h.2.1
+                @Override // java.lang.Runnable
+                public void run() {
+                    GameEngine gameEngine2 = GameEngine.getInstance();
+                    if (!gameEngine2.replayEngine.k()) {
+                        EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+                        gameEngine2.gameUI.e = true;
+                        if (!gameEngine2.networkEngine.networkGameActive) {
+                            long j = gameEngine2.networkEngine.nextUnitId;
+                            gameEngine2.networkEngine.requireActiveMods = true;
+                            int i = gameEngine2.networkEngine.roomSettings.fogMode;
+                            gameEngine2.networkEngine.startSandboxServer();
+                            gameEngine2.networkEngine.roomSettings.fogMode = i;
+                            gameEngine2.networkEngine.nextUnitId = j;
+                            gameEngine2.networkEngine.gameHasBeenStarted = true;
+                            gameEngine2.currentTick = 0;
+                            gameEngine2.networkEngine.nextBlockingFrame = gameEngine2.currentTick + 1;
+                            gameEngine2.networkEngine.w();
+                        }
+                        String str = "[sandbox]" + gameEngine2.getCurrentMapName() + " [v" + gameEngine2.getVersionString() + "] (" + Utility.formatCurrentDate("d MMM yyyy HH.mm.ss") + ").replay";
+                        gameEngine2.replayEngine.d(str);
+                        gameEngine2.gameUI.e = false;
+                        GameEngine.addUIMessage(null, "Replay started as: " + str);
+                        EditorOrBuilder editorOrBuilderL2 = EditorOrBuilder.L();
+                        if (editorOrBuilderL2 != null && editorOrBuilderL != null) {
+                            editorOrBuilderL2.a(editorOrBuilderL);
+                            editorOrBuilderL2.editorIconTexture10 = str;
+                            return;
+                        } else {
+                            GameEngine.logColored("Failed copySettingsFromAnotherEditor");
+                            return;
+                        }
+                    }
+                    gameEngine2.replayEngine.e();
+                }
+            });
+            return false;
+        }
+    };
+    static AbstractUnitAction s = new NoneAction("startReplayPlayback") { // from class: com.corrodinggames.rts.game.units.h.3
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Start playback of last a replay";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Start Playback";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String d() {
+            String str;
+            if (!GameEngine.getInstance().replayEngine.j()) {
+                str = "Start Playback";
+            } else {
+                str = "Stop Playback";
+            }
+            return str;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            boolean zK = GameEngine.getInstance().replayEngine.k();
+            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+            return (editorOrBuilderL == null || editorOrBuilderL.editorIconTexture10 == null || zK) ? false : true;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean b(BaseUnit baseUnit) {
+            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+            return (editorOrBuilderL == null || editorOrBuilderL.editorIconTexture10 == null) ? false : true;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean isTargetingGround(BaseUnit baseUnit) {
+            return GameEngine.getInstance().replayEngine.j();
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public boolean onClicked(BaseUnit baseUnit, boolean z2) {
+            final GameEngine gameEngine = GameEngine.getInstance();
+            final String str = EditorOrBuilder.L().editorIconTexture10;
+            if (str == null) {
+                gameEngine.alert("No last replay found");
+                return false;
+            }
+            if (!gameEngine.replayEngine.j()) {
+                final Runnable runnable = new Runnable() { // from class: com.corrodinggames.rts.game.units.h.3.1
+                    @Override // java.lang.Runnable
+                    public void run() {
+                        GameEngine gameEngine2 = GameEngine.getInstance();
+                        if (!gameEngine2.replayEngine.j()) {
+                            boolean z3 = gameEngine2.tileMap.fogEnabled;
+                            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+                            boolean z4 = gameEngine2.hasWonGame;
+                            boolean z5 = gameEngine2.isContinuingAfterGameEnd;
+                            gameEngine2.replayEngine.h = true;
+                            gameEngine2.replayEngine.loadReplay(str);
+                            gameEngine2.replayEngine.h = false;
+                            gameEngine2.hasWonGame = z4;
+                            gameEngine2.isContinuingAfterGameEnd = z5;
+                            EditorOrBuilder editorOrBuilderL2 = EditorOrBuilder.L();
+                            if (editorOrBuilderL2 != null && editorOrBuilderL != null) {
+                                editorOrBuilderL2.a(editorOrBuilderL);
+                            } else {
+                                GameEngine.logColored("Failed copySettingsFromAnotherEditor");
+                            }
+                            gameEngine2.isGameStarted = true;
+                            if (gameEngine2.tileMap != null) {
+                                gameEngine2.tileMap.fogEnabled = z3;
+                            }
+                            gameEngine2.isMenuOpen = true;
+                            if (editorOrBuilderL2 != null) {
+                                editorOrBuilderL2.M();
+                                return;
+                            }
+                            return;
+                        }
+                        GameEngine.log("stopPlaybackRunnable: Already started");
+                    }
+                };
+                final MenuDialog menuDialogA = MenuDialog.a("Start playback of last recording?", true);
+                menuDialogA.a(Locale.get("menus.common.ok", new Object[0]), new UIEventHandler() { // from class: com.corrodinggames.rts.game.units.h.3.2
+                    @Override // com.corrodinggames.rts.gameFramework.ui.widgets.UIEventHandler
+                    public boolean a(UIEvent uIEvent) {
+                        menuDialogA.i();
+                        gameEngine.queueGameThreadTask(runnable);
+                        return true;
+                    }
+                });
+                gameEngine.gameUI.a(menuDialogA);
+                return false;
+            }
+            gameEngine.queueGameThreadTask(new Runnable() { // from class: com.corrodinggames.rts.game.units.h.3.3
+                @Override // java.lang.Runnable
+                public void run() {
+                    GameEngine gameEngine2 = GameEngine.getInstance();
+                    if (!gameEngine2.replayEngine.j()) {
+                        GameEngine.log("stopPlaybackRunnable: Already stopped");
+                        return;
+                    }
+                    gameEngine2.replayEngine.e();
+                    gameEngine2.gameSpeed = 1.0f;
+                    gameEngine2.isGameStarted = true;
+                    EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+                    if (editorOrBuilderL != null) {
+                        gameEngine2.playerTeam = editorOrBuilderL.team;
+                    }
+                }
+            });
+            return false;
+        }
+    };
+    static AbstractUnitAction t = new NoneAction("hideInterface") { // from class: com.corrodinggames.rts.game.units.h.4
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            String str = "Hide interface till the screen is clicked/pressed";
+            if (GameEngine.isPC()) {
+                str = str + "\n-Enable mouse capture to also hide the mouse";
+            }
+            return str;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Hide interface";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public boolean onClicked(BaseUnit baseUnit, boolean z2) {
+            GameEngine.getInstance().isMenuOpen = true;
+            return false;
+        }
+    };
+    static AbstractUnitAction u = new NoneAction("freezeAllAI") { // from class: com.corrodinggames.rts.game.units.h.5
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Freeze full high level logic for all AI forever";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Freeze AI";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String d() {
+            String str = "Freeze AI";
+            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+            if (editorOrBuilderL != null && editorOrBuilderL.controlPointPaints) {
+                str = "Unfreeze AIs";
+            }
+            return str;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return true;
+        }
+    };
+    static AbstractUnitAction v = new NoneAction("pauseGame") { // from class: com.corrodinggames.rts.game.units.h.6
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Pause Game";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            if (GameEngine.getInstance().gameSpeed != 0.0f) {
+                return "Pause: Off";
+            }
+            return "Pause: On";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public boolean onClicked(BaseUnit baseUnit, boolean z2) {
+            GameEngine gameEngine = GameEngine.getInstance();
+            if (gameEngine.replayEngine.j()) {
+            }
+            if (gameEngine.gameSpeed != 0.0f) {
+                gameEngine.gameSpeed = 0.0f;
+                return false;
+            }
+            gameEngine.gameSpeed = 1.0f;
+            return false;
+        }
+    };
+    static AbstractUnitAction w = new NoneAction("slowGame") { // from class: com.corrodinggames.rts.game.units.h.7
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Slow motion";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            if (GameEngine.getInstance().gameSpeed != 0.1f) {
+                return "Slow motion: Off";
+            }
+            return "Slow motion: On";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public boolean onClicked(BaseUnit baseUnit, boolean z2) {
+            GameEngine gameEngine = GameEngine.getInstance();
+            if (gameEngine.replayEngine.j()) {
+            }
+            if (gameEngine.gameSpeed == 1.0f) {
+                gameEngine.gameSpeed = 0.1f;
+                return false;
+            }
+            gameEngine.gameSpeed = 1.0f;
+            return false;
+        }
+    };
+    static AbstractUnitAction x = new NoneAction("fastForward") { // from class: com.corrodinggames.rts.game.units.h.8
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Fast Forward 1-5x";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Fast Forward: " + GameEngine.getInstance().gameSpeed;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public boolean onClicked(BaseUnit baseUnit, boolean z2) {
+            GameEngine gameEngine = GameEngine.getInstance();
+            if (gameEngine.replayEngine.j()) {
+            }
+            if (gameEngine.gameSpeed == 1.0f) {
+                gameEngine.gameSpeed = 2.0f;
+                return false;
+            }
+            if (gameEngine.gameSpeed == 2.0f) {
+                gameEngine.gameSpeed = 3.0f;
+                return false;
+            }
+            if (gameEngine.gameSpeed == 3.0f) {
+                gameEngine.gameSpeed = 4.0f;
+                return false;
+            }
+            if (gameEngine.gameSpeed == 4.0f) {
+                gameEngine.gameSpeed = 5.0f;
+                return false;
+            }
+            if (gameEngine.gameSpeed == 5.0f) {
+                gameEngine.gameSpeed = 10.0f;
+                return false;
+            }
+            gameEngine.gameSpeed = 1.0f;
+            return false;
+        }
+    };
+    static AbstractUnitAction y = new NoneAction("search") { // from class: com.corrodinggames.rts.game.units.h.9
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: j */
+        public Texture getIconTexture() {
+            return EditorOrBuilder.editorSelectionTexture2;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Search for units";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            GameEngine.getInstance();
+            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+            if (editorOrBuilderL != null && editorOrBuilderL.G == EditorTab.search) {
+                return "Search: " + Utility.truncateWithEllipsis(editorOrBuilderL.H, 8);
+            }
+            return "Search units";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: c */
+        public boolean onClicked(BaseUnit baseUnit, boolean z2) {
+            GameEngine gameEngine = GameEngine.getInstance();
+            if (gameEngine.replayEngine.i()) {
+                gameEngine.showMessageBox("Reply active", "Changing search filter is currently not supported while recording a replay");
+                return false;
+            }
+            PasswordHandler passwordHandler = new PasswordHandler() { // from class: com.corrodinggames.rts.game.units.h.9.1
+                @Override // com.corrodinggames.rts.gameFramework.network.PasswordHandler
+                /* JADX INFO: renamed from: a */
+                public void submitPassword(String str) {
+                    GameEngine.log("Searching for: " + str);
+                    GameEngine gameEngine2 = GameEngine.getInstance();
+                    if (gameEngine2.replayEngine.i()) {
+                        gameEngine2.showMessageBox("Reply active", "Changing search filter is currently not supported while recording a replay");
+                        return;
+                    }
+                    EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+                    if (editorOrBuilderL == null) {
+                        GameEngine.log("search: No editor");
+                        return;
+                    }
+                    if (str == null || str.trim().equals(VariableScope.nullOrMissingString)) {
+                        GameEngine.log("search: No text entered");
+                        if (editorOrBuilderL.G == EditorTab.search) {
+                            editorOrBuilderL.G = EditorTab.all;
+                        }
+                        editorOrBuilderL.H = null;
+                        editorOrBuilderL.I = true;
+                        GameUI.notifySelectionChanged();
+                        return;
+                    }
+                    editorOrBuilderL.G = EditorTab.search;
+                    editorOrBuilderL.H = str;
+                    editorOrBuilderL.I = true;
+                    GameUI.notifySelectionChanged();
+                }
+
+                @Override // com.corrodinggames.rts.gameFramework.network.PasswordHandler
+                /* JADX INFO: renamed from: a */
+                public void cancelPasswordEntry() {
+                }
+            };
+            passwordHandler.promptMessage = "Search units by internal name or text title.";
+            passwordHandler.dialogTitle = "Search units";
+            passwordHandler.confirmButtonLabel = "Search";
+            passwordHandler.cancelButtonLabel = "Cancel";
+            NetworkEngine.a(passwordHandler);
+            return false;
+        }
+    };
+    static AbstractUnitAction z = new NoneAction("enableDebug") { // from class: com.corrodinggames.rts.game.units.h.10
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Show hidden unit information in tooltips including flags, ammo, tags and resources";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            if (!GameEngine.getInstance().isDebugTempMode) {
+                return "Debug: Off";
+            }
+            return "Debug: On";
+        }
+    };
+    static AbstractUnitAction A = new NoneAction("enableAIDebug") { // from class: com.corrodinggames.rts.game.units.h.11
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "AI debug view";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            GameEngine.getInstance();
+            if (!AIController.unitCountsUpdated) {
+                return "AI Debug: Off";
+            }
+            return "AI Debug: On";
+        }
+    };
+    static AbstractUnitAction B = new NoneAction("enableTriggerDebug") { // from class: com.corrodinggames.rts.game.units.h.13
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "For debugging autoTriggers. When enabled will log a message when any auto triggers fire on any selected units";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            if (!GameEngine.getInstance().isTriggerDebugMode) {
+                return "Trigger Debug: Off";
+            }
+            return "Trigger Debug: On";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean b(BaseUnit baseUnit) {
+            return GameEngine.getInstance().isDebugTempMode;
+        }
+    };
+    static AbstractUnitAction C = new NoneAction("clearSaveHistory") { // from class: com.corrodinggames.rts.game.units.h.14
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Clear save history";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            GameEngine.getInstance();
+            return "Clear history";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean b(BaseUnit baseUnit) {
+            return GameEngine.getInstance().isDebugTempMode;
+        }
+    };
+    static AbstractUnitAction rwxAddCircleZone = new AbstractUnitAction("rwxAddCircleZone") {
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String getDescription() {
+            return "Drag on the map to add a circular RWX area control zone";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String getDisplayName() {
+            return "Add Circle Zone";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return EditorOrBuilder.isRwxAreaEditorAvailable();
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+    static AbstractUnitAction rwxAddRectZone = new AbstractUnitAction("rwxAddRectZone") {
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String getDescription() {
+            return "Drag on the map to add a rectangular RWX area control zone";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String getDisplayName() {
+            return "Add Rect Zone";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return EditorOrBuilder.isRwxAreaEditorAvailable();
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+    static AbstractUnitAction rwxEditZone = new AbstractUnitAction("rwxEditZone") {
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String getDescription() {
+            return "Edit the RWX area control zone at the selected point";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String getDisplayName() {
+            return "Edit Zone";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return EditorOrBuilder.isRwxAreaEditorAvailable();
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+    static AbstractUnitAction rwxDeleteZone = new AbstractUnitAction("rwxDeleteZone") {
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String getDescription() {
+            return "Delete the RWX area control zone at the selected point";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String getDisplayName() {
+            return "Delete Zone";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return EditorOrBuilder.isRwxAreaEditorAvailable();
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+    static AbstractUnitAction rwxAddRectMapPortal = new AbstractUnitAction("rwxAddRectMapPortal") {
+        @Override
+        public String getDescription() {
+            return "Drag on the map to add a rectangular RWX map portal";
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Add Rect Map Portal";
+        }
+
+        @Override
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return EditorOrBuilder.isRwxAreaEditorAvailable();
+        }
+
+        @Override
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+    static AbstractUnitAction rwxAddCircleMapPortal = new AbstractUnitAction("rwxAddCircleMapPortal") {
+        @Override
+        public String getDescription() {
+            return "Drag on the map to add a circular RWX map portal";
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Add Circle Map Portal";
+        }
+
+        @Override
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return EditorOrBuilder.isRwxAreaEditorAvailable();
+        }
+
+        @Override
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+    static AbstractUnitAction rwxEditMapPortal = new AbstractUnitAction("rwxEditMapPortal") {
+        @Override
+        public String getDescription() {
+            return "Edit the RWX map portal at the selected point";
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Edit Map Portal";
+        }
+
+        @Override
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return EditorOrBuilder.isRwxAreaEditorAvailable();
+        }
+
+        @Override
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+    static AbstractUnitAction rwxDeleteMapPortal = new AbstractUnitAction("rwxDeleteMapPortal") {
+        @Override
+        public String getDescription() {
+            return "Delete the RWX map portal at the selected point";
+        }
+
+        @Override
+        public String getDisplayName() {
+            return "Delete Map Portal";
+        }
+
+        @Override
+        public boolean shouldShowDisplayText() {
+            return false;
+        }
+
+        @Override
+        public int getCostAmount() {
+            return 0;
+        }
+
+        @Override
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
+            return -1;
+        }
+
+        @Override
+        public UnitTypeEnum getUnitType() {
+            return null;
+        }
+
+        @Override
+        public ActionType getActionType() {
+            return ActionType.targetGround;
+        }
+
+        @Override
+        public ActionDisplayType getActionDisplayType() {
+            return ActionDisplayType.action;
+        }
+
+        @Override
+        public boolean isHighPriority() {
+            return false;
+        }
+
+        @Override
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return EditorOrBuilder.isRwxAreaEditorAvailable();
+        }
+
+        @Override
+        public boolean getIconForUnit() {
+            return true;
+        }
+    };
+    static AbstractUnitAction rwxSaveAreaMap = new NoneAction("rwxSaveAreaMap") {
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String getDescription() {
+            return "Export this sandbox map with all RWX editor features";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String getDisplayName() {
+            return "Save RWX Map";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public boolean b(BaseUnit baseUnit) {
+            return EditorOrBuilder.isRwxAreaEditorAvailable();
+        }
+    };
+    static ActionFilter K = new ActionFilter() { // from class: com.corrodinggames.rts.game.units.h.16
+        @Override // com.corrodinggames.rts.game.units.actions.ActionFilter
+        public boolean isAvailable(AbstractUnitAction abstractUnitAction, BaseUnit baseUnit) {
+            if (abstractUnitAction instanceof FilteredUnitAction) {
+                abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
+            }
+            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+            if (editorOrBuilderL == null) {
+                return true;
+            }
+            EditorTab editorTab = editorOrBuilderL.G;
+            if (editorTab == null) {
+                editorTab = EditorTab.all;
+            }
+            if (editorTab == EditorTab.all && EditorOrBuilder.a(abstractUnitAction, baseUnit)) {
+                return false;
+            }
+            if (editorTab == EditorTab.modded && abstractUnitAction == EditorOrBuilder.editorSelectionTexture3) {
+                return true;
+            }
+            if (editorTab == EditorTab.modded && abstractUnitAction == EditorOrBuilder.editorIconTexture) {
+                return true;
+            }
+            if (editorTab == EditorTab.search && abstractUnitAction == EditorOrBuilder.y) {
+                return true;
+            }
+            if (abstractUnitAction == EditorOrBuilder.B && !EditorOrBuilder.B.b(baseUnit)) {
+                return false;
+            }
+            if (abstractUnitAction == EditorOrBuilder.C && !EditorOrBuilder.C.b(baseUnit)) {
+                return false;
+            }
+            if (EditorOrBuilder.isRwxAreaEditorAction(abstractUnitAction) && !EditorOrBuilder.isRwxAreaEditorAvailable()) {
+                return false;
+            }
+            return editorTab.a(abstractUnitAction.getUnitType());
+        }
+    };
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: f, reason: merged with bridge method [inline-methods] */
+    public UnitTypeEnum r() {
+        return UnitTypeEnum.editorOrBuilder;
+    }
+
+    public static boolean w() {
+        if (GameEngine.getInstance().replayEngine.i()) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.UnitPathPoints
+    public PointF[] b() {
+        return this.controlPoints;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.UnitPathPoints
+    public PointF[] e_() {
+        return this.targetPoints;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.land.LandUnit, com.corrodinggames.rts.game.units.BaseUnit
+    public Texture v() {
+        if (this.team.teamId == -1) {
+            return null;
+        }
+        return landUnitIconTextures[this.team.getTeamColorIndex()];
+    }
+
+    public static void K() {
+        editorSelectionTexture2 = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.icon_search);
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    /* JADX INFO: renamed from: a */
+    public boolean canRepairTarget(BaseUnit baseUnit) {
+        return true;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public Texture d() {
+        if (this.isDead) {
+            return BuilderUnit.builderTexture_dead;
+        }
+        return BuilderUnit.builderTexture_teamColors[this.team.getTeamColorIndex()];
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public Texture k() {
+        return null;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public Texture d(int i) {
+        return null;
+    }
+
+    public EditorOrBuilder(boolean z2) {
+        super(z2);
+        this.controlPoints = new PointF[6];
+        this.targetPoints = new PointF[this.controlPoints.length];
+        targetPointPaints = new KoolPaint();
+        targetPointPaints.a(40, 0, 255, 0);
+        targetPointPaints.a(true);
+        targetPointPaints.a(2.0f);
+        targetPointPaints.a(KoolPaint.Cap.ROUND);
+        editorSelectionPaint = new KoolPaint();
+        editorSelectionPaint.a(targetPointPaints);
+        editorSelectionPaint.a(55, 255, 60, 60);
+        editorSelectionTexture = new KoolPaint();
+        editorSelectionTexture.a(60, 255, 255, 255);
+        this.E = null;
+        this.F = EditorUnitTypeFilter.land;
+        this.G = EditorTab.all;
+        this.I = true;
+        T(20);
+        U(20);
+        this.radius = 10.0f;
+        this.posX = -1000.0f;
+        this.posY = -1000.0f;
+        this.displayRadius = this.radius;
+        this.maxHealth = 170000.0f;
+        this.currentHealth = this.maxHealth;
+        this.baseTexture = BuilderUnit.builderTexture_dead;
+        for (int i = 0; i < this.controlPoints.length; i++) {
+            this.controlPoints[i] = new PointF();
+            this.targetPoints[i] = new PointF();
+        }
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    public static void a(float f, UnitPathPoints unitPathPoints) {
+        OrderableUnit orderableUnit = (OrderableUnit) unitPathPoints;
+        PointF[] pointFArrB = unitPathPoints.b();
+        PointF[] pointFArrE_ = unitPathPoints.e_();
+        BaseUnit currentRepairOrReclaimTarget = orderableUnit.getCurrentRepairOrReclaimTarget();
+        orderableUnit.aN = currentRepairOrReclaimTarget != null;
+        if (currentRepairOrReclaimTarget == null) {
+            if (pointFArrB[0].x != 0.0f || pointFArrB[0].y != 0.0f) {
+                for (int i = 0; i < pointFArrB.length; i++) {
+                    PointF pointF = pointFArrB[i];
+                    PointF pointF2 = pointFArrE_[i];
+                    pointF.x = 0.0f;
+                    pointF.y = 0.0f;
+                    pointF2.x = 0.0f;
+                    pointF2.y = 0.0f;
+                }
+                return;
+            }
+            return;
+        }
+        for (int i2 = 0; i2 < pointFArrB.length; i2++) {
+            PointF pointF3 = pointFArrB[i2];
+            PointF pointF4 = pointFArrE_[i2];
+            pointF3.x = Utility.distanceSq(pointF3.x, pointF4.x, 0.1f * f);
+            pointF3.y = Utility.distanceSq(pointF3.y, pointF4.y, 0.1f * f);
+            pointF3.x += (pointF4.x - pointF3.x) * 0.04f * f;
+            pointF3.y += (pointF4.y - pointF3.y) * 0.04f * f;
+            float f2 = currentRepairOrReclaimTarget.radius * 0.75f;
+            if (Utility.abs(pointF3.x - pointF4.x) < 1.0f) {
+                pointF4.x = Utility.randomRepairTargetOffset(-f2, f2);
+            }
+            if (Utility.abs(pointF3.y - pointF4.y) < 1.0f) {
+                pointF4.y = Utility.randomRepairTargetOffset(-f2, f2);
+            }
+        }
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public boolean e() {
+        GameEngine gameEngine = GameEngine.getInstance();
+        gameEngine.effectManager.createSmallExplosion(this.posX, this.posY, this.posZ);
+        this.baseTexture = BuilderUnit.builderTexture_dead;
+        S(0);
+        this.isAlive = false;
+        gameEngine.soundEngine.playSound(SoundEngine.unitExplodeSound, 0.8f, this.posX, this.posY);
+        bq();
+        return true;
+    }
+
+    @Override
+    // com.corrodinggames.rts.game.units.land.LandUnit, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
+    /* JADX INFO: renamed from: a */
+    public void update(float f) {
+        if (f < 0.3f) {
+            f = 0.3f;
+        }
+        if (this.ax && this.team.isSpectatorTeamColor()) {
+            int i = 0;
+            while (true) {
+                if (i < PlayerTeam.TEAM_NEUTRAL) {
+                    PlayerTeam playerTeamK = PlayerTeam.k(i);
+                    if (playerTeamK == null || playerTeamK.isSpectatorTeamColor()) {
+                        i++;
+                    } else {
+                        changeTeam(playerTeamK);
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        super.update(f);
+        if (!this.isDead) {
+            a(f, this);
+        }
+        this.currentHealth = this.maxHealth;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
+    public void a(float f, boolean z2) {
+        if (!this.isDead) {
+        }
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float e(int i) {
+        return 0.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float f(int i) {
+        return 0.0f;
+    }
+
+    @Override
+    // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
+    public boolean c(float f) {
+        if (!super.c(f)) {
+            return false;
+        }
+        GameEngine.getInstance();
+        return true;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public void a(BaseUnit baseUnit, int i) {
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    /* JADX INFO: renamed from: b_ */
+    public boolean requiresFacingForActions() {
+        return false;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public int y() {
+        return 850000;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: b */
+    public float getDistanceToTarget(BaseUnit baseUnit) {
+        return 1.0E7f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public float c(BaseUnit baseUnit) {
+        return 1.0E7f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float m() {
+        return 30.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float b(int i) {
+        return 100.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    /* JADX INFO: renamed from: z */
+    public float getMoveSpeed() {
+        return 0.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    /* JADX INFO: renamed from: A */
+    public float getMaxTurnSpeed() {
+        return 9.8f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float B() {
+        return 9.35f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float c(int i) {
+        return 99.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: l */
+    public boolean canAttack() {
+        return false;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    /* JADX INFO: renamed from: C */
+    public float getMoveAccelerationSpeed() {
+        return 0.04f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float D() {
+        return 0.1f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: a */
+    public void performUnitAction(AbstractUnitAction abstractUnitAction, boolean z2) {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (abstractUnitAction instanceof TeamChangeAction) {
+            TeamChangeAction teamChangeAction = (TeamChangeAction) abstractUnitAction;
+            boolean z3 = true;
+            if (z2) {
+                z3 = 1 == 0;
+            }
+            if (teamChangeAction.a) {
+                z3 = !z3;
+            }
+            if (z3) {
+                PlayerTeam playerTeamK = null;
+                int i = this.team.teamId + 1;
+                while (true) {
+                    if (i < PlayerTeam.TEAM_NEUTRAL) {
+                        PlayerTeam playerTeamK2 = PlayerTeam.k(i);
+                        if (playerTeamK2 == null || playerTeamK2.isSpectatorTeamColor()) {
+                            i++;
+                        } else {
+                            playerTeamK = playerTeamK2;
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                if (playerTeamK == null && this.team.teamId < 4) {
+                    playerTeamK = PlayerTeam.k(this.team.teamId + 1);
+                    if (playerTeamK == null) {
+                        GameEngine.log("Sandbox adding new team:" + this.team.teamId);
+                        AIController aIController = new AIController(this.team.teamId + 1);
+                        playerTeamK = aIController;
+                        playerTeamK.teamColorId = 1;
+                        playerTeamK.isTeamDefeatedTech = true;
+                        playerTeamK.isTeamWipedOut = true;
+                        if (!this.controlPointPaints) {
+                            aIController.aiUnitManagementTimer = 0.0f;
+                        } else {
+                            aIController.aiUnitManagementTimer = Float.MAX_VALUE;
+                        }
+                    }
+                }
+                if (playerTeamK == null) {
+                    int i2 = 0;
+                    while (true) {
+                        if (i2 < PlayerTeam.TEAM_NEUTRAL) {
+                            PlayerTeam playerTeamK3 = PlayerTeam.k(i2);
+                            if (playerTeamK3 == null || playerTeamK3.isSpectatorTeamColor()) {
+                                i2++;
+                            } else {
+                                playerTeamK = playerTeamK3;
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                if (playerTeamK != null) {
+                    changeTeam(playerTeamK);
+                    if (!gameEngine.replayEngine.j()) {
+                        gameEngine.playerTeam = playerTeamK;
+                    }
+                }
+            } else {
+                PlayerTeam playerTeam = null;
+                int i3 = this.team.teamId - 1;
+                while (true) {
+                    if (i3 >= 0) {
+                        PlayerTeam playerTeamK4 = PlayerTeam.k(i3);
+                        if (playerTeamK4 == null || playerTeamK4.isSpectatorTeamColor()) {
+                            i3--;
+                        } else {
+                            playerTeam = playerTeamK4;
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                if (playerTeam == null) {
+                    int i4 = PlayerTeam.TEAM_NEUTRAL - 1;
+                    while (true) {
+                        if (i4 >= 0) {
+                            PlayerTeam playerTeamK5 = PlayerTeam.k(i4);
+                            if (playerTeamK5 == null || playerTeamK5.isSpectatorTeamColor()) {
+                                i4--;
+                            } else {
+                                playerTeam = playerTeamK5;
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                if (playerTeam != null) {
+                    changeTeam(playerTeam);
+                    if (!gameEngine.replayEngine.j()) {
+                        gameEngine.playerTeam = playerTeam;
+                    }
+                }
+            }
+        }
+        if (abstractUnitAction instanceof ModFilterAction) {
+            ModFilterAction modFilterAction = (ModFilterAction) abstractUnitAction;
+            boolean z4 = true;
+            if (z2) {
+                z4 = 1 == 0;
+            }
+            if (modFilterAction.a) {
+                z4 = !z4;
+            }
+            ArrayList activeMods = gameEngine.modManager.getActiveMods();
+            if (activeMods.size() == 0) {
+                this.E = null;
+            } else if (z4) {
+                if (this.E == null) {
+                    this.E = (ModInfo) activeMods.get(0);
+                } else {
+                    ModInfo modInfo = null;
+                    boolean z5 = false;
+                    Iterator it = activeMods.iterator();
+                    while (true) {
+                        if (!it.hasNext()) {
+                            break;
+                        }
+                        ModInfo modInfo2 = (ModInfo) it.next();
+                        if (z5) {
+                            modInfo = modInfo2;
+                            break;
+                        } else if (modInfo2 == this.E) {
+                            z5 = true;
+                        }
+                    }
+                    this.E = modInfo;
+                }
+            } else if (this.E == null) {
+                this.E = (ModInfo) activeMods.get(activeMods.size() - 1);
+            } else {
+                ModInfo modInfo3 = null;
+                boolean z6 = false;
+                ArrayList arrayList = new ArrayList();
+                arrayList.addAll(activeMods);
+                Collections.reverse(arrayList);
+                Iterator it2 = arrayList.iterator();
+                while (true) {
+                    if (!it2.hasNext()) {
+                        break;
+                    }
+                    ModInfo modInfo4 = (ModInfo) it2.next();
+                    if (z6) {
+                        modInfo3 = modInfo4;
+                        break;
+                    } else if (modInfo4 == this.E) {
+                        z6 = true;
+                    }
+                }
+                this.E = modInfo3;
+            }
+        }
+        if (abstractUnitAction instanceof ChangeTypeFilterAction) {
+            ChangeTypeFilterAction changeTypeFilterAction = (ChangeTypeFilterAction) abstractUnitAction;
+            boolean z7 = true;
+            if (z2) {
+                z7 = 1 == 0;
+            }
+            if (changeTypeFilterAction.a) {
+                z7 = !z7;
+            }
+            this.F = this.F.a(!z7);
+        }
+        if (abstractUnitAction instanceof AddCreditsAction) {
+            this.team.d(10000.0f);
+        }
+        if (abstractUnitAction instanceof ChangeEditorTabAction) {
+            ((ChangeEditorTabAction) abstractUnitAction).n();
+        }
+    }
+
+    static EditorOrBuilder L() {
+        return GameEngine.getInstance().gameUI.getEditorOrBuilder();
+    }
+
+    public static AbstractUnitAction unwrapRwxAreaEditorAction(AbstractUnitAction abstractUnitAction) {
+        if (abstractUnitAction instanceof FilteredUnitAction) {
+            abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
+        }
+        if (abstractUnitAction instanceof WrapperUnitAction) {
+            abstractUnitAction = ((WrapperUnitAction) abstractUnitAction).p_();
+        }
+        return abstractUnitAction;
+    }
+
+    public static boolean isRwxAreaEditorAction(AbstractUnitAction abstractUnitAction) {
+        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
+        return abstractUnitAction == rwxAddCircleZone || abstractUnitAction == rwxAddRectZone || abstractUnitAction == rwxEditZone || abstractUnitAction == rwxDeleteZone || abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal || abstractUnitAction == rwxEditMapPortal || abstractUnitAction == rwxDeleteMapPortal || abstractUnitAction == rwxSaveAreaMap;
+    }
+
+    public static boolean isRwxAreaEditorAddAction(AbstractUnitAction abstractUnitAction) {
+        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
+        return abstractUnitAction == rwxAddCircleZone || abstractUnitAction == rwxAddRectZone || abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal;
+    }
+
+    public static boolean isRwxAreaEditorCircleAddAction(AbstractUnitAction abstractUnitAction) {
+        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
+        return abstractUnitAction == rwxAddCircleZone || abstractUnitAction == rwxAddCircleMapPortal;
+    }
+
+    public static boolean isRwxMapPortalEditorAddAction(AbstractUnitAction abstractUnitAction) {
+        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
+        return abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal;
+    }
+
+    public static boolean isRwxMapPortalEditorAction(AbstractUnitAction abstractUnitAction) {
+        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
+        return abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal || abstractUnitAction == rwxEditMapPortal || abstractUnitAction == rwxDeleteMapPortal;
+    }
+
+    public static boolean isRwxAreaEditorAvailable() {
+        GameEngine gameEngine = GameEngine.getInstance();
+        return gameEngine != null && gameEngine.isGameStarted && gameEngine.missionEngine != null && gameEngine.gameUI != null && gameEngine.gameUI.getEditorOrBuilder() != null && !gameEngine.replayEngine.j();
+    }
+
+    static void addRwxAreaZoneAt(float x, float y, boolean circle, float width, float height) {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (!isRwxAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+            return;
+        }
+        try {
+            int zoneCount = gameEngine.missionEngine.addAreaControlEditorZone(x, y, circle, width, height);
+            gameEngine.gameUI.showMediumPriorityMessage("Added RWX " + (circle ? "circle" : "rect") + " zone #" + zoneCount);
+        } catch (Exception e) {
+            e.printStackTrace();
+            gameEngine.showMessageBox("RWX area editor", "Failed to add RWX area zone: " + e.getMessage());
+        }
+    }
+
+    public static void addRwxAreaZoneBounds(float startX, float startY, float endX, float endY, boolean circle) {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (!isRwxAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+            return;
+        }
+        try {
+            int zoneCount = gameEngine.missionEngine.addAreaControlEditorZoneBounds(startX, startY, endX, endY, circle);
+            gameEngine.gameUI.showMediumPriorityMessage("Added RWX " + (circle ? "circle" : "rect") + " zone #" + zoneCount);
+        } catch (Exception e) {
+            e.printStackTrace();
+            gameEngine.showMessageBox("RWX area editor", "Failed to add RWX area zone: " + e.getMessage());
+        }
+    }
+
+    public static void addRwxEditorBounds(AbstractUnitAction action, float startX, float startY, float endX, float endY, boolean circle) {
+        if (isRwxMapPortalEditorAddAction(action)) {
+            if (!LinkedMapAvailability.ENABLED) {
+                GameEngine.getInstance().showMessageBox("Linked Map", LinkedMapAvailability.UNAVAILABLE_MESSAGE);
+                return;
+            }
+            requestRwxAddMapPortalDialog(startX, startY, endX, endY, circle);
+        } else {
+            addRwxAreaZoneBounds(startX, startY, endX, endY, circle);
+        }
+    }
+
+    static void requestRwxAddMapPortalDialog(final float startX, final float startY, final float endX, final float endY, final boolean circle) {
+        final GameEngine gameEngine = GameEngine.getInstance();
+        if (!isRwxAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+            return;
+        }
+        CoreUiEventQueue.requestFormDialog("Add Map Portal", "Create a RWX map portal. Target map id can FastArrayList an existing map path, file name, base name, or display name.", new String[]{"targetMapId", "targetPortalId"}, new String[]{"Target map id", "Target portal id"}, new String[]{"", ""}, new String[]{"Lake (2p)", "optional"}, "Create", "Cancel", new FormDialogSubmitHandler() {
+            @Override
+            public void submit(Map<String, String> values) {
+                try {
+                    String targetMapId = parseRwxRequiredString(values, "targetMapId", "Target map id");
+                    String targetPortalId = parseRwxOptionalString(values, "targetPortalId");
+                    int count = gameEngine.missionEngine.addMapPortalEditorPortalBounds(startX, startY, endX, endY, circle, targetMapId, targetPortalId);
+                    gameEngine.gameUI.showMediumPriorityMessage("Added RWX " + (circle ? "circle" : "rect") + " map portal #" + count);
+                } catch (IllegalArgumentException e) {
+                    gameEngine.showMessageBox("RWX map portal editor", e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    gameEngine.showMessageBox("RWX map portal editor", "Failed to add RWX map portal: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    static void requestRwxEditAreaZoneDialog(final float x, final float y) {
+        final GameEngine gameEngine = GameEngine.getInstance();
+        if (!isRwxAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+            return;
+        }
+        final AreaControlMode.EditorZoneProperties properties;
+        final int scoreLimit;
+        try {
+            properties = gameEngine.missionEngine.getAreaControlEditorZone(x, y);
+            scoreLimit = gameEngine.missionEngine.getAreaControlEditorScoreLimit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            gameEngine.showMessageBox("RWX area editor", "Failed to read RWX area zone: " + e.getMessage());
+            return;
+        }
+        if (properties == null) {
+            gameEngine.gameUI.showMediumPriorityMessage("No RWX area zone at selected point");
+            return;
+        }
+        String[] ids = new String[]{"id", "victoryScore", "shape", "x", "y", "width", "height", "captureTime", "neutralizeTime", "scoreRate", "scoreInterval", "maxCaptureWeight", "groundOnly", "startingOwner"};
+        String[] labels = new String[]{"Name", "Victory score", "Shape", "X", "Y", "Width", "Height", "Capture time", "Neutralize time", "Score rate", "Score interval", "Max capture weight", "Ground only", "Starting owner"};
+        String[] initial = new String[]{
+                properties.id,
+                String.valueOf(scoreLimit),
+                properties.circle ? "circle" : "rect",
+                trimRwxFloat(properties.x),
+                trimRwxFloat(properties.y),
+                trimRwxFloat(properties.width),
+                trimRwxFloat(properties.height),
+                trimRwxFloat(properties.captureTimeSeconds),
+                trimRwxFloat(properties.neutralizeTimeSeconds),
+                String.valueOf(properties.scoreRate),
+                trimRwxFloat(properties.scoreIntervalSeconds),
+                trimRwxFloat(properties.maxCaptureWeight),
+                String.valueOf(properties.groundOnly),
+                properties.startingOwner == -1 ? "neutral" : String.valueOf(properties.startingOwner)
+        };
+        String[] hints = new String[]{"A", "500", "rect/circle", "0", "0", "320", "320", "8", "4", "1", "3", "5", "true/false", "neutral or team id"};
+        CoreUiEventQueue.requestFormDialog("Edit Zone", "Edit RWX area control zone properties.", ids, labels, initial, hints, "Save", "Cancel", new FormDialogSubmitHandler() {
+            @Override
+            public void submit(Map<String, String> values) {
+                try {
+                    properties.id = parseRwxRequiredString(values, "id", "Name");
+                    properties.circle = parseRwxShape(values, "shape", properties.circle);
+                    properties.x = parseRwxFloat(values, "x", properties.x, "X");
+                    properties.y = parseRwxFloat(values, "y", properties.y, "Y");
+                    properties.width = parseRwxPositiveFloat(values, "width", properties.width, "Width");
+                    properties.height = parseRwxPositiveFloat(values, "height", properties.height, "Height");
+                    properties.captureTimeSeconds = parseRwxPositiveFloat(values, "captureTime", properties.captureTimeSeconds, "Capture time");
+                    properties.neutralizeTimeSeconds = parseRwxPositiveFloat(values, "neutralizeTime", properties.neutralizeTimeSeconds, "Neutralize time");
+                    properties.scoreRate = parseRwxNonNegativeInt(values, "scoreRate", properties.scoreRate, "Score rate");
+                    properties.scoreIntervalSeconds = parseRwxPositiveFloat(values, "scoreInterval", properties.scoreIntervalSeconds, "Score interval");
+                    properties.maxCaptureWeight = parseRwxPositiveFloat(values, "maxCaptureWeight", properties.maxCaptureWeight, "Max capture weight");
+                    properties.groundOnly = parseRwxBoolean(values, "groundOnly", properties.groundOnly, "Ground only");
+                    properties.startingOwner = parseRwxOwner(values, "startingOwner", properties.startingOwner, "Starting owner");
+                    int updatedScoreLimit = parseRwxPositiveInt(values, "victoryScore", scoreLimit, "Victory score");
+                    String id = gameEngine.missionEngine.updateAreaControlEditorZone(x, y, properties);
+                    if (id == null) {
+                        gameEngine.gameUI.showMediumPriorityMessage("No RWX area zone at selected point");
+                    } else {
+                        gameEngine.missionEngine.updateAreaControlEditorScoreLimit(updatedScoreLimit);
+                        gameEngine.gameUI.showMediumPriorityMessage("Updated RWX area zone: " + id);
+                    }
+                } catch (IllegalArgumentException e) {
+                    gameEngine.showMessageBox("RWX area editor", e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    gameEngine.showMessageBox("RWX area editor", "Failed to update RWX area zone: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    static void deleteRwxAreaZoneAt(float x, float y) {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (!isRwxAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+            return;
+        }
+        try {
+            String deletedZone = gameEngine.missionEngine.removeAreaControlEditorZone(x, y);
+            if (deletedZone == null) {
+                gameEngine.gameUI.showMediumPriorityMessage("No RWX area zone at selected point");
+            } else {
+                gameEngine.gameUI.showMediumPriorityMessage("Deleted RWX area zone: " + deletedZone);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            gameEngine.showMessageBox("RWX area editor", "Failed to delete RWX area zone: " + e.getMessage());
+        }
+    }
+
+    static void requestRwxEditMapPortalDialog(final float x, final float y) {
+        final GameEngine gameEngine = GameEngine.getInstance();
+        if (!isRwxAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+            return;
+        }
+        final MapPortalMode.EditorPortalProperties properties;
+        try {
+            properties = gameEngine.missionEngine.getMapPortalEditorPortal(x, y);
+        } catch (Exception e) {
+            e.printStackTrace();
+            gameEngine.showMessageBox("RWX map portal editor", "Failed to read RWX map portal: " + e.getMessage());
+            return;
+        }
+        if (properties == null) {
+            gameEngine.gameUI.showMediumPriorityMessage("No RWX map portal at selected point");
+            return;
+        }
+        String[] ids = new String[]{"id", "shape", "x", "y", "width", "height", "targetMapId", "targetPortalId"};
+        String[] labels = new String[]{"Name", "Shape", "X", "Y", "Width", "Height", "Target map id", "Target portal id"};
+        String[] initial = new String[]{
+                properties.id,
+                properties.circle ? "circle" : "rect",
+                trimRwxFloat(properties.x),
+                trimRwxFloat(properties.y),
+                trimRwxFloat(properties.width),
+                trimRwxFloat(properties.height),
+                properties.targetMapId,
+                properties.targetPortalId == null ? "" : properties.targetPortalId
+        };
+        String[] hints = new String[]{"portal1", "rect/circle", "0", "0", "360", "220", "Lake (2p)", "optional"};
+        CoreUiEventQueue.requestFormDialog("Edit Map Portal", "Edit RWX map portal properties.", ids, labels, initial, hints, "Save", "Cancel", new FormDialogSubmitHandler() {
+            @Override
+            public void submit(Map<String, String> values) {
+                try {
+                    properties.id = parseRwxRequiredString(values, "id", "Name");
+                    properties.circle = parseRwxShape(values, "shape", properties.circle);
+                    properties.x = parseRwxFloat(values, "x", properties.x, "X");
+                    properties.y = parseRwxFloat(values, "y", properties.y, "Y");
+                    properties.width = parseRwxPositiveFloat(values, "width", properties.width, "Width");
+                    properties.height = parseRwxPositiveFloat(values, "height", properties.height, "Height");
+                    properties.targetMapId = parseRwxRequiredString(values, "targetMapId", "Target map id");
+                    properties.targetPortalId = parseRwxOptionalString(values, "targetPortalId");
+                    String id = gameEngine.missionEngine.updateMapPortalEditorPortal(x, y, properties);
+                    if (id == null) {
+                        gameEngine.gameUI.showMediumPriorityMessage("No RWX map portal at selected point");
+                    } else {
+                        gameEngine.gameUI.showMediumPriorityMessage("Updated RWX map portal: " + id);
+                    }
+                } catch (IllegalArgumentException e) {
+                    gameEngine.showMessageBox("RWX map portal editor", e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    gameEngine.showMessageBox("RWX map portal editor", "Failed to update RWX map portal: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    static void deleteRwxMapPortalAt(float x, float y) {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (!isRwxAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+            return;
+        }
+        try {
+            String deletedPortal = gameEngine.missionEngine.removeMapPortalEditorPortal(x, y);
+            if (deletedPortal == null) {
+                gameEngine.gameUI.showMediumPriorityMessage("No RWX map portal at selected point");
+            } else {
+                gameEngine.gameUI.showMediumPriorityMessage("Deleted RWX map portal: " + deletedPortal);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            gameEngine.showMessageBox("RWX map portal editor", "Failed to delete RWX map portal: " + e.getMessage());
+        }
+    }
+
+    static void requestRwxSaveAreaMapDialog() {
+        String defaultName = defaultRwxMapExportName();
+        CoreUiEventQueue.requestFormDialog("Save RWX Map", "Export this sandbox map with all RWX editor features.", new String[]{"name"}, new String[]{"Map name"}, new String[]{defaultName}, new String[]{defaultName}, "Save", "Cancel", new FormDialogSubmitHandler() {
+            @Override
+            public void submit(Map<String, String> values) {
+                exportRwxAreaMap(values.get("name"));
+            }
+        });
+    }
+
+    static void exportRwxAreaMap(String mapName) {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (!isRwxAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+            return;
+        }
+        String exportName = sanitizeRwxMapExportName(mapName);
+        String targetPath = "/SD/rustedWarfare/maps/" + exportName + ".tmx";
+        try {
+            gameEngine.missionEngine.exportRwxEditorMap(targetPath);
+            gameEngine.gameUI.showMediumPriorityMessage("RWX map exported: " + exportName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            gameEngine.showMessageBox("RWX map editor", "Failed to export RWX map: " + e.getMessage());
+        }
+    }
+
+    static float parseRwxPositiveFloat(Map<String, String> values, String key, float defaultValue, String label) {
+        String value = values.get(key);
+        if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
+            return defaultValue;
+        }
+        try {
+            float parsed = Float.parseFloat(value.trim());
+            if (Float.isNaN(parsed) || Float.isInfinite(parsed) || parsed <= 0.0f) {
+                throw new NumberFormatException();
+            }
+            return parsed;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(label + " must FastArrayList a number greater than 0");
+        }
+    }
+
+    static float parseRwxFloat(Map<String, String> values, String key, float defaultValue, String label) {
+        String value = values.get(key);
+        if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
+            return defaultValue;
+        }
+        try {
+            float parsed = Float.parseFloat(value.trim());
+            if (Float.isNaN(parsed) || Float.isInfinite(parsed)) {
+                throw new NumberFormatException();
+            }
+            return parsed;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(label + " must FastArrayList a valid number");
+        }
+    }
+
+    static int parseRwxNonNegativeInt(Map<String, String> values, String key, int defaultValue, String label) {
+        String value = values.get(key);
+        if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
+            return defaultValue;
+        }
+        try {
+            int parsed = Integer.parseInt(value.trim());
+            if (parsed < 0) {
+                throw new NumberFormatException();
+            }
+            return parsed;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(label + " must FastArrayList a whole number of 0 or greater");
+        }
+    }
+
+    static int parseRwxPositiveInt(Map<String, String> values, String key, int defaultValue, String label) {
+        String value = values.get(key);
+        if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
+            return defaultValue;
+        }
+        try {
+            int parsed = Integer.parseInt(value.trim());
+            if (parsed <= 0) {
+                throw new NumberFormatException();
+            }
+            return parsed;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(label + " must FastArrayList a whole number greater than 0");
+        }
+    }
+
+    static boolean parseRwxBoolean(Map<String, String> values, String key, boolean defaultValue, String label) {
+        String value = values.get(key);
+        if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
+            return defaultValue;
+        }
+        value = value.trim();
+        if ("true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value) || "1".equals(value)) {
+            return true;
+        }
+        if ("false".equalsIgnoreCase(value) || "no".equalsIgnoreCase(value) || "0".equals(value)) {
+            return false;
+        }
+        throw new IllegalArgumentException(label + " must FastArrayList true or false");
+    }
+
+    static boolean parseRwxShape(Map<String, String> values, String key, boolean defaultValue) {
+        String value = values.get(key);
+        if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
+            return defaultValue;
+        }
+        value = value.trim();
+        if ("circle".equalsIgnoreCase(value) || "ellipse".equalsIgnoreCase(value)) {
+            return true;
+        }
+        if ("rect".equalsIgnoreCase(value) || "rectangle".equalsIgnoreCase(value)) {
+            return false;
+        }
+        throw new IllegalArgumentException("Shape must FastArrayList rect or circle");
+    }
+
+    static int parseRwxOwner(Map<String, String> values, String key, int defaultValue, String label) {
+        String value = values.get(key);
+        if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
+            return defaultValue;
+        }
+        value = value.trim();
+        if ("neutral".equalsIgnoreCase(value) || "none".equalsIgnoreCase(value) || "-1".equals(value)) {
+            return -1;
+        }
+        try {
+            int parsed = Integer.parseInt(value);
+            if (parsed < 0) {
+                throw new NumberFormatException();
+            }
+            return parsed;
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(label + " must FastArrayList neutral or a team id of 0 or greater");
+        }
+    }
+
+    static String parseRwxRequiredString(Map<String, String> values, String key, String label) {
+        String value = values.get(key);
+        value = value == null ? VariableScope.nullOrMissingString : value.trim();
+        if (value.equals(VariableScope.nullOrMissingString)) {
+            throw new IllegalArgumentException(label + " must not FastArrayList empty");
+        }
+        return value;
+    }
+
+    static String parseRwxOptionalString(Map<String, String> values, String key) {
+        String value = values.get(key);
+        value = value == null ? VariableScope.nullOrMissingString : value.trim();
+        return value.equals(VariableScope.nullOrMissingString) ? null : value;
+    }
+
+    static String defaultRwxMapExportName() {
+        return "rwx_area_control_" + Utility.formatCurrentDate("yyyyMMdd_HHmmss");
+    }
+
+    static String sanitizeRwxMapExportName(String name) {
+        String safeName = name == null ? VariableScope.nullOrMissingString : name.trim();
+        if (safeName.toLowerCase(java.util.Locale.ROOT).endsWith(".tmx")) {
+            safeName = safeName.substring(0, safeName.length() - 4);
+        }
+        if (safeName.equals(VariableScope.nullOrMissingString)) {
+            safeName = defaultRwxMapExportName();
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < safeName.length(); i++) {
+            char c = safeName.charAt(i);
+            if (c == '.' || c == '/' || c == '\\' || c == '|' || c == '?' || c == ':' || c == '*' || c == '"' || c == '<' || c == '>') {
+                builder.append('_');
+            } else {
+                builder.append(c);
+            }
+        }
+        return builder.length() == 0 ? defaultRwxMapExportName() : builder.toString();
+    }
+
+    static String trimRwxFloat(float value) {
+        if (value == (int) value) {
+            return String.valueOf((int) value);
+        }
+        return String.valueOf(value);
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public void a(AbstractUnitAction abstractUnitAction, boolean z2, PointF pointF, BaseUnit baseUnit) {
+        GameEngine gameEngine = GameEngine.getInstance();
+        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
+        if (isRwxAreaEditorAction(abstractUnitAction) && !isRwxAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+            return;
+        }
+        if (isRwxMapPortalEditorAction(abstractUnitAction) && !LinkedMapAvailability.ENABLED) {
+            gameEngine.gameUI.clearCurrentAction();
+            gameEngine.showMessageBox("Linked Map", LinkedMapAvailability.UNAVAILABLE_MESSAGE);
+            return;
+        }
+        if (abstractUnitAction == rwxAddCircleZone || abstractUnitAction == rwxAddRectZone) {
+            if (z2) {
+                return;
+            }
+            if (pointF == null) {
+                gameEngine.gameUI.showMediumPriorityMessage("Select a map point for the RWX area zone");
+                return;
+            }
+            boolean circle = abstractUnitAction == rwxAddCircleZone;
+            addRwxAreaZoneAt(pointF.x, pointF.y, circle, circle ? RWX_DEFAULT_CIRCLE_ZONE_SIZE : RWX_DEFAULT_RECT_ZONE_WIDTH, circle ? RWX_DEFAULT_CIRCLE_ZONE_SIZE : RWX_DEFAULT_RECT_ZONE_HEIGHT);
+            return;
+        }
+        if (abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal) {
+            if (z2) {
+                return;
+            }
+            if (pointF == null) {
+                gameEngine.gameUI.showMediumPriorityMessage("Drag on the map to create a RWX map portal");
+                return;
+            }
+            boolean circle = abstractUnitAction == rwxAddCircleMapPortal;
+            float width = circle ? RWX_DEFAULT_CIRCLE_ZONE_SIZE : 360.0f;
+            float height = circle ? RWX_DEFAULT_CIRCLE_ZONE_SIZE : 220.0f;
+            requestRwxAddMapPortalDialog(pointF.x - (width * 0.5f), pointF.y - (height * 0.5f), pointF.x + (width * 0.5f), pointF.y + (height * 0.5f), circle);
+            return;
+        }
+        if (abstractUnitAction == rwxEditZone) {
+            if (z2) {
+                return;
+            }
+            if (pointF == null) {
+                gameEngine.gameUI.showMediumPriorityMessage("Select a RWX area zone to edit");
+                return;
+            }
+            requestRwxEditAreaZoneDialog(pointF.x, pointF.y);
+            return;
+        }
+        if (abstractUnitAction == rwxEditMapPortal) {
+            if (z2) {
+                return;
+            }
+            if (pointF == null) {
+                gameEngine.gameUI.showMediumPriorityMessage("Select a RWX map portal to edit");
+                return;
+            }
+            requestRwxEditMapPortalDialog(pointF.x, pointF.y);
+            return;
+        }
+        if (abstractUnitAction == rwxDeleteZone) {
+            if (z2) {
+                return;
+            }
+            if (pointF == null) {
+                gameEngine.gameUI.showMediumPriorityMessage("Select a RWX area zone to delete");
+                return;
+            }
+            deleteRwxAreaZoneAt(pointF.x, pointF.y);
+            return;
+        }
+        if (abstractUnitAction == rwxDeleteMapPortal) {
+            if (z2) {
+                return;
+            }
+            if (pointF == null) {
+                gameEngine.gameUI.showMediumPriorityMessage("Select a RWX map portal to delete");
+                return;
+            }
+            deleteRwxMapPortalAt(pointF.x, pointF.y);
+            return;
+        }
+        if (abstractUnitAction == rwxSaveAreaMap) {
+            if (z2) {
+                return;
+            }
+            requestRwxSaveAreaMapDialog();
+            return;
+        }
+        if (abstractUnitAction == editorSelectionTexture3) {
+            if (w()) {
+                GameEngine.logColored("Not reloading units: Need to keep network sync");
+                gameEngine.gameUI.showMediumPriorityMessage("Not reloading units: Need to keep network sync");
+                return;
+            }
+            if (z2) {
+                return;
+            }
+            if (gameEngine.modManager.getActiveModCount() == 0) {
+                gameEngine.gameUI.showMediumPriorityMessage("No custom units to reload");
+                return;
+            }
+            GameEngine.log("Reload units requested");
+            gameEngine.modManager.applyMods(true, false);
+            for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
+                if (playerTeam instanceof AIController) {
+                    ((AIController) playerTeam).initializeBuildStrategies();
+                }
+            }
+            gameEngine.gameUI.showMediumPriorityMessage("All custom unit files reloaded");
+        }
+        if (abstractUnitAction == editorIconTexture) {
+            if (w()) {
+                GameEngine.logColored("Not reloading units: Need to keep network sync");
+                return;
+            }
+            if (z2) {
+                return;
+            }
+            if (gameEngine.modManager.getActiveModCount() == 0) {
+                gameEngine.gameUI.showMediumPriorityMessage("No custom units to reload");
+                return;
+            }
+            GameEngine.log("Reload active only requested");
+            gameEngine.modManager.applyMods(true, true);
+            for (PlayerTeam playerTeam2 : PlayerTeam.getTeams()) {
+                if (playerTeam2 instanceof AIController) {
+                    ((AIController) playerTeam2).initializeBuildStrategies();
+                }
+            }
+            int i = CustomUnitConfigParser.unitsRegeneratedCount;
+            int i2 = 100;
+            String str = "Quick reloaded changed data for " + i + " units active on map.";
+            if (gameEngine.settingsEngine.liveReloading && i == 0) {
+                str = str + " (Note: Live reloading is currently enabled, so changed units may have already FastArrayList reloaded)";
+                i2 = 170;
+            }
+            gameEngine.gameUI.showInfoMessageWithPriority(str, i2);
+        }
+        if (abstractUnitAction == editorIconTexture3 || abstractUnitAction == editorIconTexture4 || abstractUnitAction == editorIconTexture2) {
+            int i3 = 0;
+            if (z2) {
+                return;
+            }
+            for (BaseUnit baseUnit2 : BaseUnit.getGlobalUnitList()) {
+                if ((baseUnit2 instanceof BaseUnit) && Utility.distanceSq(baseUnit2.posX, baseUnit2.posY, pointF.x, pointF.y) < 2500.0f) {
+                    if (abstractUnitAction == editorIconTexture3) {
+                        if (baseUnit2.unitTransportTarget == null && baseUnit2.parentEntity == null) {
+                            baseUnit2.removeFromGame();
+                            if ((baseUnit2 instanceof OrderableUnit) && baseUnit2.bI()) {
+                                gameEngine.pathfindingEngine.a((OrderableUnit) baseUnit2);
+                            }
+                        }
+                    } else if (abstractUnitAction == editorIconTexture4) {
+                        if (baseUnit2.unitTransportTarget == null && baseUnit2.parentEntity == null) {
+                            baseUnit2.currentHealth = -1.0f;
+                        }
+                    } else if (abstractUnitAction != editorIconTexture2) {
+                        continue;
+                    } else if (i3 <= 4) {
+                        if (!baseUnit2.bI() && !(baseUnit2 instanceof Tree) && !baseUnit2.isDead && baseUnit2.unitTransportTarget == null && baseUnit2.parentEntity == null) {
+                            i3++;
+                            UnitType unitTypeR = baseUnit2.r();
+                            for (int i4 = -25; i4 < 25; i4++) {
+                                BaseUnit baseUnitA = unitTypeR.a();
+                                baseUnitA.posX = baseUnit2.posX + (i4 * 0.5f) + 1.0f;
+                                baseUnitA.posY = baseUnit2.posY + (i4 * 0.5f) + 1.0f;
+                                baseUnitA.setUnitTeam(baseUnit2.team);
+                                PlayerTeam.c(baseUnitA);
+                                baseUnitA.rotationSpeed = Utility.getDeterministicRandomInt((GameObject) baseUnit2, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT, 25 + i4);
+                                if (baseUnitA instanceof OrderableUnit) {
+                                    ((OrderableUnit) baseUnitA).movementActiveThisFrame = true;
+                                }
+                            }
+                        }
+                    } else {
+                        return;
+                    }
+                }
+            }
+            return;
+        }
+        if (abstractUnitAction == editorIconTexture6) {
+            if (z2) {
+                return;
+            }
+            Projectile projectileA = NukeLauncher.a(this, pointF.x, pointF.y, pointF.x, pointF.y);
+            if (projectileA != null) {
+                projectileA.posZ = 100.0f;
+                projectileA.j = null;
+            }
+        }
+        if (abstractUnitAction == editorIconTexture5) {
+            if (z2) {
+                return;
+            }
+            for (GameObject gameObject : BaseUnit.getGlobalUnitList()) {
+                if ((gameObject instanceof OrderableUnit) && (gameObject instanceof FactoryQueueInterface) && Utility.distanceSq(gameObject.posX, gameObject.posY, pointF.x, pointF.y) < 2500.0f) {
+                    ((FactoryQueueInterface) gameObject).dz();
+                }
+            }
+            return;
+        }
+        if (abstractUnitAction == editorIconTexture7) {
+            PlayerTeam playerTeam3 = this.team;
+            if (playerTeam3 instanceof AIController) {
+                AIController aIController = (AIController) playerTeam3;
+                if (aIController.aiUnitManagementTimer > 0.0f) {
+                    aIController.aiUnitManagementTimer = 0.0f;
+                } else {
+                    aIController.aiUnitManagementTimer = 10800.0f;
+                }
+            }
+        }
+        if (abstractUnitAction == editorIconTexture8) {
+            PlayerTeam playerTeam4 = this.team;
+            playerTeam4.teamColorId++;
+            if (playerTeam4.teamColorId > 4) {
+                playerTeam4.teamColorId = 0;
+            }
+        }
+        if (abstractUnitAction == u) {
+            boolean z3 = false;
+            boolean z4 = false;
+            for (PlayerTeam playerTeam5 : PlayerTeam.getTeams()) {
+                if (playerTeam5 instanceof AIController) {
+                    if (((AIController) playerTeam5).aiUnitManagementTimer > 0.0f) {
+                        z3 = true;
+                    }
+                    z4 = true;
+                }
+            }
+            boolean z5 = !z3;
+            if (!z4) {
+                z5 = !this.controlPointPaints;
+            }
+            this.controlPointPaints = z5;
+            M();
+        }
+        if (abstractUnitAction == v) {
+        }
+        if (abstractUnitAction == w) {
+        }
+        if (abstractUnitAction == x) {
+        }
+        if (abstractUnitAction == z) {
+            gameEngine.isDebugTempMode = !gameEngine.isDebugTempMode;
+        }
+        if (abstractUnitAction == A) {
+            AIController.unitCountsUpdated = !AIController.unitCountsUpdated;
+        }
+        if (abstractUnitAction == B) {
+            gameEngine.isTriggerDebugMode = !gameEngine.isTriggerDebugMode;
+        }
+        if (abstractUnitAction == C) {
+            gameEngine.gameStatistics.a();
+        }
+        if (abstractUnitAction instanceof SetTerrainTypeAction) {
+            TerrainAutotiler.a(((SetTerrainTypeAction) abstractUnitAction).a, pointF);
+        }
+        super.a(abstractUnitAction, z2, pointF, baseUnit);
+    }
+
+    public void M() {
+        for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
+            if (playerTeam instanceof AIController) {
+                AIController aIController = (AIController) playerTeam;
+                if (!this.controlPointPaints) {
+                    aIController.aiUnitManagementTimer = 0.0f;
+                } else {
+                    aIController.aiUnitManagementTimer = Float.MAX_VALUE;
+                }
+            }
+        }
+    }
+
+    public static boolean a(AbstractUnitAction abstractUnitAction, BaseUnit baseUnit) {
+        if (abstractUnitAction instanceof FilteredUnitAction) {
+            abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
+        }
+        if (abstractUnitAction == editorIconTexture7 || abstractUnitAction == w || abstractUnitAction == x || abstractUnitAction == editorIconTexture5 || abstractUnitAction == editorIconTexture3 || abstractUnitAction == editorIconTexture2 || abstractUnitAction == z || abstractUnitAction == editorIconTexture8 || abstractUnitAction == editorIconTexture9 || abstractUnitAction == s || abstractUnitAction == t || abstractUnitAction == B || abstractUnitAction == C || abstractUnitAction == rwxAddCircleZone || abstractUnitAction == rwxAddRectZone || abstractUnitAction == rwxEditZone || abstractUnitAction == rwxDeleteZone || abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal || abstractUnitAction == rwxEditMapPortal || abstractUnitAction == rwxDeleteMapPortal || abstractUnitAction == rwxSaveAreaMap) {
+            return true;
+        }
+        return false;
+    }
+
+    public static void a(ArrayList arrayList, int i) {
+        if (i != 1) {
+            return;
+        }
+        D = new ArrayList();
+        D.add(new TeamChangeAction(true, false));
+        D.add(new TeamChangeAction(true, true));
+        D.add(new TeamChangeAction(false, false));
+        D.add(new ChangeEditorTabAction(true, false));
+        D.add(new ChangeEditorTabAction(true, true));
+        D.add(new ChangeEditorTabAction(false, false));
+        D.add(new ModFilterAction(true, false));
+        D.add(new ModFilterAction(true, true));
+        D.add(new ModFilterAction(false, false));
+        D.add(new ChangeTypeFilterAction(true, false));
+        D.add(new ChangeTypeFilterAction(true, true));
+        D.add(new ChangeTypeFilterAction(false, false));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.grass));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.sea));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.sand));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.dust));
+        ArrayList arrayList2 = new ArrayList();
+        arrayList2.add(new AddCreditsAction());
+        arrayList2.add(y);
+        arrayList2.add(rwxAddCircleZone);
+        arrayList2.add(rwxAddRectZone);
+        arrayList2.add(rwxEditZone);
+        arrayList2.add(rwxDeleteZone);
+        arrayList2.add(rwxAddCircleMapPortal);
+        arrayList2.add(rwxAddRectMapPortal);
+        arrayList2.add(rwxEditMapPortal);
+        arrayList2.add(rwxDeleteMapPortal);
+        arrayList2.add(rwxSaveAreaMap);
+        arrayList2.add(editorSelectionTexture3);
+        arrayList2.add(editorIconTexture);
+        arrayList2.add(editorIconTexture3);
+        arrayList2.add(editorIconTexture2);
+        arrayList2.add(editorIconTexture4);
+        arrayList2.add(editorIconTexture6);
+        arrayList2.add(editorIconTexture5);
+        arrayList2.add(u);
+        arrayList2.add(v);
+        arrayList2.add(w);
+        arrayList2.add(x);
+        arrayList2.add(z);
+        arrayList2.add(editorIconTexture8);
+        arrayList2.add(editorIconTexture9);
+        arrayList2.add(s);
+        arrayList2.add(t);
+        if (GameEngine.isTestingBuild) {
+            arrayList2.add(A);
+        }
+        arrayList2.add(B);
+        arrayList2.add(C);
+        Iterator it = arrayList2.iterator();
+        while (it.hasNext()) {
+            D.add(new FilteredUnitAction((AbstractUnitAction) it.next(), K, true));
+        }
+        ArrayList<UnitType> arrayList3 = new ArrayList();
+        arrayList3.addAll(UnitTypeEnum.ae);
+        // from class: com.corrodinggames.rts.game.units.h.15
+// java.util.Comparator
+        /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
+        arrayList3.sort((unitType, unitType2) -> {
+            BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
+            BaseUnit baseUnitCanAttack2 = BaseUnit.canAttack(unitType2);
+            int iCompareTo = Boolean.valueOf(baseUnitCanAttack.bP()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bP()));
+            if (iCompareTo != 0) {
+                return iCompareTo;
+            }
+            int iCompareTo2 = Boolean.valueOf(unitType.j()).compareTo(Boolean.valueOf(unitType2.j()));
+            if (iCompareTo2 != 0) {
+                return iCompareTo2;
+            }
+            int iCompareTo3 = Boolean.valueOf(baseUnitCanAttack.bO()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bO()));
+            if (iCompareTo3 != 0) {
+                return iCompareTo3;
+            }
+            UnitPrice unitPriceU = unitType.u();
+            UnitPrice unitPriceU2 = unitType2.u();
+            UnitPrice unitPriceB = unitType.B();
+            UnitPrice unitPriceB2 = unitType2.B();
+            if (unitPriceB != null) {
+                unitPriceU = UnitPrice.a(unitPriceU, unitPriceB);
+            }
+            if (unitPriceB2 != null) {
+                unitPriceU2 = UnitPrice.a(unitPriceU2, unitPriceB2);
+            }
+            int iCompareTo4 = unitPriceU.compareTo(unitPriceU2);
+            if (iCompareTo4 != 0) {
+                return iCompareTo4;
+            }
+            return 0;
+        });
+        for (UnitType unitType : arrayList3) {
+            if (unitType != UnitTypeEnum.wall_v && !unitType.getUnitTypeDescriptionShort().equals("test_tank") && !unitType.getUnitTypeDescriptionShort().equals("missing") && unitType != UnitTypeEnum.tankDestroyer && unitType != UnitTypeEnum.megaTank && unitType != UnitTypeEnum.fogRevealer && unitType != UnitTypeEnum.crystalResource && unitType != UnitTypeEnum.damagingBorder && unitType != UnitTypeEnum.zoneMarker && unitType != UnitTypeEnum.editorOrBuilder && unitType != UnitTypeEnum.dummyNonUnitWithTeam && unitType != UnitTypeEnum.supplyDepot && (BaseUnit.canAttack(unitType) instanceof OrderableUnit) && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).showInEditor)) {
+                FilteredUnitAction filteredUnitAction = new FilteredUnitAction(new PlaceBuildingAction(unitType, 1, null), K);
+                boolean z2 = false;
+                Iterator it2 = D.iterator();
+                while (it2.hasNext()) {
+                    if (((AbstractUnitAction) it2.next()).equals(filteredUnitAction)) {
+                        z2 = true;
+                    }
+                }
+                if (!z2) {
+                    D.add(filteredUnitAction);
+                }
+            }
+        }
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: N */
+    public ArrayList getAvailableActions() {
+        GameEngine.getInstance();
+        return D;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public boolean E() {
+        return true;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public float g(int i) {
+        return 10.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    /* JADX INFO: renamed from: F */
+    public boolean canDrawShadow() {
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDead;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    /* JADX INFO: renamed from: G */
+    public float getShadowOffsetX() {
+        return 1.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    /* JADX INFO: renamed from: H */
+    public float getShadowOffsetY() {
+        return 1.0f;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public boolean u() {
+        return true;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.MovableUnit, com.corrodinggames.rts.game.units.OrderableUnit
+    public boolean I() {
+        return false;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public boolean d(BaseUnit baseUnit) {
+        return false;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: J */
+    public boolean isDamageImmune() {
+        return true;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: a */
+    public float setTarget(BaseUnit baseUnit, float f, Projectile projectile) {
+        return super.setTarget(baseUnit, 0.0f, projectile);
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public void O() {
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public boolean P() {
+        return true;
+    }
+
+    public void a(EditorOrBuilder editorOrBuilder) {
+        this.editorIconTexture10 = editorOrBuilder.editorIconTexture10;
+        this.controlPointPaints = editorOrBuilder.controlPointPaints;
+    }
+
+    @Override
+    // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
+    public void a(GameOutputStream gameOutputStream) throws IOException {
+        gameOutputStream.writeByte(1);
+        gameOutputStream.writeEnumOrdinal(this.G);
+        gameOutputStream.writeStringNullable(this.H);
+        super.a(gameOutputStream);
+    }
+
+    @Override
+    // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject
+    public void a(GameInputStream gameInputStream) throws IOException {
+        byte b = gameInputStream.readByte();
+        this.G = (EditorTab) gameInputStream.readEnumOrdinalOrNull(EditorTab.class);
+        if (this.G == null) {
+            this.G = EditorTab.all;
+        }
+        if (b >= 1) {
+            this.H = gameInputStream.readNullableString();
+        }
+        super.a(gameInputStream);
+    }
+}

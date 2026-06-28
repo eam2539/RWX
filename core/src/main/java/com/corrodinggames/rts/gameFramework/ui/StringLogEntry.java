@@ -1,0 +1,24 @@
+package com.corrodinggames.rts.gameFramework.ui;
+
+/* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.aq */
+/* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/aq.class */
+class StringLogEntry extends WarLogEntry {
+    public StringLogEntry(String str) {
+        super(-1000.0f, -1000.0f);
+        this.g = str;
+    }
+
+    @Override // com.corrodinggames.rts.gameFramework.ui.WarLogEntry
+    public boolean a(WarLogEntry warLogEntry) {
+        return false;
+    }
+
+    @Override // com.corrodinggames.rts.gameFramework.ui.WarLogEntry
+    public void b(WarLogEntry warLogEntry) {
+    }
+
+    @Override // com.corrodinggames.rts.gameFramework.ui.WarLogEntry
+    public String a() {
+        return this.g;
+    }
+}

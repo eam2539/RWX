@@ -1,0 +1,48 @@
+[versions]
+androidGradleVersion = "9.1.0"
+#androidGradleVersion = "9.2.1"
+httpclientVersion = "4.5.14"
+junitPlatformLauncherVersion = "6.1.2"
+jvmLibp2pVersion = "1.2.0-RELEASE"
+kotlinxSerializationJsonVersion = "1.11.0"
+ktorVersion = "3.5.1"
+kotlinVersion = "2.4.0"
+lwjgl3AwtVersion = "0.2.4"
+lwjglVersion = "3.3.6"
+tomlktVersion = "0.5.0"
+webrtcJavaVersion = "0.14.0"
+androidWebrtcVersion = "137.7151.05"
+koolVersion = "0.19.0"
+koinCoreVersion = "4.2.2"
+slf4jVersion = "2.0.18"
+logbackVersion = "1.5.37"
+shadowVersion = "9.4.3"
+timberVersion = "5.0.1"
+[libraries]
+httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclientVersion" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatformLauncherVersion" }
+jvm-libp2p = { module = "io.libp2p:jvm-libp2p", version.ref = "jvmLibp2pVersion" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorVersion" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorVersion" }
+lwjgl = { module = "org.lwjgl:lwjgl", version.ref = "lwjglVersion" }
+lwjgl-glfw = { module = "org.lwjgl:lwjgl-glfw", version.ref = "lwjglVersion" }
+lwjgl-openal = { module = "org.lwjgl:lwjgl-openal", version.ref = "lwjglVersion" }
+lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl", version.ref = "lwjglVersion" }
+lwjgl3-awt = { module = "org.lwjglx:lwjgl3-awt", version.ref = "lwjgl3AwtVersion" }
+tomlkt = { module = "net.peanuuutz.tomlkt:tomlkt", version.ref = "tomlktVersion" }
+webrtc-java = { module = "dev.onvoid.webrtc:webrtc-java", version.ref = "webrtcJavaVersion" }
+android-webrtc = { module = "io.github.webrtc-sdk:android", version.ref = "androidWebrtcVersion" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCoreVersion" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinCoreVersion" }
+kool-core = { module = "de.fabmax.kool:kool-core", version.ref = "koolVersion" }
+kool-core-desktop = { module = "de.fabmax.kool:kool-core-desktop", version.ref = "koolVersion" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4jVersion" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackVersion" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timberVersion" }
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradleVersion" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinVersion" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadowVersion" }

@@ -1,0 +1,9 @@
+[mod]
+title: Mega Builders
+description: Example mod which replaces builders with Mega Builders
+
+minVersion: v1.15p7
+
+tags: starting-units, units
+
+thumbnail: mod-thumbnail.png
