@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomButton" parent="android:style/Theme.NoTitleBar">
+        <item name="android:buttonStyle">@style/MenuButton</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>

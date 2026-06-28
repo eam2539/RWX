@@ -1,0 +1,30 @@
+<!--
+<!DOCTYPE html>
+-->
+
+
+<div>
+  
+  <div class="panelCloseButton" onclick="closePopup()"  click_on_escape=""/>
+  
+  <p id="keyBindMessage">...</p>
+  
+  
+  <!-- -->
+  
+  
+  <div class="mainButtons">
+    
+    <!--
+    <button id="button_apply" onclick="keyBindingPopup_apply(false);closePopup();">${i:menus.battleroom.playerpopup.apply}</button>
+    -->
+    <button id="button_clear"  onclick="keyBindingPopup_apply(true);closePopup();">Clear</button>
+    
+    <button id="button_back"  onclick="closePopup();">${i:menus.battleroom.playerpopup.cancel}</button>
+    
+  </div>
+
+
+</div>
+
+

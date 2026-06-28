@@ -1,0 +1,11 @@
+
+Adding custom units here will lock you out of multiplayer and syntax errors will crash instead of warn.
+
+The best place for mods is under:
+
+'{game_folder}/mods/units/YOURMOD/' on pc
+and 'rustedwarfare/units/YOURMOD/' on android
+
+The mods directory also allows for workshop upload on PC
+
+

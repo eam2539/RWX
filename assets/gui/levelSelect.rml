@@ -1,0 +1,303 @@
+<rml>
+	<head>
+		<title>Singleplayer</title>
+		<link type="text/rcss" href="rkt.rcss"/>
+		<link type="text/rcss" href="common.rcss"/>
+		<link type="text/rcss" href="forms.rcss"/>
+		<style>
+			
+			
+			body
+      {
+	      
+	      width: auto;
+	      
+	      max-width:80%;
+	      
+	      /*height: 525px;*/
+	      
+	      height: 80%;
+		    top:5%;
+	      
+      }
+			
+			#mapTemplateHolder
+			{
+			  display:none;
+			}
+			
+			/*
+			.map
+			{
+			  float:left;
+			  width:120px;
+			  height:170px;
+			}
+			*/
+			
+			.map
+			{
+			  float:left;
+			  
+			  
+			  /*width:125px;
+			  height:170px;*/
+			  
+			  width:180px;
+			  height:200px;
+			  
+			  /*padding:5px;
+			  margin:5px;*/
+			  
+			  text-align:center;
+			  
+			  
+			  
+			  
+			}
+			
+			.map button
+			{
+			  font-size: 14;
+			  
+			  /*float:left;*/
+			  
+			  header-color: gray;
+			  
+			  /*padding:13px;
+			  margin:5px;*/
+			  
+			  
+			  display:block;
+			  
+			  width:100%;
+			  
+			}
+			
+			.map button img
+			{
+			  border-style: solid;
+			  border-color: rgba( 0%, 0%, 0%, 20%);
+			  border-width: 2px;
+			  
+			  margin:auto;
+			  margin-top:9px;
+			  /*margin-left:7px;*/
+			  /*margin-right:7px;*/
+			  
+			  
+			  
+			  
+			  
+			}
+			
+			.notSavesOnly .map button:hover img
+			{
+			  border-style: solid;
+			  border-width: 2px;
+			  border-color: red;
+			}
+			
+			
+			
+			
+			.mapImage
+			{
+			  /*width:100px;
+			  height:100px;*/
+			  
+			  
+			  width:170px;
+			  height:170px;
+			}
+			
+			#mapScrollWrap
+			{
+			  height: 100%;
+        
+        position: relative;
+			
+			}
+			
+			
+			#mapScroll
+			{
+			  display:block;
+			  
+			  overflow-y: auto;
+			  
+			  /*min-height:250px;*/
+			  /*max-height:470px;*/
+			  
+			  /*max-height:100%;*/
+			  
+			  /*width:100%;*/
+			  
+			  
+			  position: absolute;
+			  top:0px;
+			  bottom:30px;
+			  left:0px;
+			  right:0px;
+			  
+			  
+			  
+			  /*
+			  border-style: solid;
+			  border-width: 2px;
+			  border-color: red;
+			  */
+			  
+			  padding: 7px;
+			}
+			
+			#mainButtonsBottom
+      {
+        position: absolute;
+			  bottom:0px;
+      }
+			
+			
+			#mapHolder
+			{
+			  /*width:500px;*/
+			  width:100%;
+			  
+			}
+			
+			
+			.savesOnly .map
+			{
+			  
+			  width:100%;
+			  height:auto;
+			  margin:5px;
+			  
+
+			}
+			
+			.map button, .mobile .map button
+			{
+			  font-size: 16;
+			}
+			
+			.savesOnly .mapText
+			{
+			  font-size: 16;
+			  background:rgba(255,255,255,128);
+			  
+			}
+			
+			.savesOnly .mapImage
+			{
+			  display:none;
+			  
+			}
+			
+			/*
+			button .mapText.needsUnicodeFont
+			{
+			  
+			}
+			*/
+			
+			.map .editButton
+			{
+			  display:none;
+			  /*float:right;*/
+			  position:absolute;
+			  right:0;
+			  top:0;
+			  
+			  width:20px;
+			  
+			  padding:2px;
+			  
+			  /*border-style: solid;
+			  border-width: 2px;
+			  border-color: red;*/
+			}
+			
+			.savesOnly .map .editButton
+			{
+			  display:block;
+			}
+			
+			
+			.importButton
+			{
+			  display:none;
+			}
+			
+			.showImportButton .importButton
+			{
+			  display:inline;
+			}
+			
+			#mainButtonsBottom button
+	    {
+	      margin:9px;
+	    }
+			
+		</style>
+		
+	</head>
+	<body onshow="showMaps()"> <!-- not the true body in popup -->
+		
+		
+		<div class="panelMain noStyleInPopup">
+	  
+	    <div class="panelCloseButton" onclick="backOrClose()"  click_on_escape=""/>
+	  
+	    <div id="mapScrollWrap" class="mainButtons">
+	      <div id="mapScroll" class="slider">
+	      
+          <div id="mapHolder">
+            
+            
+          </div>
+        </div>
+      
+      
+      <div id="mapTemplateHolder">
+        <div class="map ">
+          <button onclick="_ONCLICK_" class="openButton">
+            <img class="mapImage" src="_IMG_" />
+            <div class="mapText">_NAME_</div>
+          </button>
+          <button onclick="_ONCLICKEDIT_" class="editButton">
+            ...
+          </button>
+        </div>
+      </div>
+      
+      <!-- startNew('_PATH_')  -->
+    
+      <div id="mainButtonsBottom" class="panelBottomButtons">
+        <button class="stealFocus"></button>
+        
+        <button class="importButton" onclick="importFilePopup()">Import</button>
+        
+        <button class="backButtonText" onclick="backOrClose()" click_on_escape="">${i:menus.common.back}</button>
+        
+        <br />
+        
+        <!--
+        <p>test</p>
+        <form>
+        <input type="text" name="test" value="test123"/>
+        </form>
+        -->
+      
+      </div>
+	    
+	    <div class="clearDiv"></div>
+	    
+	    </div><!-- mapScrollWrap -->
+		
+		
+		</div>
+		
+		
+	</body>
+</rml>

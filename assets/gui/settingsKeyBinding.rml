@@ -1,0 +1,469 @@
+<rml>
+	<head>
+		<title>Settings</title>
+		<link type="text/rcss" href="rkt.rcss"/>
+		<link type="text/rcss" href="common.rcss"/>
+		<link type="text/rcss" href="forms.rcss"/>
+		<style>
+			
+			body
+	    {
+		    /*width: 680px;*/
+		    
+		    width: 75%;
+		    height: 520px;
+		    /*height: 100%;*/
+		    
+		    
+		    font-size: 25;
+		    
+		    
+		    height: 70%;
+		    
+		  }
+			
+			
+			.background
+      {
+        /*background:rgba(205,205,205,150);*/
+        
+        background:rgba(205,205,205,0);
+        
+        /*padding:13px;
+        padding-right:40px;
+        */
+        
+      }
+      
+      
+		  h2
+	    {
+	      font-size: 35;
+        font-weight:bold;
+	    }
+	
+      h3
+      {
+        font-size: 30;
+	      color:black;
+	      font-weight:bold;
+	      
+	      header-font-effect: shadow;
+	      
+	      header-width: 2px;
+	      
+        header-offset: 2px 2px;
+        header-color: gray;
+        
+        display:block;
+        
+        border-bottom: 3px rgba(0,0,0,128);
+        
+        padding-left:0.4em;
+        
+        margin-bottom:0.5em;
+        margin-top:0.5em;
+        
+        background:rgba(0,100,0,128);
+        
+      }
+			
+			.group
+			{
+			  padding-left:0.5em;
+			  
+			}
+			
+			
+			div
+			{
+			  /*border-style: solid;
+	      border-width: 1px;
+	      border-color: red;*/
+			}
+			
+			
+			.form
+			{
+			  text-align: left;
+			  display: block;
+			  
+			  text-color:black;
+			}
+			
+		  
+		  
+			label
+			{
+			  padding-bottom:0em;
+			  margin-top:0em;
+			  
+			  /*border-style: solid;
+			  border-width: 2px;
+			  border-color: green;*/
+			  
+			  /*display:inline-block;*/
+			  
+        /*vertical-align:middle; */
+        
+			}
+			
+			#scrollDivWrap
+      {
+        /*max-height:500px;*/
+      }
+       
+      #scrollDiv
+      {
+        
+        display:block;
+			  
+			  overflow-y: auto;
+			  
+			  min-height:230px;
+			  /*max-height:470px;*/
+			  max-height:540px;
+			  
+			  max-height:100%;
+			  
+			  width:100%;
+			  /*
+			  border-style: solid;
+			  border-width: 2px;
+			  border-color: red;
+			  */
+			  
+			  margin: 3px;
+			  padding: 3px;
+			  
+      }
+      
+     
+      
+      .audioGroup .sliderDiv label
+      {
+        width:7em;
+			  
+			  text-align:right;
+      }
+      
+
+
+      .mainButtons button
+	    {
+	      margin:6px;
+	    }
+      
+      .whiteText label, .whiteText h2, .whiteText h3
+      {
+        color:white;
+        header-color: black;
+      }
+      
+      
+      
+      
+      
+      
+      
+			
+			
+			.tableList
+			{
+			  
+			  border-style: solid;
+			  border-width: 1px;
+			  border-color: gray;
+			  
+			  /*margin-right:1px;*/
+			  
+			  /*width: 100%;*/
+			  
+			  
+			  
+			}
+			
+			.tableRow
+			{
+			  /*border-style: solid;
+			  border-width: 1px;
+			  border-color: gray;*/
+			  
+			  /*white-space: nowrap;*/ /*affects overflow hidden :(*/
+			  
+			  
+			  /*width:50px;
+			  overflow: hidden;*/
+			  
+			  /*margin-left:-2px;*/
+			  /*margin-right:-1px;*/
+			  
+			  
+			  
+			}
+			
+			.tableRowHeader
+			{
+			  font-weight:bold;
+			  background:rgba(200,200,200,98);
+			}
+			
+			.tableRowData
+			{
+			  background:rgba(100,100,100,58);
+			}
+			
+			.clickablecell:hover
+			{
+			  background:rgba(200,0,0,48);
+			  border-color:rgba(200,0,0,255);
+			}
+			
+			
+			
+			.tableRow .cell
+			{
+			  border-style: solid;
+			  border-width: 1px;
+			  border-color: gray;
+			  /*padding:2px;*/
+			  
+			  border-left-width: 0px;
+			  border-top-width: 0px;
+			   
+			  overflow-x: hidden;
+			  overflow-y: hidden;
+			  
+			  
+			  /*width:24.6%;*/
+			  width:33.3%;
+			  
+			  
+			  
+			  height:1.25em;
+			  
+			  /*width:40px;
+			  height:40px;*/
+			  
+			  /*float:left;*/
+			  
+			  margin-right:-1px;
+			  /*margin-left:-1px;*/
+			  
+			  /*margin-left:-1px;*/
+			  
+			  display: inline-block;
+			 
+			  /*position:relative;*/
+			  
+			  
+			}
+			
+			
+						
+			.rowHeader
+			{
+			  margin-top:25px;
+			
+			  background:rgba(100,100,100,100);
+			  
+			  
+			  
+			}
+			
+			.rowHeader .cell
+			{
+			  border-top-style: solid;
+			  border-top-width: 1px;
+			  border-top-color: gray;
+			  
+			  width: 100%;
+			  
+			  /*font-size: 20;*/
+	      
+	      font-weight:bold;
+	      
+			}
+			
+			/* debug */
+			.template
+			{
+			  background:red;
+			  
+			  border-style: solid;
+			  border-width: 2px;
+			  border-color: red;
+			}
+			/*
+			div
+			{
+			  border-style: solid;
+			  border-width: 1px;
+			  border-color: red;
+			  
+			  margin:2px;
+			  padding: 2px;
+			}
+			*/
+			
+			
+			/*
+			.tableRow .cell.rPlayers
+			{
+			  width:7.5%;
+			}
+			
+			.tableRow .cell.rVersion
+			{
+			  width:8.5%;
+			}
+			
+			.tableRow .cell.rPing,
+			.tableRow .cell.rOpen
+			{
+			  width:8.5%;
+			}
+			
+			.tableRow .cell.rMap
+			{
+			  width:41.5%;
+			}
+      */
+      /*
+      .cell
+      {
+        border-style: solid;
+			  border-width: 1px;
+			  
+        border-color: red;
+        margin:2px;
+        
+        background:green;
+      }
+      */
+      
+      
+      
+      #tableScrollDiv
+      {
+        
+        display:block;
+        
+        overflow-y: auto;
+        
+        min-height:190px;
+        max-height:370px;
+        
+        width:100%;
+        /*
+        border-style: solid;
+        border-width: 2px;
+        border-color: red;
+        */
+        
+        /*margin: 3px;*/
+        /*padding: 3px;*/
+        
+      }
+      
+      .keysDiv
+      {
+        
+        margin: 10px;
+        font-size: 18;
+        
+        
+        text-align:center;
+      }
+      
+      
+		</style>
+	</head>
+	<body onshow="showKeyBinding()" id="body">
+		
+		
+		<div class="background panelMainNoAlpha whiteText">
+		
+		  <div class="panelCloseButton" onclick="saveSettings();back()"  click_on_escape=""/>
+		
+		  <div class="mainButtons">
+		    
+		    
+		    <div id="scrollDivWrap">
+		    
+		    <div id="scrollDiv">
+		      
+		      <h2>Edit Key Bindings</h2>
+	        <form class="form">
+	          
+	          <!--
+	          <h3>Key Bindings</h3>
+	          <div class="group">
+	          </div>
+	          -->
+	          
+	          <div class="keysDiv" id="keysDiv">
+		          <div class="tableList">
+		            <div class="tableRow tableRowHeader">
+		              <div class="ctext cell rName">Action</div>
+		              <div class="ctext cell rSpawnPoint">Key</div>
+		              <div class="ctext cell rTeam">Alt-Key</div>
+		            </div>
+		            
+		            <div id="tableScrollDiv">
+		              <div id="tableListData">
+		                <div class="tableRow tableRowData">
+		                  <div class="cell rName">Up</div>
+	                    <div class="clickablecell cell rSpawnPoint" onclick="createAndShowPopup('settingsKeyBindingSet.rml', null, 'W')">W</div>
+	                    <div class="clickablecell cell rTeam">Arrow up</div>
+		                </div>
+		                <div class="tableRow tableRowData">
+		                  <div class="cell rName">1</div>
+	                    <div class="clickablecell cell rSpawnPoint">2</div>
+	                    <div class="clickablecell cell rTeam">3</div>
+		                </div>
+		                
+		              </div>
+		            </div>
+		          </div>
+	            <div id="tableRowTemplateHolder" style="display:none;">
+                <div class="rowTemplate template">
+                  <div class="tableRow tableRowData"></div>
+                </div>
+                
+                <div class="cellTemplate template">
+                  <div class="ctext cell"></div>
+                </div>
+	            </div> 
+		        </div>
+		      
+		      
+		      
+	          
+	          
+	        </form>
+		      
+	        
+	      </div>
+	      
+	      <button class="stealFocus"></button>
+	      <!--
+	      <button onclick="back()" click_on_escape="">Back</button>
+	      -->
+	      
+	      <!--<button onclick="">Reset</button>-->
+	      
+	      <button onclick="saveSettings();backWarnIfOverlappingKeyBinding()" click_on_escape="">Back</button>
+	      
+	      
+	      </div> <!-- scrollDivWrap -->
+	      
+	      
+		  </div>
+		  
+		  
+		</div>
+		
+		
+	</body>
+</rml>

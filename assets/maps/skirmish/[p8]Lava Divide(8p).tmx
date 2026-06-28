@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="170" height="170" tilewidth="20" tileheight="20" nextobjectid="2">
+ <tileset firstgid="1" name="Mountain" tilewidth="20" tileheight="20" tilecount="35" columns="7">
+  <image source="terrain/bitmaps/mountain.png" trans="008a76" width="140" height="100"/>
+  <tile id="7">
+   <properties>
+    <property name="small-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="small-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="small-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="21">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="22">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="28">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="29">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="36" name="Snow" tilewidth="20" tileheight="20" tilecount="80" columns="8">
+  <image source="terrain/bitmaps/snow.png" trans="008a76" width="160" height="200"/>
+  <tile id="14">
+   <properties>
+    <property name="tree" value=""/>
+   </properties>
+  </tile>
+  <tile id="15">
+   <properties>
+    <property name="tree" value=""/>
+   </properties>
+  </tile>
+  <tile id="55">
+   <properties>
+    <property name="tree" value=""/>
+   </properties>
+  </tile>
+  <tile id="79">
+   <properties>
+    <property name="tree" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="116" name="Ice" tilewidth="20" tileheight="20" tilecount="10" columns="5">
+  <image source="terrain/bitmaps/ice.png" trans="008a76" width="100" height="40"/>
+  <tile id="9">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="126" source="terrain/Long Grass.tsx"/>
+ <tileset firstgid="176" source="terrain/Dirt.tsx"/>
+ <tileset firstgid="186" name="Shallow Water" tilewidth="20" tileheight="20" tilecount="6" columns="3">
+  <image source="terrain/bitmaps/shallowwater.png" trans="008a76" width="60" height="40"/>
+  <tile id="0">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="192" name="Water" tilewidth="20" tileheight="20" tilecount="1" columns="1">
+  <image source="terrain/bitmaps/water.png" trans="008a76" width="20" height="20"/>
+  <tile id="0">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="193" name="Deep Water" tilewidth="20" tileheight="20" tilecount="1" columns="1">
+  <image source="terrain/bitmaps/deepwater.png" trans="008a76" width="20" height="20"/>
+  <tile id="0">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="194" source="ridges/Mountain Mountain - Hill.tsx"/>
+ <tileset firstgid="215" source="ridges/Mountain Snow - Flat.tsx"/>
+ <tileset firstgid="236" source="ridges/Snow Ice - Ridge.tsx"/>
+ <tileset firstgid="257" name="Ice ShallowWater - Ridge" tilewidth="20" tileheight="20" tilecount="21" columns="3">
+  <image source="ridges/bitmaps/ice2shallowwater_ridge.png" trans="008a76" width="60" height="140"/>
+  <tile id="0">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="18">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="cliff" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="278" name="ShallowWater Water - Flat" tilewidth="20" tileheight="20" tilecount="21" columns="3">
+  <image source="ridges/bitmaps/shallowwater2water_flat.png" trans="008a76" width="60" height="140"/>
+  <tile id="0">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="18">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="water" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="299" source="ridges/Water DeepWater - Flat.tsx"/>
+ <tileset firstgid="320" source="ridges/LongGrass ShallowWater - Ridge.tsx"/>
+ <tileset firstgid="350" source="ridges/LongGrass Dirt - Flat.tsx"/>
+ <tileset firstgid="371" name="misc" tilewidth="20" tileheight="20" tilecount="24" columns="3">
+  <image source="bitmaps/misc.png" width="79" height="160"/>
+  <tile id="4">
+   <properties>
+    <property name="res_pool" value=""/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="team" value="none"/>
+    <property name="unit" value="tree"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="395" name="Ice Ice - Flat" tilewidth="20" tileheight="20" tilecount="21" columns="3">
+  <image source="ridges/bitmaps/ice2ice_flat.png" trans="008a76" width="60" height="140"/>
+  <tile id="0">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="18">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="416" name="Ice ShallowWater - Broken" tilewidth="20" tileheight="20" tilecount="21" columns="3">
+  <image source="ridges/bitmaps/ice2shallowwater_broken.png" trans="008a76" width="60" height="140"/>
+  <tile id="0">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="18">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="cliff-soft" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="437" source="ridges/Dirt ShalowWater - Ridge.tsx"/>
+ <tileset firstgid="458" source="ridges/Mountain ShallowWater - Ridge.tsx"/>
+ <tileset firstgid="479" source="ridges/Sand ShallowWater - Ridge.tsx"/>
+ <tileset firstgid="500" source="ridges/Snow Snow - ridge.tsx"/>
+ <tileset firstgid="521" source="units.tsx"/>
+ <tileset firstgid="800" name="Sand" tilewidth="20" tileheight="20" tilecount="42" columns="7">
+  <image source="terrain/bitmaps/sand.png" trans="008a76" width="140" height="120"/>
+  <tile id="28">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="29">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="31">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="35">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="36">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="38">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+  <tile id="40">
+   <properties>
+    <property name="large-rock" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="842" source="ridges/LongGrass ShallowWater - Flat.tsx"/>
+ <tileset firstgid="863" source="ridges/Mountain LongGrass - Flat.tsx"/>
+ <tileset firstgid="884" source="ridges/Mountain Sand - Flat.tsx"/>
+ <tileset firstgid="905" source="terrain/Sand.tsx"/>
+ <tileset firstgid="947" source="terrain/Lava.tsx"/>
+ <tileset firstgid="968" source="ridges/LongGrass LongGrass - Ridge.tsx"/>
+ <layer name="Ground" width="170" height="170">
+  <data encoding="base64" compression="gzip">
+   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
+  </data>
+ </layer>
+ <layer name="Items" width="170" height="170">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3d60rEMBAG0O4ze788vAURiixCa9J8k54D/StpM/Otxi2zLAAAAAAAAEAvD7dleVyvp9volYz1eZH7r7rfz+t6X9brtdi6Oabqfr+t631fr4/wdVfNgTRV9ruq1BzQP2yl5kBq/8BWav8AAAAAAAAApDn6/darfC+WsfbUmZoEAAAAAAAAAAAAAAAAAOjL+5wA55K7nEm9AYwlhznCzLt9PK8x0mbepddB2vPqJW0f0mbepddB2vPqJX0fRrtKHaSzDwDcs/ecybkUwN9+cvJ3XspPqlGzpNjWoroEAAAAAAAAgLH8755k6hMAAAAAAAAAAAAAAAAAAIDWZniXPW0uMNxjLnAbs/R76n2YC9zGLP0+y330kNrDe8zS77PcRw96mAr0MABAWzOc9wMAAAAAAAAAAAAAAAAA8/IuJMD/yVIAZuDzjGq2Nat+Ab7JQ0brXYNqHJidnGvj6N+LM8w8aU1N5jHzhArMPIHafP4DAHA11X4Hdo6Zq1ot9eQcM1OLGj36MxKzyzlmDWdmq+yaT0L2tK5h2TUf2UMFsgcAAAAAAAAA4Lq+ADr4uueQwwEA
+  </data>
+ </layer>
+ <layer name="Units" width="170" height="170" opacity="0.92">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3duw2DQBAFQERIQjkk7oSEBkjoxAkFmF+bSG7AWIDg2JkKLni3T7rgNssAAAAAAPjXkF99Ap6glyOAJHzMaw7wliMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASU568i+9l1x8AhFHpfQ5QyBEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAujX3RAMnozGwggNqsg6/WXQAAAAAAAAAAAAAAAAAAAAAAAAAAAADYbPK3MwCEMep9AAAAAIDbWbzdAkAYs94HAAAAAAAAAOCHFahGf2+QwwEA
+  </data>
+ </layer>
+ <objectgroup name="Triggers">
+  <object id="1" name="map_info" x="400" y="441" width="203" height="122">
+   <properties>
+    <property name="type" value="skirmish"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer name="set" width="170" height="170" opacity="0.28">
+  <data encoding="base64" compression="gzip">
+   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
+  </data>
+ </layer>
+</map>

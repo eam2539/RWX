@@ -1,0 +1,301 @@
+<rml>
+	<head>
+		<title>Message</title>
+		<link type="text/rcss" href="rkt.rcss"/>
+		<link type="text/rcss" href="common.rcss"/>
+		<link type="text/rcss" href="forms.rcss"/>
+		<style>
+			
+			body
+			{
+				/*width: 100%;*/
+				
+				/*height: 545px;*/
+		    
+				/*width: 620px;*/
+				
+				
+				/*height: 100%;*/
+				
+				height: 500px;
+				width: 670px;
+		  }
+		  
+			
+			
+			.middle
+			{
+			
+			  
+			}
+			
+			
+			
+			.mainButtons
+			{
+			  margin: auto;
+			  width:15em;
+			}
+			
+			.formSection
+			{
+			  /*float:left;*/
+			  
+			  border-style: solid;
+			  border-width: 1px;
+			  border-color: gray;
+			  width:7em;
+			  margin:2px;
+			  
+			  margin: 0 auto;
+			  
+			  
+			  
+			}
+		  
+		  
+		  .background
+		  {
+		    background:rgba(205,205,205,230);
+		    border-style: solid;
+			  border-width: 3px;
+			  border-color: rgba(70,70,70,255);
+		    
+		    
+		    border-top:    3px rgba(120,120,120,255) solid;
+		    border-left:   3px rgba(90 ,90 ,90 ,255) solid;
+		    border-bottom: 3px rgba(20 ,20 ,20 ,255) solid;
+		    border-right:  3px rgba(70 ,70 ,70 ,255) solid;
+		    
+		    
+		    color:black;
+		    
+		    /*
+		    color:white;
+		    
+		    background-decorator: tiled-box;
+        background-left-image-src: drawable:metal_dark.png;
+		    background-left-image-repeat: repeat-truncate;
+		    
+		    background-center-image-src: drawable:metal_dark.png;
+		    background-center-image-repeat: repeat-truncate;
+		    
+		    background-bottom-image-src: drawable:metal_dark.png;
+		    background-bottom-image-repeat: repeat-truncate;
+		    */
+		    
+		  }
+		  
+		  .oldStyle #title
+		  {
+		    display:block;
+		    background:rgba(205,205,205,255);
+		    
+		    width:100%;
+		    
+		    text-align:center;
+		  }
+		  
+		  .panelStyle #title
+		  {
+		    display:block;
+		    /*background:rgba(205,205,205,50);*/
+		    
+		    width:100%;
+		    
+		    text-align:center;
+		    
+		    
+		    color:white;
+		    header-font-effect: shadow;
+        
+        header-width: 2px;
+        
+        header-offset: 2px 2px;
+        header-color: gray;
+		    
+		    
+		  }
+		  
+		  .oldStyle #message
+		  {
+		    color:black;
+		    
+		    margin:10px;
+		    margin-bottom:2px;
+		    
+		    white-space: pre-wrap;
+		    
+		    font-size: 24;
+		  }
+		  
+		  .panelStyle #message
+		  {
+		    color:white;
+		    
+		    margin:10px;
+		    margin-bottom:2px;
+		    
+		    /*white-space: pre-wrap;*/
+		    
+		    font-size: 22;
+		    
+		    
+		    /*border-width: 1px;
+        border-color: rgba(255,0,0,255);*/
+        
+        /*text-align:center;*/
+        
+  
+		  }
+		  
+		  .messageWrap
+		  {
+		    max-height: 450px;
+        overflow-y: auto;
+		  }
+		  
+		  .panelStyle .styledText
+		  {
+		    color:white;
+		  }
+		  
+      .background
+      {
+        padding:0;
+		  }
+		  
+		  .mainButtons
+		  {
+		    padding:10px;
+		  }
+		  
+		  .mainButtons button
+		  {
+		    padding:2px 3px;
+		    margin:0px 3px;
+		    
+		    /*
+		    background:rgba(105,105,105,255);
+		    border-top:    3px rgba(120,120,120,255) solid;
+		    border-left:   3px rgba(90 ,90 ,90 ,255) solid;
+		    border-bottom: 3px rgba(20 ,20 ,20 ,255) solid;
+		    border-right:  3px rgba(70 ,70 ,70 ,255) solid;
+		    header-font-effect: outline;
+        header-color: gray;
+        */
+        
+        background:rgba(105,105,105,255);
+        border-width: 1px;
+        border-color: rgba(0,0,0,255);
+        
+		  }
+		  
+		  #textInputWrapper
+		  {
+		    /*margin: 0 auto;*/
+		    width: 90%;
+		  }
+		  
+		  .selectDiv,
+      .inputDiv
+      {
+        /*margin-top:0px;*/
+        /*font-size: 25;*/
+      }
+      
+      .selectDiv input,
+      .inputDiv input
+      {
+        width: 100%;
+        font-size: 26;
+      }
+      
+      .selectDiv label,
+      .inputDiv label
+      {
+        float:left;
+        white-space: nowrap;
+        
+        /*width:2em;*/
+			  
+			  margin-top:13px;
+			  padding-right:6px;
+      }
+		  
+		  .noStyleInPopup
+		  {
+		    padding:0;
+		    margin:0;
+		    
+	      background-decorator: none;
+		    
+		  }
+		  
+		  
+		  .smallmessage
+      {
+        font-size: 18;
+        white-space: pre-wrap;
+        line-height:1.0em;
+        
+        padding:5px;
+      }
+		  
+		  
+		  .green
+	    {
+	      color: #00FF00FF;
+	    }
+	    
+	    .red
+	    {
+	      color: #FF0000FF;
+	    }
+		  
+      .hide
+      {
+        display: none;
+      }
+		  
+		</style>
+	</head>
+	<body onshow="" style="">
+		
+		<!-- old
+		<div class="shadow_outer"><div class="shadow_inner">
+		  <div class="background">
+	  -->
+	  <div class="middle"><div class="">
+		  <div class="panelMainNoAlpha panelStyle">
+	  
+	      <h2 id="title" class="titleInPanel"></h2>
+	      
+	      <div class="messageWrap">
+          <div id="message"></div>
+        </div>
+        
+        <div id="textInputWrapper" class="inputDiv hide textinputUnicodeWrap" >
+          <label for="textInput"></label><input type="text" id="textInput" />
+        </div>
+
+        
+        
+        
+        
+        <div id="mainButtons" class="mainBoxButtons" style="padding:8px;">
+          <button class="stealFocus"></button>
+        
+          <button id="button_back" class="boxButton">${i:menus.common.cancel}</button>
+        
+          <button id="button_1" class="boxButton">1</button>
+        
+          <button id="button_2" class="boxButton">2</button>
+        
+          
+        </div>
+		  </div>
+		</div></div>
+		
+	</body>
+</rml>

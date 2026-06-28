@@ -1,0 +1,1527 @@
+package com.corrodinggames.rts.gameFramework.mission;
+
+import com.corrodinggames.rts.game.PlayerTeam;
+import com.corrodinggames.rts.game.ai.AIController;
+import com.corrodinggames.rts.game.map.MapLoadException;
+import com.corrodinggames.rts.game.map.MapObject;
+import com.corrodinggames.rts.game.map.MapObjectLayer;
+import com.corrodinggames.rts.game.units.*;
+import com.corrodinggames.rts.game.units.buildings.CommandCenter;
+import com.corrodinggames.rts.game.units.buildings.ResourceExtractor;
+import com.corrodinggames.rts.game.units.buildings.turrets.TurretFactory;
+import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
+import com.corrodinggames.rts.game.units.custom.LocaleString;
+import com.corrodinggames.rts.gameFramework.GameEngine;
+import com.corrodinggames.rts.gameFramework.Serializable;
+import com.corrodinggames.rts.gameFramework.Utility;
+import com.corrodinggames.rts.gameFramework.effects.EffectManager;
+import com.corrodinggames.rts.gameFramework.effects.SpriteSheet;
+import com.corrodinggames.rts.gameFramework.network.GameInputStream;
+import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
+import com.corrodinggames.rts.gameFramework.network.NetworkEngine;
+import io.github.rwx.geometry.PointF;
+import io.github.rwx.render.canvas.KoolPaint;
+import io.github.rwx.render.canvas.KoolTypeface;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+/* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.n.f */
+/* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/n/f.class */
+public class MissionEngine extends Serializable {
+    public static boolean a = false;
+    int b;
+    int c;
+    PlayerTeam d;
+    WaveSpawnMode e;
+    public LocaleString h;
+    boolean i;
+    boolean j;
+    public boolean k;
+    public boolean l;
+    boolean m;
+    boolean n;
+    boolean o;
+    boolean p;
+    public boolean q;
+    public KoolPaint E;
+    public KoolPaint F;
+    public KoolPaint G;
+    public KoolPaint H;
+    public boolean N;
+    WaveSpawnMode f = WaveSpawnMode.allUnitsAndBuildings;
+    public ArrayList g = new ArrayList();
+    public int r = 0;
+    String s = null;
+    String t = null;
+    int u = 0;
+    int v = 2;
+    int w = 1;
+    int x = 0;
+    public int y = 0;
+    float z = 3000.0f;
+    float A = 0.0f;
+    float B = 0.0f;
+    MissionMode C = MissionMode.normal;
+    ArrayList D = new ArrayList();
+    final boolean I = true;
+    public ArrayList<MapTrigger> J = new ArrayList();
+    PointF K = new PointF();
+    int L = 0;
+    float M = 0.0f;
+    public ArrayList O = new ArrayList();
+    PointF P = new PointF();
+    boolean Q = false;
+    boolean R = false;
+    ArrayList S = new ArrayList();
+    ArrayList T = new ArrayList();
+    AreaControlMode areaControlMode;
+    MapPortalMode mapPortalMode;
+    boolean areaControlEditorModified;
+
+    public void a(String str) {
+        GameEngine.log("MissionEngine", "Map warning: " + str);
+        NetworkEngine.a((String) null, "Map error: " + str);
+    }
+
+    @Override // com.corrodinggames.rts.gameFramework.Serializable
+    public void a(GameOutputStream gameOutputStream) throws IOException {
+        gameOutputStream.writeBoolean(this.j);
+        gameOutputStream.writeInt(this.r);
+        gameOutputStream.writeInt(this.u);
+        gameOutputStream.writeInt(this.v);
+        gameOutputStream.writeInt(this.w);
+        gameOutputStream.writeInt(this.x);
+        gameOutputStream.writeFloat(this.z);
+        gameOutputStream.writeFloat(this.A);
+        gameOutputStream.writeFloat(this.B);
+        gameOutputStream.writeBoolean(this.m);
+        boolean hasAreaControlMode = this.areaControlMode != null && this.areaControlMode.getZoneCount() > 0;
+        boolean hasMapPortalMode = this.mapPortalMode != null && this.mapPortalMode.getPortalCount() > 0;
+        int missionStateVersion = (hasAreaControlMode || hasMapPortalMode) ? 8 : 6;
+        gameOutputStream.writeInt(missionStateVersion);
+        gameOutputStream.writeInt(this.J.size());
+        for (MapTrigger mapTrigger : this.J) {
+            gameOutputStream.writeStringUTF(mapTrigger.c);
+            gameOutputStream.writeBoolean(mapTrigger.j);
+            gameOutputStream.writeInt(mapTrigger.k);
+            gameOutputStream.writeInt(mapTrigger.l);
+            gameOutputStream.writeBoolean(mapTrigger.m);
+            gameOutputStream.writeInt(mapTrigger.n);
+        }
+        gameOutputStream.writeInt(this.y);
+        gameOutputStream.writeBoolean(this.l);
+        if (missionStateVersion >= 7) {
+            gameOutputStream.writeBoolean(hasAreaControlMode);
+            if (hasAreaControlMode) {
+                if (missionStateVersion >= 8) {
+                    this.areaControlMode.writeSnapshot(gameOutputStream);
+                } else {
+                    this.areaControlMode.writeState(gameOutputStream);
+                }
+            }
+        }
+        if (missionStateVersion >= 8) {
+            gameOutputStream.writeBoolean(hasMapPortalMode);
+            if (hasMapPortalMode) {
+                this.mapPortalMode.writeSnapshot(gameOutputStream);
+            }
+        }
+    }
+
+    public void a(GameInputStream gameInputStream) throws IOException {
+        this.j = gameInputStream.readBoolean();
+        this.r = gameInputStream.readInt();
+        this.u = gameInputStream.readInt();
+        this.v = gameInputStream.readInt();
+        this.w = gameInputStream.readInt();
+        this.x = gameInputStream.readInt();
+        this.z = gameInputStream.readFloat();
+        this.A = gameInputStream.readFloat();
+        this.B = gameInputStream.readFloat();
+        this.m = gameInputStream.readBoolean();
+        int i = gameInputStream.readInt();
+        if (i >= 1) {
+            int i2 = gameInputStream.readInt();
+            for (int i3 = 0; i3 < i2; i3++) {
+                String utf = gameInputStream.readUTF();
+                boolean z = gameInputStream.readBoolean();
+                int i4 = 0;
+                int i5 = 0;
+                boolean z2 = false;
+                int i6 = 0;
+                if (i >= 2) {
+                    i4 = gameInputStream.readInt();
+                    i5 = gameInputStream.readInt();
+                }
+                if (i >= 3) {
+                    z2 = gameInputStream.readBoolean();
+                }
+                if (i >= 4) {
+                    i6 = gameInputStream.readInt();
+                }
+                MapTrigger mapTriggerE = e(utf);
+                if (mapTriggerE == null) {
+                    GameEngine.logColored("MissionEngine:readIn: Could not find saved trigger:" + utf + " for de/activation");
+                } else {
+                    mapTriggerE.j = z;
+                    mapTriggerE.k = i4;
+                    mapTriggerE.l = i5;
+                    mapTriggerE.m = z2;
+                    mapTriggerE.n = i6;
+                }
+            }
+        }
+        if (i >= 5) {
+            this.y = gameInputStream.readInt();
+        }
+        if (i >= 6) {
+            this.l = gameInputStream.readBoolean();
+        } else {
+            this.l = true;
+        }
+        if (i >= 7) {
+            boolean hasAreaControlMode = gameInputStream.readBoolean();
+            if (hasAreaControlMode) {
+                if (i >= 8) {
+                    this.areaControlMode = AreaControlMode.readSnapshot(gameInputStream, GameEngine.getInstance().tileMap.objectsLayer);
+                } else if (this.areaControlMode != null) {
+                    this.areaControlMode.readState(gameInputStream);
+                } else {
+                    AreaControlMode.skipState(gameInputStream);
+                }
+            }
+        }
+        if (i >= 8) {
+            boolean hasMapPortalMode = gameInputStream.readBoolean();
+            if (hasMapPortalMode) {
+                this.mapPortalMode = MapPortalMode.readSnapshot(gameInputStream, GameEngine.getInstance().tileMap.objectsLayer);
+            } else {
+                this.mapPortalMode = null;
+            }
+        }
+    }
+
+    public void b(String str) {
+        GameEngine.log("MissionEngine:triggerLog", str);
+    }
+
+    public boolean a() {
+        return this.n;
+    }
+
+    public boolean b() {
+        return this.o;
+    }
+
+    public void a(final boolean boolean1) throws MapLoadException {
+        final GameEngine instance = GameEngine.getInstance();
+        this.areaControlMode = null;
+        this.mapPortalMode = null;
+        this.areaControlEditorModified = false;
+        this.q = false;
+        this.b = instance.gameTimeMillis - 1000;
+        this.c = instance.gameTimeMillis - 1000;
+        (this.E = new KoolPaint()).a(255, 255, 255, 255);
+        this.E.a(true);
+        this.E.a(KoolPaint.Align.CENTER);
+        this.E.a(KoolTypeface.a(KoolTypeface.c, 1));
+        instance.updatePaintTextSize(this.E, 24.0f);
+        (this.G = new KoolPaint()).a(255, 255, 255, 255);
+        this.G.a(true);
+        this.G.a(KoolPaint.Align.CENTER);
+        instance.updatePaintTextSize(this.G, 18.0f);
+        (this.H = new KoolPaint()).a(255, 255, 255, 255);
+        this.H.a(true);
+        this.H.a(KoolPaint.Align.CENTER);
+        instance.updatePaintTextSize(this.H, 14.0f);
+        (this.F = new KoolPaint()).a(this.H);
+        instance.updatePaintTextSize(this.F, 18.0f);
+        this.j = true;
+        boolean b = false;
+        MapObject objectByName = null;
+        if (instance.tileMap.objectsLayer == null) {
+            GameEngine.log("MissionEngine", "Error: 'triggers' object layer is missing from this map");
+            b = true;
+        } else {
+            objectByName = instance.tileMap.objectsLayer.findObjectByName("map_info");
+        }
+        if (objectByName == null) {
+            GameEngine.log("MissionEngine", "Error: map_info is missing from this map");
+            b = true;
+        }
+        if (objectByName != null && objectByName.getDescription("type") == null) {
+            this.a("type is missing from map_info");
+            b = true;
+        }
+        if (b) {
+            GameEngine.log("MissionEngine", "Defaulting to skirmish");
+            this.n = true;
+            this.e = WaveSpawnMode.noConstructionOrTech;
+            return;
+        }
+        final String rwxMode = AreaControlMode.readMode(objectByName);
+        final boolean areaControlMap = AreaControlMode.isAreaControlMode(rwxMode);
+        if (rwxMode != null && !areaControlMap) {
+            throw new MapLoadException("Unsupported RWX map mode: " + rwxMode);
+        }
+        if (areaControlMap && !isRwxMapModeAllowed(instance)) {
+            throw new MapLoadException("RWX areaControl maps can FastArrayList used in single-player or RWX P2P multiplayer only");
+        }
+        this.k = "survival".equalsIgnoreCase(objectByName.getDescription("type"));
+        if (this.k) {
+            this.l = "true".equalsIgnoreCase(objectByName.getDescription("survivalWavesClassic"));
+            if (this.l) {
+                GameEngine.log("Classic survial waves selected");
+            }
+            this.f();
+            this.p = false;
+            this.y = instance.settingsEngine.aiDifficulty;
+            if (!this.l) {
+                this.z = 1200.0f;
+                if (this.y < 0) {
+                    this.z = 3000.0f;
+                }
+            } else {
+                this.z = 3000.0f;
+            }
+        }
+        final String description = objectByName.getDescription("survivalWaves");
+        if (description != null) {
+            this.g(description);
+        }
+        final String description2 = objectByName.getDescription("startWithMusic");
+        if (description2 != null) {
+            instance.musicManager.playMusic(description2);
+        }
+        this.n = "skirmish".equalsIgnoreCase(objectByName.getDescription("type"));
+        if (this.n) {
+            this.e = WaveSpawnMode.noConstructionOrTech;
+        }
+        this.o = "true".equalsIgnoreCase(objectByName.getDescription("shareFogWithAllies"));
+        final String description3 = objectByName.getDescription("winCondition");
+        if (description3 == null && !this.n && !areaControlMap) {
+            throw new MapLoadException("win condition not set");
+        }
+        if (description3 != null) {
+            if (description3.equalsIgnoreCase("none")) {
+                this.e = WaveSpawnMode.none;
+            } else if (description3.equalsIgnoreCase("allUnitsAndBuildings")) {
+                this.e = WaveSpawnMode.allUnitsAndBuildings;
+            } else if (description3.equalsIgnoreCase("allBuildings")) {
+                this.e = WaveSpawnMode.allBuildings;
+            } else if (description3.equalsIgnoreCase("mainBuilings")) {
+                this.e = WaveSpawnMode.mainBuildings;
+            } else if (description3.equalsIgnoreCase("mainBuildings")) {
+                this.e = WaveSpawnMode.mainBuildings;
+            } else if (description3.equalsIgnoreCase("commandCenter")) {
+                this.e = WaveSpawnMode.commandCenter;
+            } else {
+                if (!description3.equalsIgnoreCase("requiredObjectives")) {
+                    throw new MapLoadException("unknown win condition:" + description3);
+                }
+                this.e = WaveSpawnMode.requiredObjectives;
+            }
+        }
+        if (this.n) {
+            this.f = this.e;
+        }
+        if (areaControlMap) {
+            this.e = WaveSpawnMode.none;
+            this.f = WaveSpawnMode.none;
+        }
+        this.h = objectByName.createLocaleStringFromProperty("introText", null);
+        if (this.h != null) {
+            this.h.wrapSingleText("\\\\n", "\n");
+            if (this.h.isEmpty()) {
+                this.h = null;
+            }
+        }
+        if (!instance.isInNetworkOrReplay() && !this.n) {
+            this.d = PlayerTeam.k(3);
+            if (this.d != null) {
+                this.d.teamColorId = 0;
+            }
+        }
+        if (instance.isInNetworkOrReplay()) {
+        }
+        for (final MapObject mapObject : instance.tileMap.objectsLayer.mapObjects) {
+            if ("team_info".equalsIgnoreCase(mapObject.type)) {
+                final int int1 = Integer.parseInt(mapObject.getPropertyOrDefault("team", "-2"));
+                if (int1 == -2) {
+                    throw new RuntimeException("cannot find team for:" + mapObject.name);
+                }
+                final PlayerTeam k = PlayerTeam.k(int1);
+                if (k == null) {
+                    GameEngine.logColored("No team loaded for:" + int1 + " skipping");
+                    continue;
+                }
+                final Integer integerProperty = mapObject.getIntegerProperty("credits");
+                if (integerProperty != null) {
+                    k.credits = integerProperty;
+                }
+                if (mapObject.getDescription("basicAI") != null && instance.isSinglePlayerGame() && k instanceof AIController) {
+                    GameEngine.logColored("Using basic AI:" + int1 + " by map request");
+                    ((AIController) k).isAggressive = true;
+                }
+                final String description4 = mapObject.getDescription("lockAiDifficulty");
+                if (description4 != null && k instanceof AIController) {
+                    GameEngine.logColored("Locking lockAiDifficulty:" + int1 + " by map request to: " + description4);
+                    final AIController aiController = (AIController) k;
+                    aiController.teamPingTime = Integer.parseInt(description4);
+                    aiController.isTeamLocked = true;
+                    instance.networkEngine.updateAiTeamNames();
+                }
+                if (mapObject.getDescription("disabledAI") != null && instance.isSinglePlayerGame() && k instanceof AIController) {
+                    GameEngine.logColored("Disabling AI:" + int1 + " by map request");
+                    ((AIController) k).canBuild = true;
+                }
+                final String description5 = mapObject.getDescription("allyGroup");
+                if (description5 != null && instance.isSinglePlayerGame()) {
+                    k.teamColorId = Integer.parseInt(description5);
+                }
+                final String description6 = mapObject.getDescription("ai");
+                if (description6 != null) {
+                    k.isTeamObserver = description6.equalsIgnoreCase("survival");
+                }
+            }
+            if ("camera_start".equalsIgnoreCase(mapObject.name) && !boolean1) {
+                instance.centerViewpoint(mapObject.x, mapObject.y);
+                this.q = true;
+                final Integer integerProperty2 = mapObject.getIntegerProperty("zoomTo");
+                if (integerProperty2 != null) {
+                    instance.targetZoom = integerProperty2;
+                }
+            }
+            if ("attack_point".equalsIgnoreCase(mapObject.name)) {
+                this.D.add(new PointF(mapObject.x, mapObject.y));
+            }
+            if ("rotate".equalsIgnoreCase(mapObject.type)) {
+                final float float1 = Float.parseFloat(mapObject.getDescription("dir"));
+                for (final BaseUnit am : BaseUnit.bE) {
+                    if (am instanceof OrderableUnit && !am.bI() && mapObject.containsUnitPosition(am)) {
+                        am.rotationSpeed = float1;
+                    }
+                }
+            }
+            if ("fall".equalsIgnoreCase(mapObject.type)) {
+                for (final BaseUnit am2 : BaseUnit.bE) {
+                    if (am2 instanceof OrderableUnit && !am2.bI() && mapObject.containsUnitPosition(am2)) {
+                        am2.startFalling();
+                    }
+                }
+            }
+            if ("set_team".equalsIgnoreCase(mapObject.type)) {
+                final int unitSelected = Integer.parseInt(mapObject.getDescription("team"));
+                for (final BaseUnit am3 : BaseUnit.bE) {
+                    if (am3 instanceof OrderableUnit && mapObject.containsUnitPosition(am3)) {
+                        am3.setUnitSelected(unitSelected);
+                    }
+                }
+            }
+            if ("ai_allow_full_use".equalsIgnoreCase(mapObject.type)) {
+                for (final BaseUnit am4 : BaseUnit.bE) {
+                    if (am4 instanceof OrderableUnit && mapObject.containsUnitPosition(am4)) {
+                        ((OrderableUnit) am4).isActive = false;
+                    }
+                }
+            }
+            if ("disable_unit_ai".equalsIgnoreCase(mapObject.type)) {
+                for (final BaseUnit am5 : BaseUnit.bE) {
+                    if (am5 instanceof OrderableUnit && mapObject.containsUnitPosition(am5)) {
+                        am5.isAIUnit = true;
+                    }
+                }
+            }
+        }
+        for (final BaseUnit baseUnit : BaseUnit.bE) {
+            if (!baseUnit.u() && !(baseUnit instanceof Tree) && !baseUnit.bI() && baseUnit.unitTransportTarget == null && baseUnit.parentEntity == null) {
+                BaseUnit baseUnit2 = null;
+                float float1 = 4900.0f;
+                for (final BaseUnit baseUnit3 : BaseUnit.bE) {
+                    if (baseUnit3.canTransportUnits() && baseUnit != baseUnit3 && (baseUnit.team == PlayerTeam.TEAM_ALL || baseUnit3.team.d(baseUnit.team))) {
+                        final float distanceSq = Utility.distanceSq(baseUnit3.posX, baseUnit3.posY, baseUnit.posX, baseUnit.posY);
+                        if (distanceSq >= float1 || !baseUnit3.d(baseUnit, true)) {
+                            continue;
+                        }
+                        baseUnit2 = baseUnit3;
+                        float1 = distanceSq;
+                    }
+                }
+                if (baseUnit2 == null) {
+                    continue;
+                }
+                baseUnit2.e(baseUnit, true);
+            }
+        }
+        if (areaControlMap) {
+            this.areaControlMode = AreaControlMode.fromMap(objectByName, instance.tileMap.objectsLayer);
+            GameEngine.log("MissionEngine", "RWX areaControl mode enabled");
+        }
+        if (MapPortalMode.hasMapLinks(objectByName, instance.tileMap.objectsLayer)) {
+            this.mapPortalMode = MapPortalMode.fromMap(objectByName, instance.tileMap.objectsLayer);
+            GameEngine.log("MissionEngine", "RWX map links enabled with " + this.mapPortalMode.getPortalCount() + " portals");
+        }
+        this.J.clear();
+        for (final MapObject a : instance.tileMap.objectsLayer.mapObjects) {
+            if (!"team_info".equalsIgnoreCase(a.type) && !"point".equalsIgnoreCase(a.type) && !"camera_pan".equalsIgnoreCase(a.type) && !"camera_start".equalsIgnoreCase(a.name) && !"map_info".equalsIgnoreCase(a.name) && !"attack_point".equalsIgnoreCase(a.name) && !"rotate".equalsIgnoreCase(a.type) && !"fall".equalsIgnoreCase(a.type) && !"set_team".equalsIgnoreCase(a.type) && !"ai_allow_full_use".equalsIgnoreCase(a.type) && !"disable_unit_ai".equalsIgnoreCase(a.type) && !AreaControlMode.isControlZoneObject(a) && !MapPortalMode.isPortalObject(a)) {
+                if ("info".equalsIgnoreCase(a.type)) {
+                    continue;
+                }
+                if (a.properties == null) {
+                    c("Error: Skipping trigger:" + a.name + " - no properties found");
+                } else {
+                    final MapTrigger a2 = TriggerFactory.a(this, a);
+                    if (a2 == null) {
+                        continue;
+                    }
+                    this.J.add(a2);
+                }
+            }
+        }
+        for (final MapTrigger a3 : this.J) {
+            String s = a3.b("activateIds");
+            if (s == null) {
+                s = a3.b("alsoActivate");
+            }
+            if (s != null) {
+                final String[] split = s.split(",");
+                for (int length = split.length, i = 0; i < length; ++i) {
+                    final MapTrigger d = this.d(split[i]);
+                    if (d == null) {
+                        a3.g("linkedTo target not found: " + s);
+                        GameEngine.log("Possible IDs:");
+                        for (final MapTrigger mapTrigger : this.J) {
+                            if (mapTrigger.b != null) {
+                                GameEngine.log(mapTrigger.b);
+                            }
+                        }
+                        GameEngine.log("--------");
+                    } else {
+                        d.d.a(a3);
+                    }
+                }
+            }
+            String s2 = a3.b("whenActivatedIds");
+            if (s2 == null) {
+                s2 = a3.b("activatedBy");
+            }
+            if (s2 != null) {
+                for (final String string : s2.split(",")) {
+                    final MapTrigger d2 = this.d(string);
+                    if (d2 == null) {
+                        a3.g("linkedFrom target not found: " + string);
+                    } else {
+                        a3.d.a(d2);
+                    }
+                }
+            }
+            final String b2 = a3.b("deactivatedBy");
+            if (b2 != null) {
+                for (final String string2 : b2.split(",")) {
+                    final MapTrigger d3 = this.d(string2);
+                    if (d3 == null) {
+                        a3.g("deactivatedBy: target not found: " + string2);
+                    } else {
+                        a3.e.a(d3);
+                    }
+                }
+            }
+        }
+        GameEngine.log("Found " + this.J.size() + " map triggers");
+        for (final MapTrigger mapTrigger2 : this.J) {
+            final String[] unvisitedPropertyNames = mapTrigger2.t.getUnvisitedPropertyNames();
+            for (int unitSelected = unvisitedPropertyNames.length, l = 0; l < unitSelected; ++l) {
+                mapTrigger2.g("Key was not used: " + unvisitedPropertyNames[l]);
+            }
+        }
+        this.c();
+    }
+
+    public void c() {
+        for (MapTrigger mapTrigger : this.J) {
+            if (mapTrigger.g == TriggerType.objective) {
+                boolean z = false;
+                Iterator it = this.g.iterator();
+                while (it.hasNext()) {
+                    if (((TriggerWrapper) it.next()).a == mapTrigger) {
+                        z = true;
+                    }
+                }
+                if (!z) {
+                    TriggerWrapper triggerWrapper = new TriggerWrapper();
+                    triggerWrapper.a = mapTrigger;
+                    this.g.add(triggerWrapper);
+                    GameEngine.log("Found objective: " + triggerWrapper.a());
+                }
+            }
+        }
+    }
+
+    public static void c(String str) {
+        GameEngine.getInstance();
+        GameEngine.log("MissionEngine", str);
+        NetworkEngine.reportDesync(str);
+    }
+
+    public MapTrigger d(String str) {
+        String strTrim = str.trim();
+        for (MapTrigger mapTrigger : this.J) {
+            if (mapTrigger.b != null && mapTrigger.b.equalsIgnoreCase(strTrim)) {
+                return mapTrigger;
+            }
+        }
+        return null;
+    }
+
+    public MapTrigger e(String str) {
+        String strTrim = str.trim();
+        for (MapTrigger mapTrigger : this.J) {
+            if (mapTrigger.c.equalsIgnoreCase(strTrim)) {
+                return mapTrigger;
+            }
+        }
+        return null;
+    }
+
+    public PointF f(String str) {
+        MapObjectLayer mapObjectLayer = GameEngine.getInstance().tileMap.objectsLayer;
+        if (mapObjectLayer != null) {
+            for (MapObject mapObject : mapObjectLayer.mapObjects) {
+                if ("point".equalsIgnoreCase(mapObject.type) && mapObject.normalizedName != null && mapObject.normalizedName.equalsIgnoreCase(str)) {
+                    this.K.a(mapObject.x, mapObject.y);
+                    return this.K;
+                }
+            }
+            return null;
+        }
+        return null;
+    }
+
+    public AreaControlMode ensureAreaControlEditorMode() {
+        if (this.areaControlMode == null) {
+            this.areaControlMode = AreaControlMode.createForEditor();
+        }
+        return this.areaControlMode;
+    }
+
+    public MapPortalMode ensureMapPortalEditorMode() {
+        if (this.mapPortalMode == null) {
+            this.mapPortalMode = MapPortalMode.createForEditor();
+        }
+        return this.mapPortalMode;
+    }
+
+    public boolean requestMapPortalJumpAt(float x, float y) {
+        return this.mapPortalMode != null && this.mapPortalMode.requestJumpAt(x, y);
+    }
+
+    public boolean hasMapPortalMode() {
+        return this.mapPortalMode != null && this.mapPortalMode.getPortalCount() > 0;
+    }
+
+    public float[] getMapPortalCenter(String portalId) {
+        return this.mapPortalMode == null ? null : this.mapPortalMode.getPortalCenter(portalId);
+    }
+
+    public String[] getMapPortalTargetMapIds() {
+        return this.mapPortalMode == null ? new String[0] : this.mapPortalMode.getTargetMapIds();
+    }
+
+    public int addAreaControlEditorZone(float x, float y, boolean circle) throws MapLoadException {
+        return addAreaControlEditorZone(x, y, circle, circle ? 320.0f : 420.0f, circle ? 320.0f : 260.0f);
+    }
+
+    public int addAreaControlEditorZone(float x, float y, boolean circle, float width, float height) throws MapLoadException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new MapLoadException("No map loaded");
+        }
+        if (width <= 0.0f || height <= 0.0f) {
+            throw new MapLoadException("RWX area zone size must FastArrayList greater than 0");
+        }
+        AreaControlMode mode = ensureAreaControlEditorMode();
+        MapObjectLayer layer = ensureAreaControlEditorObjectLayer(gameEngine);
+        int zoneIndex = mode.getZoneCount();
+        MapObject object = createAreaControlEditorObject(gameEngine, layer, zoneIndex, x, y, circle, width, height);
+        layer.mapObjects.add(object);
+        int count = mode.addEditorZone(object);
+        this.areaControlEditorModified = true;
+        return count;
+    }
+
+    public int addAreaControlEditorZoneBounds(float left, float top, float right, float bottom, boolean circle) throws MapLoadException {
+        float width = Math.abs(right - left);
+        float height = Math.abs(bottom - top);
+        if (circle) {
+            float diameter = Math.min(width, height);
+            if (diameter <= 0.0f) {
+                diameter = 320.0f;
+            }
+            float centerX = (left + right) * 0.5f;
+            float centerY = (top + bottom) * 0.5f;
+            return addAreaControlEditorZone(centerX, centerY, true, diameter, diameter);
+        }
+        if (width <= 0.0f) {
+            width = 420.0f;
+        }
+        if (height <= 0.0f) {
+            height = 260.0f;
+        }
+        float centerX = (left + right) * 0.5f;
+        float centerY = (top + bottom) * 0.5f;
+        return addAreaControlEditorZone(centerX, centerY, false, width, height);
+    }
+
+    public String removeAreaControlEditorZone(float x, float y) throws MapLoadException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new MapLoadException("No map loaded");
+        }
+        if (this.areaControlMode == null || this.areaControlMode.getZoneCount() == 0) {
+            return null;
+        }
+        MapObject removed = this.areaControlMode.removeEditorZoneAt(x, y);
+        if (removed == null) {
+            return null;
+        }
+        if (gameEngine.tileMap.objectsLayer != null && gameEngine.tileMap.objectsLayer.mapObjects != null) {
+            gameEngine.tileMap.objectsLayer.mapObjects.remove(removed);
+        }
+        this.areaControlEditorModified = true;
+        if (this.areaControlMode.getZoneCount() == 0) {
+            this.areaControlMode = null;
+        }
+        String id = removed.getDescription("id");
+        if (id == null || id.trim().length() == 0) {
+            id = removed.name;
+        }
+        if (id == null || id.trim().length() == 0) {
+            id = "zone";
+        }
+        return id;
+    }
+
+    public AreaControlMode.EditorZoneProperties getAreaControlEditorZone(float x, float y) throws MapLoadException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new MapLoadException("No map loaded");
+        }
+        if (this.areaControlMode == null || this.areaControlMode.getZoneCount() == 0) {
+            return null;
+        }
+        return this.areaControlMode.getEditorZonePropertiesAt(x, y);
+    }
+
+    public int getAreaControlEditorScoreLimit() throws MapLoadException {
+        if (this.areaControlMode == null || this.areaControlMode.getZoneCount() == 0) {
+            throw new MapLoadException("No RWX area control zones are active");
+        }
+        return this.areaControlMode.getScoreLimit();
+    }
+
+    public void updateAreaControlEditorScoreLimit(int scoreLimit) throws MapLoadException {
+        if (this.areaControlMode == null || this.areaControlMode.getZoneCount() == 0) {
+            throw new MapLoadException("No RWX area control zones are active");
+        }
+        this.areaControlMode.setEditorScoreLimit(scoreLimit);
+        this.areaControlEditorModified = true;
+    }
+
+    public String updateAreaControlEditorZone(float x, float y, AreaControlMode.EditorZoneProperties properties) throws MapLoadException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new MapLoadException("No map loaded");
+        }
+        if (this.areaControlMode == null || this.areaControlMode.getZoneCount() == 0) {
+            return null;
+        }
+        String id = this.areaControlMode.updateEditorZoneAt(x, y, properties);
+        if (id != null) {
+            this.areaControlEditorModified = true;
+        }
+        return id;
+    }
+
+    public int addMapPortalEditorPortal(float x, float y, boolean circle, float width, float height, String targetMapId, String targetPortalId) throws MapLoadException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new MapLoadException("No map loaded");
+        }
+        if (circle) {
+            float diameter = Math.min(width, height);
+            width = diameter;
+            height = diameter;
+        }
+        if (width <= 0.0f || height <= 0.0f) {
+            throw new MapLoadException("RWX map portal size must FastArrayList greater than 0");
+        }
+        MapPortalMode mode = ensureMapPortalEditorMode();
+        MapObjectLayer layer = ensureAreaControlEditorObjectLayer(gameEngine);
+        int portalIndex = mode.getPortalCount();
+        MapObject object = createMapPortalEditorObject(gameEngine, layer, portalIndex, x, y, circle, width, height, targetMapId, targetPortalId);
+        layer.mapObjects.add(object);
+        return mode.addEditorPortal(object);
+    }
+
+    public int addMapPortalEditorPortalBounds(float left, float top, float right, float bottom, boolean circle, String targetMapId, String targetPortalId) throws MapLoadException {
+        float width = Math.abs(right - left);
+        float height = Math.abs(bottom - top);
+        if (circle) {
+            float diameter = Math.min(width, height);
+            if (diameter <= 0.0f) {
+                diameter = 320.0f;
+            }
+            float centerX = (left + right) * 0.5f;
+            float centerY = (top + bottom) * 0.5f;
+            return addMapPortalEditorPortal(centerX, centerY, true, diameter, diameter, targetMapId, targetPortalId);
+        }
+        if (width <= 0.0f) {
+            width = 360.0f;
+        }
+        if (height <= 0.0f) {
+            height = 220.0f;
+        }
+        float centerX = (left + right) * 0.5f;
+        float centerY = (top + bottom) * 0.5f;
+        return addMapPortalEditorPortal(centerX, centerY, false, width, height, targetMapId, targetPortalId);
+    }
+
+    public String removeMapPortalEditorPortal(float x, float y) throws MapLoadException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new MapLoadException("No map loaded");
+        }
+        if (this.mapPortalMode == null || this.mapPortalMode.getPortalCount() == 0) {
+            return null;
+        }
+        MapObject removed = this.mapPortalMode.removeEditorPortalAt(x, y);
+        if (removed == null) {
+            return null;
+        }
+        if (gameEngine.tileMap.objectsLayer != null && gameEngine.tileMap.objectsLayer.mapObjects != null) {
+            gameEngine.tileMap.objectsLayer.mapObjects.remove(removed);
+        }
+        String id = removed.getDescription("id");
+        return id == null || id.trim().length() == 0 ? removed.name : id;
+    }
+
+    public MapPortalMode.EditorPortalProperties getMapPortalEditorPortal(float x, float y) throws MapLoadException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new MapLoadException("No map loaded");
+        }
+        if (this.mapPortalMode == null || this.mapPortalMode.getPortalCount() == 0) {
+            return null;
+        }
+        return this.mapPortalMode.getEditorPortalPropertiesAt(x, y);
+    }
+
+    public String updateMapPortalEditorPortal(float x, float y, MapPortalMode.EditorPortalProperties properties) throws MapLoadException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new MapLoadException("No map loaded");
+        }
+        if (this.mapPortalMode == null || this.mapPortalMode.getPortalCount() == 0) {
+            return null;
+        }
+        return this.mapPortalMode.updateEditorPortalAt(x, y, properties);
+    }
+
+    public void exportRwxEditorMap(String targetPath) throws MapLoadException, IOException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null || gameEngine.currentMapPath == null || gameEngine.currentMapPath.length() == 0) {
+            throw new IOException("No source map loaded");
+        }
+        AreaControlMode areaMode = this.areaControlMode;
+        MapPortalMode portalMode = this.mapPortalMode;
+        boolean hasAreaZones = areaMode != null && areaMode.getZoneCount() > 0;
+        boolean hasMapPortals = portalMode != null && portalMode.getPortalCount() > 0;
+        if (!hasAreaZones && !hasMapPortals && !this.areaControlEditorModified) {
+            throw new MapLoadException("Add at least one RWX area zone or map portal before saving");
+        }
+        gameEngine.tileMap.exportMapToPath(gameEngine.currentMapPath, targetPath);
+        if (hasAreaZones) {
+            areaMode.writeEditorZonesToPath(targetPath);
+        } else if (this.areaControlEditorModified) {
+            AreaControlMode.clearEditorZonesFromPath(targetPath);
+        }
+        if (hasMapPortals) {
+            portalMode.writeEditorPortalsToPath(targetPath);
+        }
+    }
+
+    private MapObjectLayer ensureAreaControlEditorObjectLayer(GameEngine gameEngine) throws MapLoadException {
+        if (gameEngine.tileMap.objectsLayer != null) {
+            return gameEngine.tileMap.objectsLayer;
+        }
+        try {
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element group = document.createElement("objectgroup");
+            group.setAttribute("name", "Triggers");
+            gameEngine.tileMap.objectsLayer = new MapObjectLayer(group, gameEngine.tileMap);
+            return gameEngine.tileMap.objectsLayer;
+        } catch (Exception e) {
+            throw new MapLoadException("Failed to create RWX editor object layer", e);
+        }
+    }
+
+    private MapObject createAreaControlEditorObject(GameEngine gameEngine, MapObjectLayer layer, int zoneIndex, float centerX, float centerY, boolean circle, float width, float height) throws MapLoadException {
+        try {
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element object = document.createElement("object");
+            String id = editorZoneId(zoneIndex);
+            object.setAttribute("id", String.valueOf(10000 + zoneIndex));
+            object.setAttribute("name", id);
+            object.setAttribute("type", AreaControlMode.CONTROL_ZONE_TYPE);
+            object.setAttribute("x", String.valueOf(centerX - (width * 0.5f)));
+            object.setAttribute("y", String.valueOf(centerY - (height * 0.5f)));
+            object.setAttribute("width", String.valueOf(width));
+            object.setAttribute("height", String.valueOf(height));
+
+            Element properties = document.createElement("properties");
+            addEditorProperty(document, properties, "id", id);
+            if (circle) {
+                addEditorProperty(document, properties, "shape", "circle");
+            }
+            addEditorProperty(document, properties, "captureTime", "8");
+            addEditorProperty(document, properties, "neutralizeTime", "4");
+            addEditorProperty(document, properties, "scoreRate", "1");
+            addEditorProperty(document, properties, "scoreInterval", "3");
+            addEditorProperty(document, properties, "groundOnly", "true");
+            object.appendChild(properties);
+            return new MapObject(object, gameEngine.tileMap, layer);
+        } catch (MapLoadException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MapLoadException("Failed to create RWX area control zone", e);
+        }
+    }
+
+    private MapObject createMapPortalEditorObject(GameEngine gameEngine, MapObjectLayer layer, int portalIndex, float centerX, float centerY, boolean circle, float width, float height, String targetMapId, String targetPortalId) throws MapLoadException {
+        try {
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element object = document.createElement("object");
+            String id = "portal" + (portalIndex + 1);
+            object.setAttribute("id", String.valueOf(11000 + portalIndex));
+            object.setAttribute("name", id);
+            object.setAttribute("type", MapPortalMode.PORTAL_OBJECT_TYPE);
+            object.setAttribute("x", String.valueOf(centerX - (width * 0.5f)));
+            object.setAttribute("y", String.valueOf(centerY - (height * 0.5f)));
+            object.setAttribute("width", String.valueOf(width));
+            object.setAttribute("height", String.valueOf(height));
+            Element properties = document.createElement("properties");
+            addEditorProperty(document, properties, "id", id);
+            addEditorProperty(document, properties, "targetMapId", targetMapId == null ? "" : targetMapId.trim());
+            addEditorProperty(document, properties, "targetPortalId", targetPortalId == null ? "" : targetPortalId.trim());
+            if (circle) {
+                addEditorProperty(document, properties, "shape", "circle");
+            }
+            object.appendChild(properties);
+            return new MapObject(object, gameEngine.tileMap, layer);
+        } catch (MapLoadException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MapLoadException("Failed to create RWX map portal", e);
+        }
+    }
+
+    private static void addEditorProperty(Document document, Element properties, String name, String value) {
+        Element property = document.createElement("property");
+        property.setAttribute("name", name);
+        property.setAttribute("value", value);
+        properties.appendChild(property);
+    }
+
+    private static String editorZoneId(int index) {
+        if (index >= 0 && index < 26) {
+            return String.valueOf((char) ('A' + index));
+        }
+        return "Z" + (index + 1);
+    }
+
+    public void a(float f) {
+        GameEngine.getInstance();
+    }
+
+    public void b(final float float1) {
+        final GameEngine instance = GameEngine.getInstance();
+        if (this.i) {
+            for (final MapTrigger mapTrigger : this.J) {
+                if (mapTrigger.g == TriggerType.mapText && mapTrigger.j) {
+                    float n = mapTrigger.b() - instance.viewpointXSnapped;
+                    float n2 = mapTrigger.c() - instance.viewpointYSnapped;
+                    n *= instance.zoom;
+                    n2 *= instance.zoom;
+                    n += mapTrigger.w;
+                    n2 += mapTrigger.x;
+                    if (mapTrigger.C) {
+                        final SpriteSheet spriteSheet = EffectManager.effectTemplates[9];
+                        spriteSheet.drawSprite(2, n, n2, mapTrigger.B);
+                        n2 -= spriteSheet.c - 2;
+                    }
+                    if (mapTrigger.z == null) {
+                        continue;
+                    }
+                    final String resolveText = mapTrigger.z.resolveText();
+                    if (resolveText == null) {
+                        continue;
+                    }
+                    if (resolveText.equals("")) {
+                        continue;
+                    }
+                    instance.renderGraphicsEngine.a(resolveText, n, n2, mapTrigger.B);
+                }
+            }
+        }
+        if (this.areaControlMode != null) {
+            this.areaControlMode.draw(this.G, this.H);
+        }
+        if (this.mapPortalMode != null) {
+            this.mapPortalMode.draw(this.H);
+        }
+        if (this.k && !this.N) {
+            final boolean b = true;
+            boolean b2 = false;
+            this.B = Utility.moveTowardsZero(this.B, float1);
+            if (this.B == 0.0f && this.A != 0.0f) {
+                this.A = Utility.moveTowardsZero(this.A, float1);
+                b2 = true;
+            }
+            if (b) {
+                if (b2) {
+                    final int n3 = (int) (23.0f + this.E.k() / 2.0f);
+                    instance.renderGraphicsEngine.a("- Wave " + this.r + " -", instance.currentScreenWidthPixels / 2.0f, (float) n3, this.E);
+                    if (this.s != null) {
+                        instance.renderGraphicsEngine.a(this.s, instance.currentScreenWidthPixels / 2.0f, n3 + this.E.k() + 2.0f, this.F);
+                    }
+                } else {
+                    final int n3 = (int) (23.0f + this.G.k() / 2.0f);
+                    String string = "Wave " + (this.r + 1) + " in " + Utility.padRight(String.valueOf((int) (this.z / 60.0)), 3);
+                    if (this.m) {
+                        string = "Defeat - Wave " + this.r;
+                    }
+                    instance.renderGraphicsEngine.a(string, instance.currentScreenWidthPixels / 2.0f, (float) n3, this.G);
+                    if (this.t == null) {
+                        WaveUnitGroup waveunits;
+                        if (!this.l) {
+                            waveunits = this.b(false);
+                        } else {
+                            waveunits = this.c(false);
+                        }
+                        this.t = waveunits.toString();
+                    }
+                    instance.renderGraphicsEngine.a(this.t, instance.currentScreenWidthPixels / 2.0f, n3 + this.G.k() + 2.0f, this.H);
+                }
+            }
+        }
+        if (this.k && this.N) {
+            final MissionWave d = this.d();
+            if (d != null) {
+                final int n4 = d.e - instance.gameTimeMillis / 1000;
+                final int n3 = (int) (23.0f + this.G.k() / 2.0f);
+                String string2 = "Wave " + (this.r + 1) + " in " + Utility.padRight(String.valueOf(n4), 3);
+                if (this.m) {
+                    string2 = "Defeat - Wave " + this.r;
+                }
+                instance.renderGraphicsEngine.a(string2, instance.currentScreenWidthPixels / 2.0f, (float) n3, this.G);
+                final String f = d.f;
+                if (f != null) {
+                    instance.renderGraphicsEngine.a(f, instance.currentScreenWidthPixels / 2.0f, n3 + this.G.k() + 2.0f, this.H);
+                }
+            }
+        }
+    }
+
+    public void g(String str) throws MapLoadException {
+        GameEngine.log("Loading survival waves");
+        this.N = true;
+        int i = 0;
+        int i2 = 0;
+        for (String str2 : str.split("\n")) {
+            i2++;
+            MissionWave waveVar = new MissionWave(this);
+            if (waveVar.a(str2)) {
+                waveVar.e = i + ((int) waveVar.d);
+                i = waveVar.e;
+                GameEngine.log("Adding wave " + i2 + " at " + waveVar.e);
+                this.O.add(waveVar);
+            }
+        }
+    }
+
+    public MissionWave d() {
+        if (this.r < this.O.size()) {
+            return (MissionWave) this.O.get(this.r);
+        }
+        return null;
+    }
+
+    public void e() {
+        this.R = true;
+        this.P.a((PointF) this.D.get(Utility.getDeterministicRandomIntInRange(0, this.D.size() - 1, this.r)));
+    }
+
+    public void f() {
+        this.S.clear();
+        a(this.S, "scout", 0.7f);
+        a(this.S, UnitTypeEnum.tank, 2.1f);
+        a(this.S, "mechGun", 1.0f);
+        a(this.S, "lightGunship", 2.8f);
+        a(this.S, UnitTypeEnum.hoverTank, 1.9f);
+        a(this.S, UnitTypeEnum.helicopter, 0.8f);
+        a(this.S, UnitTypeEnum.heavyTank, 1.0f);
+        a(this.S, UnitTypeEnum.heavyHoverTank, 0.8f);
+        a(this.S, UnitTypeEnum.gunShip, 0.7f);
+        a(this.S, "plasmaTank", 0.6f);
+        a(this.S, "missileAirship", 0.4f);
+        this.T.clear();
+        a(this.T, UnitTypeEnum.experimentalTank, 1.0f);
+        a(this.T, UnitTypeEnum.experimentalHoverTank, 0.5f);
+    }
+
+    public void a(ArrayList arrayList, String str, float f) {
+        a(arrayList, CustomUnitConfig.getUnitTypeByName(str), f);
+    }
+
+    public void a(ArrayList arrayList, UnitType unitType, float f) {
+        if (unitType == null) {
+            unitType = UnitTypeEnum.tank;
+        }
+        UnitType unitTypeC = CustomUnitConfig.c(unitType);
+        if (unitTypeC != null) {
+            unitType = unitTypeC;
+        }
+        WaveUnitSpawner waveUnitSpawner = new WaveUnitSpawner(this);
+        waveUnitSpawner.a = unitType;
+        waveUnitSpawner.b = f;
+        arrayList.add(waveUnitSpawner);
+    }
+
+    public void a(WaveUnitGroup waveunitsVar, int i, float f) {
+        if (i < 0) {
+            i = 0;
+        }
+        int size = this.S.size();
+        if (size == 0) {
+            GameEngine.logColored("error maxTypeNum: " + size);
+            return;
+        }
+        WaveUnitSpawner waveUnitSpawner = (WaveUnitSpawner) this.S.get(i % size);
+        int waveUnitCount = (int) Utility.pow((int) (((double) (i + 3)) * 0.5d * ((double) waveUnitSpawner.b) * ((double) f)), 0.8f);
+        if (waveUnitCount < 1) {
+            waveUnitCount = 1;
+        }
+        waveunitsVar.b(waveUnitSpawner.a, waveUnitCount);
+    }
+
+    public WaveUnitGroup b(boolean z) {
+        WaveUnitGroup waveunitsVar = new WaveUnitGroup(this);
+        boolean z2 = false;
+        if (this.u > 50 && (this.u + 1) % 100 == 0) {
+            int size = this.T.size();
+            int i = this.u / 100;
+            if (size == 0) {
+                GameEngine.logColored("error maxTypeNum: " + size);
+            } else {
+                WaveUnitSpawner waveUnitSpawner = (WaveUnitSpawner) this.T.get(i % size);
+                int i2 = (int) (i * waveUnitSpawner.b);
+                if (i2 < 1) {
+                    i2 = 1;
+                }
+                waveunitsVar.b(waveUnitSpawner.a, i2);
+            }
+            z2 = true;
+        }
+        int i3 = 0;
+        if (this.y > 0) {
+            i3 = this.y;
+        }
+        a(waveunitsVar, this.u + i3, 1.0f);
+        if (this.u > 15 && !z2) {
+            a(waveunitsVar, ((int) ((this.u + i3) * 1.1f)) - 11, 0.5f);
+        }
+        if (z) {
+            this.u++;
+            this.v++;
+        }
+        return waveunitsVar;
+    }
+
+    public WaveUnitGroup c(boolean z) {
+        WaveUnitGroup waveunitsVar = new WaveUnitGroup(this);
+        waveunitsVar.a = false;
+        int i = this.v;
+        UnitTypeEnum unitTypeEnum = null;
+        if (this.p) {
+            unitTypeEnum = UnitTypeEnum.ladybug;
+        } else {
+            if (this.u == 0) {
+                i++;
+                unitTypeEnum = UnitTypeEnum.tank;
+            }
+            if (this.u == 1) {
+                unitTypeEnum = UnitTypeEnum.hoverTank;
+            }
+            if (this.u == 2) {
+                unitTypeEnum = UnitTypeEnum.helicopter;
+            }
+            if (this.u == 3) {
+                i = this.w;
+                unitTypeEnum = UnitTypeEnum.heavyTank;
+            }
+            if (this.u == 4) {
+                i = this.w;
+                unitTypeEnum = UnitTypeEnum.heavyHoverTank;
+                if (this.w % 2 == 0) {
+                    unitTypeEnum = UnitTypeEnum.gunShip;
+                }
+            }
+            if (this.u == 5) {
+                waveunitsVar.a = true;
+                i = 1;
+                unitTypeEnum = UnitTypeEnum.experimentalTank;
+            }
+            if (z) {
+                this.u++;
+                boolean z2 = false;
+                if (this.w == 1) {
+                    if (this.u > 2) {
+                        z2 = true;
+                    }
+                } else if (this.w < 5) {
+                    if (this.u > 4) {
+                        z2 = true;
+                    }
+                } else {
+                    if (this.u > 5) {
+                        z2 = true;
+                    }
+                    if (this.u > 4 && this.w % 2 == 0) {
+                        z2 = true;
+                    }
+                }
+                if (z2) {
+                    this.u = 0;
+                    this.v += 2;
+                    this.w++;
+                }
+            }
+        }
+        waveunitsVar.a(unitTypeEnum, i);
+        return waveunitsVar;
+    }
+
+    public void c(float f) {
+        WaveUnitGroup waveunitsVarC;
+        GameEngine gameEngine = GameEngine.getInstance();
+        int i = gameEngine.gameTimeMillis;
+        this.M = Utility.moveTowardsZero(this.M, f);
+        if (gameEngine.isStopped && gameEngine.isMenuBackgroundMap) {
+            MapObject mapObject = null;
+            if (gameEngine.tileMap.objectsLayer != null) {
+                for (MapObject mapObject2 : gameEngine.tileMap.objectsLayer.mapObjects) {
+                    if ("camera_pan".equalsIgnoreCase(mapObject2.type) && this.L == Integer.parseInt(mapObject2.getPropertyOrDefault("index", "-1"))) {
+                        mapObject = mapObject2;
+                    }
+                }
+            }
+            if (mapObject == null) {
+                this.L = 0;
+            } else {
+                float worldWidth = mapObject.x;
+                float worldHeight = mapObject.y;
+                if (worldWidth < gameEngine.halfVisibleWorldWidth + 2.0f) {
+                    worldWidth = gameEngine.halfVisibleWorldWidth + 2.0f;
+                }
+                if (worldHeight < gameEngine.halfVisibleWorldHeight + 2.0f) {
+                    worldHeight = gameEngine.halfVisibleWorldHeight + 2.0f;
+                }
+                if (worldWidth > (gameEngine.tileMap.getWorldWidth() - gameEngine.halfVisibleWorldWidth) - 2.0f) {
+                    worldWidth = (gameEngine.tileMap.getWorldWidth() - gameEngine.halfVisibleWorldWidth) - 2.0f;
+                }
+                if (worldHeight > (gameEngine.tileMap.getWorldHeight() - gameEngine.halfVisibleWorldHeight) - 2.0f) {
+                    worldHeight = (gameEngine.tileMap.getWorldHeight() - gameEngine.halfVisibleWorldHeight) - 2.0f;
+                }
+                float angleBetweenPoints = Utility.getAngleBetweenPoints(gameEngine.viewpointX + gameEngine.halfVisibleWorldWidth, gameEngine.viewpointY + gameEngine.halfVisibleWorldHeight, worldWidth, worldHeight);
+                float fDistanceSq = Utility.distanceSq(gameEngine.viewpointX + gameEngine.halfVisibleWorldWidth, gameEngine.viewpointY + gameEngine.halfVisibleWorldHeight, worldWidth, worldHeight);
+                if (this.M == 0.0f && (fDistanceSq < 225.0f || gameEngine.wasCameraClamped)) {
+                    this.L++;
+                    this.M = 50.0f;
+                }
+                float f2 = 0.45f * f;
+                gameEngine.viewpointX += Utility.fastCos(angleBetweenPoints) * f2;
+                gameEngine.viewpointY += Utility.fastSin(angleBetweenPoints) * f2;
+                gameEngine.setViewpoint(gameEngine.viewpointX, gameEngine.viewpointY);
+                gameEngine.clampCameraPosition();
+            }
+        }
+        if (this.k) {
+            if (!this.N) {
+                if (!this.m) {
+                    this.z = Utility.moveTowardsZero(this.z, f);
+                }
+                if (this.z == 0.0f && !this.m) {
+                    this.r++;
+                    this.A = 180.0f;
+                    PointF pointF = (PointF) this.D.get(Utility.getDeterministicRandomIntInRange(0, this.D.size() - 1, this.r));
+                    if (!this.l) {
+                        this.s = b(false).toString();
+                        waveunitsVarC = b(true);
+                    } else {
+                        this.s = c(false).toString();
+                        waveunitsVarC = c(true);
+                    }
+                    this.z = 1800.0f;
+                    if (!this.l) {
+                        if (this.y > 0) {
+                            this.z -= (this.y * 3) * 60;
+                        } else {
+                            this.z -= (this.y * 9) * 60;
+                        }
+                    }
+                    waveunitsVarC.a(pointF.x, pointF.y);
+                    this.t = null;
+                }
+            } else if (!this.m) {
+                MissionWave waveVarD = d();
+                if (waveVarD != null) {
+                    if (waveVarD.e * 1000 < gameEngine.gameTimeMillis) {
+                        waveVarD.a();
+                        this.r++;
+                    }
+                } else if (!gameEngine.hasWonGame && !gameEngine.replayEngine.j()) {
+                    gameEngine.gameUI.startGameEndSequence();
+                }
+            }
+        }
+        if (this.j) {
+            this.j = false;
+            if (this.h != null) {
+                gameEngine.showMessageBox("Briefing", this.h);
+            }
+        }
+        if (this.areaControlMode != null) {
+            this.areaControlMode.update(f);
+        }
+        if (this.mapPortalMode != null) {
+            this.mapPortalMode.update(f);
+        }
+        if (i > this.b + 250) {
+            this.b = i;
+            a(i);
+        }
+        if (i > this.c + 1000) {
+            this.c = i;
+            if (h()) {
+                h();
+                h();
+            }
+            boolean z = false;
+            if (gameEngine.playerTeam != null) {
+                if (gameEngine.playerTeam.hasTeamVictory()) {
+                }
+                if (gameEngine.playerTeam.isSpectatorTeamColor()) {
+                    z = true;
+                }
+            }
+            if (!gameEngine.hasWonGame && !gameEngine.hasLostGame && !gameEngine.replayEngine.j() && !z && this.areaControlMode == null) {
+                boolean z2 = true;
+                boolean z3 = true;
+                if (this.e == WaveSpawnMode.none) {
+                    z2 = false;
+                } else if (this.e == WaveSpawnMode.requiredObjectives) {
+                    Iterator it = this.g.iterator();
+                    while (it.hasNext()) {
+                        if (!((TriggerWrapper) it.next()).b()) {
+                            z2 = false;
+                        }
+                    }
+                } else if (gameEngine.playerTeam != null) {
+                    Iterator it2 = BaseUnit.bE.iterator();
+                    while (true) {
+                        if (!it2.hasNext()) {
+                            break;
+                        }
+                        BaseUnit baseUnit = (BaseUnit) it2.next();
+                        if (gameEngine.playerTeam.c(baseUnit.team) && a(this.e, baseUnit)) {
+                            z2 = false;
+                            break;
+                        }
+                    }
+                }
+                if (this.f == WaveSpawnMode.none || this.f == WaveSpawnMode.requiredObjectives) {
+                    z3 = false;
+                } else if (gameEngine.playerTeam != null) {
+                    Iterator it3 = BaseUnit.bE.iterator();
+                    while (true) {
+                        if (!it3.hasNext()) {
+                            break;
+                        }
+                        BaseUnit baseUnit2 = (BaseUnit) it3.next();
+                        if (gameEngine.playerTeam.d(baseUnit2.team) && a(this.f, baseUnit2)) {
+                            z3 = false;
+                            break;
+                        }
+                    }
+                }
+                if (z3 && !z2) {
+                    gameEngine.gameUI.endGameSequence();
+                }
+                if (z2) {
+                    gameEngine.gameUI.startGameEndSequence();
+                    if (gameEngine.gameTimeMillis > 1500) {
+                        gameEngine.settingsEngine.numberOfWins++;
+                        gameEngine.settingsEngine.save();
+                    }
+                }
+            }
+            if (this.areaControlMode == null && this.k && !this.m) {
+                boolean z4 = true;
+                for (BaseUnit baseUnit3 : BaseUnit.bE) {
+                    if ((baseUnit3 instanceof CommandCenter) || baseUnit3.isTargetable) {
+                        if (!baseUnit3.isDead && !baseUnit3.u() && baseUnit3.team == gameEngine.playerTeam) {
+                            z4 = false;
+                        }
+                    }
+                }
+                if (z4) {
+                    this.m = true;
+                    gameEngine.gameUI.endGameSequence();
+                }
+            }
+        }
+    }
+
+    public boolean a(WaveSpawnMode waveSpawnMode, BaseUnit baseUnit) {
+        if (!(baseUnit instanceof OrderableUnit) || baseUnit.isDead || baseUnit.isExcludedFromDefeatCheck() || waveSpawnMode == WaveSpawnMode.none) {
+            return false;
+        }
+        if (waveSpawnMode == WaveSpawnMode.allUnitsAndBuildings) {
+            return true;
+        }
+        if (waveSpawnMode == WaveSpawnMode.allBuildings) {
+            return baseUnit.bI();
+        }
+        if (waveSpawnMode == WaveSpawnMode.commandCenter) {
+            return (baseUnit instanceof CommandCenter) || baseUnit.isTargetable;
+        }
+        if (waveSpawnMode == WaveSpawnMode.mainBuildings) {
+            return baseUnit.bI() && baseUnit.bJ() && !(baseUnit instanceof TurretFactory) && !(baseUnit instanceof ResourceExtractor);
+        }
+        if (waveSpawnMode == WaveSpawnMode.noConstructionOrTech) {
+            if (baseUnit.bJ() || baseUnit.canMove()) {
+                return true;
+            }
+            return false;
+        }
+        if (waveSpawnMode == WaveSpawnMode.requiredObjectives) {
+            return false;
+        }
+        return false;
+    }
+
+    public void h(String str) {
+        GameEngine.log("Map Script: " + str);
+    }
+
+    public void a(MapTrigger mapTrigger) {
+        if (g()) {
+            h("Activiated trigger:" + mapTrigger.a + " (id:" + mapTrigger.b + ")");
+        }
+    }
+
+    public boolean g() {
+        return a && GameEngine.getInstance().isDebugTempMode;
+    }
+
+    private static boolean isRwxMapModeAllowed(GameEngine gameEngine) {
+        if (!gameEngine.isNetworkGameActive()) {
+            return true;
+        }
+        return gameEngine.networkEngine != null && gameEngine.networkEngine.rwxP2PSession;
+    }
+
+    public static void i(String str) {
+        NetworkEngine.reportDesync("Map ScriptError: " + str);
+    }
+
+    public void a(int i) {
+        for (MapTrigger mapTrigger : this.J) {
+            if (mapTrigger.j && mapTrigger.q != -1 && i >= mapTrigger.k + mapTrigger.q) {
+                mapTrigger.j = false;
+                mapTrigger.u = false;
+            }
+            if (!mapTrigger.j && !mapTrigger.u && mapTrigger.d()) {
+                mapTrigger.u = true;
+            }
+            if ((mapTrigger.j || mapTrigger.u) && mapTrigger.e.b()) {
+                mapTrigger.j = false;
+                mapTrigger.u = false;
+                mapTrigger.m = true;
+            }
+            if (mapTrigger.j && mapTrigger.p > 0 && i >= mapTrigger.k + mapTrigger.p) {
+                mapTrigger.u = true;
+            }
+            if (mapTrigger.u) {
+                mapTrigger.u = false;
+                try {
+                    TriggerExecutor.a(this, mapTrigger);
+                } catch (MapLoadException e) {
+                    e.printStackTrace();
+                    mapTrigger.g("Error activating trigger: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+
+    public boolean h() {
+        boolean var1 = false;
+        GameEngine var2 = GameEngine.getInstance();
+        BaseUnit[] var3 = BaseUnit.bE.a();
+        int var4 = 0;
+
+        for (int var5 = BaseUnit.bE.size(); var4 < var5; var4++) {
+            BaseUnit var6 = var3[var4];
+            if (var6.team == PlayerTeam.TEAM_ALL && var6 instanceof OrderableUnit && var6.isAlive() && !var6.o()) {
+                int var7 = 0;
+
+                for (int var8 = BaseUnit.bE.size(); var7 < var8; var7++) {
+                    BaseUnit var9 = var3[var7];
+                    boolean var10;
+                    if (!var2.isInNetworkOrReplay()) {
+                        var10 = var9.team == var2.playerTeam;
+                    } else {
+                        var10 = !var9.team.isTeamSpectator;
+                        if (var6.canBeCapturedByAI()) {
+                            var10 = true;
+                        }
+                    }
+
+                    if (var9.team != null && var9.team.teamId < 0) {
+                        var10 = false;
+                    }
+
+                    if (var10
+                            && var9.team != var6.team
+                            && var9 instanceof OrderableUnit
+                            && !var9.i()
+                            && var9.isAlive()
+                            && Utility.distanceSq(var9.posX, var9.posY, var6.posX, var6.posY) < 28900.0F) {
+                        var6.changeTeam(var9.team);
+                        var6.selectionFlashTimer = 60.0F;
+                        var1 = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return var1;
+    }
+}

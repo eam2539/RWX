@@ -1,0 +1,153 @@
+<!--
+<!DOCTYPE html>
+-->
+
+
+<div style="width: 100%;">
+  
+  <div class="panelCloseButton" onclick="closePopup()"  click_on_escape=""/>
+  
+  <div class="smallForms">
+    
+    <div class="selectDiv bigger typeSelectorWrap">
+    <label>Type:</label>
+    <select id="typeSelector" onchange="multiplayer.gameOptionsRefreshTypes()">
+      <!--<option value="skirmishMap" >Skirmish Map</option>
+      <option value="customMap"   >Custom Map</option>
+      <option value="savedGame"   >Saved Game</option>-->
+      
+      <option value="0"   >Skirmish Map</option>
+      <option value="1"   >Custom Map</option>
+      <option value="2"   >Saved Game</option>
+      
+    </select>
+    </div>
+    
+    <!--
+    <div class="selectDiv bigger mapsSelectorWrap" id="mapsSelectorWrap">
+      <label>Map:</label>
+      <div id="mapsSelectorParent">
+        <select id='mapsSelector' class="mapsSelector">
+          <option value="0"   >test</option>
+        </select>
+      </div>
+    </div>
+    -->
+    
+    <div class="" style="padding:7px;">
+      <button class="boxButton" onclick="mp.gameOptionsPush(); mp.showMapSelect()">Select Map</button>
+    </div>
+    
+    
+    
+    
+    
+    <!-- i:menus.battleroom.gameoptions.aiDifficulty -->
+    
+    <div class="selectDiv">
+      <label>${i:menus.battleroom.gameoptions.aiDifficulty}</label>
+      <select id="aiDifficulty" data-settings>
+        <option value="-2">${i:menus.settings.option.ai.-2}</option>
+        <option value="-1">${i:menus.settings.option.ai.-1}</option>
+        <option value="0" selected>${i:menus.settings.option.ai.0}</option>
+        <option value="1"  >${i:menus.settings.option.ai.1}</option>
+        <option value="2"  >${i:menus.settings.option.ai.2}</option>
+        <option value="3"  >${i:menus.settings.option.ai.3}</option>
+      </select>
+    </div>
+    
+    <!-- <option value="1">Normal (1 builder)</option>
+          <option value="2">Small Army</option>
+          <option value="3">3 Engineers</option>
+          <option value="4">3 Engineers (No Command Center)</option>
+          <option value="5">Experimental Spider</option> -->
+    
+    
+    <div class="selectDiv bigger2">
+      <label>${i:menus.battleroom.gameoptions.startingUnits}</label>
+      
+      <div id="startingUnitsWrap">
+        <select id="startingUnits" class="scrollBar" data-settings>
+          
+        </select>
+      </div>
+    </div>
+    
+    
+    <div class="selectDiv">
+      <label>Fog Mode</label>
+      <select id="fogMode" data-settings>
+        <option value="0">No Fog</option>
+        <option value="1">Basic Fog</option>
+        <option value="2">LOS Fog</option>
+      </select>
+    </div>
+    
+    
+    
+    
+    <!-- i:menus.battleroom.gameoptions.startingCredits -->
+    
+    <div class="selectDiv">
+      <label>${i:menus.battleroom.gameoptions.startingCredits}</label>
+      <select id="startingCredits" data-settings>
+          
+          <option value="0">Default</option>
+          <option value="1">$0</option>
+          <option value="2">$1000</option>
+          <option value="3">$2000</option>
+          <option value="4">$5000</option>
+          <option value="5">$10000</option>
+          <option value="6">$50000</option>
+          <option value="7">$100000</option>
+          <option value="8">$200000</option>
+      </select>
+    </div>
+    
+    <div class="selectDiv">
+      <label>${i:menus.battleroom.gameoptions.incomeMultiplier}</label>
+      <select id="incomeMultiplier" data-settings>
+        <option value="1">1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+        <option value="2.5">2.5x</option>
+      </select>
+    </div>
+    
+    <div class="checkboxDiv" style="display:none;">
+      <input type="checkbox" data-settings id="revealedMap"><label for="revealedMap">${i:menus.battleroom.gameoptions.startRevealed}</label></input>
+    </div>
+    
+    <!--
+    <div class="checkboxDiv">
+      <input type="checkbox" data-settings id="doubleIncome"><label for="doubleIncome">${i:menus.battleroom.gameoptions.doubleIncome}</label></input>
+    </div>
+    -->
+    
+    
+    <div class="checkboxDiv">
+      <input type="checkbox" data-settings id="noNukes"><label for="noNukes">${i:menus.battleroom.gameoptions.noNukes}</label></input>
+    </div>
+    
+    
+    <div class="checkboxDiv">
+      <input type="checkbox" data-settings id="sharedControl"><label for="sharedControl">${i:menus.battleroom.gameoptions.sharedControl}</label></input>
+    </div>
+    
+    
+    
+    <!-- -->
+    
+  </div><!-- end smallForms -->
+    
+  <div id="mainButtons" class="mainBoxButtons">
+    
+    <button class="boxButton" id="button_apply" onclick="mp.gameOptionsPush(); closePopup();">${i:menus.battleroom.playerpopup.apply}</button>
+    <button class="boxButton" id="button_back"  onclick="closePopup();">${i:menus.battleroom.playerpopup.cancel}</button>
+    
+  </div>
+
+
+</div>
+
+

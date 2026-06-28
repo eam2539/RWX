@@ -1,0 +1,548 @@
+/*
+* Default styles for all the basic elements.
+*/
+
+div
+{
+	display: block;
+	/*background: green;*/
+}
+
+p
+{
+	display: block;
+}
+
+h1
+{
+	display: block;
+}
+
+em
+{
+	font-style: italic;
+}
+
+strong
+{
+	font-weight: bold;
+}
+
+datagrid
+{
+	display: block;
+}
+
+select, dataselect, datacombo
+{
+	text-align: left;
+}
+
+tabset tabs
+{
+	display: block;
+}
+
+
+input.text
+{
+	/*height: 55px;*/
+	
+	height: 50px;
+	
+	width: 12em;
+	
+	/*padding: 14px 14px 0px;*/
+
+	background-decorator: tiled-horizontal;
+	/*background-left-image: nocolor:widgets.png 162px 192px 176px 223px;
+	background-center-image: nocolor:widgets.png stretch 176px 192px 177px 223px;*/
+	/*
+	background-left-image: nocolor:widgets.png 162px 196px 176px 223px;
+	background-center-image: nocolor:widgets.png stretch 176px 196px 177px 223px;
+	*/
+	
+	/* new */
+	
+	background-left-image: nocolor:widgets.png 164px 306px 176px 333px;
+	background-center-image: nocolor:widgets.png stretch 176px 306px 177px 333px;
+	padding: 11px 14px 0px;
+
+	color:black;
+	
+	header-font-effect: shadow;
+  
+  /*header-font-effect: outline;*/
+  
+  header-width: 1px;
+  
+  header-offset: 1px 1px;
+  header-color: white;
+        
+}
+
+.smallForms input.text
+{
+  
+	height: 42px;
+	
+}
+
+
+label
+{
+  color:black;
+  header-font-effect: shadow;
+  header-width: 1px;
+  header-offset: 1px 1px;
+  header-color: gray;
+}
+
+
+
+select,
+dataselect
+{
+  
+	width: 175px;
+	/*height: 37px;*/
+	
+	/*height: 64px; normal*/
+	height: 60px;
+	
+	color:black;
+	
+	/*
+  header-font-effect: shadow;
+  header-width: 1px;
+  header-offset: 1px 1px;
+  header-color: gray;
+  */
+	
+}
+
+select selectvalue,
+dataselect selectvalue
+{
+	width: auto;
+	margin-right: 40px;
+	
+	height: 52px;
+	padding: 14px 13px 0px 13px;
+
+  /*background-color: rgba( 100%, 100%, 100%, 0%);*/
+  
+	background-decorator: image;
+	background-image: nocolor:widgets.png 162px 192px 307px 229px;
+	
+	
+	
+}
+
+
+
+select selectvalue:hover,
+dataselect selectvalue:hover
+{
+	background-image-t: 230px 267px;
+}
+
+select selectarrow,
+dataselect selectarrow
+{
+	width: 40px;
+	height: 64px;
+	
+	icon-decorator: image;
+	icon-image: nocolor:widgets.png 307px 192px 337px 229px;
+}
+
+select selectarrow:hover,
+dataselect selectarrow:hover
+{
+	icon-image-t: 230px 267px;
+}
+
+select selectarrow:active,
+select selectarrow:checked,
+dataselect selectarrow:active,
+dataselect selectarrow:checked
+{
+	icon-image-t: 268px 305px;
+}
+
+select selectbox,
+dataselect selectbox
+{
+	margin-left: 1px;
+	margin-top: -7px;
+	width: 162px;
+	padding: 1px 4px 4px 4px;
+	
+	overflow-y: auto;
+	max-height: 300px;
+}
+
+select.scrollBar selectbox,
+dataselect.scrollBar selectbox
+{
+  overflow-y: auto;
+	max-height: 200px;
+}
+
+.smallScreen select selectbox,
+.smallScreen dataselect selectbox
+{
+	/*height: 220px;*/
+	
+	/*margin-top: -80px;*/
+	
+	/*bottom:0px;
+	position: absolute;*/
+
+	overflow-y: auto;
+	max-height: 130px;
+}
+
+select selectbox,
+dataselect selectbox,
+datagrid datagridbody
+{
+	background-decorator: tiled-box;
+	background-top-left-image: nocolor:widgets.png 281px 275px 292px 284px;
+	background-top-right-image: nocolor:widgets.png 294px 275px 305px 284px;
+	background-top-image: nocolor:widgets.png stretch 292px 275px 293px 284px;
+	background-bottom-left-image: nocolor:widgets.png 281px 285px 292px 296px;
+	background-bottom-right-image: nocolor:widgets.png 294px 285px 305px 296px;
+	background-bottom-image: nocolor:widgets.png stretch 292px 285px 293px 296px;
+	background-left-image: nocolor:widgets.png stretch 281px 283px 292px 284px;
+	background-center-image: nocolor:widgets.png stretch 292px 283px 293px 284px;
+}
+
+select selectbox option,
+dataselect selectbox option
+{
+	width: auto;
+	padding-left: 3px;
+	
+	/*background: #FFFFFFB0;*/
+	background: #BBBBBBA0;
+}
+
+select selectbox option:nth-child(even),
+dataselect selectbox option:nth-child(even),
+datagrid datagridrow:nth-child(even)
+{
+	background: #FFFFFFA0;
+}
+
+select selectbox option:hover,
+dataselect selectbox option:hover
+{
+	background: #FF5D5D;
+}
+
+
+
+input.radio,
+input.checkbox
+{
+	width: 30px;
+	height: 30px;
+
+	vertical-align: -11px;
+	
+}
+
+
+input.radio
+{
+	icon-decorator: image;
+	icon-image: nocolor:widgets.png 407px 0px 437px 30px;
+}
+
+input.radio:hover
+{
+	icon-image-s: 437px 467px;
+}
+
+input.radio:active
+{
+	icon-image-s: 467px 497px;
+}
+
+input.radio:checked
+{
+	icon-image-t: 30px 60px;
+}
+
+input.radio:checked:hover
+{
+	icon-image-s: 437px 467px;
+	icon-image-t: 30px 60px;
+}
+
+input.radio:checked:active
+{
+	icon-image-s: 467px 497px;
+	icon-image-t: 30px 60px;
+}
+
+input.checkbox
+{
+	icon-decorator: image;
+	icon-image: nocolor:widgets.png 407px 60px 437px 90px;
+}
+
+input.checkbox:hover
+{
+	icon-image-s: 437px 467px;
+}
+
+input.checkbox:active
+{
+	icon-image-s: 467px 497px;
+}
+
+input.checkbox:checked
+{
+	icon-image-t: 90px 120px;
+}
+
+input.checkbox:checked:hover
+{
+	icon-image-s: 437px 467px;
+	icon-image-t: 90px 120px;
+}
+
+input.checkbox:checked:active
+{
+	icon-image-s: 467px 497px;
+	icon-image-t: 90px 120px;
+}
+
+
+
+datagrid datagridheader
+{
+	width: auto;
+	height: 25px;
+	padding: 5px 10px 0px 10px;
+
+	background-decorator: tiled-horizontal;
+	background-left-image: nocolor:widgets.png 127px 192px 143px 223px;
+	background-center-image: nocolor:widgets.png stretch 143px 192px 145px 223px;
+	background-right-image: nocolor:widgets.png 145px 192px 160px 223px;
+}
+
+datagrid datagridbody
+{
+	color: black;
+
+	margin-left: 4px;
+	margin-right: 3px;
+	padding: 0px 4px 4px 4px;
+}
+
+
+
+datagridexpand
+{
+	display: block;
+	
+	margin: 1px 0px 1px 5px;
+	height: 17px;
+	width: 17px;
+	
+	icon-decorator: image;
+	icon-image: nocolor:widgets.png 3px 232px 20px 249px;
+}
+
+datagridexpand:hover
+{
+	icon-image-s: 21px 38px;
+}
+
+datagridexpand:active
+{
+	icon-image-s: 39px 56px;
+}
+
+datagridexpand.collapsed
+{
+	icon-image-t: 250px 267px;
+}
+
+
+
+scrollbarvertical
+{
+	/*margin-top: -6px;*/
+	/*margin-bottom: -6px;*/
+	/*margin-right: -11px;*/
+	margin-left: -4px;
+	margin-right: -24px;
+	width: 27px;
+}
+
+scrollbarvertical slidertrack
+{
+	background-decorator: tiled-vertical;
+	background-top-image: nocolor:widgets.png 70px 199px 97px 201px;
+	background-center-image: nocolor:widgets.png stretch 70px 201px 97px 202px;
+	background-bottom-image: nocolor:widgets.png 70px 203px 97px 204px;
+}
+
+scrollbarvertical sliderbar
+{
+	margin-left: 4px;
+	width: 23px;
+	min-height: 46px;
+
+	background-decorator: tiled-vertical;
+	background-top-image: nocolor:widgets.png 56px 152px 79px 175px;
+	background-center-image: nocolor:widgets.png stretch 56px 175px 79px 175px;
+	background-bottom-image: nocolor:widgets.png 56px 176px 79px 198px;
+}
+
+scrollbarvertical sliderbar:hover
+{
+	background-top-image-s: 80px 103px;
+	background-center-image-s: 80px 103px;
+	background-bottom-image-s: 80px 103px;
+}
+
+scrollbarvertical sliderbar:active
+{
+	background-top-image-s: 104px 127px;
+	background-center-image-s: 104px 127px;
+	background-bottom-image-s: 104px 127px;
+}
+
+scrollbarvertical sliderarrowdec
+{
+	width: 27px;
+	height: 24px;
+	
+	icon-decorator: image;
+	icon-image: nocolor:widgets.png 0px 152px 27px 176px;
+}
+
+scrollbarvertical sliderarrowdec:hover,
+scrollbarvertical sliderarrowinc:hover
+{
+	icon-image-t: 177px 201px;
+}
+
+scrollbarvertical sliderarrowdec:active,
+scrollbarvertical sliderarrowinc:active
+{
+	icon-image-t: 202px 226px;
+}
+
+scrollbarvertical sliderarrowinc
+{
+	width: 27px;
+	height: 24px;
+	
+	icon-decorator: image;
+	icon-image: nocolor:widgets.png 28px 152px 55px 176px;
+}
+
+
+
+scrollbarhorizontal
+{
+	width: 0px;
+	height: 0px;
+}
+
+
+
+
+input.range{
+
+}
+input.range slidertrack{
+	background:#83fff522;
+	border-style:solid;
+	border-width:1px;
+	border-color:#83fff555;
+	height: 4px;
+	margin-top: 9px;
+	width: 50px;
+}
+input.range sliderbar{
+	/*border-style:solid;
+	border-width:2px;
+	border-color:#152a1788;
+	background:#49924fCC;*/
+	height: 18px;
+	width: 40px;
+}
+/*
+input.range sliderbar:hover{
+	background:#77b27a;   
+}
+input.range sliderbar:active{
+	background:#102011;   
+}
+*/
+
+
+input.range sliderbar
+{
+	display: inline-block;
+
+
+	padding-top: 8px;
+	vertical-align: -18px;
+
+	font-size: 18;
+	text-align: center;
+	tab-index: auto;
+
+	background-decorator: image;
+	background-image: nocolor:widgets.png 247px 0px 406px 45px;
+}
+
+input.range sliderbar:focus
+{
+    /*background:#77b27a;*/
+    /*background-image-t: 45px 90px;*/
+}
+
+input.range sliderbar:hover
+{
+	background-image-t: 45px 90px;
+}
+
+input.range sliderbar:active
+{
+	background-image-t: 90px 135px;
+}
+
+
+
+
+/*
+button:focus,
+input:focus,
+{
+    font-weight: bold;
+    
+    shadow-font-effect: shadow;
+    shadow-offset: 1px 1px;
+    shadow-color: black;
+}
+*/
+
+
+
+
+
+
+
+
+
+

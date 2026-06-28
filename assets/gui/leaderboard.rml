@@ -1,0 +1,214 @@
+<rml>
+<head>
+	<title>Leaderboard</title>
+	<link type="text/rcss" href="rkt.rcss"/>
+	<link type="text/rcss" href="common.rcss"/>
+	<link type="text/rcss" href="forms.rcss"/>
+	<style>
+		
+	body
+    {
+   
+	    /*width: 50%;*/
+	    height: 350px;
+	    font-size: 25;
+
+	    top:5%;
+	    
+	  }
+		
+		
+	.background
+	{
+	    background:rgba(205,205,205,0);
+	    height: 100%;
+    
+	}
+  
+  
+	h2
+    {
+		font-size: 35;
+		font-weight:bold;
+
+		text-align:center;
+
+		display:block;
+    }
+    
+    h2.needsUnicodeFont
+	{
+		font-size: 27;
+	}
+
+	.group
+	{
+		padding-left:0.5em;
+
+	}
+		
+		
+	div
+	{
+	}
+		
+		
+	.form
+	{
+		text-align: left;
+		display: block;
+
+		text-color:black;
+	}
+
+	label
+	{
+		padding-bottom:0em;
+		margin-top:0em;
+	}
+		
+	#scrollDivWrap
+	{
+
+		height: 100%;
+
+		position: relative;
+
+	}
+   
+	#scrollDiv
+	{
+		display:block;
+
+		overflow-y: auto;
+
+		position: absolute;
+		top:0px;
+		bottom:30px;
+		left:0px;
+		right:0px;
+
+		margin: 3px;
+		padding: 3px;
+
+	}
+  
+	.mainButtons
+	{
+	position: absolute;
+		  bottom:0px;
+	}
+
+
+	.sliderDiv input
+	{
+	width:15em;
+	}
+
+
+	.sliderDiv label
+	{
+	width:10em;
+		  
+		  text-align:right;
+	}
+
+
+	.audioGroup .sliderDiv label
+	{
+	width:10em;
+		  
+		  text-align:right;
+		  
+		  
+	}
+
+
+
+	.mainButtons button
+	{
+	  margin:6px;
+	}
+
+	.whiteText label, .whiteText h2, .whiteText h3
+	{
+	color:white;
+	header-color: black;
+	}
+
+	.selectDiv label
+	{
+	width:6.5em;
+	}
+
+	.hide
+		{
+		  display:none; /* not sure if needed */
+		}
+		
+	.editKeybindingsWrap
+	{
+	padding-top:10px;
+	}
+
+	.editKeybindings
+	{
+	padding:7px 13px;
+	}
+
+	</style>
+</head>
+<body onshow="setPageMinWidthAndHeight(700, 200); loadLeaderboard();" onunload="closeSettings();" id="body">
+	
+	
+	<div class="background panelMainNoAlpha whiteText">
+
+		<div class="panelCloseButton" onclick="back()" />
+
+
+		<div id="scrollDivWrap">
+
+			<div id="scrollDiv">
+		  
+			<h2>${i:menus.ingame.leaderboard.title}</h2>
+			<form class="form">
+			<div class="group audioGroup">
+
+			    <div class="selectDiv wide">
+					<label>${i:menus.ingame.leaderboard.type}</label>
+					<select name="leaderboardType" data-settings id="leaderboardType" >
+					<option value="none" >${i:gui.leaderboard.type.none}</option>
+					<option value="income" >${i:gui.leaderboard.type.income}</option>
+					<option value="armyValue"  >${i:gui.leaderboard.type.armyValue}</option>
+					<option value="buildingValue" >${i:gui.leaderboard.type.buildingValue}</option>
+					<option value="totalValue" selected >${i:gui.leaderboard.type.totalValue}</option>
+					<option value="credits" >${i:gui.leaderboard.type.credits}</option>
+					</select>
+			    </div>
+			    
+			    <div class="selectDiv wide">
+					<label>${i:menus.ingame.leaderboard.grouping}</label>
+					<select name="leaderboardType" data-settings id="leaderboardGrouping" >
+					<option value="player" >${i:gui.leaderboard.grouping.player}</option>
+					<option value="allyGroup" >${i:gui.leaderboard.grouping.allyGroup}</option>
+					</select>
+			    </div>
+
+			</div>
+			</form>
+			<br/>
+			</div>
+
+
+			<div class="mainButtons panelBottomButtons">
+				<button onclick="back()">Back</button>
+				<button onclick="saveLeaderboard();back()" click_on_escape="">Save</button>
+			</div>
+		</div><!-- scrollDivWrap -->
+
+
+	</div>
+	
+	
+</body>
+</rml>

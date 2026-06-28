@@ -1,0 +1,349 @@
+
+	
+/* --- Forms --- */
+
+input.checkbox
+{
+  
+}
+
+.checkboxDiv
+{
+  /*height:55px;*/
+  
+  height:45px;
+  
+  /*width:90px;*/
+  
+}
+
+.checkboxDiv input
+{
+  /*height:25px;*/
+  
+  height:30px;
+}
+
+.checkboxDiv label
+{
+  margin-left:5px;
+  
+  /*float:left;
+  margin-top:-34px;
+  margin-left:31px;*/
+  
+  vertical-align: 5px;
+  
+  line-height:1em;
+  
+}
+
+
+.sliderDiv
+{
+  margin-top:13px;
+  position:relative;
+}
+
+.sliderDiv label
+{
+  float:left;
+  
+  /*min-width:3em;*/
+  width:6em;
+  
+  margin-top:-8px;
+  
+  padding-right:6px;
+  
+  
+}
+
+
+.sliderDiv input
+{
+  width: 200px;
+}
+
+
+.selectDiv,
+.inputDiv
+{
+  margin-top:0px;
+  
+}
+
+.selectDiv label,
+.inputDiv label
+{
+  float:left;
+  white-space: nowrap;
+  
+  width:2em;
+  
+  margin-top:13px;
+  padding-right:6px;
+}
+
+.inputDiv input
+{
+  vertical-align:middle;
+  
+}
+
+
+.selectDiv.wide select
+{
+  width:17em;
+  text-align:center;
+}
+.selectDiv.wide select selectbox,
+{
+ /* margin-left: 1px;
+  margin-top: -7px;*/
+  width: 17em;
+  /*padding: 1px 4px 4px 4px;*/
+}
+
+
+
+.selectDiv.bigger select
+{
+  width:12em;
+  
+  
+  /*text-align:center;*/
+}
+.selectDiv.bigger select selectbox,
+{
+ /* margin-left: 1px;
+  margin-top: -7px;*/
+  width: 12em;
+  /*padding: 1px 4px 4px 4px;*/
+  
+  
+}
+
+.selectDiv.bigger2 select
+{
+  width:18em;
+  /*text-align:center;*/
+}
+.selectDiv.bigger2 select selectbox,
+{
+ /* margin-left: 1px;
+  margin-top: -7px;*/
+  width: 18em;
+  /*padding: 1px 4px 4px 4px;*/
+}
+
+.pad
+{
+  color:#00000000;
+  /*width: 7px;
+  height:2px;
+  background: red;*/
+}
+
+
+.smallForms
+{
+  font-size: 18;
+
+}
+
+.smallForms .selectDiv 
+{
+  /*font-size: 18;*/
+  height:44px;
+  
+  
+}
+
+.smallForms .selectDiv label
+{
+  height:20px;
+  
+  margin-top:5px;
+  
+}
+
+.smallForms .selectDiv select
+{
+  /*font-size: 18;*/
+  height:39px;
+  
+}
+
+.smallForms .selectDiv selectvalue
+{
+  font-size: 18;
+  height:36px;
+  
+  padding-top:6px;
+  padding-left:18px;
+
+  margin-right: 30px;
+}
+
+.smallForms .selectDiv selectarrow
+{
+  /*font-size: 18;*/
+  height:38px;
+  
+  width: 30px;
+}
+
+.rangeLabel
+{
+  position:absolute;
+  z-index:-1;
+  left:6em;
+  top:-30px;
+}
+
+
+
+
+
+/*
+
+scrollbarvertical
+{
+  width: 25px;
+}
+
+scrollbarvertical slidertrack
+{
+  border-style: solid;
+  border-width: 2px;
+  border-color: rgba( 0%, 0%, 0%, 40%);
+  background: rgba( 0%, 0%, 0%, 10%);
+  
+}
+
+scrollbarvertical sliderbar
+{
+  width: 21px;
+  
+  border-style: solid;
+  border-width: 2px;
+  border-color: black;
+  background: rgba( 0%, 0%, 0%, 50%);
+  
+}
+*/
+
+	
+.panelSection
+{
+  
+  
+  background-decorator: tiled-box;
+  background-top-left-image:       nocolor:panel2.png 0px   0px   128px 94px ;
+  background-top-right-image:      nocolor:panel2.png 128px 0px   359px 94px ;
+  background-bottom-left-image:    nocolor:panel2.png 0px   94px  128px 283px;
+  background-bottom-right-image:   nocolor:panel2.png 128px 94px  359px 283px;
+  background-top-image:            nocolor:panel2.png 128px 0px   221px 94px ;
+  background-bottom-image:         nocolor:panel2.png 128px 94px  221px 283px;
+  background-left-image:           nocolor:panel2.png 0px   94px  128px 148px;
+  background-right-image:          nocolor:panel2.png 221px 94px  359px 148px;
+  background-center-image:         nocolor:panel2.png stretch 128px 94px  221px 148px;
+  
+  
+}
+
+
+.panel1, .panelMain
+{
+
+  /*auto-generated 9-patch*/
+  background-decorator: tiled-box;
+  background-top-left-image:       nocolor:alpha(0.8):panel2.png 0px   0px   128px 94px ;
+  background-top-right-image:      nocolor:alpha(0.8):panel2.png 128px 0px   359px 94px ;
+  background-bottom-left-image:    nocolor:alpha(0.8):panel2.png 0px   94px  128px 283px;
+  background-bottom-right-image:   nocolor:alpha(0.8):panel2.png 128px 94px  359px 283px;
+  background-top-image:            nocolor:alpha(0.8):panel2.png 128px 0px   221px 94px ;
+  background-bottom-image:         nocolor:alpha(0.8):panel2.png 128px 94px  221px 283px;
+  background-left-image:           nocolor:alpha(0.8):panel2.png 0px   94px  128px 148px;
+  background-right-image:          nocolor:alpha(0.8):panel2.png 221px 94px  359px 148px;
+  background-center-image:         nocolor:alpha(0.8):panel2.png stretch 128px 94px  221px 148px;
+}
+
+.panelMainNoAlpha
+{
+	
+  
+  /*auto-generated 9-patch*/
+  background-decorator: tiled-box;
+  background-top-left-image:       nocolor:panel2.png 0px   0px   128px 94px ;
+  background-top-right-image:      nocolor:panel2.png 128px 0px   359px 94px ;
+  background-bottom-left-image:    nocolor:panel2.png 0px   94px  128px 283px;
+  background-bottom-right-image:   nocolor:panel2.png 128px 94px  359px 283px;
+  background-top-image:            nocolor:panel2.png 128px 0px   221px 94px ;
+  background-bottom-image:         nocolor:panel2.png 128px 94px  221px 283px;
+  background-left-image:           nocolor:panel2.png 0px   94px  128px 148px;
+  background-right-image:          nocolor:panel2.png 221px 94px  359px 148px;
+  background-center-image:         nocolor:panel2.png stretch 128px 94px  221px 148px;
+  
+}
+
+.panel1, .panelMain, .panelMainNoAlpha
+{
+  padding-left:30px;
+  
+  padding-right:55px;
+  
+  padding-bottom:30px;
+  padding-top:30px;
+
+}
+
+
+.panel_basic
+{
+	background-decorator: tiled-box;
+	
+	
+  /*auto-generated 9-patch*/
+  background-decorator: tiled-box;
+  /*
+  background-top-left-image:     nocolor:alpha(0.5):panel2.png 0px   0px  126px 94px;
+  background-top-right-image:    nocolor:alpha(0.5):panel2.png 126px 0px  345px 94px;
+  background-bottom-left-image:  nocolor:alpha(0.5):panel2.png 0px   94px 126px 269px;
+  background-bottom-right-image: nocolor:alpha(0.5):panel2.png 126px 94px 345px 269px;
+  background-top-image:          nocolor:alpha(0.5):panel2.png 126px 0px  221px 94px;
+  background-bottom-image:       nocolor:alpha(0.5):panel2.png 126px 94px 221px 269px;
+  background-left-image:         nocolor:alpha(0.5):panel2.png 0px   94px 126px 148px;
+  background-right-image:        nocolor:alpha(0.5):panel2.png 221px 94px 345px 148px;
+  background-center-image:       nocolor:alpha(0.5):panel2.png 126px 94px 221px 148px;
+  */
+  
+  /*auto-generated 9-patch*/
+  background-decorator: tiled-box;
+  background-top-left-image:       nocolor:alpha(0.5):panel_basic.png 0px   0px   128px 94px ;
+  background-top-right-image:      nocolor:alpha(0.5):panel_basic.png 128px 0px   359px 94px ;
+  background-bottom-left-image:    nocolor:alpha(0.5):panel_basic.png 0px   94px  128px 283px;
+  background-bottom-right-image:   nocolor:alpha(0.5):panel_basic.png 128px 94px  359px 283px;
+  background-top-image:            nocolor:alpha(0.5):panel_basic.png 128px 0px   221px 94px ;
+  background-bottom-image:         nocolor:alpha(0.5):panel_basic.png 128px 94px  221px 283px;
+  background-left-image:           nocolor:alpha(0.5):panel_basic.png 0px   94px  128px 148px;
+  background-right-image:          nocolor:alpha(0.5):panel_basic.png 221px 94px  359px 148px;
+  background-center-image:         nocolor:alpha(0.5):panel_basic.png 128px 94px  221px 148px;
+    
+  padding:15px;
+  padding-right:55px;
+  padding-bottom:10px;
+  
+}
+
+
+
+
+
+
+
+
+
+
+

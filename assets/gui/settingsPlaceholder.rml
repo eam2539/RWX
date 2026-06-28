@@ -1,0 +1,255 @@
+<rml>
+	<head>
+		<title>Settings</title>
+		<link type="text/rcss" href="rkt.rcss"/>
+		<link type="text/rcss" href="common.rcss"/>
+		<link type="text/rcss" href="forms.rcss"/>
+		<style>
+			
+			body
+	    {
+		    /*width: 680px;*/
+		    
+		    width: 80%;
+		    height: 525px;
+		    /*height: 100%;*/
+		    
+		    
+		    font-size: 25;
+		    
+		    
+		    height: 80%;
+		    top:5%;
+		    
+		  }
+			
+			
+			h2
+	    {
+	      font-size: 35;
+        font-weight:bold;
+        
+        text-align:center;
+        
+        display:block;
+	    }
+	    
+	    h2.needsUnicodeFont
+      {
+        font-size: 27;
+      }
+      
+      h3
+      {
+        font-size: 30;
+	      color:black;
+	      font-weight:bold;
+	      
+	      header-font-effect: shadow;
+	      
+	      header-width: 2px;
+	      
+        header-offset: 2px 2px;
+        header-color: gray;
+        
+        display:block;
+        
+        border-bottom: 3px rgba(0,0,0,128);
+        
+        padding-left:0.6em;
+        
+        margin-bottom:0.5em;
+        margin-top:0.5em;
+        
+        background:rgba(0,100,0,128);
+        
+      }
+      
+      h3.needsUnicodeFont
+      {
+        font-size: 27;
+      }
+			
+			.group
+			{
+			  padding-left:0.5em;
+			  
+			}
+			
+			.background
+      {
+        /*background:rgba(205,205,205,150);*/
+        
+        
+        
+        
+        
+        background:rgba(205,205,205,0);
+        
+        /*padding:13px;
+        padding-right:40px;
+        */
+        
+        
+        /*background:rgba(205,0,205,120);*/
+        
+        height: 100%;
+        
+      }
+      
+      
+			
+			div
+			{
+			  /*border-style: solid;
+	      border-width: 1px;
+	      border-color: red;*/
+			}
+			
+			
+			.form
+			{
+			  text-align: left;
+			  display: block;
+			  
+			  text-color:black;
+			}
+			
+		  
+		  
+			label
+			{
+			  padding-bottom:0em;
+			  margin-top:0em;
+			  
+			  /*border-style: solid;
+			  border-width: 2px;
+			  border-color: green;*/
+			  
+			  /*display:inline-block;*/
+			  
+        /*vertical-align:middle; */
+        
+			}
+			
+			#scrollDivWrap
+      {
+        
+        height: 100%;
+        
+        position: relative;
+			  
+        /*background:rgba(0,220,0,120);*/
+        
+      }
+       
+      #scrollDiv
+      {
+        
+        display:block;
+			  /*display:inline-block;*/
+			  
+			  overflow-y: auto;
+			  
+			  
+			  
+			  /*min-height:230px;
+			  
+			  
+			  max-height:540px;
+			  
+			  max-height:90%;*/
+			  
+			  /*height:100%;*/
+			  
+			  /*float:left;*/
+			  
+			  /*height: 100%;*/
+			  
+			  position: absolute;
+			  top:0px;
+			  bottom:30px;
+			  left:0px;
+			  right:0px;
+			  
+			  /*background:rgba(205,0,0,120);*/
+			  
+			  /*height:100%;*/
+			  
+			  /*width:100%;*/
+			  
+			  
+			  /*
+			  border-style: solid;
+			  border-width: 2px;
+			  border-color: red;
+			  */
+			  
+			  margin: 3px;
+			  padding: 3px;
+			  
+			  /*margin-bottom:-30em;*/
+			  /*margin-bottom:20em;*/
+      }
+      
+      .mainButtons
+      {
+        position: absolute;
+			  bottom:0px;
+      }
+      
+      .mainButtons button
+	    {
+	      margin:6px;
+	    }
+      
+      .whiteText label, .whiteText h2, .whiteText h3
+      {
+        color:white;
+        header-color: black;
+      }
+      
+      
+		</style>
+	</head>
+	<body onshow="setPageMinWidthAndHeight(900, 800); delayedOpenNoHistory('settings.rml')" id="body">
+		
+		
+		<div class="background panelMainNoAlpha whiteText">
+		  
+		    <div class="panelCloseButton" onclick="back()"  click_on_escape=""/>
+		    
+		    
+		    <div id="scrollDivWrap">
+		    
+		    <div id="scrollDiv">
+		      
+		      <h2>Settings</h2>
+	        <form class="form">
+	          
+	          <p class="center">...</p>
+	          
+	          
+	        </form>
+		      
+		      <br/>
+		      
+	        
+	      </div>
+	      
+	      
+	      <div class="mainButtons">
+	        <button onclick="back()">Back</button>
+	        
+	        <button onclick="saveSettings();back()" click_on_escape="">Save</button>
+	        
+	      </div> 
+	      
+		  </div><!-- scrollDivWrap -->
+		  
+		  
+		</div>
+		
+		
+	</body>
+</rml>

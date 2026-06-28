@@ -1,0 +1,51 @@
+<!--
+<!DOCTYPE html>
+-->
+
+
+
+<div>
+  <div class="panelCloseButton" onclick="closePopup()"  click_on_escape=""/>
+
+  <p id="message2" class="smallmessage">${ ifCondition(isMobile(), i('menus.hostgame.info'), i('menus.hostgame.info_pc')) }</p>
+  
+  <!--
+  <div class="checkboxDiv" style="display:none">
+    <input type="checkbox" id="useModdedUnits"><label for="useModdedUnits">Use (and require) modded units</label></input>
+  </div>
+  -->
+  
+  
+  <!--
+  <div class="checkboxDiv">
+    <input type="checkbox" id="requirePassword"><label for="requirePassword">Require Password</label></input>
+  </div>
+  -->
+  
+  <div class="checkboxDiv">
+    <input type="checkbox" id="useMods"><label for="useMods" class="styledText smallmessage">Use active mods (Players joining will require the same mods)</label></input>
+  </div>
+  
+  <div class="inputDiv" style="padding-left:20px;">
+    <label for="password" class="styledText smallmessage">Require Password:</label><input type="text" id="password" style="width: 7em;"  />
+  </div>
+  
+  
+  
+  <div class="mainButtons">
+
+    <!--
+    <button id="button_apply" onclick="keyBindingPopup_apply(false);closePopup();">${i:menus.battleroom.playerpopup.apply}</button>
+    -->
+    <button id="button_cancel"  onclick="closePopup();">Cancel</button>
+        
+    <button id="button_private"  onclick="hostStartFromPopup(false);">Host Private</button>
+    
+    <button id="button_public"   onclick="hostStartFromPopup(true);" >Host Public</button>
+    
+  </div>
+
+
+</div>
+
+
