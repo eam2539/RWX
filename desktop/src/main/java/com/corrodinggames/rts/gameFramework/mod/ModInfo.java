@@ -8,7 +8,6 @@ import com.corrodinggames.rts.gameFramework.file.CacheManager;
 import com.corrodinggames.rts.gameFramework.file.FileHelper;
 import com.corrodinggames.rts.gameFramework.utility.AssetInputStream;
 import com.corrodinggames.rts.gameFramework.utility.IniFile;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.i.b */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/i/b.class */
-public class ModInfo extends ModMetadata implements Comparable<ModInfo> {
+public class ModInfo implements Comparable<ModInfo> {
 
     /* JADX INFO: renamed from: a */
     public int tmpId;
@@ -186,20 +185,14 @@ public class ModInfo extends ModMetadata implements Comparable<ModInfo> {
         return this.dirName;
     }
 
-    @NotNull
-    @Override
     public String getId() {
         return this.uuid;
     }
 
-    @NotNull
-    @Override
     public String getName() {
         return getDisplayTitle();
     }
 
-    @NotNull
-    @Override
     public String getMinGameVersionName() {
         return this.minVersion;
     }
@@ -221,8 +214,6 @@ public class ModInfo extends ModMetadata implements Comparable<ModInfo> {
     }
 
     /* JADX INFO: renamed from: e */
-    @NotNull
-    @Override
     public String getDescription() {
         return getFullDescription();
     }
@@ -251,8 +242,6 @@ public class ModInfo extends ModMetadata implements Comparable<ModInfo> {
         return FileHelper.convertAbstractPath(this.sourceFolder);
     }
 
-    @NotNull
-    @Override
     /* JADX INFO: renamed from: h */
     public String getPath() {
         if (this.isFromSteam) {

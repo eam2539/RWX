@@ -130,77 +130,11 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-  build-android-apk:
-    name: Android APK
-    runs-on: ubuntu-latest
-    environment: ci
-    env:
-      KEYSTORE_FILE: ${{ github.workspace }}/android-signing.p12
-      KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-      KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-      KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Set up Temurin 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: gradle
-
-      - name: Ensure Gradle wrapper is executable
-        run: chmod +x ./gradlew
-
-      - name: Restore Android signing keystore
-        run: |
-          set -euo pipefail
-          printf '%s' '${{ secrets.ANDROID_KEYSTORE_BASE64 }}' | base64 -d > "$KEYSTORE_FILE"
-
-      - name: Build Android release APK
-        run: |
-          set -o pipefail
-          ./gradlew --no-daemon --max-workers=4 :android:assembleRelease 2>&1 | tee android-apk.log
-
-      - name: Stage Android APK
-        run: |
-          set -euo pipefail
-          mkdir -p android-artifacts
-          cp android/build/outputs/apk/release/*-release*.apk android-artifacts/RWX-android-release.apk
-
-      - name: Upload Android APK artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: RWX-android-apk
-          path: android-artifacts/*.apk
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Upload failure logs
-        if: failure()
-        uses: actions/upload-artifact@v6
-        with:
-          name: RWX-android-apk-logs
-          path: |
-            android-apk.log
-            android/build/reports/**
-            android/build/outputs/logs/**
-            hs_err_pid*.log
-          if-no-files-found: warn
-          retention-days: 14
-
-      - name: Remove Android signing keystore
-        if: always()
-        run: rm -f "$KEYSTORE_FILE"
-
   publish-release:
     name: Publish GitHub Release
     if: startsWith(github.ref, 'refs/tags/v')
     needs:
       - build-desktop
-      - build-android-apk
     runs-on: ubuntu-latest
 
     steps:
@@ -211,17 +145,10 @@ jobs:
           pattern: RWX-*-desktop
           merge-multiple: true
 
-      - name: Download Android APK artifact
-        uses: actions/download-artifact@v6
-        with:
-          path: release-artifacts
-          pattern: RWX-android-apk
-          merge-multiple: true
-
       - name: Generate checksums
         run: |
           cd release-artifacts
-          sha256sum *.zip *.apk > SHA256SUMS.txt
+          sha256sum *.zip > SHA256SUMS.txt
 
       - name: Create or update GitHub Release
         env:
@@ -230,7 +157,7 @@ jobs:
           set -euo pipefail
           tag="${GITHUB_REF_NAME}"
           repo="${GITHUB_REPOSITORY}"
-          assets=(release-artifacts/*.zip release-artifacts/*.apk release-artifacts/SHA256SUMS.txt)
+          assets=(release-artifacts/*.zip release-artifacts/SHA256SUMS.txt)
 
           if gh release view "$tag" --repo "$repo" >/dev/null 2>&1; then
             gh release upload "$tag" "${assets[@]}" --repo "$repo" --clobber

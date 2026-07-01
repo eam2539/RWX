@@ -17,8 +17,6 @@ import com.corrodinggames.rts.gameFramework.file.FileHelper;
 import com.corrodinggames.rts.gameFramework.local.Locale;
 import com.corrodinggames.rts.gameFramework.network.*;
 import com.corrodinggames.rts.gameFramework.network.ChatMessage;
-import com.corrodinggames.rts.gameFramework.p2p.P2PLobbyService;
-import com.corrodinggames.rts.gameFramework.p2p.P2PRoomAdvertisement;
 import com.corrodinggames.rts.gameFramework.platform.FileSelectionCallback;
 import com.corrodinggames.rts.gameFramework.platform.PlatformExtension;
 import com.corrodinggames.rts.gameFramework.stats.StatGroup;
@@ -42,7 +40,6 @@ public class Root extends ScriptContext {
     static ProfilerTimer convertTextStopwatch = new ProfilerTimer("ConvertText", true);
     static ProfilerTimer loadSettingsStopwatch = new ProfilerTimer("LoadSettings", true);
     ArrayList lastSortedDiscoveredServers;
-    ArrayList lastSortedDiscoveredP2PRooms;
 
     public void logDebug(String str) {
         GameEngine.log("ui[debug]: " + str);
@@ -235,31 +232,6 @@ public class Root extends ScriptContext {
         joinServer(str);
     }
 
-    public void joinP2PServerWithId(String str) {
-        try {
-            P2PLobbyService p2PLobbyService = P2PLobbyService.getInstance();
-            String strPrepareJoin = p2PLobbyService.prepareJoin(str);
-            GameEngine.getInstance().networkEngine.serverAddress = str;
-            p2PLobbyService.inLobby = false;
-            joinServer(strPrepareJoin);
-        } catch (IOException e) {
-            showPopup("Connection failed", e.getMessage(), true, (String) null, (String) null);
-        }
-    }
-
-    public void loadP2PConfig() {
-        String savedPeerConfig = P2PLobbyService.getInstance().getSavedPeerConfig();
-        setValueById("p2pConfigPath", savedPeerConfig);
-    }
-
-    public void enterP2PLobby() {
-        P2PLobbyService.getInstance().inLobby = true;
-    }
-
-    public void leaveP2PLobby() {
-        P2PLobbyService.getInstance().inLobby = false;
-    }
-
     public void joinServer(String str) {
         if (ScriptEngine.inDebugScript && !DebugSocketServer.field_d) {
             return;
@@ -444,7 +416,6 @@ public class Root extends ScriptContext {
 
     public void hostStartWithPasswordAndMods(boolean z, String str, boolean z2) throws ConfigParseException {
         GameEngine gameEngine = GameEngine.getInstance();
-        P2PLobbyService.getInstance().stopSession();
         gameEngine.networkEngine.disconnectNetworking("starting new");
         gameEngine.networkEngine.n = str;
         gameEngine.networkEngine.o = z2;
@@ -468,55 +439,6 @@ public class Root extends ScriptContext {
             return;
         }
         logWarn("hosting failed");
-    }
-
-    public void hostP2PStartFromPopup() throws ConfigParseException {
-        ElementDocument topmostDocument = this.libRocket.getTopmostDocument();
-        Element elementById = topmostDocument.getElementById("password");
-        String str = null;
-        if (elementById != null) {
-            String value = elementById.getValue();
-            if (value != null && !value.trim().equals(VariableScope.nullOrMissingString)) {
-                str = value.trim();
-            }
-        }
-        boolean checkbox = topmostDocument.getElementById("useMods").getCheckbox();
-        closePopup();
-        hostP2PStartWithPasswordAndMods(str, checkbox);
-    }
-
-    public void updateP2PStatus() {
-        P2PLobbyService.getInstance().inLobby = false;
-    }
-    public void hostP2PStartWithPasswordAndMods(String str, boolean z) throws ConfigParseException {
-        GameEngine gameEngine = GameEngine.getInstance();
-        gameEngine.networkEngine.disconnectNetworking("starting new p2p");
-        gameEngine.networkEngine.n = str;
-        gameEngine.networkEngine.o = z;
-        gameEngine.networkEngine.q = false;
-        gameEngine.networkEngine.useMasterServer = false;
-        if (!gameEngine.networkEngine.startServerHosting(false)) {
-            logWarn("p2p hosting failed");
-            return;
-        }
-        String strAv = gameEngine.networkEngine.av();
-        if (strAv != null && !FileHelper.fileExists(strAv)) {
-            strAv = null;
-        }
-        if (strAv == null) {
-            gameEngine.networkEngine.roomSettings.gameModeType = GameModeType.values()[0];
-            gameEngine.networkEngine.az = "maps/skirmish/[p8]Many Islands (8p).tmx";
-            gameEngine.networkEngine.roomSettings.mapPath = "[p8]Many Islands (8p).tmx";
-        }
-        try {
-            P2PLobbyService.getInstance().startIfNeeded();
-            P2PLobbyService.getInstance().hostCurrentServer();
-            P2PLobbyService.getInstance().inLobby = false;
-            this.libRocket.setDocument("battleroom.rml", null);
-        } catch (IOException e) {
-            gameEngine.networkEngine.disconnectNetworking("p2p host setup failed");
-            showPopup("P2P setup failed", e.getMessage(), true, (String) null, (String) null);
-        }
     }
 
     public void exit() {
@@ -1258,96 +1180,6 @@ public class Root extends ScriptContext {
         displayServerListRaw("serverListData", "serverRowTemplateHolder", "refreshButton");
     }
 
-    public void refreshP2PServerList() {
-        Element activeElementById = this.libRocket.getActiveElementById("refreshButton");
-        if (activeElementById != null) {
-            activeElementById.setText("Refreshing");
-        }
-        try {
-            P2PLobbyService.getInstance().startIfNeeded();
-            P2PLobbyService.getInstance().requestRefresh();
-        } catch (IOException e) {
-            showPopup("P2P refresh failed", e.getMessage(), true, (String) null, (String) null);
-        }
-        displayP2PServerList();
-    }
-
-    public void displayP2PServerList() {
-        displayP2PServerListRaw("serverListData", "serverRowTemplateHolder", "refreshButton");
-    }
-
-    public void displayP2PServerListRaw(String str, String str2, String str3) {
-        GameEngine gameEngine = GameEngine.getInstance();
-        Element activeElementById = this.libRocket.getActiveElementById(str);
-        Element activeElementById2 = this.libRocket.getActiveElementById(str2);
-        if (activeElementById == null) {
-            return;
-        }
-        ArrayList<P2PRoomAdvertisement> rooms = P2PLobbyService.getInstance().getRooms();
-        this.lastSortedDiscoveredP2PRooms = rooms;
-        String str4 = Locale.get("menus.lobby.gameState.battleroom", new Object[0]);
-        String str5 = Locale.get("menus.lobby.gameState.ingame", new Object[0]);
-        String str6 = Locale.get("menus.lobby.gameState.chat", new Object[0]);
-        if (activeElementById.getNumChildren() > rooms.size()) {
-            for (int numChildren = activeElementById.getNumChildren() - 1; numChildren >= rooms.size(); numChildren--) {
-                activeElementById.removeChild(activeElementById.getChild(numChildren));
-            }
-        }
-        int i = 0;
-        for (P2PRoomAdvertisement p2PRoomAdvertisement : rooms) {
-            Element child = i < activeElementById.getNumChildren() ? activeElementById.getChild(i) : null;
-            if (child != null && child.hasClassName("serverRowMessage")) {
-                activeElementById.removeChild(child);
-                child = null;
-            }
-            if (child != null && child.findByClassName("rState") == null) {
-                activeElementById.removeChild(child);
-                child = null;
-            }
-            if (child == null) {
-                child = activeElementById2.m29clone();
-                activeElementById.appendChild(child);
-                child.removeReference();
-                child.setAttribute("onclick", "clickedP2PServerRow(" + i + ")");
-            }
-            String strReplace = safeString(p2PRoomAdvertisement.getGameState()).replace("battleroom", str4).replace("ingame", str5).replace("chat", str6);
-            boolean z = !p2PRoomAdvertisement.isVersionCompatible();
-            int iA = Color.a(255, 240, 240, 240);
-            String str7 = "serverRow serverRowData realServerRow openRow ";
-            child.compareAndSetClassNames(str7);
-            child.findByClassName("rState").compareAndSetText(strReplace);
-            child.findByClassName("rHost").compareAndSetText(Utility.padLeft(safeString(p2PRoomAdvertisement.getCreatedBy()), 15));
-            child.findByClassName("rPlayers").compareAndSetText(Utility.padLeft(p2PRoomAdvertisement.getCurrentPlayers() + "\\" + p2PRoomAdvertisement.getMaxPlayers(), 15));
-            child.findByClassName("rMap").compareAndSetText(Utility.padLeft(p2PRoomAdvertisement.getMapDisplayName(), 40));
-            Element elementFindByClassName = child.findByClassName("rVersion");
-            elementFindByClassName.compareAndSetText("v" + Utility.padLeft(safeString(p2PRoomAdvertisement.getGameVersionString()), 8));
-            elementFindByClassName.compareAndSetClassNames(z ? "cell rVersion nonMatchingRow " : "cell rVersion ");
-            Element elementFindByClassName2 = child.findByClassName("rOpen");
-            elementFindByClassName2.compareAndSetText("P2P");
-            elementFindByClassName2.compareAndSetClassNames("cell rOpen ");
-            i++;
-        }
-        if (rooms.isEmpty()) {
-            Element child2 = activeElementById.getNumChildren() > 0 ? activeElementById.getChild(0) : null;
-            if (child2 == null || !child2.hasClassName("serverRowMessage")) {
-                Element elementM29clone = activeElementById2.m29clone();
-                activeElementById.appendChild(elementM29clone);
-                elementM29clone.removeReference();
-                elementM29clone.addClass("serverRowMessage");
-                elementM29clone.setText("No P2P rooms found. Edit p2p.toml for libp2p peers and WebRTC ICE servers, or host a room on this device.");
-            } else {
-                child2.setText("No P2P rooms found. Edit p2p.toml for libp2p peers and WebRTC ICE servers, or host a room on this device.");
-            }
-        }
-        if (str3 != null) {
-            Element activeElementById3 = this.libRocket.getActiveElementById(str3);
-            if (activeElementById3 != null) {
-                activeElementById3.setText("Refresh");
-            }
-        }
-        GameEngine.updatePaintTextSizeIfNeeded("DONE");
-    }
-
     public void refreshServerListRaw(final String str, final String str2, final String str3) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (str3 != null) {
@@ -1556,13 +1388,6 @@ public class Root extends ScriptContext {
         clickedServer(((ServerInfo) this.lastSortedDiscoveredServers.get(i)).serverId);
     }
 
-    public void clickedP2PServerRow(int i) {
-        if (this.lastSortedDiscoveredP2PRooms == null || i < 0 || i >= this.lastSortedDiscoveredP2PRooms.size()) {
-            return;
-        }
-        clickedP2PServer(((P2PRoomAdvertisement) this.lastSortedDiscoveredP2PRooms.get(i)).getRoomId());
-    }
-
     public void clickedServer(String str) {
         String str2;
         if (getAlertOrPopup() != null) {
@@ -1588,26 +1413,6 @@ public class Root extends ScriptContext {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void clickedP2PServer(String str) {
-        if (getAlertOrPopup() != null) {
-            return;
-        }
-        P2PRoomAdvertisement room = P2PLobbyService.getInstance().findRoom(str);
-        if (room == null) {
-            alert("That P2P room no longer exists");
-            return;
-        }
-        String str2 = "[onenter]Join:closePopup(); joinP2PServerWithId(" + restrictedString(room.getRoomId()) + ");";
-        showPopup(null, room.getInfoText(), true, str2, null);
-    }
-
-    private String safeString(String str) {
-        if (str == null) {
-            return VariableScope.nullOrMissingString;
-        }
-        return str;
     }
 
     public void hideKeyboard() {

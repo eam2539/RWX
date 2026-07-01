@@ -13,7 +13,6 @@ import com.corrodinggames.rts.gameFramework.local.Locale;
 import com.corrodinggames.rts.gameFramework.network.GameModeType;
 import com.corrodinggames.rts.gameFramework.network.GameRoomSettings;
 import com.corrodinggames.rts.gameFramework.network.TeamLayoutType;
-import com.corrodinggames.rts.gameFramework.p2p.P2PLobbyService;
 import com.corrodinggames.rts.gameFramework.steam.DisabledSteamEngine;
 import com.corrodinggames.rts.gameFramework.utility.StringUtils;
 
@@ -580,7 +579,6 @@ public class Multiplayer extends ScriptContext {
     }
 
     public void disconnect(String str) {
-        P2PLobbyService.getInstance().stopSession();
         GameEngine.getInstance().networkEngine.disconnectNetworking(str);
     }
 

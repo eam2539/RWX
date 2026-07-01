@@ -1,26 +1,17 @@
 [versions]
-androidGradleVersion = "9.0.1"
+androidGradleVersion = "8.13.2"
 appcompatVersion = "1.7.1"
 httpclientVersion = "4.5.14"
-jacksonDatabindVersion = "2.21.4"
-jvmLibp2pVersion = "1.2.0-RELEASE"
 kotlinVersion = "2.3.21"
 legacySupportV4Version = "1.0.0"
 lwjglVersion = "2.9.3"
 lwjgl_utilVersion = "2.9.3"
-tomlktVersion = "0.5.0"
-webrtcJavaVersion = "0.14.0"
 [libraries]
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclientVersion" }
-jvm-libp2p = { module = "io.libp2p:jvm-libp2p", version.ref = "jvmLibp2pVersion" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonDatabindVersion" }
 legacy-support-v4 = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacySupportV4Version" }
 lwjgl_util = { module = "org.lwjgl.lwjgl:lwjgl_util", version.ref = "lwjgl_utilVersion" }
 lwjgl = { module = "org.lwjgl.lwjgl:lwjgl", version.ref = "lwjglVersion" }
-tomlkt = { module = "net.peanuuutz.tomlkt:tomlkt", version.ref = "tomlktVersion" }
-webrtc-java = { module = "dev.onvoid.webrtc:webrtc-java", version.ref = "webrtcJavaVersion" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradleVersion" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinVersion" }

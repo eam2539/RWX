@@ -68,7 +68,6 @@ public class Main extends NetworkCallbacks {
 
     public static void main(String[] strArr) {
         m = new Main();
-        GlobalLogger.storage = new DesktopPlatformBridge().getStorage();
         m.a(strArr);
         new Runnable() { // from class: com.corrodinggames.rts.java.Main.1
             @Override // java.lang.Runnable
