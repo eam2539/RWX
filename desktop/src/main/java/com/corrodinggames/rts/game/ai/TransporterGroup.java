@@ -12,6 +12,7 @@ import com.corrodinggames.rts.gameFramework.Utility;
 import com.corrodinggames.rts.gameFramework.network.GameInputStream;
 import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
 import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,6 +39,15 @@ public class TransporterGroup extends AIUnitGroupBase {
     boolean q;
     float r;
     float s;
+
+    public TransporterGroup(AIController aIController) {
+        super(aIController);
+        this.e = 100.0f;
+        this.f = 4000.0f;
+        this.g = 100.0f;
+        this.o = 0.0f;
+        this.p = false;
+    }
 
     @Override // com.corrodinggames.rts.game.ai.AIStrategyNode, com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
@@ -97,15 +107,6 @@ public class TransporterGroup extends AIUnitGroupBase {
             this.s = gameInputStream.readFloat();
         }
         super.readFromInputStream(gameInputStream);
-    }
-
-    public TransporterGroup(AIController aIController) {
-        super(aIController);
-        this.e = 100.0f;
-        this.f = 4000.0f;
-        this.g = 100.0f;
-        this.o = 0.0f;
-        this.p = false;
     }
 
     public void c() {
@@ -225,17 +226,17 @@ public class TransporterGroup extends AIUnitGroupBase {
                     if (this.k == 0.0f) {
                         this.k = 80.0f;
                         for (OrderableUnit orderableUnit3 : arrayList) {
-                            Iterator it3 = this.F.iterator();
+                            Iterator<OrderableUnit> it3 = this.F.iterator();
                             while (true) {
                                 if (it3.hasNext()) {
-                                    OrderableUnit orderableUnit4 = (OrderableUnit) it3.next();
-                                    if (orderableUnit4.d((BaseUnit) orderableUnit3, false) && Utility.distanceSq(orderableUnit4.posX, orderableUnit4.posY, orderableUnit3.posX, orderableUnit3.posY) < 14400.0f) {
+                                    OrderableUnit orderableUnit4 = it3.next();
+                                    if (orderableUnit4.d(orderableUnit3, false) && Utility.distanceSq(orderableUnit4.posX, orderableUnit4.posY, orderableUnit3.posX, orderableUnit3.posY) < 14400.0f) {
                                         Command commandNewCommandForTeam4 = gameEngine.commandController.newCommandForTeam(this.aiController);
                                         commandNewCommandForTeam4.setTargetUnit(orderableUnit3);
                                         commandNewCommandForTeam4.setLoadIntoTarget(orderableUnit4);
                                         break;
                                     }
-                                }
+                                }else break;
                             }
                         }
                         boolean z = false;
