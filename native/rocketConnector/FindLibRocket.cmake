@@ -42,10 +42,24 @@ endif()
 function(_libRocket_find_shared_library output_var)
     if(DEFINED ${output_var})
         set(_libRocket_EXISTING_LIBRARY "${${output_var}}")
+        set(_libRocket_CLEAR_EXISTING_LIBRARY FALSE)
         if(_libRocket_EXISTING_LIBRARY AND NOT _libRocket_EXISTING_LIBRARY MATCHES "${_libRocket_SHARED_LIBRARY_PATTERN}")
+            set(_libRocket_CLEAR_EXISTING_LIBRARY TRUE)
+        elseif(_libRocket_EXISTING_LIBRARY)
+            get_filename_component(_libRocket_ROOT_ABSOLUTE "${LibRocket_ROOT}" ABSOLUTE)
+            file(RELATIVE_PATH _libRocket_EXISTING_LIBRARY_RELATIVE
+                "${_libRocket_ROOT_ABSOLUTE}"
+                "${_libRocket_EXISTING_LIBRARY}"
+            )
+            if(_libRocket_EXISTING_LIBRARY_RELATIVE MATCHES "^\\.\\.(/|$)")
+                set(_libRocket_CLEAR_EXISTING_LIBRARY TRUE)
+            endif()
+        endif()
+        if(_libRocket_CLEAR_EXISTING_LIBRARY)
             unset(${output_var} CACHE)
             unset(${output_var})
         endif()
+        unset(_libRocket_CLEAR_EXISTING_LIBRARY)
     endif()
 
     find_library(${output_var}

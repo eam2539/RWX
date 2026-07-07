@@ -79,17 +79,33 @@ val platformId = platformType.name.lowercase(getDefault()).replace("_", "-")
 
 val rocketConnectorNativeDir = layout.buildDirectory.dir("native/rocketConnector")
 val rocketConnectorSourceDir = layout.projectDirectory.dir("../native/rocketConnector")
+val libRocketRoot = providers.environmentVariable("LIBROCKET_ROOT").map { File(it).absolutePath }
 
 
-fun isRocketConnectorBuilt(buildDir: File): Boolean {
+fun rocketConnectorLibraryName(): String {
     return when (osType) {
-        OSType.WINDOWS -> buildDir.resolve("rocketConnector.dll").exists()
-        OSType.LINUX -> buildDir.resolve("librocketConnector.so").exists()
-        OSType.MACOS -> buildDir.resolve("librocketConnector.dylib").exists()
+        OSType.WINDOWS -> "rocketConnector64.dll"
+        OSType.LINUX -> "librocketConnector.so"
+        OSType.MACOS -> "librocketConnector.dylib"
     }
 }
 
-fun getLibrocketRoot(): String? = System.getenv("LIBROCKET_ROOT")
+fun getLibrocketRoot(): String? = libRocketRoot.orNull
+
+fun requireLibrocketRoot(): String {
+    return getLibrocketRoot() ?: throw GradleException("LIBROCKET_ROOT environment variable is not set")
+}
+
+fun libRocketBuildDirs(root: String): List<File> {
+    return listOf(File(root).resolve("Build/build"), File(root).resolve("Build/build/Release"))
+        .filter { it.exists() }
+}
+
+fun nativeLibraryPatterns(): List<String> = when (osType) {
+    OSType.WINDOWS -> listOf("*.dll")
+    OSType.LINUX -> listOf("*.so", "*.so.*")
+    OSType.MACOS -> listOf("*.dylib", "*.dylib.*")
+}
 
 fun libRocketRuntimePatterns(): List<String> = when (osType) {
     OSType.WINDOWS -> listOf("Rocket*.dll", "libRocket*.dll")
@@ -100,44 +116,61 @@ fun libRocketRuntimePatterns(): List<String> = when (osType) {
 
 val configureRocketConnectorNative by tasks.registering(Exec::class) {
     inputs.dir(rocketConnectorSourceDir)
-    outputs.dir(rocketConnectorNativeDir)
-    onlyIf {
-        !isRocketConnectorBuilt(rocketConnectorNativeDir.get().asFile)
-    }
+    inputs.property("libRocketRoot", libRocketRoot.orElse(""))
+    inputs.property("javaHome", System.getProperty("java.home"))
+    outputs.file(rocketConnectorNativeDir.map { it.file("CMakeCache.txt") })
     doFirst {
-        val root = getLibrocketRoot() ?: throw GradleException("LIBROCKET_ROOT environment variable is not set")
+        val root = requireLibrocketRoot().replace("\\", "/")
         environment("LIBROCKET_ROOT", root)
+        val javaHome = System.getProperty("java.home").replace("\\", "/")
+        val cmakeArgs = mutableListOf(
+            "cmake",
+            "-S", rocketConnectorSourceDir.asFile.absolutePath,
+            "-B", rocketConnectorNativeDir.get().asFile.absolutePath,
+            "-UlibRocket_*",
+            "-DLibRocket_ROOT=$root",
+            "-DJAVA_HOME=$javaHome"
+        )
+        val toolchainFile = System.getenv("CMAKE_TOOLCHAIN_FILE")
+        if (toolchainFile != null) {
+            cmakeArgs += "-DCMAKE_TOOLCHAIN_FILE=$toolchainFile"
+        }
+        val cmakeGenerator = System.getenv("CMAKE_GENERATOR")
+        if (cmakeGenerator != null) {
+            cmakeArgs += listOf("-G", cmakeGenerator)
+        }
+        commandLine(cmakeArgs)
     }
-    val javaHome = System.getProperty("java.home").replace("\\", "/")
-    var cmakeArgs = mutableListOf(
-        "cmake",
-        "-S", rocketConnectorSourceDir.asFile.absolutePath,
-        "-B", rocketConnectorNativeDir.get().asFile.absolutePath,
-        "-DJAVA_HOME=$javaHome"
-    )
-    val toolchainFile = System.getenv("CMAKE_TOOLCHAIN_FILE")
-    if (toolchainFile != null) {
-        cmakeArgs += "-DCMAKE_TOOLCHAIN_FILE=$toolchainFile"
-    }
-    val cmakeGenerator = System.getenv("CMAKE_GENERATOR")
-    if (cmakeGenerator != null) {
-        cmakeArgs += listOf("-G", cmakeGenerator)
-    }
-    commandLine(cmakeArgs)
 }
 
 val buildRocketConnectorNative by tasks.registering(Exec::class) {
     dependsOn(configureRocketConnectorNative)
     inputs.dir(rocketConnectorSourceDir)
-    outputs.dir(rocketConnectorNativeDir)
-    onlyIf {
-        !isRocketConnectorBuilt(rocketConnectorNativeDir.get().asFile)
-    }
+    inputs.file(rocketConnectorNativeDir.map { it.file("CMakeCache.txt") })
+    inputs.property("libRocketRoot", libRocketRoot.orElse(""))
+    outputs.file(rocketConnectorNativeDir.map { it.file(rocketConnectorLibraryName()) })
     doFirst {
-        val root = getLibrocketRoot() ?: throw GradleException("LIBROCKET_ROOT environment variable is not set")
+        val root = requireLibrocketRoot()
         environment("LIBROCKET_ROOT", root)
     }
     commandLine("cmake", "--build", rocketConnectorNativeDir.get().asFile.absolutePath, "--config", "Release")
+}
+
+val copyLibRocketRuntimeLibraries by tasks.registering(Copy::class) {
+    dependsOn(buildRocketConnectorNative)
+    inputs.property("libRocketRoot", libRocketRoot.orElse(""))
+    from({
+        val root = requireLibrocketRoot()
+        val libDirs = libRocketBuildDirs(root)
+        if (libDirs.isEmpty()) {
+            throw GradleException("LIBROCKET_ROOT does not contain Build/build or Build/build/Release: $root")
+        }
+        libDirs
+    }) {
+        include(libRocketRuntimePatterns())
+    }
+    into(rocketConnectorNativeDir)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 // ======================== Extract LWJGL Natives ========================
@@ -155,7 +188,7 @@ val extractNatives by tasks.registering(Sync::class) {
 // ======================== Jar ========================
 
 tasks.named<Jar>("jar") {
-    dependsOn(extractNatives, buildRocketConnectorNative, "compileJava", "compileKotlin")
+    dependsOn(extractNatives, copyLibRocketRuntimeLibraries, "compileJava", "compileKotlin")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from(tasks.named<JavaCompile>("compileJava").map { it.outputs.files })
@@ -170,48 +203,50 @@ tasks.named<Jar>("jar") {
 // ======================== Run ========================
 
 tasks.named<JavaExec>("run") {
-    dependsOn(extractNatives, buildRocketConnectorNative)
+    dependsOn(extractNatives, copyLibRocketRuntimeLibraries)
     workingDir = project.file("..")
     val nativePaths = listOf(
         layout.buildDirectory.dir("libs/natives").get().asFile.absolutePath,
         rocketConnectorNativeDir.get().asFile.absolutePath
     ).joinToString(File.pathSeparator)
     jvmArgs("-Djava.library.path=$nativePaths")
+    doFirst {
+        if (osType == OSType.LINUX) {
+            val libRocketPaths = libRocketBuildDirs(requireLibrocketRoot()).joinToString(File.pathSeparator)
+            val existingLdLibraryPath = System.getenv("LD_LIBRARY_PATH").orEmpty()
+            environment(
+                "LD_LIBRARY_PATH",
+                listOf(libRocketPaths, nativePaths, existingLdLibraryPath)
+                    .filter { it.isNotBlank() }
+                    .joinToString(File.pathSeparator)
+            )
+        }
+    }
 }
 
 // ======================== Tar/Zip Distribution ========================
 
-tasks.named("distTar").configure { dependsOn(extractNatives, buildRocketConnectorNative) }
-tasks.named("distZip").configure { dependsOn(extractNatives, buildRocketConnectorNative) }
+tasks.named("distTar").configure { dependsOn(extractNatives, copyLibRocketRuntimeLibraries) }
+tasks.named("distZip").configure { dependsOn(extractNatives, copyLibRocketRuntimeLibraries) }
 
 distributions {
     main {
         contents {
             from(layout.buildDirectory.dir("libs/natives")) {
-                when (osType) {
-                    OSType.WINDOWS -> include("*.dll")
-                    OSType.LINUX -> include("*.so")
-                    OSType.MACOS -> include("*.dylib")
-                }
+                include(nativeLibraryPatterns())
                 into("lib/natives")
             }
             from(rocketConnectorNativeDir) {
-                when (osType) {
-                    OSType.WINDOWS -> include("*.dll")
-                    OSType.LINUX -> include("*.so")
-                    OSType.MACOS -> include("*.dylib")
-                }
+                include(nativeLibraryPatterns())
                 into("lib/natives")
             }
             getLibrocketRoot()?.let { root ->
-                listOf(File(root).resolve("Build/build"), File(root).resolve("Build/build/Release"))
-                    .filter { it.exists() }
-                    .forEach { libDir ->
-                        from(libDir) {
-                            include(libRocketRuntimePatterns())
-                            into("lib/natives")
-                        }
+                libRocketBuildDirs(root).forEach { libDir ->
+                    from(libDir) {
+                        include(libRocketRuntimePatterns())
+                        into("lib/natives")
                     }
+                }
             }
 
             from(project.file("../res")) { into("res") }
@@ -231,7 +266,7 @@ val stagedDesktopDistDir = layout.buildDirectory.dir("jpackage/distributions/$pl
 val stageJpackageInput by tasks.registering(Sync::class) {
     group = "distribution"
     description = "Stage application jars and natives for jpackage."
-    dependsOn("jar", extractNatives, buildRocketConnectorNative)
+    dependsOn("jar", extractNatives, copyLibRocketRuntimeLibraries)
 
     from(tasks.named<Jar>("jar"))
     from({
@@ -245,27 +280,17 @@ val stageJpackageInput by tasks.registering(Sync::class) {
         nativesTarget.mkdirs()
         project.copy {
             from(layout.buildDirectory.dir("libs/natives")) {
-                when (osType) {
-                    OSType.WINDOWS -> include("*.dll")
-                    OSType.LINUX -> include("*.so")
-                    OSType.MACOS -> include("*.dylib")
-                }
+                include(nativeLibraryPatterns())
             }
             from(rocketConnectorNativeDir) {
-                when (osType) {
-                    OSType.WINDOWS -> include("*.dll")
-                    OSType.LINUX -> include("*.so")
-                    OSType.MACOS -> include("*.dylib")
-                }
+                include(nativeLibraryPatterns())
             }
             getLibrocketRoot()?.let { root ->
-                listOf(File(root).resolve("Build/build"), File(root).resolve("Build/build/Release"))
-                    .filter { it.exists() }
-                    .forEach { libDir ->
-                        from(libDir) {
-                            include(libRocketRuntimePatterns())
-                        }
+                libRocketBuildDirs(root).forEach { libDir ->
+                    from(libDir) {
+                        include(libRocketRuntimePatterns())
                     }
+                }
             }
 
             into(nativesTarget)

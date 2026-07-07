@@ -33,9 +33,18 @@ target_link_libraries(rocketConnector PRIVATE
 )
 
 if(APPLE)
-    set_target_properties(rocketConnector PROPERTIES BUILD_RPATH "@loader_path")
+    set(_rocketConnectorOriginRpath "@loader_path")
 elseif(UNIX)
-    set_target_properties(rocketConnector PROPERTIES BUILD_RPATH "$ORIGIN")
+    set(_rocketConnectorOriginRpath "$ORIGIN")
+endif()
+
+if(DEFINED _rocketConnectorOriginRpath)
+    set_target_properties(rocketConnector PROPERTIES
+        BUILD_RPATH "${_rocketConnectorOriginRpath}"
+        INSTALL_RPATH "${_rocketConnectorOriginRpath}"
+        BUILD_WITH_INSTALL_RPATH TRUE
+    )
+    unset(_rocketConnectorOriginRpath)
 endif()
 
 if(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
