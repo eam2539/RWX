@@ -12,8 +12,8 @@ public class TextRenderer extends RenderElement {
     @Override // com.corrodinggames.rts.gameFramework.ui.RenderElement
     public int a(Paint paint) {
         GameEngine gameEngine = GameEngine.getInstance();
-        int iB = gameEngine.graphicsEngine2.b(this.d, b(paint));
-        if (GameEngine.isDesktop()) {
+        int iB = gameEngine.renderGraphicsEngine.b(this.d, b(paint));
+        if (GameEngine.isAndroidPlatform()) {
         }
         return iB;
     }

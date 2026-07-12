@@ -166,7 +166,7 @@ public class Tileset {
             this.tileWidth = Integer.parseInt(element.getAttribute("tilewidth"));
             this.tileHeight = Integer.parseInt(element.getAttribute("tileheight"));
         }
-        if (GameEngine.printLog()) {
+        if (GameEngine.isSpaceGame()) {
             this.tileWidth = this.tileMap.tileWorldSizeX;
             this.tileHeight = this.tileMap.tileWorldSizeY;
         }
@@ -239,7 +239,7 @@ public class Tileset {
         if (tilesetImageDescriptor != null) {
             if (tilesetImageDescriptor.embeddedBase64 != null) {
                 try {
-                    Texture textureA = gameEngine.graphicsEngine2.a((InputStream) new BufferedInputStream(MapLayer.decodeCompressedBase64Stream(tilesetImageDescriptor.embeddedBase64, "base64", VariableScope.nullOrMissingString)), false);
+                    Texture textureA = gameEngine.renderGraphicsEngine.a((InputStream) new BufferedInputStream(MapLayer.decodeCompressedBase64Stream(tilesetImageDescriptor.embeddedBase64, "base64", VariableScope.nullOrMissingString)), false);
                     if (textureA == null) {
                         throw new MapLoadException("Embedded tilesetBitmap is null for: " + str);
                     }
@@ -255,7 +255,7 @@ public class Tileset {
         }
         try {
             InputStream inputStreamOpenAssetStreamFromPair = gameEngine.tileMap.openAssetStreamFromPair(str2, str);
-            Texture textureA2 = gameEngine.graphicsEngine2.a(inputStreamOpenAssetStreamFromPair, false);
+            Texture textureA2 = gameEngine.renderGraphicsEngine.a(inputStreamOpenAssetStreamFromPair, false);
             if (inputStreamOpenAssetStreamFromPair != null) {
                 try {
                     inputStreamOpenAssetStreamFromPair.close();

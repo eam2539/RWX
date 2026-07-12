@@ -113,7 +113,7 @@ public class GameStateChecksum {
                 if (i == 2) {
                     this.team3CreditsChecksum.value += (long) ((int) playerTeamK.credits);
                 }
-                this.unitCountChecksum.value += (long) playerTeamK.getTeamUnitCountInt();
+                this.unitCountChecksum.value += (long) playerTeamK.getNonBuildingUnitCountIncludingQueued();
                 this.teamInfoChecksum.value += (long) (i + (playerTeamK.teamPingTime * 100) + (playerTeamK.teamColorId * 1000) + ((playerTeamK.isTeamSpectator ? i : 0) * 10000));
             }
         }

@@ -5,14 +5,14 @@ import com.corrodinggames.rts.debug.DebugSocketServer;
 import com.corrodinggames.rts.game.GameLogic;
 import com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope;
 import com.corrodinggames.rts.gameFramework.GameEngine;
-import com.corrodinggames.rts.gameFramework.MissionEngine;
+import com.corrodinggames.rts.gameFramework.PlatformCallbacks;
 import org.lwjgl.Sys;
 
 import java.awt.*;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.java.i */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/java/i.class */
-public class JavaMissionEngine extends MissionEngine {
+public class JavaMissionEngine extends PlatformCallbacks {
     Main a;
 
     public JavaMissionEngine(Main main) {
@@ -91,7 +91,7 @@ public class JavaMissionEngine extends MissionEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.MissionEngine
     public boolean b() {
-        if (!GameEngine.getInstance().isGameThreadRunning() && !this.a.p.isGuiVisible()) {
+        if (!GameEngine.getInstance().isMenuBackgroundMapActive() && !this.a.p.isGuiVisible()) {
             return true;
         }
         return false;

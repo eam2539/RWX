@@ -142,13 +142,13 @@ public class MusicManager {
 
     /* JADX INFO: renamed from: b */
     public boolean isMusicEnabled() {
-        return (GameEngine.isDebug() || this.disabled || getMusicVolume() <= 0.01f) ? false : true;
+        return (GameEngine.isDedicatedServer() || this.disabled || getMusicVolume() <= 0.01f) ? false : true;
     }
 
     /* JADX INFO: renamed from: a */
     public void init(Context context) {
         this.context = context;
-        if (GameEngine.isDebug()) {
+        if (GameEngine.isDedicatedServer()) {
             return;
         }
         musicFactory.a(this);
@@ -270,7 +270,7 @@ public class MusicManager {
 
     /* JADX INFO: renamed from: a */
     public synchronized void update(float f) {
-        if (GameEngine.isDebug()) {
+        if (GameEngine.isDedicatedServer()) {
             return;
         }
         if (!musicFactory.isThreaded()) {
@@ -345,7 +345,7 @@ public class MusicManager {
     public void updateMusicInner(float f) {
         float musicVolume;
         float musicVolume2;
-        if (GameEngine.isDebug()) {
+        if (GameEngine.isDedicatedServer()) {
             return;
         }
         musicFactory.createMusicTrack(f);

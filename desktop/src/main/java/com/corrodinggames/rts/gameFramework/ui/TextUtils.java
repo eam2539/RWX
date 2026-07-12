@@ -27,13 +27,13 @@ public class TextUtils {
 
     /* JADX INFO: renamed from: a */
     public static int getLineHeight(Paint paint) {
-        return GameEngine.getInstance().graphicsEngine2.a("abcABC123!|", paint) + 4;
+        return GameEngine.getInstance().renderGraphicsEngine.a("abcABC123!|", paint) + 4;
     }
 
     /* JADX INFO: renamed from: b */
     public static int getCharWidth(Paint paint) {
-        int iA = GameEngine.getInstance().graphicsEngine2.a("abcABC123!|", paint);
-        if (GameEngine.isPCVersionStatic2) {
+        int iA = GameEngine.getInstance().renderGraphicsEngine.a("abcABC123!|", paint);
+        if (GameEngine.isGDXVersion) {
             return iA + 2;
         }
         return iA;
@@ -76,7 +76,7 @@ public class TextUtils {
             if (size == 0) {
                 paint3 = paint;
             }
-            float fB = GameEngine.getInstance().graphicsEngine2.b(str2, paint3);
+            float fB = GameEngine.getInstance().renderGraphicsEngine.b(str2, paint3);
             if (fB < rect.b()) {
                 rect.a = (int) (fD - (fB / 2.0f));
                 rect.c = (int) (fD + (fB / 2.0f));
@@ -87,7 +87,7 @@ public class TextUtils {
 
     /* JADX INFO: renamed from: a */
     public static void drawTextWithBackground(String str, float f, float f2, Paint paint, Paint paint2, float f3, float f4, float f5, float f6) {
-        GraphicsEngine graphicsEngine = GameEngine.getInstance().graphicsEngine2;
+        GraphicsEngine graphicsEngine = GameEngine.getInstance().renderGraphicsEngine;
         float fB = graphicsEngine.b(str, paint);
         textBounds.a(f, f2, f + fB, f2 + graphicsEngine.a(str, paint));
         backgroundRect.a(textBounds);

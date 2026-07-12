@@ -408,7 +408,7 @@ public class CustomAction extends PopupQueueAction {
             return false;
         }
         if (!(baseUnit instanceof CustomUnit)) {
-            GameEngine.updatePaintTextSizeIfNeeded("ai_isHighPriority non customUnit:" + baseUnit.r().getUnitTypeDescriptionShort());
+            GameEngine.logColored("ai_isHighPriority non customUnit:" + baseUnit.r().getUnitTypeDescriptionShort());
             return false;
         }
         return this.a.iconColorCondition.read((CustomUnit) baseUnit);

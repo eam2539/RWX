@@ -82,7 +82,7 @@ public class TransporterGroup extends AIUnitGroupBase {
             OrderableUnit unitEntity = gameInputStream.readUnitEntity();
             if (unitEntity != null) {
                 if (!this.aiController.isNonCombatCustomUnit(unitEntity)) {
-                    GameEngine.updatePaintTextSizeIfNeeded("TransporterGroup:readIn: Unit is not transporterUnit");
+                    GameEngine.logColored("TransporterGroup:readIn: Unit is not transporterUnit");
                 } else {
                     a(unitEntity);
                 }

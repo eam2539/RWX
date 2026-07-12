@@ -33,10 +33,10 @@ public class Gunship extends AirUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        b = gameEngine.graphicsEngine2.a(R.drawable.gunship);
-        c = gameEngine.graphicsEngine2.a(R.drawable.gunship_shadow);
-        a = gameEngine.graphicsEngine2.a(R.drawable.gunship_dead);
-        e = PlayerTeam.getUnitCountByType(b);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.gunship);
+        c = gameEngine.renderGraphicsEngine.a(R.drawable.gunship_shadow);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.gunship_dead);
+        e = PlayerTeam.getTeamColorTextures(b);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

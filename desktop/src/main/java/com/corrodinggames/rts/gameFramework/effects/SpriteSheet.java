@@ -55,6 +55,6 @@ public final class SpriteSheet {
         if (1 != 0) {
             rectF.a((-rectF.b()) / 2.0f, (-rectF.c()) / 2.0f);
         }
-        gameEngine.graphicsEngine2.a(this.i, rect, rectF, paint);
+        gameEngine.renderGraphicsEngine.a(this.i, rect, rectF, paint);
     }
 }

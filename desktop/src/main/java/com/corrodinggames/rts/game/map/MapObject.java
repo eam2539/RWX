@@ -166,7 +166,7 @@ public class MapObject {
                         if (playerTeamK == null) {
                             GameEngine.log("map", "Unit object without team:" + property + " (skipping unit)");
                             return;
-                        } else if (playerTeamK.addCredits()) {
+                        } else if (playerTeamK.isSpectatorTeamColor()) {
                             GameEngine.log("map", "Unit team is marked as spectator:" + property + " (skipping unit)");
                             return;
                         }
@@ -184,7 +184,7 @@ public class MapObject {
                         if (unitTypeC instanceof CustomUnitConfig) {
                             customUnitConfigFindConfigByName = (CustomUnitConfig) unitTypeC;
                         } else {
-                            GameEngine.updatePaintTextSizeIfNeeded("replacement not a custom unit:" + unitTypeC.getUnitTypeDescriptionShort());
+                            GameEngine.logColored("replacement not a custom unit:" + unitTypeC.getUnitTypeDescriptionShort());
                         }
                     }
                     baseUnitA = CustomUnitConfig.a(false, customUnitConfigFindConfigByName);
@@ -301,29 +301,29 @@ public class MapObject {
                     fastArrayList.add(str3);
                 }
             } else {
-                GameEngine.updatePaintTextSizeIfNeeded("createLocaleStringFromProperty: Non string:" + obj);
+                GameEngine.logColored("createLocaleStringFromProperty: Non string:" + obj);
             }
         }
         for (String str4 : fastArrayList) {
             String lowerCase = str4.substring(str2.length()).toLowerCase(Locale.ROOT);
-            GameEngine.updatePaintTextSizeIfNeeded("createLocaleStringFromProperty checking: " + str4);
+            GameEngine.logColored("createLocaleStringFromProperty checking: " + str4);
             if (lowerCase.length() <= 4) {
                 String description = getDescription(str4);
-                GameEngine.updatePaintTextSizeIfNeeded("createLocaleStringFromProperty got: " + description);
-                GameEngine.updatePaintTextSizeIfNeeded("createLocaleStringFromProperty code: " + lowerCase);
+                GameEngine.logColored("createLocaleStringFromProperty got: " + description);
+                GameEngine.logColored("createLocaleStringFromProperty code: " + lowerCase);
                 arrayList.add(new LanguagePart(lowerCase, description));
             }
         }
         LocaleString localeString2 = new LocaleString((LanguagePart[]) arrayList.toArray(new LanguagePart[0]));
         localeString2.resolveText();
-        GameEngine.updatePaintTextSizeIfNeeded("createLocaleStringFromProperty final: " + localeString2.resolveText());
-        GameEngine.updatePaintTextSizeIfNeeded("createLocaleStringFromProperty locate: " + com.corrodinggames.rts.gameFramework.local.Locale.getLanguage());
+        GameEngine.logColored("createLocaleStringFromProperty final: " + localeString2.resolveText());
+        GameEngine.logColored("createLocaleStringFromProperty locate: " + com.corrodinggames.rts.gameFramework.local.Locale.getLanguage());
         return localeString2;
     }
 
     /* JADX INFO: renamed from: d */
     public void logTriggerMessage(String str) {
-        NetworkEngine.g("(Map trigger: " + this.name + ", type:" + this.type + "): " + str);
+        NetworkEngine.reportDesync("(Map trigger: " + this.name + ", type:" + this.type + "): " + str);
     }
 
     /* JADX INFO: renamed from: b */

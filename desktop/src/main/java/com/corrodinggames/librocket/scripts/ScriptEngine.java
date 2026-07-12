@@ -44,7 +44,7 @@ public class ScriptEngine {
 
     public static void checkThreadAccess() {
         if (!((Boolean) isMainScriptThread.get()).booleanValue()) {
-            GameEngine.updatePaintTextSizeIfNeeded("ScriptEngine: thread is not marked as main script thread!");
+            GameEngine.logColored("ScriptEngine: thread is not marked as main script thread!");
             GameEngine.printStackTrace();
         }
     }
@@ -439,15 +439,15 @@ public class ScriptEngine {
             e.printStackTrace();
             throw new RuntimeException(e);
         } catch (IllegalArgumentException e2) {
-            GameEngine.updatePaintTextSizeIfNeeded("convertedParameters:");
+            GameEngine.logColored("convertedParameters:");
             for (Object obj2 : arrayList) {
                 if (obj2 == null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("=null");
+                    GameEngine.logColored("=null");
                 } else {
-                    GameEngine.updatePaintTextSizeIfNeeded("=" + obj2.getClass().getName());
+                    GameEngine.logColored("=" + obj2.getClass().getName());
                 }
             }
-            GameEngine.updatePaintTextSizeIfNeeded("-----");
+            GameEngine.logColored("-----");
             e2.printStackTrace();
             throw new RuntimeException(e2);
         } catch (InvocationTargetException e3) {

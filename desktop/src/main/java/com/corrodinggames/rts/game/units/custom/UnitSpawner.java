@@ -228,13 +228,13 @@ public class UnitSpawner {
                 float var21 = float4;
                 if (var15.spawnSource != null) {
                     if (!(am instanceof OrderableUnit)) {
-                        GameEngine.updatePaintTextSizeIfNeeded("spawnUnitsAt: sourceUnit!=OrderableUnit is:" + BaseUnit.serialize(am));
+                        GameEngine.logColored("spawnUnitsAt: sourceUnit!=OrderableUnit is:" + BaseUnit.serialize(am));
                         continue;
                     }
 
                     BaseUnit var22 = var15.spawnSource.readUnit((OrderableUnit)am);
                     if (var22 == null) {
-                        GameEngine.updatePaintTextSizeIfNeeded("spawnUnitsAt: spawnSource==null");
+                        GameEngine.logColored("spawnUnitsAt: spawnSource==null");
                         continue;
                     }
 
@@ -245,16 +245,16 @@ public class UnitSpawner {
                     var20 = var22.posZ;
                     var21 = var22.rotationSpeed;
                     if (var16 == null) {
-                        GameEngine.updatePaintTextSizeIfNeeded("spawnUnitsAt: newSpawnSource.team==null");
+                        GameEngine.logColored("spawnUnitsAt: newSpawnSource.team==null");
                         continue;
                     }
                 }
 
                 if (!boolean9) {
-                    if (var16.getTeamUnitCountInt() > var16.getTeamBuildingCountInt() + 300) {
+                    if (var16.getNonBuildingUnitCountIncludingQueued() > var16.getUnitCap() + 300) {
                         var10 = true;
                     }
-                } else if (var16.addUnitToTeam(true, false) > var16.getTeamBuildingCountInt() + 20000) {
+                } else if (var16.getUnitCount(true, false) > var16.getUnitCap() + 20000) {
                     var10 = true;
                 }
 
@@ -264,21 +264,21 @@ public class UnitSpawner {
                         var34 = var34 + "source:" + var17.getVelocityX();
                     }
 
-                    GameEngine.updatePaintTextSizeIfNeeded("spawnUnitsAt: Skipping, too many units already on team:" + var16.teamId + " count:" + var16.getTeamUnitCountInt() + " " + var34);
-                    if (GameEngine.getInstance().isNetworkGameActive) {
-                        var16.updateTeamTextures();
+                    GameEngine.logColored("spawnUnitsAt: Skipping, too many units already on team:" + var16.teamId + " count:" + var16.getNonBuildingUnitCountIncludingQueued() + " " + var34);
+                    if (GameEngine.getInstance().isDebugTempMode) {
+                        var16.debugLogUnitCountsByType();
                     }
-                } else if (var16.getTeamPing() > var16.getTeamBuildingCountInt() + 25000) {
+                } else if (var16.getTotalUnitCountIncludingQueued() > var16.getUnitCap() + 25000) {
                     String var33 = "";
                     if (var17 != null) {
                         var33 = var33 + "source:" + var17.getVelocityX();
                     }
 
-                    GameEngine.updatePaintTextSizeIfNeeded(
-                            "spawnUnitsAt: Failsafe, too many units already on team (including ignored):" + var16.teamId + " total count:" + var16.getTeamPing() + " " + var33
+                    GameEngine.logColored(
+                            "spawnUnitsAt: Failsafe, too many units already on team (including ignored):" + var16.teamId + " total count:" + var16.getTotalUnitCountIncludingQueued() + " " + var33
                     );
-                    if (GameEngine.getInstance().isNetworkGameActive) {
-                        var16.updateTeamTextures();
+                    if (GameEngine.getInstance().isDebugTempMode) {
+                        var16.debugLogUnitCountsByType();
                     }
                 } else {
                     UnitType var32 = var15.unitType.c();
@@ -358,8 +358,8 @@ public class UnitSpawner {
                                     var11.tileMap.exportTmxToFile(var35.posX, var35.posY);
                                     var35.posX = var11.tileMap.cursorTileX;
                                     var35.posY = var11.tileMap.cursorTileY;
-                                    var35.posX = var35.posX + var35.getUnitAIState();
-                                    var35.posY = var35.posY + var35.getUnitAIPathfindStatus();
+                                    var35.posX = var35.posX + var35.getTileOffsetX();
+                                    var35.posY = var35.posY + var35.getTileOffsetY();
                                 }
 
                                 var35.posX = var35.posX + var15.offsetX;
@@ -407,7 +407,7 @@ public class UnitSpawner {
                                                 }
 
                                                 if (!var35.e(var37, true)) {
-                                                    GameEngine.updatePaintTextSizeIfNeeded("transportedUnitsToTransfer failed for: " + var37.getVelocityX() + " to: " + var35.getVelocityX());
+                                                    GameEngine.logColored("transportedUnitsToTransfer failed for: " + var37.getVelocityX() + " to: " + var35.getVelocityX());
                                                     var37.getUnitAICondition();
                                                 }
                                             }
@@ -425,12 +425,12 @@ public class UnitSpawner {
 
                                     if (var15.copyWaypointsFrom != null) {
                                         if (!(var35 instanceof OrderableUnit)) {
-                                            GameEngine.updatePaintTextSizeIfNeeded("copyWaypointsFrom: spawnedUnit!=OrderableUnit is:" + BaseUnit.serialize(var17));
+                                            GameEngine.logColored("copyWaypointsFrom: spawnedUnit!=OrderableUnit is:" + BaseUnit.serialize(var17));
                                         } else {
                                             BaseUnit var36 = var15.copyWaypointsFrom.readUnit((OrderableUnit)am);
                                             if (var36 != null) {
                                                 if (!(var36 instanceof OrderableUnit)) {
-                                                    GameEngine.updatePaintTextSizeIfNeeded("copyWaypointsFrom: copyWaypointsFrom!=OrderableUnit is:" + BaseUnit.serialize(var17));
+                                                    GameEngine.logColored("copyWaypointsFrom: copyWaypointsFrom!=OrderableUnit is:" + BaseUnit.serialize(var17));
                                                 } else {
                                                     OrderableUnit.copyWaypoints((OrderableUnit)var36, (OrderableUnit)var35);
                                                 }

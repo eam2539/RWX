@@ -55,10 +55,10 @@ public class BattleShip extends WaterUnit {
     /* JADX INFO: renamed from: f */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        battleShipTexture_alive = gameEngine.graphicsEngine2.a(R.drawable.battle_ship_t2);
-        battleShipTexture = gameEngine.graphicsEngine2.a(R.drawable.battle_ship_t2_dead);
-        battleShipTurretTexture = gameEngine.graphicsEngine2.a(R.drawable.battle_ship_t2_turret);
-        battleShipTextures_teamColors = PlayerTeam.getUnitCountByType(battleShipTexture_alive);
+        battleShipTexture_alive = gameEngine.renderGraphicsEngine.a(R.drawable.battle_ship_t2);
+        battleShipTexture = gameEngine.renderGraphicsEngine.a(R.drawable.battle_ship_t2_dead);
+        battleShipTurretTexture = gameEngine.renderGraphicsEngine.a(R.drawable.battle_ship_t2_turret);
+        battleShipTextures_teamColors = PlayerTeam.getTeamColorTextures(battleShipTexture_alive);
         battleShipShadowTexture = attackUnit(battleShipTexture_alive, battleShipTexture_alive.m(), battleShipTexture_alive.l());
     }
 

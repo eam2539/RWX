@@ -210,7 +210,7 @@ public abstract class BaseUnit extends SizedObject {
     public float unitEnergyMax;
 
     /* JADX INFO: renamed from: cB */
-    public float f0cB;
+    public float currentEnergy;
     public float cC;
 
     /* JADX INFO: renamed from: cD */
@@ -405,7 +405,7 @@ public abstract class BaseUnit extends SizedObject {
             bE.add(this);
             a.a(this);
         }
-        this.unitFlags1 = GameEngine.getInstance().lastTick;
+        this.unitFlags1 = GameEngine.getInstance().gameTimeMillis;
         this.unitType = r();
     }
 
@@ -565,7 +565,7 @@ public abstract class BaseUnit extends SizedObject {
         HoverLandUnit.K();
         WaterUnit.loadTextures();
         AirUnit.loadAirUnitTextures();
-        if (GameEngine.getInstance().isPaused()) {
+        if (GameEngine.getInstance().usesCoreUnitTypes()) {
             Iterator it = EnumSet.allOf(UnitTypeEnum.class).iterator();
             while (it.hasNext()) {
                 ((UnitTypeEnum) it.next()).abstractMethodB();
@@ -589,7 +589,7 @@ public abstract class BaseUnit extends SizedObject {
 
     public static HashMap bK() {
         HashMap map = new HashMap();
-        if (GameEngine.getInstance().isPaused()) {
+        if (GameEngine.getInstance().usesCoreUnitTypes()) {
             for (UnitTypeEnum unitTypeEnum : EnumSet.allOf(UnitTypeEnum.class)) {
                 BaseUnit baseUnitCreateUnitInstanceWithBoolean = unitTypeEnum.createUnitInstanceWithBoolean(true);
                 baseUnitCreateUnitInstanceWithBoolean.remove();
@@ -627,7 +627,7 @@ public abstract class BaseUnit extends SizedObject {
 
     public static int bM() {
         int iBw = 0;
-        if (GameEngine.getInstance().isPaused()) {
+        if (GameEngine.getInstance().usesCoreUnitTypes()) {
             for (UnitTypeEnum unitTypeEnum : EnumSet.allOf(UnitTypeEnum.class)) {
                 iBw = (iBw * 31) + findTurretPosition(unitTypeEnum).bw();
             }
@@ -704,7 +704,7 @@ public abstract class BaseUnit extends SizedObject {
         gameOutputStream.writeBoolean(this.isUnitUntargetable);
         gameOutputStream.writeBoolean(this.isUnitCapturable);
         gameOutputStream.writeBoolean(this.isAIUnit);
-        gameOutputStream.writeFloat(this.f0cB);
+        gameOutputStream.writeFloat(this.currentEnergy);
         gameOutputStream.writeBoolean(this.isRotating);
         gameOutputStream.writeBoolean(this.unitEffects != null);
         if (this.unitEffects != null) {
@@ -819,7 +819,7 @@ public abstract class BaseUnit extends SizedObject {
             this.isAIUnit = gameInputStream.readBoolean();
         }
         if (b >= 9) {
-            this.f0cB = gameInputStream.readFloat();
+            this.currentEnergy = gameInputStream.readFloat();
         }
         if (b >= 10) {
             this.isRotating = gameInputStream.readBoolean();
@@ -1087,7 +1087,7 @@ public abstract class BaseUnit extends SizedObject {
             f2 = gameEngine.zoom;
         }
         if (f2 < 1.0f) {
-            gameEngine.graphicsEngine2.k();
+            gameEngine.renderGraphicsEngine.k();
             gameEngine.restoreZoomTransform();
             f4 *= gameEngine.zoom;
             f5 *= gameEngine.zoom;
@@ -1118,9 +1118,9 @@ public abstract class BaseUnit extends SizedObject {
                         i2 = 1;
                     }
                     dr.a(f4 - f3, f5 + f6, (f4 - f3) + (f7 * x()), f5 + f6 + i2);
-                    gameEngine.graphicsEngine2.a(dr, paintA);
+                    gameEngine.renderGraphicsEngine.a(dr, paintA);
                     dr.a(f4 - f3, f5 + f6, (f4 - f3) + f7, f5 + f6 + i2);
-                    gameEngine.graphicsEngine2.a(dr, paintA2);
+                    gameEngine.renderGraphicsEngine.a(dr, paintA2);
                     if (this.cC != 0.0f && bU() && gameEngine.settingsEngine.showHpChanges) {
                         float fX = x();
                         float f9 = fX + ((-this.cC) / this.maxHealth);
@@ -1132,7 +1132,7 @@ public abstract class BaseUnit extends SizedObject {
                         }
                         Paint paintA3 = GameViewUtils.a(Utility.longToIntArray(100, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_RADIO_SERVICE, 208, 26), Paint.Style.FILL);
                         dr.a((f4 - f3) + (f7 * fX), f5 + f6, (f4 - f3) + (f7 * f9), f5 + f6 + i2);
-                        gameEngine.graphicsEngine2.a(dr, paintA3);
+                        gameEngine.renderGraphicsEngine.a(dr, paintA3);
                     }
                 }
             }
@@ -1149,9 +1149,9 @@ public abstract class BaseUnit extends SizedObject {
                     float f14 = f11 + ((i3 - 1) * f12);
                     dr.a(f14, f5 + f6 + 3.0f, f14 + f13, f5 + f6 + 3.0f + 3.0f);
                     if (transportedUnitsWeight >= i3) {
-                        gameEngine.graphicsEngine2.a(dr, GameViewUtils.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_SATELLITE_SERVICE, 0, 0, 255, Paint.Style.FILL));
+                        gameEngine.renderGraphicsEngine.a(dr, GameViewUtils.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_SATELLITE_SERVICE, 0, 0, 255, Paint.Style.FILL));
                     }
-                    gameEngine.graphicsEngine2.a(dr, GameViewUtils.a(110, 0, 0, 210, Paint.Style.STROKE));
+                    gameEngine.renderGraphicsEngine.a(dr, GameViewUtils.a(110, 0, 0, 210, Paint.Style.STROKE));
                 }
                 f8 = 3.0f + 5.0f;
             }
@@ -1165,27 +1165,27 @@ public abstract class BaseUnit extends SizedObject {
             } else {
                 iLongToIntArray3 = Utility.longToIntArray(200, 23, 179, 207);
             }
-            gameEngine.graphicsEngine2.a(dr, GameViewUtils.a(iLongToIntArray3, Paint.Style.FILL));
+            gameEngine.renderGraphicsEngine.a(dr, GameViewUtils.a(iLongToIntArray3, Paint.Style.FILL));
             dr.a(f4 - f3, f5 + f6 + i4 + f8, (f4 - f3) + f7, f5 + f6 + i4 + 2 + f8);
             if (zIsUnitAtPositionX) {
                 iLongToIntArray4 = Utility.longToIntArray(105, 123, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_AVR_INPUT, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_BUTTON_6);
             } else {
                 iLongToIntArray4 = Utility.longToIntArray(120, 45, 211, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_NETWORK);
             }
-            gameEngine.graphicsEngine2.a(dr, GameViewUtils.a(iLongToIntArray4, Paint.Style.STROKE));
+            gameEngine.renderGraphicsEngine.a(dr, GameViewUtils.a(iLongToIntArray4, Paint.Style.STROKE));
             f8 += 2;
             i = 4;
         }
         if (bV() >= 0.0f) {
             int i5 = i + 1;
             dr.a(f4 - f3, f5 + f6 + i5 + f8, (f4 - f3) + (f7 * bV()), f5 + f6 + i5 + i + f8);
-            gameEngine.graphicsEngine2.a(dr, GameViewUtils.a(200, 0, 0, 150, Paint.Style.FILL));
+            gameEngine.renderGraphicsEngine.a(dr, GameViewUtils.a(200, 0, 0, 150, Paint.Style.FILL));
             dr.a(f4 - f3, f5 + f6 + i5 + f8, (f4 - f3) + f7, f5 + f6 + i5 + i + f8);
-            gameEngine.graphicsEngine2.a(dr, GameViewUtils.a(120, 0, 0, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, Paint.Style.STROKE));
+            gameEngine.renderGraphicsEngine.a(dr, GameViewUtils.a(120, 0, 0, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, Paint.Style.STROKE));
             float f15 = f8 + i;
         }
         if (f2 < 1.0f) {
-            gameEngine.graphicsEngine2.l();
+            gameEngine.renderGraphicsEngine.l();
         }
     }
 
@@ -1198,8 +1198,8 @@ public abstract class BaseUnit extends SizedObject {
         if (!this.isDestroyed && this.unitTransportTarget == null && this.isSelected) {
             GameEngine gameEngine = GameEngine.getInstance();
             if (this.team == gameEngine.playerTeam || gameEngine.gameUI.canControlUnit(this)) {
-                if (gameEngine.settingsEngine.showUnitWaypoints && gameEngine.lastPinchDistance <= 40) {
-                    gameEngine.lastPinchDistance++;
+                if (gameEngine.settingsEngine.showUnitWaypoints && gameEngine.selectedWaypointDrawCount <= 40) {
+                    gameEngine.selectedWaypointDrawCount++;
                     O();
                 }
                 getUnitAISettings();
@@ -1261,7 +1261,7 @@ public abstract class BaseUnit extends SizedObject {
                         targetX = f + (Utility.fastCos(angleBetweenPoints) * 400.0f);
                         targetY = f2 + (Utility.fastSin(angleBetweenPoints) * 400.0f);
                     }
-                    gameEngine.graphicsEngine2.a(f - gameEngine.viewpointXSnapped, f2 - gameEngine.viewpointYSnapped, targetX - gameEngine.viewpointXSnapped, targetY - gameEngine.viewpointYSnapped, ds);
+                    gameEngine.renderGraphicsEngine.a(f - gameEngine.viewpointXSnapped, f2 - gameEngine.viewpointYSnapped, targetX - gameEngine.viewpointXSnapped, targetY - gameEngine.viewpointYSnapped, ds);
                     if (0 != 0) {
                         float fDistance = Utility.distance(f, f2, targetX, targetY);
                         float angleBetweenPoints2 = Utility.getAngleBetweenPoints(f, f2, targetX, targetY);
@@ -1270,7 +1270,7 @@ public abstract class BaseUnit extends SizedObject {
                         float fFastSin = f2 + (Utility.fastSin(angleBetweenPoints2) * f3);
                         dr.a(fFastCos - 1.0f, fFastSin - 1.0f, fFastCos + 1.0f, fFastSin + 1.0f);
                         dr.a(-gameEngine.viewpointXSnapped, -gameEngine.viewpointYSnapped);
-                        gameEngine.graphicsEngine2.a(dr, ds);
+                        gameEngine.renderGraphicsEngine.a(dr, ds);
                     }
                     f = targetX;
                     f2 = targetY;
@@ -1280,7 +1280,7 @@ public abstract class BaseUnit extends SizedObject {
         if (unitCommand != null && unitCommand2 != null && unitCommand != unitCommand2) {
             ds.b(Color.a(50, 0, 210, 210));
             UnitCommand unitCommand3 = unitCommand;
-            gameEngine.graphicsEngine2.a(unitCommand2.getTargetX() - gameEngine.viewpointXSnapped, unitCommand2.getTargetY() - gameEngine.viewpointYSnapped, unitCommand3.getTargetX() - gameEngine.viewpointXSnapped, unitCommand3.getTargetY() - gameEngine.viewpointYSnapped, ds);
+            gameEngine.renderGraphicsEngine.a(unitCommand2.getTargetX() - gameEngine.viewpointXSnapped, unitCommand2.getTargetY() - gameEngine.viewpointYSnapped, unitCommand3.getTargetX() - gameEngine.viewpointXSnapped, unitCommand3.getTargetY() - gameEngine.viewpointYSnapped, ds);
         }
     }
 
@@ -1331,21 +1331,21 @@ public abstract class BaseUnit extends SizedObject {
                         dr.d *= gameEngine.tileMap.tileWorldSizeY;
                         dr.a *= gameEngine.tileMap.tileWorldSizeX;
                         dr.c *= gameEngine.tileMap.tileWorldSizeX;
-                        float unitAIPathfindError = getUnitAIPathfindError();
-                        dr.a(-(getUnitAIState() - gameEngine.tileMap.halfTileWorldSizeX), -(getUnitAIPathfindStatus() - gameEngine.tileMap.halfTileWorldSizeY));
-                        Utility.grow(dr, unitAIPathfindError);
+                        float selectionRadius = getSelectionRadius();
+                        dr.a(-(getTileOffsetX() - gameEngine.tileMap.halfTileWorldSizeX), -(getTileOffsetY() - gameEngine.tileMap.halfTileWorldSizeY));
+                        Utility.grow(dr, selectionRadius);
                         dr.a(f2, f3);
-                        gameEngine.graphicsEngine2.a(dr.a - 11.0f, dr.b, dr.c + 11.0f, dr.b, paint);
-                        gameEngine.graphicsEngine2.a(dr.a - 11.0f, dr.d, dr.c + 11.0f, dr.d, paint);
-                        gameEngine.graphicsEngine2.a(dr.a, dr.b - 11.0f, dr.a, dr.d + 11.0f, paint);
-                        gameEngine.graphicsEngine2.a(dr.c, dr.b - 11.0f, dr.c, dr.d + 11.0f, paint);
+                        gameEngine.renderGraphicsEngine.a(dr.a - 11.0f, dr.b, dr.c + 11.0f, dr.b, paint);
+                        gameEngine.renderGraphicsEngine.a(dr.a - 11.0f, dr.d, dr.c + 11.0f, dr.d, paint);
+                        gameEngine.renderGraphicsEngine.a(dr.a, dr.b - 11.0f, dr.a, dr.d + 11.0f, paint);
+                        gameEngine.renderGraphicsEngine.a(dr.c, dr.b - 11.0f, dr.c, dr.d + 11.0f, paint);
                         return;
                     }
                     return;
                 }
                 float unitSelectionFadeEffect = this.displayRadius + gameEngine.gameUI.getUnitSelectionFadeEffect(this);
-                if (gameEngine.handleNetworkPacket(f2, f3, unitSelectionFadeEffect)) {
-                    gameEngine.graphicsEngine2.a(f2, f3, unitSelectionFadeEffect, paint);
+                if (gameEngine.isCircleVisibleInCamera(f2, f3, unitSelectionFadeEffect)) {
+                    gameEngine.renderGraphicsEngine.a(f2, f3, unitSelectionFadeEffect, paint);
                 }
             }
         }
@@ -1384,7 +1384,7 @@ public abstract class BaseUnit extends SizedObject {
             return true;
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        gameEngine.graphicsEngine2.l();
+        gameEngine.renderGraphicsEngine.l();
         float f2 = (int) (this.posX - gameEngine.viewpointXSnapped);
         float f3 = (int) (this.posY - gameEngine.viewpointYSnapped);
         float f4 = f2 * gameEngine.zoom;
@@ -1394,15 +1394,15 @@ public abstract class BaseUnit extends SizedObject {
         } else {
             paint = bI;
         }
-        gameEngine.graphicsEngine2.a(textureV, f4, f5, paint);
-        gameEngine.graphicsEngine2.k();
+        gameEngine.renderGraphicsEngine.a(textureV, f4, f5, paint);
+        gameEngine.renderGraphicsEngine.k();
         gameEngine.applyZoomTransform();
         return true;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.GameObject
     public boolean a(GameEngine gameEngine) {
-        if (!gameEngine.cameraFollowSpeed.b(this.posX, this.posY) || this.unitTransportTarget != null) {
+        if (!gameEngine.bufferedVisibleWorldRectF.b(this.posX, this.posY) || this.unitTransportTarget != null) {
             return false;
         }
         if ((this.attachmentData != null && (this.attachmentData.I || this.attachmentData.C)) || !d(gameEngine.playerTeam)) {
@@ -1467,7 +1467,7 @@ public abstract class BaseUnit extends SizedObject {
             this.unitAnimationRotation += f;
             if (this.unitAnimationOffset > 10.0f && this.unitAnimationScale < 300.0f && !dl()) {
                 this.unitAnimationOffset = 0.0f;
-                if (this.flag3 && gameEngine.mouseScreenY && (effectCreateEffectInternal = gameEngine.effectManager.createEffectInternal(this.posX, this.posY, this.posZ, EffectType.custom, false, EffectQuality.verylow)) != null) {
+                if (this.flag3 && gameEngine.shouldDrawMediumDetailEffects && (effectCreateEffectInternal = gameEngine.effectManager.createEffectInternal(this.posX, this.posY, this.posZ, EffectType.custom, false, EffectQuality.verylow)) != null) {
                     EffectEmitter.b(effectCreateEffectInternal, true);
                     effectCreateEffectInternal.I = this.posX;
                     effectCreateEffectInternal.J = this.posY;
@@ -1592,7 +1592,7 @@ public abstract class BaseUnit extends SizedObject {
                 this.cC -= f8;
             }
         }
-        this.bs = gameEngine.lastTick;
+        this.bs = gameEngine.gameTimeMillis;
         if (baseUnit != null) {
             this.unitTarget1 = baseUnit;
         } else {
@@ -1603,7 +1603,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     public BaseUnit q(float f) {
-        if (GameEngine.getInstance().lastTick - (f * 1000.0f) < this.bs) {
+        if (GameEngine.getInstance().gameTimeMillis - (f * 1000.0f) < this.bs) {
             return this.unitTarget1;
         }
         return null;
@@ -1634,7 +1634,7 @@ public abstract class BaseUnit extends SizedObject {
         if (bE.remove(this)) {
         }
         this.isDestroyed = true;
-        this.unitCreationTime = gameEngine.lastTick;
+        this.unitCreationTime = gameEngine.gameTimeMillis;
         if (this.currentHealth > 0.0f) {
             this.currentHealth = 0.0f;
         }
@@ -1787,7 +1787,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cl */
-    public boolean isUnitBuilding() {
+    public boolean hasAiHighPriorityAction() {
         return false;
     }
 
@@ -1852,7 +1852,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cr */
-    public boolean getUnitAIPathfindCost() {
+    public boolean canTransportUnits() {
         return false;
     }
 
@@ -2310,13 +2310,13 @@ public abstract class BaseUnit extends SizedObject {
                 BuildPreview buildPreview = new BuildPreview();
                 unitEffectData.c = buildPreview;
                 buildPreview.unitType = r();
-                buildPreview.tempPoint = this.posX;
-                buildPreview.tempRectF1 = this.posY;
+                buildPreview.worldX = this.posX;
+                buildPreview.worldY = this.posY;
                 buildPreview.isBuilding = false;
                 buildPreview.team = this.team;
-                buildPreview.someCounterF = unitEffectData.b;
+                buildPreview.previewUnitLevel = unitEffectData.b;
                 buildPreview.placingTeam = gameEngine.playerTeam;
-                buildPreview.someFlagU = c_();
+                buildPreview.isVisibleOnMinimap = c_();
                 buildPreview.attachedUnit = this;
             }
         }
@@ -2329,29 +2329,29 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cZ */
-    public float getUnitAIState() {
+    public float getTileOffsetX() {
         return GameEngine.getInstance().tileMap.halfTileWorldSizeX;
     }
 
     /* JADX INFO: renamed from: da */
-    public float getUnitAIPathfindStatus() {
+    public float getTileOffsetY() {
         return GameEngine.getInstance().tileMap.halfTileWorldSizeY;
     }
 
     /* JADX INFO: renamed from: db */
-    public float getUnitAIPathfindError() {
+    public float getSelectionRadius() {
         final GameEngine instance = GameEngine.getInstance();
         return instance.tileMap.halfTileWorldSizeX + 2 + instance.gameUI.getUnitSelectionFadeEffect(this);
     }
 
     public Point a(TileMap tileMap, Point point) {
-        point.worldX = (int) (((this.posX - getUnitAIState()) + 1.0f) * tileMap.tileScaleX);
-        point.worldY = (int) (((this.posY - getUnitAIPathfindStatus()) + 1.0f) * tileMap.tileScaleY);
+        point.worldX = (int) (((this.posX - getTileOffsetX()) + 1.0f) * tileMap.tileScaleX);
+        point.worldY = (int) (((this.posY - getTileOffsetY()) + 1.0f) * tileMap.tileScaleY);
         return point;
     }
 
     public RectF a(TileMap tileMap, RectF rectF) {
-        tileMap.setCursorTileIndexFromTileIndex((int) (((this.posX - getUnitAIState()) + 1.0f) * tileMap.tileScaleX), (int) (((this.posY - getUnitAIPathfindStatus()) + 1.0f) * tileMap.tileScaleY));
+        tileMap.setCursorTileIndexFromTileIndex((int) (((this.posX - getTileOffsetX()) + 1.0f) * tileMap.tileScaleX), (int) (((this.posY - getTileOffsetY()) + 1.0f) * tileMap.tileScaleY));
         float f = tileMap.cursorTileX;
         float f2 = tileMap.cursorTileY;
         Rect rectCd = cd();

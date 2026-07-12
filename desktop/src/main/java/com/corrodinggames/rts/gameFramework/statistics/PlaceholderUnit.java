@@ -27,7 +27,7 @@ public class PlaceholderUnit extends DummyUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        GameEngine.printLog("PlaceholderUnit was updated");
+        GameEngine.logErrorColored("PlaceholderUnit was updated");
         getUnitAICondition();
     }
 

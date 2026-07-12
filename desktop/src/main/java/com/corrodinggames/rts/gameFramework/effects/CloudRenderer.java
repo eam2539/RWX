@@ -37,7 +37,7 @@ public class CloudRenderer {
 
     /* JADX INFO: renamed from: b */
     public void initialize() {
-        this.noiseTexture = GameEngine.getInstance().graphicsEngine2.a(R.drawable.noise, false);
+        this.noiseTexture = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.noise, false);
         this.isInitialized = true;
     }
 
@@ -64,14 +64,14 @@ public class CloudRenderer {
             initialize();
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        gameEngine.graphicsEngine2.i();
-        gameEngine.graphicsEngine2.a(3.0f, 3.0f);
+        gameEngine.renderGraphicsEngine.i();
+        gameEngine.renderGraphicsEngine.a(3.0f, 3.0f);
         float fMax = (int) Utility.max((-gameEngine.viewpointXSnapped) / 3.0f, 0.0f);
         float fMax2 = (int) Utility.max((-gameEngine.viewpointYSnapped) / 3.0f, 0.0f);
-        this.drawRect.a(fMax, fMax2, ((int) (gameEngine.screenHeight / 3.0f)) + 1, ((int) (gameEngine.viewpointHeight / 3.0f)) + 1);
+        this.drawRect.a(fMax, fMax2, ((int) (gameEngine.visibleWorldWidth / 3.0f)) + 1, ((int) (gameEngine.visibleWorldHeight / 3.0f)) + 1);
         this.paint.b(-16777216);
         this.paint.c(40);
-        gameEngine.graphicsEngine2.a(this.noiseTexture, this.drawRect, this.paint, (gameEngine.viewpointXSnapped / 3.0f) + fMax + this.scrollX, (gameEngine.viewpointYSnapped / 3.0f) + fMax2 + this.scrollY, 0, 0);
-        gameEngine.graphicsEngine2.j();
+        gameEngine.renderGraphicsEngine.a(this.noiseTexture, this.drawRect, this.paint, (gameEngine.viewpointXSnapped / 3.0f) + fMax + this.scrollX, (gameEngine.viewpointYSnapped / 3.0f) + fMax2 + this.scrollY, 0, 0);
+        gameEngine.renderGraphicsEngine.j();
     }
 }

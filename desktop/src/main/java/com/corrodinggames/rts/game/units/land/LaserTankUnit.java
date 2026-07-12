@@ -35,11 +35,11 @@ public class LaserTankUnit extends LandUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        b = gameEngine.graphicsEngine2.a(R.drawable.laser_tank_base);
-        a = gameEngine.graphicsEngine2.a(R.drawable.laser_tank_dead);
-        c = gameEngine.graphicsEngine2.a(R.drawable.laser_tank_turrent);
-        d = gameEngine.graphicsEngine2.a(R.drawable.laser_tank_charge);
-        e = PlayerTeam.getUnitCountByType(b);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.laser_tank_base);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.laser_tank_dead);
+        c = gameEngine.renderGraphicsEngine.a(R.drawable.laser_tank_turrent);
+        d = gameEngine.renderGraphicsEngine.a(R.drawable.laser_tank_charge);
+        e = PlayerTeam.getTeamColorTextures(b);
         f = attackUnit(b, b.m(), b.l());
     }
 
@@ -194,11 +194,11 @@ public class LaserTankUnit extends LandUnit {
             float fE = this.movementLevels[0].speed / e(0);
             if (fE != 0.0f) {
                 PointF pointFE = E(0);
-                gameEngine.graphicsEngine2.i();
-                gameEngine.graphicsEngine2.b(pointFE.x - gameEngine.viewpointXSnapped, pointFE.y - gameEngine.viewpointYSnapped);
-                gameEngine.graphicsEngine2.a(fE, fE);
-                gameEngine.graphicsEngine2.a(d, 0.0f, 0.0f, (Paint) null);
-                gameEngine.graphicsEngine2.j();
+                gameEngine.renderGraphicsEngine.i();
+                gameEngine.renderGraphicsEngine.b(pointFE.x - gameEngine.viewpointXSnapped, pointFE.y - gameEngine.viewpointYSnapped);
+                gameEngine.renderGraphicsEngine.a(fE, fE);
+                gameEngine.renderGraphicsEngine.a(d, 0.0f, 0.0f, (Paint) null);
+                gameEngine.renderGraphicsEngine.j();
                 return true;
             }
             return true;

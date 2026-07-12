@@ -141,7 +141,7 @@ public class MissionEngine extends Serializable {
                 }
                 MapTrigger mapTriggerE = e(utf);
                 if (mapTriggerE == null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("MissionEngine:readIn: Could not find saved trigger:" + utf + " for de/activation");
+                    GameEngine.logColored("MissionEngine:readIn: Could not find saved trigger:" + utf + " for de/activation");
                 } else {
                     mapTriggerE.j = z;
                     mapTriggerE.k = i4;
@@ -176,8 +176,8 @@ public class MissionEngine extends Serializable {
     public void a(final boolean boolean1) throws MapLoadException {
         final GameEngine instance = GameEngine.getInstance();
         this.q = false;
-        this.b = instance.lastTick - 1000;
-        this.c = instance.lastTick - 1000;
+        this.b = instance.gameTimeMillis - 1000;
+        this.c = instance.gameTimeMillis - 1000;
         (this.E = new Paint()).a(255, 255, 255, 255);
         this.E.a(true);
         this.E.a(Paint.Align.CENTER);
@@ -304,31 +304,31 @@ public class MissionEngine extends Serializable {
                 }
                 final PlayerTeam k = PlayerTeam.k(int1);
                 if (k == null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("No team loaded for:" + int1 + " skipping");
+                    GameEngine.logColored("No team loaded for:" + int1 + " skipping");
                     continue;
                 }
                 final Integer integerProperty = mapObject.getIntegerProperty("credits");
                 if (integerProperty != null) {
                     k.credits = integerProperty;
                 }
-                if (mapObject.getDescription("basicAI") != null && instance.loadLevelNetwork() && k instanceof AIController) {
-                    GameEngine.updatePaintTextSizeIfNeeded("Using basic AI:" + int1 + " by map request");
+                if (mapObject.getDescription("basicAI") != null && instance.isSinglePlayerGame() && k instanceof AIController) {
+                    GameEngine.logColored("Using basic AI:" + int1 + " by map request");
                     ((AIController)k).isAggressive = true;
                 }
                 final String description4 = mapObject.getDescription("lockAiDifficulty");
                 if (description4 != null && k instanceof AIController) {
-                    GameEngine.updatePaintTextSizeIfNeeded("Locking lockAiDifficulty:" + int1 + " by map request to: " + description4);
+                    GameEngine.logColored("Locking lockAiDifficulty:" + int1 + " by map request to: " + description4);
                     final AIController aiController = (AIController)k;
                     aiController.teamPingTime = Integer.parseInt(description4);
                     aiController.isTeamLocked = true;
-                    instance.networkEngine.aq();
+                    instance.networkEngine.updateAiTeamNames();
                 }
-                if (mapObject.getDescription("disabledAI") != null && instance.loadLevelNetwork() && k instanceof AIController) {
-                    GameEngine.updatePaintTextSizeIfNeeded("Disabling AI:" + int1 + " by map request");
+                if (mapObject.getDescription("disabledAI") != null && instance.isSinglePlayerGame() && k instanceof AIController) {
+                    GameEngine.logColored("Disabling AI:" + int1 + " by map request");
                     ((AIController)k).canBuild = true;
                 }
                 final String description5 = mapObject.getDescription("allyGroup");
-                if (description5 != null && instance.loadLevelNetwork()) {
+                if (description5 != null && instance.isSinglePlayerGame()) {
                     k.teamColorId = Integer.parseInt(description5);
                 }
                 final String description6 = mapObject.getDescription("ai");
@@ -341,7 +341,7 @@ public class MissionEngine extends Serializable {
                 this.q = true;
                 final Integer integerProperty2 = mapObject.getIntegerProperty("zoomTo");
                 if (integerProperty2 != null) {
-                    instance.cameraEdgeScrollZone = integerProperty2;
+                    instance.targetZoom = integerProperty2;
                 }
             }
             if ("attack_point".equalsIgnoreCase(mapObject.name)) {
@@ -390,7 +390,7 @@ public class MissionEngine extends Serializable {
                 BaseUnit baseUnit2 = null;
                 float float1 = 4900.0f;
                 for (final BaseUnit baseUnit3 : BaseUnit.bE) {
-                    if (baseUnit3.getUnitAIPathfindCost() && baseUnit != baseUnit3 && (baseUnit.team == PlayerTeam.TEAM_ALL || baseUnit3.team.d(baseUnit.team))) {
+                    if (baseUnit3.canTransportUnits() && baseUnit != baseUnit3 && (baseUnit.team == PlayerTeam.TEAM_ALL || baseUnit3.team.d(baseUnit.team))) {
                         final float distanceSq = Utility.distanceSq(baseUnit3.posX, baseUnit3.posY, baseUnit.posX, baseUnit.posY);
                         if (distanceSq >= float1 || !baseUnit3.d(baseUnit, true)) {
                             continue;
@@ -508,7 +508,7 @@ public class MissionEngine extends Serializable {
     public static void c(String str) {
         GameEngine.getInstance();
         GameEngine.log("MissionEngine", str);
-        NetworkEngine.g(str);
+        NetworkEngine.reportDesync(str);
     }
 
     public MapTrigger d(String str) {
@@ -575,7 +575,7 @@ public class MissionEngine extends Serializable {
                     if (resolveText.equals("")) {
                         continue;
                     }
-                    instance.graphicsEngine2.a(resolveText, n, n2, mapTrigger.B);
+                    instance.renderGraphicsEngine.a(resolveText, n, n2, mapTrigger.B);
                 }
             }
         }
@@ -590,9 +590,9 @@ public class MissionEngine extends Serializable {
             if (b) {
                 if (b2) {
                     final int n3 = (int)(23.0f + this.E.k() / 2.0f);
-                    instance.graphicsEngine2.a("- Wave " + this.r + " -", instance.currentScreenWidthPixels / 2.0f, (float)n3, this.E);
+                    instance.renderGraphicsEngine.a("- Wave " + this.r + " -", instance.currentScreenWidthPixels / 2.0f, (float)n3, this.E);
                     if (this.s != null) {
-                        instance.graphicsEngine2.a(this.s, instance.currentScreenWidthPixels / 2.0f, n3 + this.E.k() + 2.0f, this.F);
+                        instance.renderGraphicsEngine.a(this.s, instance.currentScreenWidthPixels / 2.0f, n3 + this.E.k() + 2.0f, this.F);
                     }
                 }
                 else {
@@ -601,9 +601,9 @@ public class MissionEngine extends Serializable {
                     if (this.m) {
                         string = "Defeat - Wave " + this.r;
                     }
-                    instance.graphicsEngine2.a(string, instance.currentScreenWidthPixels / 2.0f, (float)n3, this.G);
+                    instance.renderGraphicsEngine.a(string, instance.currentScreenWidthPixels / 2.0f, (float)n3, this.G);
                     if (this.t == null) {
-                        waveunits waveunits;
+                        WaveUnitGroup waveunits;
                         if (!this.l) {
                             waveunits = this.b(false);
                         }
@@ -612,23 +612,23 @@ public class MissionEngine extends Serializable {
                         }
                         this.t = waveunits.toString();
                     }
-                    instance.graphicsEngine2.a(this.t, instance.currentScreenWidthPixels / 2.0f, n3 + this.G.k() + 2.0f, this.H);
+                    instance.renderGraphicsEngine.a(this.t, instance.currentScreenWidthPixels / 2.0f, n3 + this.G.k() + 2.0f, this.H);
                 }
             }
         }
         if (this.k && this.N) {
-            final wave d = this.d();
+            final MissionWave d = this.d();
             if (d != null) {
-                final int n4 = d.e - instance.lastTick / 1000;
+                final int n4 = d.e - instance.gameTimeMillis / 1000;
                 final int n3 = (int)(23.0f + this.G.k() / 2.0f);
                 String string2 = "Wave " + (this.r + 1) + " in " + Utility.formatSize(String.valueOf(n4), 3);
                 if (this.m) {
                     string2 = "Defeat - Wave " + this.r;
                 }
-                instance.graphicsEngine2.a(string2, instance.currentScreenWidthPixels / 2.0f, (float)n3, this.G);
+                instance.renderGraphicsEngine.a(string2, instance.currentScreenWidthPixels / 2.0f, (float)n3, this.G);
                 final String f = d.f;
                 if (f != null) {
-                    instance.graphicsEngine2.a(f, instance.currentScreenWidthPixels / 2.0f, n3 + this.G.k() + 2.0f, this.H);
+                    instance.renderGraphicsEngine.a(f, instance.currentScreenWidthPixels / 2.0f, n3 + this.G.k() + 2.0f, this.H);
                 }
             }
         }
@@ -641,7 +641,7 @@ public class MissionEngine extends Serializable {
         int i2 = 0;
         for (String str2 : str.split("\n")) {
             i2++;
-            wave waveVar = new wave(this);
+            MissionWave waveVar = new MissionWave(this);
             if (waveVar.a(str2)) {
                 waveVar.e = i + ((int) waveVar.d);
                 i = waveVar.e;
@@ -651,9 +651,9 @@ public class MissionEngine extends Serializable {
         }
     }
 
-    public wave d() {
+    public MissionWave d() {
         if (this.r < this.O.size()) {
-            return (wave) this.O.get(this.r);
+            return (MissionWave) this.O.get(this.r);
         }
         return null;
     }
@@ -699,13 +699,13 @@ public class MissionEngine extends Serializable {
         arrayList.add(waveUnitSpawner);
     }
 
-    public void a(waveunits waveunitsVar, int i, float f) {
+    public void a(WaveUnitGroup waveunitsVar, int i, float f) {
         if (i < 0) {
             i = 0;
         }
         int size = this.S.size();
         if (size == 0) {
-            GameEngine.updatePaintTextSizeIfNeeded("error maxTypeNum: " + size);
+            GameEngine.logColored("error maxTypeNum: " + size);
             return;
         }
         WaveUnitSpawner waveUnitSpawner = (WaveUnitSpawner) this.S.get(i % size);
@@ -716,14 +716,14 @@ public class MissionEngine extends Serializable {
         waveunitsVar.b(waveUnitSpawner.a, iCreateAndOpenFile);
     }
 
-    public waveunits b(boolean z) {
-        waveunits waveunitsVar = new waveunits(this);
+    public WaveUnitGroup b(boolean z) {
+        WaveUnitGroup waveunitsVar = new WaveUnitGroup(this);
         boolean z2 = false;
         if (this.u > 50 && (this.u + 1) % 100 == 0) {
             int size = this.T.size();
             int i = this.u / 100;
             if (size == 0) {
-                GameEngine.updatePaintTextSizeIfNeeded("error maxTypeNum: " + size);
+                GameEngine.logColored("error maxTypeNum: " + size);
             } else {
                 WaveUnitSpawner waveUnitSpawner = (WaveUnitSpawner) this.T.get(i % size);
                 int i2 = (int) (i * waveUnitSpawner.b);
@@ -749,8 +749,8 @@ public class MissionEngine extends Serializable {
         return waveunitsVar;
     }
 
-    public waveunits c(boolean z) {
-        waveunits waveunitsVar = new waveunits(this);
+    public WaveUnitGroup c(boolean z) {
+        WaveUnitGroup waveunitsVar = new WaveUnitGroup(this);
         waveunitsVar.a = false;
         int i = this.v;
         UnitTypeEnum unitTypeEnum = null;
@@ -814,11 +814,11 @@ public class MissionEngine extends Serializable {
     }
 
     public void c(float f) {
-        waveunits waveunitsVarC;
+        WaveUnitGroup waveunitsVarC;
         GameEngine gameEngine = GameEngine.getInstance();
-        int i = gameEngine.lastTick;
+        int i = gameEngine.gameTimeMillis;
         this.M = Utility.moveTowardsZero(this.M, f);
-        if (gameEngine.isStopped && gameEngine.reloadMap) {
+        if (gameEngine.isStopped && gameEngine.isMenuBackgroundMap) {
             MapObject mapObject = null;
             if (gameEngine.tileMap.objectsLayer != null) {
                 for (MapObject mapObject2 : gameEngine.tileMap.objectsLayer.mapObjects) {
@@ -832,21 +832,21 @@ public class MissionEngine extends Serializable {
             } else {
                 float worldWidth = mapObject.x;
                 float worldHeight = mapObject.y;
-                if (worldWidth < gameEngine.halfViewpointWidth + 2.0f) {
-                    worldWidth = gameEngine.halfViewpointWidth + 2.0f;
+                if (worldWidth < gameEngine.halfVisibleWorldWidth + 2.0f) {
+                    worldWidth = gameEngine.halfVisibleWorldWidth + 2.0f;
                 }
-                if (worldHeight < gameEngine.halfViewpointHeight + 2.0f) {
-                    worldHeight = gameEngine.halfViewpointHeight + 2.0f;
+                if (worldHeight < gameEngine.halfVisibleWorldHeight + 2.0f) {
+                    worldHeight = gameEngine.halfVisibleWorldHeight + 2.0f;
                 }
-                if (worldWidth > (gameEngine.tileMap.getWorldWidth() - gameEngine.halfViewpointWidth) - 2.0f) {
-                    worldWidth = (gameEngine.tileMap.getWorldWidth() - gameEngine.halfViewpointWidth) - 2.0f;
+                if (worldWidth > (gameEngine.tileMap.getWorldWidth() - gameEngine.halfVisibleWorldWidth) - 2.0f) {
+                    worldWidth = (gameEngine.tileMap.getWorldWidth() - gameEngine.halfVisibleWorldWidth) - 2.0f;
                 }
-                if (worldHeight > (gameEngine.tileMap.getWorldHeight() - gameEngine.halfViewpointHeight) - 2.0f) {
-                    worldHeight = (gameEngine.tileMap.getWorldHeight() - gameEngine.halfViewpointHeight) - 2.0f;
+                if (worldHeight > (gameEngine.tileMap.getWorldHeight() - gameEngine.halfVisibleWorldHeight) - 2.0f) {
+                    worldHeight = (gameEngine.tileMap.getWorldHeight() - gameEngine.halfVisibleWorldHeight) - 2.0f;
                 }
-                float angleBetweenPoints = Utility.getAngleBetweenPoints(gameEngine.viewpointX + gameEngine.halfViewpointWidth, gameEngine.viewpointY + gameEngine.halfViewpointHeight, worldWidth, worldHeight);
-                float fDistanceSq = Utility.distanceSq(gameEngine.viewpointX + gameEngine.halfViewpointWidth, gameEngine.viewpointY + gameEngine.halfViewpointHeight, worldWidth, worldHeight);
-                if (this.M == 0.0f && (fDistanceSq < 225.0f || gameEngine.stoppedScrolling)) {
+                float angleBetweenPoints = Utility.getAngleBetweenPoints(gameEngine.viewpointX + gameEngine.halfVisibleWorldWidth, gameEngine.viewpointY + gameEngine.halfVisibleWorldHeight, worldWidth, worldHeight);
+                float fDistanceSq = Utility.distanceSq(gameEngine.viewpointX + gameEngine.halfVisibleWorldWidth, gameEngine.viewpointY + gameEngine.halfVisibleWorldHeight, worldWidth, worldHeight);
+                if (this.M == 0.0f && (fDistanceSq < 225.0f || gameEngine.wasCameraClamped)) {
                     this.L++;
                     this.M = 50.0f;
                 }
@@ -885,13 +885,13 @@ public class MissionEngine extends Serializable {
                     this.t = null;
                 }
             } else if (!this.m) {
-                wave waveVarD = d();
+                MissionWave waveVarD = d();
                 if (waveVarD != null) {
-                    if (waveVarD.e * 1000 < gameEngine.lastTick) {
+                    if (waveVarD.e * 1000 < gameEngine.gameTimeMillis) {
                         waveVarD.a();
                         this.r++;
                     }
-                } else if (!gameEngine.isTouchDown && !gameEngine.replayEngine.j()) {
+                } else if (!gameEngine.hasWonGame && !gameEngine.replayEngine.j()) {
                     gameEngine.gameUI.startGameEndSequence();
                 }
             }
@@ -914,13 +914,13 @@ public class MissionEngine extends Serializable {
             }
             boolean z = false;
             if (gameEngine.playerTeam != null) {
-                if (gameEngine.playerTeam.getTeamColorNameById()) {
+                if (gameEngine.playerTeam.hasTeamVictory()) {
                 }
-                if (gameEngine.playerTeam.addCredits()) {
+                if (gameEngine.playerTeam.isSpectatorTeamColor()) {
                     z = true;
                 }
             }
-            if (!gameEngine.isTouchDown && !gameEngine.touchStartY && !gameEngine.replayEngine.j() && !z) {
+            if (!gameEngine.hasWonGame && !gameEngine.hasLostGame && !gameEngine.replayEngine.j() && !z) {
                 boolean z2 = true;
                 boolean z3 = true;
                 if (this.e == WaveSpawnMode.none) {
@@ -965,7 +965,7 @@ public class MissionEngine extends Serializable {
                 }
                 if (z2) {
                     gameEngine.gameUI.startGameEndSequence();
-                    if (gameEngine.lastTick > 1500) {
+                    if (gameEngine.gameTimeMillis > 1500) {
                         gameEngine.settingsEngine.numberOfWins++;
                         gameEngine.settingsEngine.save();
                     }
@@ -1027,11 +1027,11 @@ public class MissionEngine extends Serializable {
     }
 
     public boolean g() {
-        return a && GameEngine.getInstance().isNetworkGameActive;
+        return a && GameEngine.getInstance().isDebugTempMode;
     }
 
     public static void i(String str) {
-        NetworkEngine.g("Map ScriptError: " + str);
+        NetworkEngine.reportDesync("Map ScriptError: " + str);
     }
 
     public void a(int i) {

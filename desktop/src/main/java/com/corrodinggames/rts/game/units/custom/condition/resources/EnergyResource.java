@@ -15,16 +15,16 @@ public class EnergyResource extends AbstractResource {
 
     @Override // com.corrodinggames.rts.game.units.custom.resources.Resource
     public double a(BaseUnit baseUnit) {
-        return baseUnit.f0cB;
+        return baseUnit.currentEnergy;
     }
 
     @Override // com.corrodinggames.rts.game.units.custom.resources.Resource
     public void a(BaseUnit baseUnit, double d) {
-        baseUnit.f0cB = (float) d;
+        baseUnit.currentEnergy = (float) d;
     }
 
     @Override // com.corrodinggames.rts.game.units.custom.resources.Resource
     public void b(BaseUnit baseUnit, double d) {
-        baseUnit.f0cB = (float) (((double) baseUnit.f0cB) + d);
+        baseUnit.currentEnergy = (float) (((double) baseUnit.currentEnergy) + d);
     }
 }

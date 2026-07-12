@@ -31,7 +31,7 @@ public class DebugServer implements Runnable {
         GameEngine.log("----- Debug Active ----");
         GameEngine.log("-----");
         GameEngine.log("-----");
-        GameEngine.isDesktopVersionStatic2 = true;
+        GameEngine.isDebugServerActive = true;
         GameEngine.getInstance().refreshVersionName();
         new DebugServer().b();
     }
@@ -40,13 +40,13 @@ public class DebugServer implements Runnable {
         if (b) {
             a(5677, VariableScope.nullOrMissingString);
         }
-        GameEngine.getInstance().taskQueue1.a(new DebugUpdateTask(this));
+        GameEngine.getInstance().recurringGameThreadTasks.a(new DebugUpdateTask(this));
     }
 
     public void a(int i, String str) {
         try {
             g = true;
-            GameEngine.isNetworkServerStatic2 = true;
+            GameEngine.isAutomatedTestMode = true;
             GameEngine.log(VariableScope.nullOrMissingString);
             GameEngine.log("----- createDebugSocket ----");
             GameEngine.log("port: " + i);

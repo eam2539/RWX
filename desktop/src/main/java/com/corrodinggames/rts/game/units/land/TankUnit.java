@@ -55,11 +55,11 @@ public class TankUnit extends LandUnit {
     /* JADX INFO: renamed from: f */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        tankTexture_alive = gameEngine.graphicsEngine2.a(R.drawable.tank2);
-        tankTexture = gameEngine.graphicsEngine2.a(R.drawable.tank2_dead);
-        tankTurretTexture = gameEngine.graphicsEngine2.a(R.drawable.tank2_turret);
-        tankShadowTexture = gameEngine.graphicsEngine2.a(R.drawable.tank2_shadow);
-        tankTextures_teamColors = PlayerTeam.getUnitCountByType(tankTexture_alive);
+        tankTexture_alive = gameEngine.renderGraphicsEngine.a(R.drawable.tank2);
+        tankTexture = gameEngine.renderGraphicsEngine.a(R.drawable.tank2_dead);
+        tankTurretTexture = gameEngine.renderGraphicsEngine.a(R.drawable.tank2_turret);
+        tankShadowTexture = gameEngine.renderGraphicsEngine.a(R.drawable.tank2_shadow);
+        tankTextures_teamColors = PlayerTeam.getTeamColorTextures(tankTexture_alive);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

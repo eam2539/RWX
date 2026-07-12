@@ -19,10 +19,10 @@ public class Message {
     String formattedTimestamp;
 
     /* JADX INFO: renamed from: e */
-    public int field_e = -1;
+    public int delayPerCharMs = -1;
 
     /* JADX INFO: renamed from: f */
-    public int field_f = -1;
+    public int textColor = -1;
 
     /* JADX INFO: renamed from: a */
     public int getTimeDifference() {
@@ -31,7 +31,7 @@ public class Message {
 
     /* JADX INFO: renamed from: b */
     public boolean shouldDisplay() {
-        if (GameEngine.getInstance().createInstance() || this.timestamp + ((long) 14000) > System.currentTimeMillis()) {
+        if (GameEngine.getInstance().isMessageDisplayPersistent() || this.timestamp + ((long) 14000) > System.currentTimeMillis()) {
             return true;
         }
         return false;

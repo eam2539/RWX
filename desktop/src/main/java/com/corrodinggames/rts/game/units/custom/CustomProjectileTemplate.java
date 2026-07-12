@@ -84,7 +84,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         if (textureA3 != null) {
             customProjectileTemplate.Y = textureA3;
             customProjectileTemplate.X = true;
-            if (textureA3.q < 20 && !GameEngine.isDebug()) {
+            if (textureA3.q < 20 && !GameEngine.isDedicatedServer()) {
                 throw new RuntimeException("beamImage height must currently be 20 pixels or greater (performance when tiling)");
             }
         }
@@ -333,12 +333,12 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             return null;
         }
         if (!(unitTypeQ instanceof CustomUnitConfig)) {
-            GameEngine.updatePaintTextSizeIfNeeded("ProjectileTemplate:readInLinkCustom: Got non CustomUnitMetadata object of:" + unitTypeQ.getUnitTypeDescriptionShort() + " loading real_meta");
+            GameEngine.logColored("ProjectileTemplate:readInLinkCustom: Got non CustomUnitMetadata object of:" + unitTypeQ.getUnitTypeDescriptionShort() + " loading real_meta");
             return null;
         }
         CustomProjectileTemplate customProjectileTemplateFindProjectileTemplateByName = ((CustomUnitConfig) unitTypeQ).findProjectileTemplateByName(utf);
         if (customProjectileTemplateFindProjectileTemplateByName == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("ProjectileTemplate:readInLinkCustom: Could not find projectile with name:" + utf);
+            GameEngine.logColored("ProjectileTemplate:readInLinkCustom: Could not find projectile with name:" + utf);
             return null;
         }
         return customProjectileTemplateFindProjectileTemplateByName;

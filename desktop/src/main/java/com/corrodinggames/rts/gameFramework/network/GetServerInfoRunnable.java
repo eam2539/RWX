@@ -57,7 +57,7 @@ class GetServerInfoRunnable implements Runnable {
                 throw new IOException("Unexpected end of response");
             }
             if (line.contains("[FAILED]")) {
-                GameEngine.updatePaintTextSizeIfNeeded("Got failed header with status:" + line2);
+                GameEngine.logColored("Got failed header with status:" + line2);
                 String str = "Failed to get server connection data - unknown";
                 ConnectionErrorType connectionErrorType = ConnectionErrorType.unknown;
                 if (line2.startsWith("ERROR_OTHER")) {

@@ -116,7 +116,7 @@ public class TextRenderQueue {
     }
 
     public int c() {
-        return GameEngine.getInstance().graphicsEngine2.a("A", this.g);
+        return GameEngine.getInstance().renderGraphicsEngine.a("A", this.g);
     }
 
     /* JADX WARN: Type inference fix 'apply assigned field type' failed

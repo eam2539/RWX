@@ -481,16 +481,16 @@ public class TurretFactory extends FactoryWithQueue {
     /* JADX INFO: renamed from: dB */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.graphicsEngine2.a(R.drawable.turret_base);
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.turret_base_dead);
-        turretTopL1Texture = gameEngine.graphicsEngine2.a(R.drawable.turret_top);
-        turretTopL2Texture = gameEngine.graphicsEngine2.a(R.drawable.turret_top_l2);
-        turretTopL3Texture = gameEngine.graphicsEngine2.a(R.drawable.turret_top_l3);
-        turretTopArtilleryTexture = gameEngine.graphicsEngine2.a(R.drawable.turret_top_artillery);
-        turretTopFlameTexture = gameEngine.graphicsEngine2.a(R.drawable.turret_top_flame);
-        teamTextures = PlayerTeam.getUnitCountByType(baseTexture);
-        iconTexture = gameEngine.graphicsEngine2.a(R.drawable.unit_icon_building_turrent);
-        teamIconTextures = PlayerTeam.getUnitCountByType(iconTexture);
+        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_base);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_base_dead);
+        turretTopL1Texture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_top);
+        turretTopL2Texture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_top_l2);
+        turretTopL3Texture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_top_l3);
+        turretTopArtilleryTexture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_top_artillery);
+        turretTopFlameTexture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_top_flame);
+        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
+        iconTexture = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_building_turrent);
+        teamIconTextures = PlayerTeam.getTeamColorTextures(iconTexture);
     }
 
     public TurretFactory(boolean z) {
@@ -625,7 +625,7 @@ public class TurretFactory extends FactoryWithQueue {
         GameEngine gameEngine = GameEngine.getInstance();
         Texture textureD = d(0);
         PointF pointFG = G(0);
-        gameEngine.graphicsEngine2.a(textureD, pointFG.x - GameEngine.getInstance().viewpointXSnapped, pointFG.y - GameEngine.getInstance().viewpointYSnapped, this.movementLevels[0].targetX, getBuildingPaint());
+        gameEngine.renderGraphicsEngine.a(textureD, pointFG.x - GameEngine.getInstance().viewpointXSnapped, pointFG.y - GameEngine.getInstance().viewpointYSnapped, this.movementLevels[0].targetX, getBuildingPaint());
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -733,20 +733,20 @@ public class TurretFactory extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cZ */
-    public float getUnitAIState() {
+    public float getTileOffsetX() {
         return GameEngine.getInstance().tileMap.tileWorldSizeX;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: da */
-    public float getUnitAIPathfindStatus() {
+    public float getTileOffsetY() {
         return GameEngine.getInstance().tileMap.tileWorldSizeY;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: db */
-    public float getUnitAIPathfindError() {
-        return super.getUnitAIPathfindError() - 8.0f;
+    public float getSelectionRadius() {
+        return super.getSelectionRadius() - 8.0f;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit

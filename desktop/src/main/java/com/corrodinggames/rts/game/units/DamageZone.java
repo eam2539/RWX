@@ -202,8 +202,8 @@ public class DamageZone extends DummyUnit {
             this.j += f;
             if (this.j > 3.0f) {
                 this.j = 0.0f;
-                int randomIntInRange = gameEngine.cameraBoundsMaxY + Utility.getRandomIntInRange(0, (int) gameEngine.screenHeight);
-                int randomIntInRange2 = gameEngine.mapWidth + Utility.getRandomIntInRange(0, (int) gameEngine.viewpointHeight);
+                int randomIntInRange = gameEngine.viewpointXInt + Utility.getRandomIntInRange(0, (int) gameEngine.visibleWorldWidth);
+                int randomIntInRange2 = gameEngine.viewpointYInt + Utility.getRandomIntInRange(0, (int) gameEngine.visibleWorldHeight);
                 if (Utility.distanceSq(this.posX, this.posY, randomIntInRange, randomIntInRange2) > (this.a + 30.0f) * (this.a + 30.0f)) {
                     gameEngine.tileMap.setCursorTileIndexFromWorldPoint(randomIntInRange, randomIntInRange2);
                     gameEngine.tileMap.setCursorTileIndexFromTileIndex(gameEngine.tileMap.cursorTileX, gameEngine.tileMap.cursorTileY);
@@ -259,21 +259,21 @@ public class DamageZone extends DummyUnit {
         if (this.g && (damageZoneF = f()) != null) {
             f4 = damageZoneF.d - 300.0f;
         }
-        gameEngine.graphicsEngine2.a(f2, f3, f4, paint);
+        gameEngine.renderGraphicsEngine.a(f2, f3, f4, paint);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean a(int i, int i2) {
         GameEngine gameEngine = GameEngine.getInstance();
-        gameEngine.graphicsEngine2.i();
-        gameEngine.graphicsEngine2.a(gameEngine.minimap.rect);
+        gameEngine.renderGraphicsEngine.i();
+        gameEngine.renderGraphicsEngine.a(gameEngine.minimap.minimapBoundsRect);
         float fWorldToMinimapX = gameEngine.minimap.worldToMinimapX(this.a);
         Paint paint = this.i ? n : l;
         if (this.q) {
             paint = p;
         }
-        GraphicsUtils.a(gameEngine.graphicsEngine2, i, i2, fWorldToMinimapX, paint);
-        gameEngine.graphicsEngine2.j();
+        GraphicsUtils.a(gameEngine.renderGraphicsEngine, i, i2, fWorldToMinimapX, paint);
+        gameEngine.renderGraphicsEngine.j();
         return true;
     }
 

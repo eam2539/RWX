@@ -34,7 +34,7 @@ public class ZipHelper {
         IFileLoader zipFileLoaderForPath = FileLoaderFactory.getZipFileLoaderForPath(str2);
         if (zipFileLoaderForPath != null) {
             GameEngine.log("Temp file needed for zip with SAF interface");
-            if (!GameEngine.isDesktop()) {
+            if (!GameEngine.isAndroidPlatform()) {
                 throw new IOException("Failed to open source zip with mapper: " + str2);
             }
             long jA = PerformanceProfiler.a();
@@ -55,7 +55,7 @@ public class ZipHelper {
             try {
                 if (zipFileLoaderForPath != null) {
                     GameEngine.log("Temp file needed for zip with SAF interface");
-                    if (!GameEngine.isDesktop()) {
+                    if (!GameEngine.isAndroidPlatform()) {
                         throw new IOException("Failed to open source zip with mapper: " + str2);
                     }
                     long jA2 = PerformanceProfiler.a();

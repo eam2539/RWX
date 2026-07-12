@@ -97,7 +97,7 @@ public class SafFileLoader extends IFileLoader {
         GameEngine.log("createSAFLink: " + uri + " to " + str);
         synchronized (b) {
             if (((SafFileSystem) b.get(str)) != null) {
-                GameEngine.updatePaintTextSizeIfNeeded("createSAFLink: Already open");
+                GameEngine.logColored("createSAFLink: Already open");
             }
             safFileSystem = new SafFileSystem(uri, z);
             try {

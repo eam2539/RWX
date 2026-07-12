@@ -2,7 +2,7 @@ package com.corrodinggames.rts.debug.test;
 
 import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.pathfinding.FastNodeQueue;
-import com.corrodinggames.rts.gameFramework.pathfinding.FastNodeQueue2;
+import com.corrodinggames.rts.gameFramework.pathfinding.BucketedNodeQueue;
 import com.corrodinggames.rts.gameFramework.pathfinding.NodeQueue;
 import com.corrodinggames.rts.gameFramework.pathfinding.PathOpenListNode;
 
@@ -21,8 +21,8 @@ public class FastNodeQueueTest extends Test {
     public void runAllTests() {
         GameEngine.log("== Testing FastNodeQueue ==");
         runQueueTest(new FastNodeQueue());
-        GameEngine.log("== Testing FastNodeQueue2 ==");
-        runQueueTest(new FastNodeQueue2());
+        GameEngine.log("== Testing BucketedNodeQueue ==");
+        runQueueTest(new BucketedNodeQueue());
     }
 
     /* JADX INFO: renamed from: a */

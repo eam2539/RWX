@@ -84,7 +84,7 @@ public class MultiplayerBattleroomActivity extends TaskQueueActivity {
     /* JADX INFO: renamed from: n */
     void refreshChatLogInternal() {
         if (!this.onCreateFinished) {
-            GameEngine.updatePaintTextSizeIfNeeded("addMessageToChatLogInternal: !onCreateFinished");
+            GameEngine.logColored("addMessageToChatLogInternal: !onCreateFinished");
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
@@ -122,10 +122,10 @@ public class MultiplayerBattleroomActivity extends TaskQueueActivity {
     public static void updateUI() {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.networkEngine != null) {
-            gameEngine.networkEngine.O();
+            gameEngine.networkEngine.updateTeamConnectionStatuses();
             gameEngine.networkEngine.callbacks.c();
         }
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return;
         }
         if (gameEngine.networkEngine != null && gameEngine.networkEngine.gameHasBeenStarted) {
@@ -134,7 +134,7 @@ public class MultiplayerBattleroomActivity extends TaskQueueActivity {
         if (instance != null) {
             instance.uiHandler.a(instance.updateUIRunnable);
         } else {
-            GameEngine.updatePaintTextSizeIfNeeded("MultiplayerBattleroomActivity:updateUI() lastLoaded==null");
+            GameEngine.logColored("MultiplayerBattleroomActivity:updateUI() lastLoaded==null");
         }
     }
 
@@ -144,7 +144,7 @@ public class MultiplayerBattleroomActivity extends TaskQueueActivity {
             instance.uiHandler.a(instance.startGameRunnable);
             startGamePending = false;
         } else {
-            GameEngine.updatePaintTextSizeIfNeeded("MultiplayerBattleroomActivity:startGame() lastLoaded==null");
+            GameEngine.logColored("MultiplayerBattleroomActivity:startGame() lastLoaded==null");
             GameEngine.printStackTrace();
             startGamePending = true;
         }
@@ -155,7 +155,7 @@ public class MultiplayerBattleroomActivity extends TaskQueueActivity {
         TeamStats teamStats = new TeamStats("Starting unit count");
         TeamStats teamStats2 = new TeamStats("Total unit HP");
         TeamStats teamStats3 = new TeamStats("Team Credits");
-        for (PlayerTeam playerTeam : PlayerTeam.addEnergy()) {
+        for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
             int i = 0;
             int i2 = 0;
             BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
@@ -185,7 +185,7 @@ public class MultiplayerBattleroomActivity extends TaskQueueActivity {
         gameEngine.remoteMapStream = null;
         if (gameEngine.networkEngine.roomSettings.gameModeType == GameModeType.savedGame) {
             if (!gameEngine.networkEngine.isServer) {
-                gameEngine.gameSaver.writeSaveToStream(gameEngine.networkEngine.aA, true, false, false);
+                gameEngine.gameSaver.writeSaveToStream(gameEngine.networkEngine.receivedSaveGameStream, true, false, false);
                 gameEngine.gameUI.messageManager.addMessage((String) null, "Note: Game was started from a saved game.");
             } else {
                 gameEngine.gameSaver.performAutosave(gameEngine.networkEngine.roomSettings.mapPath, true);
@@ -196,17 +196,17 @@ public class MultiplayerBattleroomActivity extends TaskQueueActivity {
         if (gameEngine.networkEngine.roomSettings.gameModeType == GameModeType.customMap) {
             if (!gameEngine.networkEngine.isServer) {
                 gameEngine.currentMapPath = VariableScope.nullOrMissingString;
-                gameEngine.remoteMapStream = gameEngine.networkEngine.aB;
+                gameEngine.remoteMapStream = gameEngine.networkEngine.receivedCustomMapStream;
                 gameEngine.loadGame(true, GameMode.normal);
                 gameEngine.gameUI.messageManager.addMessage((String) null, "Note: Game was started from a custom map on server.");
             } else {
-                gameEngine.currentMapPath = gameEngine.networkEngine.az;
+                gameEngine.currentMapPath = gameEngine.networkEngine.selectedMapPath;
                 gameEngine.loadGame(true, GameMode.normal);
             }
             showTeamStats();
             return;
         }
-        gameEngine.currentMapPath = gameEngine.networkEngine.az;
+        gameEngine.currentMapPath = gameEngine.networkEngine.selectedMapPath;
         gameEngine.loadGame(true, GameMode.normal);
     }
 

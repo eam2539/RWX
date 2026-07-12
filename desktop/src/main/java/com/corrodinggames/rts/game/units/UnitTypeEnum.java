@@ -1891,7 +1891,7 @@ public enum UnitTypeEnum implements UnitType {
             String str = "units." + name() + ".name";
             this.ac = Locale.getFormattedString(str, null, new Object[0]);
             if (this.ac == null) {
-                if (GameEngine.getInstance().isPaused() && !createUnit()) {
+                if (GameEngine.getInstance().usesCoreUnitTypes() && !createUnit()) {
                     throw new RuntimeException("Can't find translation text for: " + str);
                 }
                 this.ac = name();
@@ -1907,7 +1907,7 @@ public enum UnitTypeEnum implements UnitType {
             String str = "units." + name() + ".description";
             this.ad = Locale.getFormattedString(str, null, new Object[0]);
             if (this.ad == null) {
-                if (GameEngine.getInstance().isPaused() && !createUnit()) {
+                if (GameEngine.getInstance().usesCoreUnitTypes() && !createUnit()) {
                     throw new RuntimeException("Can't find translation text for: " + str);
                 }
                 this.ad = VariableScope.nullOrMissingString;
@@ -2050,7 +2050,7 @@ public enum UnitTypeEnum implements UnitType {
     public static void loadAllUnitTypes() {
         new File("output_all_unit_images/").mkdirs();
         for (int i = 0; i < 50; i++) {
-            GameEngine.printLog("running outputUnitImages()");
+            GameEngine.logErrorColored("running outputUnitImages()");
         }
         String[] strArr = {"carrier", "experimentalGunship", "experimentalGunshipLanded", "mech_gun", "ladybug", "spiderBot", "wall_v", "crystalResource", "test_tank", "missing", "fogRevealer", "supplyDepot", "tankDestroyer", "megaTank", "crystal_mid", "mechFlyingLanded"};
         for (UnitType unitType : ae) {
@@ -2065,14 +2065,14 @@ public enum UnitTypeEnum implements UnitType {
                 if (!z) {
                     String str2 = "output_all_unit_images/" + unitType.getUnitTypeDescriptionShort().replace("/", "_").replace("\\", "_") + ".png";
                     GameEngine gameEngine = GameEngine.getInstance();
-                    Texture textureB = gameEngine.graphicsEngine2.b(100, 100, true);
-                    GraphicsEngine graphicsEngineB = gameEngine.graphicsEngine2.b(textureB);
-                    GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
-                    gameEngine.graphicsEngine2 = graphicsEngineB;
+                    Texture textureB = gameEngine.renderGraphicsEngine.b(100, 100, true);
+                    GraphicsEngine graphicsEngineB = gameEngine.renderGraphicsEngine.b(textureB);
+                    GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
+                    gameEngine.renderGraphicsEngine = graphicsEngineB;
                     drawUnitWithBoolean(unitType, textureB.r, textureB.s, 0.0f, 0.0f, PlayerTeam.k(0), 20.0f, 100, false, false, 1, true, null);
-                    gameEngine.graphicsEngine2 = graphicsEngine;
+                    gameEngine.renderGraphicsEngine = graphicsEngine;
                     graphicsEngineB.p();
-                    gameEngine.graphicsEngine2.a(textureB, new File(str2));
+                    gameEngine.renderGraphicsEngine.a(textureB, new File(str2));
                 }
             }
         }
@@ -2082,7 +2082,7 @@ public enum UnitTypeEnum implements UnitType {
     public static void loadUnitTypeImages() {
         int unitCountByUnit;
         for (int i = 0; i < 50; i++) {
-            GameEngine.printLog("running printForHelp()");
+            GameEngine.logErrorColored("running printForHelp()");
         }
         String[] strArr = {"carrier", "experimentalGunship", "experimentalGunshipLanded", "mech_gun", "ladybug", "spiderBot", "wall_v", "crystalResource", "test_tank", "missing", "fogRevealer", "supplyDepot", "tankDestroyer", "megaTank", "crystal_mid", "mechFlyingLanded"};
         String str = VariableScope.nullOrMissingString;
@@ -2267,11 +2267,11 @@ public enum UnitTypeEnum implements UnitType {
         if (f7 > f6) {
             f8 = f6 / f7;
         }
-        gameEngine.graphicsEngine2.k();
+        gameEngine.renderGraphicsEngine.k();
         if (z4) {
         }
         if (f8 != 1.0f) {
-            gameEngine.graphicsEngine2.a(f8, f8, f, f2);
+            gameEngine.renderGraphicsEngine.a(f8, f8, f, f2);
         }
         if (f8 < 1.0f) {
             ag = true;
@@ -2285,8 +2285,8 @@ public enum UnitTypeEnum implements UnitType {
             baseUnitCanAttack.unitLevel = baseUnit.unitLevel;
             float f9 = baseUnitCanAttack.currentHealth;
             baseUnitCanAttack.currentHealth = baseUnit.currentHealth;
-            float f10 = baseUnitCanAttack.f0cB;
-            baseUnitCanAttack.f0cB = baseUnit.f0cB;
+            float f10 = baseUnitCanAttack.currentEnergy;
+            baseUnitCanAttack.currentEnergy = baseUnit.currentEnergy;
             VariableScope variableScope = baseUnitCanAttack.unitVariables;
             baseUnitCanAttack.unitVariables = baseUnit.unitVariables;
             baseUnitCanAttack.d(0.0f);
@@ -2295,14 +2295,14 @@ public enum UnitTypeEnum implements UnitType {
             baseUnitCanAttack.unitCustomEffects = storedResources;
             baseUnitCanAttack.unitLevel = i2;
             baseUnitCanAttack.currentHealth = f9;
-            baseUnitCanAttack.f0cB = f10;
+            baseUnitCanAttack.currentEnergy = f10;
             baseUnitCanAttack.unitVariables = variableScope;
         } else {
             baseUnitCanAttack.d(0.0f);
             baseUnitCanAttack.c(0.0f);
             baseUnitCanAttack.a(0.0f, false);
         }
-        gameEngine.graphicsEngine2.l();
+        gameEngine.renderGraphicsEngine.l();
         baseUnitCanAttack.posZ = 0.0f;
         if (!zBI) {
             baseUnitCanAttack.rotationSpeed = 0.0f;

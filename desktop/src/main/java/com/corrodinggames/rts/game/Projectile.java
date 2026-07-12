@@ -552,9 +552,9 @@ public class Projectile extends PositionedObject {
 
     public static void c() {
         GameEngine gameEngine = GameEngine.getInstance();
-        b = gameEngine.graphicsEngine2.a(com.corrodinggames.rts.R.drawable.projectiles);
-        c = gameEngine.graphicsEngine2.a(com.corrodinggames.rts.R.drawable.projectiles2);
-        d = gameEngine.graphicsEngine2.a(com.corrodinggames.rts.R.drawable.projectiles_large);
+        b = gameEngine.renderGraphicsEngine.a(com.corrodinggames.rts.R.drawable.projectiles);
+        c = gameEngine.renderGraphicsEngine.a(com.corrodinggames.rts.R.drawable.projectiles2);
+        d = gameEngine.renderGraphicsEngine.a(com.corrodinggames.rts.R.drawable.projectiles_large);
     }
 
     public void d() {
@@ -598,7 +598,7 @@ public class Projectile extends PositionedObject {
 
     public static void a(BaseUnit baseUnit, BaseUnit baseUnit2, float f2, Projectile projectile, boolean z) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine.isGameThreadRunning && f2 > 0.0f) {
+        if (gameEngine.isUnitInvincibilityEnabled && f2 > 0.0f) {
             f2 = 0.0f;
         }
         if (baseUnit2 != null && !baseUnit2.isDestroyed) {
@@ -1324,7 +1324,7 @@ public class Projectile extends PositionedObject {
                             }
                             if (GameEngine.isFancyWaterSupported()) {
                                 if (gameEngine.effectManager.texture2 == null) {
-                                    gameEngine.effectManager.texture2 = gameEngine.graphicsEngine2.a(com.corrodinggames.rts.R.drawable.shockwave_normal_256, true);
+                                    gameEngine.effectManager.texture2 = gameEngine.renderGraphicsEngine.a(com.corrodinggames.rts.R.drawable.shockwave_normal_256, true);
                                 }
                                 gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
                                 Effect effectCreateLightEffect13 = gameEngine.effectManager.createLightEffect(this.aV, this.aW, this.posZ, -1);
@@ -1483,10 +1483,10 @@ public class Projectile extends PositionedObject {
 
     @Override // com.corrodinggames.rts.gameFramework.GameObject
     public boolean a(GameEngine gameEngine) {
-        if (gameEngine.cameraFollowSpeed.b(this.posX, this.posY)) {
+        if (gameEngine.bufferedVisibleWorldRectF.b(this.posX, this.posY)) {
             return true;
         }
-        if ((this.B || this.E || this.g.X) && this.l != null && gameEngine.cameraFollowSpeed.b(this.l.posX, this.l.posY)) {
+        if ((this.B || this.E || this.g.X) && this.l != null && gameEngine.bufferedVisibleWorldRectF.b(this.l.posX, this.l.posY)) {
             return true;
         }
         return false;
@@ -1502,7 +1502,7 @@ public class Projectile extends PositionedObject {
         }
         ProjectileTemplate projectileTemplate = this.g;
         GameEngine gameEngine = GameEngine.getInstance();
-        GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
+        GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
         float f6 = this.posX - gameEngine.viewpointXSnapped;
         float f7 = this.posY - gameEngine.viewpointYSnapped;
         if (this.l != null) {
@@ -1697,7 +1697,7 @@ public class Projectile extends PositionedObject {
     public Paint f() {
         Paint paintA;
         if (this.ar != aq) {
-            if (GameEngine.isDesktop()) {
+            if (GameEngine.isAndroidPlatform()) {
                 paintA = a(this.ar);
             } else {
                 paintA = bb;
@@ -1729,7 +1729,7 @@ public class Projectile extends PositionedObject {
     public void a(float f2, float f3, AnimationSet animationSet) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (this.j == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("Projectile: cannot Retarget: source==null");
+            GameEngine.logColored("Projectile: cannot Retarget: source==null");
             return;
         }
         float fFastCos = this.posX + (Utility.fastCos(this.az) * f3);

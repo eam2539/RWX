@@ -136,14 +136,14 @@ public final class UnitCommand {
         if (this.targetUnitId != -1) {
             this.targetUnit = GameObject.a(this.targetUnitId, true);
             if (this.targetUnit == null) {
-                GameEngine.updatePaintTextSizeIfNeeded("convertUnitIds failed");
+                GameEngine.logColored("convertUnitIds failed");
                 if (this.commandType != null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("convertUnitIds: type:" + this.commandType.toString());
+                    GameEngine.logColored("convertUnitIds: type:" + this.commandType.toString());
                 }
                 if (this.buildUnitType != null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("convertUnitIds: build:" + this.buildUnitType.toString());
+                    GameEngine.logColored("convertUnitIds: build:" + this.buildUnitType.toString());
                 }
-                GameEngine.updatePaintTextSizeIfNeeded("convertUnitIds: x:" + this.targetX + ", y:" + this.targetY);
+                GameEngine.logColored("convertUnitIds: x:" + this.targetX + ", y:" + this.targetY);
             }
             this.targetUnitId = -1L;
         }

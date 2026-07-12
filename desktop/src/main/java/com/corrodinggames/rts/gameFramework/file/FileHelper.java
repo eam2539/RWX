@@ -35,7 +35,7 @@ public class FileHelper {
         if (fileB != null) {
             return fileB.getAbsolutePath();
         }
-        GameEngine.updatePaintTextSizeIfNeeded("Failed to get an internal path.");
+        GameEngine.logColored("Failed to get an internal path.");
         return null;
     }
 
@@ -52,7 +52,7 @@ public class FileHelper {
     /* JADX INFO: renamed from: b */
     public static void initialize() {
         loadError = null;
-        if (GameEngine.isDesktop()) {
+        if (GameEngine.isAndroidPlatform()) {
             if (Build.VERSION.SDK_INT < 19) {
                 loadError = "Android version too old for new file system support";
                 GameEngine.log("FileLoader: SDK too old, not changing FileLoader");
@@ -74,7 +74,7 @@ public class FileHelper {
     /* JADX INFO: renamed from: a */
     public static FileAccessFlags getFileAccessFlags(boolean z) {
         FileAccessFlags fileAccessFlags = new FileAccessFlags();
-        if (!GameEngine.isDesktop()) {
+        if (!GameEngine.isAndroidPlatform()) {
             fileAccessFlags.useSaf = false;
             fileAccessFlags.useDirectAccess = true;
             return fileAccessFlags;
@@ -95,7 +95,7 @@ public class FileHelper {
             fileAccessFlags.useOverriddenExternalPath = false;
         }
         if (Build.VERSION.SDK_INT <= 28 && useStorageApi == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("FileLoader using direct external access due to sdk: " + Build.VERSION.SDK_INT);
+            GameEngine.logColored("FileLoader using direct external access due to sdk: " + Build.VERSION.SDK_INT);
             fileAccessFlags.useDirectAccess = true;
             fileAccessFlags.useSaf = false;
             fileAccessFlags.useOverriddenExternalPath = false;
@@ -107,7 +107,7 @@ public class FileHelper {
     public static FileLoader createFileLoader(int i) {
         FileLoader customPathFileLoader;
         MergedFileLoader mergedFileLoader;
-        if (!GameEngine.isDesktop()) {
+        if (!GameEngine.isAndroidPlatform()) {
             return new FileLoader();
         }
         if (Build.VERSION.SDK_INT >= 19) {
@@ -123,11 +123,11 @@ public class FileHelper {
             FileAccessFlags fileAccessFlags = getFileAccessFlags(false);
             if (!fileAccessFlags.useOverriddenExternalPath) {
                 if (!fileAccessFlags.useDirectAccess) {
-                    GameEngine.updatePaintTextSizeIfNeeded("Not using direct external backend: As direct reads will cause problems");
+                    GameEngine.logColored("Not using direct external backend: As direct reads will cause problems");
                     customPathFileLoader = null;
                     i = 0;
                 } else {
-                    GameEngine.updatePaintTextSizeIfNeeded("FileLoader using direct external file access! SDK:" + Build.VERSION.SDK_INT);
+                    GameEngine.logColored("FileLoader using direct external file access! SDK:" + Build.VERSION.SDK_INT);
                     customPathFileLoader = new FileLoader();
                 }
             } else {
@@ -136,7 +136,7 @@ public class FileHelper {
             }
             NullFileLoader nullFileLoader = new NullFileLoader();
             if (i != 3 && customPathFileLoader2 == null) {
-                GameEngine.updatePaintTextSizeIfNeeded("No available file backends!!");
+                GameEngine.logColored("No available file backends!!");
                 return nullFileLoader;
             }
             if (i == 1) {

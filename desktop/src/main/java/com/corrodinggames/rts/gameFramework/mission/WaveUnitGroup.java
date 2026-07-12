@@ -13,12 +13,12 @@ import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.n.i */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/n/i.class */
-class waveunits {
+class WaveUnitGroup {
     boolean a;
     FastArrayList<WaveUnitEntry> b = new FastArrayList();
     final /* synthetic */ MissionEngine c;
 
-    waveunits(MissionEngine missionEngine) {
+    WaveUnitGroup(MissionEngine missionEngine) {
         this.c = missionEngine;
     }
 

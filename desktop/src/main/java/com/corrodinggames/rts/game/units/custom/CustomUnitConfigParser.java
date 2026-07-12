@@ -181,7 +181,7 @@ public class CustomUnitConfigParser {
                 fastArrayList2.add(pathForModError);
             }
         }
-        if (str != null && GameEngine.isDesktop()) {
+        if (str != null && GameEngine.isAndroidPlatform()) {
             gameEngine.showMessageBox("Unit errors", str);
         }
         if (z2 && !validateCustomUnitSet(false)) {
@@ -191,7 +191,7 @@ public class CustomUnitConfigParser {
             CustomUnitConfig.validUnitsForSync = null;
             rebuildUnitTypeListsAsync();
             lastErrorMessage = null;
-            PlayerTeam.updateTeamDefeatStatus();
+            PlayerTeam.markTeamStatsDirtyFromMetadataChange();
             GameUI.notifySelectionChanged();
             z3 = true;
             if (!z) {
@@ -450,7 +450,7 @@ public class CustomUnitConfigParser {
             } else {
                 GameEngine.log("Changed unit was not enabled (original not found in customUnitTypes)");
             }
-            PlayerTeam.updateTeamDefeatStatus();
+            PlayerTeam.markTeamStatsDirtyFromMetadataChange();
             GameUI.notifySelectionChanged();
         }
         return unitReference;
@@ -470,8 +470,8 @@ public class CustomUnitConfigParser {
                     }
                     PlayerTeam.c(customUnit);
                 }
-                if (customUnit.customUnitCOnfig == unitType) {
-                    customUnit.customUnitCOnfig = customUnitConfig;
+                if (customUnit.factoryUnitConfig == unitType) {
+                    customUnit.factoryUnitConfig = customUnitConfig;
                 }
             }
         }
@@ -544,7 +544,7 @@ public class CustomUnitConfigParser {
     private static void rebuildUnitTypeRegistry()  {
         CustomUnitConfig customUnitConfig = null;
         ArrayList arrayList = new ArrayList();
-        if (GameEngine.getInstance().isPaused()) {
+        if (GameEngine.getInstance().usesCoreUnitTypes()) {
             for (UnitTypeEnum unitTypeEnum : UnitTypeEnum.values()) {
                 arrayList.add(unitTypeEnum);
             }
@@ -610,10 +610,10 @@ public class CustomUnitConfigParser {
             unitType.h();
             if (unitType instanceof CustomUnitConfig) {
                 CustomUnitConfig customUnitConfig = (CustomUnitConfig) unitType;
-                if (customUnitConfig.f43fI != null) {
-                    UnitType unitTypeByName = CustomUnitConfig.getUnitTypeByName(customUnitConfig.f43fI);
+                if (customUnitConfig.aiUpgradedFrom != null) {
+                    UnitType unitTypeByName = CustomUnitConfig.getUnitTypeByName(customUnitConfig.aiUpgradedFrom);
                     if (unitTypeByName == null) {
-                        throw new ConfigParseException("Could not find [ai]upgradedFrom target:" + customUnitConfig.f43fI);
+                        throw new ConfigParseException("Could not find [ai]upgradedFrom target:" + customUnitConfig.aiUpgradedFrom);
                     }
                     customUnitConfig.b(unitTypeByName);
                 }
@@ -628,7 +628,7 @@ public class CustomUnitConfigParser {
             for (CustomUnitConfig customUnitConfig2 : CustomUnitConfig.activeConfigs) {
                 if (unitType instanceof CustomUnitConfig) {
                     CustomUnitConfig customUnitConfig3 = (CustomUnitConfig) unitType;
-                    if (customUnitConfig2.f43fI != null && customUnitConfig2.f43fI.equalsIgnoreCase(customUnitConfig3.getUnitTypeDescriptionShort())) {
+                    if (customUnitConfig2.aiUpgradedFrom != null && customUnitConfig2.aiUpgradedFrom.equalsIgnoreCase(customUnitConfig3.getUnitTypeDescriptionShort())) {
                         customUnitConfig3.b(customUnitConfig2);
                     }
                 }
@@ -684,7 +684,7 @@ public class CustomUnitConfigParser {
                                 setRallyAction.sortOrder = customActionDef.buildTime;
                             }
                             arrayListA2.add(setRallyAction);
-                            customUnitConfig4.canBeBuiltByOrTagsAndLogicAndTagsAndLogicOrTags = true;
+                            customUnitConfig4.hasSetRallyAction = true;
                             loadSoundInternal(arrayListA2);
                         }
                     } else if (customActionDef.stringId != null && customActionDef.stringId.equalsIgnoreCase("reclaim")) {
@@ -752,11 +752,11 @@ public class CustomUnitConfigParser {
             }
             if (unitType instanceof CustomUnitConfig) {
                 CustomUnitConfig customUnitConfig5 = (CustomUnitConfig) unitType;
-                customUnitConfig5.f29fu = false;
+                customUnitConfig5.canBuildUnits = false;
                 for (int i6 = 1; i6 <= 3; i6++) {
                     for (AbstractUnitAction abstractUnitAction : unitType.a(i6)) {
                         if (!(abstractUnitAction instanceof CustomAction) && abstractUnitAction.getUnitType() != null) {
-                            customUnitConfig5.f29fu = true;
+                            customUnitConfig5.canBuildUnits = true;
                         }
                     }
                 }
@@ -769,7 +769,7 @@ public class CustomUnitConfigParser {
             for (int i7 = 1; i7 <= 3; i7++) {
                 for (AbstractUnitAction abstractUnitAction2 : unitType.a(i7)) {
                     if (abstractUnitAction2.unitAction instanceof ActionWithCost) {
-                        GameEngine.printLog("=== ChainedActionConfig already on: " + unitType.getUnitTypeDescriptionShort() + " action:" + abstractUnitAction2.getCostForUnit());
+                        GameEngine.logErrorColored("=== ChainedActionConfig already on: " + unitType.getUnitTypeDescriptionShort() + " action:" + abstractUnitAction2.getCostForUnit());
                         abstractUnitAction2.unitAction = ((ActionWithCost) abstractUnitAction2.unitAction).wrappedAction;
                     }
                     if (z5) {
@@ -808,7 +808,7 @@ public class CustomUnitConfigParser {
             if (var1.modInfo != null) {
                 String var2 = var1.modInfo.firstError;
                 if (var2 != null) {
-                    GameEngine.updatePaintTextSizeIfNeeded(var1.getUnitTypeDescriptionShort() + "(mod:" + var1.getOwningModDisplayTitle() + "): Getting setup while mod has error: " + var2);
+                    GameEngine.logColored(var1.getUnitTypeDescriptionShort() + "(mod:" + var1.getOwningModDisplayTitle() + "): Getting setup while mod has error: " + var2);
                 }
             }
 
@@ -969,12 +969,12 @@ public class CustomUnitConfigParser {
         ByteBuffer[] array3 = null;
         try {
             array = new byte[8000000];
-            array[0] = instance.gameModeDifficulty;
-            instance.gameModeType = array[1];
+            array[0] = instance.memoryProbeWriteByte;
+            instance.memoryProbeReadByte = array[1];
             array2 = new byte[][] { new byte[3000000], new byte[3000000] };
-            array2[0][0] = instance.gameModeDifficulty;
-            array2[1][0] = instance.gameModeDifficulty;
-            if (!GameEngine.isDesktop()) {
+            array2[0][0] = instance.memoryProbeWriteByte;
+            array2[1][0] = instance.memoryProbeWriteByte;
+            if (!GameEngine.isAndroidPlatform()) {
                 array3 = new ByteBuffer[] { ByteBuffer.allocateDirect(5000000), ByteBuffer.allocateDirect(5000000), ByteBuffer.allocateDirect(5000000), ByteBuffer.allocateDirect(5000000) };
             }
         }
@@ -995,7 +995,7 @@ public class CustomUnitConfigParser {
             CustomUnitConfigParser.iniCache.clear();
         }
         loadOrGetSound(FileHelper.getSourcePath("units"), 1, false, null, FileHelper.getSourcePath("units"), null);
-        if (!GameEngine.isInGameOrLobbyStatic && !instance.isDemo) {
+        if (!GameEngine.isModsDisabled && !instance.isDemo) {
             final String defaultUserModsFolder = getDefaultUserModsFolder();
             if (!FileHelper.isDirectoryNonZip(defaultUserModsFolder)) {
                 GameEngine.log("Modded Custom '" + defaultUserModsFolder + "' directory not found");
@@ -1046,8 +1046,8 @@ public class CustomUnitConfigParser {
             final byte[][] array4 = null;
         }
         if (array != null) {
-            array[1] = instance.gameModeDifficulty;
-            instance.gameModeType = array[1];
+            array[1] = instance.memoryProbeWriteByte;
+            instance.memoryProbeReadByte = array[1];
             System.gc();
             System.gc();
         }
@@ -1071,8 +1071,8 @@ public class CustomUnitConfigParser {
         String[] strArrListFiles = FileHelper.listFiles(str);
         if (strArrListFiles == null) {
             String readPath = FileHelper.getReadPath();
-            GameEngine.updatePaintTextSizeIfNeeded("readAllCustomUnitConfigs: ERROR");
-            GameEngine.updatePaintTextSizeIfNeeded("readAllCustomUnitConfigs: Failed to load:" + str);
+            GameEngine.logColored("readAllCustomUnitConfigs: ERROR");
+            GameEngine.logColored("readAllCustomUnitConfigs: Failed to load:" + str);
             if (modInfo != null) {
                 if (!modInfo.hasError) {
                     if (readPath == null) {
@@ -1109,7 +1109,7 @@ public class CustomUnitConfigParser {
                 if (z && i == 1 && modByShortName == null) {
                     modByShortName = gameEngine.modManager.getModByShortName(str5);
                     if (modByShortName == null) {
-                        GameEngine.updatePaintTextSizeIfNeeded("readAllCustomUnitConfigs: Could not find linked mod:" + str5);
+                        GameEngine.logColored("readAllCustomUnitConfigs: Could not find linked mod:" + str5);
                         modByShortName = gameEngine.modManager.modInfo;
                     }
                     z3 = true;
@@ -1177,7 +1177,7 @@ public class CustomUnitConfigParser {
                 }
                 GameEngine.log("Loading unit config: " + str + " [" + sourceFolderRaw + "]");
             }
-            gameEngine.graphicsEngine2.e();
+            gameEngine.renderGraphicsEngine.e();
             long jA = PerformanceProfiler.a();
             try {
                 IniFile iniFile = new IniFile(inputStream, str);
@@ -1315,7 +1315,7 @@ public class CustomUnitConfigParser {
                 customUnitConfig.image_offsetY = iniFile.getLogicBooleanUnit("graphics", "image_offsetY", (Integer) 0).intValue();
                 customUnitConfig.image_offsetH = iniFile.getFloat("graphics", "image_offsetH", Float.valueOf(0.0f)).floatValue();
                 if (customUnitConfig.image_offsetX != 0 || customUnitConfig.image_offsetY != 0 || customUnitConfig.image_offsetH != 0.0f) {
-                    customUnitConfig.bool4 = true;
+                    customUnitConfig.hasImageOffset = true;
                 }
                 customUnitConfig.baseDamage = ColorMode.pureGreen;
                 if (iniFile.getBoolean("graphics", "teamColorsUseHue", (Boolean) false).booleanValue()) {
@@ -1349,7 +1349,7 @@ public class CustomUnitConfigParser {
                 if (customUnitConfig.baseTexture == null) {
                     throw new ConfigParseException("Main unit image must be set on custom unit");
                 }
-                customUnitConfig.hp = iniFile.getBoolean("graphics", "image_floatingPointSize", (Boolean) false).booleanValue();
+                customUnitConfig.imageFloatingPointSize = iniFile.getBoolean("graphics", "image_floatingPointSize", (Boolean) false).booleanValue();
                 customUnitConfig.maxHp = customUnitConfig.baseTexture.m() / customUnitConfig.total_frames;
                 customUnitConfig.mass = customUnitConfig.baseTexture.l();
                 if (customUnitConfig.maxHp < 1) {
@@ -1361,9 +1361,9 @@ public class CustomUnitConfigParser {
                 if (customUnitConfig.frame_height > 0) {
                     customUnitConfig.mass = customUnitConfig.frame_height;
                     if (customUnitConfig.mass < customUnitConfig.baseTexture.l()) {
-                        customUnitConfig.int2 = customUnitConfig.baseTexture.m() / customUnitConfig.maxHp;
-                        if (customUnitConfig.int2 < 1) {
-                            customUnitConfig.int2 = 1;
+                        customUnitConfig.frameColumns = customUnitConfig.baseTexture.m() / customUnitConfig.maxHp;
+                        if (customUnitConfig.frameColumns < 1) {
+                            customUnitConfig.frameColumns = 1;
                         }
                     }
                 }
@@ -1397,12 +1397,12 @@ public class CustomUnitConfigParser {
                             parseCustomActionDef(str8, customUnitConfig.shieldRegenMoving);
                         }
                     }
-                    customUnitConfig.bool3 = true;
+                    customUnitConfig.hasShadowFrames = true;
                 } else {
                     customUnitConfig.shieldRegenMoving = customUnitConfig.a(customUnitConfig.generation_free_in_sandbox, string6, customUnitConfig.imageSmoothing, "graphics", "image_shadow");
                 }
                 if (iniFile.getBoolean("graphics", "image_shadow_frames", (Boolean) false).booleanValue()) {
-                    customUnitConfig.bool3 = true;
+                    customUnitConfig.hasShadowFrames = true;
                 }
                 customUnitConfig.textures = customUnitConfig.a(customUnitConfig.baseTexture, customUnitConfig.baseDamage);
                 customUnitConfig.teamColorsOnTurret = iniFile.getBoolean("graphics", "teamColorsOnTurret", (Boolean) false).booleanValue();
@@ -1433,17 +1433,17 @@ public class CustomUnitConfigParser {
                 Texture textureA = customUnitConfig.a(iniFile, "graphics", "image_shield");
                 if (textureA != null) {
                     customUnitConfig.texture = textureA;
-                    customUnitConfig.bool5 = true;
+                    customUnitConfig.hasCustomShieldImage = true;
                 }
                 customUnitConfig.icon_build = customUnitConfig.a(iniFile, "graphics", "icon_build", false);
                 float fM = customUnitConfig.baseTexture.m() * customUnitConfig.targetOwnTeam;
                 float fL = customUnitConfig.baseTexture.l() * customUnitConfig.targetOwnTeam;
                 if (fM / 2.0f > 90.0f || fL / 2.0f > 90.0f) {
-                    customUnitConfig.tech = new Rect();
-                    customUnitConfig.tech.a = (int) ((-fM) / 2.0f);
-                    customUnitConfig.tech.c = (int) (fM / 2.0f);
-                    customUnitConfig.tech.b = (int) ((-fL) / 2.0f);
-                    customUnitConfig.tech.d = (int) (fL / 2.0f);
+                    customUnitConfig.largeImageBounds = new Rect();
+                    customUnitConfig.largeImageBounds.a = (int) ((-fM) / 2.0f);
+                    customUnitConfig.largeImageBounds.c = (int) (fM / 2.0f);
+                    customUnitConfig.largeImageBounds.b = (int) ((-fL) / 2.0f);
+                    customUnitConfig.largeImageBounds.d = (int) (fL / 2.0f);
                     customUnitConfig.isHover = true;
                 }
                 for (String str9 : iniFile.getSectionsStartingWithOr("resource_", "global_resource_")) {
@@ -1606,22 +1606,22 @@ public class CustomUnitConfigParser {
                         effectTemplate2.trailEffect.c();
                     }
                 }
-                customUnitConfig.splastEffect = iniFile.getBoolean("graphics", "splastEffect", (Boolean) false).booleanValue();
+                customUnitConfig.splashEffect = iniFile.getBoolean("graphics", "splastEffect", (Boolean) false).booleanValue();
                 customUnitConfig.dustEffect = iniFile.getBoolean("graphics", "dustEffect", (Boolean) false).booleanValue();
-                customUnitConfig.splastEffectReverse = iniFile.getBoolean("graphics", "splastEffectReverse", (Boolean) true).booleanValue();
+                customUnitConfig.splashEffectReverse = iniFile.getBoolean("graphics", "splastEffectReverse", (Boolean) true).booleanValue();
                 customUnitConfig.dustEffectReverse = iniFile.getBoolean("graphics", "dustEffectReverse", (Boolean) true).booleanValue();
-                customUnitConfig.internalEffect = customUnitConfig.dustEffect || customUnitConfig.splastEffect;
+                customUnitConfig.internalEffect = customUnitConfig.dustEffect || customUnitConfig.splashEffect;
                 String string9 = iniFile.getString("graphics", "movementEffect", (String) null);
                 if (string9 != null) {
-                    customUnitConfig.list1 = customUnitConfig.addConfigExtension(string9, null);
-                    if (customUnitConfig.list1 != null && customUnitConfig.list1.a()) {
+                    customUnitConfig.movementEffect = customUnitConfig.addConfigExtension(string9, null);
+                    if (customUnitConfig.movementEffect != null && customUnitConfig.movementEffect.a()) {
                         customUnitConfig.internalEffect = true;
                     }
                 }
                 String string10 = iniFile.getString("graphics", "movementEffectReverse", (String) null);
                 if (string10 != null) {
-                    customUnitConfig.list2 = customUnitConfig.addConfigExtension(string10, (CustomUnitSpawnList) null);
-                    if (customUnitConfig.list2 != null && customUnitConfig.list2.a()) {
+                    customUnitConfig.movementEffectReverse = customUnitConfig.addConfigExtension(string10, (CustomUnitSpawnList) null);
+                    if (customUnitConfig.movementEffectReverse != null && customUnitConfig.movementEffectReverse.a()) {
                         customUnitConfig.internalEffect = true;
                     }
                 }
@@ -1630,31 +1630,31 @@ public class CustomUnitConfigParser {
                 customUnitConfig.repairEffectRate = iniFile.getFloat("graphics", "repairEffectRate", Float.valueOf(5.0f)).floatValue();
                 String string11 = iniFile.getString("graphics", "repairEffect", (String) null);
                 if (string11 != null) {
-                    customUnitConfig.list3 = customUnitConfig.addConfigExtension(string11, null);
-                    if (customUnitConfig.list3 != null && customUnitConfig.list3.b()) {
+                    customUnitConfig.repairEffect = customUnitConfig.addConfigExtension(string11, null);
+                    if (customUnitConfig.repairEffect != null && customUnitConfig.repairEffect.b()) {
                         customUnitConfig.showActionsAndWaypoints = true;
                     }
                 }
                 String string12 = iniFile.getString("graphics", "repairEffectAtTarget", (String) null);
                 if (string12 != null) {
-                    customUnitConfig.list4 = customUnitConfig.addConfigExtension(string12, (CustomUnitSpawnList) null);
-                    if (customUnitConfig.list4 != null && customUnitConfig.list4.b()) {
+                    customUnitConfig.repairEffectAtTarget = customUnitConfig.addConfigExtension(string12, (CustomUnitSpawnList) null);
+                    if (customUnitConfig.repairEffectAtTarget != null && customUnitConfig.repairEffectAtTarget.b()) {
                         customUnitConfig.showActionsAndWaypoints = true;
                     }
                 }
                 customUnitConfig.reclaimEffectRate = iniFile.getFloat("graphics", "reclaimEffectRate", Float.valueOf(5.0f)).floatValue();
                 String string13 = iniFile.getString("graphics", "reclaimEffect", (String) null);
                 if (string13 != null) {
-                    customUnitConfig.createOnNeutralTeam = customUnitConfig.addConfigExtension(string13, (CustomUnitSpawnList) null);
-                    if (customUnitConfig.createOnNeutralTeam != null && customUnitConfig.createOnNeutralTeam.b()) {
-                        customUnitConfig.bool2 = true;
+                    customUnitConfig.reclaimEffect = customUnitConfig.addConfigExtension(string13, (CustomUnitSpawnList) null);
+                    if (customUnitConfig.reclaimEffect != null && customUnitConfig.reclaimEffect.b()) {
+                        customUnitConfig.hasReclaimEffect = true;
                     }
                 }
                 String string14 = iniFile.getString("graphics", "reclaimEffectAtTarget", (String) null);
                 if (string14 != null) {
-                    customUnitConfig.createOnSameTeamAsParent = customUnitConfig.addConfigExtension(string14, (CustomUnitSpawnList) null);
-                    if (customUnitConfig.createOnSameTeamAsParent != null && customUnitConfig.createOnSameTeamAsParent.b()) {
-                        customUnitConfig.bool2 = true;
+                    customUnitConfig.reclaimEffectAtTarget = customUnitConfig.addConfigExtension(string14, (CustomUnitSpawnList) null);
+                    if (customUnitConfig.reclaimEffectAtTarget != null && customUnitConfig.reclaimEffectAtTarget.b()) {
+                        customUnitConfig.hasReclaimEffect = true;
                     }
                 }
                 customUnitConfig.movingAnimation.a(customUnitConfig, iniFile, "graphics", "animation_" + customUnitConfig.movingAnimation.animationName + "_");
@@ -1708,8 +1708,8 @@ public class CustomUnitConfigParser {
                 customUnitConfig.constructionFootprint = iniFile.getRect("core", "constructionFootprint", customUnitConfig.constructionFootprint);
                 customUnitConfig.displayFootprint.a(customUnitConfig.footprint);
                 customUnitConfig.displayFootprint = iniFile.getRect("core", "displayFootprint", customUnitConfig.displayFootprint);
-                customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsOrLogicOrTags = iniFile.getFloat("core", "buildingToFootprintOffsetX", Float.valueOf(10.0f)).floatValue();
-                customUnitConfig.canBeBuiltByOrTagsAndLogicOrTagsOrLogicAndTags = iniFile.getFloat("core", "buildingToFootprintOffsetY", Float.valueOf(10.0f)).floatValue();
+                customUnitConfig.buildingToFootprintOffsetX = iniFile.getFloat("core", "buildingToFootprintOffsetX", Float.valueOf(10.0f)).floatValue();
+                customUnitConfig.buildingToFootprintOffsetY = iniFile.getFloat("core", "buildingToFootprintOffsetY", Float.valueOf(10.0f)).floatValue();
                 customUnitConfig.radius = (int) (customUnitConfig.radius * customUnitConfig.globalScale);
                 customUnitConfig.displayRadius = (int) (customUnitConfig.displayRadius * customUnitConfig.globalScale);
                 customUnitConfig.unitStats.fogOfWarSightRange = iniFile.getLogicBooleanUnit("core", "fogOfWarSightRange", (Integer) 15).intValue();
@@ -1838,10 +1838,10 @@ public class CustomUnitConfigParser {
                 customUnitConfig.transportUnitsHealBy = iniFile.getFloat("core", "transportUnitsHealBy", Float.valueOf(0.0f)).floatValue();
                 customUnitConfig.transportUnitsCanUnloadUnits = iniFile.getLogicBoolean(customUnitConfig, "core", "transportUnitsCanUnloadUnits", (LogicBoolean) null);
                 if (customUnitConfig.transportUnitsCanUnloadUnits != null) {
-                    customUnitConfig.f17fd = customUnitConfig.transportUnitsCanUnloadUnits;
+                    customUnitConfig.transportUnitsCanUnloadCondition = customUnitConfig.transportUnitsCanUnloadUnits;
                 } else {
                     customUnitConfig.transportUnitsCanUnloadUnits = CustomUnitConfig.logic_notOverLiquidAndNotMoving;
-                    customUnitConfig.f17fd = CustomUnitConfig.logic_notOverLiquid;
+                    customUnitConfig.transportUnitsCanUnloadCondition = CustomUnitConfig.logic_notOverLiquid;
                 }
                 customUnitConfig.transportUnitsAddUnloadOption = iniFile.getBoolean("core", "transportUnitsAddUnloadOption", Boolean.valueOf(customUnitConfig.transportUnitsCanUnloadUnits != LogicBoolean.falseBoolean)).booleanValue();
                 customUnitConfig.transportUnitsOnTeamChangeKeepCurrentTeam = iniFile.getBoolean("core", "transportUnitsOnTeamChangeKeepCurrentTeam", Boolean.valueOf(customUnitConfig.transportUnitsOnTeamChangeKeepCurrentTeam)).booleanValue();
@@ -1885,9 +1885,9 @@ public class CustomUnitConfigParser {
                 customUnitConfig.customUnitMetadata = PlacementRules.a(customUnitConfig, iniFile);
                 customUnitConfig.movementType = UnitMovementType.a(iniFile.getValueStrict("movement", "movementType"), "movementType");
                 if (!customUnitConfig.isBuildingUnit) {
-                    customUnitConfig.f19fh = customUnitConfig.movementType;
+                    customUnitConfig.effectiveMovementType = customUnitConfig.movementType;
                 } else {
-                    customUnitConfig.f19fh = UnitMovementType.NONE;
+                    customUnitConfig.effectiveMovementType = UnitMovementType.NONE;
                 }
                 Boolean bool = iniFile.getBoolean("ai", "useAsBuilder", (Boolean) null);
                 customUnitConfig.useAsAttacker = iniFile.getBoolean("ai", "useAsAttacker", (Boolean) true).booleanValue();
@@ -1979,16 +1979,16 @@ public class CustomUnitConfigParser {
                 if (customUnitConfig.moveYAxisScaling <= 0.0f) {
                     throw new RuntimeException("[movement]moveYAxisScaling must be > 0");
                 }
-                customUnitConfig.float2 = 1.0f / customUnitConfig.moveYAxisScaling;
+                customUnitConfig.inverseMoveYAxisScaling = 1.0f / customUnitConfig.moveYAxisScaling;
                 customUnitConfig.reverseSpeedPercentage = iniFile.getFloat("movement", "reverseSpeedPercentage", Float.valueOf(0.6f)).floatValue();
                 String string17 = iniFile.getString("movement", "landOnGround", "false");
                 if (string17.equalsIgnoreCase("false")) {
-                    customUnitConfig.bool8 = false;
+                    customUnitConfig.landOnGround = false;
                 } else if (string17.equalsIgnoreCase("onlyIdle")) {
-                    customUnitConfig.bool8 = true;
-                    customUnitConfig.bool9 = true;
+                    customUnitConfig.landOnGround = true;
+                    customUnitConfig.landOnGroundOnlyIdle = true;
                 } else if (string17.equalsIgnoreCase("true")) {
-                    customUnitConfig.bool8 = true;
+                    customUnitConfig.landOnGround = true;
                 } else {
                     throw new RuntimeException("landOnGround expected:true, false, onlyIdle, not:" + string17);
                 }
@@ -2071,27 +2071,27 @@ public class CustomUnitConfigParser {
                 if (size < 1) {
                     size = 1;
                 }
-                customUnitConfig.f50fR = new CustomProjectileTemplate[size];
+                customUnitConfig.projectileTemplatesById = new CustomProjectileTemplate[size];
                 for (int i4 = 0; i4 < customUnitConfig.projectileTemplates.size(); i4++) {
                     CustomProjectileTemplate customProjectileTemplate2 = customUnitConfig.projectileTemplates.get(i4);
                     customProjectileTemplate2.projectileId = i4;
-                    customUnitConfig.f50fR[i4] = customProjectileTemplate2;
+                    customUnitConfig.projectileTemplatesById[i4] = customProjectileTemplate2;
                 }
-                for (int i5 = 0; i5 < customUnitConfig.f50fR.length; i5++) {
-                    CustomProjectileTemplate customProjectileTemplate3 = customUnitConfig.f50fR[i5];
+                for (int i5 = 0; i5 < customUnitConfig.projectileTemplatesById.length; i5++) {
+                    CustomProjectileTemplate customProjectileTemplate3 = customUnitConfig.projectileTemplatesById[i5];
                     if (customProjectileTemplate3 != null) {
                         customProjectileTemplate3.w *= customUnitConfig.globalScale;
                         customProjectileTemplate3.au *= customUnitConfig.globalScale;
                         customProjectileTemplate3.aF *= customUnitConfig.globalScale;
                     }
                 }
-                if (customUnitConfig.f50fR[0] == null) {
+                if (customUnitConfig.projectileTemplatesById[0] == null) {
                     CustomProjectileTemplate customProjectileTemplate4 = new CustomProjectileTemplate();
                     customProjectileTemplate4.projectileId = 0;
                     customProjectileTemplate4.projectileName = "1";
                     customProjectileTemplate4.b = 10;
                     customUnitConfig.projectileTemplates.add(customProjectileTemplate4);
-                    customUnitConfig.f50fR[0] = customProjectileTemplate4;
+                    customUnitConfig.projectileTemplatesById[0] = customProjectileTemplate4;
                 }
                 ArrayList<TurretConfig> arrayList = customUnitConfig.projectileConfigs;
                 for (String str17 : iniFile.getSectionsStartingWith("turret_")) {
@@ -2297,7 +2297,7 @@ public class CustomUnitConfigParser {
                 customUnitConfig.canOnlyAttackUnitsWithTags = iniFile.getAnimationSet(customUnitConfig, "attack", "canOnlyAttackUnitsWithTags", (AnimationSet) null);
                 customUnitConfig.canOnlyAttackUnitsWithoutTags = iniFile.getAnimationSet(customUnitConfig, "attack", "canOnlyAttackUnitsWithoutTags", (AnimationSet) null);
                 if (customUnitConfig.canOnlyAttackUnitsWithTags != null || customUnitConfig.canOnlyAttackUnitsWithoutTags != null) {
-                    customUnitConfig.bool11 = true;
+                    customUnitConfig.hasAttackTagRestrictions = true;
                 }
                 boolean z7 = false;
                 boolean z8 = false;
@@ -2317,8 +2317,8 @@ public class CustomUnitConfigParser {
                     }
                 }
                 if (z7 && !z8) {
-                    customUnitConfig.bool12 = true;
-                    customUnitConfig.bool11 = true;
+                    customUnitConfig.allFiringTurretsHaveTagRestrictions = true;
+                    customUnitConfig.hasAttackTagRestrictions = true;
                 }
                 customUnitConfig.isFixedFiring = iniFile.getBoolean("attack", "isFixedFiring", (Boolean) false).booleanValue();
                 customUnitConfig.lowPriorityTargetForOtherUnits = iniFile.getBoolean("ai", "lowPriorityTargetForOtherUnits", (Boolean) false).booleanValue();
@@ -2352,24 +2352,24 @@ public class CustomUnitConfigParser {
                 customUnitConfig.nonInBaseExtraPriority = iniFile.getFloat("ai", "noneInBaseExtraPriority", Float.valueOf(customUnitConfig.nonInBaseExtraPriority)).floatValue();
                 customUnitConfig.nonGlobalExtraPriority = iniFile.getFloat("ai", "nonGlobalExtraPriority", Float.valueOf(0.0f)).floatValue();
                 customUnitConfig.nonGlobalExtraPriority = iniFile.getFloat("ai", "noneGlobalExtraPriority", Float.valueOf(customUnitConfig.nonGlobalExtraPriority)).floatValue();
-                customUnitConfig.f43fI = iniFile.getString("ai", "upgradedFrom", (String) null);
+                customUnitConfig.aiUpgradedFrom = iniFile.getString("ai", "upgradedFrom", (String) null);
                 Float f8 = iniFile.getFloat("ai", "ai_upgradePriority", (Float) null);
                 if (f8 != null && f8.floatValue() != -1.0f) {
                     if (f8.floatValue() >= 0.0f && f8.floatValue() <= 1.0f) {
-                        customUnitConfig.f45fK = f8.floatValue() * 100.0f;
+                        customUnitConfig.aiUpgradePriority = f8.floatValue() * 100.0f;
                     } else {
-                        throw new RuntimeException("[ai]ai_upgradePriority: " + customUnitConfig.f45fK + " must be between 0-1 or -1 for default");
+                        throw new RuntimeException("[ai]ai_upgradePriority: " + customUnitConfig.aiUpgradePriority + " must be between 0-1 or -1 for default");
                     }
                 }
                 if (customUnitConfig.canAttack) {
                     for (int i9 = 0; i9 < customUnitConfig.turrets.length; i9++) {
                         TurretConfig turretConfig7 = customUnitConfig.turrets[i9];
                         if (turretConfig7.B && turretConfig7.linkedTurret == null && customUnitConfig.showShotDelayBar) {
-                            if (turretConfig7.m > 140.0f && (customUnitConfig.currentTurrentIndex == -1 || customUnitConfig.turrets[customUnitConfig.currentTurrentIndex].m < turretConfig7.m)) {
-                                customUnitConfig.currentTurrentIndex = i9;
+                            if (turretConfig7.m > 140.0f && (customUnitConfig.currentTurretIndex == -1 || customUnitConfig.turrets[customUnitConfig.currentTurretIndex].m < turretConfig7.m)) {
+                                customUnitConfig.currentTurretIndex = i9;
                             }
                             if (turretConfig7.n > 80.0f) {
-                                customUnitConfig.int3 = i9;
+                                customUnitConfig.warmupBarTurretIndex = i9;
                             }
                         }
                     }
@@ -2392,7 +2392,7 @@ public class CustomUnitConfigParser {
                     }
                 }
                 if (customUnitConfig.autoTriggerConditions.size() > 0) {
-                    customUnitConfig.f52fX = true;
+                    customUnitConfig.hasAutoTriggerConditions = true;
                     FastArrayList fastArrayList = new FastArrayList();
                     FastArrayList fastArrayList2 = new FastArrayList();
                     FastArrayList fastArrayList3 = new FastArrayList();
@@ -2504,7 +2504,7 @@ public class CustomUnitConfigParser {
     public static void addTimingSample(String str, Exception exc, ModInfo modInfo) {
         String strIsGreaterThan;
         String str2;
-        GameEngine.updatePaintTextSizeIfNeeded("Error while loading unit:" + str);
+        GameEngine.logColored("Error while loading unit:" + str);
         GameEngine.printStackTrace(exc);
         if (str == null) {
             str = "<null>";
@@ -2774,7 +2774,7 @@ public class CustomUnitConfigParser {
                 customActionDef.iconColorCondition = null;
             }
             if (customActionDef.iconColorCondition != null) {
-                customUnitConfig.f44fJ = true;
+                customUnitConfig.hasAiHighPriorityAction = true;
             }
             customActionDef.iconColor = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "ai_isDisabled", LogicBoolean.falseBoolean);
             customActionDef.aN = (com.corrodinggames.rts.game.units.custom.logic.ActionType) iniFile.getEnum(str, str2 + "aiUse", customActionDef.aN, com.corrodinggames.rts.game.units.custom.logic.ActionType.class);
@@ -3040,7 +3040,7 @@ public class CustomUnitConfigParser {
                     }
                 }
                 if (customActionDef.stringId != null && customActionDef.buildCost != null && customActionDef.buildCost.b > 0) {
-                    customUnitConfig.f56gi = true;
+                    customUnitConfig.hasBuildCostActions = true;
                 }
                 customUnitConfig.customActionDefs.add(customActionDef);
             }
@@ -3158,11 +3158,11 @@ public class CustomUnitConfigParser {
         }
         if (i > 5) {
             GameEngine.log("Fast failing to oom image for this mod");
-            textureA = gameEngine.graphicsEngine2.r();
+            textureA = gameEngine.renderGraphicsEngine.r();
         } else {
             long jA = PerformanceProfiler.a();
             try {
-                textureA = gameEngine.graphicsEngine2.a((InputStream) assetInputStreamOpenAssetStreamForUnit, true);
+                textureA = gameEngine.renderGraphicsEngine.a((InputStream) assetInputStreamOpenAssetStreamForUnit, true);
                 getLocaleString(jA, LoadPhase.imageLoad);
                 if (textureA.A()) {
                     GameEngine.log("oomErrors:" + oomImageErrorCount);
@@ -3171,7 +3171,7 @@ public class CustomUnitConfigParser {
                         currentModInfo.imageCount++;
                         currentModInfo.soundCount++;
                     }
-                } else if (currentModInfo != null && !currentModInfo.isBuiltIn && GameEngine.isDebugVersionStatic2) {
+                } else if (currentModInfo != null && !currentModInfo.isBuiltIn && GameEngine.isIOSVersion) {
                     textureA.z();
                 }
             } catch (RuntimeException e) {
@@ -3284,7 +3284,7 @@ public class CustomUnitConfigParser {
 
     /* JADX INFO: renamed from: a */
     public static boolean parseCustomEventList(String str, String str2, String str3, ModInfo modInfo) throws IOException {
-        if (str2 == null || !str2.contains("..") || GameEngine.isDesktop()) {
+        if (str2 == null || !str2.contains("..") || GameEngine.isAndroidPlatform()) {
             return true;
         }
         String canonicalPath = new File(FileHelper.convertAbstractPath(str3)).getCanonicalPath();
@@ -3294,7 +3294,7 @@ public class CustomUnitConfigParser {
         String canonicalPath2 = modInfo.getCanonicalPath();
         boolean zStartsWith = canonicalPath.startsWith(canonicalPath2);
         if (!zStartsWith) {
-            GameEngine.updatePaintTextSizeIfNeeded("File: '" + canonicalPath + "' is not within mod: '" + canonicalPath2 + "'");
+            GameEngine.logColored("File: '" + canonicalPath + "' is not within mod: '" + canonicalPath2 + "'");
         }
         return zStartsWith;
     }
@@ -3385,7 +3385,7 @@ public class CustomUnitConfigParser {
     /* JADX INFO: renamed from: m */
     public static String getDefaultUserModsFolder() {
         String str;
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             str = "/SD/mods/units";
         } else {
             str = "/SD/rustedWarfare/units";

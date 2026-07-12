@@ -433,7 +433,7 @@ public final class AIController extends PlayerTeam {
             return new RallyGroup(this);
         }
         if (i == 0) {
-            GameEngine.updatePaintTextSizeIfNeeded("Found zone type 0, loading PlainZone instead");
+            GameEngine.logColored("Found zone type 0, loading PlainZone instead");
             return new PlainZone(this);
         }
         throw new RuntimeException("Unknown zone type:" + i);
@@ -441,7 +441,7 @@ public final class AIController extends PlayerTeam {
 
     @Override // com.corrodinggames.rts.game.PlayerTeam
     /* JADX INFO: renamed from: c */
-    public void getActiveTeams(GameInputStream gameInputStream) throws IOException {
+    public void readExtendedTeamState(GameInputStream gameInputStream) throws IOException {
         AIStrategyNode aIStrategyNodeFindNodeById;
         this.aiEnabled = gameInputStream.readBoolean();
         this.attackTimerEasy = gameInputStream.readFloat();
@@ -513,7 +513,7 @@ public final class AIController extends PlayerTeam {
             }
             gameInputStream.a("ai-c e");
         }
-        super.getActiveTeams(gameInputStream);
+        super.readExtendedTeamState(gameInputStream);
         updateUnitCounts();
     }
 
@@ -814,7 +814,7 @@ public final class AIController extends PlayerTeam {
         this.debugPaint.b(Color.a(0, 255, 0));
         this.debugPaint.a(Paint.Style.STROKE);
         this.debugPaint.a(true);
-        gameEngine.getTouchY(this.debugPaint, 14.0f);
+        gameEngine.setScaledTextSize(this.debugPaint, 14.0f);
         initializeBuildStrategies();
     }
 
@@ -1045,7 +1045,7 @@ public final class AIController extends PlayerTeam {
     public boolean isNonCombatCustomUnit(BaseUnit baseUnit) {
         if (baseUnit instanceof OrderableUnit) {
             OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
-            if (orderableUnit.getUnitAIPathfindCost()) {
+            if (orderableUnit.canTransportUnits()) {
                 UnitType unitTypeR = orderableUnit.r();
                 if ((unitTypeR instanceof CustomUnitConfig) && !((CustomUnitConfig) unitTypeR).useAsTransport) {
                     return false;
@@ -1093,7 +1093,7 @@ public final class AIController extends PlayerTeam {
 
     /* JADX INFO: renamed from: i */
     public void renderDebugOverlay(float f) {
-        if (!unitCountsUpdated || !GameEngine.getInstance().isNetworkGameActive || this.enableScouting || this.canBuild) {
+        if (!unitCountsUpdated || !GameEngine.getInstance().isDebugTempMode || this.enableScouting || this.canBuild) {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
@@ -1101,7 +1101,7 @@ public final class AIController extends PlayerTeam {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit.team == this && gameEngine.cameraFollowTarget.b((int) (baseUnit.posX - 200.0f), (int) (baseUnit.posY - 200.0f), (int) (baseUnit.posX + 200.0f), (int) (baseUnit.posY + 200.0f))) {
+            if (baseUnit.team == this && gameEngine.bufferedVisibleWorldRect.b((int) (baseUnit.posX - 200.0f), (int) (baseUnit.posY - 200.0f), (int) (baseUnit.posX + 200.0f), (int) (baseUnit.posY + 200.0f))) {
                 if (baseUnit instanceof OrderableUnit) {
                 }
                 String str = VariableScope.nullOrMissingString;
@@ -1120,24 +1120,24 @@ public final class AIController extends PlayerTeam {
                         float f3 = baseUnit.posX - gameEngine.viewpointXSnapped;
                         float f4 = f2;
                         float fM = (-this.debugPaint.l()) + this.debugPaint.m();
-                        gameEngine.graphicsEngine2.k();
+                        gameEngine.renderGraphicsEngine.k();
                         if (gameEngine.zoom > 1.0f) {
                             gameEngine.restoreZoomTransform();
                             f3 *= gameEngine.zoom;
                             f4 *= gameEngine.zoom;
                             fM /= gameEngine.zoom;
                         }
-                        gameEngine.graphicsEngine2.a(str2, f3, f4, this.debugPaint);
-                        gameEngine.graphicsEngine2.l();
+                        gameEngine.renderGraphicsEngine.a(str2, f3, f4, this.debugPaint);
+                        gameEngine.renderGraphicsEngine.l();
                         f2 += fM;
                     }
                 }
             }
         }
         for (AIStrategyNode aIStrategyNode : this.strategyNodes) {
-            if (gameEngine.cameraFollowTarget.b((int) (aIStrategyNode.posX - aIStrategyNode.radius), (int) (aIStrategyNode.posY - aIStrategyNode.radius), (int) (aIStrategyNode.posX + aIStrategyNode.radius), (int) (aIStrategyNode.posY + aIStrategyNode.radius))) {
-                this.debugPaint.b(getTeamUnitCount());
-                gameEngine.graphicsEngine2.a(aIStrategyNode.posX - gameEngine.viewpointXSnapped, aIStrategyNode.posY - gameEngine.viewpointYSnapped, aIStrategyNode.radius + 2.0f, this.debugPaint);
+            if (gameEngine.bufferedVisibleWorldRect.b((int) (aIStrategyNode.posX - aIStrategyNode.radius), (int) (aIStrategyNode.posY - aIStrategyNode.radius), (int) (aIStrategyNode.posX + aIStrategyNode.radius), (int) (aIStrategyNode.posY + aIStrategyNode.radius))) {
+                this.debugPaint.b(getTeamColorArgb());
+                gameEngine.renderGraphicsEngine.a(aIStrategyNode.posX - gameEngine.viewpointXSnapped, aIStrategyNode.posY - gameEngine.viewpointYSnapped, aIStrategyNode.radius + 2.0f, this.debugPaint);
                 int iA = Color.a(0, 255, 0);
                 String str3 = VariableScope.nullOrMissingString + "\n" + aIStrategyNode.getClass().getSimpleName() + " ( Team:" + this.teamId + " )";
                 float f5 = aIStrategyNode.posY - gameEngine.viewpointYSnapped;
@@ -1203,21 +1203,21 @@ public final class AIController extends PlayerTeam {
                 if (aIStrategyNode instanceof RallyGroup) {
                     str3 = str3 + "\nneedsTransportGroup: " + ((RallyGroup) aIStrategyNode).a;
                 }
-                this.debugPaint.b(getTeamUnitCount());
+                this.debugPaint.b(getTeamColorArgb());
                 for (String str8 : str3.split("\n")) {
                     if (!str8.trim().equals(VariableScope.nullOrMissingString)) {
                         float f6 = aIStrategyNode.posX - gameEngine.viewpointXSnapped;
                         float f7 = f5;
                         float fM2 = (-this.debugPaint.l()) + this.debugPaint.m();
-                        gameEngine.graphicsEngine2.k();
+                        gameEngine.renderGraphicsEngine.k();
                         if (gameEngine.zoom > 1.0f) {
                             gameEngine.restoreZoomTransform();
                             f6 *= gameEngine.zoom;
                             f7 *= gameEngine.zoom;
                             fM2 /= gameEngine.zoom;
                         }
-                        gameEngine.graphicsEngine2.a(str8, f6, f7, this.debugPaint);
-                        gameEngine.graphicsEngine2.l();
+                        gameEngine.renderGraphicsEngine.a(str8, f6, f7, this.debugPaint);
+                        gameEngine.renderGraphicsEngine.l();
                         f5 += fM2;
                         this.debugPaint.b(iA);
                     }
@@ -1250,13 +1250,13 @@ public final class AIController extends PlayerTeam {
         if (this.canBuild || this.enableScouting) {
             return;
         }
-        if (!gameEngine.networkEngine.B || (gameEngine.networkEngine.isServer && !gameEngine.replayEngine.j())) {
+        if (!gameEngine.networkEngine.networkGameActive || (gameEngine.networkEngine.isServer && !gameEngine.replayEngine.j())) {
             if (this.aiUnitManagementTimer > 0.0f) {
                 this.aiUnitManagementTimer -= f;
                 return;
             }
             this.difficultyLevel = getTeamColorId();
-            if (this.enableAirForce && gameEngine.lastTick > 3000) {
+            if (this.enableAirForce && gameEngine.gameTimeMillis > 3000) {
                 this.enableAirForce = false;
                 BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
                 int i = 0;
@@ -1632,11 +1632,11 @@ public final class AIController extends PlayerTeam {
                     }
                 }
             }
-            if (getTeamColorName(4100.0d) || this.resourceMultiplierInsane > 2400.0f || this.constructingBaseCount == 0) {
+            if (hasCredits(4100.0d) || this.resourceMultiplierInsane > 2400.0f || this.constructingBaseCount == 0) {
                 for (BaseUnit baseUnit5 : BaseUnit.bE) {
                     if (baseUnit5.team == this && (baseUnit5 instanceof OrderableUnit)) {
                         OrderableUnit orderableUnit4 = (OrderableUnit) baseUnit5;
-                        if (orderableUnit4.isUnitBuilding()) {
+                        if (orderableUnit4.hasAiHighPriorityAction()) {
                             ArrayList<AbstractUnitAction> arrayListN = orderableUnit4.getAvailableActions();
                             ArrayList reusableList = getReusableList();
                             for (AbstractUnitAction abstractUnitAction : arrayListN) {
@@ -1651,7 +1651,7 @@ public final class AIController extends PlayerTeam {
                     }
                 }
                 boolean z3 = false;
-                if (getTeamColorName(30000.0d)) {
+                if (hasCredits(30000.0d)) {
                     z3 = true;
                 }
                 for (BaseUnit baseUnit6 : BaseUnit.bE) {
@@ -1723,7 +1723,7 @@ public final class AIController extends PlayerTeam {
                                         if (!z3) {
                                             break;
                                         }
-                                        if (getTeamColorName(40000.0d)) {
+                                        if (hasCredits(40000.0d)) {
                                             if (Utility.getRandomInt(100) > 95) {
                                                 break;
                                             }
@@ -1785,11 +1785,11 @@ public final class AIController extends PlayerTeam {
         for (AIStrategyNode aIStrategyNode2 : this.strategyNodes) {
             for (AIStrategyNode aIStrategyNode3 : this.strategyNodes) {
                 if (aIStrategyNode2 != aIStrategyNode3 && aIStrategyNode2.strategyId == aIStrategyNode3.strategyId) {
-                    GameEngine.printLog("Id overlap on:" + aIStrategyNode2.strategyId);
-                    GameEngine.printLog("zone x:" + aIStrategyNode2.posX);
-                    GameEngine.printLog("zone y:" + aIStrategyNode2.posY);
-                    GameEngine.printLog("zone radius:" + aIStrategyNode2.radius);
-                    GameEngine.printLog("zone type:" + aIStrategyNode2.getClass().getName());
+                    GameEngine.logErrorColored("Id overlap on:" + aIStrategyNode2.strategyId);
+                    GameEngine.logErrorColored("zone x:" + aIStrategyNode2.posX);
+                    GameEngine.logErrorColored("zone y:" + aIStrategyNode2.posY);
+                    GameEngine.logErrorColored("zone radius:" + aIStrategyNode2.radius);
+                    GameEngine.logErrorColored("zone type:" + aIStrategyNode2.getClass().getName());
                 }
             }
         }

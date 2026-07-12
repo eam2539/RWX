@@ -129,10 +129,10 @@ public class SlickLibRocketManager extends LibRocketManager {
                 TextureImpl.getLastBind();
                 if (slickUITextureHolder.h == null && slickUITextureHolder.lazyLoad) {
                     if (slickUITextureHolder.unitType != null) {
-                        GraphicsEngine graphicsEngine = GameEngine.getInstance().graphicsEngine2;
+                        GraphicsEngine graphicsEngine = GameEngine.getInstance().renderGraphicsEngine;
                         this.j.pushTransform();
                         graphicsEngine.i();
-                        float f6 = (((GameEngine.getInstance().lastTickTime / 1000.0f) / 10.0f) * 360.0f) % 360.0f;
+                        float f6 = (((GameEngine.getInstance().renderTimeMillis / 1000.0f) / 10.0f) * 360.0f) % 360.0f;
                         this.j.translate(-f, -f2);
                         Rect rect = new Rect(this.scissorRect.a, this.scissorRect.b, this.scissorRect.c, this.scissorRect.d);
                         this.j.setClip((Rectangle) null);

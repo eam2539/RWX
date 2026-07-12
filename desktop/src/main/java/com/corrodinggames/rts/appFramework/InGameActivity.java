@@ -62,7 +62,7 @@ public class InGameActivity extends TaskQueueActivity {
         menu.clear();
         GameEngine gameEngine = GameEngine.getInstance();
         menu.add(0, 12, 0, Locale.get("menus.ingame.save", new Object[0])).setIcon(R.drawable.ic_menu_save);
-        if (gameEngine.isGameStarted && !GameEngine.isDebugVersionStatic2) {
+        if (gameEngine.isGameStarted && !GameEngine.isIOSVersion) {
             menu.add(0, 18, 0, Locale.get("menus.ingame.exportMap", new Object[0])).setIcon(R.drawable.ic_menu_save);
         }
         menu.add(0, 2, 0, Locale.get("menus.ingame.settings", new Object[0])).setIcon(R.drawable.ic_menu_preferences);
@@ -81,7 +81,7 @@ public class InGameActivity extends TaskQueueActivity {
             if (gameEngine.playerTeam != null && gameEngine.playerTeam.isTeamWipedOut) {
                 z = true;
             }
-            if (!z && !gameEngine.isTouchDown) {
+            if (!z && !gameEngine.hasWonGame) {
                 menu.add(0, 19, 0, Locale.get("menus.ingame.surrender", new Object[0])).setIcon(R.drawable.ic_lock_power_off);
             }
             if (!gameEngine.networkEngine.isServer) {
@@ -96,7 +96,7 @@ public class InGameActivity extends TaskQueueActivity {
             menu.add(0, 15, 0, Locale.get("menus.ingame.exitGame", new Object[0])).setIcon(R.drawable.ic_lock_power_off);
         }
         if (gameEngine != null && gameEngine.settingsEngine.allowGameRecording) {
-            if (!gameEngine.isServer) {
+            if (!gameEngine.isGameRecording) {
                 menu.add(0, 9, 0, "Start Recording");
                 return true;
             }
@@ -128,12 +128,12 @@ public class InGameActivity extends TaskQueueActivity {
                 new AlertDialog.Builder(this).setIcon(R.drawable.ic_dialog_alert).setTitle("Skip?").setMessage("Are you sure you want to skip this level?").setPositiveButton("Yes", new DialogInterface.OnClickListener() { // from class: com.corrodinggames.rts.appFramework.g.9
                     @Override // android.content.DialogInterface.OnClickListener
                     public void onClick(DialogInterface dialogInterface, int i2) {
-                        GameEngine.getInstance().isPinching = true;
+                        GameEngine.getInstance().shouldAdvanceAfterGameEnd = true;
                     }
                 }).setNegativeButton("No", (DialogInterface.OnClickListener) null).show();
                 break;
             case 4:
-                GameEngine.getInstance().isGameEngineReady = !GameEngine.getInstance().isGameEngineReady;
+                GameEngine.getInstance().isLookModeEnabled = !GameEngine.getInstance().isLookModeEnabled;
                 break;
             case 5:
                 new AlertDialog.Builder(this).setIcon(R.drawable.ic_dialog_alert).setTitle("Restart?").setMessage("Are you sure you want to restart this level?").setPositiveButton("Yes", new DialogInterface.OnClickListener() { // from class: com.corrodinggames.rts.appFramework.g.10
@@ -148,14 +148,14 @@ public class InGameActivity extends TaskQueueActivity {
                 break;
             case 6:
                 GameEngine gameEngine = GameEngine.getInstance();
-                gameEngine.isNetworkGameActive = !gameEngine.isNetworkGameActive;
+                gameEngine.isDebugTempMode = !gameEngine.isDebugTempMode;
                 break;
             case 9:
                 GameEngine gameEngine2 = GameEngine.getInstance();
-                if (!gameEngine2.isServer) {
-                    gameEngine2.isServer = true;
+                if (!gameEngine2.isGameRecording) {
+                    gameEngine2.isGameRecording = true;
                 } else {
-                    gameEngine2.isServer = false;
+                    gameEngine2.isGameRecording = false;
                 }
                 break;
             case 10:
@@ -181,7 +181,7 @@ public class InGameActivity extends TaskQueueActivity {
                         public void onClick(DialogInterface dialogInterface, int i2) {
                             GameEngine.log("Returning to battleroom clicked.");
                             GameEngine gameEngine4 = GameEngine.getInstance();
-                            gameEngine4.networkEngine.ag();
+                            gameEngine4.networkEngine.scheduleDefaultReturnToBattleroom();
                             gameEngine4.gameUI.isDraggingSelection = false;
                         }
                     });
@@ -214,7 +214,7 @@ public class InGameActivity extends TaskQueueActivity {
             case 14:
                 GameEngine gameEngine5 = GameEngine.getInstance();
                 if (gameEngine5.networkEngine != null) {
-                    gameEngine5.networkEngine.H();
+                    gameEngine5.networkEngine.showPlayerListPopup();
                 }
                 break;
             case 15:
@@ -237,7 +237,7 @@ public class InGameActivity extends TaskQueueActivity {
                 new AlertDialog.Builder(this).setIcon(R.drawable.ic_dialog_alert).setTitle("Disconnect?").setMessage("Are you sure you want to surrender this game?").setPositiveButton("Surrender", new DialogInterface.OnClickListener() { // from class: com.corrodinggames.rts.appFramework.g.12
                     @Override // android.content.DialogInterface.OnClickListener
                     public void onClick(DialogInterface dialogInterface, int i2) {
-                        GameEngine.getInstance().networkEngine.m("-surrender");
+                        GameEngine.getInstance().networkEngine.sendChatMessage("-surrender");
                     }
                 }).setNegativeButton("No", (DialogInterface.OnClickListener) null).show();
                 break;
@@ -285,7 +285,7 @@ public class InGameActivity extends TaskQueueActivity {
                     if (z) {
                         gameEngine2.networkEngine.l(string);
                     } else {
-                        gameEngine2.networkEngine.m(string);
+                        gameEngine2.networkEngine.sendChatMessage(string);
                     }
                 }
                 gameEngine2.gameUI.isDraggingSelection = false;
@@ -300,7 +300,7 @@ public class InGameActivity extends TaskQueueActivity {
                     if (z) {
                         gameEngine2.networkEngine.l(string);
                     } else {
-                        gameEngine2.networkEngine.m(string);
+                        gameEngine2.networkEngine.sendChatMessage(string);
                     }
                 }
                 gameEngine2.gameUI.isDraggingSelection = false;

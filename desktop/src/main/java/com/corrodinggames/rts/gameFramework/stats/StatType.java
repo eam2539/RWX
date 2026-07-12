@@ -20,17 +20,17 @@ public enum StatType {
             case none:
                 return 0;
             case income: {
-                int energyScaledByCredits = n.getEnergyScaledByCredits();
+                int scaledIncomeRate = n.getScaledIncomeRate();
                 for (final Resource a : Resource.f()) {
                     if (a.d()) {
                         final float b = a.b();
                         if (b == 0.0f) {
                             continue;
                         }
-                        energyScaledByCredits += (int)(b * n.b(a));
+                        scaledIncomeRate += (int)(b * n.b(a));
                     }
                 }
-                return energyScaledByCredits;
+                return scaledIncomeRate;
             }
             case armyValue: {
                 return n.teamStatistics.n;

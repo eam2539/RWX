@@ -17,9 +17,9 @@ public class CustomExceptionHandler implements Thread.UncaughtExceptionHandler {
         GameEngine gameEngine = null;
         try {
             try {
-                GameEngine.oomCheckBuffer = null;
-                GameEngine.oomCheckBuffer2 = null;
-                GameEngine.tempBuffer = null;
+                GameEngine.outOfMemoryReserveBuffer = null;
+                GameEngine.secondaryOutOfMemoryReserveBuffer = null;
+                GameEngine.exceptionHandlerMemoryReserve = null;
                 System.gc();
                 try {
                     GameEngine.log("uncaughtException start");
@@ -56,12 +56,12 @@ public class CustomExceptionHandler implements Thread.UncaughtExceptionHandler {
                     } else {
                         GameEngine.log("CustomExceptionHandler: no game");
                     }
-                    if (GameEngine.isGameModeSandbox) {
+                    if (GameEngine.hasHandledCrash) {
                         GameEngine.log("CustomExceptionHandler: a crash was already sent");
                         z = false;
                         z2 = true;
                     }
-                    GameEngine.isGameModeSandbox = true;
+                    GameEngine.hasHandledCrash = true;
                     if (z) {
                         try {
                             GameEngine.log("Starting errorReport");
@@ -72,8 +72,8 @@ public class CustomExceptionHandler implements Thread.UncaughtExceptionHandler {
                             e.printStackTrace();
                         }
                     }
-                    if (!z2 && gameEngine != null && gameEngine.missionEngine2 != null) {
-                        gameEngine.missionEngine2.a(th);
+                    if (!z2 && gameEngine != null && gameEngine.platformCallbacks != null) {
+                        gameEngine.platformCallbacks.a(th);
                     }
                     GameEngine.writeCrashToFile("fatal", stackTrace);
                 } catch (Exception e2) {
@@ -81,7 +81,7 @@ public class CustomExceptionHandler implements Thread.UncaughtExceptionHandler {
                     e2.printStackTrace();
                 }
                 if (gameEngine != null) {
-                    if (gameEngine.missionEngine2 != null && gameEngine.missionEngine2.a()) {
+                    if (gameEngine.platformCallbacks != null && gameEngine.platformCallbacks.a()) {
                         GameEngine.log("gameCrashesDontExit=true");
                         if (1 == 0) {
                             GameEngine.log("Crash was not handled, exiting");
@@ -90,12 +90,12 @@ public class CustomExceptionHandler implements Thread.UncaughtExceptionHandler {
                         }
                         return;
                     }
-                    if (gameEngine.networkEngine != null && gameEngine.networkEngine.B) {
+                    if (gameEngine.networkEngine != null && gameEngine.networkEngine.networkGameActive) {
                         GameEngine.log("Sending disconnect");
                         gameEngine.networkEngine.c("Game crash");
                     }
                 }
-                if (!GameEngine.isDesktopVersionStatic) {
+                if (!GameEngine.isDesktopVersion) {
                     if (this.a != null) {
                         GameEngine.log("CustomExceptionHandler: sending to: defaultUEH.uncaughtException");
                         this.a.uncaughtException(thread, th);

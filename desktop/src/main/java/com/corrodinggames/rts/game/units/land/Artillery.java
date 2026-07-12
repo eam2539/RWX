@@ -31,9 +31,9 @@ public class Artillery extends LandUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        a = gameEngine.graphicsEngine2.a(R.drawable.artillery2);
-        b = gameEngine.graphicsEngine2.a(R.drawable.artillery1_dead);
-        d = PlayerTeam.getUnitCountByType(a);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.artillery2);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.artillery1_dead);
+        d = PlayerTeam.getTeamColorTextures(a);
         c = getUnitTextureSize(a);
     }
 

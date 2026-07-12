@@ -69,7 +69,7 @@ public final class GameViewUtils {
             if (z2) {
                 paint = BaseUnit.dh;
             }
-            gameEngine.graphicsEngine2.a(f3, f4, f2, paint);
+            gameEngine.renderGraphicsEngine.a(f3, f4, f2, paint);
         }
     }
 
@@ -81,7 +81,7 @@ public final class GameViewUtils {
             Paint paint = BaseUnit.dk;
             paint.b(i);
             paint.a(i2);
-            gameEngine.graphicsEngine2.a(f3, f4, f2, paint);
+            gameEngine.renderGraphicsEngine.a(f3, f4, f2, paint);
         }
     }
 
@@ -92,7 +92,7 @@ public final class GameViewUtils {
     public static void a(BaseUnit baseUnit, float f2, boolean z, Paint paint) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (a(baseUnit) || z) {
-            gameEngine.graphicsEngine2.a(baseUnit.posX - gameEngine.viewpointXSnapped, baseUnit.posY - gameEngine.viewpointYSnapped, f2, paint);
+            gameEngine.renderGraphicsEngine.a(baseUnit.posX - gameEngine.viewpointXSnapped, baseUnit.posY - gameEngine.viewpointYSnapped, f2, paint);
         }
     }
 
@@ -105,7 +105,7 @@ public final class GameViewUtils {
         float f9 = i * f7;
         float f10 = i2 * f7;
         e.a(f2 - f9, f8 - f10, f2 + f9, f8 + f10);
-        GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
+        GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
         graphicsEngine.k();
         graphicsEngine.a(f5 + 90.0f, f2, f8);
         if (f6 != 1.0f) {
@@ -116,7 +116,7 @@ public final class GameViewUtils {
     }
 
     public static boolean a(BaseUnit baseUnit, boolean z, boolean z2) {
-        if (baseUnit.getUnitAIPathfindCost() && z2) {
+        if (baseUnit.canTransportUnits() && z2) {
             return false;
         }
         if ((z && ((baseUnit instanceof AirUnit) || (baseUnit instanceof WaterUnit))) || baseUnit.bI()) {
@@ -163,11 +163,11 @@ public final class GameViewUtils {
         if (!orderableUnit.isDestroyed && f2 != 0.0f) {
             GameEngine gameEngine = GameEngine.getInstance();
             Vector3D vector3DD = orderableUnit.D(i);
-            gameEngine.graphicsEngine2.k();
-            gameEngine.graphicsEngine2.b(vector3DD.a - gameEngine.viewpointXSnapped, ((vector3DD.b - vector3DD.c) - orderableUnit.posZ) - gameEngine.viewpointYSnapped);
-            gameEngine.graphicsEngine2.a(f2, f2);
-            gameEngine.graphicsEngine2.a(texture, 0.0f, 0.0f, (Paint) null);
-            gameEngine.graphicsEngine2.l();
+            gameEngine.renderGraphicsEngine.k();
+            gameEngine.renderGraphicsEngine.b(vector3DD.a - gameEngine.viewpointXSnapped, ((vector3DD.b - vector3DD.c) - orderableUnit.posZ) - gameEngine.viewpointYSnapped);
+            gameEngine.renderGraphicsEngine.a(f2, f2);
+            gameEngine.renderGraphicsEngine.a(texture, 0.0f, 0.0f, (Paint) null);
+            gameEngine.renderGraphicsEngine.l();
         }
     }
 
@@ -182,7 +182,7 @@ public final class GameViewUtils {
         Vector3D vector3DF = orderableUnit.F(i);
         float f2 = vector3DF.a - GameEngine.getInstance().viewpointXSnapped;
         float f3 = ((vector3DF.b - GameEngine.getInstance().viewpointYSnapped) - orderableUnit.posZ) - vector3DF.c;
-        GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
+        GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
         graphicsEngine.k();
         if (fP != 1.0f) {
             graphicsEngine.a(fP, fP, f2, f3);
@@ -226,7 +226,7 @@ public final class GameViewUtils {
         }
         Integer num = (Integer) GameEngine.getInstance().pathfindingEngine.a(unitMovementType).h.get(Short.valueOf(sB));
         if (num == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("Could not find groupSize for:" + ((int) sB) + " at X:" + f2 + " y:" + f3);
+            GameEngine.logColored("Could not find groupSize for:" + ((int) sB) + " at X:" + f2 + " y:" + f3);
             return 0;
         }
         return num.intValue();
@@ -296,7 +296,7 @@ public final class GameViewUtils {
         }
         if (!h) {
             h = true;
-            GameEngine.updatePaintTextSizeIfNeeded("----- getCachingPaint --- Paint fallback was needed!!");
+            GameEngine.logColored("----- getCachingPaint --- Paint fallback was needed!!");
         }
         f.b(i);
         f.a(style);
@@ -338,14 +338,14 @@ public final class GameViewUtils {
                 f6 -= GameEngine.getInstance().viewpointYSnapped;
             }
             if (debugDrawItem.c) {
-                gameEngine.graphicsEngine2.a(f3, f4, f5, f6, debugDrawItem.a);
+                gameEngine.renderGraphicsEngine.a(f3, f4, f5, f6, debugDrawItem.a);
             } else {
                 if (debugDrawItem.d) {
                 }
-                gameEngine.graphicsEngine2.a(debugDrawItem.b, debugDrawItem.a);
+                gameEngine.renderGraphicsEngine.a(debugDrawItem.b, debugDrawItem.a);
             }
             if (debugDrawItem.f != null) {
-                gameEngine.graphicsEngine2.i();
+                gameEngine.renderGraphicsEngine.i();
                 gameEngine.restoreZoomTransform();
                 float f7 = f5;
                 float f8 = f6;
@@ -353,14 +353,14 @@ public final class GameViewUtils {
                     f7 *= gameEngine.zoom;
                     f8 *= gameEngine.zoom;
                 }
-                gameEngine.graphicsEngine2.a(debugDrawItem.f, f7, f8, debugDrawItem.a);
-                gameEngine.graphicsEngine2.j();
+                gameEngine.renderGraphicsEngine.a(debugDrawItem.f, f7, f8, debugDrawItem.a);
+                gameEngine.renderGraphicsEngine.j();
             }
         }
     }
 
     public static final boolean a(int i, int i2) {
-        int i3 = GameEngine.getInstance().lastTick;
+        int i3 = GameEngine.getInstance().gameTimeMillis;
         if (i + i2 < i3 || i3 < i - 1000) {
             return true;
         }
@@ -368,7 +368,7 @@ public final class GameViewUtils {
     }
 
     public static final boolean b(int i, int i2) {
-        int i3 = GameEngine.getInstance().lastTick;
+        int i3 = GameEngine.getInstance().gameTimeMillis;
         if (i >= 0 && i + i2 >= i3 && i <= i3) {
             return true;
         }

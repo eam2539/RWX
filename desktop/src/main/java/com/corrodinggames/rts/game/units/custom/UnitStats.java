@@ -120,18 +120,18 @@ public class UnitStats implements Cloneable {
         a(s, new UnitDataField(s.size(), "energy") { // from class: com.corrodinggames.rts.game.units.custom.as.13
             @Override // com.corrodinggames.rts.game.units.custom.UnitDataField
             public double a(CustomUnit customUnit) {
-                return customUnit.f0cB;
+                return customUnit.currentEnergy;
             }
 
             @Override // com.corrodinggames.rts.game.units.custom.UnitDataField
             public void b(CustomUnit customUnit, double d) {
-                customUnit.f0cB = (float) d;
+                customUnit.currentEnergy = (float) d;
             }
 
             @Override // com.corrodinggames.rts.game.units.custom.UnitDataField, com.corrodinggames.rts.game.units.custom.CustomUnitDataField
             public void a(CustomUnit customUnit, double d) {
                 super.a(customUnit, d);
-                customUnit.f0cB = (float) d;
+                customUnit.currentEnergy = (float) d;
             }
         });
         a(s, new UnitStatsDataField(s.size(), "maxhp") { // from class: com.corrodinggames.rts.game.units.custom.as.14

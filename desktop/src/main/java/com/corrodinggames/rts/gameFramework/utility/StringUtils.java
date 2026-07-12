@@ -196,7 +196,7 @@ public class StringUtils {
 
     public static int a(String str, int i) {
         if (str.charAt(i) != '(') {
-            GameEngine.updatePaintTextSizeIfNeeded("getBracketEnd: Did not start on a bracket");
+            GameEngine.logColored("getBracketEnd: Did not start on a bracket");
             return -1;
         }
         if (i + 1 >= str.length()) {

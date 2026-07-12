@@ -224,8 +224,8 @@ public class SoundEngine {
             if (gameEngine.replayEngine.j() && gameEngine.gameSpeed > 1.5d) {
                 f /= gameEngine.gameSpeed;
             }
-            float fDistanceSq = Utility.distanceSq((int) (gameEngine.viewpointXSnapped + gameEngine.halfViewpointWidth), (int) (gameEngine.viewpointYSnapped + gameEngine.halfViewpointHeight), f3, f4);
-            float f5 = gameEngine.halfViewpointWidth * 1.72f;
+            float fDistanceSq = Utility.distanceSq((int) (gameEngine.viewpointXSnapped + gameEngine.halfVisibleWorldWidth), (int) (gameEngine.viewpointYSnapped + gameEngine.halfVisibleWorldHeight), f3, f4);
+            float f5 = gameEngine.halfVisibleWorldWidth * 1.72f;
             if (gameEngine.zoom < 0.5d) {
                 f = f * 4.0f * gameEngine.zoom * gameEngine.zoom;
             }
@@ -234,8 +234,8 @@ public class SoundEngine {
             }
             float fSqrt = (float) Math.sqrt(fDistanceSq);
             float f6 = 1.0f;
-            if (fSqrt > gameEngine.halfViewpointWidth) {
-                f6 = 1.0f - ((fSqrt - gameEngine.halfViewpointWidth) / gameEngine.halfViewpointWidth);
+            if (fSqrt > gameEngine.halfVisibleWorldWidth) {
+                f6 = 1.0f - ((fSqrt - gameEngine.halfVisibleWorldWidth) / gameEngine.halfVisibleWorldWidth);
             }
             float f7 = f6 * f;
             if (f7 <= 0.05d && !sound.f) {

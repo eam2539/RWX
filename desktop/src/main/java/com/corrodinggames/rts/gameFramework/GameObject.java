@@ -132,11 +132,11 @@ public abstract class GameObject extends Serializable {
                 }
                 String name = gameObject.getClass().getName();
                 String name2 = cls.getName();
-                NetworkEngine.g("object id:" + j + " was found, but with type " + name.replace("com.corrodinggames.rts.", VariableScope.nullOrMissingString) + " instead of " + name2.replace("com.corrodinggames.rts.", VariableScope.nullOrMissingString));
+                NetworkEngine.reportDesync("object id:" + j + " was found, but with type " + name.replace("com.corrodinggames.rts.", VariableScope.nullOrMissingString) + " instead of " + name2.replace("com.corrodinggames.rts.", VariableScope.nullOrMissingString));
             }
         }
         if (!z) {
-            NetworkEngine.g("getFromId:" + j + " was not found");
+            NetworkEngine.reportDesync("getFromId:" + j + " was not found");
             return null;
         }
         return null;

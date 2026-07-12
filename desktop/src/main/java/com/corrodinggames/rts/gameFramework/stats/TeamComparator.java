@@ -29,7 +29,7 @@ public class TeamComparator extends GameObjectComparator {
 
     @Override // com.corrodinggames.rts.gameFramework.stats.GameObjectComparator
     public int c() {
-        return this.team.getTeamUnitCount();
+        return this.team.getTeamColorArgb();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.stats.GameObjectComparator

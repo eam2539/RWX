@@ -27,7 +27,7 @@ public class SpecialActionBlockEffect extends AirUnitEffect {
         super(i);
         this.blockedAction = ActionId.NONE;
         this.blockedAction = actionId;
-        this.startTime = GameEngine.getInstance().lastTick;
+        this.startTime = GameEngine.getInstance().gameTimeMillis;
     }
 
     @Override // com.corrodinggames.rts.game.units.g.AirUnitEffect
@@ -44,11 +44,11 @@ public class SpecialActionBlockEffect extends AirUnitEffect {
         if (i <= 0) {
             return 1.0f;
         }
-        return (this.effectId - GameEngine.getInstance().lastTick) / i;
+        return (this.effectId - GameEngine.getInstance().gameTimeMillis) / i;
     }
 
     public static void a(OrderableUnit orderableUnit, ActionId actionId, int i) {
-        AirUnitEffectManager.a(orderableUnit, new SpecialActionBlockEffect(GameEngine.getInstance().lastTick + i, actionId));
+        AirUnitEffectManager.a(orderableUnit, new SpecialActionBlockEffect(GameEngine.getInstance().gameTimeMillis + i, actionId));
     }
 
     public static int a(BaseUnit baseUnit, ActionId actionId) {
@@ -60,7 +60,7 @@ public class SpecialActionBlockEffect extends AirUnitEffect {
     }
 
     public int d() {
-        return this.effectId - GameEngine.getInstance().lastTick;
+        return this.effectId - GameEngine.getInstance().gameTimeMillis;
     }
 
     public static SpecialActionBlockEffect b(BaseUnit baseUnit, ActionId actionId) {
@@ -68,7 +68,7 @@ public class SpecialActionBlockEffect extends AirUnitEffect {
         if (!(baseUnit instanceof OrderableUnit) || (fastArrayList = ((OrderableUnit) baseUnit).activeStatusEffects) == null) {
             return null;
         }
-        int i = GameEngine.getInstance().lastTick;
+        int i = GameEngine.getInstance().gameTimeMillis;
         SpecialActionBlockEffect specialActionBlockEffect = null;
         Object[] objArrA = fastArrayList.a();
         for (int i2 = fastArrayList.size - 1; i2 >= 0; i2--) {
@@ -109,7 +109,7 @@ public class SpecialActionBlockEffect extends AirUnitEffect {
         if (!(baseUnit instanceof OrderableUnit) || (fastArrayList = ((OrderableUnit) baseUnit).activeStatusEffects) == null) {
             return;
         }
-        int i = GameEngine.getInstance().lastTick;
+        int i = GameEngine.getInstance().gameTimeMillis;
         Object[] objArrA = fastArrayList.a();
         for (int i2 = fastArrayList.size - 1; i2 >= 0; i2--) {
             AirUnitEffect airUnitEffect = (AirUnitEffect) objArrA[i2];

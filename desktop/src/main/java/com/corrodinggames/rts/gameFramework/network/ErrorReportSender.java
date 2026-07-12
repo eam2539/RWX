@@ -43,14 +43,14 @@ class ErrorReportSender implements Runnable {
                             str = "s:1;";
                         }
                     }
-                    if (GameEngine.isPC() || GameEngine.isDebugVersionStatic2) {
+                    if (GameEngine.isPC() || GameEngine.isIOSVersion) {
                         MasterServerClient.addParam(arrayList, "system_version", System.getProperty("os.name") + " - " + System.getProperty("os.version"));
                     }
                     MasterServerClient.addParam(arrayList, "sdk_version", str);
                     MasterServerClient.addParam(arrayList, "device_model", gameEngine.getPlatformName());
-                    MasterServerClient.addParam(arrayList, "build_version", gameEngine.getAndroidVersion());
-                    MasterServerClient.addParam(arrayList, "release_version", Utility.padString(GameEngine.isGameBetaStatic));
-                    MasterServerClient.addParam(arrayList, "dedicated_server", Utility.padString(GameEngine.isPausedStatic2));
+                    MasterServerClient.addParam(arrayList, "build_version", gameEngine.getBuildVersion());
+                    MasterServerClient.addParam(arrayList, "release_version", Utility.padString(GameEngine.isGameBeta));
+                    MasterServerClient.addParam(arrayList, "dedicated_server", Utility.padString(GameEngine.isNonAndroidVersion));
                     String str2 = gameEngine.networkEngine != null ? gameEngine.networkEngine.sessionToken : "NA";
                     MasterServerClient.addParam(arrayList, "private_token", str2);
                     MasterServerClient.addParam(arrayList, "private_token_2", Utility.getParentDir(Utility.getParentDir(str2)));

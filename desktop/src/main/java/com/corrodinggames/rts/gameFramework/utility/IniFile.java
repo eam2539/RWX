@@ -223,7 +223,7 @@ public class IniFile {
                             Matcher var20 = keyValuePattern.matcher(var3);
                             if (var20.matches()) {
                                 if (var4 == null) {
-                                    GameEngine.updatePaintTextSizeIfNeeded("IniFile: " + this.fileName + "  line " + var2 + " is not in a [section]:'" + var3 + "'");
+                                    GameEngine.logColored("IniFile: " + this.fileName + "  line " + var2 + " is not in a [section]:'" + var3 + "'");
                                     this.errors.add("Line " + var2 + " is not in a [section]: '" + var3 + "'");
                                 } else {
                                     String var22 = var20.group(1).trim();
@@ -257,7 +257,7 @@ public class IniFile {
                                         throw new IOException(var24);
                                     }
                                 } else {
-                                    GameEngine.updatePaintTextSizeIfNeeded(this.fileName + ": Unexpected format on line:" + var2 + ": '" + var3 + "' in ini file");
+                                    GameEngine.logColored(this.fileName + ": Unexpected format on line:" + var2 + ": '" + var3 + "' in ini file");
                                     this.errors.add(var3);
                                 }
                             }

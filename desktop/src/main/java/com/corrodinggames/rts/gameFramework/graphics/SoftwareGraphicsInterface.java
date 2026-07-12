@@ -782,7 +782,7 @@ public class SoftwareGraphicsInterface implements GraphicsEngine {
         if (this.i != null) {
             return this.l;
         }
-        return (int) GameEngine.getInstance().viewpointWidthRaw;
+        return (int) GameEngine.getInstance().screenHeight;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine

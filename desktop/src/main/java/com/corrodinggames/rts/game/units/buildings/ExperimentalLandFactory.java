@@ -109,10 +109,10 @@ public class ExperimentalLandFactory extends FactoryWithQueue {
 
     public static void b() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.graphicsEngine2.a(R.drawable.experimental_unit_factory_front);
-        backgroundTexture = gameEngine.graphicsEngine2.a(R.drawable.experimental_unit_factory_base);
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.experimental_unit_factory_dead);
-        teamTextures = PlayerTeam.getUnitCountByType(baseTexture);
+        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_front);
+        backgroundTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_base);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_dead);
+        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit

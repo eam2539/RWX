@@ -56,10 +56,10 @@ public class GameInterfaceRenderer extends Serializable {
     public float selectionTimer;
 
     /* JADX INFO: renamed from: n */
-    GamePaint paint1;
+    GamePaint actionIconPaint;
 
     /* JADX INFO: renamed from: o */
-    GamePaint paint2;
+    GamePaint buildActionIconPaint;
 
     /* JADX INFO: renamed from: q */
     Paint textPaint;
@@ -302,12 +302,12 @@ public class GameInterfaceRenderer extends Serializable {
     /* JADX INFO: renamed from: b */
     public void initializeUI() {
         initializeStrings();
-        this.zoomButtonTexture = this.gameEngine.graphicsEngine2.a(R.drawable.zoom_button);
-        this.lockIconTexture = this.gameEngine.graphicsEngine2.a(R.drawable.lock_icon_menu);
-        this.pauseTexture = this.gameEngine.graphicsEngine2.a(R.drawable.pause);
-        this.replayPauseTexture = this.gameEngine.graphicsEngine2.a(R.drawable.replay_pause);
-        this.fastTexture = this.gameEngine.graphicsEngine2.a(R.drawable.fast);
-        this.leaderboardTexture = this.gameEngine.graphicsEngine2.a(R.drawable.replay_leaderboard);
+        this.zoomButtonTexture = this.gameEngine.renderGraphicsEngine.a(R.drawable.zoom_button);
+        this.lockIconTexture = this.gameEngine.renderGraphicsEngine.a(R.drawable.lock_icon_menu);
+        this.pauseTexture = this.gameEngine.renderGraphicsEngine.a(R.drawable.pause);
+        this.replayPauseTexture = this.gameEngine.renderGraphicsEngine.a(R.drawable.replay_pause);
+        this.fastTexture = this.gameEngine.renderGraphicsEngine.a(R.drawable.fast);
+        this.leaderboardTexture = this.gameEngine.renderGraphicsEngine.a(R.drawable.replay_leaderboard);
         staticPaint.a(255, 30, 30, 30);
         staticPaint.a(staticColorFilter);
         staticPaint.d(true);
@@ -321,12 +321,12 @@ public class GameInterfaceRenderer extends Serializable {
         this.textPaint2.a(Paint.Align.LEFT);
         this.textPaint2.c(true);
         this.textPaint2.a(true);
-        this.paint1 = new GamePaint();
-        this.paint1.b(Color.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_BUTTON_3, 255, 255, 255));
-        this.paint1.o();
-        this.paint2 = new GamePaint();
-        this.paint2.b(Color.a(133, 255, 255, 255));
-        this.paint2.o();
+        this.actionIconPaint = new GamePaint();
+        this.actionIconPaint.b(Color.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_BUTTON_3, 255, 255, 255));
+        this.actionIconPaint.o();
+        this.buildActionIconPaint = new GamePaint();
+        this.buildActionIconPaint.b(Color.a(133, 255, 255, 255));
+        this.buildActionIconPaint.o();
         this.arrayList.clear();
         int i = 0;
         while (i < 10) {
@@ -337,7 +337,7 @@ public class GameInterfaceRenderer extends Serializable {
 
     /* JADX INFO: renamed from: p */
     private float getMaxZoomLevel() {
-        float f = 4.6f / this.gameEngine.cameraIsDragging;
+        float f = 4.6f / this.gameEngine.densityZoomScale;
         if (f > 4.6f) {
             f = 4.6f;
         }
@@ -346,7 +346,7 @@ public class GameInterfaceRenderer extends Serializable {
 
     /* JADX INFO: renamed from: q */
     private float getMinZoomLevel() {
-        return getScreenRatio() / this.gameEngine.cameraIsDragging;
+        return getScreenRatio() / this.gameEngine.densityZoomScale;
     }
 
     /* JADX INFO: renamed from: r */
@@ -375,13 +375,13 @@ public class GameInterfaceRenderer extends Serializable {
                 this.zoomButtonRect.a(i - 4, (int) (i2 - (50.0f * this.gameEngine.screenScale)), i + 4, (int) (i2 + (50.0f * this.gameEngine.screenScale)));
                 this.paintUnitInfo.a();
                 this.paintUnitInfo.b(Color.a(255, 0, 0, 0));
-                this.gameEngine.graphicsEngine2.b(this.zoomButtonRect, this.paintUnitInfo);
+                this.gameEngine.renderGraphicsEngine.b(this.zoomButtonRect, this.paintUnitInfo);
             }
             float f4 = i2;
-            if (this.gameEngine.cameraEdgeScrollZone > 1.0f) {
-                f2 = f4 - (((this.gameEngine.cameraEdgeScrollZone - 1.0f) * 3.0f) * this.gameEngine.screenScale);
+            if (this.gameEngine.targetZoom > 1.0f) {
+                f2 = f4 - (((this.gameEngine.targetZoom - 1.0f) * 3.0f) * this.gameEngine.screenScale);
             } else {
-                f2 = f4 + (((this.gameEngine.cameraEdgeScrollZone * (-20.0f)) + 20.0f + 1.0f) * this.gameEngine.screenScale);
+                f2 = f4 + (((this.gameEngine.targetZoom * (-20.0f)) + 20.0f + 1.0f) * this.gameEngine.screenScale);
             }
             float f5 = 48.0f * f3;
             float f6 = 54.0f * f3;
@@ -390,8 +390,8 @@ public class GameInterfaceRenderer extends Serializable {
             if (f2 < f8) {
                 f2 = f8;
             }
-            if (f2 > this.gameEngine.viewpointWidthRaw - f8) {
-                f2 = (int) (this.gameEngine.viewpointWidthRaw - f8);
+            if (f2 > this.gameEngine.screenHeight - f8) {
+                f2 = (int) (this.gameEngine.screenHeight - f8);
             }
             this.zoomButtonRect.a((int) (i - f7), (int) (f2 - f8), (int) (i + f7), (int) (f2 + f8));
             if (!this.isZoomButtonPressed) {
@@ -399,7 +399,7 @@ public class GameInterfaceRenderer extends Serializable {
             } else {
                 staticPaint.a(255, 255, 255, 255);
             }
-            this.gameEngine.graphicsEngine2.a(this.zoomButtonTexture, this.zoomButtonRect.a, this.zoomButtonRect.b, staticPaint, 0.0f, f3);
+            this.gameEngine.renderGraphicsEngine.a(this.zoomButtonTexture, this.zoomButtonRect.a, this.zoomButtonRect.b, staticPaint, 0.0f, f3);
             boolean z = this.isZoomButtonPressed;
             if (!this.isZoomButtonPressed && this.gameUI.b(this.zoomButtonRect.a, this.zoomButtonRect.b, this.zoomButtonRect.b(), this.zoomButtonRect.c(), IconGroup.zoomButton)) {
                 this.isZoomButtonPressed = true;
@@ -418,20 +418,20 @@ public class GameInterfaceRenderer extends Serializable {
                 if (f9 < -180.0f) {
                     f9 = -180.0f;
                 }
-                float f10 = f9 * this.gameEngine.cameraEdgeScrollZone;
+                float f10 = f9 * this.gameEngine.targetZoom;
                 if (f10 > 2.0f) {
-                    this.gameEngine.cameraEdgeScrollZone -= (5.0E-4f * Utility.abs(f10)) * f;
-                    this.gameEngine.cameraDragStartX = false;
-                    if (this.gameEngine.cameraEdgeScrollZone < getMinZoomLevel()) {
-                        this.gameEngine.cameraEdgeScrollZone = getMinZoomLevel();
-                        this.gameEngine.cameraDragStartX = true;
+                    this.gameEngine.targetZoom -= (5.0E-4f * Utility.abs(f10)) * f;
+                    this.gameEngine.isZoomLimitReached = false;
+                    if (this.gameEngine.targetZoom < getMinZoomLevel()) {
+                        this.gameEngine.targetZoom = getMinZoomLevel();
+                        this.gameEngine.isZoomLimitReached = true;
                     }
                 } else if (f10 < -2.0f) {
-                    this.gameEngine.cameraEdgeScrollZone += 5.0E-4f * Utility.abs(f10) * f;
-                    this.gameEngine.cameraDragStartX = false;
-                    if (this.gameEngine.cameraEdgeScrollZone > getMaxZoomLevel()) {
-                        this.gameEngine.cameraEdgeScrollZone = getMaxZoomLevel();
-                        this.gameEngine.cameraDragStartX = true;
+                    this.gameEngine.targetZoom += 5.0E-4f * Utility.abs(f10) * f;
+                    this.gameEngine.isZoomLimitReached = false;
+                    if (this.gameEngine.targetZoom > getMaxZoomLevel()) {
+                        this.gameEngine.targetZoom = getMaxZoomLevel();
+                        this.gameEngine.isZoomLimitReached = true;
                     }
                 }
             } else {
@@ -442,9 +442,9 @@ public class GameInterfaceRenderer extends Serializable {
         }
         if (this.gameEngine.settingsEngine.mouseSupport) {
             if (this.gameUI.isWorldClickAllowedAt(this.gameEngine.getTouchX(), this.gameEngine.getTouchY()) && !this.gameUI.isKeyboardShiftPressed) {
-                int accumulatedKeyCodes = this.gameEngine.getAccumulatedKeyCodes();
-                if (accumulatedKeyCodes != 0) {
-                    this.mouseWheelZoomAccumulator += (accumulatedKeyCodes / 120.0f) * 0.18f;
+                int mouseWheelDelta = this.gameEngine.getMouseWheelDelta();
+                if (mouseWheelDelta != 0) {
+                    this.mouseWheelZoomAccumulator += (mouseWheelDelta / 120.0f) * 0.18f;
                 }
                 if (this.mouseWheelZoomAccumulator > 1.0f) {
                     this.mouseWheelZoomAccumulator = 1.0f;
@@ -464,13 +464,13 @@ public class GameInterfaceRenderer extends Serializable {
                 if (this.mouseWheelZoomAccumulator == 0.0f) {
                     f12 = f13;
                 }
-                float f14 = f12 * this.gameEngine.cameraEdgeScrollZone;
-                this.gameEngine.cameraEdgeScrollZone += f14;
-                this.gameEngine.recomputeViewpoint = true;
+                float f14 = f12 * this.gameEngine.targetZoom;
+                this.gameEngine.targetZoom += f14;
+                this.gameEngine.shouldRecenterZoomOnPointer = true;
                 this.gameEngine.mouseX = this.gameEngine.getTouchX();
                 this.gameEngine.mouseY = this.gameEngine.getTouchY();
                 if (f14 != 0.0f) {
-                    this.gameEngine.cameraDragStartX = false;
+                    this.gameEngine.isZoomLimitReached = false;
                 }
             }
         }
@@ -489,13 +489,13 @@ public class GameInterfaceRenderer extends Serializable {
             if (z2) {
                 for (int i3 = 0; i3 < this.gameEngine.getTouchPointerCount(); i3++) {
                     touchX += this.gameEngine.getTouchX(i3);
-                    fLogWarning += this.gameEngine.logWarning(i3);
+                    fLogWarning += this.gameEngine.getTouchY(i3);
                 }
                 touchPointerCount = touchX / this.gameEngine.getTouchPointerCount();
                 touchPointerCount2 = fLogWarning / this.gameEngine.getTouchPointerCount();
                 fDistance = 0.0f;
                 for (int i4 = 0; i4 < this.gameEngine.getTouchPointerCount(); i4++) {
-                    fDistance += Utility.distance(touchPointerCount, touchPointerCount2, this.gameEngine.getTouchX(i4), this.gameEngine.logWarning(i4));
+                    fDistance += Utility.distance(touchPointerCount, touchPointerCount2, this.gameEngine.getTouchX(i4), this.gameEngine.getTouchY(i4));
                 }
             } else {
                 touchPointerCount = this.multiTouchCurrentX;
@@ -510,39 +510,39 @@ public class GameInterfaceRenderer extends Serializable {
                 this.multiTouchCenterX = touchPointerCount;
                 this.multiTouchCenterY = touchPointerCount2;
                 this.multiTouchInitialDistance = fDistance;
-                this.initialZoomLevel = this.gameEngine.cameraEdgeScrollZone;
+                this.initialZoomLevel = this.gameEngine.targetZoom;
                 this.multiTouchCurrentX = touchPointerCount;
                 this.multiTouchCurrentY = touchPointerCount2;
                 this.multiTouchCurrentDistance = fDistance;
                 this.multiTouchPointerCount = this.gameEngine.getTouchPointerCount();
             }
             if (z2) {
-                float f15 = (this.multiTouchCurrentY - touchPointerCount2) * 2.0f * this.gameEngine.cameraEdgeScrollZone;
-                this.gameEngine.cameraEdgeScrollZone += (f15 / 250.0f) / this.gameEngine.screenScale;
-                this.gameEngine.cameraDragStartX = false;
+                float f15 = (this.multiTouchCurrentY - touchPointerCount2) * 2.0f * this.gameEngine.targetZoom;
+                this.gameEngine.targetZoom += (f15 / 250.0f) / this.gameEngine.screenScale;
+                this.gameEngine.isZoomLimitReached = false;
                 float f16 = this.multiTouchCurrentDistance - fDistance;
                 if (0 != 0) {
-                    this.gameEngine.cameraEdgeScrollZone -= (f16 / 350.0f) / this.gameEngine.screenScale;
-                    this.gameEngine.cameraDragStartX = false;
+                    this.gameEngine.targetZoom -= (f16 / 350.0f) / this.gameEngine.screenScale;
+                    this.gameEngine.isZoomLimitReached = false;
                 }
                 this.multiTouchCurrentX = touchPointerCount;
                 this.multiTouchCurrentY = touchPointerCount2;
                 this.multiTouchCurrentDistance = fDistance;
                 this.multiTouchPointerCount = this.gameEngine.getTouchPointerCount();
                 for (int i5 = 0; i5 < this.gameEngine.getTouchPointerCount(); i5++) {
-                    this.gameEngine.graphicsEngine2.a(touchPointerCount, touchPointerCount2, this.gameEngine.getTouchX(i5), this.gameEngine.logWarning(i5), this.gameUI.minimapUnitPaint);
+                    this.gameEngine.renderGraphicsEngine.a(touchPointerCount, touchPointerCount2, this.gameEngine.getTouchX(i5), this.gameEngine.getTouchY(i5), this.gameUI.minimapUnitPaint);
                 }
-                this.gameEngine.graphicsEngine2.a(touchPointerCount, touchPointerCount2, touchPointerCount, this.multiTouchCenterY, this.gameUI.minimapViewportPaint);
-                this.gameEngine.graphicsEngine2.a(touchPointerCount, touchPointerCount2, 6.0f, this.gameUI.minimapUnitPaint);
+                this.gameEngine.renderGraphicsEngine.a(touchPointerCount, touchPointerCount2, touchPointerCount, this.multiTouchCenterY, this.gameUI.minimapViewportPaint);
+                this.gameEngine.renderGraphicsEngine.a(touchPointerCount, touchPointerCount2, 6.0f, this.gameUI.minimapUnitPaint);
             }
         }
-        if (this.gameEngine.cameraEdgeScrollZone > getMaxZoomLevel()) {
-            this.gameEngine.cameraEdgeScrollZone = getMaxZoomLevel();
-            this.gameEngine.cameraDragStartX = true;
+        if (this.gameEngine.targetZoom > getMaxZoomLevel()) {
+            this.gameEngine.targetZoom = getMaxZoomLevel();
+            this.gameEngine.isZoomLimitReached = true;
         }
-        if (this.gameEngine.cameraEdgeScrollZone < getMinZoomLevel()) {
-            this.gameEngine.cameraEdgeScrollZone = getMinZoomLevel();
-            this.gameEngine.cameraDragStartX = true;
+        if (this.gameEngine.targetZoom < getMinZoomLevel()) {
+            this.gameEngine.targetZoom = getMinZoomLevel();
+            this.gameEngine.isZoomLimitReached = true;
         }
     }
 
@@ -553,7 +553,7 @@ public class GameInterfaceRenderer extends Serializable {
         boolean z2 = false;
         boolean z3 = false;
         int i = 7;
-        if (GameEngine.isIOS()) {
+        if (GameEngine.isDesktopMouseInput()) {
             i = 14;
         }
         if (this.gameEngine.isTouchDown() && this.gameUI.currentAction == null) {
@@ -562,13 +562,13 @@ public class GameInterfaceRenderer extends Serializable {
             if (this.gameEngine.settingsEngine.mouseOrders == 2) {
                 i2 = 2;
             }
-            int iIsInDebug = this.gameEngine.isInDebug(i2);
+            int iIsInDebug = this.gameEngine.findTouchPointerIndex(i2);
             if (zIsKeyboardSupportAndGraphicsEnabled || (this.gameEngine.settingsEngine.mouseSupport && iIsInDebug != -1 && !this.gameUI.isRightMousePressed && !this.gameUI.isMiddleMousePressed)) {
                 float touchX = this.gameEngine.getTouchX(0);
-                float fLogWarning = this.gameEngine.logWarning(0);
+                float fLogWarning = this.gameEngine.getTouchY(0);
                 if (iIsInDebug != -1) {
                     touchX = this.gameEngine.getTouchX(iIsInDebug);
-                    fLogWarning = this.gameEngine.logWarning(iIsInDebug);
+                    fLogWarning = this.gameEngine.getTouchY(iIsInDebug);
                 }
                 if (!this.isDragging) {
                     z2 = true;
@@ -583,9 +583,9 @@ public class GameInterfaceRenderer extends Serializable {
                 z = true;
             } else if (this.gameEngine.getTouchPointerCount() == 2 && this.gestureZoomTimer == 0.0f) {
                 this.selectionRectF2.a = (int) this.gameEngine.getTouchX(0);
-                this.selectionRectF2.b = (int) this.gameEngine.logWarning(0);
+                this.selectionRectF2.b = (int) this.gameEngine.getTouchY(0);
                 this.selectionRectF2.c = (int) this.gameEngine.getTouchX(1);
-                this.selectionRectF2.d = (int) this.gameEngine.logWarning(1);
+                this.selectionRectF2.d = (int) this.gameEngine.getTouchY(1);
                 this.isDraggingSelectionBox = false;
                 z = true;
             }
@@ -608,7 +608,7 @@ public class GameInterfaceRenderer extends Serializable {
                     this.paintSelectionBox.b(Color.a(255, 0, 255, 0));
                     this.paintSelectionBox.a(Paint.Style.STROKE);
                     this.paintSelectionBox.a(1.0f);
-                    this.gameEngine.graphicsEngine2.b(this.selectionRect, this.paintSelectionBox);
+                    this.gameEngine.renderGraphicsEngine.b(this.selectionRect, this.paintSelectionBox);
                     this.isSelecting = true;
                 }
             }
@@ -646,7 +646,7 @@ public class GameInterfaceRenderer extends Serializable {
                 this.selectionRectF3.b /= this.gameEngine.zoom;
                 this.selectionRectF3.a /= this.gameEngine.zoom;
                 this.selectionRectF3.c /= this.gameEngine.zoom;
-                this.selectionRectF3.a(this.gameEngine.cameraBoundsMaxY, this.gameEngine.mapWidth);
+                this.selectionRectF3.a(this.gameEngine.viewpointXInt, this.gameEngine.viewpointYInt);
                 this.gameUI.tooltipX = 4.0f;
                 this.gameUI.tooltipY = 40.0f;
                 this.gameUI.isSelectionBoxActive = false;
@@ -697,7 +697,7 @@ public class GameInterfaceRenderer extends Serializable {
                         }
                         if (z9) {
                             this.gameUI.selectUnit(unitBase2);
-                            if (z4 && unitBase2.lastSelectedTick + 900 < this.gameEngine.lastTickTime && ((!zDrawRectWithBorder && !zDrawSelectionBox) || !unitBase2.isUnitBuilt)) {
+                            if (z4 && unitBase2.lastSelectedTick + 900 < this.gameEngine.renderTimeMillis && ((!zDrawRectWithBorder && !zDrawSelectionBox) || !unitBase2.isUnitBuilt)) {
                                 z8 = true;
                             }
                         } else {
@@ -708,7 +708,7 @@ public class GameInterfaceRenderer extends Serializable {
                 if (z8) {
                     for (GameObject gameObject4 : GameObject.fastGameObjectList) {
                         if (gameObject4 instanceof UnitBase) {
-                            ((UnitBase) gameObject4).lastSelectedTick = this.gameEngine.lastTickTime;
+                            ((UnitBase) gameObject4).lastSelectedTick = this.gameEngine.renderTimeMillis;
                         }
                     }
                 }
@@ -725,7 +725,7 @@ public class GameInterfaceRenderer extends Serializable {
                 f2 += unitBase.posZ;
             }
             if (this.selectionRectF3.b(f, f2)) {
-                if ((this.gameUI.canControlUnit(unitBase) || this.gameEngine.playerTeam.addCredits()) && !unitBase.t()) {
+                if ((this.gameUI.canControlUnit(unitBase) || this.gameEngine.playerTeam.isSpectatorTeamColor()) && !unitBase.t()) {
                     return true;
                 }
                 return false;
@@ -756,7 +756,7 @@ public class GameInterfaceRenderer extends Serializable {
     public void c(float f) {
         if (this.messageTimer > 0.0f && this.messageText != null) {
             this.messageTimer = Utility.moveTowardsZero(this.messageTimer, f);
-            this.gameEngine.graphicsEngine2.a(this.messageText, this.gameEngine.halfScreenWidth, this.gameEngine.halfScreenHeight, this.gameUI.buildingPreviewInvalidPaint, this.gameUI.unitTargetLinePaint, 8.0f);
+            this.gameEngine.renderGraphicsEngine.a(this.messageText, this.gameEngine.halfScreenWidth, this.gameEngine.halfScreenHeight, this.gameUI.buildingPreviewInvalidPaint, this.gameUI.unitTargetLinePaint, 8.0f);
         }
     }
 
@@ -900,7 +900,7 @@ public class GameInterfaceRenderer extends Serializable {
         if (GameUI.bO && (this.gameEngine.settingsEngine.showSelectedUnitsList || selectedUnitCount == 1)) {
             z3 = true;
         }
-        if (GameEngine.isDesktop() && selectedUnitCount > 0) {
+        if (GameEngine.isAndroidPlatform() && selectedUnitCount > 0) {
             z3 = true;
         }
         if (z3 && !(baseUnit instanceof EditorOrBuilder)) {
@@ -1021,7 +1021,7 @@ public class GameInterfaceRenderer extends Serializable {
     }
 
     float h() {
-        return Utility.clampTo255((this.gameEngine.viewpointWidthRaw / 14.0f) / this.gameEngine.screenScale, 25.0f * this.gameEngine.screenScale, 40.0f * this.gameEngine.screenScale);
+        return Utility.clampTo255((this.gameEngine.screenHeight / 14.0f) / this.gameEngine.screenScale, 25.0f * this.gameEngine.screenScale, 40.0f * this.gameEngine.screenScale);
     }
 
     private boolean c(AbstractUnitAction abstractUnitAction) {
@@ -1244,7 +1244,7 @@ public class GameInterfaceRenderer extends Serializable {
                 h += 15.0f * this.gameEngine.screenScale;
                 n6 += 15.0f * this.gameEngine.screenScale;
                 n4 = 2.0f * this.gameEngine.screenScale;
-                if (GameEngine.isAndroid()) {
+                if (GameEngine.isNonPCPlatform()) {
                     n4 = 2.0f * this.gameEngine.screenScale;
                 }
                 n6 += 2.0f;
@@ -1315,9 +1315,9 @@ public class GameInterfaceRenderer extends Serializable {
             final boolean b4 = baseUnit.br > n11;
             this.showInfoText = (n12 != 0 || b4);
             if (this.gameEngine.settingsEngine.mouseSupport && !this.gameUI.isWorldClickAllowedAt(this.gameEngine.getTouchX(), this.gameEngine.getTouchY())) {
-                final int accumulatedKeyCodes = this.gameEngine.getAccumulatedKeyCodes();
-                if (accumulatedKeyCodes != 0) {
-                    n15 = -(accumulatedKeyCodes / 120.0f);
+                final int mouseWheelDelta = this.gameEngine.getMouseWheelDelta();
+                if (mouseWheelDelta != 0) {
+                    n15 = -(mouseWheelDelta / 120.0f);
                 }
             }
             float n16 = 0.0f;
@@ -1351,10 +1351,10 @@ public class GameInterfaceRenderer extends Serializable {
                 }
                 n14 += n6 * n17 + 2.0f;
             }
-            this.gameEngine.graphicsEngine2.i();
+            this.gameEngine.renderGraphicsEngine.i();
             this.rectF.a(0.0f, n14 - 1.0f, this.gameEngine.screenWidth, currentScreenHeightPixels + 1.0f);
-            this.gameEngine.graphicsEngine2.a(this.rectF);
-            if (GameEngine.isAndroid()) {
+            this.gameEngine.renderGraphicsEngine.a(this.rectF);
+            if (GameEngine.isNonPCPlatform()) {
                 if (this.lastCommandTime != baseUnit.objectId) {
                     this.commandX = 0.0f;
                     this.commandY = baseUnit.br;
@@ -1488,10 +1488,10 @@ public class GameInterfaceRenderer extends Serializable {
                 GamePaint paint3;
                 if (buildOption) {
                     paint2.c((int)(paint2.f() * 0.7f));
-                    paint3 = this.paint2;
+                    paint3 = this.buildActionIconPaint;
                 }
                 else {
-                    paint3 = this.paint1;
+                    paint3 = this.actionIconPaint;
                 }
                 float timerValue = 0.0f;
                 if (b5) {
@@ -1524,9 +1524,9 @@ public class GameInterfaceRenderer extends Serializable {
                             this.minimapRect.a(this.zoomButtonRect);
                             final Rect minimapRect = this.minimapRect;
                             minimapRect.c -= (int)((1.0f - n25) * this.minimapRect.b());
-                            this.gameEngine.graphicsEngine2.b(this.minimapRect, this.paintUnitTeam);
+                            this.gameEngine.renderGraphicsEngine.b(this.minimapRect, this.paintUnitTeam);
                             this.paintUnitStatus.a(190, 148, 189, 255);
-                            this.gameEngine.graphicsEngine2.a((float)this.minimapRect.c, (float)this.minimapRect.b, (float)this.minimapRect.c, (float)this.minimapRect.d, this.paintUnitTeam);
+                            this.gameEngine.renderGraphicsEngine.a((float)this.minimapRect.c, (float)this.minimapRect.b, (float)this.minimapRect.c, (float)this.minimapRect.d, this.paintUnitTeam);
                         }
                         else {
                             final float e = this.e(unitCommand);
@@ -1535,9 +1535,9 @@ public class GameInterfaceRenderer extends Serializable {
                                 this.minimapRect.a(this.zoomButtonRect);
                                 final Rect minimapRect2 = this.minimapRect;
                                 minimapRect2.c -= (int)((1.0f - e) * this.minimapRect.b());
-                                this.gameEngine.graphicsEngine2.b(this.minimapRect, this.paintUnitTeam);
+                                this.gameEngine.renderGraphicsEngine.b(this.minimapRect, this.paintUnitTeam);
                                 this.paintUnitStatus.a(190, 148, 189, 255);
-                                this.gameEngine.graphicsEngine2.a((float)this.minimapRect.c, (float)this.minimapRect.b, (float)this.minimapRect.c, (float)this.minimapRect.d, this.paintUnitTeam);
+                                this.gameEngine.renderGraphicsEngine.a((float)this.minimapRect.c, (float)this.minimapRect.b, (float)this.minimapRect.c, (float)this.minimapRect.d, this.paintUnitTeam);
                             }
                         }
                         int n26 = Color.a(255, 0, 0, 0);
@@ -1558,8 +1558,8 @@ public class GameInterfaceRenderer extends Serializable {
                 final KeyBinding a3 = this.a(unitCommand, integer, arrayList);
                 if (a3 != null && b5) {
                     final String c2 = a3.c();
-                    final float n25 = (float)this.gameEngine.graphicsEngine2.a("A", this.gameUI.selectionBoxPaint);
-                    this.gameEngine.graphicsEngine2.a(c2, (float)(this.zoomButtonRect.a + 3), this.zoomButtonRect.b + n25 + 1.0f, this.gameUI.selectionBoxPaint);
+                    final float n25 = (float)this.gameEngine.renderGraphicsEngine.a("A", this.gameUI.selectionBoxPaint);
+                    this.gameEngine.renderGraphicsEngine.a(c2, (float)(this.zoomButtonRect.a + 3), this.zoomButtonRect.b + n25 + 1.0f, this.gameUI.selectionBoxPaint);
                 }
                 boolean b11 = false;
                 UnitType as = unitCommand.getUnitType();
@@ -1583,7 +1583,7 @@ public class GameInterfaceRenderer extends Serializable {
                     this.paintMinimap.a(100, 255, 255, 255);
                     final RectF minimapRectF = this.minimapRectF;
                     minimapRectF.a((float)n27, (float)a4, n27 + rect.b() * float2, a4 + rect.c() * float2);
-                    this.gameEngine.graphicsEngine2.a(e2, rect, minimapRectF, this.paintMinimap);
+                    this.gameEngine.renderGraphicsEngine.a(e2, rect, minimapRectF, this.paintMinimap);
                     b11 = true;
                 }
                 else if (as != null) {
@@ -1603,8 +1603,8 @@ public class GameInterfaceRenderer extends Serializable {
                     }
                     this.selectionRectF.a(this.zoomButtonRect);
                     if (this.selectionRectF.b(this.rectF)) {
-                        this.gameEngine.graphicsEngine2.i();
-                        this.gameEngine.graphicsEngine2.a(this.selectionRectF);
+                        this.gameEngine.renderGraphicsEngine.i();
+                        this.gameEngine.renderGraphicsEngine.a(this.selectionRectF);
                         UnitTypeEnum.drawUnit(as, float3, float2, 0.0f, 0.0f, baseUnit.team, float4, float5, false, false, unitCommand.getQueueSize(), showingNotEnoughResources);
                         if (showingNotEnoughResources != null) {
                             final float n28 = showingNotEnoughResources.x();
@@ -1620,9 +1620,9 @@ public class GameInterfaceRenderer extends Serializable {
                                 final int n33 = 0;
                                 final int n34 = n32 * 2;
                                 this.minimapRectF.a(float3 - n32, float2 + n33, float3 - n32 + n34 * bv, float2 + n33 + n31);
-                                this.gameEngine.graphicsEngine2.a(this.minimapRectF, a5);
+                                this.gameEngine.renderGraphicsEngine.a(this.minimapRectF, a5);
                                 this.minimapRectF.a(float3 - n32, float2 + n33, float3 - n32 + n34, float2 + n33 + n31);
-                                this.gameEngine.graphicsEngine2.a(this.minimapRectF, a6);
+                                this.gameEngine.renderGraphicsEngine.a(this.minimapRectF, a6);
                             }
                             else if (n28 != -1.0f && unitCommand.shouldShowProgress(baseUnit)) {
                                 final int n29 = 120;
@@ -1635,12 +1635,12 @@ public class GameInterfaceRenderer extends Serializable {
                                 final int n33 = 0;
                                 final int n34 = n32 * 2;
                                 this.minimapRectF.a(float3 - n32, float2 + n33, float3 - n32 + n34 * n28, float2 + n33 + n31);
-                                this.gameEngine.graphicsEngine2.a(this.minimapRectF, a7);
+                                this.gameEngine.renderGraphicsEngine.a(this.minimapRectF, a7);
                                 this.minimapRectF.a(float3 - n32, float2 + n33, float3 - n32 + n34, float2 + n33 + n31);
-                                this.gameEngine.graphicsEngine2.a(this.minimapRectF, a8);
+                                this.gameEngine.renderGraphicsEngine.a(this.minimapRectF, a8);
                             }
                         }
-                        this.gameEngine.graphicsEngine2.j();
+                        this.gameEngine.renderGraphicsEngine.j();
                     }
                     b11 = true;
                 }
@@ -1657,17 +1657,17 @@ public class GameInterfaceRenderer extends Serializable {
                     this.paintMinimap.b(unitCommand.getNotAvailableReason());
                     final RectF minimapRectF2 = this.minimapRectF;
                     minimapRectF2.a((float)a4, (float)n35, a4 + rect2.b() * float4, n35 + rect2.c() * float4);
-                    this.gameEngine.graphicsEngine2.a(showingNotEnoughEnergy, rect2, minimapRectF2, this.paintMinimap);
+                    this.gameEngine.renderGraphicsEngine.a(showingNotEnoughEnergy, rect2, minimapRectF2, this.paintMinimap);
                     b11 = true;
                 }
                 if (b5) {
                     final String d = unitCommand.d();
                     if (a2) {
-                        this.gameEngine.graphicsEngine2.a(this.lockIconTexture, (float)(this.zoomButtonRect.a + 25), this.zoomButtonRect.g(), null);
+                        this.gameEngine.renderGraphicsEngine.a(this.lockIconTexture, (float)(this.zoomButtonRect.a + 25), this.zoomButtonRect.g(), null);
                     }
-                    final float float4 = (float)this.gameEngine.graphicsEngine2.b(d, this.gameUI.buildingPreviewPaint);
+                    final float float4 = (float)this.gameEngine.renderGraphicsEngine.b(d, this.gameUI.buildingPreviewPaint);
                     if (float4 > this.zoomButtonRect.b() - 2) {
-                        final float float5 = (float)this.gameEngine.graphicsEngine2.b(d, this.gameUI.rallyPointPaint);
+                        final float float5 = (float)this.gameEngine.renderGraphicsEngine.b(d, this.gameUI.rallyPointPaint);
                         if (float5 > this.zoomButtonRect.b() - 2) {
                             this.paintUnitInfo.a(this.gameUI.selectionBoxBorderPaint);
                         }
@@ -1706,7 +1706,7 @@ public class GameInterfaceRenderer extends Serializable {
                     else if (b6) {
                         this.paintUnitInfo.a(155, 255, 255, 255);
                     }
-                    final int a4 = this.gameEngine.graphicsEngine2.a(d, this.paintUnitInfo);
+                    final int a4 = this.gameEngine.renderGraphicsEngine.a(d, this.paintUnitInfo);
                     float n28 = this.zoomButtonRect.g() + a4 / 2;
                     if (b6) {
                         n28 = this.zoomButtonRect.g();
@@ -1723,7 +1723,7 @@ public class GameInterfaceRenderer extends Serializable {
                         GraphicsUtils.a(d, this.zoomButtonRect.f(), n28, this.paintUnitInfo);
                     }
                     else {
-                        this.gameEngine.graphicsEngine2.a(d, this.zoomButtonRect.f(), n28, this.paintUnitInfo);
+                        this.gameEngine.renderGraphicsEngine.a(d, this.zoomButtonRect.f(), n28, this.paintUnitInfo);
                     }
                 }
                 int n36 = 0;
@@ -1734,7 +1734,7 @@ public class GameInterfaceRenderer extends Serializable {
                     b13 = true;
                 }
                 this.unitRect.a(this.zoomButtonRect);
-                if (GameEngine.isAndroid()) {
+                if (GameEngine.isNonPCPlatform()) {
                     Utility.grow2(this.unitRect, 2.0f);
                 }
                 this.gameUI.a((float)this.unitRect.a, (float)this.unitRect.b, (float)this.unitRect.b(), (float)this.unitRect.c());
@@ -1824,7 +1824,7 @@ public class GameInterfaceRenderer extends Serializable {
                             }
                             else {
                                 final boolean highPriority = unitCommand.isHighPriority();
-                                if (highPriority && !b14 && this.gameEngine.playerTeam.getTeamBuildingCountInt() <= this.gameEngine.playerTeam.getTeamUnitCountInt()) {
+                                if (highPriority && !b14 && this.gameEngine.playerTeam.getUnitCap() <= this.gameEngine.playerTeam.getNonBuildingUnitCountIncludingQueued()) {
                                     this.gameUI.showMediumPriorityMessage(this.unitCapReachedText);
                                 }
                                 if (highPriority) {
@@ -1852,7 +1852,7 @@ public class GameInterfaceRenderer extends Serializable {
                                     }
                                     commandForSelectedUnits.setActionId(unitCommand.getQueueId());
                                     if (!b14) {
-                                        this.gameUI.unknownFun(unitCommand, null, null, commandForSelectedUnits);
+                                        this.gameUI.prepareUnitActionCommand(unitCommand, null, null, commandForSelectedUnits);
                                     }
                                 }
                             }
@@ -1929,8 +1929,8 @@ public class GameInterfaceRenderer extends Serializable {
                         this.gameUI.screenFlashRed = -99.0f;
                         this.gameUI.screenFlashGreen = -99.0f;
                         if (!this.gameUI.isBuildingMode) {
-                            this.gameUI.buildingPlaceX = this.gameEngine.halfViewpointWidth * this.gameEngine.zoom;
-                            this.gameUI.buildingPlaceY = this.gameEngine.halfViewpointHeight * this.gameEngine.zoom;
+                            this.gameUI.buildingPlaceX = this.gameEngine.halfVisibleWorldWidth * this.gameEngine.zoom;
+                            this.gameUI.buildingPlaceY = this.gameEngine.halfVisibleWorldHeight * this.gameEngine.zoom;
                         }
                         this.gameUI.isBuildingMode = true;
                         this.gameEngine.tileMap.noop();
@@ -1956,7 +1956,7 @@ public class GameInterfaceRenderer extends Serializable {
                 }
                 n3 = (c ? 1 : 0);
             }
-            this.gameEngine.graphicsEngine2.j();
+            this.gameEngine.renderGraphicsEngine.j();
             this.rectF.f();
         }
         if (baseUnit != null && baseUnit == this.selectedUnit) {
@@ -1994,7 +1994,7 @@ public class GameInterfaceRenderer extends Serializable {
     }
 
     float i() {
-        return (float) (((double) Utility.clampTo255((this.gameEngine.viewpointWidthRaw / 14.0f) / this.gameEngine.screenScale, 25.0f * this.gameEngine.screenScale, 40.0f * this.gameEngine.screenScale)) * 0.9d);
+        return (float) (((double) Utility.clampTo255((this.gameEngine.screenHeight / 14.0f) / this.gameEngine.screenScale, 25.0f * this.gameEngine.screenScale, 40.0f * this.gameEngine.screenScale)) * 0.9d);
     }
 
     void a(float f, int i) {
@@ -2086,7 +2086,7 @@ public class GameInterfaceRenderer extends Serializable {
     public String a(PlayerTeam playerTeam) {
         String str = VariableScope.nullOrMissingString;
         boolean z = false;
-        if (this.gameEngine.playerTeam.addCredits()) {
+        if (this.gameEngine.playerTeam.isSpectatorTeamColor()) {
             z = true;
         } else if (this.gameEngine.playerTeam.d(playerTeam)) {
             str = str + this.allyUnitText;
@@ -2099,14 +2099,14 @@ public class GameInterfaceRenderer extends Serializable {
             if (playerTeam == PlayerTeam.TEAM_ALL) {
                 str = str + this.neutralUnitText;
             } else {
-                str = str + "Team - " + playerTeam.getTeamColorName();
+                str = str + "Team - " + playerTeam.getTeamSlotLabel();
             }
         }
         String str2 = str + "\n";
         if (playerTeam.teamName != null) {
             str2 = str2 + playerTeam.teamName;
         }
-        if (!playerTeam.isTeamSpectator && this.gameEngine.isNetworkConnected() && playerTeam.isTeamActiveCheck()) {
+        if (!playerTeam.isTeamSpectator && this.gameEngine.isNetworkConnected() && playerTeam.isTeamDisconnected()) {
             str2 = (str2 + "\n") + "(disconnected)";
         }
         return str2;
@@ -2225,7 +2225,7 @@ public class GameInterfaceRenderer extends Serializable {
         if (baseUnit instanceof OrderableUnit) {
             OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
             if (orderableUnit.bd() != 0.0f && !z3) {
-                str2 = str2 + "Energy: " + Utility.min(baseUnit.f0cB) + "/" + Utility.min(orderableUnit.bd()) + str;
+                str2 = str2 + "Energy: " + Utility.min(baseUnit.currentEnergy) + "/" + Utility.min(orderableUnit.bd()) + str;
             }
             float moveSpeed = orderableUnit.getMoveSpeed();
             if (!orderableUnit.canExecuteMovementCommands()) {
@@ -2268,7 +2268,7 @@ public class GameInterfaceRenderer extends Serializable {
             str2 = str2 + "Kills: " + baseUnit.unitCargoType + str;
         }
         boolean z5 = false;
-        if (GameEngine.getInstance().isNetworkGameActive) {
+        if (GameEngine.getInstance().isDebugTempMode) {
             UnitType unitTypeR = baseUnit.r();
             str2 = ((str2 + "\n") + "--Debug--" + str) + "name: " + unitTypeR.getUnitTypeDescriptionShort() + str;
             if ((unitTypeR instanceof CustomUnitConfig) && (modInfo = ((CustomUnitConfig) unitTypeR).modInfo) != null) {
@@ -2364,21 +2364,21 @@ public class GameInterfaceRenderer extends Serializable {
         this.zoomButtonRect.a(this.rect.a, this.rect.b, this.rect.c, this.rect.d);
         final Rect zoomButtonRect = this.zoomButtonRect;
         zoomButtonRect.c *= (int)float7;
-        this.gameEngine.graphicsEngine2.c(this.zoomButtonRect, paint);
-        this.gameEngine.graphicsEngine2.a(string4, (float)n, integer6 + (this.gameUI.buildingPreviewPaint.k() + 5.0f) * 1.0f, this.gameUI.buildingPreviewPaint);
-        this.gameEngine.graphicsEngine2.a(string5, (float)n, integer6 + (this.gameUI.buildingPreviewPaint.k() + 5.0f) * 2.0f, this.gameUI.buildingPreviewPaint);
+        this.gameEngine.renderGraphicsEngine.c(this.zoomButtonRect, paint);
+        this.gameEngine.renderGraphicsEngine.a(string4, (float)n, integer6 + (this.gameUI.buildingPreviewPaint.k() + 5.0f) * 1.0f, this.gameUI.buildingPreviewPaint);
+        this.gameEngine.renderGraphicsEngine.a(string5, (float)n, integer6 + (this.gameUI.buildingPreviewPaint.k() + 5.0f) * 2.0f, this.gameUI.buildingPreviewPaint);
     }
 
     void a(final float float1, final boolean boolean2) {
         float float2 = this.gameEngine.screenScale * 0.7f;
-        if (GameEngine.isAndroid() && float2 < 0.7) {
+        if (GameEngine.isNonPCPlatform() && float2 < 0.7) {
             float2 = 0.7f;
         }
         int n = this.pauseTexture.m();
         int n2 = (int)(n * float2);
         int n3 = 4 + n2 / 2;
         int n4 = 4 + n2 / 2;
-        if (this.gameEngine.setKeyReleased(111)) {
+        if (this.gameEngine.consumeKeyPress(111)) {
             boolean clearCurrentAction = false;
             if (!this.gameUI.isDraggingSelection) {
                 clearCurrentAction = this.gameUI.clearCurrentAction();
@@ -2401,14 +2401,14 @@ public class GameInterfaceRenderer extends Serializable {
         this.unitRect2.a(n3, n4, n3 + n2, n4 + n2);
         this.unitRect2.a(-(n2 / 2), -(n2 / 2));
         if (boolean2) {
-            this.gameEngine.graphicsEngine2.a(this.pauseTexture, (float)this.unitRect2.a, (float)this.unitRect2.b, this.paintHealthBar, 0.0f, float2);
+            this.gameEngine.renderGraphicsEngine.a(this.pauseTexture, (float)this.unitRect2.a, (float)this.unitRect2.b, this.paintHealthBar, 0.0f, float2);
             if (this.gameEngine.settingsEngine.newRender) {
                 this.minimapRect.a(this.unitRect2.d() - 4, this.unitRect2.e() - 4, this.unitRect2.d() + 4, this.unitRect2.e() + 4);
                 this.paintMinimap.a(100, 0, 155, 0);
-                this.gameEngine.graphicsEngine2.b(this.minimapRect, this.paintMinimap);
+                this.gameEngine.renderGraphicsEngine.b(this.minimapRect, this.paintMinimap);
             }
         }
-        if (GameEngine.isAndroid()) {
+        if (GameEngine.isNonPCPlatform()) {
             Utility.grow(this.unitRect2, 4.0f);
         }
         if (this.gameUI.isSelectionBoxActive && !this.gameUI.isInputDisabled && this.unitRect2.b((int)this.gameUI.selectionBoxStartX, (int)this.gameUI.selectionBoxStartY)) {
@@ -2425,20 +2425,20 @@ public class GameInterfaceRenderer extends Serializable {
             n2 = (int)(n * this.gameEngine.screenScale * 1.6f);
             n3 = (int)(this.gameEngine.currentScreenWidthPixels / 2.0f);
             n4 = 7 + (int)this.gameUI.unitRangePaint.k();
-            this.gameEngine.graphicsEngine2.a(Utility.copyStream(this.gameEngine.lastTick / 1000), (float)n3, (float)n4, this.gameUI.unitRangePaint);
+            this.gameEngine.renderGraphicsEngine.a(Utility.copyStream(this.gameEngine.gameTimeMillis / 1000), (float)n3, (float)n4, this.gameUI.unitRangePaint);
             n4 += n2 / 2 + 10;
             n3 += n2 / 2 + 5;
             this.unitRect2.a(n3, n4, n3 + n2, n4 + n2);
             this.unitRect2.a(-this.unitRect2.b() / 2, -this.unitRect2.c() / 2);
             if (boolean2) {
-                this.gameEngine.graphicsEngine2.a(this.fastTexture, (float)this.unitRect2.a, (float)this.unitRect2.b, this.paintHealthBar, 0.0f, (float)(n2 / n));
+                this.gameEngine.renderGraphicsEngine.a(this.fastTexture, (float)this.unitRect2.a, (float)this.unitRect2.b, this.paintHealthBar, 0.0f, (float)(n2 / n));
             }
             if (this.gameUI.isSelectionBoxActive && !this.gameUI.isInputDisabled && this.unitRect2.b((int)this.gameUI.selectionBoxStartX, (int)this.gameUI.selectionBoxStartY)) {
                 this.gameUI.isSelectionBoxActive = false;
                 this.gameEngine.replayEngine.b();
             }
             if (this.gameEngine.gameSpeed != 1.0f && boolean2) {
-                this.gameEngine.graphicsEngine2.a("x" + this.gameEngine.gameSpeed, (float)(this.unitRect2.d() + n2 / 2), (float)this.unitRect2.e(), this.gameUI.buildingPreviewPaint);
+                this.gameEngine.renderGraphicsEngine.a("x" + this.gameEngine.gameSpeed, (float)(this.unitRect2.d() + n2 / 2), (float)this.unitRect2.e(), this.gameUI.buildingPreviewPaint);
             }
             final Texture replayPauseTexture = this.replayPauseTexture;
             n = replayPauseTexture.q;
@@ -2447,7 +2447,7 @@ public class GameInterfaceRenderer extends Serializable {
             this.unitRect2.a(n3, n4, n3 + n2, n4 + n2);
             this.unitRect2.a(-this.unitRect2.b() / 2, -this.unitRect2.c() / 2);
             if (boolean2) {
-                this.gameEngine.graphicsEngine2.a(replayPauseTexture, (float)this.unitRect2.a, (float)this.unitRect2.b, this.paintHealthBar, 0.0f, (float)(n2 / n));
+                this.gameEngine.renderGraphicsEngine.a(replayPauseTexture, (float)this.unitRect2.a, (float)this.unitRect2.b, this.paintHealthBar, 0.0f, (float)(n2 / n));
             }
             if (this.gameUI.isSelectionBoxActive && !this.gameUI.isInputDisabled && this.unitRect2.b((int)this.gameUI.selectionBoxStartX, (int)this.gameUI.selectionBoxStartY)) {
                 this.gameUI.isSelectionBoxActive = false;
@@ -2458,7 +2458,7 @@ public class GameInterfaceRenderer extends Serializable {
             this.unitRect2.a(n3, n4, n3 + n2, n4 + n2);
             this.unitRect2.a(-this.unitRect2.b() / 2, -this.unitRect2.c() / 2);
             if (boolean2) {
-                this.gameEngine.graphicsEngine2.a(leaderboardTexture, (float)this.unitRect2.a, (float)this.unitRect2.b, this.paintHealthBar, 0.0f, (float)(n2 / n));
+                this.gameEngine.renderGraphicsEngine.a(leaderboardTexture, (float)this.unitRect2.a, (float)this.unitRect2.b, this.paintHealthBar, 0.0f, (float)(n2 / n));
             }
             if (this.gameUI.isSelectionBoxActive && !this.gameUI.isInputDisabled && this.unitRect2.b((int)this.gameUI.selectionBoxStartX, (int)this.gameUI.selectionBoxStartY)) {
                 final TeamStats teamStats = this.gameEngine.teamStats;
@@ -2479,7 +2479,7 @@ public class GameInterfaceRenderer extends Serializable {
             this.zoomButtonRect.b = (int)(this.gameEngine.halfScreenHeight - n6 / 2);
             this.zoomButtonRect.d = (int)(this.gameEngine.halfScreenHeight + n6 / 2);
             if (boolean2) {
-                this.gameUI.ninePatchStyle5.c(this.gameEngine.graphicsEngine2, this.zoomButtonRect);
+                this.gameUI.ninePatchStyle5.c(this.gameEngine.renderGraphicsEngine, this.zoomButtonRect);
             }
             final int n7 = this.zoomButtonRect.b + this.gameEngine.toScreenPixels(40);
             final int screenPixels3 = this.gameEngine.toScreenPixels(152);
@@ -2518,14 +2518,14 @@ public class GameInterfaceRenderer extends Serializable {
     }
 
     void a(int i) {
-        GameView gameView = this.gameEngine.activity;
+        GameView gameView = this.gameEngine.activeGameView;
         if (gameView == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("selectMenuOption: gameView==null");
+            GameEngine.logColored("selectMenuOption: gameView==null");
             return;
         }
         InGameActivity surfaceHolder = gameView.getSurfaceHolder();
         if (surfaceHolder == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("selectMenuOption: inGameActivity==null");
+            GameEngine.logColored("selectMenuOption: inGameActivity==null");
         } else {
             surfaceHolder.selectMenuOption(i);
         }
@@ -2533,14 +2533,14 @@ public class GameInterfaceRenderer extends Serializable {
 
     Menu o() {
         this.vObject.clear();
-        GameView gameView = this.gameEngine.activity;
+        GameView gameView = this.gameEngine.activeGameView;
         if (gameView == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("selectMenuOption: gameView==null");
+            GameEngine.logColored("selectMenuOption: gameView==null");
             return this.vObject;
         }
         InGameActivity surfaceHolder = gameView.getSurfaceHolder();
         if (surfaceHolder == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("selectMenuOption: inGameActivity==null");
+            GameEngine.logColored("selectMenuOption: inGameActivity==null");
             return this.vObject;
         }
         surfaceHolder.a(this.vObject);
@@ -2609,7 +2609,7 @@ public class GameInterfaceRenderer extends Serializable {
                     }
                     int i6 = (int) (31.0f * this.gameEngine.screenScale);
                     this.zoomButtonRect.a(i2, (int) ((i + i6) - (i6 * f2)), i2 + i4, i + i6);
-                    this.gameEngine.graphicsEngine2.b(this.zoomButtonRect, this.paintUnitInfo);
+                    this.gameEngine.renderGraphicsEngine.b(this.zoomButtonRect, this.paintUnitInfo);
                 }
                 if (!z) {
                     if (unitGroupMarker.b != 0.0f && !this.gameUI.isMousePressed) {

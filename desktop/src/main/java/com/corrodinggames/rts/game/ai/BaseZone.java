@@ -766,7 +766,7 @@ public class BaseZone extends AIStrategyNode {
         if (abstractUnitActionFindActionForUnitType != null) {
             queueSize = abstractUnitActionFindActionForUnitType.getQueueSize();
         } else {
-            GameEngine.updatePaintTextSizeIfNeeded("buildBuilding: could not find getBuildUnitAction for builder this shouldn't happen:" + unitType.getUnitTypeDescriptionShort());
+            GameEngine.logColored("buildBuilding: could not find getBuildUnitAction for builder this shouldn't happen:" + unitType.getUnitTypeDescriptionShort());
         }
         if (!abstractUnitActionFindActionForUnitType.b(orderableUnitA) || !abstractUnitActionFindActionForUnitType.drawTooltip((BaseUnit) orderableUnitA, false)) {
             if (!this.aiController.isPathPossibleBetweenPoints(abstractUnitActionFindActionForUnitType.getDisplayText(), orderableUnitA)) {
@@ -1139,13 +1139,13 @@ public class BaseZone extends AIStrategyNode {
 
     public void t() {
         if (this.stage == null) {
-            GameEngine.printLog("fixOverlaps: this.state==null");
-            GameEngine.printLog("id:" + this.strategyId);
-            GameEngine.printLog("x:" + this.posX);
-            GameEngine.printLog("y:" + this.posY);
-            GameEngine.printLog("radius:" + this.radius);
+            GameEngine.logErrorColored("fixOverlaps: this.state==null");
+            GameEngine.logErrorColored("id:" + this.strategyId);
+            GameEngine.logErrorColored("x:" + this.posX);
+            GameEngine.logErrorColored("y:" + this.posY);
+            GameEngine.logErrorColored("radius:" + this.radius);
             if (this.aiController != null) {
-                GameEngine.printLog("team:" + this.aiController.teamId);
+                GameEngine.logErrorColored("team:" + this.aiController.teamId);
                 return;
             }
             return;
@@ -1155,7 +1155,7 @@ public class BaseZone extends AIStrategyNode {
                 BaseZone baseZone = (BaseZone) aIStrategyNode;
                 if (Utility.distanceSq(this.posX, this.posY, baseZone.posX, baseZone.posY) < 400.0f) {
                     if (baseZone.stage == null) {
-                        GameEngine.printLog("fixOverlaps: targetBase.state==null");
+                        GameEngine.logErrorColored("fixOverlaps: targetBase.state==null");
                     } else if (baseZone.stage.a() < this.stage.a()) {
                         baseZone.destroy();
                     } else {
@@ -1259,7 +1259,7 @@ public class BaseZone extends AIStrategyNode {
             if (this.lastFoundBuildingPriority < 0.08d) {
                 this.defensiveScore += 180.0f;
             }
-            if ((y() != null) && (bestBuildingToBuild = getBestBuildingToBuild()) != null && ((this.lastFoundBuildingPriority > 0.8d || this.aiController.getTeamColorName(1300.0d)) && ((this.lastFoundBuildingPriority > 0.4d || this.aiController.getTeamColorName(1700.0d)) && ((this.lastFoundBuildingPriority > 0.2d || this.aiController.getTeamColorName(2100.0d)) && ((this.lastFoundBuildingPriority > 0.1d || this.aiController.getTeamColorName(2800.0d)) && ((this.lastFoundBuildingPriority > 0.05d || this.aiController.getTeamColorName(3100.0d)) && (this.lastFoundBuildingPriority > 0.01d || this.aiController.getTeamColorName(4800.0d)))))))) {
+            if ((y() != null) && (bestBuildingToBuild = getBestBuildingToBuild()) != null && ((this.lastFoundBuildingPriority > 0.8d || this.aiController.hasCredits(1300.0d)) && ((this.lastFoundBuildingPriority > 0.4d || this.aiController.hasCredits(1700.0d)) && ((this.lastFoundBuildingPriority > 0.2d || this.aiController.hasCredits(2100.0d)) && ((this.lastFoundBuildingPriority > 0.1d || this.aiController.hasCredits(2800.0d)) && ((this.lastFoundBuildingPriority > 0.05d || this.aiController.hasCredits(3100.0d)) && (this.lastFoundBuildingPriority > 0.01d || this.aiController.hasCredits(4800.0d)))))))) {
                 this.numberOfLandUnits++;
                 if (!getClosestEnemyUnit(bestBuildingToBuild)) {
                     this.defensiveScore -= 120.0f;
@@ -1277,35 +1277,35 @@ public class BaseZone extends AIStrategyNode {
         if (this.lastFoundBuildingPriority < 0.6d) {
             if (this.aiController.unitCount < 2) {
                 this.reclaimScore = (float) (((double) this.reclaimScore) + (((double) f) * 7.0E-4d * ((double) fU)));
-            } else if (this.aiController.getTeamColorName(1200.0d)) {
+            } else if (this.aiController.hasCredits(1200.0d)) {
                 this.reclaimScore = (float) (((double) this.reclaimScore) + (((double) f) * 1.0E-4d * ((double) fU)));
             }
-            if (this.aiController.getTeamColorName(1600.0d)) {
+            if (this.aiController.hasCredits(1600.0d)) {
                 this.reclaimScore = (float) (((double) this.reclaimScore) + (((double) f) * 0.001d));
             }
-            if (this.aiController.getTeamColorName(2200.0d)) {
+            if (this.aiController.hasCredits(2200.0d)) {
                 this.reclaimScore = (float) (((double) this.reclaimScore) + (((double) f) * 0.001d));
             }
-            if (this.aiController.getTeamColorName(2600.0d)) {
+            if (this.aiController.hasCredits(2600.0d)) {
                 this.reclaimScore = (float) (((double) this.reclaimScore) + (((double) f) * 0.001d));
             }
-            if (this.aiController.getTeamColorName(8000.0d)) {
+            if (this.aiController.hasCredits(8000.0d)) {
                 this.reclaimScore = (float) (((double) this.reclaimScore) + (((double) f) * 0.005d));
             }
-            if (this.aiController.getTeamColorName(9000.0d)) {
+            if (this.aiController.hasCredits(9000.0d)) {
                 this.reclaimScore = (float) (((double) this.reclaimScore) + (((double) f) * 0.01d));
             }
-            if (this.aiController.getTeamColorName(10100.0d)) {
+            if (this.aiController.hasCredits(10100.0d)) {
                 this.reclaimScore = (float) (((double) this.reclaimScore) + (((double) f) * 0.01d));
             }
-            if (this.aiController.getTeamColorName(30000.0d)) {
+            if (this.aiController.hasCredits(30000.0d)) {
                 this.reclaimScore = (float) (((double) this.reclaimScore) + (((double) f) * 0.05d));
             }
         }
-        if (this.aiController.getTeamColorName(5000.0d)) {
+        if (this.aiController.hasCredits(5000.0d)) {
             this.reclaimScore = (float) (((double) this.reclaimScore) + (((double) f) * 0.001d));
         }
-        if (!this.aiController.getTeamColorName(800.0d) && !this.isUnderAttack && this.reclaimScore > 1.2f) {
+        if (!this.aiController.hasCredits(800.0d) && !this.isUnderAttack && this.reclaimScore > 1.2f) {
             this.reclaimScore = 1.2f;
         }
         if (this.reclaimScore > 3.5f) {
@@ -1340,7 +1340,7 @@ public class BaseZone extends AIStrategyNode {
             i2 = 65;
             i = 16;
         }
-        boolean zA = this.aiController.getTeamColorName(25000.0d);
+        boolean zA = this.aiController.hasCredits(25000.0d);
         ArrayList arrayList = new ArrayList();
         boolean zIsAttackBlockedByConditions = this.aiController.isAttackBlockedByConditions();
         boolean zShouldLaunchAttack = this.aiController.shouldLaunchAttack();
@@ -1362,7 +1362,7 @@ public class BaseZone extends AIStrategyNode {
         } else {
             unitMovementType = UnitMovementType.AIR;
         }
-        if ((this.aiController.getTeamColorName(1300.0d) && this.reclaimScore >= 1.0f) || (this.aiController.getTeamColorName(300.0d) && this.reclaimScore >= 3.0f)) {
+        if ((this.aiController.hasCredits(1300.0d) && this.reclaimScore >= 1.0f) || (this.aiController.hasCredits(300.0d) && this.reclaimScore >= 3.0f)) {
             if (this.aiController.isPathfindingOverloaded() && this.aiController.buildingCount < i && Utility.getRandomInt(100) < 35) {
                 a(arrayList, this.aiController.seaUnitBuildStrategy, null, 2);
                 if (zA) {
@@ -1387,7 +1387,7 @@ public class BaseZone extends AIStrategyNode {
                 int iShouldWriteForUnitType = this.aiController.shouldWriteForUnitType(this.aiController.baseDefenseUnitBuildStrategy, UnitFilterMode.include);
                 int iShouldWriteForUnitType2 = iShouldWriteForUnitType + this.aiController.shouldWriteForUnitType(this.aiController.scoutUnitBuildStrategy, UnitFilterMode.include);
                 int iCountUnitsInGroups = this.aiController.countUnitsInGroups();
-                if ((this.aiController.getTeamColorName(1700.0d) || iCountUnitsInGroups > 10 || (this.aiController.attackCooldownTimer == 0 && iCountUnitsInGroups >= 1 && iShouldWriteForUnitType == 0)) && (iShouldWriteForUnitType2 < 3 || (iCountUnitsInGroups > 20 && iShouldWriteForUnitType2 < 5))) {
+                if ((this.aiController.hasCredits(1700.0d) || iCountUnitsInGroups > 10 || (this.aiController.attackCooldownTimer == 0 && iCountUnitsInGroups >= 1 && iShouldWriteForUnitType == 0)) && (iShouldWriteForUnitType2 < 3 || (iCountUnitsInGroups > 20 && iShouldWriteForUnitType2 < 5))) {
                     if (zShouldLaunchAttack && iShouldWriteForUnitType2 < 2) {
                         a(arrayList, this.aiController.antiNukeUnitBuildStrategy, null, 2);
                     } else {

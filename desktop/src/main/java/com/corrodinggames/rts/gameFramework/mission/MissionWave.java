@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.n.g */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/n/g.class */
-public class wave {
+public class MissionWave {
     public ArrayList a = new ArrayList();
     public boolean b;
     public boolean c;
@@ -24,7 +24,7 @@ public class wave {
     public boolean h;
     final /* synthetic */ MissionEngine i;
 
-    public wave(MissionEngine missionEngine) {
+    public MissionWave(MissionEngine missionEngine) {
         this.i = missionEngine;
     }
 
@@ -119,7 +119,7 @@ public class wave {
                     if (unitTypeByName == null) {
                         throw new MapLoadException("Could not find unit '" + strTrim6 + "' in: " + strTrim);
                     }
-                    waveunits waveunitsVar = new waveunits(this.i);
+                    WaveUnitGroup waveunitsVar = new WaveUnitGroup(this.i);
                     waveunitsVar.b(unitTypeByName, i);
                     this.a.add(waveunitsVar);
                 } catch (NumberFormatException e2) {
@@ -139,7 +139,7 @@ public class wave {
         PointF pointF = this.i.P;
         Iterator it = this.a.iterator();
         while (it.hasNext()) {
-            ((waveunits) it.next()).a(pointF.x, pointF.y);
+            ((WaveUnitGroup) it.next()).a(pointF.x, pointF.y);
         }
         if (!this.i.Q) {
             this.i.e();

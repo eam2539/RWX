@@ -62,11 +62,11 @@ public class AirFactory extends FactoryWithQueue {
     /* JADX INFO: renamed from: b */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        level1Texture = gameEngine.graphicsEngine2.a(R.drawable.air_factory);
-        level2Texture = gameEngine.graphicsEngine2.a(R.drawable.air_factory_t2);
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.air_factory_dead);
-        level1Textures = PlayerTeam.getUnitCountByType(level1Texture);
-        level2Textures = PlayerTeam.getUnitCountByType(level2Texture);
+        level1Texture = gameEngine.renderGraphicsEngine.a(R.drawable.air_factory);
+        level2Texture = gameEngine.renderGraphicsEngine.a(R.drawable.air_factory_t2);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.air_factory_dead);
+        level1Textures = PlayerTeam.getTeamColorTextures(level1Texture);
+        level2Textures = PlayerTeam.getTeamColorTextures(level2Texture);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit

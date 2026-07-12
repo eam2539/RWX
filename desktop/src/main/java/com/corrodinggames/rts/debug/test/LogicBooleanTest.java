@@ -485,7 +485,7 @@ public class LogicBooleanTest extends Test {
                 throw new RuntimeException(e);
             }
             if (z) {
-                GameEngine.m332d("assertCreateError: " + str + " error:" + e.getMessage());
+                GameEngine.logDebug("assertCreateError: " + str + " error:" + e.getMessage());
             }
         }
     }

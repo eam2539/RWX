@@ -211,7 +211,7 @@ public class Path {
 
     public LinkedList a() {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine.networkEngine.B || gameEngine.replayEngine.i()) {
+        if (gameEngine.networkEngine.networkGameActive || gameEngine.replayEngine.i()) {
             if (this.u) {
                 return this.x;
             }
@@ -235,9 +235,9 @@ public class Path {
         Paint paint = new Paint();
         paint.a(2.0f);
         paint.a(100, 0, 100, 0);
-        gameEngine.graphicsEngine2.a(((this.l * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().cameraBoundsMaxY, ((this.m * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().mapWidth, this.n * tileMap.tileWorldSizeX, paint);
+        gameEngine.renderGraphicsEngine.a(((this.l * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((this.m * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, this.n * tileMap.tileWorldSizeX, paint);
         paint.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PAIRING, 0, 0, 255);
-        gameEngine.graphicsEngine2.a(((this.h * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().cameraBoundsMaxY, ((this.i * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().mapWidth, ((this.l * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().cameraBoundsMaxY, ((this.m * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().mapWidth, paint);
+        gameEngine.renderGraphicsEngine.a(((this.h * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((this.i * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, ((this.l * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((this.m * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, paint);
     }
 
     public void h() {
@@ -251,7 +251,7 @@ public class Path {
                     Paint paint = new Paint();
                     paint.a(255, 0, 255, 0);
                     paint.a(2.0f);
-                    gameEngine.graphicsEngine2.a(((pathPoint.a * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().cameraBoundsMaxY, ((pathPoint.b * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().mapWidth, ((pathPoint2.a * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().cameraBoundsMaxY, ((pathPoint2.b * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().mapWidth, paint);
+                    gameEngine.renderGraphicsEngine.a(((pathPoint.a * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((pathPoint.b * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, ((pathPoint2.a * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((pathPoint2.b * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, paint);
                 }
             }
         }

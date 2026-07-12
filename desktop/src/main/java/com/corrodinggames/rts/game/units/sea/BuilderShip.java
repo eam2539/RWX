@@ -62,10 +62,10 @@ public class BuilderShip extends WaterUnit implements UnitPathPoints {
 
     public static void t_() {
         GameEngine gameEngine = GameEngine.getInstance();
-        b = gameEngine.graphicsEngine2.a(R.drawable.builder_ship);
-        a = gameEngine.graphicsEngine2.a(R.drawable.builder_ship_dead);
-        c = gameEngine.graphicsEngine2.a(R.drawable.builder_ship_turret);
-        e = PlayerTeam.getUnitCountByType(b);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.builder_ship);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.builder_ship_dead);
+        c = gameEngine.renderGraphicsEngine.a(R.drawable.builder_ship_turret);
+        e = PlayerTeam.getTeamColorTextures(b);
         d = attackUnit(b, b.m(), b.l());
     }
 
@@ -202,15 +202,15 @@ public class BuilderShip extends WaterUnit implements UnitPathPoints {
             float fE = this.movementLevels[0].speed / e(0);
             if (fE != 0.0f) {
                 PointF pointFE = E(0);
-                gameEngine.graphicsEngine2.i();
-                gameEngine.graphicsEngine2.b(pointFE.x - gameEngine.viewpointXSnapped, (pointFE.y - gameEngine.viewpointYSnapped) - this.posZ);
-                gameEngine.graphicsEngine2.a(fE, fE);
+                gameEngine.renderGraphicsEngine.i();
+                gameEngine.renderGraphicsEngine.b(pointFE.x - gameEngine.viewpointXSnapped, (pointFE.y - gameEngine.viewpointYSnapped) - this.posZ);
+                gameEngine.renderGraphicsEngine.a(fE, fE);
                 if (isCurrentCommandReclaim()) {
-                    gameEngine.graphicsEngine2.a(BuilderUnit.builderDechargeTexture, 0.0f, 0.0f, (Paint) null);
+                    gameEngine.renderGraphicsEngine.a(BuilderUnit.builderDechargeTexture, 0.0f, 0.0f, (Paint) null);
                 } else {
-                    gameEngine.graphicsEngine2.a(BuilderUnit.builderChargeTexture, 0.0f, 0.0f, (Paint) null);
+                    gameEngine.renderGraphicsEngine.a(BuilderUnit.builderChargeTexture, 0.0f, 0.0f, (Paint) null);
                 }
-                gameEngine.graphicsEngine2.j();
+                gameEngine.renderGraphicsEngine.j();
                 return true;
             }
             return true;

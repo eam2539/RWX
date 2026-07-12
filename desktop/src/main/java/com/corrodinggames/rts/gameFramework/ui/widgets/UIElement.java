@@ -40,7 +40,7 @@ public abstract class UIElement {
     }
 
     public GraphicsEngine d() {
-        return GameEngine.getInstance().graphicsEngine2;
+        return GameEngine.getInstance().renderGraphicsEngine;
     }
 
     public RectF a(RectF rectF, float f2, float f3) {

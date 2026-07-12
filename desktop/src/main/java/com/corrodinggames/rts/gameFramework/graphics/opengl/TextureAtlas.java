@@ -33,8 +33,8 @@ public class TextureAtlas {
     public void a(int i, int i2) {
         GameEngine gameEngine = GameEngine.getInstance();
         GameEngine.log("Creating BitmapOrTextureAlias: " + i + "x" + i2);
-        this.a = gameEngine.graphicsEngine2.a(i, i2, true);
-        this.b = gameEngine.graphicsEngine2.b(this.a);
+        this.a = gameEngine.renderGraphicsEngine.a(i, i2, true);
+        this.b = gameEngine.renderGraphicsEngine.b(this.a);
         this.c = new GamePaint();
         this.c.a(new TeamColorFilter(BlendMode.copy));
     }

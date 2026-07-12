@@ -186,7 +186,7 @@ public class EffectTemplate {
             }
             return effectCreateSmallExplosion;
         }
-        if (!this.createWhenZoomedOut && !gameEngine.mouseScreenX) {
+        if (!this.createWhenZoomedOut && !gameEngine.shouldDrawHighDetailEffects) {
             return null;
         }
         if (!this.createWhenOverLiquid && GameViewUtils.d(f, f2)) {
@@ -273,9 +273,9 @@ public class EffectTemplate {
                 int iB = (int) (Color.b(effectCreateEffectInternal.x) * f5);
                 int iC = (int) (Color.c(effectCreateEffectInternal.x) * f5);
                 int iD = (int) (Color.d(effectCreateEffectInternal.x) * f5);
-                int teamUnitCount = playerTeam.getTeamUnitCount();
-                effectCreateEffectInternal.x = Color.a(iA, Utility.distance((int) (iB + (Color.b(teamUnitCount) * this.teamColorRatio)), 0, 255), Utility.distance((int) (iC + (Color.c(teamUnitCount) * this.teamColorRatio)), 0, 255), Utility.distance((int) (iD + (Color.d(teamUnitCount) * this.teamColorRatio)), 0, 255));
-                if (GameEngine.isDesktop()) {
+                int teamColorArgb = playerTeam.getTeamColorArgb();
+                effectCreateEffectInternal.x = Color.a(iA, Utility.distance((int) (iB + (Color.b(teamColorArgb) * this.teamColorRatio)), 0, 255), Utility.distance((int) (iC + (Color.c(teamColorArgb) * this.teamColorRatio)), 0, 255), Utility.distance((int) (iD + (Color.d(teamColorArgb) * this.teamColorRatio)), 0, 255));
+                if (GameEngine.isAndroidPlatform()) {
                     effectCreateEffectInternal.B = new LightingColorFilter(effectCreateEffectInternal.x, 0);
                 }
             }
@@ -387,7 +387,7 @@ public class EffectTemplate {
         this.scaleFrom = iniFile.getFloat(str, "scaleFrom", Float.valueOf(this.scaleFrom)).floatValue();
         this.alpha = iniFile.getFloat(str, "alpha", Float.valueOf(this.alpha)).floatValue();
         this.color = iniFile.getColorAsInt(str, "color", Integer.valueOf(this.color)).intValue();
-        if (GameEngine.isDesktop() && this.color != 0 && this.color != -1) {
+        if (GameEngine.isAndroidPlatform() && this.color != 0 && this.color != -1) {
             this.cachedLightingColorFilter = new LightingColorFilter(this.color, 0);
         }
         this.teamColorRatio = iniFile.getFloat(str, "teamColorRatio", Float.valueOf(this.teamColorRatio)).floatValue();

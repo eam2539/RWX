@@ -75,8 +75,8 @@ public class TileAtlasCache {
     /* JADX INFO: renamed from: a */
     public void initializeAtlasTexture() {
         GameEngine gameEngine = GameEngine.getInstance();
-        this.atlasTexture = gameEngine.graphicsEngine2.b(20 * this.slotStridePixelsX, 20 * this.slotStridePixelsY, this.isAlphaAtlas);
-        this.atlasGraphics = gameEngine.graphicsEngine2.b(this.atlasTexture);
+        this.atlasTexture = gameEngine.renderGraphicsEngine.b(20 * this.slotStridePixelsX, 20 * this.slotStridePixelsY, this.isAlphaAtlas);
+        this.atlasGraphics = gameEngine.renderGraphicsEngine.b(this.atlasTexture);
         if (this.isAlphaAtlas) {
             this.atlasTexture.m = true;
         }

@@ -49,7 +49,7 @@ public class Texture {
         if (colorMode == ColorMode.hueShift) {
             return this.c;
         }
-        GameEngine.updatePaintTextSizeIfNeeded("getTeamImageCache coloringMode:" + colorMode);
+        GameEngine.logColored("getTeamImageCache coloringMode:" + colorMode);
         return this.a;
     }
 
@@ -63,7 +63,7 @@ public class Texture {
         } else if (colorMode == ColorMode.hueShift) {
             this.c = textureArr;
         } else {
-            GameEngine.updatePaintTextSizeIfNeeded("setTeamImageCache coloringMode:" + colorMode);
+            GameEngine.logColored("setTeamImageCache coloringMode:" + colorMode);
             this.a = textureArr;
         }
     }
@@ -128,7 +128,7 @@ public class Texture {
         texture.u = this.u;
     }
 
-    @Override // 
+    @Override //
     /* JADX INFO: renamed from: h, reason: merged with bridge method [inline-methods] */
     public Texture clone() {
         Texture texture = new Texture();
@@ -167,7 +167,7 @@ public class Texture {
     }
 
     public void j() {
-        if (this.k == null && GameEngine.isPausedStatic2 && !GameEngine.isIOSVersionStatic2) {
+        if (this.k == null && GameEngine.isNonAndroidVersion && !GameEngine.isJavaDesktopVersion) {
             return;
         }
         if (this.j == null) {
@@ -211,12 +211,12 @@ public class Texture {
             this.k = null;
         }
         if (this.w) {
-            GameEngine.updatePaintTextSizeIfNeeded("remove with keepInGPUMemory=true");
+            GameEngine.logColored("remove with keepInGPUMemory=true");
         }
     }
 
     public void p() {
-        if (this.k == null && GameEngine.isPausedStatic2 && !GameEngine.isAndroidVersionStatic2) {
+        if (this.k == null && GameEngine.isNonAndroidVersion && !GameEngine.isPCOrIOSVersion) {
             return;
         }
         if (this.j != null) {

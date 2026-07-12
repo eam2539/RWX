@@ -49,10 +49,10 @@ public final class NetworkEngine {
     public float j;
     public float k;
     public int m;
-    public String n;
-    public boolean o;
+    public String roomPassword;
+    public boolean requireActiveMods;
     public boolean p;
-    public boolean q;
+    public boolean publishToMasterServer;
     public boolean useMasterServer = true;
     public boolean s;
     public String u;
@@ -73,24 +73,24 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: H */
     public boolean isProxyController;
-    public Float K;
-    public String L;
-    public boolean N;
-    public int O;
-    public int P;
-    public int Q;
-    public int R;
+    public Float forcedStepRateOverride;
+    public String connectionQueryString;
+    public boolean quickResyncRequested;
+    public int stepRateSampleCount;
+    public int slowStepRateSampleCount;
+    public int commandFrameInterval;
+    public int commandFrameSendAhead;
 
     /* JADX INFO: renamed from: S */
     public String serverUuid;
-    public boolean Y;
-    public float Z;
-    boolean aa;
-    public float ab;
-    public float ac;
-    public boolean ad;
-    public float ae;
-    public boolean af;
+    public boolean frameUpdateBlocked;
+    public float allPlayersReadyCountdown;
+    boolean allPlayersReady;
+    public float allPlayersReadyWaitTimer;
+    public float allPlayersReadyReminderTimer;
+    public boolean catchupSpeedupActive;
+    public float catchupSpeedupTimer;
+    public boolean catchupFastForwardActive;
     public boolean ag;
 
     /* JADX INFO: renamed from: aj */
@@ -104,14 +104,14 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: an */
     public boolean syncChecksumSentForFrame;
-    public int ap;
-    public int aq;
-    public int ar;
-    public static boolean as;
-    long au;
-    public boolean av;
-    public GameInputStream aA;
-    public GameInputStream aB;
+    public int desyncCount;
+    public int desyncPassCount;
+    public int resyncSendOrReceiveCount;
+    public static boolean forceIgnoreDesync;
+    long playerUpdatePendingTimestamp;
+    public boolean gameSetupReceived;
+    public GameInputStream receivedSaveGameStream;
+    public GameInputStream receivedCustomMapStream;
 
     /* JADX INFO: renamed from: aD */
     Thread connectionAcceptorThread1;
@@ -155,29 +155,29 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: ba */
     public float returnToBattleroomDelaySeconds;
-    public boolean bb;
-    public boolean bc;
+    public boolean freeForAllMode;
+    public boolean startGameFailed;
     public boolean bd;
-    public boolean be;
+    public boolean gameEndedByServer;
     public boolean bf;
     public String bg;
-    public GameTeam bj;
-    public GameTeam bk;
-    float bn;
-    float bo;
-    int bp;
-    int bq;
+    public GameTeam spectatorGameTeam;
+    public GameTeam adminGameTeam;
+    float timeSinceLastResync;
+    float resyncDelayTimer;
+    int resyncAttemptCount;
+    int lastResyncTick;
 
     /* JADX INFO: renamed from: bs */
     public long totalBytesSent;
 
     /* JADX INFO: renamed from: bt */
     public long totalBytesReceived;
-    public boolean bx;
+    public boolean reconnectDialogShown;
 
     /* JADX INFO: renamed from: bA */
     static ArrayList engineInstances;
-    Timer bD;
+    Timer masterServerUpdateTimer;
 
     /* JADX INFO: renamed from: bF */
     SocketConnector socketConnector;
@@ -196,14 +196,14 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: t */
     public int udpPort = 5005;
-    public boolean v = false;
+    public boolean chatOnlyMode = false;
 
     /* JADX INFO: renamed from: w */
     public long nextUnitId = 1;
     public boolean x = false;
     private boolean bH = false;
-    public volatile boolean B = false;
-    public boolean F = false;
+    public volatile boolean networkGameActive = false;
+    public boolean singleplayerServer = false;
     public int I = 0;
 
     /* JADX INFO: renamed from: bI */
@@ -216,22 +216,22 @@ public final class NetworkEngine {
     public int U = -1;
     public int V = -1;
     public int W = Utility.getRandomIntInRange(1, 9000000);
-    public int X = 0;
+    public int nextBlockingFrame = 0;
 
     /* JADX INFO: renamed from: ah */
     public int lastSyncedTick = -1;
-    public int ai = 300;
+    public int checksumIntervalFrames = 300;
 
     /* JADX INFO: renamed from: am */
     public GameStateChecksum stateChecksum = new GameStateChecksum();
-    public boolean ao = true;
+    public boolean desyncReportingEnabled = true;
     float at = 0.0f;
-    public int aw = 5;
-    public int ax = 5;
+    public int currentUnitCap = 5;
+    public int maxUnitCap = 5;
 
     /* JADX INFO: renamed from: ay */
     public GameRoomSettings roomSettings = new GameRoomSettings();
-    public String az = null;
+    public String selectedMapPath = null;
 
     /* JADX INFO: renamed from: aC */
     public ChatLog chatLog = new ChatLog();
@@ -241,11 +241,11 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: aN */
     ConcurrentLinkedQueue recvQueue = new ConcurrentLinkedQueue();
-    volatile int aP = 1;
+    volatile int nextConnectionId = 1;
 
     /* JADX INFO: renamed from: aQ */
     Object sessionLock = new Object();
-    public boolean aX = false;
+    public boolean freeForAllModeChecked = false;
 
     /* JADX INFO: renamed from: aY */
     boolean returnToBattleroomPending = false;
@@ -258,21 +258,21 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: bi */
     public ConcurrentLinkedQueue<ServerInfo> discoveredServerList = new ConcurrentLinkedQueue();
-    public final Object bl = new Object();
-    public boolean bm = false;
-    boolean br = false;
-    boolean bu = false;
+    public final Object queuedDisconnectLock = new Object();
+    public boolean queuedDisconnectRequested = false;
+    boolean quickResyncCommandPending = false;
+    boolean pathfindingPauseActive = false;
 
     /* JADX INFO: renamed from: bv */
     public Socket socket = null;
 
     /* JADX INFO: renamed from: bw */
     public String serverAddress = null;
-    boolean by = false;
+    boolean networkClientIdMachineKeyChecked = false;
 
     /* JADX INFO: renamed from: bz */
     boolean registerConnectionSent = false;
-    boolean bB = false;
+    boolean pendingMultiplayerChatNotification = false;
 
     /* JADX INFO: renamed from: bC */
     final Object connectionLock = new Object();
@@ -285,7 +285,7 @@ public final class NetworkEngine {
     NetworkConnection localConnection = new NetworkConnection(this, null);
 
     /* JADX INFO: renamed from: a */
-    public BanEntry setCurrentStepRate(NetworkConnection networkConnection) {
+    public BanEntry getActiveBanForConnection(NetworkConnection networkConnection) {
         String ipAddress = networkConnection.getIpAddress();
         long jCurrentTimeMillis = System.currentTimeMillis();
         if (ipAddress == null) {
@@ -303,9 +303,9 @@ public final class NetworkEngine {
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean writeSyncHeader(NetworkConnection networkConnection, String str, int i) {
+    public boolean banConnection(NetworkConnection networkConnection, String str, int i) {
         if (networkConnection == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("Ban failed: No connection");
+            GameEngine.logColored("Ban failed: No connection");
             return false;
         }
         String ipAddress = networkConnection.getIpAddress();
@@ -318,7 +318,7 @@ public final class NetworkEngine {
         banEntry.b = System.currentTimeMillis() + ((long) (i * 1000));
         banEntry.c = str;
         synchronized (this.banList) {
-            applyProxyControl();
+            pruneExpiredBans();
             this.banList.add(banEntry);
         }
         networkConnection.logInfo("Banned " + ipAddress + " for " + i + "s");
@@ -326,14 +326,14 @@ public final class NetworkEngine {
     }
 
     /* JADX INFO: renamed from: a */
-    public void readSyncHeader() {
+    public void clearBans() {
         synchronized (this.banList) {
             this.banList.clear();
         }
     }
 
     /* JADX INFO: renamed from: b */
-    public void applyProxyControl() {
+    public void pruneExpiredBans() {
         synchronized (this.banList) {
             int i = 0;
             long jCurrentTimeMillis = System.currentTimeMillis();
@@ -392,19 +392,19 @@ public final class NetworkEngine {
         GameEngine gameEngine = GameEngine.getInstance();
         gameOutputStream.writeByte(0);
         this.roomSettings.writeToStream(gameOutputStream);
-        gameOutputStream.writeInt(gameEngine.currentTimeMillis);
-        gameOutputStream.writeInt(gameEngine.lastTimeMillis);
+        gameOutputStream.writeInt(gameEngine.currentUnitCap);
+        gameOutputStream.writeInt(gameEngine.maxUnitCap);
     }
 
     public void a(GameInputStream gameInputStream) throws IOException {
         GameEngine gameEngine = GameEngine.getInstance();
         gameInputStream.readByte();
         this.roomSettings.readFromStream(gameInputStream);
-        gameEngine.currentTimeMillis = gameInputStream.readInt();
-        gameEngine.lastTimeMillis = gameInputStream.readInt();
+        gameEngine.currentUnitCap = gameInputStream.readInt();
+        gameEngine.maxUnitCap = gameInputStream.readInt();
     }
 
-    public GameRoomSettings e() {
+    public GameRoomSettings getEditableRoomSettings() {
         GameRoomSettings gameRoomSettingsC;
         if (this.isServer) {
             gameRoomSettingsC = this.roomSettings;
@@ -417,11 +417,11 @@ public final class NetworkEngine {
         return gameRoomSettingsC;
     }
 
-    public void f() {
-        if (this.F) {
+    public void refreshAIDifficultyForTeams() {
+        if (this.singleplayerServer) {
             GameEngine.getInstance().settingsEngine.aiDifficulty = this.roomSettings.aiDifficulty;
         }
-        if (!this.isServer && !this.F) {
+        if (!this.isServer && !this.singleplayerServer) {
             return;
         }
         if (this.gameHasBeenStarted) {
@@ -434,7 +434,7 @@ public final class NetworkEngine {
                 }
             }
         }
-        aq();
+        updateAiTeamNames();
     }
 
     public void a(PlayerTeam playerTeam) {
@@ -463,9 +463,9 @@ public final class NetworkEngine {
 
     public void a(GameRoomSettings gameRoomSettings) {
         if (this.isServer) {
-            f();
-            P();
-            L();
+            refreshAIDifficultyForTeams();
+            markPlayerUpdatePending();
+            broadcastServerInfoToLargePacketConnections();
             MultiplayerBattleroomActivity.updateUI();
             return;
         }
@@ -643,7 +643,7 @@ public final class NetworkEngine {
     }
 
     public String l() {
-        return FileHelper.mapPath(this.az);
+        return FileHelper.mapPath(this.selectedMapPath);
     }
 
     public void m() {
@@ -703,7 +703,7 @@ public final class NetworkEngine {
                 Integer.parseInt(strArrSplit[4]);
                 GameEngine.log("[relay-debug] master get string room=" + str4 + " port=" + i + " needsPassword=" + z3 + " token=" + str3);
                 if (z3) {
-                    gameEngine.networkEngine.n = null;
+                    gameEngine.networkEngine.roomPassword = null;
                     final Object obj = new Object();
                     PasswordHandler passwordHandler2 = new PasswordHandler() { // from class: com.corrodinggames.rts.gameFramework.j.ad.1
                         @Override // com.corrodinggames.rts.gameFramework.network.PasswordHandler
@@ -712,9 +712,9 @@ public final class NetworkEngine {
                             GameEngine gameEngine2 = GameEngine.getInstance();
                             GameEngine.log("Entered password");
                             if (gameEngine2.networkEngine.isServer) {
-                                GameEngine.printLog("Cannot enter a password when we are a server");
+                                GameEngine.logErrorColored("Cannot enter a password when we are a server");
                             } else {
-                                gameEngine2.networkEngine.n = str5;
+                                gameEngine2.networkEngine.roomPassword = str5;
                             }
                             synchronized (obj) {
                                 obj.notify();
@@ -738,15 +738,15 @@ public final class NetworkEngine {
                             e.printStackTrace();
                         }
                     }
-                    if (gameEngine.networkEngine.n == null) {
-                        GameEngine.updatePaintTextSizeIfNeeded("No password entered");
+                    if (gameEngine.networkEngine.roomPassword == null) {
+                        GameEngine.logColored("No password entered");
                         throw new NetworkException();
                     }
                     GameEngine.log("Password has been entered");
                 }
                 String str5 = null;
                 if (z3) {
-                    str5 = gameEngine.networkEngine.n;
+                    str5 = gameEngine.networkEngine.roomPassword;
                     if (str5 == null) {
                         throw new IOException("This server requires a password but no password was provided");
                     }
@@ -802,7 +802,7 @@ public final class NetworkEngine {
             GameEngine.log("Converting connect string to: " + str6);
             strTrim = str6;
         }
-        gameEngine.networkEngine.L = null;
+        gameEngine.networkEngine.connectionQueryString = null;
         if (strTrim.contains("/") || strTrim.contains("\\")) {
             int iIndexOf = strTrim.indexOf("/");
             int iIndexOf2 = strTrim.indexOf("\\");
@@ -815,7 +815,7 @@ public final class NetworkEngine {
             int iMin = Utility.min(iIndexOf, iIndexOf2);
             String strTrim2 = strTrim.substring(iMin + 1).trim();
             if (!strTrim2.equals(VariableScope.nullOrMissingString)) {
-                gameEngine.networkEngine.L = strTrim2;
+                gameEngine.networkEngine.connectionQueryString = strTrim2;
             }
             strTrim = strTrim.substring(0, iMin);
         }
@@ -841,7 +841,7 @@ public final class NetworkEngine {
                 throw new IOException(str9);
             }
         }
-        if (!z && gameEngine.networkEngine.T()) {
+        if (!z && gameEngine.networkEngine.isUdpMultiplayerEnabled()) {
             z2 = true;
         }
         int i4 = 7000;
@@ -880,7 +880,7 @@ public final class NetworkEngine {
                 throw new IOException(str12, e6);
             }
         } catch (IllegalArgumentException e7) {
-            GameEngine.updatePaintTextSizeIfNeeded("IllegalArgumentException..Incorrect server format");
+            GameEngine.logColored("IllegalArgumentException..Incorrect server format");
             e7.printStackTrace();
             throw new IOException("Incorrect server format", e7);
         }
@@ -888,10 +888,10 @@ public final class NetworkEngine {
 
     public NetworkEngine() {
         this.localConnection.allowLargeIncomingPackets = true;
-        this.bj = new GameTeam(-3, false);
-        this.bj.teamName = "SPECTATOR";
-        this.bk = new GameTeam(-1, false);
-        this.bk.teamName = "ADMIN";
+        this.spectatorGameTeam = new GameTeam(-3, false);
+        this.spectatorGameTeam.teamName = "SPECTATOR";
+        this.adminGameTeam = new GameTeam(-1, false);
+        this.adminGameTeam.teamName = "ADMIN";
     }
 
     public void q()  {
@@ -909,61 +909,61 @@ public final class NetworkEngine {
         this.localPlayerTeam = null;
         this.p = false;
         this.totalBytesSent = System.currentTimeMillis();
-        this.X = 0;
+        this.nextBlockingFrame = 0;
         this.I = 0;
         this.nextUnitId = 1L;
         applyChangedSetup(1.0f, "new");
-        this.Z = 10.0f;
-        this.N = false;
-        this.Q = 10;
-        this.R = 0;
-        this.Y = false;
-        this.aa = false;
+        this.allPlayersReadyCountdown = 10.0f;
+        this.quickResyncRequested = false;
+        this.commandFrameInterval = 10;
+        this.commandFrameSendAhead = 0;
+        this.frameUpdateBlocked = false;
+        this.allPlayersReady = false;
         this.gamePaused = false;
         this.pausedOnDesync = false;
-        this.ab = 0.0f;
-        this.ac = 0.0f;
-        this.ad = false;
-        this.af = false;
+        this.allPlayersReadyWaitTimer = 0.0f;
+        this.allPlayersReadyReminderTimer = 0.0f;
+        this.catchupSpeedupActive = false;
+        this.catchupFastForwardActive = false;
         this.gameHasBeenStarted = false;
         this.returnToBattleroomPending = false;
         this.returnToBattleroomCountdownActive = false;
         this.returnToBattleroomDelaySeconds = 0.0f;
-        this.aX = false;
-        this.bb = false;
-        this.bc = false;
+        this.freeForAllModeChecked = false;
+        this.freeForAllMode = false;
+        this.startGameFailed = false;
         this.bd = false;
-        this.be = false;
+        this.gameEndedByServer = false;
         this.ag = false;
         this.lastSyncedTick = -1;
         this.stateChecksum.totalChecksum = 0L;
-        this.br = false;
+        this.quickResyncCommandPending = false;
         this.stateChecksum.resetFields();
         this.syncChecksumSentForFrame = false;
-        this.ao = true;
-        this.ap = 0;
-        this.aq = 0;
-        this.ar = 0;
+        this.desyncReportingEnabled = true;
+        this.desyncCount = 0;
+        this.desyncPassCount = 0;
+        this.resyncSendOrReceiveCount = 0;
         this.at = 0.0f;
-        this.bn = 0.0f;
-        this.bo = 0.0f;
-        this.bp = 0;
-        this.bq = -1000;
+        this.timeSinceLastResync = 0.0f;
+        this.resyncDelayTimer = 0.0f;
+        this.resyncAttemptCount = 0;
+        this.lastResyncTick = -1000;
         MasterServerAuth.minClientVersion = 55;
         MasterServerAuth.minServerVersion = 66;
     }
 
     public void a(boolean z)  {
-        this.B = false;
+        this.networkGameActive = false;
         this.isServer = false;
         this.f = null;
-        this.F = false;
+        this.singleplayerServer = false;
         this.D = false;
         this.E = null;
         this.x = false;
         this.isProxyController = false;
         this.G = false;
-        this.av = false;
+        this.gameSetupReceived = false;
         this.A = false;
         resetNetworkGameState();
         this.serverUuid = null;
@@ -972,12 +972,12 @@ public final class NetworkEngine {
         this.j = 0.0f;
         this.k = 0.0f;
         this.registerConnectionSent = false;
-        this.aB = null;
-        this.ax = GameEngine.getInstance().settingsEngine.teamUnitCapHostedGame;
-        if (this.ax < 1) {
-            this.ax = 1;
+        this.receivedCustomMapStream = null;
+        this.maxUnitCap = GameEngine.getInstance().settingsEngine.teamUnitCapHostedGame;
+        if (this.maxUnitCap < 1) {
+            this.maxUnitCap = 1;
         }
-        this.aw = this.ax;
+        this.currentUnitCap = this.maxUnitCap;
         this.roomSettings.startingUnits = 1;
         this.roomSettings.incomeMultiplier = 1.0f;
         this.roomSettings.noNukes = false;
@@ -989,7 +989,7 @@ public final class NetworkEngine {
         this.roomSettings.allowSpectators = true;
         this.roomSettings.roomLock = false;
         this.roomSettings.randomSeed = 0;
-        readSyncHeader();
+        clearBans();
         this.chatLog.c();
         GameEngine.getInstance().gameUI.clearMessages();
         if ("<CHAT ONLY>".equals(this.roomSettings.mapPath)) {
@@ -997,9 +997,9 @@ public final class NetworkEngine {
             this.roomSettings.resetToDefaults();
         }
         if (!z) {
-            PlayerTeam.staticInitTeamData();
+            PlayerTeam.resetTeamRegistry();
         }
-        CustomUnitConfigParser.enableAllCustomUnits(this.o);
+        CustomUnitConfigParser.enableAllCustomUnits(this.requireActiveMods);
     }
 
     public void t() {
@@ -1010,11 +1010,11 @@ public final class NetworkEngine {
     }
 
     public void u() {
-        synchronized (this.bl) {
-            if (this.B) {
-                this.bm = true;
+        synchronized (this.queuedDisconnectLock) {
+            if (this.networkGameActive) {
+                this.queuedDisconnectRequested = true;
                 try {
-                    this.bl.wait();
+                    this.queuedDisconnectLock.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -1026,7 +1026,7 @@ public final class NetworkEngine {
         this.sendQueue.remove(networkConnection);
     }
 
-    private synchronized void ay() {
+    private synchronized void removeDisconnectingConnections() {
         Iterator it = this.sendQueue.iterator();
         while (it.hasNext()) {
             if (((NetworkConnection) it.next()).isDisconnecting) {
@@ -1036,7 +1036,7 @@ public final class NetworkEngine {
     }
 
     void a(byte[] bArr, NetworkConnection networkConnection) {
-        if (!GameEngine.isDebug()) {
+        if (!GameEngine.isDedicatedServer()) {
             Log.d("RustedWarfare", "Ignoring incoming resync tagged as debug only");
             return;
         }
@@ -1057,8 +1057,8 @@ public final class NetworkEngine {
         }
     }
 
-    public void v() {
-        if (this.br) {
+    public void queueQuickResyncCommand() {
+        if (this.quickResyncCommandPending) {
             return;
         }
         GameEngine.log("Adding quick resync command");
@@ -1068,7 +1068,7 @@ public final class NetworkEngine {
         commandCreateCommand.isSystemAction = true;
         commandCreateCommand.systemActionType = 200;
         gameEngine.networkEngine.a(commandCreateCommand);
-        this.br = true;
+        this.quickResyncCommandPending = true;
     }
 
     public void w() {
@@ -1096,25 +1096,25 @@ public final class NetworkEngine {
             GameInputStream gameInputStream = new GameInputStream(byteArray);
             gameEngine.loadLevel("Game resync (quick)...", true);
             int i = gameEngine.currentTick;
-            int i2 = gameEngine.lastTick;
+            int i2 = gameEngine.gameTimeMillis;
             gameEngine.gameSaver.writeSaveToStream(gameInputStream, true, true, true);
             gameEngine.currentTick = i;
-            gameEngine.lastTick = i2;
-            this.X = gameEngine.currentTick + 1;
+            gameEngine.gameTimeMillis = i2;
+            this.nextBlockingFrame = gameEngine.currentTick + 1;
             this.ag = false;
-            this.lastSyncedTick = this.X + 1;
+            this.lastSyncedTick = this.nextBlockingFrame + 1;
             this.stateChecksum.totalChecksum = 0L;
             for (NetworkConnection networkConnection : this.sendQueue) {
                 networkConnection.isDirectServer = false;
             }
-            this.br = false;
-            this.ar++;
-            this.bn = 0.0f;
-            this.bo = 0.0f;
-            if (this.bp < 1) {
-                this.bp++;
+            this.quickResyncCommandPending = false;
+            this.resyncSendOrReceiveCount++;
+            this.timeSinceLastResync = 0.0f;
+            this.resyncDelayTimer = 0.0f;
+            if (this.resyncAttemptCount < 1) {
+                this.resyncAttemptCount++;
             }
-            this.bq = gameEngine.currentTick;
+            this.lastResyncTick = gameEngine.currentTick;
         } catch (IOException e2) {
             throw new RuntimeException(e2);
         }
@@ -1140,49 +1140,49 @@ public final class NetworkEngine {
         boolean z = false;
         boolean z2 = false;
         boolean z3 = false;
-        this.bn += f;
+        this.timeSinceLastResync += f;
         for (NetworkConnection networkConnection : this.sendQueue) {
             if (networkConnection.isForwarded) {
                 z = true;
             }
             if (networkConnection.isDirectServer) {
                 if (this.g) {
-                    GameEngine.log("desync_count:" + networkConnection.y + " lastResyncTimer:" + this.bn);
+                    GameEngine.log("desync_count:" + networkConnection.y + " lastResyncTimer:" + this.timeSinceLastResync);
                 }
-                if (networkConnection.y < 4 || this.bn > 3600.0f) {
+                if (networkConnection.y < 4 || this.timeSinceLastResync > 3600.0f) {
                     z3 = true;
                 }
             }
         }
         if (z3) {
-            this.bo += f;
-            if (c && this.bo > 5.0f) {
+            this.resyncDelayTimer += f;
+            if (c && this.resyncDelayTimer > 5.0f) {
                 z2 = true;
             }
-            if (this.bp == 0) {
-                if (this.bo > 60.0f) {
+            if (this.resyncAttemptCount == 0) {
+                if (this.resyncDelayTimer > 60.0f) {
                     z2 = true;
                 }
-            } else if (this.bp == 1) {
-                if (this.bo > 420.0f) {
+            } else if (this.resyncAttemptCount == 1) {
+                if (this.resyncDelayTimer > 420.0f) {
                     z2 = true;
                 }
-            } else if (this.bp == 2) {
-                if (this.bo > 3600.0f) {
+            } else if (this.resyncAttemptCount == 2) {
+                if (this.resyncDelayTimer > 3600.0f) {
                     z2 = true;
                 }
-            } else if (this.bp == 3 && this.bo > 14400.0f) {
+            } else if (this.resyncAttemptCount == 3 && this.resyncDelayTimer > 14400.0f) {
                 z2 = true;
             }
         }
-        if (as && z2) {
+        if (forceIgnoreDesync && z2) {
             GameEngine.log("disableDesyncFixing==true, running quick resync instead");
             z2 = false;
             z = true;
         }
         if (!z2 && z) {
             if (b) {
-                v();
+                queueQuickResyncCommand();
             } else {
                 z2 = true;
             }
@@ -1198,17 +1198,17 @@ public final class NetworkEngine {
                 }
             }
             j("Resyncing game for " + str + "...");
-            az();
+            resetResyncTracking();
             a(this.l, false, true);
         }
     }
 
-    private void az() {
+    private void resetResyncTracking() {
         GameEngine gameEngine = GameEngine.getInstance();
-        this.bn = 0.0f;
-        this.bo = 0.0f;
-        this.bp++;
-        this.bq = gameEngine.currentTick;
+        this.timeSinceLastResync = 0.0f;
+        this.resyncDelayTimer = 0.0f;
+        this.resyncAttemptCount++;
+        this.lastResyncTick = gameEngine.currentTick;
         for (NetworkConnection networkConnection : this.sendQueue) {
             networkConnection.isForwarded = false;
             networkConnection.isDirectServer = false;
@@ -1227,7 +1227,7 @@ public final class NetworkEngine {
         }
         this.sendQueue.clear();
         this.recvQueue.clear();
-        this.aP = 1;
+        this.nextConnectionId = 1;
         this.aO = false;
     }
 
@@ -1317,7 +1317,7 @@ public final class NetworkEngine {
     /* JADX INFO: renamed from: E */
     public int getChangeableRoomSettings() {
         int currentStepRate = 0 + getCurrentStepRate();
-        if (!GameEngine.isDebug()) {
+        if (!GameEngine.isDedicatedServer()) {
             currentStepRate++;
         }
         return currentStepRate;
@@ -1340,7 +1340,7 @@ public final class NetworkEngine {
         }
     }
 
-    public static void g(String str) {
+    public static void reportDesync(String str) {
         a(str, false);
     }
 
@@ -1352,16 +1352,16 @@ public final class NetworkEngine {
         String str2;
         NetworkEngine networkEngine = GameEngine.getInstance().networkEngine;
         String str3 = "desync:" + str;
-        GameEngine.updatePaintTextSizeIfNeeded(str3);
+        GameEngine.logColored(str3);
         GameEngine.printStackTrace();
-        networkEngine.ap++;
-        if (networkEngine.ao) {
-            if (networkEngine.ap > 2 || as) {
+        networkEngine.desyncCount++;
+        if (networkEngine.desyncReportingEnabled) {
+            if (networkEngine.desyncCount > 2 || forceIgnoreDesync) {
                 z = true;
             }
-            if (networkEngine.ap > 10) {
+            if (networkEngine.desyncCount > 10) {
                 str2 = "<suppressing desync errors>";
-                networkEngine.ao = false;
+                networkEngine.desyncReportingEnabled = false;
                 z = true;
             } else {
                 str2 = str3;
@@ -1369,7 +1369,7 @@ public final class NetworkEngine {
             if (z) {
                 str2 = "-i " + str2;
             }
-            networkEngine.m(str2);
+            networkEngine.sendChatMessage(str2);
         }
     }
 
@@ -1389,7 +1389,7 @@ public final class NetworkEngine {
 
     public void a(Command command) {
         GameEngine gameEngine = GameEngine.getInstance();
-        command.scheduledTick = this.X;
+        command.scheduledTick = this.nextBlockingFrame;
         command.prepareForNetworkTransfer();
         gameEngine.commandController.pendingCommands.add(command);
     }
@@ -1402,16 +1402,16 @@ public final class NetworkEngine {
         }
     }
 
-    public void H() {
+    public void showPlayerListPopup() {
         GameEngine gameEngine = GameEngine.getInstance();
         String str = VariableScope.nullOrMissingString;
-        for (PlayerTeam playerTeam : PlayerTeam.readTeamDataFromStream(true)) {
+        for (PlayerTeam playerTeam : PlayerTeam.getSortedTeams(true)) {
             if (playerTeam != null) {
                 String str2 = "unnamed";
                 if (playerTeam.teamName != null) {
                     str2 = playerTeam.teamName;
                 }
-                str = str + "•" + playerTeam.getTeamName().toLowerCase() + " [Team " + playerTeam.getTeamColorName() + "] - " + str2 + (" " + playerTeam.getTeamDisplayName()) + "\n";
+                str = str + "•" + playerTeam.getTeamColorDisplayName().toLowerCase() + " [Team " + playerTeam.getTeamSlotLabel() + "] - " + str2 + (" " + playerTeam.getPlayerListTeamSuffix()) + "\n";
             }
         }
         GameEngine.log("showPlayerListPopup(): Showing playlist messagebox.");
@@ -1438,48 +1438,48 @@ public final class NetworkEngine {
             getFogDescription();
             this.at = 0.0f;
         }
-        if (this.gameHasBeenStarted && !this.aX) {
-            this.aX = true;
+        if (this.gameHasBeenStarted && !this.freeForAllModeChecked) {
+            this.freeForAllModeChecked = true;
             int i = 0;
             int i2 = 0;
-            Iterator it = PlayerTeam.getAllTeams().iterator();
+            Iterator it = PlayerTeam.getTeamColorIds().iterator();
             while (it.hasNext()) {
-                int iUpdateNetworkTeamData = PlayerTeam.updateNetworkTeamData(((Integer) it.next()).intValue(), false);
-                if (iUpdateNetworkTeamData > i2) {
-                    i2 = iUpdateNetworkTeamData;
+                int playerCount = PlayerTeam.countPlayersWithTeamColor(((Integer) it.next()).intValue(), false);
+                if (playerCount > i2) {
+                    i2 = playerCount;
                 }
                 i++;
             }
             if (i > 2 && i2 <= 1) {
-                this.bb = true;
+                this.freeForAllMode = true;
             }
         }
         if (!this.isServer && !this.bH) {
-            ad();
+            sendClientStatusPacket();
             this.bH = true;
         }
         if (this.isServer) {
-            if (!this.aa && this.gameHasBeenStarted) {
+            if (!this.allPlayersReady && this.gameHasBeenStarted) {
                 if (a(false, 0)) {
-                    this.Z = Utility.moveTowardsZero(this.Z, f);
-                    if (this.Z == 0.0f) {
-                        this.aa = true;
+                    this.allPlayersReadyCountdown = Utility.moveTowardsZero(this.allPlayersReadyCountdown, f);
+                    if (this.allPlayersReadyCountdown == 0.0f) {
+                        this.allPlayersReady = true;
                         a(VariableScope.nullOrMissingString, "<All players ready>");
                         this.callbacks.onAllPlayersReady();
                     }
                 } else {
-                    this.ab += f;
-                    this.ac += f;
-                    if (this.ab > 900.0f) {
-                        this.aa = true;
+                    this.allPlayersReadyWaitTimer += f;
+                    this.allPlayersReadyReminderTimer += f;
+                    if (this.allPlayersReadyWaitTimer > 900.0f) {
+                        this.allPlayersReady = true;
                         a(VariableScope.nullOrMissingString, "Starting game without all players ready!");
-                    } else if (this.ac > 180.0f) {
-                        this.ac = 0.0f;
-                        a(true, (int) ((900.0f - this.ab) / 60.0f));
+                    } else if (this.allPlayersReadyReminderTimer > 180.0f) {
+                        this.allPlayersReadyReminderTimer = 0.0f;
+                        a(true, (int) ((900.0f - this.allPlayersReadyWaitTimer) / 60.0f));
                     }
                 }
             }
-            if (this.aa) {
+            if (this.allPlayersReady) {
                 boolean z = false;
                 if (this.pausedOnDesync) {
                     z = true;
@@ -1487,29 +1487,29 @@ public final class NetworkEngine {
                 if (this.gamePaused) {
                     z = true;
                 }
-                if (gameEngine.currentTick >= this.X - this.R && !z) {
-                    int i3 = this.X + this.Q;
-                    this.O++;
+                if (gameEngine.currentTick >= this.nextBlockingFrame - this.commandFrameSendAhead && !z) {
+                    int i3 = this.nextBlockingFrame + this.commandFrameInterval;
+                    this.stepRateSampleCount++;
                     boolean z2 = false;
                     for (int i4 = 0; i4 < PlayerTeam.TEAM_NEUTRAL; i4++) {
                         PlayerTeam playerTeamK = PlayerTeam.k(i4);
-                        if (playerTeamK != null && playerTeamK.teamColorIndex != 0 && !playerTeamK.isTeamActiveCheck() && playerTeamK.teamColorIndex < 40) {
+                        if (playerTeamK != null && playerTeamK.teamColorIndex != 0 && !playerTeamK.isTeamDisconnected() && playerTeamK.teamColorIndex < 40) {
                             z2 = true;
                         }
                     }
-                    if (gameEngine.getFps() != 0 && gameEngine.getFps() < 40 && !GameEngine.isDebug()) {
+                    if (gameEngine.getFps() != 0 && gameEngine.getFps() < 40 && !GameEngine.isDedicatedServer()) {
                         z2 = true;
                     }
                     if (z2) {
-                        this.P++;
+                        this.slowStepRateSampleCount++;
                     }
-                    if (this.O > 8) {
+                    if (this.stepRateSampleCount > 8) {
                         float fFloatValue = 1.0f;
-                        if (this.P > 4) {
+                        if (this.slowStepRateSampleCount > 4) {
                             fFloatValue = 2.0f;
                         }
-                        if (this.K != null) {
-                            fFloatValue = this.K.floatValue();
+                        if (this.forcedStepRateOverride != null) {
+                            fFloatValue = this.forcedStepRateOverride.floatValue();
                         }
                         if (fFloatValue != getDifficultyString()) {
                             GameEngine.log("Changing step rate to " + fFloatValue);
@@ -1519,8 +1519,8 @@ public final class NetworkEngine {
                             commandCreateCommand.gameSpeedChange = fFloatValue;
                             a(commandCreateCommand);
                         }
-                        this.O = 0;
-                        this.P = 0;
+                        this.stepRateSampleCount = 0;
+                        this.slowStepRateSampleCount = 0;
                     }
                     GameOutputStream gameOutputStream = new GameOutputStream();
                     try {
@@ -1528,20 +1528,20 @@ public final class NetworkEngine {
                         int i5 = 0;
                         Iterator it2 = gameEngine.commandController.pendingCommands.iterator();
                         while (it2.hasNext()) {
-                            if (((Command) it2.next()).scheduledTick == this.X) {
+                            if (((Command) it2.next()).scheduledTick == this.nextBlockingFrame) {
                                 i5++;
                             }
                         }
                         gameOutputStream.writeInt(i5);
                         for (Command command : gameEngine.commandController.pendingCommands) {
-                            if (command.scheduledTick == this.X) {
+                            if (command.scheduledTick == this.nextBlockingFrame) {
                                 command.serializeCommand(gameOutputStream);
                             }
                         }
                         PacketData packetDataBuildPacketData = gameOutputStream.buildPacketData(10);
                         packetDataBuildPacketData.isUrgent = true;
                         d(packetDataBuildPacketData);
-                        this.X = i3;
+                        this.nextBlockingFrame = i3;
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -1586,7 +1586,7 @@ public final class NetworkEngine {
             for (Command command4 : gameEngine.commandController.executedCommands) {
                 if (!command4.isSystemCommand()) {
                     if (!command4.prepareAndValidateCommand()) {
-                        g("Skipped command issued from server");
+                        reportDesync("Skipped command issued from server");
                     } else {
                         command4.debugPrintCommand();
                         a(command4);
@@ -1609,32 +1609,32 @@ public final class NetworkEngine {
                         message = "IO error";
                     }
                     networkConnection.handleRemoteDisconnect(message);
-                    g("IO error on processGamePacket for " + networkConnection.getPlayerDisplayName());
+                    reportDesync("IO error on processGamePacket for " + networkConnection.getPlayerDisplayName());
                 }
                 GameEngine.log("Error on processGamePacket ip:" + displayIpAddress, (Throwable) e3);
             }
         }
         if (this.isServer) {
-            if (!this.B) {
+            if (!this.networkGameActive) {
                 GameEngine.log("Skipping server updates, not networked");
             } else {
-                ay();
+                removeDisconnectingConnections();
                 if (!this.pauseOnDesyncEnabled) {
                     updateDesyncResyncTimer(f);
                 }
             }
         }
-        if (this.B) {
+        if (this.networkGameActive) {
             if (this.gamePaused) {
                 gameEngine.gameUI.showMessageWithPriority("Game paused.", 100);
             } else {
                 gameEngine.gameUI.showInfoMessage("Game paused.");
             }
         }
-        if (gameEngine.currentTick < this.X) {
-            this.Y = false;
+        if (gameEngine.currentTick < this.nextBlockingFrame) {
+            this.frameUpdateBlocked = false;
         }
-        if (this.bm) {
+        if (this.queuedDisconnectRequested) {
             disconnectNetworking("queDisconnect");
         }
     }
@@ -1642,14 +1642,14 @@ public final class NetworkEngine {
     public void b(float f) {
         NetworkConnection networkConnectionW;
         GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine != null && !this.isServer && this.B) {
+        if (gameEngine != null && !this.isServer && this.networkGameActive) {
             boolean z = false;
             for (NetworkConnection networkConnection : this.sendQueue) {
                 if (networkConnection.allowLargeIncomingPackets && !networkConnection.isDisconnecting) {
                     z = true;
                 }
             }
-            if (this.be && n()) {
+            if (this.gameEndedByServer && n()) {
                 gameEngine.gameUI.showMediumPriorityMessage("Game ended by server.");
                 MultiplayerBattleroomActivity.updateUI();
             } else if (!z && n()) {
@@ -1657,7 +1657,7 @@ public final class NetworkEngine {
                 MultiplayerBattleroomActivity.updateUI();
             }
             if (z) {
-                if ((this.Y || this.totalBytesSent + 1000 < System.currentTimeMillis()) && !this.isServer && (networkConnectionW = W()) != null && networkConnectionW.bytesReadTotalCurrentPacket > 20000) {
+                if ((this.frameUpdateBlocked || this.totalBytesSent + 1000 < System.currentTimeMillis()) && !this.isServer && (networkConnectionW = getActiveServerConnection()) != null && networkConnectionW.bytesReadTotalCurrentPacket > 20000) {
                     String str = "Receiving network data: " + networkConnectionW.bytesReadSoFar + "/" + networkConnectionW.bytesReadTotalCurrentPacket;
                     GameEngine.log(str);
                     gameEngine.gameUI.showDebugMessage(str);
@@ -1675,15 +1675,15 @@ public final class NetworkEngine {
     public void update(float delta) throws IOException {
         GameEngine gameEngine = GameEngine.getInstance();
         this.totalBytesSent = System.currentTimeMillis();
-        if (this.B && (this.lastSyncedTick + this.ai < gameEngine.currentTick || this.lastSyncedTick == -1)) {
+        if (this.networkGameActive && (this.lastSyncedTick + this.checksumIntervalFrames < gameEngine.currentTick || this.lastSyncedTick == -1)) {
             resetSyncChecksumState();
             gameEngine.replayEngine.a(this.stateChecksum);
         }
-        if ((this.B || gameEngine.replayEngine.j()) && this.N) {
-            this.N = false;
+        if ((this.networkGameActive || gameEngine.replayEngine.j()) && this.quickResyncRequested) {
+            this.quickResyncRequested = false;
             w();
         }
-        if (this.B && this.isServer && !this.syncChecksumSentForFrame && this.lastSyncedTick + (this.ai / 2) < gameEngine.currentTick && this.lastSyncedTick != -1) {
+        if (this.networkGameActive && this.isServer && !this.syncChecksumSentForFrame && this.lastSyncedTick + (this.checksumIntervalFrames / 2) < gameEngine.currentTick && this.lastSyncedTick != -1) {
             try {
                 GameOutputStream gameOutputStream = new GameOutputStream();
                 gameOutputStream.writeInt(this.lastSyncedTick);
@@ -1704,32 +1704,32 @@ public final class NetworkEngine {
         }
     }
 
-    public boolean I() {
+    public boolean shouldGameBePausedForPathfinding() {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.pathfindingEngine.e()) {
-            if (!this.bu) {
+            if (!this.pathfindingPauseActive) {
                 GameEngine.log("shouldGameBePaused: isGoingToBlockThisFrame()==true: " + gameEngine.pathfindingEngine.f());
             }
-            this.bu = true;
+            this.pathfindingPauseActive = true;
             return true;
         }
-        if (this.bu) {
+        if (this.pathfindingPauseActive) {
             GameEngine.log("shouldGameBePaused: isGoingToBlockThisFrame()==false");
         }
-        this.bu = false;
+        this.pathfindingPauseActive = false;
         return false;
     }
 
     public void a(float f, boolean z) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine.currentTick >= this.X) {
-            if (gameEngine.currentTick > this.X) {
-                throw new RuntimeException("game frame:" + gameEngine.currentTick + " is greater then nest step:" + this.X);
+        if (gameEngine.currentTick >= this.nextBlockingFrame) {
+            if (gameEngine.currentTick > this.nextBlockingFrame) {
+                throw new RuntimeException("game frame:" + gameEngine.currentTick + " is greater then nest step:" + this.nextBlockingFrame);
             }
-            this.Y = true;
+            this.frameUpdateBlocked = true;
         }
-        if (z && I()) {
-            this.Y = true;
+        if (z && shouldGameBePausedForPathfinding()) {
+            this.frameUpdateBlocked = true;
         }
     }
 
@@ -1738,7 +1738,7 @@ public final class NetworkEngine {
         GameEngine gameEngine = GameEngine.getInstance();
         GameEngine.log("Disconnect: " + str);
         if (this.isServer) {
-            ar();
+            stopMasterServerUpdateTimer();
             if (this.useMasterServer) {
                 MasterServerClient.removeServerAsync();
             }
@@ -1777,11 +1777,11 @@ public final class NetworkEngine {
         }
         q(str);
         DisabledSteamEngine.a().j();
-        synchronized (this.bl) {
-            this.B = false;
+        synchronized (this.queuedDisconnectLock) {
+            this.networkGameActive = false;
             this.isServer = false;
             this.useMasterServer = true;
-            this.F = false;
+            this.singleplayerServer = false;
             this.f = null;
             try {
                 wait(50L);
@@ -1791,9 +1791,9 @@ public final class NetworkEngine {
             this.gameHasBeenStarted = false;
             gameEngine.replayEngine.e();
             gameEngine.stopAndReset();
-            am();
-            this.bm = false;
-            this.bl.notifyAll();
+            updateMultiplayerNotifications();
+            this.queuedDisconnectRequested = false;
+            this.queuedDisconnectLock.notifyAll();
         }
     }
 
@@ -1824,14 +1824,14 @@ public final class NetworkEngine {
                     int i2 = gameInputStream.readInt();
                     for (int i3 = 0; i3 < i2; i3++) {
                         Command commandCreateCommand = gameEngine.commandController.createCommand();
-                        commandCreateCommand.scheduledTick = this.X;
+                        commandCreateCommand.scheduledTick = this.nextBlockingFrame;
                         commandCreateCommand.deserializeCommand(gameInputStream);
                         a(commandCreateCommand);
                     }
-                    if (i < this.X) {
-                        g("New nextBlockingFrame:" + i + " is smaller than current step:" + this.X);
+                    if (i < this.nextBlockingFrame) {
+                        reportDesync("New nextBlockingFrame:" + i + " is smaller than current step:" + this.nextBlockingFrame);
                     }
-                    this.X = i;
+                    this.nextBlockingFrame = i;
                 }
                 break;
             case 20:
@@ -1854,9 +1854,9 @@ public final class NetworkEngine {
                                 commandCreateCommand2.isSystemAction = false;
                             }
                             if (commandCreateCommand2.getTeam() == null) {
-                                g("Invalid command from '" + gameTeam.teamName + "', no team found");
+                                reportDesync("Invalid command from '" + gameTeam.teamName + "', no team found");
                             } else if (!commandCreateCommand2.prepareAndValidateCommand()) {
-                                g("Ignored command from '" + gameTeam.teamName + "', check failed");
+                                reportDesync("Ignored command from '" + gameTeam.teamName + "', check failed");
                             } else {
                                 a(commandCreateCommand2);
                             }
@@ -1887,15 +1887,15 @@ public final class NetworkEngine {
                         gameOutputStream.writeLong(this.stateChecksum.totalChecksum);
                         boolean z = false;
                         if (j != this.stateChecksum.totalChecksum) {
-                            g("Checksum doesn't match. Got:" + j + " expected:" + this.stateChecksum.totalChecksum);
+                            reportDesync("Checksum doesn't match. Got:" + j + " expected:" + this.stateChecksum.totalChecksum);
                             z = true;
                             GameEngine.log("--- Desync for frame: " + i4 + " ---");
-                            Iterator it = PlayerTeam.addEnergy().iterator();
+                            Iterator it = PlayerTeam.getTeams().iterator();
                             while (it.hasNext()) {
-                                ((PlayerTeam) it.next()).isTeamDefeatedCheck();
+                                ((PlayerTeam) it.next()).hasTeamStatsCacheMismatch();
                             }
                         } else {
-                            this.aq++;
+                            this.desyncPassCount++;
                         }
                         int i5 = gameInputStream3.readInt();
                         if (i5 != this.stateChecksum.fields.size()) {
@@ -1909,7 +1909,7 @@ public final class NetworkEngine {
                             gameOutputStream.writeLong(j2);
                             gameOutputStream.writeLong(checksumField.value);
                             if (j2 != checksumField.value && checksumField.includeInTotalChecksum) {
-                                g("[" + i4 + "] check(" + checksumField.label + "): " + j2 + "!=" + checksumField.value);
+                                reportDesync("[" + i4 + "] check(" + checksumField.label + "): " + j2 + "!=" + checksumField.value);
                                 z = true;
                             }
                         }
@@ -1943,13 +1943,13 @@ public final class NetworkEngine {
                             long j3 = gameInputStream4.readLong();
                             long j4 = gameInputStream4.readLong();
                             if (j3 != j4) {
-                                GameEngine.updatePaintTextSizeIfNeeded(checksumField2.label + " Checksum [" + i6 + "]. server:" + j3 + " client:" + j4);
+                                GameEngine.logColored(checksumField2.label + " Checksum [" + i6 + "]. server:" + j3 + " client:" + j4);
                             }
                         }
                         gameInputStream4.d("checkList");
                         boolean z2 = gameInputStream4.readBoolean();
-                        if (this.bq >= i6) {
-                            d("Not marking desync, already resynced before frame: " + this.bq + "<=" + i6);
+                        if (this.lastResyncTick >= i6) {
+                            d("Not marking desync, already resynced before frame: " + this.lastResyncTick + "<=" + i6);
                             break;
                         } else {
                             if (!networkConnection3.isDirectServer && z2) {
@@ -1965,7 +1965,7 @@ public final class NetworkEngine {
                             } else {
                                 GameEngine.log("client:" + networkConnection3.getPlayerDisplayName() + " desync [" + i6 + "]");
                                 if (this.pauseOnDesyncEnabled && !this.pausedOnDesync) {
-                                    g("pauseOnDesync is active, pausing");
+                                    reportDesync("pauseOnDesync is active, pausing");
                                     this.pausedOnDesync = true;
                                     break;
                                 }
@@ -2014,13 +2014,13 @@ public final class NetworkEngine {
                         GameInputStream gameInputStream6 = new GameInputStream(bArrC);
                         gameEngine.loadLevel("Resyncing game from server...", true);
                         gameEngine.gameSaver.writeSaveToStream(gameInputStream6, true, true, true);
-                        gameEngine.clearLevelConfig();
-                        this.ar++;
+                        gameEngine.clearCurrentLoadingStatus();
+                        this.resyncSendOrReceiveCount++;
                         gameEngine.currentTick = i8;
-                        gameEngine.lastTick = i9;
-                        this.X = i8 + 1;
+                        gameEngine.gameTimeMillis = i9;
+                        this.nextBlockingFrame = i8 + 1;
                         this.ag = false;
-                        this.lastSyncedTick = this.X + 1;
+                        this.lastSyncedTick = this.nextBlockingFrame + 1;
                         this.stateChecksum.totalChecksum = 0L;
                         if (f < 0.1d) {
                             a("resync setCurrentStepRate:" + f + " is too small", true);
@@ -2078,7 +2078,7 @@ public final class NetworkEngine {
         GameEngine.getInstance().gameUI.interfaceRenderer.m();
     }
 
-    public void K() {
+    public void closeBattleroom() {
         b((String) null, (String) null);
     }
 
@@ -2088,7 +2088,7 @@ public final class NetworkEngine {
         this.callbacks.d();
     }
 
-    public synchronized void L() {
+    public synchronized void broadcastServerInfoToLargePacketConnections() {
         for (NetworkConnection networkConnection : this.sendQueue) {
             if (networkConnection.allowLargeIncomingPackets) {
                 c(networkConnection);
@@ -2106,7 +2106,7 @@ public final class NetworkEngine {
             gameOutputStream.writeStringUTF("com.corrodinggames.rts");
             gameOutputStream.writeInt(this.e);
             gameOutputStream.writeEnumOrdinal(this.roomSettings.gameModeType);
-            if (this.v) {
+            if (this.chatOnlyMode) {
                 gameOutputStream.writeStringUTF("<CHAT ONLY>");
             } else {
                 gameOutputStream.writeStringUTF(this.roomSettings.mapPath == null ? "<NULL>" : FileHelper.mapPath(this.roomSettings.mapPath));
@@ -2118,13 +2118,13 @@ public final class NetworkEngine {
             gameOutputStream.writeByte(8);
             gameOutputStream.writeBoolean(this.callbacks.a(networkConnection));
             gameOutputStream.writeBoolean(this.callbacks.b(networkConnection));
-            gameOutputStream.writeInt(this.aw);
-            gameOutputStream.writeInt(this.ax);
+            gameOutputStream.writeInt(this.currentUnitCap);
+            gameOutputStream.writeInt(this.maxUnitCap);
             gameOutputStream.writeInt(this.roomSettings.startingUnits);
             gameOutputStream.writeFloat(this.roomSettings.incomeMultiplier);
             gameOutputStream.writeBoolean(this.roomSettings.noNukes);
             gameOutputStream.writeBoolean(this.roomSettings.unknown);
-            if (this.v) {
+            if (this.chatOnlyMode) {
                 gameOutputStream.writeBoolean(false);
             } else {
                 gameOutputStream.writeBoolean(true);
@@ -2172,41 +2172,41 @@ public final class NetworkEngine {
         }
     }
 
-    public void M() {
+    public void refreshTeamSortAndAiGroups() {
         if (this.isServer) {
             for (int i = 0; i < PlayerTeam.TEAM_ENEMIES; i++) {
                 PlayerTeam playerTeamK = PlayerTeam.k(i);
                 if (playerTeamK != null) {
-                    if (this.v) {
+                    if (this.chatOnlyMode) {
                         playerTeamK.teamSortIndex = 0;
-                    } else if (playerTeamK.addCredits()) {
+                    } else if (playerTeamK.isSpectatorTeamColor()) {
                         playerTeamK.teamSortIndex = 100;
                     } else {
                         playerTeamK.teamSortIndex = playerTeamK.teamColorId;
                     }
-                    if (playerTeamK.addCredits()) {
-                        playerTeamK.teamAIGroupOverride = -1;
+                    if (playerTeamK.isSpectatorTeamColor()) {
+                        playerTeamK.assignedTeamColorIndex = -1;
                     } else {
-                        int teamNetworkId = playerTeamK.getTeamNetworkId();
-                        if (playerTeamK.teamAIControlOverride != null) {
-                            teamNetworkId = playerTeamK.teamAIControlOverride.intValue();
-                        } else if (a(teamNetworkId, (PlayerTeam) null)) {
-                            teamNetworkId = -1;
+                        int teamColorIndex = playerTeamK.getDefaultTeamColorIndex();
+                        if (playerTeamK.playerColorOverride != null) {
+                            teamColorIndex = playerTeamK.playerColorOverride.intValue();
+                        } else if (a(teamColorIndex, (PlayerTeam) null)) {
+                            teamColorIndex = -1;
                         }
-                        playerTeamK.teamAIGroupOverride = teamNetworkId;
+                        playerTeamK.assignedTeamColorIndex = teamColorIndex;
                     }
                 }
             }
             for (int i2 = 0; i2 < PlayerTeam.TEAM_ENEMIES; i2++) {
                 PlayerTeam playerTeamK2 = PlayerTeam.k(i2);
-                if (playerTeamK2 != null && playerTeamK2.teamAIGroupOverride == -1 && !playerTeamK2.addCredits()) {
-                    playerTeamK2.teamAIGroupOverride = N();
+                if (playerTeamK2 != null && playerTeamK2.assignedTeamColorIndex == -1 && !playerTeamK2.isSpectatorTeamColor()) {
+                    playerTeamK2.assignedTeamColorIndex = findUnusedTeamColorIndex();
                 }
             }
         }
     }
 
-    public int N() {
+    public int findUnusedTeamColorIndex() {
         for (int i = 0; i < 10; i++) {
             if (!f(i)) {
                 return i;
@@ -2218,7 +2218,7 @@ public final class NetworkEngine {
     public boolean f(int i) {
         for (int i2 = 0; i2 < PlayerTeam.TEAM_ENEMIES; i2++) {
             PlayerTeam playerTeamK = PlayerTeam.k(i2);
-            if (playerTeamK != null && playerTeamK.teamAIGroupOverride == i && !playerTeamK.addCredits()) {
+            if (playerTeamK != null && playerTeamK.assignedTeamColorIndex == i && !playerTeamK.isSpectatorTeamColor()) {
                 return true;
             }
         }
@@ -2228,31 +2228,31 @@ public final class NetworkEngine {
     public boolean a(int i, PlayerTeam playerTeam) {
         for (int i2 = 0; i2 < PlayerTeam.TEAM_ENEMIES; i2++) {
             PlayerTeam playerTeamK = PlayerTeam.k(i2);
-            if (playerTeamK != null && playerTeamK != playerTeam && playerTeamK.teamAIControlOverride != null && playerTeamK.teamAIControlOverride.intValue() == i && !playerTeamK.addCredits()) {
+            if (playerTeamK != null && playerTeamK != playerTeam && playerTeamK.playerColorOverride != null && playerTeamK.playerColorOverride.intValue() == i && !playerTeamK.isSpectatorTeamColor()) {
                 return true;
             }
         }
         return false;
     }
 
-    public void O() {
+    public void updateTeamConnectionStatuses() {
         if (this.isServer) {
             long jCurrentTimeMillis = System.currentTimeMillis();
-            int i = GameEngine.getInstance().lastTick;
+            int i = GameEngine.getInstance().gameTimeMillis;
             if (this.localPlayerTeam != null && !this.D) {
                 this.localPlayerTeam.teamNetworkId = -99;
                 this.localPlayerTeam.teamLastPingTime = jCurrentTimeMillis;
             }
-            M();
+            refreshTeamSortAndAiGroups();
             for (int i2 = 0; i2 < PlayerTeam.TEAM_NEUTRAL; i2++) {
                 PlayerTeam playerTeamK = PlayerTeam.k(i2);
                 if (playerTeamK != null) {
-                    playerTeamK.getResourceAmount(this.localPlayerTeam == playerTeamK);
+                    playerTeamK.setHostTeam(this.localPlayerTeam == playerTeamK);
                     if (!this.gameHasBeenStarted) {
                     }
-                    if (this.gameHasBeenStarted && !this.F && !playerTeamK.isTeamSpectator) {
+                    if (this.gameHasBeenStarted && !this.singleplayerServer && !playerTeamK.isTeamSpectator) {
                         boolean z = false;
-                        if (playerTeamK.isTeamActiveCheck()) {
+                        if (playerTeamK.isTeamDisconnected()) {
                             z = true;
                         }
                         long j = 60000;
@@ -2260,7 +2260,7 @@ public final class NetworkEngine {
                             j = 160000;
                         }
                         boolean z2 = false;
-                        if (this.aa) {
+                        if (this.allPlayersReady) {
                             if (playerTeamK.teamLastConnectionTime == -1) {
                                 playerTeamK.teamLastConnectionTime = jCurrentTimeMillis;
                                 playerTeamK.teamPingCount = i;
@@ -2279,19 +2279,19 @@ public final class NetworkEngine {
                         if (z2) {
                             z = true;
                             if (!playerTeamK.isTeamAutoStart) {
-                                if (!(playerTeamK.isTeamWipedOut || playerTeamK.isTeamDefeatedTech || playerTeamK.isTeamNetworkActive || playerTeamK.addCredits())) {
+                                if (!(playerTeamK.isTeamWipedOut || playerTeamK.isTeamDefeatedTech || playerTeamK.isTeamNetworkActive || playerTeamK.isSpectatorTeamColor())) {
                                     playerTeamK.isTeamAutoStart = true;
                                 }
                             }
                         }
                         if (playerTeamK.isTeamNetworkActive != z) {
-                            if (z && !playerTeamK.isTeamWipedOut && !playerTeamK.isTeamDefeatedTech && !playerTeamK.isTeamConnectionActive && !playerTeamK.addCredits()) {
+                            if (z && !playerTeamK.isTeamWipedOut && !playerTeamK.isTeamDefeatedTech && !playerTeamK.isTeamConnectionActive && !playerTeamK.isSpectatorTeamColor()) {
                                 String str = "-t [Sharing control due to disconnect]";
                                 if (z2) {
                                     str = "-t [Sharing control due to afk]";
                                 }
                                 GameEngine.log(playerTeamK.teamName + " - " + str);
-                                if (PlayerTeam.updateNetworkTeamData(playerTeamK.teamColorId, true) > 1) {
+                                if (PlayerTeam.countPlayersWithTeamColor(playerTeamK.teamColorId, true) > 1) {
                                     a((NetworkConnection) null, playerTeamK, playerTeamK.teamName, str);
                                 }
                             }
@@ -2303,14 +2303,14 @@ public final class NetworkEngine {
         }
     }
 
-    public void P() {
-        if (this.au == 0) {
-            this.au = System.currentTimeMillis();
+    public void markPlayerUpdatePending() {
+        if (this.playerUpdatePendingTimestamp == 0) {
+            this.playerUpdatePendingTimestamp = System.currentTimeMillis();
         }
     }
 
-    public void Q() {
-        this.au = 0L;
+    public void sendPlayerUpdateNow() {
+        this.playerUpdatePendingTimestamp = 0L;
         e((NetworkConnection) null);
     }
 
@@ -2319,7 +2319,7 @@ public final class NetworkEngine {
             d("sendUpdatePlayer: we are not a server!");
             return;
         }
-        O();
+        updateTeamConnectionStatuses();
         for (NetworkConnection networkConnection2 : this.sendQueue) {
             if (networkConnection2.allowLargeIncomingPackets) {
                 GameOutputStream gameOutputStream = new GameOutputStream(networkConnection2.E);
@@ -2340,7 +2340,7 @@ public final class NetworkEngine {
                         gameOutputStream.beginBlockInternal("teams", z2);
                     } else {
                         i = 8;
-                        if (!this.v) {
+                        if (!this.chatOnlyMode) {
                             d("sendUpdatePlayer: warning saving with lower team count");
                         }
                     }
@@ -2354,9 +2354,9 @@ public final class NetworkEngine {
                             }
                             gameOutputStream.writeInt(i3);
                             if (z) {
-                                playerTeamK.updateTeam(gameOutputStream);
+                                playerTeamK.writeNetworkTeamUpdate(gameOutputStream);
                             } else {
-                                playerTeamK.writeToStream(gameOutputStream);
+                                playerTeamK.writeBasicTeamState(gameOutputStream);
                             }
                         }
                     }
@@ -2368,8 +2368,8 @@ public final class NetworkEngine {
                     gameOutputStream.writeBoolean(this.roomSettings.revealedMap);
                     gameOutputStream.writeInt(this.roomSettings.aiDifficulty);
                     gameOutputStream.writeByte(5);
-                    gameOutputStream.writeInt(this.aw);
-                    gameOutputStream.writeInt(this.ax);
+                    gameOutputStream.writeInt(this.currentUnitCap);
+                    gameOutputStream.writeInt(this.maxUnitCap);
                     gameOutputStream.writeInt(this.roomSettings.startingUnits);
                     gameOutputStream.writeFloat(this.roomSettings.incomeMultiplier);
                     gameOutputStream.writeBoolean(this.roomSettings.noNukes);
@@ -2402,8 +2402,8 @@ public final class NetworkEngine {
         }
     }
 
-    public synchronized boolean R()  {
-        if (S()) {
+    public synchronized boolean startSandboxServer()  {
+        if (startSingleplayerServer()) {
             this.p = true;
             this.roomSettings.fodMode = 0;
             return true;
@@ -2411,18 +2411,18 @@ public final class NetworkEngine {
         return false;
     }
 
-    public synchronized boolean S()  {
-        if (this.B) {
+    public synchronized boolean startSingleplayerServer()  {
+        if (this.networkGameActive) {
             disconnectNetworking("Started singleplayer");
         }
         GameEngine gameEngine = GameEngine.getInstance();
         r();
-        this.B = true;
+        this.networkGameActive = true;
         this.isServer = true;
-        this.F = true;
+        this.singleplayerServer = true;
         this.roomSettings.gameModeType = gameEngine.getGameModeType();
         this.roomSettings.mapPath = gameEngine.getCurrentMapFilename();
-        aa();
+        regenerateOwnServerId();
         this.localPlayerTeam = gameEngine.playerTeam;
         MultiplayerBattleroomActivity.updateUI();
         this.m = gameEngine.settingsEngine.networkPort;
@@ -2476,10 +2476,10 @@ public final class NetworkEngine {
                 byte b2 = gameInputStream2.readByte();
                 this.G = gameInputStream2.readBoolean();
                 this.isProxyController = gameInputStream2.readBoolean();
-                this.av = true;
+                this.gameSetupReceived = true;
                 if (b2 >= 1) {
-                    this.aw = gameInputStream2.readInt();
-                    this.ax = gameInputStream2.readInt();
+                    this.currentUnitCap = gameInputStream2.readInt();
+                    this.maxUnitCap = gameInputStream2.readInt();
                 }
                 if (b2 >= 2) {
                     this.roomSettings.startingUnits = gameInputStream2.readInt();
@@ -2614,43 +2614,43 @@ public final class NetworkEngine {
                     networkConnection5.handleRemoteDisconnect("kicked");
                     return;
                 }
-                GameTeam teamById = null;
+                GameTeam existingGameTeam = null;
                 if (utf2 != null) {
-                    teamById = PlayerTeam.getTeamById(utf2);
-                    if (teamById != null) {
-                        d("Existing player: " + teamById.teamId + " - " + teamById.teamName);
+                    existingGameTeam = PlayerTeam.findGameTeamBySharedControlId(utf2);
+                    if (existingGameTeam != null) {
+                        d("Existing player: " + existingGameTeam.teamId + " - " + existingGameTeam.teamName);
                     }
                 }
-                BanEntry currentStepRate = setCurrentStepRate(networkConnection5);
-                if (currentStepRate != null) {
-                    GameEngine.log("Connection banned for " + currentStepRate.b() + " more seconds");
-                    a(networkConnection5, currentStepRate.a());
+                BanEntry activeBan = getActiveBanForConnection(networkConnection5);
+                if (activeBan != null) {
+                    GameEngine.log("Connection banned for " + activeBan.b() + " more seconds");
+                    a(networkConnection5, activeBan.a());
                     networkConnection5.handleRemoteDisconnect("kicked");
                     return;
                 }
-                String strA = this.callbacks.a(networkConnection5, strP, i3, i4, networkConnection5.connectionLabel, teamById);
+                String strA = this.callbacks.a(networkConnection5, strP, i3, i4, networkConnection5.connectionLabel, existingGameTeam);
                 if (strA != null) {
                     a(networkConnection5, strA);
                     networkConnection5.handleRemoteDisconnect("kicked");
                     return;
                 }
-                if (i3 < this.e && !this.v) {
+                if (i3 < this.e && !this.chatOnlyMode) {
                     a(networkConnection5, "Game is out of date, please update to v" + gameEngine.getVersion());
                     networkConnection5.handleRemoteDisconnect("kicked");
                     return;
                 }
-                if (i3 > this.e && !this.v) {
+                if (i3 > this.e && !this.chatOnlyMode) {
                     a(networkConnection5, "Your client is newer then the server. Server is on: v" + gameEngine.getVersion());
                     networkConnection5.handleRemoteDisconnect("kicked");
                     return;
                 }
-                if (!this.v && i5 != gameEngine.getAllUnitsChecksum()) {
+                if (!this.chatOnlyMode && i5 != gameEngine.getAllUnitsChecksum()) {
                     GameEngine.log("New Player kicked: Unit checksum mismatch: clientUnitsChecksum=" + i5 + " game.getAllUnitsChecksum():" + gameEngine.getAllUnitsChecksum());
                     a(networkConnection5, "Your core units are different to the server's core units. Game can not be synchronized");
                     networkConnection5.handleRemoteDisconnect("kicked");
                     return;
                 }
-                if (!this.v) {
+                if (!this.chatOnlyMode) {
                     String strG = g(networkConnection5.sessionRandomId);
                     if (!strG.equals(utf3)) {
                         GameEngine.log("New Player kicked: Integrity Check Failed: expectedResponse=" + strG + " clientResponse=" + utf3);
@@ -2664,12 +2664,12 @@ public final class NetworkEngine {
                     networkConnection5.handleRemoteDisconnect("kicked");
                     return;
                 }
-                if (this.gameHasBeenStarted && teamById == null && !this.s) {
+                if (this.gameHasBeenStarted && existingGameTeam == null && !this.s) {
                     a(networkConnection5, "A game has already been started on this server");
                     networkConnection5.handleRemoteDisconnect("kicked");
                     return;
                 }
-                if (this.n != null && teamById == null && !Utility.truncate(this.n).equals(nullableString2)) {
+                if (this.roomPassword != null && existingGameTeam == null && !Utility.truncate(this.roomPassword).equals(nullableString2)) {
                     if (nullableString2 == null) {
                         GameEngine.log("processSystemPacket", "Player tried to join but needs a password");
                     } else {
@@ -2684,12 +2684,12 @@ public final class NetworkEngine {
                 }
                 if (networkConnection5.player == null) {
                     synchronized (this.connectionLock) {
-                        if (teamById == null) {
-                            activeTeamCount = PlayerTeam.getActiveTeamCount();
+                        if (existingGameTeam == null) {
+                            activeTeamCount = PlayerTeam.getFirstFreePlayerTeamId();
                         } else {
-                            activeTeamCount = teamById.teamId;
+                            activeTeamCount = existingGameTeam.teamId;
                         }
-                        if (activeTeamCount == -1 && !this.v) {
+                        if (activeTeamCount == -1 && !this.chatOnlyMode) {
                             a(networkConnection5, "No free slots on server");
                             networkConnection5.handleRemoteDisconnect("no free slots");
                             return;
@@ -2700,28 +2700,28 @@ public final class NetworkEngine {
                             networkConnection5.handleRemoteDisconnect("kicked");
                         } else {
                             MasterServerAuth.applyHandshakeTimeoutFlag(networkConnection5);
-                            if (!this.v && networkConnection5.O) {
+                            if (!this.chatOnlyMode && networkConnection5.O) {
                                 a(networkConnection5, VariableScope.nullOrMissingString);
                                 networkConnection5.handleRemoteDisconnect("kicked");
                                 return;
                             }
                             String str2 = null;
-                            if (teamById != null) {
-                                networkConnection5.player = teamById;
+                            if (existingGameTeam != null) {
+                                networkConnection5.player = existingGameTeam;
                                 String str3 = VariableScope.nullOrMissingString;
                                 if (this.gameHasBeenStarted) {
-                                    if (teamById.addCredits()) {
+                                    if (existingGameTeam.isSpectatorTeamColor()) {
                                         str3 = " (Spectator)";
                                     } else {
-                                        str3 = " (Team " + teamById.getTeamColorName() + ")";
+                                        str3 = " (Team " + existingGameTeam.getTeamSlotLabel() + ")";
                                     }
                                 }
                                 j("'" + networkConnection5.player.teamName + "' reconnected. " + str3);
                                 networkConnection5.isForwarded = true;
-                                str2 = teamById.teamName;
-                                teamById.teamAIHint = networkConnection5.remoteId;
+                                str2 = existingGameTeam.teamName;
+                                existingGameTeam.teamAIHint = networkConnection5.remoteId;
                             } else {
-                                if (this.v && activeTeamCount == -1) {
+                                if (this.chatOnlyMode && activeTeamCount == -1) {
                                     networkConnection5.player = new GameTeam(-3);
                                 } else {
                                     networkConnection5.player = new GameTeam(activeTeamCount);
@@ -2731,15 +2731,15 @@ public final class NetworkEngine {
                                     networkConnection5.isForwarded = true;
                                 }
                             }
-                            if (teamById == null && strP != null) {
-                                ArrayList arrayListAx = ax();
+                            if (existingGameTeam == null && strP != null) {
+                                ArrayList activePlayerTeams = getActivePlayerTeamsSnapshot();
                                 for (int i6 = 0; i6 < 10; i6++) {
                                     boolean z = false;
                                     String str4 = strP;
                                     if (i6 > 0) {
                                         str4 = str4 + "(" + i6 + ")";
                                     }
-                                    Iterator it = arrayListAx.iterator();
+                                    Iterator it = activePlayerTeams.iterator();
                                     while (it.hasNext()) {
                                         if (str4.equalsIgnoreCase(((PlayerTeam) it.next()).teamName)) {
                                             z = true;
@@ -2755,16 +2755,16 @@ public final class NetworkEngine {
                             networkConnection5.player.teamSharedControlType = utf2;
                             networkConnection5.player.teamAIHint = networkConnection5.remoteId;
                             networkConnection5.E = i3;
-                            GameEngine.log("processSystemPacket", "New player: " + strP + ", networkVersion:" + networkConnection5.E + " existing:" + (teamById != null));
+                            GameEngine.log("processSystemPacket", "New player: " + strP + ", networkVersion:" + networkConnection5.E + " existing:" + (existingGameTeam != null));
                             networkConnection5.allowLargeIncomingPackets = true;
-                            if (teamById == null) {
+                            if (existingGameTeam == null) {
                                 this.callbacks.a(networkConnection5.player);
                             }
                             MultiplayerBattleroomActivity.updateUI();
                             e(networkConnection5);
                             c(networkConnection5);
                             this.callbacks.c(networkConnection5, strP, str2);
-                            if ((teamById != null || this.s) && this.gameHasBeenStarted) {
+                            if ((existingGameTeam != null || this.s) && this.gameHasBeenStarted) {
                                 a(networkConnection5, true);
                             }
                         }
@@ -2827,38 +2827,38 @@ public final class NetworkEngine {
                         z2 = gameInputStream8.readBoolean();
                     }
                     i8 = gameInputStream8.readInt();
-                    PlayerTeam.getResourceCost(i8, false);
+                    PlayerTeam.setMaxTeamId(i8, false);
                     gameInputStream8.a("teams", z3);
                     if (i8 > PlayerTeam.TEAM_NEUTRAL) {
                         throw new IOException("Cannot load:" + i8 + " teams");
                     }
                 } else if (this.gameHasBeenStarted) {
-                    g("Warning old team system used in started game, stream version:" + gameInputStream8.getMaxBlockSize());
+                    reportDesync("Warning old team system used in started game, stream version:" + gameInputStream8.getMaxBlockSize());
                 }
                 for (int i9 = 0; i9 < i8; i9++) {
                     PlayerTeam playerTeamK = PlayerTeam.k(i9);
                     if (!gameInputStream8.readBoolean()) {
                         if (playerTeamK != null) {
                             if (this.gameHasBeenStarted) {
-                                g("Warning team:" + i9 + " removed while game is running");
+                                reportDesync("Warning team:" + i9 + " removed while game is running");
                             }
-                            playerTeamK.updateTeamActiveStatus();
+                            playerTeamK.removeFromTeamRegistry();
                         }
                     } else {
                         gameInputStream8.readInt();
                         if (playerTeamK == null) {
                             if (this.gameHasBeenStarted) {
-                                g("Warning team:" + i9 + " added while game is running");
+                                reportDesync("Warning team:" + i9 + " added while game is running");
                             }
                             if (!this.isServer && (playerTeamK instanceof AIController)) {
-                                g("Warning we are a client with an AI team");
+                                reportDesync("Warning we are a client with an AI team");
                             }
                             playerTeamK = new GameTeam(i9);
                         }
                         if (z2) {
-                            playerTeamK.readFromStream(gameInputStream8);
+                            playerTeamK.readNetworkTeamUpdate(gameInputStream8);
                         } else {
-                            playerTeamK.compareToTeam(gameInputStream8, this.gameHasBeenStarted);
+                            playerTeamK.readBasicTeamState(gameInputStream8, this.gameHasBeenStarted);
                         }
                     }
                     if (playerTeamK != null && playerTeamK.teamId == i7) {
@@ -2874,8 +2874,8 @@ public final class NetworkEngine {
                 this.roomSettings.revealedMap = gameInputStream8.readBoolean();
                 this.roomSettings.aiDifficulty = gameInputStream8.readInt();
                 byte b4 = gameInputStream8.readByte();
-                this.aw = gameInputStream8.readInt();
-                this.ax = gameInputStream8.readInt();
+                this.currentUnitCap = gameInputStream8.readInt();
+                this.maxUnitCap = gameInputStream8.readInt();
                 if (b4 >= 2) {
                     this.roomSettings.startingUnits = gameInputStream8.readInt();
                     this.roomSettings.incomeMultiplier = gameInputStream8.readFloat();
@@ -2914,8 +2914,8 @@ public final class NetworkEngine {
                 NetworkConnection networkConnection9 = packet.connection;
                 gameInputStream9.readInt();
                 boolean z4 = gameInputStream9.readBoolean();
-                if (z4 && !this.be) {
-                    this.be = z4;
+                if (z4 && !this.gameEndedByServer) {
+                    this.gameEndedByServer = z4;
                     return;
                 }
                 return;
@@ -2946,11 +2946,11 @@ public final class NetworkEngine {
                 gameInputStream11.readByte();
                 this.roomSettings.gameModeType = (GameModeType) gameInputStream11.readEnumOrdinalOrNull(GameModeType.class);
                 if (this.roomSettings.gameModeType == GameModeType.savedGame) {
-                    this.aA = gameInputStream11.readNestedStream();
+                    this.receivedSaveGameStream = gameInputStream11.readNestedStream();
                 } else if (this.roomSettings.gameModeType == GameModeType.customMap) {
-                    this.aB = gameInputStream11.readNestedStream();
+                    this.receivedCustomMapStream = gameInputStream11.readNestedStream();
                 }
-                this.az = gameInputStream11.readUTF();
+                this.selectedMapPath = gameInputStream11.readUTF();
                 aB();
                 return;
             case 122:
@@ -2972,7 +2972,7 @@ public final class NetworkEngine {
                 if (gameTeam == null) {
                     if (networkConnection11.trackLastPacket) {
                         d("Allowing message from non player on forwarding connection");
-                        gameTeam = this.bk;
+                        gameTeam = this.adminGameTeam;
                     } else {
                         d("player is null for message, skipping");
                         return;
@@ -3120,7 +3120,7 @@ public final class NetworkEngine {
                 if (i18 >= 4) {
                     gameInputStream15.readUTF();
                     String utf12 = gameInputStream15.readUTF();
-                    if (GameEngine.isDebug()) {
+                    if (GameEngine.isDedicatedServer()) {
                         networkConnection13.logInfo("Misc: " + utf12);
                     }
                 }
@@ -3200,9 +3200,9 @@ public final class NetworkEngine {
                 }
                 this.D = true;
                 this.E = nullableString5;
-                gameEngine.networkEngine.n = null;
-                gameEngine.networkEngine.o = z7;
-                gameEngine.networkEngine.q = z8;
+                gameEngine.networkEngine.roomPassword = null;
+                gameEngine.networkEngine.requireActiveMods = z7;
+                gameEngine.networkEngine.publishToMasterServer = z8;
                 ensureKeepAliveTimerStarted(false);
                 if (nullableString6 != null) {
                     if (this.localPlayerTeam != null) {
@@ -3211,17 +3211,17 @@ public final class NetworkEngine {
                         GameEngine.log("Become server: No local team");
                     }
                 }
-                if (gameEngine.networkEngine.q) {
+                if (gameEngine.networkEngine.publishToMasterServer) {
                 }
                 if (nullableString4 != null) {
                     gameEngine.settingsEngine.networkServerId = nullableString4;
                 }
                 if (gameEngine.currentTick > 60) {
-                    this.aa = true;
+                    this.allPlayersReady = true;
                 }
                 if (!this.x && !this.gameHasBeenStarted) {
-                    GameEngine.log("enableAllCustomUnitsPossible mods:" + this.o);
-                    CustomUnitConfigParser.enableAllCustomUnits(this.o);
+                    GameEngine.log("enableAllCustomUnitsPossible mods:" + this.requireActiveMods);
+                    CustomUnitConfigParser.enableAllCustomUnits(this.requireActiveMods);
                     this.x = true;
                     return;
                 }
@@ -3250,7 +3250,7 @@ public final class NetworkEngine {
                     GameTeam gameTeamB = PlayerTeam.b(utf13);
                     if (gameTeamB == null) {
                         d("PACKET_FORWARD_CLIENT_ADD: Failed to find existing player with id:" + utf13);
-                        for (PlayerTeam playerTeam2 : PlayerTeam.addEnergy()) {
+                        for (PlayerTeam playerTeam2 : PlayerTeam.getTeams()) {
                             if (playerTeam2 != null) {
                                 d("option: " + playerTeam2.teamName + " - " + playerTeam2.teamAIHint + " - localPlayer:" + (this.localPlayerTeam == playerTeam2));
                             }
@@ -3334,13 +3334,13 @@ public final class NetworkEngine {
         if (this.localPlayerTeam == null) {
             GameTeam gameTeam = null;
             if (!z) {
-                activeTeamCount = PlayerTeam.getActiveTeamCount();
+                activeTeamCount = PlayerTeam.getFirstFreePlayerTeamId();
                 if (activeTeamCount == -1) {
                     throw new RuntimeException("playerId is -1 for server player");
                 }
             } else {
-                gameTeam = this.bk;
-                activeTeamCount = this.bk.teamId;
+                gameTeam = this.adminGameTeam;
+                activeTeamCount = this.adminGameTeam.teamId;
             }
             if (gameTeam == null) {
                 gameTeam = new GameTeam(activeTeamCount);
@@ -3360,7 +3360,7 @@ public final class NetworkEngine {
         MultiplayerBattleroomActivity.updateUI();
     }
 
-    public boolean T() {
+    public boolean isUdpMultiplayerEnabled() {
         return GameEngine.getInstance().settingsEngine.udpInMultiplayer;
     }
 
@@ -3372,13 +3372,13 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: b */
     public synchronized boolean startServerHosting(boolean z) throws ConfigParseException {
-        if (this.B) {
+        if (this.networkGameActive) {
             throw new RuntimeException("networking already started");
         }
         q();
-        this.B = true;
+        this.networkGameActive = true;
         this.isServer = true;
-        aa();
+        regenerateOwnServerId();
         aA();
         GameEngine gameEngine = GameEngine.getInstance();
         ensureKeepAliveTimerStarted(z);
@@ -3402,8 +3402,8 @@ public final class NetworkEngine {
                 disconnectNetworking("Could not open udp port");
                 return false;
             }
-            am();
-            if (this.useMasterServer && this.q) {
+            updateMultiplayerNotifications();
+            if (this.useMasterServer && this.publishToMasterServer) {
                 MasterServerClient.createServerAsync();
             }
             this.publicIpLookupSuccess = null;
@@ -3420,7 +3420,7 @@ public final class NetworkEngine {
         }
     }
 
-    public void U() {
+    public void showReconnectDialog() {
         final GameEngine gameEngine = GameEngine.getInstance();
         final MenuDialog menuDialogA = MenuDialog.a(Locale.get("menus.ingame.multiplayerReconnect.message", new Object[0]), false);
         menuDialogA.a(Locale.get("menus.ingame.resume", new Object[0]), new UIEventHandler() { // from class: com.corrodinggames.rts.gameFramework.j.ad.3
@@ -3434,7 +3434,7 @@ public final class NetworkEngine {
             @Override // com.corrodinggames.rts.gameFramework.ui.widgets.UIEventHandler
             public boolean a(UIEvent uIEvent)  {
                 menuDialogA.i();
-                NetworkEngine.this.V();
+                NetworkEngine.this.reconnectToServer();
                 return true;
             }
         });
@@ -3442,7 +3442,7 @@ public final class NetworkEngine {
             @Override // com.corrodinggames.rts.gameFramework.ui.widgets.UIEventHandler
             public boolean a(UIEvent uIEvent) {
                 menuDialogA.i();
-                gameEngine.isPositionInBounds(new Runnable() { // from class: com.corrodinggames.rts.gameFramework.j.ad.5.1
+                gameEngine.queueGameThreadTask(new Runnable() { // from class: com.corrodinggames.rts.gameFramework.j.ad.5.1
                     @Override // java.lang.Runnable
                     public void run() {
                         NetworkEngine.this.disconnectNetworking("already disconnected");
@@ -3453,17 +3453,17 @@ public final class NetworkEngine {
             }
         });
         gameEngine.gameUI.a(menuDialogA);
-        this.bx = true;
+        this.reconnectDialogShown = true;
     }
 
-    public synchronized boolean V() {
+    public synchronized boolean reconnectToServer() {
         Socket socket = this.socket;
         if (socket == null) {
             GameEngine.log("reconnectToServer: lastConnectedTo==null");
             return false;
         }
         GameEngine.log("reconnectToServer attempted");
-        if (this.B) {
+        if (this.networkGameActive) {
             GameEngine.log("reconnectToServer: disconnecting");
             disconnectNetworking("reconnecting");
         }
@@ -3485,7 +3485,7 @@ public final class NetworkEngine {
     }
 
     public synchronized boolean a(Socket socket) throws  IOException {
-        if (this.B) {
+        if (this.networkGameActive) {
             disconnectNetworking("starting new");
         }
         if (socket == null) {
@@ -3494,7 +3494,7 @@ public final class NetworkEngine {
         q();
         GameEngine.getInstance();
         this.m = socket.getPort();
-        this.B = true;
+        this.networkGameActive = true;
         this.isServer = false;
         d("connected to Server..");
         NetworkConnection networkConnection = new NetworkConnection(this, socket);
@@ -3502,7 +3502,7 @@ public final class NetworkEngine {
         networkConnection.startWorkers();
         this.sendQueue.add(networkConnection);
         f(networkConnection);
-        am();
+        updateMultiplayerNotifications();
         this.socket = socket;
         return true;
     }
@@ -3525,7 +3525,7 @@ public final class NetworkEngine {
         return null;
     }
 
-    public NetworkConnection W() {
+    public NetworkConnection getActiveServerConnection() {
         if (this.isServer) {
             return null;
         }
@@ -3538,7 +3538,7 @@ public final class NetworkEngine {
     }
 
     public void d(PacketData packetData) {
-        if (!this.B) {
+        if (!this.networkGameActive) {
             GameEngine.log("Skipping sendPacketToAll, not networked");
         } else {
             i(packetData);
@@ -3554,7 +3554,7 @@ public final class NetworkEngine {
     }
 
     public void e(PacketData packetData) {
-        if (!this.B) {
+        if (!this.networkGameActive) {
             GameEngine.log("Skipping sendPacketToAllIncludingRelay, not networked");
             return;
         }
@@ -3566,7 +3566,7 @@ public final class NetworkEngine {
     }
 
     public void f(PacketData packetData) {
-        if (!this.B) {
+        if (!this.networkGameActive) {
             GameEngine.log("Skipping sendPacketToServer, not networked");
         } else {
             if (this.isServer) {
@@ -3577,7 +3577,7 @@ public final class NetworkEngine {
     }
 
     public void g(PacketData packetData) {
-        if (!this.B) {
+        if (!this.networkGameActive) {
             GameEngine.log("Skipping sendPacketToClients, not networked");
         } else {
             if (!this.isServer) {
@@ -3588,7 +3588,7 @@ public final class NetworkEngine {
     }
 
     public void h(PacketData packetData) {
-        if (!this.B) {
+        if (!this.networkGameActive) {
             GameEngine.log("Skipping sendPacketToClients, not networked");
         } else {
             if (!this.isServer) {
@@ -3599,7 +3599,7 @@ public final class NetworkEngine {
     }
 
     public void a(NetworkConnection networkConnection, PacketData packetData) {
-        if (!this.B) {
+        if (!this.networkGameActive) {
             GameEngine.log("Skipping sendPacketOnConnection, not networked");
         } else {
             networkConnection.enqueuePacket(packetData);
@@ -3636,15 +3636,15 @@ public final class NetworkEngine {
         if (gameEngine.settingsEngine.networkClientId == null) {
             z = true;
         }
-        if (!this.by) {
-            this.by = true;
+        if (!this.networkClientIdMachineKeyChecked) {
+            this.networkClientIdMachineKeyChecked = true;
             if (GameEngine.isPC()) {
-                String strAk = ak();
-                if (!strAk.equals(gameEngine.settingsEngine.networkClientIdMachineKey)) {
+                String hardwareAddressHash = getHardwareAddressHash();
+                if (!hardwareAddressHash.equals(gameEngine.settingsEngine.networkClientIdMachineKey)) {
                     if (gameEngine.settingsEngine.networkClientIdMachineKey != null) {
-                        GameEngine.log("Machine appears to have changed: " + gameEngine.settingsEngine.networkClientIdMachineKey + " vs " + strAk);
+                        GameEngine.log("Machine appears to have changed: " + gameEngine.settingsEngine.networkClientIdMachineKey + " vs " + hardwareAddressHash);
                     }
-                    gameEngine.settingsEngine.networkClientIdMachineKey = strAk;
+                    gameEngine.settingsEngine.networkClientIdMachineKey = hardwareAddressHash;
                     z = true;
                 }
             }
@@ -3661,16 +3661,16 @@ public final class NetworkEngine {
         return Utility.truncate(str + this.serverUuid);
     }
 
-    public void aa() {
+    public void regenerateOwnServerId() {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.settingsEngine.networkServerId = UUID.randomUUID().toString();
         gameEngine.settingsEngine.save();
     }
 
-    public String ab() {
+    public String getOwnServerId() {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.settingsEngine.networkServerId == null) {
-            aa();
+            regenerateOwnServerId();
         }
         return gameEngine.settingsEngine.networkServerId;
     }
@@ -3691,18 +3691,18 @@ public final class NetworkEngine {
             if (GameEngine.isPC()) {
                 i = 2;
             }
-            if (GameEngine.isDebugVersionStatic2) {
+            if (GameEngine.isIOSVersion) {
                 i = 3;
             }
             gameOutputStream.writeStringUTF("com.corrodinggames.rts");
             gameOutputStream.writeInt(4);
             gameOutputStream.writeInt(this.e);
             gameOutputStream.writeInt(i);
-            gameOutputStream.writeStringNullable(this.L);
+            gameOutputStream.writeStringNullable(this.connectionQueryString);
             gameOutputStream.writeStringUTF(this.playerName);
             gameOutputStream.writeStringUTF(Locale.getLanguage());
             String str = VariableScope.nullOrMissingString;
-            if (GameEngine.isNetworkServerStatic2) {
+            if (GameEngine.isAutomatedTestMode) {
                 str = str + "d";
             }
             gameOutputStream.writeStringUTF(str);
@@ -3721,7 +3721,7 @@ public final class NetworkEngine {
             gameOutputStream.writeInt(this.e);
             gameOutputStream.writeInt(gameEngine.getVersionCode(true));
             gameOutputStream.writeStringUTF(gameEngine.getPackageName());
-            gameOutputStream.writeStringUTF(ab());
+            gameOutputStream.writeStringUTF(getOwnServerId());
             gameOutputStream.writeInt(networkConnection.sessionRandomId);
             gameOutputStream.writeInt(this.W);
             gameOutputStream.writeInt(0);
@@ -3743,8 +3743,8 @@ public final class NetworkEngine {
             gameOutputStream.writeInt(gameEngine.getVersionCode(true));
             gameOutputStream.writeStringUTF(this.playerName);
             String strTruncate = null;
-            if (this.n != null) {
-                strTruncate = Utility.truncate(this.n);
+            if (this.roomPassword != null) {
+                strTruncate = Utility.truncate(this.roomPassword);
             }
             gameOutputStream.writeStringNullable(strTruncate);
             gameOutputStream.writeStringUTF(gameEngine.getPackageName());
@@ -3772,7 +3772,7 @@ public final class NetworkEngine {
         return Utility.toHexString(i);
     }
 
-    public void ad() {
+    public void sendClientStatusPacket() {
         if (this.isServer) {
             throw new RuntimeException("We are a server");
         }
@@ -3790,7 +3790,7 @@ public final class NetworkEngine {
     public void j(String str) {
         if (!this.isServer) {
             d("cannot send sendSystemMessage:" + str + ", we are not a server");
-        } else if (!this.B || this.F) {
+        } else if (!this.networkGameActive || this.singleplayerServer) {
             d("cannot send sendSystemMessage:" + str + ", not networked");
         } else {
             GameEngine.log("sendSystemMessage:" + str);
@@ -3799,7 +3799,7 @@ public final class NetworkEngine {
     }
 
     public void k(String str) {
-        m("-qc " + str);
+        sendChatMessage("-qc " + str);
     }
 
     public void l(String str) {
@@ -3825,11 +3825,11 @@ public final class NetworkEngine {
         if (z) {
             str = "-t " + str;
         }
-        m(str);
+        sendChatMessage(str);
     }
 
-    public void m(String str) {
-        if (!this.B) {
+    public void sendChatMessage(String str) {
+        if (!this.networkGameActive) {
             GameEngine.log("sendChatMessage: not networked:" + str);
             b((NetworkConnection) null, -1, (String) null, str);
         } else {
@@ -3864,7 +3864,7 @@ public final class NetworkEngine {
                     z = true;
                     str2 = "[TEAM] " + str2.substring("-t".length());
                 } else {
-                    GameEngine.updatePaintTextSizeIfNeeded("toOnlyTeams failed team==null");
+                    GameEngine.logColored("toOnlyTeams failed team==null");
                 }
             }
             if (playerTeam != null && "surrender".equalsIgnoreCase(strN)) {
@@ -3879,7 +3879,7 @@ public final class NetworkEngine {
                 z2 = true;
                 str2 = "[COMMAND] " + str2.substring("-qc".length());
             }
-            if (!z2 && playerTeam != null && playerTeam != this.bj && playerTeam != this.bk && !this.callbacks.a(networkConnection, playerTeam, str2, z)) {
+            if (!z2 && playerTeam != null && playerTeam != this.spectatorGameTeam && playerTeam != this.adminGameTeam && !this.callbacks.a(networkConnection, playerTeam, str2, z)) {
                 z2 = true;
             }
             GameOutputStream gameOutputStream = new GameOutputStream();
@@ -3904,7 +3904,7 @@ public final class NetworkEngine {
                     b(networkConnection, i, str, str2);
                 }
             } else if (z2) {
-                GameEngine.updatePaintTextSizeIfNeeded("info message:" + c(str, str2));
+                GameEngine.logColored("info message:" + c(str, str2));
             } else {
                 if (networkConnection2 != null) {
                     a(networkConnection2, packetDataBuildPacketData);
@@ -3949,7 +3949,7 @@ public final class NetworkEngine {
         if (this.gameHasBeenStarted) {
             z = true;
         }
-        if (!this.B) {
+        if (!this.networkGameActive) {
             z = true;
         }
         if (z) {
@@ -3957,16 +3957,16 @@ public final class NetworkEngine {
             return;
         }
         String strC = c((String) null, strConvertInlineBlocks);
-        if (!GameEngine.isPausedStatic2) {
+        if (!GameEngine.isNonAndroidVersion) {
             MultiplayerBattleroomActivity.addMessageToChatLog(strC);
         }
     }
 
     private void b(NetworkConnection networkConnection, int i, String str, String str2) {
-        if (!this.B && str2.startsWith("-i ")) {
+        if (!this.networkGameActive && str2.startsWith("-i ")) {
             return;
         }
-        if (!this.B && str2.startsWith("-qc ")) {
+        if (!this.networkGameActive && str2.startsWith("-qc ")) {
             return;
         }
         String strConvertInlineBlocks = Locale.convertInlineBlocks(str2);
@@ -3991,7 +3991,7 @@ public final class NetworkEngine {
         if (this.gameHasBeenStarted) {
             z = true;
         }
-        if (!this.B) {
+        if (!this.networkGameActive) {
             z = true;
         }
         if (z) {
@@ -3999,7 +3999,7 @@ public final class NetworkEngine {
             return;
         }
         String strC = c(str, strConvertInlineBlocks);
-        if (!GameEngine.isPausedStatic2) {
+        if (!GameEngine.isNonAndroidVersion) {
             MultiplayerBattleroomActivity.addMessageToChatLog(strC);
         }
     }
@@ -4010,7 +4010,7 @@ public final class NetworkEngine {
             GameOutputStream gameOutputStream = new GameOutputStream();
             gameOutputStream.writeByte(0);
             gameOutputStream.writeInt(gameEngine.currentTick);
-            gameOutputStream.writeInt(gameEngine.lastTick);
+            gameOutputStream.writeInt(gameEngine.gameTimeMillis);
             gameOutputStream.writeFloat(getDifficultyString());
             gameOutputStream.writeFloat(1.0f);
             gameOutputStream.writeBoolean(z);
@@ -4030,7 +4030,7 @@ public final class NetworkEngine {
             GameOutputStream gameOutputStream = new GameOutputStream();
             gameOutputStream.writeByte(0);
             gameOutputStream.writeInt(gameEngine.currentTick);
-            gameOutputStream.writeInt(gameEngine.lastTick);
+            gameOutputStream.writeInt(gameEngine.gameTimeMillis);
             gameOutputStream.writeFloat(getDifficultyString());
             gameOutputStream.writeFloat(1.0f);
             gameOutputStream.writeBoolean(z);
@@ -4054,9 +4054,9 @@ public final class NetworkEngine {
         }
     }
 
-    public boolean ae() {
-        Q();
-        L();
+    public boolean startBattleRoomGame() {
+        sendPlayerUpdateNow();
+        broadcastServerInfoToLargePacketConnections();
         return a((NetworkConnection) null, false);
     }
 
@@ -4082,7 +4082,7 @@ public final class NetworkEngine {
             } else if (this.roomSettings.gameModeType == GameModeType.customMap) {
                 GameEngine.log("Starting with custom map: " + l());
                 try {
-                    TileMap.writeMapStreamToOutput(this.az, gameOutputStream);
+                    TileMap.writeMapStreamToOutput(this.selectedMapPath, gameOutputStream);
                     gameOutputStream.writeStringUTF("STEAM:" + l());
                 } catch (IOException e2) {
                     e2.printStackTrace();
@@ -4109,8 +4109,8 @@ public final class NetworkEngine {
         }
     }
 
-    public void af() {
-        this.bc = true;
+    public void onStartGameFailed() {
+        this.startGameFailed = true;
         GameEngine.log("onStartGameFailed");
         if (this.isServer) {
             this.gameHasBeenStarted = false;
@@ -4123,19 +4123,19 @@ public final class NetworkEngine {
     private void aB() {
         this.returnToBattleroomPending = false;
         this.gameHasBeenStarted = true;
-        this.bc = false;
+        this.startGameFailed = false;
         this.bd = false;
         GameEngine.log("Starting new network game (" + getCurrentServerId() + ")");
-        if (this.useMasterServer && this.q && this.isServer) {
+        if (this.useMasterServer && this.publishToMasterServer && this.isServer) {
             MasterServerClient.updateServerAsync();
         }
-        if (!GameEngine.isPausedStatic2) {
+        if (!GameEngine.isNonAndroidVersion) {
             MultiplayerBattleroomActivity.startGame();
         }
         this.callbacks.onStartGameEvent();
     }
 
-    public void ag() {
+    public void scheduleDefaultReturnToBattleroom() {
         scheduleReturnToBattleroom(5.0f);
     }
 
@@ -4189,36 +4189,36 @@ public final class NetworkEngine {
         resetNetworkGameState();
         this.localPlayerTeam = playerTeam;
         gameEngine.currentTick = 0;
-        gameEngine.lastTick = 0;
+        gameEngine.gameTimeMillis = 0;
         setPlayerName();
-        PlayerTeam.staticUpdateTeamData();
+        PlayerTeam.resetAllTeamStates();
         if (this.isServer) {
             aA();
         }
         J();
-        if (this.useMasterServer && this.q && this.isServer) {
+        if (this.useMasterServer && this.publishToMasterServer && this.isServer) {
             MasterServerClient.updateServerAsync();
         }
-        if (!GameEngine.isPausedStatic2) {
+        if (!GameEngine.isNonAndroidVersion) {
         }
     }
 
-    public String ah() {
-        ArrayList arrayListAj = aj();
-        if (arrayListAj == null || arrayListAj.size() == 0) {
+    public String getPrimaryLocalIpAddress() {
+        ArrayList localIpAddressList = getLocalIpAddressList();
+        if (localIpAddressList == null || localIpAddressList.size() == 0) {
             return null;
         }
-        return (String) arrayListAj.get(0);
+        return (String) localIpAddressList.get(0);
     }
 
-    public String ai() {
-        ArrayList<String> arrayListAj = aj();
-        if (arrayListAj == null || arrayListAj.size() == 0) {
+    public String getLocalIpAddressSummary() {
+        ArrayList<String> localIpAddressList = getLocalIpAddressList();
+        if (localIpAddressList == null || localIpAddressList.size() == 0) {
             return null;
         }
         String str = VariableScope.nullOrMissingString;
         boolean z = true;
-        for (String str2 : arrayListAj) {
+        for (String str2 : localIpAddressList) {
             if (z) {
                 z = false;
             } else {
@@ -4229,7 +4229,7 @@ public final class NetworkEngine {
         return str;
     }
 
-    public ArrayList aj() {
+    public ArrayList getLocalIpAddressList() {
         ArrayList arrayListD;
         if (engineInstances != null) {
             return new ArrayList(engineInstances);
@@ -4243,7 +4243,7 @@ public final class NetworkEngine {
         }
         double dA = PerformanceProfiler.a(jA);
         if (dA > 2.0d) {
-            GameEngine.updatePaintTextSizeIfNeeded("getLocalIpAddressList was slow, taking:" + PerformanceProfiler.a(dA));
+            GameEngine.logColored("getLocalIpAddressList was slow, taking:" + PerformanceProfiler.a(dA));
         }
         if (dA > 10.0d && arrayListD != null && arrayListD.size() > 0) {
             GameEngine.log("getLocalIpAddressList: creating cache");
@@ -4252,7 +4252,7 @@ public final class NetworkEngine {
         return arrayListD;
     }
 
-    public String ak() {
+    public String getHardwareAddressHash() {
         String str = null;
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -4304,7 +4304,7 @@ public final class NetworkEngine {
         return arrayList;
     }
 
-    InetAddress al() {
+    InetAddress getUdpBroadcastAddress() {
         try {
             DhcpInfo dhcpInfo = ((WifiManager) GameEngine.getInstance().appContext.c("wifi")).getDhcpInfo();
             int i = (dhcpInfo.ipAddress & dhcpInfo.netmask) | (dhcpInfo.netmask ^ (-1));
@@ -4320,20 +4320,20 @@ public final class NetworkEngine {
     }
 
     public void d(String str, String str2) {
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        if (this.F || gameEngine.replayEngine.j()) {
+        if (this.singleplayerServer || gameEngine.replayEngine.j()) {
             return;
         }
         boolean zIsActivityOpen = MultiplayerBattleroomActivity.isActivityOpen();
-        GameView gameView = gameEngine.activity;
+        GameView gameView = gameEngine.activeGameView;
         if (gameView != null && !gameView.isContinuousRendering()) {
             zIsActivityOpen = true;
         }
         if (zIsActivityOpen) {
-            if (this.bB) {
+            if (this.pendingMultiplayerChatNotification) {
                 i(2);
                 return;
             }
@@ -4352,13 +4352,13 @@ public final class NetworkEngine {
             a(notificationManager);
             a(builder, "multiplayerChatId");
             notificationManager.notify(2, builder.getNotification());
-            this.bB = true;
+            this.pendingMultiplayerChatNotification = true;
         }
     }
 
-    public void am() {
+    public void updateMultiplayerNotifications() {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (this.B && gameEngine != null && gameEngine.isNetworkGameActive()) {
+        if (this.networkGameActive && gameEngine != null && gameEngine.isNetworkGameActive()) {
             aE();
         } else {
             i(1);
@@ -4393,7 +4393,7 @@ public final class NetworkEngine {
     }
 
     private void aE() {
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
@@ -4418,13 +4418,13 @@ public final class NetworkEngine {
     }
 
     private void i(int i) {
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return;
         }
         ((NotificationManager) GameEngine.getInstance().appContext.c("notification")).cancel(i);
     }
 
-    public int an() {
+    public int getHumanPlayerCount() {
         int i = 0;
         for (int i2 = 0; i2 < PlayerTeam.TEAM_NEUTRAL; i2++) {
             PlayerTeam playerTeamK = PlayerTeam.k(i2);
@@ -4435,7 +4435,7 @@ public final class NetworkEngine {
         return i;
     }
 
-    public int ao() {
+    public int getPlayerAndAiCount() {
         int i = 0;
         for (int i2 = 0; i2 < PlayerTeam.TEAM_NEUTRAL; i2++) {
             if (PlayerTeam.k(i2) != null) {
@@ -4451,13 +4451,13 @@ public final class NetworkEngine {
         } else if (this.isProxyController) {
             k("-kick " + (playerTeam.teamId + 1));
         } else {
-            GameEngine.updatePaintTextSizeIfNeeded("kickTeamAndAttachedPlayer: but not server or proxy controller");
+            GameEngine.logColored("kickTeamAndAttachedPlayer: but not server or proxy controller");
         }
     }
 
     public void f(PlayerTeam playerTeam) {
         if (playerTeam instanceof AIController) {
-            playerTeam.updateTeamActiveStatus();
+            playerTeam.removeFromTeamRegistry();
         } else {
             if (this.localPlayerTeam == playerTeam) {
                 GameEngine.log("kickTeamAndAttachedPlayer", "Cannot kick self");
@@ -4465,28 +4465,28 @@ public final class NetworkEngine {
             }
             NetworkConnection networkConnectionC = c(playerTeam);
             if (networkConnectionC == null) {
-                g("Kick player: cannot find connection for team");
+                reportDesync("Kick player: cannot find connection for team");
             } else {
                 int i = GameEngine.getInstance().settingsEngine.banTimeInSecondsAfterKick;
                 if (i > 0) {
-                    writeSyncHeader(networkConnectionC, "Temporarily banned due to recent kick", i);
+                    banConnection(networkConnectionC, "Temporarily banned due to recent kick", i);
                 }
                 a(networkConnectionC, "Kicked by host");
                 networkConnectionC.handleRemoteDisconnect("Kicked by host");
             }
-            playerTeam.updateTeamActiveStatus();
+            playerTeam.removeFromTeamRegistry();
         }
-        P();
+        markPlayerUpdatePending();
         MultiplayerBattleroomActivity.updateUI();
     }
 
-    public void ap() {
+    public void addAIToGame() {
         GameEngine gameEngine = GameEngine.getInstance();
         if (!this.isServer) {
             GameEngine.log("addAIToGame", "We are not a server");
             return;
         }
-        int activeTeamCount = PlayerTeam.getActiveTeamCount();
+        int activeTeamCount = PlayerTeam.getFirstFreePlayerTeamId();
         if (activeTeamCount == -1) {
             gameEngine.alert("No free slots for AI", 1);
         }
@@ -4494,14 +4494,14 @@ public final class NetworkEngine {
         aIController.teamName = "AI";
         aIController.teamColorId = activeTeamCount % 2;
         aIController.teamPingTime = this.roomSettings.aiDifficulty;
-        aq();
+        updateAiTeamNames();
         gameEngine.networkEngine.callbacks.a(aIController);
         gameEngine.networkEngine.e((NetworkConnection) null);
         MultiplayerBattleroomActivity.updateUI();
     }
 
-    public boolean aq() {
-        if (!this.isServer && this.B) {
+    public boolean updateAiTeamNames() {
+        if (!this.isServer && this.networkGameActive) {
             GameEngine.log("updateNamesOfAI", "We are not a server");
             return false;
         }
@@ -4528,7 +4528,7 @@ public final class NetworkEngine {
             boolean z = false;
             if (i == -3) {
                 z = true;
-                i = PlayerTeam.getTeamCount();
+                i = PlayerTeam.getFirstFreeTeamSlotId();
                 if (i == -1) {
                     e("No free spectator slots");
                     return;
@@ -4549,8 +4549,8 @@ public final class NetworkEngine {
                     playerTeamK.teamColorId = i3;
                 }
             }
-            M();
-            P();
+            refreshTeamSortAndAiGroups();
+            markPlayerUpdatePending();
         }
     }
 
@@ -4682,9 +4682,9 @@ public final class NetworkEngine {
             Collections.shuffle(arrayList4);
             int i19 = 0;
             for (int i20 = 0; i20 < arrayList4.size(); i20++) {
-                int teamCount = PlayerTeam.getTeamCount();
-                if (teamCount != -1) {
-                    ((PlayerTeam) arrayList4.get(i20)).setTeamId(teamCount);
+                int freeTeamSlotId = PlayerTeam.getFirstFreeTeamSlotId();
+                if (freeTeamSlotId != -1) {
+                    ((PlayerTeam) arrayList4.get(i20)).setTeamId(freeTeamSlotId);
                 }
                 ((PlayerTeam) arrayList4.get(i20)).teamColorId = -3;
                 i19++;
@@ -4692,7 +4692,7 @@ public final class NetworkEngine {
         } else {
             throw new RuntimeException("overrideTeamLayout: unhandled layout: " + teamLayoutType);
         }
-        M();
+        refreshTeamSortAndAiGroups();
     }
 
     public void a(PlayerTeam playerTeam, int i, Integer num) {
@@ -4738,12 +4738,12 @@ public final class NetworkEngine {
             str2 = "Player - " + (playerTeam.teamId + 1) + VariableScope.nullOrMissingString;
         }
         String str3 = str2 + " was defeated";
-        if (!this.bb) {
-            str = str3 + " (Team: " + playerTeam.getTeamColorName() + ")";
+        if (!this.freeForAllMode) {
+            str = str3 + " (Team: " + playerTeam.getTeamSlotLabel() + ")";
         } else {
-            int teamById = PlayerTeam.getTeamById();
-            str = str3 + " (" + teamById + " players remaining)";
-            if (teamById == 1) {
+            int remainingPlayerCount = PlayerTeam.getRemainingPlayerCount();
+            str = str3 + " (" + remainingPlayerCount + " players remaining)";
+            if (remainingPlayerCount == 1) {
                 z = true;
             }
         }
@@ -4758,7 +4758,7 @@ public final class NetworkEngine {
             j(str);
         }
         if (z) {
-            PlayerTeam.updateTeamWipeStatus();
+            PlayerTeam.markRemainingTeamsVictorious();
         }
     }
 
@@ -4776,12 +4776,12 @@ public final class NetworkEngine {
         } else {
             str = str3 + " has been wiped out";
         }
-        if (!this.bb) {
-            str2 = str + " (Team: " + playerTeam.getTeamColorName() + ")";
+        if (!this.freeForAllMode) {
+            str2 = str + " (Team: " + playerTeam.getTeamSlotLabel() + ")";
         } else {
-            int teamById = PlayerTeam.getTeamById();
-            str2 = str + " (" + teamById + " players remaining)";
-            if (teamById == 1) {
+            int remainingPlayerCount = PlayerTeam.getRemainingPlayerCount();
+            str2 = str + " (" + remainingPlayerCount + " players remaining)";
+            if (remainingPlayerCount == 1) {
                 z = true;
             }
         }
@@ -4792,28 +4792,28 @@ public final class NetworkEngine {
         if (playerTeam.isTeamVictory) {
             str2 = null;
         }
-        if (playerTeam.addCredits()) {
+        if (playerTeam.isSpectatorTeamColor()) {
             str2 = null;
         }
         if (str2 != null) {
             j(str2);
         }
         if (z) {
-            PlayerTeam.updateTeamWipeStatus();
+            PlayerTeam.markRemainingTeamsVictorious();
         }
     }
 
-    public synchronized void ar() {
-        if (this.bD != null) {
-            this.bD.cancel();
-            this.bD = null;
+    public synchronized void stopMasterServerUpdateTimer() {
+        if (this.masterServerUpdateTimer != null) {
+            this.masterServerUpdateTimer.cancel();
+            this.masterServerUpdateTimer = null;
         }
     }
 
-    public synchronized void as() {
-        if (this.useMasterServer && this.q && this.isServer && this.bD == null) {
-            this.bD = new Timer();
-            this.bD.schedule(new TimerTask() { // from class: com.corrodinggames.rts.gameFramework.j.ad.6
+    public synchronized void startMasterServerUpdateTimer() {
+        if (this.useMasterServer && this.publishToMasterServer && this.isServer && this.masterServerUpdateTimer == null) {
+            this.masterServerUpdateTimer = new Timer();
+            this.masterServerUpdateTimer.schedule(new TimerTask() { // from class: com.corrodinggames.rts.gameFramework.j.ad.6
                 @Override // java.util.TimerTask, java.lang.Runnable
                 public void run() {
                     MasterServerClient.updateServerAsync();
@@ -4826,14 +4826,14 @@ public final class NetworkEngine {
     public String getPublicIpStatusText() {
         GameEngine gameEngine = GameEngine.getInstance();
         String str = VariableScope.nullOrMissingString;
-        if (gameEngine.networkEngine.isServer && !gameEngine.networkEngine.F) {
-            String strAi = gameEngine.networkEngine.ai();
+        if (gameEngine.networkEngine.isServer && !gameEngine.networkEngine.singleplayerServer) {
+            String localIpAddressSummary = gameEngine.networkEngine.getLocalIpAddressSummary();
             if (this.D) {
                 if (this.E != null) {
                     str = str + this.E;
                 }
-            } else if (strAi != null) {
-                String str2 = "Local IP address: " + strAi + " port: " + gameEngine.networkEngine.m;
+            } else if (localIpAddressSummary != null) {
+                String str2 = "Local IP address: " + localIpAddressSummary + " port: " + gameEngine.networkEngine.m;
                 if (gameEngine.networkEngine.publicIpLookupSuccess != null) {
                     if (!gameEngine.networkEngine.publicIpLookupSuccess.booleanValue()) {
                         str2 = str2 + "\nUnable to get a public IP address, check your internet connection";
@@ -4848,7 +4848,7 @@ public final class NetworkEngine {
                 str = str + "You do not have a network connection";
             }
         }
-        if (gameEngine.loadLevelNetwork()) {
+        if (gameEngine.isSinglePlayerGame()) {
             if (this.p) {
                 str = str + "SandBox Mode!\nPlace any unit, Control all teams, Special powers";
             } else {
@@ -4856,7 +4856,7 @@ public final class NetworkEngine {
             }
         }
         boolean z = true;
-        if (GameEngine.isDesktop() && gameEngine.networkEngine.isServer) {
+        if (GameEngine.isAndroidPlatform() && gameEngine.networkEngine.isServer) {
             z = false;
         }
         if (str.length() != 0) {
@@ -4865,7 +4865,7 @@ public final class NetworkEngine {
                 str = str + "\n";
             }
         }
-        if (gameEngine.networkEngine.av || gameEngine.networkEngine.isServer) {
+        if (gameEngine.networkEngine.gameSetupReceived || gameEngine.networkEngine.isServer) {
             if (z) {
                 if (gameEngine.networkEngine.roomSettings.gameModeType != null) {
                     str = str + "Game Mode: " + gameEngine.networkEngine.roomSettings.gameModeType.a();
@@ -4888,13 +4888,13 @@ public final class NetworkEngine {
                 str = str + "\nShared control: On";
             }
             if (this.isServer) {
-                if (gameEngine.networkEngine.n != null) {
+                if (gameEngine.networkEngine.roomPassword != null) {
                     str = str + "\nPassword Protection: On";
                 }
-                if (!gameEngine.networkEngine.q && !gameEngine.networkEngine.F) {
+                if (!gameEngine.networkEngine.publishToMasterServer && !gameEngine.networkEngine.singleplayerServer) {
                     str = str + "\nServer Visibility: Hidden";
                 }
-                if (gameEngine.networkEngine.o && !gameEngine.networkEngine.F) {
+                if (gameEngine.networkEngine.requireActiveMods && !gameEngine.networkEngine.singleplayerServer) {
                     ArrayList activeMods = gameEngine.modManager.getActiveMods();
                     str = str + "\n-- Required Mods: --\n";
                     int i = 0;
@@ -4920,8 +4920,8 @@ public final class NetworkEngine {
         return str;
     }
 
-    public String au() {
-        if (!this.o) {
+    public String getRequiredModsSummary() {
+        if (!this.requireActiveMods) {
             return null;
         }
         ArrayList activeMods = GameEngine.getInstance().modManager.getActiveMods();
@@ -4948,7 +4948,7 @@ public final class NetworkEngine {
         return str;
     }
 
-    public String av() {
+    public String getNetworkMapPath() {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.networkEngine.roomSettings.mapPath == null || gameEngine.networkEngine.roomSettings.gameModeType == null) {
             return null;
@@ -4963,7 +4963,7 @@ public final class NetworkEngine {
         return null;
     }
 
-    public boolean aw() {
+    public boolean isServerOrProxyController() {
         return this.isServer || this.isProxyController;
     }
 
@@ -5040,7 +5040,7 @@ public final class NetworkEngine {
                 a("[Game not yet started]", networkConnection);
                 return true;
             }
-            ag();
+            scheduleDefaultReturnToBattleroom();
             return true;
         }
         if ("teamlock".equals(lowerCase)) {
@@ -5157,7 +5157,7 @@ public final class NetworkEngine {
                             return true;
                         }
                         synchronized (this.connectionLock) {
-                            iIntValue = PlayerTeam.getTeamCount();
+                            iIntValue = PlayerTeam.getFirstFreeTeamSlotId();
                             if (iIntValue != -1) {
                                 a(playerTeam, -3);
                             }
@@ -5172,7 +5172,7 @@ public final class NetworkEngine {
                             return true;
                         }
                         synchronized (this.connectionLock) {
-                            if (this.localPlayerTeam != playerTeam && (playerTeamK = PlayerTeam.k(iIntValue - 1)) != null && !playerTeamK.isTeamSpectator && !playerTeamK.addCredits()) {
+                            if (this.localPlayerTeam != playerTeam && (playerTeamK = PlayerTeam.k(iIntValue - 1)) != null && !playerTeamK.isTeamSpectator && !playerTeamK.isSpectatorTeamColor()) {
                                 a("[Cannot move '" + playerTeam.teamName + "' to slot: " + iIntValue + " - Player: " + playerTeamK.teamName + " is in that slot.]", networkConnection);
                                 return true;
                             }
@@ -5200,7 +5200,7 @@ public final class NetworkEngine {
                     } else {
                         j("Player '" + playerTeam.teamName + "' moved themselves to: " + iIntValue);
                     }
-                    P();
+                    markPlayerUpdatePending();
                     MultiplayerBattleroomActivity.updateUI();
                     return true;
                 } catch (NumberFormatException e2) {
@@ -5246,11 +5246,11 @@ public final class NetworkEngine {
                     playerTeam.teamColorId = i;
                     a("Player '" + playerTeam.teamName + "' team changed to: " + iIntValue2, networkConnection);
                 }
-                P();
+                markPlayerUpdatePending();
                 MultiplayerBattleroomActivity.updateUI();
                 return true;
             } catch (NumberFormatException e3) {
-                m("'" + strTrim + "' is not a number");
+                sendChatMessage("'" + strTrim + "' is not a number");
                 return true;
             }
         }
@@ -5263,21 +5263,21 @@ public final class NetworkEngine {
                 a("[Could not find player]", networkConnection);
                 return true;
             }
-            if (!playerTeam.isTeamAlly()) {
-                playerTeam.updateTeamAllyStatus();
-                boolean zIsTeamEnemy = playerTeam.isTeamEnemy();
-                GameEngine.log(str + ": Is voting to surrender (can surrender:" + zIsTeamEnemy + ", afk:" + playerTeam.isTeamAutoStartQueued + ", defeated:" + playerTeam.isTeamWipedOut + ", disconnected:" + playerTeam.isTeamActiveCheck() + ")");
-                if (zIsTeamEnemy) {
+            if (!playerTeam.hasSurrenderVote()) {
+                playerTeam.recordSurrenderVote();
+                boolean canSurrender = playerTeam.canVoteToSurrender();
+                GameEngine.log(str + ": Is voting to surrender (can surrender:" + canSurrender + ", afk:" + playerTeam.isTeamAutoStartQueued + ", defeated:" + playerTeam.isTeamWipedOut + ", disconnected:" + playerTeam.isTeamDisconnected() + ")");
+                if (canSurrender) {
                     str3 = VariableScope.nullOrMissingString;
                 } else {
                     str3 = "(Cannot vote) ";
                 }
             } else {
                 GameEngine.log(str + ": Is already voting to surrender but updating timestamp");
-                playerTeam.updateTeamAllyStatus();
+                playerTeam.recordSurrenderVote();
                 str3 = "(Already voted) ";
             }
-            a(networkConnection, playerTeam, str, "-t " + str3 + "[Votes to surrender " + (PlayerTeam.removeCredits(playerTeam.teamColorId) + "/" + PlayerTeam.removeUnitFromTeam(playerTeam.teamColorId)) + "]");
+            a(networkConnection, playerTeam, str, "-t " + str3 + "[Votes to surrender " + (PlayerTeam.getSurrenderVoteCount(playerTeam.teamColorId) + "/" + PlayerTeam.getSurrenderEligibleCount(playerTeam.teamColorId)) + "]");
             return true;
         }
         return false;
@@ -5288,7 +5288,7 @@ public final class NetworkEngine {
         if (gameEngine.networkEngine != null) {
             gameEngine.networkEngine.callbacks.onPasswordPrompt(passwordHandler2);
         }
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return;
         }
         AppFrameworkUtils.postRunnable(new Runnable() { // from class: com.corrodinggames.rts.gameFramework.j.ad.7
@@ -5299,12 +5299,12 @@ public final class NetworkEngine {
         });
     }
 
-    public ArrayList ax() {
-        ArrayList arrayListAddEnergy;
+    public ArrayList getActivePlayerTeamsSnapshot() {
+        ArrayList activePlayerTeams;
         synchronized (this.connectionLock) {
-            arrayListAddEnergy = PlayerTeam.addEnergy();
+            activePlayerTeams = PlayerTeam.getTeams();
         }
-        return arrayListAddEnergy;
+        return activePlayerTeams;
     }
 
     /* JADX INFO: renamed from: e */
@@ -5332,14 +5332,14 @@ public final class NetworkEngine {
     public NetworkConnection a(NetworkConnection networkConnection, int i, String str, String str2) {
         GameEngine gameEngine = GameEngine.getInstance();
         NetworkConnection networkConnection2 = new NetworkConnection(this, new SteamSocket(networkConnection, i));
-        networkConnection2.unknownIntK = i;
+        networkConnection2.relayChannelId = i;
         networkConnection2.relayConnection = networkConnection;
         networkConnection2.remoteId = str;
         networkConnection2.forwardedIpAddress = str2;
         try {
             networkConnection2.startWorkers();
             gameEngine.networkEngine.sendQueue.add(networkConnection2);
-            gameEngine.networkEngine.Q();
+            gameEngine.networkEngine.sendPlayerUpdateNow();
             return networkConnection2;
         } catch (Exception e) {
             e.printStackTrace();
@@ -5350,7 +5350,7 @@ public final class NetworkEngine {
 
     public NetworkConnection a(NetworkConnection networkConnection, int i) {
         for (NetworkConnection networkConnection2 : this.sendQueue) {
-            if (networkConnection2.unknownIntK == i && networkConnection2.relayConnection == networkConnection) {
+            if (networkConnection2.relayChannelId == i && networkConnection2.relayConnection == networkConnection) {
                 return networkConnection2;
             }
         }

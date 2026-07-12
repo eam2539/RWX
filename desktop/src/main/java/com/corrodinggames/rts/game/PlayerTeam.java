@@ -86,28 +86,28 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     public Integer teamAIDifficultyOverride;
 
     /* JADX INFO: renamed from: A */
-    public Integer teamAIBehaviourOverride;
+    public Integer startingUnitsOverride;
 
     /* JADX INFO: renamed from: B */
     public Integer teamAILevelOverride;
 
     /* JADX INFO: renamed from: C */
-    public Integer teamAIControlOverride;
+    public Integer playerColorOverride;
 
     /* JADX INFO: renamed from: D */
-    public int teamAIGroupOverride;
+    public int assignedTeamColorIndex;
 
     /* JADX INFO: renamed from: at */
-    private boolean teamColorBrightness;
+    private boolean teamSurrenderTriggered;
 
     /* JADX INFO: renamed from: au */
-    private int teamColorHex;
+    private int surrenderVoteTimeMillis;
 
     /* JADX INFO: renamed from: E */
     public boolean isTeamVictory;
 
     /* JADX INFO: renamed from: av */
-    private int teamColorPacked;
+    private int teamVictoryCleanupStartTimeMillis;
 
     /* JADX INFO: renamed from: F */
     public boolean isTeamDefeatedTech;
@@ -143,10 +143,10 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     public String teamAIHint;
 
     /* JADX INFO: renamed from: Q */
-    public int teamAILevel;
+    public int hostTeamFlag;
 
     /* JADX INFO: renamed from: R */
-    public int teamAIBaseLevel;
+    public int maxNonBuildingUnitCountIncludingQueued;
 
     /* JADX INFO: renamed from: S */
     public boolean isTeamReady;
@@ -182,7 +182,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     public int teamSortIndex;
 
     /* JADX INFO: renamed from: ad */
-    int lastUnitCountCacheTick;
+    int teamStatsMismatchCount;
 
     /* JADX INFO: renamed from: ae */
     public Paint teamColorPaint;
@@ -191,25 +191,25 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     public Paint teamTextPaint;
 
     /* JADX INFO: renamed from: ai */
-    int lastCustomColorCacheTick;
+    int defeatCheckDelayTicks;
 
     /* JADX INFO: renamed from: ak */
     AnimationSet teamAnimationSet;
 
     /* JADX INFO: renamed from: al */
-    StoredResources teamColorEffect;
+    StoredResources customResources;
 
     /* JADX INFO: renamed from: am */
-    public ResourceConditionChecker teamColorTexture;
+    public ResourceConditionChecker resourceShortageTracker;
 
     /* JADX INFO: renamed from: an */
-    public float teamColorAlpha;
+    public float resourceShortageTrackerTimer;
 
     /* JADX INFO: renamed from: aq */
-    long teamColorBlue;
+    long displayedCreditsCacheTimeMillis;
 
     /* JADX INFO: renamed from: ar */
-    double teamColorHue;
+    double cachedDisplayedCreditsTotal;
 
     /* JADX INFO: renamed from: a */
     static FastArrayList teamStaticHelper = new FastArrayList();
@@ -251,13 +251,13 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     static String[] teamColorNames = new String[10];
 
     /* JADX INFO: renamed from: aj */
-    static int teamColorCount = -99;
+    static int cachedAiDifficultyForTeamNames = -99;
 
     /* JADX INFO: renamed from: ao */
-    public static float teamColorRed = 40.0f;
+    public static float resourceIncomeRatePeriod = 40.0f;
 
     /* JADX INFO: renamed from: ap */
-    public static float teamColorGreen = 10.0f;
+    public static float resourceIncomeUpdateInterval = 10.0f;
 
     @Override // java.lang.Comparable
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
@@ -277,7 +277,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: b */
-    public void writeToStream(GameOutputStream gameOutputStream) throws IOException {
+    public void writeBasicTeamState(GameOutputStream gameOutputStream) throws IOException {
         gameOutputStream.writeByte(this.teamId);
         gameOutputStream.writeInt((int) this.credits);
         gameOutputStream.writeInt(this.teamColorId);
@@ -302,24 +302,24 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         }
         if (gameOutputStream.getMaxSize() >= 125) {
             gameOutputStream.writeBoolean(this.isTeamVictory);
-            gameOutputStream.writeBoolean(this.teamColorBrightness);
-            gameOutputStream.writeInt(this.teamColorHex);
+            gameOutputStream.writeBoolean(this.teamSurrenderTriggered);
+            gameOutputStream.writeInt(this.surrenderVoteTimeMillis);
         }
         if (gameOutputStream.getMaxSize() >= 149) {
             gameOutputStream.writeStringNullable(this.teamAIHint);
-            gameOutputStream.writeInt(this.teamAILevel);
+            gameOutputStream.writeInt(this.hostTeamFlag);
         }
         if (gameOutputStream.getMaxSize() >= 156) {
             gameOutputStream.writeIntNullable(this.teamAIDifficultyOverride);
-            gameOutputStream.writeIntNullable(this.teamAIBehaviourOverride);
+            gameOutputStream.writeIntNullable(this.startingUnitsOverride);
             gameOutputStream.writeIntNullable(this.teamAILevelOverride);
-            gameOutputStream.writeIntNullable(this.teamAIControlOverride);
-            gameOutputStream.writeInt(this.teamAIGroupOverride);
+            gameOutputStream.writeIntNullable(this.playerColorOverride);
+            gameOutputStream.writeInt(this.assignedTeamColorIndex);
         }
     }
 
     /* JADX INFO: renamed from: c */
-    public void updateTeam(GameOutputStream gameOutputStream) throws IOException {
+    public void writeNetworkTeamUpdate(GameOutputStream gameOutputStream) throws IOException {
         gameOutputStream.writeByte(0);
         gameOutputStream.writeInt(getTeamId());
         gameOutputStream.writeBoolean(this.isTeamConnectionActive);
@@ -327,7 +327,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: a */
-    public void readFromStream(GameInputStream gameInputStream) throws IOException {
+    public void readNetworkTeamUpdate(GameInputStream gameInputStream) throws IOException {
         gameInputStream.readByte();
         this.teamNetworkId = gameInputStream.readInt();
         this.teamLastPingTime = System.currentTimeMillis();
@@ -336,12 +336,12 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: b */
-    public void getAlliedTeams(GameInputStream gameInputStream) throws IOException {
-        compareToTeam(gameInputStream, false);
+    public void readBasicTeamState(GameInputStream gameInputStream) throws IOException {
+        readBasicTeamState(gameInputStream, false);
     }
 
     /* JADX INFO: renamed from: a */
-    public void compareToTeam(GameInputStream gameInputStream, boolean z) throws IOException {
+    public void readBasicTeamState(GameInputStream gameInputStream, boolean z) throws IOException {
         if (!z) {
             setTeamId((int) gameInputStream.readByte());
             this.credits = gameInputStream.readInt();
@@ -369,8 +369,8 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 this.isTeamSpectator = z2;
                 this.teamPingTime = i;
             }
-        } else if (GameEngine.getInstance().networkEngine.B) {
-            NetworkEngine.g("AI was skipping in networked game, steam version:" + gameInputStream.getMaxBlockSize());
+        } else if (GameEngine.getInstance().networkEngine.networkGameActive) {
+            NetworkEngine.reportDesync("AI was skipping in networked game, steam version:" + gameInputStream.getMaxBlockSize());
         }
         if (gameInputStream.getProtocolVersion() >= 50 && gameInputStream.getMaxBlockSize() >= 91) {
             this.teamSortIndex = gameInputStream.readInt();
@@ -386,8 +386,8 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             int i2 = gameInputStream.readInt();
             if (!z) {
                 this.isTeamVictory = z3;
-                this.teamColorBrightness = z4;
-                this.teamColorHex = i2;
+                this.teamSurrenderTriggered = z4;
+                this.surrenderVoteTimeMillis = i2;
             }
         }
         if (gameInputStream.getProtocolVersion() >= 90 && gameInputStream.getMaxBlockSize() >= 149) {
@@ -395,7 +395,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             int i3 = gameInputStream.readInt();
             if (!z) {
                 this.teamAIHint = nullableString;
-                this.teamAILevel = i3;
+                this.hostTeamFlag = i3;
             }
         }
         if (gameInputStream.getProtocolVersion() >= 93 && gameInputStream.getMaxBlockSize() >= 156) {
@@ -409,10 +409,10 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                     c("readIn aiDifficultyOverride was:" + this.teamAIDifficultyOverride + " now:  " + nullableInt);
                 }
                 this.teamAIDifficultyOverride = nullableInt;
-                this.teamAIBehaviourOverride = nullableInt2;
+                this.startingUnitsOverride = nullableInt2;
                 this.teamAILevelOverride = nullableInt3;
-                this.teamAIControlOverride = nullableInt4;
-                this.teamAIGroupOverride = i4;
+                this.playerColorOverride = nullableInt4;
+                this.assignedTeamColorIndex = i4;
             }
         }
     }
@@ -420,22 +420,22 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     @Override // com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
         gameOutputStream.debugPlaceholder("Writing team: " + this.teamName);
-        writeToStream(gameOutputStream);
+        writeBasicTeamState(gameOutputStream);
         if (gameOutputStream.getMaxSize() >= 44) {
             gameOutputStream.writeByte(4);
             gameOutputStream.writeBoolean(this.isTeamWipedOut);
             gameOutputStream.writeBoolean(this.isTeamDefeatedTech);
             gameOutputStream.writeBoolean(true);
-            updateTeam2(gameOutputStream);
-            this.teamColorEffect.a(gameOutputStream);
+            writeFogState(gameOutputStream);
+            this.customResources.a(gameOutputStream);
             AnimationTag.a(this.teamAnimationSet, gameOutputStream);
             gameOutputStream.writeBoolean(this.isTeamLocked);
         }
     }
 
     /* JADX INFO: renamed from: c */
-    public void getActiveTeams(GameInputStream gameInputStream) throws IOException {
-        getAlliedTeams(gameInputStream);
+    public void readExtendedTeamState(GameInputStream gameInputStream) throws IOException {
+        readBasicTeamState(gameInputStream);
         if (gameInputStream.getProtocolVersion() >= 26) {
             byte b = gameInputStream.readByte();
             this.isTeamWipedOut = gameInputStream.readBoolean();
@@ -443,10 +443,10 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 this.isTeamDefeatedTech = gameInputStream.readBoolean();
             }
             if (gameInputStream.readBoolean()) {
-                updateTeamStatus(gameInputStream);
+                readFogState(gameInputStream);
             }
             if (b >= 2) {
-                this.teamColorEffect.a(gameInputStream);
+                this.customResources.a(gameInputStream);
             }
             if (b >= 3) {
                 a(AnimationTag.a(gameInputStream));
@@ -458,7 +458,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: d */
-    public void updateTeam2(GameOutputStream gameOutputStream) throws IOException {
+    public void writeFogState(GameOutputStream gameOutputStream) throws IOException {
         GameEngine.getInstance();
         gameOutputStream.debugPlaceholder("-- Saving fog --");
         gameOutputStream.writeBoolean(this.fogOfWarData != null);
@@ -475,7 +475,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: d */
-    public void updateTeamStatus(GameInputStream gameInputStream) throws IOException {
+    public void readFogState(GameInputStream gameInputStream) throws IOException {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameInputStream.readBoolean()) {
             this.fogOfWarWidth = gameInputStream.readInt();
@@ -486,7 +486,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 i = gameEngine.tileMap.tileCountX;
                 i2 = gameEngine.tileMap.tileCountY;
                 if (this.fogOfWarWidth != i || this.fogOfWarHeight != i2) {
-                    GameEngine.updatePaintTextSizeIfNeeded("Map size does not match fog size: " + this.fogOfWarWidth + "!=" + i + "|" + this.fogOfWarHeight + "!=" + i2);
+                    GameEngine.logColored("Map size does not match fog size: " + this.fogOfWarWidth + "!=" + i + "|" + this.fogOfWarHeight + "!=" + i2);
                 }
             }
             this.fogOfWarData = new byte[i][i2];
@@ -501,7 +501,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: a */
-    public void writeTeamDataToStream() {
+    public void resetFogOfWar() {
         if (this.fogOfWarData != null) {
             for (int i = 0; i < this.fogOfWarWidth; i++) {
                 for (int i2 = 0; i2 < this.fogOfWarHeight; i2++) {
@@ -511,7 +511,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         }
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.playerTeam == this) {
-            gameEngine.minimap.field_O = true;
+            gameEngine.minimap.isFogRefreshPending = true;
             if (gameEngine.tileMap != null) {
                 gameEngine.tileMap.resetFogToInvisible();
                 gameEngine.tileMap.invalidateAllLayerCells();
@@ -520,16 +520,16 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: b */
-    public boolean addCredits() {
+    public boolean isSpectatorTeamColor() {
         return this.teamColorId == -3;
     }
 
     /* JADX INFO: renamed from: a */
-    public static ArrayList<PlayerTeam> readTeamDataFromStream(boolean z) {
+    public static ArrayList<PlayerTeam> getSortedTeams(boolean z) {
         ArrayList arrayList = new ArrayList();
         for (int i = 0; i < TEAM_ENEMIES; i++) {
             PlayerTeam playerTeam = teamColorArray[i];
-            if (playerTeam != null && (z || playerTeam.addCredits())) {
+            if (playerTeam != null && (z || playerTeam.isSpectatorTeamColor())) {
                 arrayList.add(playerTeam);
             }
         }
@@ -538,16 +538,16 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: c */
-    public static ArrayList<PlayerTeam> addEnergy() {
-        return isEnemyToTeam(false);
+    public static ArrayList<PlayerTeam> getTeams() {
+        return getTeams(false);
     }
 
     /* JADX INFO: renamed from: b */
-    public static ArrayList isEnemyToTeam(boolean z) {
+    public static ArrayList getTeams(boolean includeSpectatorTeamColor) {
         ArrayList arrayList = new ArrayList();
         for (int i = 0; i < TEAM_ENEMIES; i++) {
             PlayerTeam playerTeam = teamColorArray[i];
-            if (playerTeam != null && (z || !playerTeam.addCredits())) {
+            if (playerTeam != null && (includeSpectatorTeamColor || !playerTeam.isSpectatorTeamColor())) {
                 arrayList.add(playerTeam);
             }
         }
@@ -555,12 +555,12 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: d */
-    public static PlayerTeam[] setTeamDefeated() {
+    public static PlayerTeam[] getTeamInstances() {
         return teamInstances;
     }
 
     /* JADX INFO: renamed from: e */
-    public static void getTeamStatistics() {
+    public static void refreshTeamInstances() {
         FastArrayList fastArrayList = teamStaticHelper;
         fastArrayList.clear();
         fastArrayList.add(TEAM_ALL);
@@ -582,11 +582,11 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: f */
-    public static ArrayList<Integer> getAllTeams() {
+    public static ArrayList<Integer> getTeamColorIds() {
         ArrayList arrayList = new ArrayList();
         for (int i = 0; i < TEAM_NEUTRAL; i++) {
             PlayerTeam playerTeam = teamColorArray[i];
-            if (playerTeam != null && !playerTeam.addCredits() && !arrayList.contains(Integer.valueOf(playerTeam.teamColorId))) {
+            if (playerTeam != null && !playerTeam.isSpectatorTeamColor() && !arrayList.contains(Integer.valueOf(playerTeam.teamColorId))) {
                 arrayList.add(Integer.valueOf(playerTeam.teamColorId));
             }
         }
@@ -595,11 +595,11 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: a */
-    public static int updateNetworkTeamData(int i, boolean z) {
+    public static int countPlayersWithTeamColor(int teamColorId, boolean excludeSpectators) {
         int i2 = 0;
         for (int i3 = 0; i3 < TEAM_NEUTRAL; i3++) {
             PlayerTeam playerTeam = teamColorArray[i3];
-            if (playerTeam != null && playerTeam.teamColorId == i && !playerTeam.addCredits() && (!z || !playerTeam.isTeamSpectator)) {
+            if (playerTeam != null && playerTeam.teamColorId == teamColorId && !playerTeam.isSpectatorTeamColor() && (!excludeSpectators || !playerTeam.isTeamSpectator)) {
                 i2++;
             }
         }
@@ -607,11 +607,11 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: g */
-    public static int getTeamById() {
+    public static int getRemainingPlayerCount() {
         int i = 0;
         for (int i2 = 0; i2 < TEAM_NEUTRAL; i2++) {
             PlayerTeam playerTeam = teamColorArray[i2];
-            if (playerTeam != null && !playerTeam.addCredits() && !playerTeam.isTeamDefeatedTech && !playerTeam.isTeamWipedOut) {
+            if (playerTeam != null && !playerTeam.isSpectatorTeamColor() && !playerTeam.isTeamDefeatedTech && !playerTeam.isTeamWipedOut) {
                 i++;
             }
         }
@@ -619,79 +619,79 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: b */
-    public static void getResourceCost(int i, boolean z) throws IOException {
-        if (i < 10 || i == TEAM_NEUTRAL) {
+    public static void setMaxTeamId(int maxTeamId, boolean allowShrink) throws IOException {
+        if (maxTeamId < 10 || maxTeamId == TEAM_NEUTRAL) {
             return;
         }
-        if (i > TEAM_ALLIES) {
-            throw new IOException("setMaxTeamId: " + i + " is over limit of:" + TEAM_ALLIES);
+        if (maxTeamId > TEAM_ALLIES) {
+            throw new IOException("setMaxTeamId: " + maxTeamId + " is over limit of:" + TEAM_ALLIES);
         }
-        if (!z && i <= TEAM_NEUTRAL) {
+        if (!allowShrink && maxTeamId <= TEAM_NEUTRAL) {
             return;
         }
-        int i2 = i + TEAM_ALL_NEUTRAL;
-        PlayerTeam[] playerTeamArr = new PlayerTeam[i2];
-        for (int i3 = 0; i3 < teamColorArray.length; i3++) {
-            PlayerTeam playerTeam = teamColorArray[i3];
-            if (i3 < playerTeamArr.length) {
-                playerTeamArr[i3] = playerTeam;
+        int teamArraySize = maxTeamId + TEAM_ALL_NEUTRAL;
+        PlayerTeam[] resizedTeams = new PlayerTeam[teamArraySize];
+        for (int index = 0; index < teamColorArray.length; index++) {
+            PlayerTeam playerTeam = teamColorArray[index];
+            if (index < resizedTeams.length) {
+                resizedTeams[index] = playerTeam;
             }
         }
-        teamColorArray = playerTeamArr;
-        TEAM_NEUTRAL = i;
-        TEAM_ENEMIES = i2;
+        teamColorArray = resizedTeams;
+        TEAM_NEUTRAL = maxTeamId;
+        TEAM_ENEMIES = teamArraySize;
     }
 
     /* JADX INFO: renamed from: a */
-    public static String updateFogOfWar(int i) {
+    public static String getTeamSlotLabel(int i) {
         return i == 0 ? "A" : i == 1 ? "B" : i == 2 ? "C" : i == 3 ? "D" : i == 4 ? "E" : i == 5 ? "F" : i == 6 ? "G" : i == 7 ? "H" : i == 8 ? "I" : i == 9 ? "J" : i == 10 ? "K" : i == -3 ? "S" : VariableScope.nullOrMissingString + i;
     }
 
     /* JADX INFO: renamed from: h */
-    public String getTeamColorName() {
-        return updateFogOfWar(this.teamColorId);
+    public String getTeamSlotLabel() {
+        return getTeamSlotLabel(this.teamColorId);
     }
 
     /* JADX INFO: renamed from: i */
-    public void getTeamColorIdByName() {
+    public void resetVictoryAndSurrenderState() {
         this.isTeamVictory = false;
-        this.teamColorBrightness = false;
-        this.teamColorHex = -9999;
+        this.teamSurrenderTriggered = false;
+        this.surrenderVoteTimeMillis = -9999;
     }
 
     /* JADX INFO: renamed from: j */
-    public boolean getTeamColorNameById() {
+    public boolean hasTeamVictory() {
         return this.isTeamVictory;
     }
 
     /* JADX INFO: renamed from: k */
-    public boolean isTeamAlly() {
-        return this.teamColorHex >= 0;
+    public boolean hasSurrenderVote() {
+        return this.surrenderVoteTimeMillis >= 0;
     }
 
     /* JADX INFO: renamed from: l */
-    public void updateTeamAllyStatus() {
-        this.teamColorHex = GameEngine.getInstance().lastTick;
+    public void recordSurrenderVote() {
+        this.surrenderVoteTimeMillis = GameEngine.getInstance().gameTimeMillis;
     }
 
     /* JADX INFO: renamed from: m */
-    public boolean isTeamEnemy() {
+    public boolean canVoteToSurrender() {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (((this.isTeamDefeatedTech || this.isTeamWipedOut) && !gameEngine.networkEngine.roomSettings.sharedControl) || this.isTeamSpectator || isTeamActiveCheck()) {
+        if (((this.isTeamDefeatedTech || this.isTeamWipedOut) && !gameEngine.networkEngine.roomSettings.sharedControl) || this.isTeamSpectator || isTeamDisconnected()) {
             return false;
         }
-        if (this.isTeamAutoStartQueued && !isTeamAlly()) {
+        if (this.isTeamAutoStartQueued && !hasSurrenderVote()) {
             return false;
         }
         return true;
     }
 
     /* JADX INFO: renamed from: b */
-    public static int removeCredits(int i) {
+    public static int getSurrenderVoteCount(int teamColorId) {
         int i2 = 0;
         for (int i3 = 0; i3 < TEAM_NEUTRAL; i3++) {
             PlayerTeam playerTeam = teamColorArray[i3];
-            if (playerTeam != null && playerTeam.teamColorId == i && playerTeam.isTeamAlly() && playerTeam.isTeamEnemy()) {
+            if (playerTeam != null && playerTeam.teamColorId == teamColorId && playerTeam.hasSurrenderVote() && playerTeam.canVoteToSurrender()) {
                 i2++;
             }
         }
@@ -699,11 +699,11 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: c */
-    public static int removeUnitFromTeam(int i) {
+    public static int getSurrenderEligibleCount(int teamColorId) {
         int i2 = 0;
         for (int i3 = 0; i3 < TEAM_NEUTRAL; i3++) {
             PlayerTeam playerTeam = teamColorArray[i3];
-            if (playerTeam != null && playerTeam.teamColorId == i && playerTeam.isTeamEnemy()) {
+            if (playerTeam != null && playerTeam.teamColorId == teamColorId && playerTeam.canVoteToSurrender()) {
                 i2++;
             }
         }
@@ -711,22 +711,22 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: n */
-    public static void staticUpdateTeamData() {
+    public static void resetAllTeamStates() {
         for (int i = 0; i < TEAM_NEUTRAL; i++) {
             PlayerTeam playerTeam = teamColorArray[i];
             if (playerTeam != null) {
-                playerTeam.updateTeamPing();
+                playerTeam.resetTeamState();
             }
         }
-        staticUpdateTeamColors();
+        resetSpecialTeamStates();
     }
 
     /* JADX INFO: renamed from: o */
-    public static void staticUpdateTeamData2() {
-        for (int i = 0; i < TEAM_NEUTRAL; i++) {
-            PlayerTeam playerTeam = teamColorArray[i];
+    public static void clearSurrenderVotes() {
+        for (int index = 0; index < TEAM_NEUTRAL; index++) {
+            PlayerTeam playerTeam = teamColorArray[index];
             if (playerTeam != null) {
-                playerTeam.teamColorHex = -9999;
+                playerTeam.surrenderVoteTimeMillis = -9999;
             }
         }
     }
@@ -738,8 +738,8 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         }
         for (int i2 = 0; i2 < TEAM_NEUTRAL; i2++) {
             PlayerTeam playerTeam = teamColorArray[i2];
-            if (playerTeam != null && playerTeam.teamColorId == i && !playerTeam.teamColorBrightness) {
-                playerTeam.teamColorBrightness = true;
+            if (playerTeam != null && playerTeam.teamColorId == i && !playerTeam.teamSurrenderTriggered) {
+                playerTeam.teamSurrenderTriggered = true;
                 Command commandCreateCommand = gameEngine.commandController.createCommand();
                 commandCreateCommand.team = playerTeam;
                 commandCreateCommand.isSystemAction = true;
@@ -750,32 +750,32 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: e */
-    public static void updateTeamVictoryStatus(int i) {
-        int i2 = -9999;
-        for (int i3 = 0; i3 < TEAM_NEUTRAL; i3++) {
-            PlayerTeam playerTeam = teamColorArray[i3];
-            if (playerTeam != null && playerTeam.teamColorId == i && playerTeam.isTeamAlly() && playerTeam.isTeamEnemy() && playerTeam.teamColorHex > i2) {
-                i2 = playerTeam.teamColorHex;
+    public static void pruneExpiredSurrenderVotes(int teamColorId) {
+        int latestSurrenderVoteTime = -9999;
+        for (int index = 0; index < TEAM_NEUTRAL; index++) {
+            PlayerTeam playerTeam = teamColorArray[index];
+            if (playerTeam != null && playerTeam.teamColorId == teamColorId && playerTeam.hasSurrenderVote() && playerTeam.canVoteToSurrender() && playerTeam.surrenderVoteTimeMillis > latestSurrenderVoteTime) {
+                latestSurrenderVoteTime = playerTeam.surrenderVoteTimeMillis;
             }
         }
-        if (i2 >= 0 && GameViewUtils.a(i2, 120000)) {
-            for (PlayerTeam playerTeam2 : teamColorArray) {
-                if (playerTeam2 != null && playerTeam2.teamColorId == i) {
-                    playerTeam2.teamColorHex = -9999;
+        if (latestSurrenderVoteTime >= 0 && GameViewUtils.a(latestSurrenderVoteTime, 120000)) {
+            for (PlayerTeam playerTeam : teamColorArray) {
+                if (playerTeam != null && playerTeam.teamColorId == teamColorId) {
+                    playerTeam.surrenderVoteTimeMillis = -9999;
                 }
             }
         }
     }
 
     public boolean b(PlayerTeam playerTeam) {
-        if (isTeamNeutral() && playerTeam != null && d(playerTeam)) {
+        if (isSharedControlEnabled() && playerTeam != null && d(playerTeam)) {
             return true;
         }
         return false;
     }
 
     /* JADX INFO: renamed from: p */
-    public boolean isTeamNeutral() {
+    public boolean isSharedControlEnabled() {
         if (this.isTeamConnectionActive || this.isTeamNetworkActive) {
             return true;
         }
@@ -783,7 +783,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: q */
-    public boolean isTeamSpectatorCheck() {
+    public boolean isCurrentPlayerTeam() {
         if (GameEngine.getInstance().playerTeam == this) {
             return true;
         }
@@ -791,21 +791,21 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: c */
-    public void getResourceAmount(boolean z) {
+    public void setHostTeam(boolean z) {
         if (z) {
-            this.teamAILevel = 1;
+            this.hostTeamFlag = 1;
         } else {
-            this.teamAILevel = 0;
+            this.hostTeamFlag = 0;
         }
     }
 
     /* JADX INFO: renamed from: r */
-    public boolean isTeamObserverCheck() {
-        return this.teamAILevel == 1;
+    public boolean isHostTeam() {
+        return this.hostTeamFlag == 1;
     }
 
     /* JADX INFO: renamed from: a */
-    public final int addUnitToTeam(boolean z, boolean z2) {
+    public final int getUnitCount(boolean z, boolean z2) {
         TeamUnitStats teamUnitStats = this.teamStatistics;
         int i = teamUnitStats.c;
         if (z) {
@@ -818,12 +818,12 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: s */
-    public final int getTeamPing() {
+    public final int getTotalUnitCountIncludingQueued() {
         return this.teamStatistics.c + this.teamStatistics.f + this.teamStatistics.e;
     }
 
     /* JADX INFO: renamed from: a */
-    public final int canAffordResource(AnimationTag animationTag, boolean z, boolean z2) {
+    public final int getUnitCountWithTag(AnimationTag animationTag, boolean z, boolean z2) {
         TeamUnitStats teamUnitStats = this.teamStatistics;
         if (teamUnitStats.d == 0) {
             return 0;
@@ -863,58 +863,58 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: t */
-    public boolean isTeamDefeatedCheck() {
+    public boolean hasTeamStatsCacheMismatch() {
         boolean z = false;
         TeamUnitStats teamUnitStatsE = e(false);
         if (this.teamStatistics.b != teamUnitStatsE.b) {
-            GameEngine.updatePaintTextSizeIfNeeded("unitCountExcludingBuildingsIncludingQueued: " + this.teamStatistics.b + "!=" + teamUnitStatsE.b + " (team:" + this.teamId + " fails: " + this.lastUnitCountCacheTick + ")");
-            this.lastUnitCountCacheTick++;
+            GameEngine.logColored("unitCountExcludingBuildingsIncludingQueued: " + this.teamStatistics.b + "!=" + teamUnitStatsE.b + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+            this.teamStatsMismatchCount++;
             z = true;
         }
         if (this.teamStatistics.a != teamUnitStatsE.a) {
-            GameEngine.updatePaintTextSizeIfNeeded("unitsMax: " + this.teamStatistics.a + "!=" + teamUnitStatsE.a + " (team:" + this.teamId + " fails: " + this.lastUnitCountCacheTick + ")");
-            this.lastUnitCountCacheTick++;
+            GameEngine.logColored("unitsMax: " + this.teamStatistics.a + "!=" + teamUnitStatsE.a + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+            this.teamStatsMismatchCount++;
             z = true;
         }
         if (this.teamStatistics.g != teamUnitStatsE.g) {
-            GameEngine.updatePaintTextSizeIfNeeded("incomeRate: " + this.teamStatistics.g + "!=" + teamUnitStatsE.g + " (team:" + this.teamId + " fails: " + this.lastUnitCountCacheTick + ")");
-            this.lastUnitCountCacheTick++;
+            GameEngine.logColored("incomeRate: " + this.teamStatistics.g + "!=" + teamUnitStatsE.g + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+            this.teamStatsMismatchCount++;
             z = true;
         }
         if (this.teamStatistics.f != teamUnitStatsE.f) {
-            GameEngine.updatePaintTextSizeIfNeeded("incompleteUnitCountOfAllTypes: " + this.teamStatistics.f + "!=" + teamUnitStatsE.f + " (team:" + this.teamId + " fails: " + this.lastUnitCountCacheTick + ")");
-            this.lastUnitCountCacheTick++;
+            GameEngine.logColored("incompleteUnitCountOfAllTypes: " + this.teamStatistics.f + "!=" + teamUnitStatsE.f + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+            this.teamStatsMismatchCount++;
             z = true;
         }
         if (this.teamStatistics.e != teamUnitStatsE.e) {
-            GameEngine.updatePaintTextSizeIfNeeded("queuedCountOfAllTypes: " + this.teamStatistics.e + "!=" + teamUnitStatsE.e + " (team:" + this.teamId + " fails: " + this.lastUnitCountCacheTick + ")");
-            this.lastUnitCountCacheTick++;
+            GameEngine.logColored("queuedCountOfAllTypes: " + this.teamStatistics.e + "!=" + teamUnitStatsE.e + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+            this.teamStatsMismatchCount++;
             z = true;
         }
         if (this.teamStatistics.c != teamUnitStatsE.c) {
-            GameEngine.updatePaintTextSizeIfNeeded("unitCountOfAllTypesOnlyCompleted: " + this.teamStatistics.c + "!=" + teamUnitStatsE.c + " (team:" + this.teamId + " fails: " + this.lastUnitCountCacheTick + ")");
-            this.lastUnitCountCacheTick++;
+            GameEngine.logColored("unitCountOfAllTypesOnlyCompleted: " + this.teamStatistics.c + "!=" + teamUnitStatsE.c + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+            this.teamStatsMismatchCount++;
             z = true;
         }
         if (!this.teamStatistics.h.e(teamUnitStatsE.h)) {
-            GameEngine.updatePaintTextSizeIfNeeded("customIncomeRate: " + this.teamStatistics.h + "!=" + teamUnitStatsE.h + " (team:" + this.teamId + " fails: " + this.lastUnitCountCacheTick + ")");
-            GameEngine.updatePaintTextSizeIfNeeded("currentCaches:" + this.teamStatistics.h.a(false, true, 30, true, true));
-            GameEngine.updatePaintTextSizeIfNeeded("targetUnitCache:" + teamUnitStatsE.h.a(false, true, 30, true, true));
-            this.lastUnitCountCacheTick++;
+            GameEngine.logColored("customIncomeRate: " + this.teamStatistics.h + "!=" + teamUnitStatsE.h + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+            GameEngine.logColored("currentCaches:" + this.teamStatistics.h.a(false, true, 30, true, true));
+            GameEngine.logColored("targetUnitCache:" + teamUnitStatsE.h.a(false, true, 30, true, true));
+            this.teamStatsMismatchCount++;
             z = true;
         }
         if (!this.teamStatistics.l.e(teamUnitStatsE.l)) {
-            GameEngine.updatePaintTextSizeIfNeeded("streamingRateNegative (team:" + this.teamId + " fails: " + this.lastUnitCountCacheTick + ")");
-            GameEngine.updatePaintTextSizeIfNeeded("currentCaches:" + this.teamStatistics.l.a(false, true, 30, true, true));
-            GameEngine.updatePaintTextSizeIfNeeded("targetUnitCache:" + teamUnitStatsE.l.a(false, true, 30, true, true));
-            this.lastUnitCountCacheTick++;
+            GameEngine.logColored("streamingRateNegative (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+            GameEngine.logColored("currentCaches:" + this.teamStatistics.l.a(false, true, 30, true, true));
+            GameEngine.logColored("targetUnitCache:" + teamUnitStatsE.l.a(false, true, 30, true, true));
+            this.teamStatsMismatchCount++;
             z = true;
         }
         if (!this.teamStatistics.k.e(teamUnitStatsE.k)) {
-            GameEngine.updatePaintTextSizeIfNeeded("streamingRatePositive (team:" + this.teamId + " fails: " + this.lastUnitCountCacheTick + ")");
-            GameEngine.updatePaintTextSizeIfNeeded("currentCaches:" + this.teamStatistics.k.a(false, true, 30, true, true));
-            GameEngine.updatePaintTextSizeIfNeeded("targetUnitCache:" + teamUnitStatsE.k.a(false, true, 30, true, true));
-            this.lastUnitCountCacheTick++;
+            GameEngine.logColored("streamingRatePositive (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+            GameEngine.logColored("currentCaches:" + this.teamStatistics.k.a(false, true, 30, true, true));
+            GameEngine.logColored("targetUnitCache:" + teamUnitStatsE.k.a(false, true, 30, true, true));
+            this.teamStatsMismatchCount++;
             z = true;
         }
         if (z) {
@@ -925,7 +925,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     private TeamUnitStats e(boolean z) {
         GameEngine gameEngine = GameEngine.getInstance();
         TeamUnitStats teamUnitStats = new TeamUnitStats();
-        teamUnitStats.a = gameEngine.currentTimeMillis;
+        teamUnitStats.a = gameEngine.currentUnitCap;
         BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
@@ -937,8 +937,8 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 }
             }
         }
-        if (teamUnitStats.a > gameEngine.lastTimeMillis) {
-            teamUnitStats.a = gameEngine.lastTimeMillis;
+        if (teamUnitStats.a > gameEngine.maxUnitCap) {
+            teamUnitStats.a = gameEngine.maxUnitCap;
         }
         return teamUnitStats;
     }
@@ -949,30 +949,30 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         }
         this.teamStatistics = e(true);
         this.isTeamReady = false;
-        if (this.teamAIBaseLevel < this.teamStatistics.b) {
-            this.teamAIBaseLevel = this.teamStatistics.b;
+        if (this.maxNonBuildingUnitCountIncludingQueued < this.teamStatistics.b) {
+            this.maxNonBuildingUnitCountIncludingQueued = this.teamStatistics.b;
         }
         if (!this.isTeamControlledByAI && this.teamStatistics.m) {
             this.isTeamControlledByAI = true;
         }
-        if (!this.isTeamActive && getTeamPing() > 0) {
+        if (!this.isTeamActive && getTotalUnitCountIncludingQueued() > 0) {
             this.isTeamActive = true;
         }
         T();
     }
 
     /* JADX INFO: renamed from: u */
-    public int getCreditsScaledByEconomy() {
+    public int getEconomyScaledIncomeRate() {
         return (int) (this.teamStatistics.g * getEconomyMultiplier());
     }
 
     /* JADX INFO: renamed from: v */
-    public int getEnergyScaledByCredits() {
-        return (int) ((getCreditsScaledByEconomy() * getSpectatorEnergyFactor()) + 0.5f);
+    public int getScaledIncomeRate() {
+        return (int) ((getEconomyScaledIncomeRate() * getSpectatorEnergyFactor()) + 0.5f);
     }
 
     /* JADX INFO: renamed from: a */
-    public int isAllyToTeam(Resource resource) {
+    public int getResourceDrainRate(Resource resource) {
         return 0 - ((int) this.teamStatistics.l.a(resource));
     }
 
@@ -996,17 +996,17 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: w */
-    public int getTeamUnitCountInt() {
+    public int getNonBuildingUnitCountIncludingQueued() {
         return this.teamStatistics.b;
     }
 
     /* JADX INFO: renamed from: x */
-    public int getTeamBuildingCountInt() {
+    public int getUnitCap() {
         return this.teamStatistics.a;
     }
 
     /* JADX INFO: renamed from: y */
-    public String getTeamDisplayName() {
+    public String getPlayerListTeamSuffix() {
         int teamId = getTeamId();
         if (teamId == -99 || this.isTeamSpectator) {
             return VariableScope.nullOrMissingString;
@@ -1031,7 +1031,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         if (teamId == -2) {
             return "-";
         }
-        if (isTeamObserverCheck()) {
+        if (isHostTeam()) {
             return teamId + " (HOST)";
         }
         return VariableScope.nullOrMissingString + teamId;
@@ -1049,7 +1049,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: B */
-    public boolean isTeamActiveCheck() {
+    public boolean isTeamDisconnected() {
         if (this.teamLastPingTime != -99 && this.teamLastPingTime != -1 && this.teamLastPingTime < System.currentTimeMillis() - 15000) {
             return true;
         }
@@ -1057,7 +1057,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: P */
-    public static void updateTeamDefeatStatus() {
+    public static void markTeamStatsDirtyFromMetadataChange() {
         if (GameEngine.getInstance().isNetworkGameActive()) {
             GameEngine.log("Skipping updateAllCachesFromChangedMetadata due to desync risk");
             return;
@@ -1076,7 +1076,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             return this.teamPingTime;
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        if ((gameEngine.networkEngine.B || gameEngine.replayEngine.i()) && !gameEngine.networkEngine.F) {
+        if ((gameEngine.networkEngine.networkGameActive || gameEngine.replayEngine.i()) && !gameEngine.networkEngine.singleplayerServer) {
             if (this.teamAIDifficultyOverride != null && this.teamAIDifficultyOverride.intValue() != this.teamPingTime) {
                 c("aiDifficultyOverride:  " + this.teamAIDifficultyOverride + "!=" + this.teamPingTime);
             }
@@ -1120,14 +1120,14 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
 
     public final void b(float f) {
         if (!this.isTeamSpectator) {
-            isNeutralToTeam(f);
+            addCreditsWithEconomyMultiplier(f);
         } else {
-            isNeutralToTeam(getSpectatorEnergyFactor() * f);
+            addCreditsWithEconomyMultiplier(getSpectatorEnergyFactor() * f);
         }
     }
 
     /* JADX INFO: renamed from: c */
-    public final void isNeutralToTeam(float f) {
+    public final void addCreditsWithEconomyMultiplier(float f) {
         d(f * getEconomyMultiplier());
     }
 
@@ -1139,9 +1139,9 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: F */
-    public static void staticInitTeamData() {
+    public static void resetTeamRegistry() {
         try {
-            getResourceCost(10, true);
+            setMaxTeamId(10, true);
             for (int i = 0; i < teamColorArray.length; i++) {
                 teamColorArray[i] = null;
             }
@@ -1151,9 +1151,9 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: a */
-    public static GameTeam getTeamById(String str) {
+    public static GameTeam findGameTeamBySharedControlId(String str) {
         if (str == null || str.equals(VariableScope.nullOrMissingString)) {
-            GameEngine.updatePaintTextSizeIfNeeded("findExistingPlayer: No clientId id");
+            GameEngine.logColored("findExistingPlayer: No clientId id");
             return null;
         }
         for (int i = 0; i < teamColorArray.length; i++) {
@@ -1162,7 +1162,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 if (playerTeam instanceof GameTeam) {
                     return (GameTeam) playerTeam;
                 }
-                GameEngine.updatePaintTextSizeIfNeeded("Player:" + i + " with matching clientId is not an instanceof player");
+                GameEngine.logColored("Player:" + i + " with matching clientId is not an instanceof player");
             }
         }
         return null;
@@ -1170,7 +1170,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
 
     public static GameTeam b(String str) {
         if (str == null || str.equals(VariableScope.nullOrMissingString)) {
-            GameEngine.updatePaintTextSizeIfNeeded("No id");
+            GameEngine.logColored("No id");
             return null;
         }
         for (int i = 0; i < teamColorArray.length; i++) {
@@ -1179,14 +1179,14 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 if (playerTeam instanceof GameTeam) {
                     return (GameTeam) playerTeam;
                 }
-                GameEngine.updatePaintTextSizeIfNeeded("Player:" + i + " with matching clientId is not an instanceof player");
+                GameEngine.logColored("Player:" + i + " with matching clientId is not an instanceof player");
             }
         }
         return null;
     }
 
     /* JADX INFO: renamed from: G */
-    public static int getActiveTeamCount() {
+    public static int getFirstFreePlayerTeamId() {
         for (int i = 0; i < TEAM_NEUTRAL; i++) {
             if (teamColorArray[i] == null) {
                 return i;
@@ -1196,7 +1196,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: H */
-    public static int getTeamCount() {
+    public static int getFirstFreeTeamSlotId() {
         for (int i = TEAM_NEUTRAL; i < TEAM_ENEMIES; i++) {
             if (teamColorArray[i] == null) {
                 return i;
@@ -1211,7 +1211,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: I */
-    public void updateTeamActiveStatus() {
+    public void removeFromTeamRegistry() {
         for (int i = 0; i < teamColorArray.length; i++) {
             if (teamColorArray[i] == this) {
                 teamColorArray[i] = null;
@@ -1228,9 +1228,9 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         this.teamCommandCenter = DummyNonUnitWithTeam.a(this);
         this.teamPrimaryUnit = DummyNonUnitWithTeam.a(this);
         this.isTeamDefeated = false;
-        this.teamAIGroupOverride = -1;
-        this.teamColorHex = -9999;
-        this.teamColorPacked = -9999;
+        this.assignedTeamColorIndex = -1;
+        this.surrenderVoteTimeMillis = -9999;
+        this.teamVictoryCleanupStartTimeMillis = -9999;
         this.synchronizationLock = new Object();
         this.isTeamReady = true;
         this.teamStatistics = new TeamUnitStats();
@@ -1241,11 +1241,11 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         this.teamSortIndex = 0;
         this.teamColorPaint = new GamePaint();
         this.teamTextPaint = new GamePaint();
-        this.lastCustomColorCacheTick = -2;
+        this.defeatCheckDelayTicks = -2;
         this.teamAnimationSet = AnimationTag.d;
-        this.teamColorEffect = new StoredResources();
-        this.teamColorTexture = new ResourceConditionChecker();
-        this.teamColorBlue = -9999L;
+        this.customResources = new StoredResources();
+        this.resourceShortageTracker = new ResourceConditionChecker();
+        this.displayedCreditsCacheTimeMillis = -9999L;
         this.isTeamSpectator = this instanceof AIController;
     }
 
@@ -1266,7 +1266,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     public void c(int i, boolean z) {
         if (this.teamId != i) {
             if (z) {
-                updateTeamActiveStatus();
+                removeFromTeamRegistry();
             }
             this.teamId = i;
             this.teamColorId = i;
@@ -1277,19 +1277,19 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 }
                 teamColorArray[i] = this;
             }
-            updateTeamConnectionStatus();
+            refreshTeamColorPaints();
         }
     }
 
     /* JADX INFO: renamed from: J */
-    public void updateTeamConnectionStatus() {
-        int teamUnitCount = getTeamUnitCount();
-        this.teamColorPaint.b(teamUnitCount);
-        this.teamTextPaint.b(Color.a(Color.a(teamUnitCount), (int) (Color.b(teamUnitCount) * 0.5f), (int) (Color.c(teamUnitCount) * 0.5f), (int) (Color.d(teamUnitCount) * 0.5f)));
+    public void refreshTeamColorPaints() {
+        int teamColorArgb = getTeamColorArgb();
+        this.teamColorPaint.b(teamColorArgb);
+        this.teamTextPaint.b(Color.a(Color.a(teamColorArgb), (int) (Color.b(teamColorArgb) * 0.5f), (int) (Color.c(teamColorArgb) * 0.5f), (int) (Color.d(teamColorArgb) * 0.5f)));
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean getTeamColorName(double d) {
+    public boolean hasCredits(double d) {
         if (this.credits >= d || d == 0.0d) {
             return true;
         }
@@ -1297,7 +1297,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: g */
-    public boolean isTeamIndexActive(int i) {
+    public boolean hasCreditsIncludingAntiLagCredit(int i) {
         if (this.credits + this.energy >= i || i == 0) {
             return true;
         }
@@ -1316,12 +1316,12 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: K */
-    public int getTeamUnitCount() {
+    public int getTeamColorArgb() {
         return i(getTeamColorIndex());
     }
 
     /* JADX INFO: renamed from: L */
-    public static void updateAllTeamData() {
+    public static void loadTeamColorSettings() {
         GameEngine gameEngine = GameEngine.getInstance();
         try {
             d(gameEngine.settingsEngine.teamColors);
@@ -1358,7 +1358,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: M */
-    public int getTeamBuildingCount() {
+    public int getTeamSlotColorArgb() {
         if (this.teamColorId == -3) {
             return i(-3);
         }
@@ -1383,7 +1383,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: N */
-    public String getTeamName() {
+    public String getTeamColorDisplayName() {
         if (this.teamId == -1 || this.teamId == -2) {
             return "GRAY";
         }
@@ -1398,12 +1398,12 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: a */
-    public static Texture[] getUnitCountByType(Texture texture) {
-        return compareToNew(texture, ColorMode.pureGreen, false);
+    public static Texture[] getTeamColorTextures(Texture texture) {
+        return getTeamColorTextures(texture, ColorMode.pureGreen, false);
     }
 
     /* JADX INFO: renamed from: a */
-    public static Texture[] compareToNew(Texture texture, ColorMode colorMode, boolean z) {
+    public static Texture[] getTeamColorTextures(Texture texture, ColorMode colorMode, boolean z) {
         if (!z || texture.A()) {
             return b(texture, colorMode);
         }
@@ -1412,7 +1412,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
 
     public static Texture[] a(Texture texture, ColorMode colorMode) {
         Texture[] textureArr = new Texture[10];
-        if ((GameEngine.isPausedStatic2 && !GameEngine.isAndroidVersionStatic2) || colorMode == ColorMode.disabled) {
+        if ((GameEngine.isNonAndroidVersion && !GameEngine.isPCOrIOSVersion) || colorMode == ColorMode.disabled) {
             for (int i = 0; i < textureArr.length; i++) {
                 textureArr[i] = texture;
             }
@@ -1439,7 +1439,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
 
     public static Texture[] b(Texture texture, ColorMode colorMode) {
         Texture[] textureArr = new Texture[10];
-        if ((GameEngine.isPausedStatic2 && !GameEngine.isAndroidVersionStatic2) || colorMode == ColorMode.disabled || texture.A()) {
+        if ((GameEngine.isNonAndroidVersion && !GameEngine.isPCOrIOSVersion) || colorMode == ColorMode.disabled || texture.A()) {
             for (int i = 0; i < textureArr.length; i++) {
                 textureArr[i] = texture;
             }
@@ -1629,14 +1629,14 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
 
     public void e(float f) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (this.lastCustomColorCacheTick > 0) {
-            this.lastCustomColorCacheTick--;
+        if (this.defeatCheckDelayTicks > 0) {
+            this.defeatCheckDelayTicks--;
             return;
         }
-        if (this.lastCustomColorCacheTick == -2) {
-            this.lastCustomColorCacheTick = this.teamId;
+        if (this.defeatCheckDelayTicks == -2) {
+            this.defeatCheckDelayTicks = this.teamId;
         } else {
-            this.lastCustomColorCacheTick = 10;
+            this.defeatCheckDelayTicks = 10;
         }
         if (!this.isTeamWipedOut && !gameEngine.replayEngine.j()) {
             boolean z = false;
@@ -1668,7 +1668,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                     z6 = true;
                 }
                 this.isTeamWipedOut = true;
-                writeTeamDataToStream();
+                resetFogOfWar();
                 for (BaseUnit baseUnit2 : BaseUnit.bE) {
                     if (baseUnit2.team == this && !baseUnit2.u()) {
                         if (z6 && !baseUnit2.isDestroyed && baseUnit2.getUnitVersion()) {
@@ -1733,10 +1733,10 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: O */
-    public static void updateTeamVictoryStatus() {
+    public static void markAllTeamsReady() {
         TEAM_ALL.isTeamReady = true;
         TEAM_UNKNOWN.isTeamReady = true;
-        Iterator it = addEnergy().iterator();
+        Iterator it = getTeams().iterator();
         while (it.hasNext()) {
             ((PlayerTeam) it.next()).isTeamReady = true;
         }
@@ -1744,10 +1744,10 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
 
     /* JADX INFO: renamed from: a */
     public void updateTeam(float f) {
-        this.teamColorAlpha += f;
-        if (this.teamColorAlpha > 90.0f) {
-            this.teamColorAlpha = 0.0f;
-            this.teamColorTexture.a();
+        this.resourceShortageTrackerTimer += f;
+        if (this.resourceShortageTrackerTimer > 90.0f) {
+            this.resourceShortageTrackerTimer = 0.0f;
+            this.resourceShortageTracker.a();
         }
         this.teamUnitCount++;
         if (this.teamUnitCount > 1000 && this.energy != 0.0d) {
@@ -1757,8 +1757,8 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: f */
-    public static void update2(float f) {
-        int iRemoveCredits;
+    public static void updateAllTeams(float f) {
+        int surrenderVoteCount;
         GameEngine gameEngine = GameEngine.getInstance();
         TEAM_ALL.updateTeam(f);
         TEAM_UNKNOWN.updateTeam(f);
@@ -1767,17 +1767,17 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             if (playerTeam != null) {
                 playerTeam.updateTeam(f);
                 playerTeam.e(f);
-                if (!playerTeam.teamColorBrightness && (iRemoveCredits = removeCredits(playerTeam.teamColorId)) > 0) {
-                    if (iRemoveCredits >= removeUnitFromTeam(playerTeam.teamColorId)) {
+                if (!playerTeam.teamSurrenderTriggered && (surrenderVoteCount = getSurrenderVoteCount(playerTeam.teamColorId)) > 0) {
+                    if (surrenderVoteCount >= getSurrenderEligibleCount(playerTeam.teamColorId)) {
                         d(playerTeam.teamColorId);
-                        staticUpdateTeamData2();
+                        clearSurrenderVotes();
                     } else {
-                        updateTeamVictoryStatus(playerTeam.teamColorId);
+                        pruneExpiredSurrenderVotes(playerTeam.teamColorId);
                     }
                 }
                 if (playerTeam.isTeamVictory) {
-                    if (playerTeam.teamColorPacked < 0) {
-                        playerTeam.teamColorPacked = gameEngine.lastTick;
+                    if (playerTeam.teamVictoryCleanupStartTimeMillis < 0) {
+                        playerTeam.teamVictoryCleanupStartTimeMillis = gameEngine.gameTimeMillis;
                     }
                     if (!playerTeam.isTeamWipedOut) {
                         int i2 = 0;
@@ -1785,13 +1785,13 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                             if (baseUnit.team == playerTeam && !baseUnit.u()) {
                                 boolean z = false;
                                 int i3 = 1;
-                                if (GameViewUtils.a(playerTeam.teamColorPacked, 10000)) {
+                                if (GameViewUtils.a(playerTeam.teamVictoryCleanupStartTimeMillis, 10000)) {
                                     z = true;
                                     i3 = 50;
-                                } else if (GameViewUtils.a(playerTeam.teamColorPacked, 6000)) {
+                                } else if (GameViewUtils.a(playerTeam.teamVictoryCleanupStartTimeMillis, 6000)) {
                                     z = Utility.readStreamToString(baseUnit, 0, 100) > 90;
                                     i3 = 20;
-                                } else if (GameViewUtils.a(playerTeam.teamColorPacked, 2000)) {
+                                } else if (GameViewUtils.a(playerTeam.teamVictoryCleanupStartTimeMillis, 2000)) {
                                     z = Utility.readStreamToString(baseUnit, 0, 100) > 98;
                                     i3 = 2;
                                 }
@@ -1813,25 +1813,25 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 }
             }
         }
-        if (gameEngine.loadLevelNetwork() && gameEngine.settingsEngine.aiDifficulty != teamColorCount) {
-            gameEngine.networkEngine.aq();
-            teamColorCount = gameEngine.settingsEngine.aiDifficulty;
+        if (gameEngine.isSinglePlayerGame() && gameEngine.settingsEngine.aiDifficulty != cachedAiDifficultyForTeamNames) {
+            gameEngine.networkEngine.updateAiTeamNames();
+            cachedAiDifficultyForTeamNames = gameEngine.settingsEngine.aiDifficulty;
         }
     }
 
     public static void g(float f) {
-        getTeamStatistics();
-        for (PlayerTeam playerTeam : setTeamDefeated()) {
+        refreshTeamInstances();
+        for (PlayerTeam playerTeam : getTeamInstances()) {
             playerTeam.d(false);
         }
     }
 
     /* JADX INFO: renamed from: Q */
-    public static void updateTeamWipeStatus() {
+    public static void markRemainingTeamsVictorious() {
         TEAM_ALL.d(false);
         for (int i = 0; i < TEAM_NEUTRAL; i++) {
             PlayerTeam playerTeam = teamColorArray[i];
-            if (playerTeam != null && !playerTeam.addCredits() && !playerTeam.isTeamWipedOut && !playerTeam.isTeamDefeatedTech && !playerTeam.isTeamVictory) {
+            if (playerTeam != null && !playerTeam.isSpectatorTeamColor() && !playerTeam.isTeamWipedOut && !playerTeam.isTeamDefeatedTech && !playerTeam.isTeamVictory) {
                 GameEngine.getInstance().networkEngine.g(playerTeam);
             }
         }
@@ -1848,14 +1848,14 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
 
     /* JADX INFO: renamed from: R */
     public int getTeamColorIndex() {
-        if (this.teamAIGroupOverride == -1) {
-            return getTeamNetworkId();
+        if (this.assignedTeamColorIndex == -1) {
+            return getDefaultTeamColorIndex();
         }
-        return this.teamAIGroupOverride;
+        return this.assignedTeamColorIndex;
     }
 
     /* JADX INFO: renamed from: S */
-    public int getTeamNetworkId() {
+    public int getDefaultTeamColorIndex() {
         PlayerTeam playerTeam;
         if (this.teamId == -1 || this.teamId == -2) {
             return 5;
@@ -1913,12 +1913,12 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: V */
-    public StoredResources getTeamColorEffect() {
-        return this.teamColorEffect;
+    public StoredResources getCustomResources() {
+        return this.customResources;
     }
 
     public double c(Resource resource) {
-        return this.teamColorEffect.a(resource);
+        return this.customResources.a(resource);
     }
 
     public boolean a(TeamRelation teamRelation, PlayerTeam playerTeam) {
@@ -1950,7 +1950,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: W */
-    public void updateTeamTextures() {
+    public void debugLogUnitCountsByType() {
         GameEngine.log("debugUnitCountByType for team:" + this.teamId);
         FastArrayList<UnitTypeCount> fastArrayList = new FastArrayList();
         BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
@@ -2015,9 +2015,9 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             PlayerTeam playerTeam = playerTeamArr[i2];
             if (playerTeam != null && this != playerTeam && this.teamColorId != playerTeam.teamColorId) {
                 if (animationTag == null) {
-                    iCanAffordResource += playerTeam.addUnitToTeam(z, z2);
+                    iCanAffordResource += playerTeam.getUnitCount(z, z2);
                 } else {
-                    iCanAffordResource += playerTeam.canAffordResource(animationTag, z, z2);
+                    iCanAffordResource += playerTeam.getUnitCountWithTag(animationTag, z, z2);
                 }
             }
         }
@@ -2032,9 +2032,9 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             PlayerTeam playerTeam = playerTeamArr[i2];
             if (playerTeam != null && this != playerTeam && d(playerTeam)) {
                 if (animationTag == null) {
-                    iCanAffordResource += playerTeam.addUnitToTeam(z, z2);
+                    iCanAffordResource += playerTeam.getUnitCount(z, z2);
                 } else {
-                    iCanAffordResource += playerTeam.canAffordResource(animationTag, z, z2);
+                    iCanAffordResource += playerTeam.getUnitCountWithTag(animationTag, z, z2);
                 }
             }
         }
@@ -2042,64 +2042,64 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     /* JADX INFO: renamed from: X */
-    public static void staticUpdateAllTeamColors() {
+    public static void syncAllTeamUnitCaps() {
         GameEngine gameEngine = GameEngine.getInstance();
-        TEAM_ALL.teamStatistics.a = gameEngine.currentTimeMillis;
-        TEAM_UNKNOWN.teamStatistics.a = gameEngine.currentTimeMillis;
+        TEAM_ALL.teamStatistics.a = gameEngine.currentUnitCap;
+        TEAM_UNKNOWN.teamStatistics.a = gameEngine.currentUnitCap;
         for (int i = 0; i < TEAM_NEUTRAL; i++) {
             PlayerTeam playerTeam = teamColorArray[i];
             if (playerTeam != null) {
-                playerTeam.teamStatistics.a = gameEngine.currentTimeMillis;
+                playerTeam.teamStatistics.a = gameEngine.currentUnitCap;
             }
         }
     }
 
     /* JADX INFO: renamed from: Y */
-    public static void staticUpdateTeamColors() {
-        TEAM_ALL.updateTeamPing();
-        TEAM_UNKNOWN.updateTeamPing();
+    public static void resetSpecialTeamStates() {
+        TEAM_ALL.resetTeamState();
+        TEAM_UNKNOWN.resetTeamState();
     }
 
     /* JADX INFO: renamed from: Z */
-    public void updateTeamPing() {
+    public void resetTeamState() {
         this.isTeamActive = false;
         this.isTeamControlledByAI = false;
         this.credits = 4000.0d;
         this.energy = 0.0d;
         this.teamUnitCount = 0;
-        this.lastCustomColorCacheTick = -2;
-        this.teamColorBrightness = false;
-        this.teamColorHex = -9999;
+        this.defeatCheckDelayTicks = -2;
+        this.teamSurrenderTriggered = false;
+        this.surrenderVoteTimeMillis = -9999;
         this.isTeamVictory = false;
-        this.teamColorPacked = -9999;
+        this.teamVictoryCleanupStartTimeMillis = -9999;
         this.isTeamDefeatedTech = false;
         this.isTeamWipedOut = false;
         this.isTeamAlliedVictory = false;
         this.isTeamConnectionActive = false;
         this.isTeamNetworkActive = false;
-        this.teamColorTexture.a();
-        this.teamColorAlpha = 0.0f;
-        this.lastUnitCountCacheTick = 0;
-        this.teamAIBaseLevel = 0;
+        this.resourceShortageTracker.a();
+        this.resourceShortageTrackerTimer = 0.0f;
+        this.teamStatsMismatchCount = 0;
+        this.maxNonBuildingUnitCountIncludingQueued = 0;
         this.isTeamReady = true;
         this.teamStatistics = new TeamUnitStats();
-        this.teamStatistics.a = GameEngine.getInstance().currentTimeMillis;
+        this.teamStatistics.a = GameEngine.getInstance().currentUnitCap;
         this.teamAnimationSet = AnimationTag.d;
-        this.teamColorEffect = new StoredResources();
+        this.customResources = new StoredResources();
     }
 
     /* JADX INFO: renamed from: aa */
-    public double getDisplayedResourcesTotal() {
+    public double getDisplayedCreditsTotal() {
         long jCurrentTimeMillis = System.currentTimeMillis();
-        if (Utility.abs(this.teamColorBlue - jCurrentTimeMillis) > 166.66666f) {
-            this.teamColorBlue = jCurrentTimeMillis;
-            this.teamColorHue = this.credits + this.energy;
+        if (Utility.abs(this.displayedCreditsCacheTimeMillis - jCurrentTimeMillis) > 166.66666f) {
+            this.displayedCreditsCacheTimeMillis = jCurrentTimeMillis;
+            this.cachedDisplayedCreditsTotal = this.credits + this.energy;
         }
-        return this.teamColorHue;
+        return this.cachedDisplayedCreditsTotal;
     }
 
     /* JADX INFO: renamed from: ab */
-    public StoredResources getTeamColorEffect2() {
-        return getTeamColorEffect();
+    public StoredResources getDisplayedCustomResources() {
+        return getCustomResources();
     }
 }

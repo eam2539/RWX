@@ -22,10 +22,10 @@ public class EndGameScreen {
     Paint textPaint;
 
     /* JADX INFO: renamed from: n */
-    boolean field_n;
+    boolean savedSelectionBoxActive;
 
     /* JADX INFO: renamed from: o */
-    boolean field_o;
+    boolean savedMousePressed;
 
     /* JADX INFO: renamed from: p */
     static String rateGameText = Locale.get("gui.rategame.text", new Object[0]);
@@ -37,7 +37,7 @@ public class EndGameScreen {
     static String rateGameNoText = Locale.get("gui.rategame.no", new Object[0]);
 
     /* JADX INFO: renamed from: b */
-    boolean field_b = false;
+    boolean hasCheckedRateGamePrompt = false;
 
     /* JADX INFO: renamed from: c */
     float timer = 0.0f;
@@ -95,14 +95,14 @@ public class EndGameScreen {
             @Override // com.corrodinggames.rts.gameFramework.ui.BackgroundTask
             /* JADX INFO: renamed from: b */
             void run() {
-                GameEngine.getInstance().isPinching = true;
+                GameEngine.getInstance().shouldAdvanceAfterGameEnd = true;
             }
         });
         this.backgroundTasks.add(new BackgroundTask("Keep playing") { // from class: com.corrodinggames.rts.gameFramework.f.f.2
             @Override // com.corrodinggames.rts.gameFramework.ui.BackgroundTask
             /* JADX INFO: renamed from: b */
             void run() {
-                GameEngine.getInstance().isTouchMoving = true;
+                GameEngine.getInstance().isContinuingAfterGameEnd = true;
             }
         });
     }
@@ -110,7 +110,7 @@ public class EndGameScreen {
     /* JADX INFO: renamed from: b */
     boolean isGameOver() {
         GameEngine gameEngine = GameEngine.getInstance();
-        if ((gameEngine.isTouchDown || gameEngine.touchStartY) && !gameEngine.isTouchMoving) {
+        if ((gameEngine.hasWonGame || gameEngine.hasLostGame) && !gameEngine.isContinuingAfterGameEnd) {
             return true;
         }
         return false;
@@ -122,7 +122,7 @@ public class EndGameScreen {
         GameUI gameUI = gameEngine.gameUI;
         boolean zIsGameOver = isGameOver();
         this.screenBounds.h();
-        this.field_n = false;
+        this.savedSelectionBoxActive = false;
         if (zIsGameOver && !gameUI.isDraggingSelection) {
             int screenPixels = gameEngine.toScreenPixels(this.buttonHeight);
             int screenPixels2 = gameEngine.toScreenPixels(this.buttonWidth);
@@ -156,9 +156,9 @@ public class EndGameScreen {
             this.rateGamePopupRect.c = (int) ((gameEngine.currentScreenWidthPixels / 2.0f) + (screenPixels5 / 2));
             this.screenBounds.a(this.rateGamePopupRect);
             if (this.screenBounds.b((int) gameUI.selectionBoxMinWidth, (int) gameUI.selectionBoxMinHeight)) {
-                this.field_n = gameUI.isSelectionBoxActive;
+                this.savedSelectionBoxActive = gameUI.isSelectionBoxActive;
                 gameUI.isSelectionBoxActive = false;
-                this.field_o = gameUI.isMousePressed;
+                this.savedMousePressed = gameUI.isMousePressed;
                 gameUI.isMousePressed = false;
             }
             gameUI.a(this.screenBounds);
@@ -170,11 +170,11 @@ public class EndGameScreen {
         GameEngine gameEngine = GameEngine.getInstance();
         GameUI gameUI = gameEngine.gameUI;
         boolean zIsGameOver = isGameOver();
-        if (!gameEngine.isTouchDown) {
-            this.field_b = false;
-        } else if (!this.field_b) {
-            this.field_b = true;
-            if (!gameEngine.isDemo && gameEngine.settingsEngine.numberOfWins >= 5 && !gameEngine.settingsEngine.rateGameShown && GameEngine.isDebugVersionStatic) {
+        if (!gameEngine.hasWonGame) {
+            this.hasCheckedRateGamePrompt = false;
+        } else if (!this.hasCheckedRateGamePrompt) {
+            this.hasCheckedRateGamePrompt = true;
+            if (!gameEngine.isDemo && gameEngine.settingsEngine.numberOfWins >= 5 && !gameEngine.settingsEngine.rateGameShown && GameEngine.isRateGamePromptEnabled) {
                 this.showRateGamePopup = true;
                 gameEngine.settingsEngine.rateGameShown = true;
                 gameEngine.settingsEngine.save();
@@ -188,10 +188,10 @@ public class EndGameScreen {
             if (gameEngine.currentTick < 120) {
                 this.timer = 100000.0f;
             }
-            if (this.field_n) {
+            if (this.savedSelectionBoxActive) {
                 gameUI.isSelectionBoxActive = true;
             }
-            if (this.field_o) {
+            if (this.savedMousePressed) {
                 gameUI.isMousePressed = true;
             }
             boolean z = this.timer > 80.0f;
@@ -210,7 +210,7 @@ public class EndGameScreen {
             if (z) {
                 float f3 = gameUI.ninePatchStyle5.g;
                 gameUI.ninePatchStyle5.g = f2;
-                gameUI.ninePatchStyle5.c(gameEngine.graphicsEngine2, this.screenBounds);
+                gameUI.ninePatchStyle5.c(gameEngine.renderGraphicsEngine, this.screenBounds);
                 gameUI.ninePatchStyle5.g = f3;
             }
             int screenPixels5 = this.screenBounds.b + gameEngine.toScreenPixels(40);
@@ -219,7 +219,7 @@ public class EndGameScreen {
             int iA = Color.a(140, 100, 100, 100);
             Paint paint = this.textPaint;
             String str = "Victory!";
-            if (gameEngine.touchStartY) {
+            if (gameEngine.hasLostGame) {
                 str = "Defeat";
             }
             float f4 = 1.0f;
@@ -228,8 +228,8 @@ public class EndGameScreen {
             }
             int iFastCos = (int) (screenPixels5 - (Utility.fastCos(f4 * 90.0f) * 100.0f));
             paint.a(str, 0, str.length(), this.textBounds);
-            gameEngine.graphicsEngine2.a(str, i2, iFastCos - ((paint.l() + paint.m()) / 2.0f), paint);
-            if (this.timer < 100.0f && !gameEngine.touchStartY) {
+            gameEngine.renderGraphicsEngine.a(str, i2, iFastCos - ((paint.l() + paint.m()) / 2.0f), paint);
+            if (this.timer < 100.0f && !gameEngine.hasLostGame) {
                 this.fireworkTimer += f;
                 if (this.fireworkTimer > 0.5f) {
                     this.fireworkTimer = 0.0f;
@@ -302,12 +302,12 @@ public class EndGameScreen {
         int screenPixels2 = gameEngine.toScreenPixels(120);
         int i2 = (int) (gameEngine.currentScreenHeightPixels - screenPixels2);
         this.rateGamePopupRect.a(i, i2, screenPixels, screenPixels2);
-        gameEngine.graphicsEngine2.b(this.rateGamePopupRect, gameUI.minimapViewportBorderPaint);
+        gameEngine.renderGraphicsEngine.b(this.rateGamePopupRect, gameUI.minimapViewportBorderPaint);
         int i3 = i + (screenPixels / 2);
         Paint paint = this.textPaint;
         String str = rateGameText;
         paint.a(str, 0, str.length(), this.textBounds);
-        gameEngine.graphicsEngine2.a(str, i3, i2 - ((paint.l() + paint.m()) / 2.0f), paint);
+        gameEngine.renderGraphicsEngine.a(str, i3, i2 - ((paint.l() + paint.m()) / 2.0f), paint);
         int iC = i2 + this.textBounds.c();
         int screenPixels3 = gameEngine.toScreenPixels(70);
         int screenPixels4 = gameEngine.toScreenPixels(30);
@@ -315,14 +315,14 @@ public class EndGameScreen {
         int iA = Color.a(140, 100, 100, 100);
         if (gameUI.a(screenPixels5, iC, screenPixels3, screenPixels4, rateGameYesText, IconGroup.none, false, iA, gameUI.buildingPreviewInvalidPaint, (UIStyle) null)) {
             this.showRateGamePopup = false;
-            GameView gameView = gameEngine.activity;
+            GameView gameView = gameEngine.activeGameView;
             if (gameView == null) {
-                GameEngine.updatePaintTextSizeIfNeeded("showRateNow: gameView==null");
+                GameEngine.logColored("showRateNow: gameView==null");
                 return;
             }
             InGameActivity surfaceHolder = gameView.getSurfaceHolder();
             if (surfaceHolder == null) {
-                GameEngine.updatePaintTextSizeIfNeeded("showRateNow: inGameActivity==null");
+                GameEngine.logColored("showRateNow: inGameActivity==null");
                 return;
             }
             surfaceHolder.l();

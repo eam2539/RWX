@@ -262,7 +262,7 @@ public class AppFrameworkUtils {
                     }
                     return;
                 }
-                GameEngine.updatePaintTextSizeIfNeeded("context not instance CommonActivity");
+                GameEngine.logColored("context not instance CommonActivity");
             }
         };
         String str = Locale.get("menus.mods.androidStorageSetupTitle", new Object[0]);
@@ -275,7 +275,7 @@ public class AppFrameworkUtils {
 
     /* JADX INFO: renamed from: b */
     public static boolean hasStoragePermission(Context context) {
-        if (GameEngine.isPausedStatic2 || !FileHelper.isZip() || Build.VERSION.SDK_INT < 23 || ContextCompat.a(context, "android.permission.WRITE_EXTERNAL_STORAGE") == 0) {
+        if (GameEngine.isNonAndroidVersion || !FileHelper.isZip() || Build.VERSION.SDK_INT < 23 || ContextCompat.a(context, "android.permission.WRITE_EXTERNAL_STORAGE") == 0) {
             return true;
         }
         return false;
@@ -284,7 +284,7 @@ public class AppFrameworkUtils {
     /* JADX INFO: renamed from: b */
     public static boolean requestStoragePermission(Activity activity) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!GameEngine.isPausedStatic2 && FileHelper.isZip() && Build.VERSION.SDK_INT >= 23) {
+        if (!GameEngine.isNonAndroidVersion && FileHelper.isZip() && Build.VERSION.SDK_INT >= 23) {
             if (gameEngine.clearGameState() == null) {
             }
             if (ContextCompat.a(activity, "android.permission.WRITE_EXTERNAL_STORAGE") == 0) {

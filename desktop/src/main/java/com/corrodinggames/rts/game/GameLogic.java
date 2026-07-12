@@ -78,7 +78,7 @@ public class GameLogic extends GameEngine {
     String someString;
 
     /* JADX INFO: renamed from: i */
-    public boolean someBoolean;
+    public boolean hasStartedBenchmarkTrace;
 
     /* JADX INFO: renamed from: j */
     public int cleanupCounter;
@@ -171,7 +171,7 @@ public class GameLogic extends GameEngine {
     boolean postProcessingFailed;
 
     /* JADX INFO: renamed from: N */
-    GraphicsEngine graphicsEngine;
+    GraphicsEngine previousRenderGraphicsEngine;
 
     /* JADX INFO: renamed from: O */
     Texture waterCloudTexture;
@@ -240,7 +240,7 @@ public class GameLogic extends GameEngine {
         super(context);
         this.densityScaleMultiplier = 1.0f;
         this.someKArray = new JpegFrameWriterTask[6];
-        this.someBoolean = false;
+        this.hasStartedBenchmarkTrace = false;
         this.cleanupCounter = 0;
         this.gameThreadRunnableQueue = new ConcurrentLinkedQueue();
         this.fpsAccumulator = 0;
@@ -270,11 +270,11 @@ public class GameLogic extends GameEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
     /* JADX INFO: renamed from: a */
-    public boolean createInstance() {
+    public boolean isMessageDisplayPersistent() {
         if (this.gameUI.isDraggingSelection) {
             return true;
         }
-        if (this.missionEngine2 != null && this.missionEngine2.b()) {
+        if (this.platformCallbacks != null && this.platformCallbacks.b()) {
             return true;
         }
         return false;
@@ -287,14 +287,14 @@ public class GameLogic extends GameEngine {
             if (this.gameUI.isDraggingSelection || this.isShowingDialog) {
                 return true;
             }
-            if (this.isStopped && !this.reloadMap) {
+            if (this.isStopped && !this.isMenuBackgroundMap) {
                 return true;
             }
-            if (this.exitGameThread && this.missionEngine2 != null && this.missionEngine2.b()) {
+            if (this.exitGameThread && this.platformCallbacks != null && this.platformCallbacks.b()) {
                 return true;
             }
         }
-        if ((z && !this.networkEngine.gameHasBeenStarted) || this.networkEngine.I()) {
+        if ((z && !this.networkEngine.gameHasBeenStarted) || this.networkEngine.shouldGameBePausedForPathfinding()) {
             return true;
         }
         return false;
@@ -308,14 +308,14 @@ public class GameLogic extends GameEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
     /* JADX INFO: renamed from: c */
-    public boolean isCustomGameMode() {
+    public boolean isExtraSafeModeActive() {
         return this.isExtraSafeMode;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
     /* JADX INFO: renamed from: d */
-    public boolean isExperimental() {
-        return this.isExtraSafeMode2;
+    public boolean isExtraSafeModeLevel2Active() {
+        return this.isExtraSafeModeLevel2;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
@@ -329,7 +329,7 @@ public class GameLogic extends GameEngine {
             return;
         }
         GameEngine.log("Version:" + getVersionNameWithSuffix());
-        if (printLog() && getClass().equals(GameLogic.class)) {
+        if (isSpaceGame() && getClass().equals(GameLogic.class)) {
             throw new RuntimeException("inSpace but class is:" + getClass());
         }
         System.gc();
@@ -338,7 +338,7 @@ public class GameLogic extends GameEngine {
         long jA = PerformanceProfiler.a();
         this.performanceProfiler = new PerformanceProfiler(this);
         this.performanceProfiler.a(ProfilerSection.init_total);
-        if (isPausedStatic2) {
+        if (isNonAndroidVersion) {
             this.densityScaleRaw = 1.0f;
         } else {
             DisplayMetrics displayMetrics = context.e().getDisplayMetrics();
@@ -348,11 +348,11 @@ public class GameLogic extends GameEngine {
         }
         this.densityScaleRaw *= this.densityScaleMultiplier;
         GameEngine.log("densityScaleRaw*densityScaleMultiplier: " + this.densityScaleRaw);
-        if (GameEngine.centerCameraOnPosition(context)) {
+        if (GameEngine.detectDemoPackage(context)) {
             this.isDemo = true;
         }
         //this.gameObjectE = new Unit();
-        this.isServer = false;
+        this.isGameRecording = false;
         loadLevel("InputController");
         this.inputController = new InputController();
         this.inputController.a();
@@ -361,14 +361,14 @@ public class GameLogic extends GameEngine {
         this.settingsEngine.loadMainExternalFolder(true);
         FileHelper.initialize();
         int i = 3;
-        if (isDebugVersionStatic2) {
+        if (isIOSVersion) {
             i = 1;
         }
         if (this.settingsEngine.numIncompleteLoadAttempts > 1 || this.settingsEngine.numLoadsSinceRunningGameOrNormalExit > i) {
             this.isSafeMode = true;
             if (this.settingsEngine.numIncompleteLoadAttempts > 2 || this.settingsEngine.numLoadsSinceRunningGameOrNormalExit > 4) {
                 this.settingsEngine.forceEnglish = true;
-                this.forceEnglish = true;
+                this.isEnglishForcedBySafeMode = true;
             }
             if (this.settingsEngine.numIncompleteLoadAttempts > 3) {
                 this.settingsEngine.newRender = false;
@@ -379,7 +379,7 @@ public class GameLogic extends GameEngine {
             }
             if (this.settingsEngine.numIncompleteLoadAttempts > 5) {
                 GameEngine.log("Extra safe mode x2");
-                this.isExtraSafeMode2 = true;
+                this.isExtraSafeModeLevel2 = true;
             }
             if (this.settingsEngine.numIncompleteLoadAttempts > 6) {
                 GameEngine.log("Extra safe mode x3");
@@ -400,12 +400,12 @@ public class GameLogic extends GameEngine {
         if (isAutomatedTesting) {
             this.isSafeMode = true;
             this.isExtraSafeMode = true;
-            this.isExtraSafeMode2 = true;
+            this.isExtraSafeModeLevel2 = true;
             this.safeModeReason = "<forced by command line>";
         }
         this.settingsEngine.numLoadsSinceRunningGameOrNormalExit++;
         this.settingsEngine.numIncompleteLoadAttempts++;
-        if (!this.settingsEngine.save() && isDebugVersionStatic2) {
+        if (!this.settingsEngine.save() && isIOSVersion) {
             GameEngine.log("starting game in safe mode, failed to save settings");
             this.safeModeReason = "failing to write preferences data";
             this.isSafeMode = true;
@@ -416,7 +416,7 @@ public class GameLogic extends GameEngine {
         long jA2 = PerformanceProfiler.a();
         Locale.initialize();
         PerformanceProfiler.a("Locale.init took:", jA2);
-        PlayerTeam.updateAllTeamData();
+        PlayerTeam.loadTeamColorSettings();
         this.paintL = new Paint();
         this.fpsPaint = new Paint();
         this.fpsPaint.a(255, 255, 255, 255);
@@ -460,29 +460,29 @@ public class GameLogic extends GameEngine {
         loadLevel("MusicController");
         this.musicManager = new MusicManager();
         this.musicManager.init(context);
-        if (graphicsEngine != null) {
+        if (GameEngine.graphicsEngine != null) {
             log("init(): using Graphics instance");
-            this.graphicsEngine2 = graphicsEngine;
+            this.renderGraphicsEngine = GameEngine.graphicsEngine;
         } else if (gameEngineClass != null) {
             log("init(): using GraphicsSlick2d");
             try {
-                this.graphicsEngine2 = (GraphicsEngine) gameEngineClass.newInstance();
+                this.renderGraphicsEngine = (GraphicsEngine) gameEngineClass.newInstance();
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (InstantiationException e2) {
                 throw new RuntimeException(e2);
             }
-        } else if (isPausedStatic2) {
-            this.graphicsEngine2 = new NullGraphicsInterface();
+        } else if (isNonAndroidVersion) {
+            this.renderGraphicsEngine = new NullGraphicsInterface();
         } else {
-            this.graphicsEngine2 = new SoftwareGraphicsInterface();
+            this.renderGraphicsEngine = new SoftwareGraphicsInterface();
         }
         loadLevel("graphics.init");
-        this.graphicsEngine2.a(context);
-        this.graphicsEngine2.b();
+        this.renderGraphicsEngine.a(context);
+        this.renderGraphicsEngine.b();
         FileChangeEngine.a();
         loadLevel("Fonts");
-        updateGraphics();
+        refreshPaintSizeTrackers();
         loadLevel("effects.init");
         this.effectManager = new EffectManager();
         this.effectManager.loadContent(context);
@@ -507,9 +507,9 @@ public class GameLogic extends GameEngine {
         loadLevel("PathEngine");
         this.pathfindingEngine = new PathEngine();
         loadLevel("GroupController");
-        this.groupController = new FormationEngine();
+        this.formationEngine = new FormationEngine();
         loadLevel("CollisionEngine");
-        this.gameRenderer = new CollisionEngine();
+        this.collisionEngine = new CollisionEngine();
         loadLevel("InterfaceEngine");
         this.gameUI = new GameUI();
         this.gameUI.initializeUIResources(context);
@@ -556,7 +556,7 @@ public class GameLogic extends GameEngine {
         PerformanceProfiler.a("allUnitsChecksum took:", jA6);
         this.paintZ = new Paint();
         this.paintZ.a(50, 255, 255, 255);
-        logMessageWithTime();
+        onInitialContentLoaded();
         System.gc();
         this.isInitialized = true;
         GameEngine.log("Init completed");
@@ -565,12 +565,12 @@ public class GameLogic extends GameEngine {
         this.performanceProfiler.a(true, true);
         long jA7 = PerformanceProfiler.a();
         loadLevel("Loading map data");
-        if (!GameEngine.isAndroidVersionStatic) {
+        if (!GameEngine.isMenuBackgroundDisabled) {
             loadMenuBackground();
         }
         PerformanceProfiler.a("loadAMenuMap took:", jA7);
         loadLevel("Last setup");
-        setupANRWatchDog();
+        setupANRWatchdog();
         this.networkEngine.m();
         loadLevel("init complete");
         if (isUnitImageGenerationMode) {
@@ -595,16 +595,16 @@ public class GameLogic extends GameEngine {
             fDistance = 3.0f;
         }
         GameEngine.log("defaultViewpointZoomDensity after limit: " + fDistance);
-        this.cameraIsDragging = 1.0f;
+        this.densityZoomScale = 1.0f;
         if (Utility.abs(fDistance - 1.0f) > 0.1d) {
-            this.cameraIsDragging = fDistance;
-            if (this.cameraIsDragging > 2.0f) {
-                this.cameraIsDragging = 2.0f;
+            this.densityZoomScale = fDistance;
+            if (this.densityZoomScale > 2.0f) {
+                this.densityZoomScale = 2.0f;
             }
-            if (this.cameraIsDragging < 0.5f) {
-                this.cameraIsDragging = 0.5f;
+            if (this.densityZoomScale < 0.5f) {
+                this.densityZoomScale = 0.5f;
             }
-            this.zoom = this.cameraEdgeScrollZone * this.cameraIsDragging;
+            this.zoom = this.targetZoom * this.densityZoomScale;
         }
     }
 
@@ -618,8 +618,8 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: f */
     public void resetFlags() {
         resetGame(false);
-        this.loadNewGame = false;
-        this.reloadMap = false;
+        this.hasLoadedLevel = false;
+        this.isMenuBackgroundMap = false;
         this.exitGameThread = false;
         this.isShowingDialog = false;
         this.gameUI.isDraggingSelection = false;
@@ -636,53 +636,53 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: a */
     public void loadLevel(boolean z, boolean z2, GameMode gameMode)  {
         InGameActivity surfaceHolder;
-        this.lastTimeMillis = this.settingsEngine.teamUnitCapSinglePlayer;
-        if (this.lastTimeMillis < 1) {
-            this.lastTimeMillis = 1;
+        this.maxUnitCap = this.settingsEngine.teamUnitCapSinglePlayer;
+        if (this.maxUnitCap < 1) {
+            this.maxUnitCap = 1;
         }
-        this.currentTimeMillis = this.lastTimeMillis;
+        this.currentUnitCap = this.maxUnitCap;
         resetGame(z2);
-        PlayerTeam.staticUpdateAllTeamColors();
-        this.isServer = false;
+        PlayerTeam.syncAllTeamUnitCaps();
+        this.isGameRecording = false;
         System.gc();
         this.fullReload = true;
-        this.loadNewGame = false;
+        this.hasLoadedLevel = false;
         this.isShowingDialog = false;
         this.exitGameThread = false;
-        this.lastTick = 0;
-        this.isGameEngineReady = false;
+        this.gameTimeMillis = 0;
+        this.isLookModeEnabled = false;
         this.networkEngine.a(1L);
         this.currentTick = 0;
         this.globalSeed = 0;
         Utility.resetSharedRandomSeed();
         this.networkEngine.t();
         if (!z2) {
-            this.isTouchDown = false;
-            this.isTouchMoving = false;
+            this.hasWonGame = false;
+            this.isContinuingAfterGameEnd = false;
             this.touchStartX = 0.0f;
-            this.isPinching = false;
-            this.touchStartY = false;
+            this.shouldAdvanceAfterGameEnd = false;
+            this.hasLostGame = false;
         }
         this.cleanupCounter = 0;
         if (!z2) {
-            this.cameraEdgeScrollZone = 1.0f;
+            this.targetZoom = 1.0f;
         }
-        this.pinchStartZoom = 0.0f;
+        this.unitSelectionFadeBase = 0.0f;
         if (!this.replayEngine.j()) {
-            if (!this.networkEngine.B) {
+            if (!this.networkEngine.networkGameActive) {
                 CustomUnitConfigParser.enableAllCustomUnits(true);
             } else {
                 CustomUnitConfigParser.applyPendingNetworkUnits();
             }
         }
-        if (!this.networkEngine.B) {
+        if (!this.networkEngine.networkGameActive) {
             if (!this.replayEngine.j() && z) {
                 this.playerTeam = new GameTeam(0);
                 this.playerTeam.teamName = "Player";
                 for (int i = 1; i < 8; i++) {
                     new AIController(i);
                 }
-                this.networkEngine.aq();
+                this.networkEngine.updateAiTeamNames();
             }
         } else {
             this.playerTeam = this.networkEngine.localPlayerTeam;
@@ -713,28 +713,28 @@ public class GameLogic extends GameEngine {
                 return;
             }
             this.tileMap.fogRenderActive = false;
-            PlayerTeam.getTeamStatistics();
+            PlayerTeam.refreshTeamInstances();
             for (int i2 = 0; i2 < PlayerTeam.TEAM_NEUTRAL; i2++) {
                 PlayerTeam playerTeamK = PlayerTeam.k(i2);
                 if (playerTeamK != null) {
-                    playerTeamK.updateTeamConnectionStatus();
+                    playerTeamK.refreshTeamColorPaints();
                 }
             }
             if (!z2) {
                 CustomUnitConfig.spawnOnNewMapAccordingToTeamColors();
             }
-            if (!this.networkEngine.B && !this.replayEngine.j()) {
+            if (!this.networkEngine.networkGameActive && !this.replayEngine.j()) {
                 this.networkEngine.roomSettings.incomeMultiplier = 1.0f;
                 this.networkEngine.roomSettings.randomSeed = Utility.getRandomIntInRange(1, 1000000000);
             }
             this.globalSeed = this.networkEngine.roomSettings.randomSeed;
             log("global Seed: " + this.globalSeed);
-            if (this.networkEngine.B || this.replayEngine.j()) {
-                if (!this.networkEngine.F) {
-                    this.currentTimeMillis = this.networkEngine.aw;
-                    this.lastTimeMillis = this.networkEngine.ax;
+            if (this.networkEngine.networkGameActive || this.replayEngine.j()) {
+                if (!this.networkEngine.singleplayerServer) {
+                    this.currentUnitCap = this.networkEngine.currentUnitCap;
+                    this.maxUnitCap = this.networkEngine.maxUnitCap;
                 }
-                GameEngine.log("Unit cap is now: " + this.lastTimeMillis);
+                GameEngine.log("Unit cap is now: " + this.maxUnitCap);
                 if (this.networkEngine.roomSettings.fodMode == 0) {
                     this.tileMap.fogEnabled = false;
                     this.tileMap.fogPeriodicMaintenanceEnabled = false;
@@ -784,8 +784,8 @@ public class GameLogic extends GameEngine {
                         boolean z3 = false;
                         boolean z4 = false;
                         int iIntValue = this.networkEngine.roomSettings.startingUnits;
-                        if (playerTeamK3.teamAIBehaviourOverride != null) {
-                            iIntValue = playerTeamK3.teamAIBehaviourOverride.intValue();
+                        if (playerTeamK3.startingUnitsOverride != null) {
+                            iIntValue = playerTeamK3.startingUnitsOverride.intValue();
                         }
                         if (iIntValue != 1) {
                             boolean z5 = true;
@@ -854,7 +854,7 @@ public class GameLogic extends GameEngine {
                                     for (int i9 = 0; i9 <= 2; i9++) {
                                         UnitType unitTypeByName = UnitTypeEnum.getUnitTypeByName("combatEngineer");
                                         if (unitTypeByName == null) {
-                                            NetworkEngine.g("Could not find: combatEngineer on network.setup.startingUnits==3");
+                                            NetworkEngine.reportDesync("Could not find: combatEngineer on network.setup.startingUnits==3");
                                         } else {
                                             BaseUnit baseUnitA3 = unitTypeByName.a();
                                             baseUnitA3.setUnitTeam(playerTeamK3);
@@ -866,7 +866,7 @@ public class GameLogic extends GameEngine {
                                 } else if (iIntValue == 5) {
                                     UnitType unitTypeByName2 = UnitTypeEnum.getUnitTypeByName("experimentalSpider");
                                     if (unitTypeByName2 == null) {
-                                        NetworkEngine.g("Could not find: experimentalSpider on network.setup.startingUnits==5");
+                                        NetworkEngine.reportDesync("Could not find: experimentalSpider on network.setup.startingUnits==5");
                                     } else {
                                         BaseUnit baseUnitA4 = unitTypeByName2.a();
                                         baseUnitA4.setUnitTeam(playerTeamK3);
@@ -880,7 +880,7 @@ public class GameLogic extends GameEngine {
                                 } else if (iIntValue != 9 && iIntValue > 10) {
                                     CustomUnitConfig customUnitConfigC = CustomUnitConfig.c(iIntValue);
                                     if (customUnitConfigC == null) {
-                                        NetworkEngine.g("Could not find starting unit on startingUnits==" + iIntValue);
+                                        NetworkEngine.reportDesync("Could not find starting unit on startingUnits==" + iIntValue);
                                     } else {
                                         BaseUnit baseUnitA5 = customUnitConfigC.a();
                                         baseUnitA5.setUnitTeam(playerTeamK3);
@@ -932,7 +932,7 @@ public class GameLogic extends GameEngine {
             this.pathfindingEngine.a(this.tileMap, z2);
             this.minimap.reset(this.tileMap, z2);
             this.commandController.clearAllCommands();
-            this.groupController.a();
+            this.formationEngine.a();
             if (!z2) {
                 BuildPreview.clearAll();
             }
@@ -959,8 +959,8 @@ public class GameLogic extends GameEngine {
             }
             this.gameStateData.e = true;
             this.gameStateManager.a(this.appContext);
-            this.loadNewGame = true;
-            this.reloadMap = false;
+            this.hasLoadedLevel = true;
+            this.isMenuBackgroundMap = false;
             this.fullReload = false;
             if (gameMode != GameMode.menu && !this.settingsEngine.hasPlayedGameOrSeenHelp) {
                 this.settingsEngine.hasPlayedGameOrSeenHelp = true;
@@ -969,7 +969,7 @@ public class GameLogic extends GameEngine {
             for (int i12 = 0; i12 < 5; i12++) {
                 System.gc();
             }
-            if (!GameEngine.isPausedStatic2) {
+            if (!GameEngine.isNonAndroidVersion) {
                 Log.a("RustedWarfare", "getNativeHeapSize" + String.valueOf(Debug.getNativeHeapSize()));
                 Log.a("RustedWarfare", "getNativeHeapAllocatedSize" + String.valueOf(Debug.getNativeHeapAllocatedSize()));
                 Log.a("RustedWarfare", "getNativeHeapFreeSize" + String.valueOf(Debug.getNativeHeapFreeSize()));
@@ -979,11 +979,11 @@ public class GameLogic extends GameEngine {
                 this.gameThread.a();
             }
             this.accumulator = 0.0f;
-            if (this.networkEngine.F && this.networkEngine.B) {
+            if (this.networkEngine.singleplayerServer && this.networkEngine.networkGameActive) {
                 GameEngine.log("Disabling network for singleplayer");
-                this.networkEngine.B = false;
+                this.networkEngine.networkGameActive = false;
             }
-            if (!isDebug()) {
+            if (!isDedicatedServer()) {
                 if (gameMode == GameMode.normalSave) {
                     GameEngine.log("Not starting replay recording as we are loading a save");
                 } else {
@@ -995,11 +995,11 @@ public class GameLogic extends GameEngine {
         } catch (MapLoadException e2) {
             e2.printStackTrace();
             alert("Error loading map: " + e2.getMessage(), 1);
-            if (isNetworkServerStatic2) {
+            if (isAutomatedTestMode) {
                 GameEngine.log("Crashing on allowed map error because automated testing is active");
                 throw new RuntimeException(e2);
             }
-            if (!this.networkEngine.B && this.activity != null && (surfaceHolder = this.activity.getSurfaceHolder()) != null) {
+            if (!this.networkEngine.networkGameActive && this.activeGameView != null && (surfaceHolder = this.activeGameView.getSurfaceHolder()) != null) {
                 surfaceHolder.m();
             }
             writeCrashToFile("Map Load Warning", getStackTrace(e2));
@@ -1034,13 +1034,13 @@ public class GameLogic extends GameEngine {
         GameObject.dK();
         int size = transactionalArrayListDK.size();
         if (size != 0) {
-            GameEngine.printLog("SHOULD_NOT_HAPPEN: we still had " + size + " objects in gameObjectListForLogic after removeAll");
+            GameEngine.logErrorColored("SHOULD_NOT_HAPPEN: we still had " + size + " objects in gameObjectListForLogic after removeAll");
             for (GameObject gameObject : transactionalArrayListDK) {
                 String unitShortName = "Object: " + gameObject.objectId;
                 if (gameObject instanceof BaseUnit) {
                     unitShortName = ((BaseUnit) gameObject).getUnitShortName();
                 }
-                GameEngine.printLog("Remaining object: " + unitShortName);
+                GameEngine.logErrorColored("Remaining object: " + unitShortName);
             }
             if (GameEngine.getInstance().isMissionActive()) {
                 throw new RuntimeException("We still had " + size + " objects in gameObjectListForLogic after removeAll");
@@ -1054,9 +1054,9 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: b */
     public void resetGame(boolean z) {
-        synchronized (this.gameLoopLock) {
-            if (this.activity != null) {
-                this.activity.onSizeChanged();
+        synchronized (this.gameStateLock) {
+            if (this.activeGameView != null) {
+                this.activeGameView.onSizeChanged();
             }
             this.isLoading = false;
             if (!z) {
@@ -1081,7 +1081,7 @@ public class GameLogic extends GameEngine {
             this.cameraFocusUnit = null;
             this.nextCameraFocusUnit = null;
             this.cleanupCounter = 0;
-            PlayerTeam.staticUpdateTeamColors();
+            PlayerTeam.resetSpecialTeamStates();
             setupTeamStats(StatType.none, StatGroup.player);
         }
     }
@@ -1089,33 +1089,33 @@ public class GameLogic extends GameEngine {
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
     /* JADX INFO: renamed from: a */
     public void gameLoop(float f, int i) throws ConfigParseException, IOException {
-        synchronized (this.gameLoopLock) {
-            processEvent(f, i);
+        synchronized (this.gameStateLock) {
+            runGameLoopFrame(f, i);
         }
     }
 
     /* JADX WARN: Finally extract failed */
     /* JADX WARN: Removed duplicated region for block: B:314:0x0948 A[EXC_TOP_SPLITTER, SYNTHETIC] */
     /* JADX INFO: renamed from: b */
-    public void processEvent(float float1, int integer) throws IOException, ConfigParseException {
+    public void runGameLoopFrame(float float1, int integer) throws IOException, ConfigParseException {
         if (this.currentTick == 2) {
-            this.checkLowMemory();
+            this.probeLowMemory();
         } else if (this.currentTick % 10000 == 0 && this.currentTick != 0) {
-            this.checkLowMemory();
+            this.probeLowMemory();
         }
 
-        if (isGameThreadRunningStatic && !this.isInGameOrLobby && isDesktop() && Debug.getNativeHeapAllocatedSize() > 209715200L) {
+        if (isGameThreadActive && !this.hasLoggedHighNativeHeapUsage && isAndroidPlatform() && Debug.getNativeHeapAllocatedSize() > 209715200L) {
             GameEngine.log("getNativeHeapAllocatedSize: " + Utility.formatMilliseconds((int) Debug.getNativeHeapAllocatedSize()));
-            this.isInGameOrLobby = true;
+            this.hasLoggedHighNativeHeapUsage = true;
         }
 
-        this.checkMemory();
-        this.taskQueue1.a();
-        this.gameModeTimer2.b();
+        this.showMemoryWarningsIfNeeded();
+        this.recurringGameThreadTasks.a();
+        this.pendingGameThreadTasks.b();
         this.performanceProfiler.a(ProfilerSection.total);
         this.networkEngine.b(float1);
-        this.activity = this.activity2;
-        if (this.activity.isPaused()) {
+        this.activeGameView = this.pendingGameView;
+        if (this.activeGameView.isPaused()) {
             this.performanceProfiler.a(ProfilerSection.update);
 
             while (this.gameThreadRunnableQueue.peek() != null) {
@@ -1123,7 +1123,7 @@ public class GameLogic extends GameEngine {
                 var3.run();
             }
 
-            if (!this.loadNewGame) {
+            if (!this.hasLoadedLevel) {
                 if (!this.isStopped) {
                     Log.d("RustedWarfare", "game running without a loaded level!!!");
                     this.stopAndClose();
@@ -1149,7 +1149,7 @@ public class GameLogic extends GameEngine {
                     }
 
                     this.settingsEngine.save();
-                    if (this.isSafeMode && (this.forceEnglish || this.modManager.getStorageModsCount() > 0)) {
+                    if (this.isSafeMode && (this.isEnglishForcedBySafeMode || this.modManager.getStorageModsCount() > 0)) {
                         if (this.safeModeReason != null) {
                             this.showMessageBox("Safe mode", "Started game in safe mode due to " + this.safeModeReason + ". Mods have been disabled.");
                         } else if (var25) {
@@ -1160,23 +1160,23 @@ public class GameLogic extends GameEngine {
                     }
                 }
 
-                if (!this.reloadMap && this.loadNewGame && this.settingsEngine.numLoadsSinceRunningGameOrNormalExit != 0) {
+                if (!this.isMenuBackgroundMap && this.hasLoadedLevel && this.settingsEngine.numLoadsSinceRunningGameOrNormalExit != 0) {
                     this.settingsEngine.numLoadsSinceRunningGameOrNormalExit = 0;
                     this.settingsEngine.save();
                 }
 
                 this.gameSaver.deleteSave();
-                float var26 = this.cameraEdgeScrollZone * this.cameraIsDragging;
+                float var26 = this.targetZoom * this.densityZoomScale;
                 if (var26 != this.zoom) {
                     float var4 = this.mouseX / this.zoom + this.viewpointX;
                     float var5 = this.mouseY / this.zoom + this.viewpointY;
                     this.zoom = var26;
                     this.updateCameraSystem();
-                    if (this.recomputeViewpoint) {
+                    if (this.shouldRecenterZoomOnPointer) {
                         float var6 = this.mouseX / this.zoom + this.viewpointX;
                         float var7 = this.mouseY / this.zoom + this.viewpointY;
                         this.setViewpoint(this.viewpointX - (var6 - var4), this.viewpointY - (var7 - var5));
-                        this.recomputeViewpoint = false;
+                        this.shouldRecenterZoomOnPointer = false;
                     }
                 }
 
@@ -1238,7 +1238,7 @@ public class GameLogic extends GameEngine {
                     float1 = this.gameSpeedMultiplier;
                 }
 
-                this.lastTickTime = (int)(this.lastTickTime + float1 * 16.666666F);
+                this.renderTimeMillis = (int)(this.renderTimeMillis + float1 * 16.666666F);
                 this.updateCameraFocus(float1);
                 this.fpsAccumulator += integer;
                 this.fpsFrameCounter++;
@@ -1256,38 +1256,38 @@ public class GameLogic extends GameEngine {
                     }
                 }
 
-                this.processKeyEvents();
+                this.processPendingInputEvents();
 
-                for (int var28 = 0; var28 < this.gameModeEnabled.length; var28++) {
-                    this.gameModeEnabled[var28] = true;
+                for (int var28 = 0; var28 < this.touchPointerEnabled.length; var28++) {
+                    this.touchPointerEnabled[var28] = true;
                 }
 
-                this.mouseRightPressed = Utility.moveTowardsZero(this.mouseRightPressed, 0.1F * float1);
-                this.mouseMiddlePressed = Utility.moveTowardsZero(this.mouseMiddlePressed, 0.1F * float1);
-                this.mouseRightPressed = Utility.clamp(this.mouseRightPressed, 5.0F);
-                this.mouseMiddlePressed = Utility.clamp(this.mouseMiddlePressed, 5.0F);
+                this.rightMouseHoldTimer = Utility.moveTowardsZero(this.rightMouseHoldTimer, 0.1F * float1);
+                this.middleMouseHoldTimer = Utility.moveTowardsZero(this.middleMouseHoldTimer, 0.1F * float1);
+                this.rightMouseHoldTimer = Utility.clamp(this.rightMouseHoldTimer, 5.0F);
+                this.middleMouseHoldTimer = Utility.clamp(this.middleMouseHoldTimer, 5.0F);
                 this.gameUI.updateInput(float1);
                 this.clampCameraPosition();
                 TileMap.updateLayerBuffers();
-                if (this.networkEngine.B) {
+                if (this.networkEngine.networkGameActive) {
                     float var29 = float1;
                     if (this.replayEngine.v != 1) {
                         var29 = float1 * this.replayEngine.v;
                     }
 
                     this.networkEngine.a(var29);
-                    if (!this.shouldSkipUpdate(true) && !this.networkEngine.Y) {
+                    if (!this.shouldSkipUpdate(true) && !this.networkEngine.frameUpdateBlocked) {
                         this.accumulator += var29;
 
                         while (this.accumulator > this.networkEngine.getDifficultyString()) {
-                            if (this.networkEngine.I()) {
-                                this.networkEngine.Y = true;
+                            if (this.networkEngine.shouldGameBePausedForPathfinding()) {
+                                this.networkEngine.frameUpdateBlocked = true;
                                 break;
                             }
 
                             this.accumulator = this.accumulator - this.networkEngine.getDifficultyString();
                             this.networkEngine.a(this.networkEngine.getDifficultyString(), false);
-                            if (this.networkEngine.Y) {
+                            if (this.networkEngine.frameUpdateBlocked) {
                                 break;
                             }
 
@@ -1295,64 +1295,64 @@ public class GameLogic extends GameEngine {
                         }
 
                         if (!this.networkEngine.isServer) {
-                            if (this.networkEngine.af || this.networkEngine.ad) {
-                                if (this.networkEngine.af && this.networkEngine.ad && this.currentTick < this.networkEngine.X - this.networkEngine.Q - 5) {
+                            if (this.networkEngine.catchupFastForwardActive || this.networkEngine.catchupSpeedupActive) {
+                                if (this.networkEngine.catchupFastForwardActive && this.networkEngine.catchupSpeedupActive && this.currentTick < this.networkEngine.nextBlockingFrame - this.networkEngine.commandFrameInterval - 5) {
                                     this.networkEngine.d("nearly within frame range");
-                                    this.networkEngine.af = false;
+                                    this.networkEngine.catchupFastForwardActive = false;
                                 }
 
-                                if (this.currentTick > this.networkEngine.X - 6) {
+                                if (this.currentTick > this.networkEngine.nextBlockingFrame - 6) {
                                     this.networkEngine.d("we have back within frame range");
-                                    this.networkEngine.af = false;
-                                    this.networkEngine.ad = false;
+                                    this.networkEngine.catchupFastForwardActive = false;
+                                    this.networkEngine.catchupSpeedupActive = false;
                                 }
                             }
 
-                            if (!this.networkEngine.ad && this.currentTick < this.networkEngine.X - this.networkEngine.Q - 10) {
+                            if (!this.networkEngine.catchupSpeedupActive && this.currentTick < this.networkEngine.nextBlockingFrame - this.networkEngine.commandFrameInterval - 10) {
                                 this.networkEngine.d("we are slightly out of frame range, speeding up");
-                                this.networkEngine.ad = true;
+                                this.networkEngine.catchupSpeedupActive = true;
                             }
 
-                            if (!this.networkEngine.af && this.currentTick < this.networkEngine.X - this.networkEngine.Q - 30) {
-                                this.networkEngine.d("we are out of frame range, fast forwarding (" + this.currentTick + "->" + this.networkEngine.X + ")");
-                                this.networkEngine.af = true;
+                            if (!this.networkEngine.catchupFastForwardActive && this.currentTick < this.networkEngine.nextBlockingFrame - this.networkEngine.commandFrameInterval - 30) {
+                                this.networkEngine.d("we are out of frame range, fast forwarding (" + this.currentTick + "->" + this.networkEngine.nextBlockingFrame + ")");
+                                this.networkEngine.catchupFastForwardActive = true;
                             }
 
-                            if (!this.networkEngine.af && this.networkEngine.ad) {
-                                this.networkEngine.ae += float1;
-                                if (this.networkEngine.ae > this.networkEngine.getDifficultyString() * 3.0F) {
-                                    this.networkEngine.ae = 0.0F;
+                            if (!this.networkEngine.catchupFastForwardActive && this.networkEngine.catchupSpeedupActive) {
+                                this.networkEngine.catchupSpeedupTimer += float1;
+                                if (this.networkEngine.catchupSpeedupTimer > this.networkEngine.getDifficultyString() * 3.0F) {
+                                    this.networkEngine.catchupSpeedupTimer = 0.0F;
                                     this.networkEngine.a(this.networkEngine.getDifficultyString(), true);
-                                    if (!this.networkEngine.Y) {
+                                    if (!this.networkEngine.frameUpdateBlocked) {
                                         this.update(this.networkEngine.getDifficultyString());
                                     }
                                 }
                             }
 
-                            if (this.networkEngine.af) {
+                            if (this.networkEngine.catchupFastForwardActive) {
                                 this.networkEngine.a(this.networkEngine.getDifficultyString(), true);
-                                if (!this.networkEngine.Y) {
+                                if (!this.networkEngine.frameUpdateBlocked) {
                                     this.update(this.networkEngine.getDifficultyString());
                                 }
                             }
 
-                            if (this.currentTick < this.networkEngine.X - 90) {
+                            if (this.currentTick < this.networkEngine.nextBlockingFrame - 90) {
                                 this.networkEngine.a(this.networkEngine.getDifficultyString(), true);
-                                if (!this.networkEngine.Y) {
+                                if (!this.networkEngine.frameUpdateBlocked) {
                                     this.update(this.networkEngine.getDifficultyString());
                                 }
                             }
 
-                            if (this.currentTick < this.networkEngine.X - 120) {
+                            if (this.currentTick < this.networkEngine.nextBlockingFrame - 120) {
                                 this.networkEngine.a(this.networkEngine.getDifficultyString(), true);
-                                if (!this.networkEngine.Y) {
+                                if (!this.networkEngine.frameUpdateBlocked) {
                                     this.update(this.networkEngine.getDifficultyString());
                                 }
                             }
 
-                            if (this.currentTick < this.networkEngine.X - 600) {
+                            if (this.currentTick < this.networkEngine.nextBlockingFrame - 600) {
                                 this.networkEngine.a(this.networkEngine.getDifficultyString(), true);
-                                if (!this.networkEngine.Y) {
+                                if (!this.networkEngine.frameUpdateBlocked) {
                                     this.update(this.networkEngine.getDifficultyString());
                                 }
                             }
@@ -1373,7 +1373,7 @@ public class GameLogic extends GameEngine {
 
                         while (this.accumulator > this.networkEngine.getDifficultyString()) {
                             this.accumulator = this.accumulator - this.networkEngine.getDifficultyString();
-                            if (this.networkEngine.I()) {
+                            if (this.networkEngine.shouldGameBePausedForPathfinding()) {
                                 break;
                             }
 
@@ -1406,15 +1406,15 @@ public class GameLogic extends GameEngine {
                 DisabledSteamEngine.a().a(float1);
                 this.performanceProfiler.b(ProfilerSection.update);
                 this.performanceProfiler.a(ProfilerSection.draw);
-                if (!this.pinchDistance) {
-                    if (this.graphicsEngine2.a()) {
+                if (!this.shouldSkipNextDraw) {
+                    if (this.renderGraphicsEngine.a()) {
                         this.drawThreadSafe(null, float1);
-                    } else if (this.activity.hasBeenStarted()) {
-                        GraphicsInterface var31 = this.activity.lockCanvas(true);
+                    } else if (this.activeGameView.hasBeenStarted()) {
+                        GraphicsInterface var31 = this.activeGameView.lockCanvas(true);
                         this.drawThreadSafe(var31, float1);
                     } else {
-                        GameView var32 = this.activity;
-                        this.activity.onDraw(float1, integer);
+                        GameView var32 = this.activeGameView;
+                        this.activeGameView.onDraw(float1, integer);
                         if (var32.isSurfaceViewReady() && !var32.isContinuousRendering()) {
                             synchronized (var32.getHolder()) {
                                 if (var32.isSurfaceViewReady() && !var32.isContinuousRendering()) {
@@ -1437,7 +1437,7 @@ public class GameLogic extends GameEngine {
                                             }
 
                                             this.drawThreadSafe(var39, float1);
-                                            this.graphicsEngine2.a((GraphicsInterface) null);
+                                            this.renderGraphicsEngine.a((GraphicsInterface) null);
                                         }
                                     } finally {
                                         if (var39 != null) {
@@ -1459,22 +1459,22 @@ public class GameLogic extends GameEngine {
                             }
                         }
 
-                        this.activity.onUpdate(float1, integer);
+                        this.activeGameView.onUpdate(float1, integer);
                     }
                 }
 
-                this.pinchDistance = false;
-                this.clearLevelConfig();
+                this.shouldSkipNextDraw = false;
+                this.clearCurrentLoadingStatus();
                 this.performanceProfiler.b(ProfilerSection.draw);
-                if (this.isPinching) {
-                    this.isPinching = false;
+                if (this.shouldAdvanceAfterGameEnd) {
+                    this.shouldAdvanceAfterGameEnd = false;
                     Integer var33 = getMapLevel(this.currentMapPath);
                     String var36 = null;
                     if (var33 != null) {
                         var36 = findNextLevel(this.currentMapPath);
                     }
 
-                    if (this.networkEngine.B) {
+                    if (this.networkEngine.networkGameActive) {
                         var36 = null;
                         // java.lang.Thread, java.lang.Runnable
                         new Thread(() -> GameLogic.this.networkEngine.disconnectNetworking("gotoNextLevel")).start();
@@ -1487,8 +1487,8 @@ public class GameLogic extends GameEngine {
                         this.loadLevel(true, false, GameMode.normal);
                     } else {
                         GameEngine.log("gotoNextLevel: No next level, finishing");
-                        this.loadNewGame = false;
-                        InGameActivity var40 = this.activity.getSurfaceHolder();
+                        this.hasLoadedLevel = false;
+                        InGameActivity var40 = this.activeGameView.getSurfaceHolder();
                         if (var40 != null) {
                             var40.b();
                             var40.m();
@@ -1498,14 +1498,14 @@ public class GameLogic extends GameEngine {
                     }
                 }
 
-                if (!this.isStopped && this.isBenchmarking && !this.someBoolean) {
+                if (!this.isStopped && this.isBenchmarking && !this.hasStartedBenchmarkTrace) {
                     log("starting method trace");
                     Debug.startMethodTracing("lukeTrace", 110000000);
-                    this.someBoolean = true;
+                    this.hasStartedBenchmarkTrace = true;
                 }
 
                 this.exitGameThread = true;
-                this.gameModeTimer3.a();
+                this.endOfFrameTasks.a();
                 this.performanceProfiler.b(ProfilerSection.total);
                 this.performanceProfiler.b();
             }
@@ -1526,32 +1526,32 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: h */
     public void stopAndClose() {
-        InGameActivity surfaceHolder = this.activity.getSurfaceHolder();
+        InGameActivity surfaceHolder = this.activeGameView.getSurfaceHolder();
         if (surfaceHolder != null) {
             if (!surfaceHolder.c()) {
                 surfaceHolder.b();
                 return;
             } else {
-                GameEngine.updatePaintTextSizeIfNeeded("stopAndClose: inGameActivity is isFinishing");
+                GameEngine.logColored("stopAndClose: inGameActivity is isFinishing");
                 return;
             }
         }
-        GameEngine.updatePaintTextSizeIfNeeded("stopAndClose: Error getInGameActivity==null");
+        GameEngine.logColored("stopAndClose: Error getInGameActivity==null");
     }
 
     /* JADX INFO: renamed from: a */
     public void update(float deltaSpeed) throws IOException {
         if (isInNetworkOrReplay() && deltaSpeed < 0.1f) {
-            NetworkEngine.g("updateAllGame1: deltaSpeed:" + deltaSpeed + " frame:" + this.currentTick + " network.currentStepRate:" + this.networkEngine.getDifficultyString());
+            NetworkEngine.reportDesync("updateAllGame1: deltaSpeed:" + deltaSpeed + " frame:" + this.currentTick + " network.currentStepRate:" + this.networkEngine.getDifficultyString());
         }
-        if (this.gameSpeed != 1.0f && !this.networkEngine.B && !this.replayEngine.i()) {
+        if (this.gameSpeed != 1.0f && !this.networkEngine.networkGameActive && !this.replayEngine.i()) {
             deltaSpeed *= this.gameSpeed;
         }
         float f = deltaSpeed * this.speedMultiplier;
         this.floatI = f + 2.0f;
         this.lastDelta = f;
         this.networkEngine.update(f);
-        this.lastTick = (int) (this.lastTick + (f * 16.666666f));
+        this.gameTimeMillis = (int) (this.gameTimeMillis + (f * 16.666666f));
         this.commandController.executeAllCommands();
         this.replayEngine.update(f);
         this.currentTick++;
@@ -1560,7 +1560,7 @@ public class GameLogic extends GameEngine {
             this.tileMap.updateFogLogicFrame(f);
         }
         if (isInNetworkOrReplay() && f < 0.1f) {
-            NetworkEngine.g("updateAllGame2: deltaSpeed:" + f + " frame:" + this.currentTick);
+            NetworkEngine.reportDesync("updateAllGame2: deltaSpeed:" + f + " frame:" + this.currentTick);
         }
         BaseUnit.getGlobalUnitList();
         TransactionalArrayList transactionalArrayListDK = GameObject.dK();
@@ -1576,7 +1576,7 @@ public class GameLogic extends GameEngine {
             gameObject.update(f);
         }
         if (isInNetworkOrReplay() && f < 0.1f) {
-            NetworkEngine.g("updateAllGame3: deltaSpeed:" + f + " frame:" + this.currentTick);
+            NetworkEngine.reportDesync("updateAllGame3: deltaSpeed:" + f + " frame:" + this.currentTick);
         }
         int size2 = transactionalArrayListDK.a.size();
         for (int i2 = 0; i2 < size2; i2++) {
@@ -1605,7 +1605,7 @@ public class GameLogic extends GameEngine {
             }
             if (i3 > 70) {
                 for (BaseUnit baseUnit2 : BaseUnit.getGlobalUnitList()) {
-                    if ((baseUnit2 instanceof BaseUnit) && baseUnit2.isDestroyed && !(baseUnit2 instanceof Tree) && baseUnit2.unitCreationTime < this.lastTick - 30000 && i3 > 70) {
+                    if ((baseUnit2 instanceof BaseUnit) && baseUnit2.isDestroyed && !(baseUnit2 instanceof Tree) && baseUnit2.unitCreationTime < this.gameTimeMillis - 30000 && i3 > 70) {
                         baseUnit2.remove();
                         i3--;
                     }
@@ -1613,7 +1613,7 @@ public class GameLogic extends GameEngine {
             }
         }
         this.performanceProfiler.a(ProfilerSection.update_all_team_and_ai);
-        PlayerTeam.update2(f);
+        PlayerTeam.updateAllTeams(f);
         this.performanceProfiler.b(ProfilerSection.update_all_team_and_ai);
         BuildPreview.updateAll(f);
         this.effectManager.update(f);
@@ -1623,7 +1623,7 @@ public class GameLogic extends GameEngine {
             this.missionEngine.c(f);
         }
         this.performanceProfiler.a(ProfilerSection.update_groupcontroller);
-        this.groupController.a(f);
+        this.formationEngine.a(f);
         this.performanceProfiler.b(ProfilerSection.update_groupcontroller);
         this.performanceProfiler.a(ProfilerSection.update_minimap);
         this.minimap.update(f);
@@ -1637,7 +1637,7 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: a */
     public void drawThreadSafe(GraphicsInterface graphicsInterface, float f) {
-        synchronized (this.gameLoopLock2) {
+        synchronized (this.drawLock) {
             draw(graphicsInterface, f);
         }
     }
@@ -1650,8 +1650,8 @@ public class GameLogic extends GameEngine {
         if (this.postDisplacementShader == null) {
             this.postDisplacementShader = new FrameBufferHelper("assets/shaders/post_displacement.frag");
         }
-        this.postBaseShader.a(this.graphicsEngine2);
-        this.postDisplacementShader.a(this.graphicsEngine2);
+        this.postBaseShader.a(this.renderGraphicsEngine);
+        this.postDisplacementShader.a(this.renderGraphicsEngine);
         if (this.postBaseShader.g || this.postDisplacementShader.g) {
             if (!this.postProcessingFailed) {
                 this.postProcessingFailed = true;
@@ -1665,26 +1665,26 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: a */
     public void beginPostProcessing(FrameBufferHelper frameBufferHelper) {
-        if (this.graphicsEngine != null) {
+        if (this.previousRenderGraphicsEngine != null) {
             throw new RuntimeException("Layer already enabled");
         }
-        this.graphicsEngine = this.graphicsEngine2;
-        this.graphicsEngine2 = frameBufferHelper.b;
-        this.graphicsEngine2.i();
-        this.graphicsEngine2.a(new Rect(0, 0, this.graphicsEngine2.m(), this.graphicsEngine2.n()));
-        this.graphicsEngine2.b(frameBufferHelper.f, frameBufferHelper.e);
+        this.previousRenderGraphicsEngine = this.renderGraphicsEngine;
+        this.renderGraphicsEngine = frameBufferHelper.b;
+        this.renderGraphicsEngine.i();
+        this.renderGraphicsEngine.a(new Rect(0, 0, this.renderGraphicsEngine.m(), this.renderGraphicsEngine.n()));
+        this.renderGraphicsEngine.b(frameBufferHelper.f, frameBufferHelper.e);
     }
 
     /* JADX INFO: renamed from: b */
     public void endPostProcessing(FrameBufferHelper frameBufferHelper) {
-        if (this.graphicsEngine == null) {
+        if (this.previousRenderGraphicsEngine == null) {
             throw new RuntimeException("Layer not enabled");
         }
-        this.graphicsEngine2.j();
-        this.graphicsEngine2.p();
-        this.graphicsEngine2 = this.graphicsEngine;
-        this.graphicsEngine = null;
-        this.graphicsEngine2.b(frameBufferHelper.f, frameBufferHelper.e);
+        this.renderGraphicsEngine.j();
+        this.renderGraphicsEngine.p();
+        this.renderGraphicsEngine = this.previousRenderGraphicsEngine;
+        this.previousRenderGraphicsEngine = null;
+        this.renderGraphicsEngine.b(frameBufferHelper.f, frameBufferHelper.e);
     }
 
     /* JADX INFO: renamed from: b */
@@ -1693,23 +1693,23 @@ public class GameLogic extends GameEngine {
             log("drawAll", "canvas is null, not may not be available yet");
             return;
         }
-        if (isNetworkServerStatic) {
+        if (isHeadlessMode) {
             return;
         }
-        this.graphicsEngine2.a(graphicsInterface);
-        this.graphicsEngine2.a(this.activity.getAudioRenderer());
-        this.graphicsEngine2.g();
-        this.tickDelta++;
+        this.renderGraphicsEngine.a(graphicsInterface);
+        this.renderGraphicsEngine.a(this.activeGameView.getAudioRenderer());
+        this.renderGraphicsEngine.g();
+        this.renderFrameCount++;
         TeamColorTexture.G = 0.0f;
-        if (this.isPinching) {
-            this.graphicsEngine2.b(Color.a(0, 0, 0));
-            this.graphicsEngine2.a("Loading..", this.halfScreenWidth, this.halfScreenHeight, this.loadingPaint);
+        if (this.shouldAdvanceAfterGameEnd) {
+            this.renderGraphicsEngine.b(Color.a(0, 0, 0));
+            this.renderGraphicsEngine.a("Loading..", this.halfScreenWidth, this.halfScreenHeight, this.loadingPaint);
             return;
         }
         float f2 = 1.0f;
         if (f2 != 1.0f) {
-            this.graphicsEngine2.i();
-            this.graphicsEngine2.a(f2, f2);
+            this.renderGraphicsEngine.i();
+            this.renderGraphicsEngine.a(f2, f2);
         }
         boolean zIsPostProcessingSupported = GameEngine.isPostProcessingSupported();
         if (zIsPostProcessingSupported && isKeyPressed(113) && isKeyPressed(44)) {
@@ -1721,7 +1721,7 @@ public class GameLogic extends GameEngine {
         if (zIsPostProcessingSupported) {
             beginPostProcessing(this.postBaseShader);
             try {
-                this.graphicsEngine2.b(Color.a(0, 0, 0));
+                this.renderGraphicsEngine.b(Color.a(0, 0, 0));
                 this.performanceProfiler.a(ProfilerSection.draw_game);
                 drawGame((GraphicsInterface) null, f);
                 this.performanceProfiler.b(ProfilerSection.draw_game);
@@ -1730,16 +1730,16 @@ public class GameLogic extends GameEngine {
                 if (!this.postDisplacementShader.a()) {
                     beginPostProcessing(this.postDisplacementShader);
                     try {
-                        this.graphicsEngine2.b(Color.a(128, 128, 255));
+                        this.renderGraphicsEngine.b(Color.a(128, 128, 255));
                         applyZoomTransform();
                         int iDrawEffect = this.effectManager.drawEffect(f, 3);
                         this.effectManager.texture = null;
                         endPostProcessing(this.postDisplacementShader);
                         if (iDrawEffect > 0) {
-                            float fS = this.graphicsEngine2.s();
+                            float fS = this.renderGraphicsEngine.s();
                             this.postDisplacementShader.d.a("screenBase", this.postBaseShader.a);
                             this.postDisplacementShader.d.b("screenBaseSize", this.postBaseShader.a);
-                            this.postDisplacementShader.d.a("u_resolution", this.screenWidth, this.viewpointWidthRaw);
+                            this.postDisplacementShader.d.a("u_resolution", this.screenWidth, this.screenHeight);
                             this.postDisplacementShader.d.a("u_offsetBy", 0.2f * this.zoom);
                             this.postDisplacementShader.d.a("u_uiScaling", fS);
                             this.postDisplacementShader.b();
@@ -1764,19 +1764,19 @@ public class GameLogic extends GameEngine {
             this.performanceProfiler.b(ProfilerSection.draw_gui);
         }
         if (this.settingsEngine.showFps && this.pauseTransition == 0.0f && !this.isMenuOpen && !this.isPaused) {
-            this.graphicsEngine2.a(this.fpsString, 100.0f, 35.0f, this.fpsPaint);
+            this.renderGraphicsEngine.a(this.fpsString, 100.0f, 35.0f, this.fpsPaint);
         }
         if (safeModeReason != null) {
-            this.graphicsEngine2.a(safeModeReason, 100.0f, 85.0f, this.fpsPaint);
+            this.renderGraphicsEngine.a(safeModeReason, 100.0f, 85.0f, this.fpsPaint);
         }
-        if (!this.isStopped && (this.graphicsEngine2.d() != null || GameEngine.isAndroidVersionStatic2)) {
+        if (!this.isStopped && (this.renderGraphicsEngine.d() != null || GameEngine.isPCOrIOSVersion)) {
             this.gameUI.handleTouchGestures(f);
         }
         if (!isGamePaused()) {
             this.effectManager.drawEffect(f, 4);
         }
         CustomUnit.dE();
-        this.graphicsEngine2.h();
+        this.renderGraphicsEngine.h();
         if (f2 != 1.0f) {
             graphicsInterface.a();
         }
@@ -1787,20 +1787,20 @@ public class GameLogic extends GameEngine {
         if (!this.settingsEngine.showUnitIcons) {
             return false;
         }
-        if (this.zoom >= 0.7d || this.viewpointWidth < this.tileMap.getWorldWidth() - 5.0f || this.viewpointHeight < this.tileMap.getWorldHeight() - 5.0f) {
-            return printLog() ? ((double) this.zoom) < 0.1d : isPC() ? ((double) this.zoom) < 0.27d : ((double) this.zoom) < 0.4d;
+        if (this.zoom >= 0.7d || this.viewpointWidth < this.tileMap.getWorldWidth() - 5.0f || this.visibleWorldHeight < this.tileMap.getWorldHeight() - 5.0f) {
+            return isSpaceGame() ? ((double) this.zoom) < 0.1d : isPC() ? ((double) this.zoom) < 0.27d : ((double) this.zoom) < 0.4d;
         }
         return true;
     }
 
     /* JADX INFO: renamed from: b */
-    public void updateCameraSmoothing(float f) {
+    public void drawOutOfBoundsBackground(float f) {
         boolean z = false;
-        if (this.cameraSmoothing.a < 0 || this.cameraSmoothing.b < 0 || this.cameraSmoothing.c > this.tileMap.getWorldWidth() || this.cameraSmoothing.d > this.tileMap.getWorldHeight()) {
+        if (this.visibleWorldRect.a < 0 || this.visibleWorldRect.b < 0 || this.visibleWorldRect.c > this.tileMap.getWorldWidth() || this.visibleWorldRect.d > this.tileMap.getWorldHeight()) {
             z = true;
         }
         if (z) {
-            this.graphicsEngine2.b(Color.a(0, 0, 0));
+            this.renderGraphicsEngine.b(Color.a(0, 0, 0));
         }
     }
 
@@ -1816,10 +1816,10 @@ public class GameLogic extends GameEngine {
     */
 
     public void drawGame(com.corrodinggames.rts.gameFramework.graphics.GraphicsInterface l, float float2) {
-        if (this.loadNewGame) {
+        if (this.hasLoadedLevel) {
             this.performanceProfiler.a(ProfilerSection.update_game_shouldDraw);
             this.renderListBuffer.b();
-            this.lastPinchDistance = 0;
+            this.selectedWaypointDrawCount = 0;
             boolean var3 = false;
             GameObject[] var4 = BaseUnit.fastGameObjectList.a();
             int var5 = GameObject.fastGameObjectList.size();
@@ -1857,68 +1857,68 @@ public class GameLogic extends GameEngine {
             this.performanceProfiler.b(ProfilerSection.update_game_sortRender);
             this.performanceProfiler.a(ProfilerSection.draw_setup);
             this.performanceProfiler.a(ProfilerSection.draw_setup_clip);
-            this.graphicsEngine2.i();
-            this.graphicsEngine2.a(this.cameraBoundsEnabled);
+            this.renderGraphicsEngine.i();
+            this.renderGraphicsEngine.a(this.screenClipRect);
             this.performanceProfiler.b(ProfilerSection.draw_setup_clip);
             this.performanceProfiler.a(ProfilerSection.draw_setup_fill);
-            this.updateCameraSmoothing(float2);
+            this.drawOutOfBoundsBackground(float2);
             this.performanceProfiler.b(ProfilerSection.draw_setup_fill);
             if (this.settingsEngine.renderFancyWater) {
                 if (this.waterCloudTexture == null) {
-                    this.waterCloudTexture = this.graphicsEngine2.a(R.drawable.water_cloud);
+                    this.waterCloudTexture = this.renderGraphicsEngine.a(R.drawable.water_cloud);
                 }
 
                 if (this.waterLayer1Texture == null) {
-                    this.waterLayer1Texture = this.graphicsEngine2.a(R.drawable.water_layer1);
+                    this.waterLayer1Texture = this.renderGraphicsEngine.a(R.drawable.water_layer1);
                 }
 
                 if (this.waterLayer2Texture == null) {
-                    this.waterLayer2Texture = this.graphicsEngine2.a(R.drawable.water_layer2);
+                    this.waterLayer2Texture = this.renderGraphicsEngine.a(R.drawable.water_layer2);
                 }
 
-                this.waterRect.a(this.cameraBoundsEnabled);
+                this.waterRect.a(this.screenClipRect);
                 this.waterAnimationTimer += 0.05F * float2;
                 if (this.waterAnimationTimer > 100.0F) {
                     this.waterAnimationTimer -= 100.0F;
                 }
 
-                this.graphicsEngine2.a(this.waterCloudTexture, this.waterRect, null, this.cameraBoundsMaxY / 6, this.mapWidth / 6, 1, 1);
-                this.waterRect.a(this.cameraBoundsBuffer);
-                this.waterRectF.a(this.cameraBoundsBuffer);
-                this.graphicsEngine2.i();
+                this.renderGraphicsEngine.a(this.waterCloudTexture, this.waterRect, null, this.viewpointXInt / 6, this.viewpointYInt / 6, 1, 1);
+                this.waterRect.a(this.viewportClipRect);
+                this.waterRectF.a(this.viewportClipRect);
+                this.renderGraphicsEngine.i();
                 this.applyZoomTransform();
-                this.graphicsEngine2.a(this.waterLayer2Texture, this.waterRectF, null, this.cameraBoundsMaxY + this.waterAnimationTimer, this.mapWidth + this.waterAnimationTimer, 0, 0);
-                this.graphicsEngine2.a(this.waterLayer1Texture, this.waterRectF, null, (float)this.cameraBoundsMaxY, (float)this.mapWidth, 0, 0);
-                this.graphicsEngine2.j();
+                this.renderGraphicsEngine.a(this.waterLayer2Texture, this.waterRectF, null, this.viewpointXInt + this.waterAnimationTimer, this.viewpointYInt + this.waterAnimationTimer, 0, 0);
+                this.renderGraphicsEngine.a(this.waterLayer1Texture, this.waterRectF, null, (float)this.viewpointXInt, (float)this.viewpointYInt, 0, 0);
+                this.renderGraphicsEngine.j();
             }
 
             this.performanceProfiler.a(ProfilerSection.draw_setup_drawMap);
-            if (this.tileMap != null && this.isNetworkServer()) {
+            if (this.tileMap != null && this.shouldUpdateFogRenderPass()) {
                 this.tileMap.updateFogRenderPass(float2);
             }
 
             this.performanceProfiler.b(ProfilerSection.draw_setup_drawMap);
             this.applyZoomTransform();
-            this.graphicsEngine2.a(this.cameraBoundsBuffer);
+            this.renderGraphicsEngine.a(this.viewportClipRect);
             boolean var13 = this.shouldDrawUnitIcons();
             this.pathfindingEngine.c(float2);
             this.performanceProfiler.b(ProfilerSection.draw_setup);
             GameObject[] var14 = this.renderList.a();
             int var15 = this.renderList.size();
-            this.mouseScreenX = true;
-            this.mouseScreenY = true;
-            this.mouseWorldX = true;
-            this.mouseWorldY = true;
-            this.mousePressed = true;
+            this.shouldDrawHighDetailEffects = true;
+            this.shouldDrawMediumDetailEffects = true;
+            this.shouldDrawSmallUnitShadows = true;
+            this.shouldDrawUnitShadows = true;
+            this.shouldDrawUnitLegDetails = true;
             if (this.zoom < 0.45) {
-                this.mouseWorldX = false;
-                this.mouseScreenX = false;
-                this.mousePressed = false;
+                this.shouldDrawSmallUnitShadows = false;
+                this.shouldDrawHighDetailEffects = false;
+                this.shouldDrawUnitLegDetails = false;
             }
 
             if (this.zoom < 0.3) {
-                this.mouseWorldY = false;
-                this.mouseScreenY = false;
+                this.shouldDrawUnitShadows = false;
+                this.shouldDrawMediumDetailEffects = false;
             }
 
             if (!var13) {
@@ -1998,8 +1998,8 @@ public class GameLogic extends GameEngine {
                 PlayerTeam.h(float2);
             }
 
-            this.mouseWorldX = true;
-            this.mouseWorldY = true;
+            this.shouldDrawSmallUnitShadows = true;
+            this.shouldDrawUnitShadows = true;
             this.performanceProfiler.b(ProfilerSection.draw_game_unit);
             this.performanceProfiler.a(ProfilerSection.draw_game_effects);
             this.effectManager.drawEffect(float2, 2);
@@ -2021,7 +2021,7 @@ public class GameLogic extends GameEngine {
             GameViewUtils.b(float2);
             this.unitSpatialIndex.c(float2);
             this.performanceProfiler.a(ProfilerSection.draw_end);
-            this.graphicsEngine2.j();
+            this.renderGraphicsEngine.j();
             this.performanceProfiler.b(ProfilerSection.draw_end);
         }
     }
@@ -2037,16 +2037,16 @@ public class GameLogic extends GameEngine {
         if (this.settingsEngine.showFps && this.pauseTransition == 0.0f) {
             this.performanceProfiler.c();
         }
-        if (this.isGameEngineReady) {
-            this.graphicsEngine2.a("Look Mode", this.halfScreenWidth, this.halfScreenHeight, this.loadingPaint);
+        if (this.isLookModeEnabled) {
+            this.renderGraphicsEngine.a("Look Mode", this.halfScreenWidth, this.halfScreenHeight, this.loadingPaint);
         }
-        if (this.isNetworkConnected) {
+        if (this.showAITeamInfoOverlay) {
             int i = 20;
             for (int i2 = 0; i2 < PlayerTeam.TEAM_NEUTRAL; i2++) {
                 PlayerTeam playerTeamK = PlayerTeam.k(i2);
                 if (playerTeamK != null && (playerTeamK instanceof AIController)) {
                     AIController aIController = (AIController) playerTeamK;
-                    this.graphicsEngine2.a(aIController.teamId + "| c:" + aIController.credits, 20.0f, i, this.teamInfoPaint);
+                    this.renderGraphicsEngine.a(aIController.teamId + "| c:" + aIController.credits, 20.0f, i, this.teamInfoPaint);
                     i += 20;
                 }
             }
@@ -2058,18 +2058,18 @@ public class GameLogic extends GameEngine {
         this.screenScale = getScreenScale();
         updateDensity();
         this.halfScreenWidth = this.screenWidth / 2.0f;
-        this.halfScreenHeight = this.viewpointWidthRaw / 2.0f;
-        this.sidebarWidth = (int) (this.viewpointWidthRaw / 3.0f);
+        this.halfScreenHeight = this.screenHeight / 2.0f;
+        this.sidebarWidth = (int) (this.screenHeight / 3.0f);
         if (isPC()) {
-            this.sidebarWidth = (int) (this.viewpointWidthRaw / 2.5f);
+            this.sidebarWidth = (int) (this.screenHeight / 2.5f);
         }
         float f = (int) (this.screenWidth / 3.0f);
         if (this.sidebarWidth > f) {
             this.sidebarWidth = f;
         }
         this.sidebarWidth = Utility.clampTo255(this.sidebarWidth, 60.0f, (int) (250.0f * this.screenScale));
-        float f2 = this.viewpointX + this.halfViewpointWidth;
-        float f3 = this.viewpointY + this.halfViewpointHeight;
+        float f2 = this.viewpointX + this.halfVisibleWorldWidth;
+        float f3 = this.viewpointY + this.halfVisibleWorldHeight;
         if (this.isPaused) {
             this.currentScreenWidthPixels = this.screenWidth;
             this.currentViewpointWidthPixels = this.screenWidth;
@@ -2095,16 +2095,16 @@ public class GameLogic extends GameEngine {
             }
         }
         this.wasPaused = this.isPaused;
-        this.currentScreenHeightPixels = this.viewpointWidthRaw;
-        this.screenHeight = this.currentScreenWidthPixels / this.zoom;
-        this.viewpointHeight = this.currentScreenHeightPixels / this.zoom;
+        this.currentScreenHeightPixels = this.screenHeight;
+        this.visibleWorldWidth = this.currentScreenWidthPixels / this.zoom;
+        this.visibleWorldHeight = this.currentScreenHeightPixels / this.zoom;
         this.viewpointWidth = this.currentViewpointWidthPixels / this.zoom;
-        this.halfViewpointWidth = this.screenHeight / 2.0f;
-        this.halfViewpointHeight = this.viewpointHeight / 2.0f;
-        this.cameraBoundsEnabled.a(0, 0, (int) this.currentScreenWidthPixels, (int) this.currentScreenHeightPixels);
-        this.cameraBoundsBuffer.a(0, 0, ((int) this.screenHeight) + 1, ((int) this.viewpointHeight) + 1);
-        this.cameraFollowMode.a(0.0f, 0.0f, this.screenHeight + 1.0f, this.viewpointHeight + 1.0f);
-        setViewpoint(f2 - this.halfViewpointWidth, f3 - this.halfViewpointHeight);
+        this.halfVisibleWorldWidth = this.visibleWorldWidth / 2.0f;
+        this.halfVisibleWorldHeight = this.visibleWorldHeight / 2.0f;
+        this.screenClipRect.a(0, 0, (int) this.currentScreenWidthPixels, (int) this.currentScreenHeightPixels);
+        this.viewportClipRect.a(0, 0, ((int) this.visibleWorldWidth) + 1, ((int) this.visibleWorldHeight) + 1);
+        this.visibleScreenRect.a(0.0f, 0.0f, this.visibleWorldWidth + 1.0f, this.visibleWorldHeight + 1.0f);
+        setViewpoint(f2 - this.halfVisibleWorldWidth, f3 - this.halfVisibleWorldHeight);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
@@ -2116,20 +2116,20 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: a */
     public void updateViewpoint(int i, int i2, float f) {
         this.screenWidth = i;
-        this.viewpointWidthRaw = i2;
+        this.screenHeight = i2;
         updateCameraSystem();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
     /* JADX INFO: renamed from: l */
     public String getPackageName() {
-        if (GameEngine.isIOSVersionStatic2) {
+        if (GameEngine.isJavaDesktopVersion) {
             return "com.corrodinggames.rts.java";
         }
-        if (GameEngine.isPCVersionStatic2) {
+        if (GameEngine.isGDXVersion) {
             return "com.corrodinggames.rts.gdx";
         }
-        if (isPausedStatic2) {
+        if (isNonAndroidVersion) {
             return "com.corrodinggames.rts.server";
         }
         if (this.appContext == null) {
@@ -2141,13 +2141,13 @@ public class GameLogic extends GameEngine {
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
     /* JADX INFO: renamed from: m */
     public String getInstallerPackageName() {
-        if (GameEngine.isIOSVersionStatic2) {
+        if (GameEngine.isJavaDesktopVersion) {
             return "java";
         }
-        if (GameEngine.isPCVersionStatic2) {
+        if (GameEngine.isGDXVersion) {
             return "java-gdx";
         }
-        if (isPausedStatic2) {
+        if (isNonAndroidVersion) {
             return "dedicatedServer";
         }
         if (this.appContext == null) {
@@ -2163,7 +2163,7 @@ public class GameLogic extends GameEngine {
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
     /* JADX INFO: renamed from: n */
     public boolean isBetaOrPreview() {
-        if (getVersion2().contains("p")) {
+        if (getVersionString().contains("p")) {
             return true;
         }
         return false;
@@ -2172,7 +2172,7 @@ public class GameLogic extends GameEngine {
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
     /* JADX INFO: renamed from: c */
     public int getVersionCode(boolean z) {
-        if (isPausedStatic2 || z) {
+        if (isNonAndroidVersion || z) {
             return 176;
         }
         try {
@@ -2184,7 +2184,7 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: o */
     public String getSignature() {
-        if (!isDesktop()) {
+        if (!isAndroidPlatform()) {
             return null;
         }
         try {
@@ -2201,8 +2201,8 @@ public class GameLogic extends GameEngine {
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
     /* JADX INFO: renamed from: p */
     public boolean isModdingEnabled() {
-        if (!GameEngine.isDebugVersionStatic2) {
-            if (isNotObfuscated() || isDesktopVersionStatic2) {
+        if (!GameEngine.isIOSVersion) {
+            if (isNotObfuscated() || isDebugServerActive) {
                 return true;
             }
             return false;
@@ -2239,14 +2239,14 @@ public class GameLogic extends GameEngine {
             return gameVersionName;
         }
         String str = "v" + getVersion();
-        if (!GameEngine.isGameBetaStatic || isDesktopVersionStatic2) {
+        if (!GameEngine.isGameBeta || isDebugServerActive) {
             str = "DEBUG BUILD - " + str;
-        } else if (GameEngine.isSandboxModeStatic) {
+        } else if (GameEngine.isTestingBuild) {
             str = "TESTING BUILD - " + str;
         } else if (str.contains("p")) {
             str = "BETA VERSION - " + str;
         }
-        if (!GameEngine.isDebugVersionStatic2 && isNotObfuscated()) {
+        if (!GameEngine.isIOSVersion && isNotObfuscated()) {
             str = "RAW - " + str;
         }
         gameVersionName = str;
@@ -2261,7 +2261,7 @@ public class GameLogic extends GameEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.GameEngine
     /* JADX INFO: renamed from: v */
-    public String getVersion2() {
+    public String getVersionString() {
         return "1.15";
     }
 
@@ -2274,20 +2274,20 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: a */
     public synchronized void colorizeLogMessage(Activity activity, GameView gameView, boolean z) {
         synchronized (this.initLock) {
-            if (!isPausedStatic2) {
+            if (!isNonAndroidVersion) {
                 gameView.pause();
             }
             this.context = activity;
             this.isStopped = z;
             this.isPaused = this.isStopped;
-            if (z && !this.loadNewGame && !this.fullReload && !GameEngine.isAndroidVersionStatic && !this.networkEngine.B) {
+            if (z && !this.hasLoadedLevel && !this.fullReload && !GameEngine.isMenuBackgroundDisabled && !this.networkEngine.networkGameActive) {
                 loadMenuBackground();
             }
-            GameView gameView2 = this.activity2;
-            if (this.activity == null) {
-                this.activity = gameView;
+            GameView gameView2 = this.pendingGameView;
+            if (this.activeGameView == null) {
+                this.activeGameView = gameView;
             }
-            this.activity2 = gameView;
+            this.pendingGameView = gameView;
             if (gameView2 != null && gameView2 != gameView) {
                 gameView2.onResume();
             }
@@ -2318,7 +2318,7 @@ public class GameLogic extends GameEngine {
         this.remoteMapStream = null;
         this.currentMapPath = "maps/menu_background/menu" + iDistance + ".tmx";
         try {
-            PlayerTeam.getResourceCost(10, true);
+            PlayerTeam.setMaxTeamId(10, true);
             for (int i2 = 0; i2 < PlayerTeam.TEAM_NEUTRAL; i2++) {
                 AIController aIController = new AIController(i2);
                 if (i2 == 0) {
@@ -2326,9 +2326,9 @@ public class GameLogic extends GameEngine {
                 }
             }
             loadGame(false, GameMode.menu);
-            this.reloadMap = true;
+            this.isMenuBackgroundMap = true;
             this.gameUI.clearSelection();
-            if (!this.loadNewGame) {
+            if (!this.hasLoadedLevel) {
                 GameEngine.logWarningAndStack("Menu load failed");
                 this.menuLoadFailureCount++;
             }
@@ -2339,7 +2339,7 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: d */
     void updateCameraFocus(float f) {
-        if (this.isStopped && !this.reloadMap) {
+        if (this.isStopped && !this.isMenuBackgroundMap) {
             if (this.nextCameraFocusUnit == null) {
                 this.nextCameraFocusUnit = findCameraFocusUnit();
                 if (this.cameraFocusUnit == this.nextCameraFocusUnit) {
@@ -2355,7 +2355,7 @@ public class GameLogic extends GameEngine {
             }
             if (this.cameraFocusUnit != null) {
                 boolean zMoveCameraTo = moveCameraTo(f, this.cameraFocusUnit.posX, this.cameraFocusUnit.posY, (1.0f - this.cameraFocusTransition) * 0.5f);
-                if (Utility.distanceSq(this.viewpointX + this.halfViewpointWidth, this.viewpointY + this.halfViewpointHeight, this.cameraFocusUnit.posX, this.cameraFocusUnit.posY) < 6400.0f) {
+                if (Utility.distanceSq(this.viewpointX + this.halfVisibleWorldWidth, this.viewpointY + this.halfVisibleWorldHeight, this.cameraFocusUnit.posX, this.cameraFocusUnit.posY) < 6400.0f) {
                     zMoveCameraTo = true;
                 }
                 if (zMoveCameraTo) {
@@ -2408,14 +2408,14 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: a */
     public boolean moveCameraTo(float f, float f2, float f3, float f4) {
-        float angleBetweenPoints = Utility.getAngleBetweenPoints(this.viewpointX + this.halfViewpointWidth, this.viewpointY + this.halfViewpointHeight, f2, f3);
-        float fDistanceSq = Utility.distanceSq(this.viewpointX + this.halfViewpointWidth, this.viewpointY + this.halfViewpointHeight, f2, f3);
+        float angleBetweenPoints = Utility.getAngleBetweenPoints(this.viewpointX + this.halfVisibleWorldWidth, this.viewpointY + this.halfVisibleWorldHeight, f2, f3);
+        float fDistanceSq = Utility.distanceSq(this.viewpointX + this.halfVisibleWorldWidth, this.viewpointY + this.halfVisibleWorldHeight, f2, f3);
         float f5 = f4 * f;
         float f6 = 15.0f;
         if (15.0f < f5 + 1.0f) {
             f6 = f5 + 1.0f;
         }
-        if (fDistanceSq < f6 * f6 || this.stoppedScrolling) {
+        if (fDistanceSq < f6 * f6 || this.wasCameraClamped) {
             return true;
         }
         this.cameraMovementX += Utility.fastCos(angleBetweenPoints) * f5;

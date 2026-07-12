@@ -28,15 +28,15 @@ class CreateServerRunnable implements Runnable {
                 MasterServerAuth.instance.addAuthParams(str, arrayList);
                 MasterServerClient.addParam(arrayList, "game_name", "Unnamed");
                 MasterServerClient.addParam(arrayList, "game_version", Integer.toString(gameEngine.getVersionCode(true)));
-                if (gameEngine.networkEngine.v) {
+                if (gameEngine.networkEngine.chatOnlyMode) {
                     MasterServerClient.addParam(arrayList, "game_version_string", "ANY");
                 } else {
-                    MasterServerClient.addParam(arrayList, "game_version_string", gameEngine.getVersion2());
+                    MasterServerClient.addParam(arrayList, "game_version_string", gameEngine.getVersionString());
                 }
                 MasterServerClient.addParam(arrayList, "game_version_beta", Utility.padString(gameEngine.isBetaOrPreview()));
-                String strAu = gameEngine.networkEngine.au();
-                if (strAu != null) {
-                    MasterServerClient.addParam(arrayList, "game_mods", strAu);
+                String requiredModsSummary = gameEngine.networkEngine.getRequiredModsSummary();
+                if (requiredModsSummary != null) {
+                    MasterServerClient.addParam(arrayList, "game_mods", requiredModsSummary);
                 }
                 MasterServerClient.addParam(arrayList, "private_token", gameEngine.networkEngine.sessionToken);
                 MasterServerClient.addParam(arrayList, "private_token_2", Utility.getParentDir(Utility.getParentDir(gameEngine.networkEngine.sessionToken)));

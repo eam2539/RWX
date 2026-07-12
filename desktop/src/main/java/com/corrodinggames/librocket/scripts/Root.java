@@ -52,13 +52,13 @@ public class Root extends ScriptContext {
     public void back() {
         this.libRocket.backToLastDocument();
         if (this.libRocket.getActiveDocument() == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("back: libRocket.getActiveDocument()==null");
+            GameEngine.logColored("back: libRocket.getActiveDocument()==null");
             GameEngine gameEngine = GameEngine.getInstance();
             if (gameEngine == null || !gameEngine.isLoading) {
-                GameEngine.updatePaintTextSizeIfNeeded("back: showing main menu!");
+                GameEngine.logColored("back: showing main menu!");
                 showMainMenu();
             } else {
-                GameEngine.updatePaintTextSizeIfNeeded("back: resuming game");
+                GameEngine.logColored("back: resuming game");
                 this.guiEngine.setGamePaused(false);
             }
         }
@@ -102,7 +102,7 @@ public class Root extends ScriptContext {
 
     public void openAfterHelpPopup(String str) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (GameEngine.isAndroid() && !gameEngine.settingsEngine.hasPlayedGameOrSeenHelp) {
+        if (GameEngine.isNonPCPlatform() && !gameEngine.settingsEngine.hasPlayedGameOrSeenHelp) {
             gameEngine.settingsEngine.hasPlayedGameOrSeenHelp = true;
             gameEngine.settingsEngine.save();
             showPopup(VariableScope.nullOrMissingString, "First time playing? Would you like to view the quick help slides?", false, "[onenter]View Help:closePopup(); open('help_quick_mobile.rml');", "Skip:closePopup(); open(" + restrictedString(str) + ");");
@@ -405,34 +405,34 @@ public class Root extends ScriptContext {
     }
 
     public void hostStart(boolean z) throws ConfigParseException {
-        GameEngine.updatePaintTextSizeIfNeeded("old version of hostStart");
+        GameEngine.logColored("old version of hostStart");
         hostStartWithPassword(z, null);
     }
 
     public void hostStartWithPassword(boolean z, String str) throws ConfigParseException {
-        GameEngine.updatePaintTextSizeIfNeeded("old version of hostStartWithPassword");
+        GameEngine.logColored("old version of hostStartWithPassword");
         hostStartWithPasswordAndMods(z, str, true);
     }
 
     public void hostStartWithPasswordAndMods(boolean z, String str, boolean z2) throws ConfigParseException {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.networkEngine.disconnectNetworking("starting new");
-        gameEngine.networkEngine.n = str;
-        gameEngine.networkEngine.o = z2;
-        gameEngine.networkEngine.q = z;
+        gameEngine.networkEngine.roomPassword = str;
+        gameEngine.networkEngine.requireActiveMods = z2;
+        gameEngine.networkEngine.publishToMasterServer = z;
         if (gameEngine.networkEngine.startServerHosting(false)) {
             logDebug("-Hosting-");
-            logDebug("using password: " + (gameEngine.networkEngine.n != null));
-            logDebug("using mods: " + (gameEngine.networkEngine.o));
-            logDebug("public: " + (gameEngine.networkEngine.q));
-            String strAv = gameEngine.networkEngine.av();
-            if (strAv != null && !FileHelper.fileExists(strAv)) {
-                GameEngine.updatePaintTextSizeIfNeeded("hostStart: map does not exist: " + strAv + " reseting");
-                strAv = null;
+            logDebug("using password: " + (gameEngine.networkEngine.roomPassword != null));
+            logDebug("using mods: " + (gameEngine.networkEngine.requireActiveMods));
+            logDebug("public: " + (gameEngine.networkEngine.publishToMasterServer));
+            String networkMapPath = gameEngine.networkEngine.getNetworkMapPath();
+            if (networkMapPath != null && !FileHelper.fileExists(networkMapPath)) {
+                GameEngine.logColored("hostStart: map does not exist: " + networkMapPath + " reseting");
+                networkMapPath = null;
             }
-            if (strAv == null) {
+            if (networkMapPath == null) {
                 gameEngine.networkEngine.roomSettings.gameModeType = GameModeType.values()[0];
-                gameEngine.networkEngine.az = "maps/skirmish/[p8]Many Islands (8p).tmx";
+                gameEngine.networkEngine.selectedMapPath = "maps/skirmish/[p8]Many Islands (8p).tmx";
                 gameEngine.networkEngine.roomSettings.mapPath = "[p8]Many Islands (8p).tmx";
             }
             this.libRocket.setDocument("battleroom.rml", null);
@@ -485,8 +485,8 @@ public class Root extends ScriptContext {
         String mapThumbnail = AppFrameworkUtils.getMapThumbnail(str);
         String str2 = "thumbnail:assets:" + mapThumbnail;
         if (!FileHelper.fileExists(mapThumbnail)) {
-            if (GameEngine.isDebugVersionStatic2) {
-                GameEngine.printLog("getMapThumbnail: Failed to find: " + mapThumbnail);
+            if (GameEngine.isIOSVersion) {
+                GameEngine.logErrorColored("getMapThumbnail: Failed to find: " + mapThumbnail);
                 return "drawable:error_missingmap.png";
             }
             return "drawable:error_missingmap.png";
@@ -532,15 +532,15 @@ public class Root extends ScriptContext {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.networkEngine.disconnectNetworking("starting singleplayer");
         gameEngine.networkEngine.playerName = "You";
-        gameEngine.networkEngine.o = true;
+        gameEngine.networkEngine.requireActiveMods = true;
         if (z) {
-            zS = gameEngine.networkEngine.R();
+            zS = gameEngine.networkEngine.startSandboxServer();
         } else {
-            zS = gameEngine.networkEngine.S();
+            zS = gameEngine.networkEngine.startSingleplayerServer();
         }
         if (zS) {
             logDebug("started startSinglePlayerServer");
-            GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.e();
+            GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.getEditableRoomSettings();
             if (gameRoomSettingsE != null) {
                 gameRoomSettingsE.aiDifficulty = gameEngine.settingsEngine.aiDifficulty;
                 gameEngine.networkEngine.a(gameRoomSettingsE);
@@ -714,12 +714,12 @@ public class Root extends ScriptContext {
                 str9 = "lazy:" + str9;
             }
             String mapThumbnail = AppFrameworkUtils.getMapThumbnail(str6 + str7);
-            if (GameEngine.isDebugVersionStatic2) {
+            if (GameEngine.isIOSVersion) {
             }
             String str10 = str9 + mapThumbnail;
             if (!FileHelper.fileExists(mapThumbnail)) {
-                if (GameEngine.isDebugVersionStatic2) {
-                    GameEngine.printLog("List: Failed to find: " + mapThumbnail + " after converting:" + mapThumbnail + " ( " + str10 + " )");
+                if (GameEngine.isIOSVersion) {
+                    GameEngine.logErrorColored("List: Failed to find: " + mapThumbnail + " after converting:" + mapThumbnail + " ( " + str10 + " )");
                 }
                 str10 = "drawable:error_missingmap.png";
             }
@@ -736,7 +736,7 @@ public class Root extends ScriptContext {
         } else {
             elementById2.addClass("notSavesOnly");
         }
-        if (zStartsWith && str5 == null && GameEngine.isAndroid()) {
+        if (zStartsWith && str5 == null && GameEngine.isNonPCPlatform()) {
             elementDocument.addClass("showImportButton");
             return true;
         }
@@ -967,7 +967,7 @@ public class Root extends ScriptContext {
         Element activeElementById = this.libRocket.getActiveElementById("leaderboardType");
         Element activeElementById2 = this.libRocket.getActiveElementById("leaderboardGrouping");
         if (activeElementById == null || activeElementById2 == null) {
-            GameEngine.printLog("loadLeaderboard: Failed to find elements. (For page: " + this.libRocket.getActiveDocumentPath() + ")");
+            GameEngine.logErrorColored("loadLeaderboard: Failed to find elements. (For page: " + this.libRocket.getActiveDocumentPath() + ")");
         } else {
             activeElementById.setAttribute("value", gameEngine.teamStats.getStatType().name());
             activeElementById2.setAttribute("value", gameEngine.teamStats.getStatGroup().name());
@@ -982,7 +982,7 @@ public class Root extends ScriptContext {
         Element activeElementById = this.libRocket.getActiveElementById("leaderboardType");
         Element activeElementById2 = this.libRocket.getActiveElementById("leaderboardGrouping");
         if (activeElementById == null || activeElementById2 == null) {
-            GameEngine.printLog("saveLeaderboard: Failed to find elements. (For page: " + this.libRocket.getActiveDocumentPath() + ")");
+            GameEngine.logErrorColored("saveLeaderboard: Failed to find elements. (For page: " + this.libRocket.getActiveDocumentPath() + ")");
         } else {
             gameEngine.setupTeamStats(StatType.valueOf(activeElementById.getAttribute("value")), StatGroup.valueOf(activeElementById2.getAttribute("value")));
         }
@@ -1088,7 +1088,7 @@ public class Root extends ScriptContext {
     }
 
     public String hideIfMobile() {
-        if (GameEngine.isAndroid()) {
+        if (GameEngine.isNonPCPlatform()) {
             return "hide";
         }
         return VariableScope.nullOrMissingString;
@@ -1096,18 +1096,18 @@ public class Root extends ScriptContext {
 
     public boolean canResume() {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine != null && gameEngine.loadNewGame && !gameEngine.reloadMap) {
+        if (gameEngine != null && gameEngine.hasLoadedLevel && !gameEngine.isMenuBackgroundMap) {
             return true;
         }
         return false;
     }
 
     public boolean isMobile() {
-        return GameEngine.isAndroid();
+        return GameEngine.isNonPCPlatform();
     }
 
     public boolean isIOS() {
-        return GameEngine.isDebugVersionStatic2;
+        return GameEngine.isIOSVersion;
     }
 
     public boolean isDesktop() {
@@ -1119,11 +1119,11 @@ public class Root extends ScriptContext {
     }
 
     public boolean hasModSupport() {
-        return !GameEngine.isDebugVersionStatic2;
+        return !GameEngine.isIOSVersion;
     }
 
     public boolean usingMods() {
-        if (!GameEngine.isDebugVersionStatic2 || GameEngine.getInstance().modManager.getStorageModsCount() > 0) {
+        if (!GameEngine.isIOSVersion || GameEngine.getInstance().modManager.getStorageModsCount() > 0) {
             return true;
         }
         return false;
@@ -1134,7 +1134,7 @@ public class Root extends ScriptContext {
     }
 
     public boolean hasReloadSupport() {
-        return !GameEngine.isDebugVersionStatic2;
+        return !GameEngine.isIOSVersion;
     }
 
     String restrictedString(String str) {
@@ -1203,7 +1203,7 @@ public class Root extends ScriptContext {
         Element activeElementById = this.libRocket.getActiveElementById(str);
         Element activeElementById2 = this.libRocket.getActiveElementById(str2);
         if (activeElementById == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("serverListData is null, we may have changed page");
+            GameEngine.logColored("serverListData is null, we may have changed page");
             return;
         }
         ArrayList<ServerInfo> serverList = ServerListActivity.getServerList();
@@ -1217,7 +1217,7 @@ public class Root extends ScriptContext {
                 activeElementById.removeChild(activeElementById.getChild(numChildren));
             }
             if (activeElementById.getNumChildren() != serverList.size()) {
-                GameEngine.updatePaintTextSizeIfNeeded("-- Non matching size after clean up:" + activeElementById.getNumChildren() + " vs " + serverList.size());
+                GameEngine.logColored("-- Non matching size after clean up:" + activeElementById.getNumChildren() + " vs " + serverList.size());
             }
         }
         Boolean bool = (Boolean) this.libRocket.getActiveDocumentMetadata("showFullServerList");
@@ -1381,7 +1381,7 @@ public class Root extends ScriptContext {
         if (str3 != null) {
             this.libRocket.getActiveElementById(str3).setText("Refresh");
         }
-        GameEngine.updatePaintTextSizeIfNeeded("DONE");
+        GameEngine.logColored("DONE");
     }
 
     public void clickedServerRow(int i) {
@@ -1472,7 +1472,7 @@ public class Root extends ScriptContext {
     public void loadReplay(String str) throws ConfigParseException {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.isGameStarted = false;
-        if (gameEngine.replayEngine.c(str)) {
+        if (gameEngine.replayEngine.loadReplay(str)) {
             resumeNonMenu();
         }
     }
@@ -1541,7 +1541,7 @@ public class Root extends ScriptContext {
         if (str == null || str.trim().equals(VariableScope.nullOrMissingString)) {
             return;
         }
-        gameEngine.networkEngine.m(str);
+        gameEngine.networkEngine.sendChatMessage(str);
         gameEngine.gameUI.isDraggingSelection = false;
     }
 
@@ -1571,7 +1571,7 @@ public class Root extends ScriptContext {
             return;
         }
         boolean attributeBoolean = activeElementById.getAttributeBoolean("reversed", false);
-        if (gameEngine.networkEngine.F && (activeElementById2 = this.libRocket.getActiveElementById("chatBox")) != null) {
+        if (gameEngine.networkEngine.singleplayerServer && (activeElementById2 = this.libRocket.getActiveElementById("chatBox")) != null) {
             activeElementById2.hide();
         }
         activeElementById.setInnerRML(VariableScope.nullOrMissingString);
@@ -1694,7 +1694,7 @@ public class Root extends ScriptContext {
         ArrayList arrayList = tableData.rows;
         Element activeElementById = this.libRocket.getActiveElementById(str);
         if (activeElementById == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("updateTableText: tableElement:" + str + " is null, we may have changed page");
+            GameEngine.logColored("updateTableText: tableElement:" + str + " is null, we may have changed page");
             return;
         }
         Element elementById = activeElementById.getElementById("tableListData");
@@ -1704,12 +1704,12 @@ public class Root extends ScriptContext {
                 TableCell tableCell = (TableCell) tableRow.tableCells.get(i2);
                 Element child = elementById.getChild(i);
                 if (child == null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("updateTableText failed to get row " + i);
+                    GameEngine.logColored("updateTableText failed to get row " + i);
                     return;
                 }
                 Element child2 = child.getChild(i2);
                 if (child2 == null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("updateTableText failed to get cell " + i2);
+                    GameEngine.logColored("updateTableText failed to get cell " + i2);
                     return;
                 }
                 child2.compareAndSetText(tableCell.text);
@@ -1721,7 +1721,7 @@ public class Root extends ScriptContext {
         ArrayList<TableRow> arrayList = tableData.rows;
         Element activeElementById = this.libRocket.getActiveElementById(str);
         if (activeElementById == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("refreshTable: tableElement:" + str + " is null, we may have changed page");
+            GameEngine.logColored("refreshTable: tableElement:" + str + " is null, we may have changed page");
             return;
         }
         Element elementById = activeElementById.getElementById("tableRowTemplateHolder");
@@ -1996,7 +1996,7 @@ public class Root extends ScriptContext {
         GameEngine gameEngine = GameEngine.getInstance();
         if (str == null) {
             if (gameEngine.networkEngine.roomSettings.gameModeType == null) {
-                GameEngine.updatePaintTextSizeIfNeeded("getModeMapPath: currentType==0");
+                GameEngine.logColored("getModeMapPath: currentType==0");
                 iIntValue = 0;
             } else {
                 iIntValue = gameEngine.networkEngine.roomSettings.gameModeType.ordinal();

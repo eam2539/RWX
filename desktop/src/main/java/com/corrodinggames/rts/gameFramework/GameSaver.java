@@ -38,7 +38,7 @@ public class GameSaver {
     int lastAutosaveTick;
 
     public GameSaver() {
-        if (!GameEngine.isGameBetaStatic) {
+        if (!GameEngine.isGameBeta) {
         }
         this.isProfilingEnabled = false;
         this.firstTick = -9999;
@@ -104,7 +104,7 @@ public class GameSaver {
                     throw th2;
                 }
             }
-            if (z && GameEngine.isDesktop() && FileHelper.fileExists(fileIsAutosaveEnabled.getAbsolutePath())) {
+            if (z && GameEngine.isAndroidPlatform() && FileHelper.fileExists(fileIsAutosaveEnabled.getAbsolutePath())) {
                 GameEngine.log("Autosave file already exists: " + fileIsAutosaveEnabled.getAbsolutePath());
                 if (!FileHelper.deleteDirectory(fileIsAutosaveEnabled)) {
                     GameEngine.log("Old autosave failed to delete");
@@ -160,9 +160,9 @@ public class GameSaver {
             CustomUnitConfig.a(gameOutputStream);
             gameOutputStream.endBlock("customUnitsBlock");
             gameOutputStream.startBlock("gameSetup");
-            boolean z = gameEngine.networkEngine.B || gameEngine.networkEngine.F;
-            gameOutputStream.writeBoolean(gameEngine.networkEngine.B);
-            gameOutputStream.writeBoolean(gameEngine.networkEngine.F);
+            boolean z = gameEngine.networkEngine.networkGameActive || gameEngine.networkEngine.singleplayerServer;
+            gameOutputStream.writeBoolean(gameEngine.networkEngine.networkGameActive);
+            gameOutputStream.writeBoolean(gameEngine.networkEngine.singleplayerServer);
             gameOutputStream.writeBoolean(z);
             if (z) {
                 gameEngine.networkEngine.getFogModeString(gameOutputStream);
@@ -175,11 +175,11 @@ public class GameSaver {
                 GameEngine.log("Writing remote map steam into save");
                 gameOutputStream.writeGameInputStreamWithLength(gameEngine.remoteMapStream);
             }
-            gameOutputStream.writeInt(gameEngine.lastTick);
-            gameOutputStream.writeFloat(gameEngine.viewpointX + gameEngine.halfViewpointWidth);
-            gameOutputStream.writeFloat(gameEngine.viewpointY + gameEngine.halfViewpointHeight);
-            gameOutputStream.writeFloat(gameEngine.cameraEdgeScrollZone);
-            gameOutputStream.writeInt(gameEngine.groupController.a);
+            gameOutputStream.writeInt(gameEngine.gameTimeMillis);
+            gameOutputStream.writeFloat(gameEngine.viewpointX + gameEngine.halfVisibleWorldWidth);
+            gameOutputStream.writeFloat(gameEngine.viewpointY + gameEngine.halfVisibleWorldHeight);
+            gameOutputStream.writeFloat(gameEngine.targetZoom);
+            gameOutputStream.writeInt(gameEngine.formationEngine.a);
             gameOutputStream.writeInt(0);
             gameOutputStream.writeMagicShort();
             gameEngine.tileMap.writeCursorSelectionPresenceFlag(gameOutputStream);
@@ -204,7 +204,7 @@ public class GameSaver {
                 gameOutputStream.writeBoolean(playerTeamK instanceof AIPlayer);
                 gameOutputStream.writeBoolean(playerTeamK != null);
                 if (playerTeamK != null) {
-                    playerTeamK.writeToStream(gameOutputStream);
+                    playerTeamK.writeBasicTeamState(gameOutputStream);
                 }
             }
             if (!gameEngine.gameUI.e) {
@@ -246,7 +246,7 @@ public class GameSaver {
             }
             gameOutputStream.debugPlaceholder("Section: CurrentUnitId");
             gameOutputStream.writeLong(gameEngine.networkEngine.z());
-            gameEngine.groupController.a(gameOutputStream);
+            gameEngine.formationEngine.a(gameOutputStream);
             gameEngine.gameUI.a(gameOutputStream);
             gameEngine.gameStatistics.a(gameOutputStream);
             for (int i3 = 0; i3 < PlayerTeam.TEAM_NEUTRAL; i3++) {
@@ -349,12 +349,12 @@ public class GameSaver {
                 try {
                     String utf = gameInputStream.readUTF();
                     if (!utf.equals("rustedWarfareSave")) {
-                        GameEngine.updatePaintTextSizeIfNeeded("Map Load: Header is not correct:" + utf.substring(0, Math.min(utf.length(), 50)));
+                        GameEngine.logColored("Map Load: Header is not correct:" + utf.substring(0, Math.min(utf.length(), 50)));
                         String str = "Failed to load save. (Could not find correct header)";
                         if (utf.equals("rustedWarfareReplay")) {
                             str = "Failed to load save. (This file appears to be a replay file, not a save file)";
                         }
-                        GameEngine.updatePaintTextSizeIfNeeded(str);
+                        GameEngine.logColored(str);
                         gameEngine.alert(str, 1);
                         return false;
                     }
@@ -392,8 +392,8 @@ public class GameSaver {
                     Integer numValueOf = null;
                     Integer numValueOf2 = null;
                     if (gameEngine.replayEngine.j() && z3) {
-                        numValueOf = Integer.valueOf(gameEngine.currentTimeMillis);
-                        numValueOf2 = Integer.valueOf(gameEngine.lastTimeMillis);
+                        numValueOf = Integer.valueOf(gameEngine.currentUnitCap);
+                        numValueOf2 = Integer.valueOf(gameEngine.maxUnitCap);
                     }
                     if (i >= 56) {
                         gameInputStream.startBlockNamed("gameSetup");
@@ -404,15 +404,15 @@ public class GameSaver {
                             z6 = gameInputStream.readBoolean();
                             z5 = gameInputStream.readBoolean();
                         }
-                        if ((gameEngine.replayEngine.j() || !gameEngine.networkEngine.B) && !z3 && z5) {
+                        if ((gameEngine.replayEngine.j() || !gameEngine.networkEngine.networkGameActive) && !z3 && z5) {
                             GameEngine.log("Using game rules from save");
                             gameEngine.replayEngine.O = true;
                             gameEngine.networkEngine.a(gameInputStream);
-                            numValueOf = Integer.valueOf(gameEngine.currentTimeMillis);
-                            numValueOf2 = Integer.valueOf(gameEngine.lastTimeMillis);
-                            if ((z4 || z6) && !gameEngine.networkEngine.F && !gameEngine.networkEngine.B && !gameEngine.replayEngine.j()) {
+                            numValueOf = Integer.valueOf(gameEngine.currentUnitCap);
+                            numValueOf2 = Integer.valueOf(gameEngine.maxUnitCap);
+                            if ((z4 || z6) && !gameEngine.networkEngine.singleplayerServer && !gameEngine.networkEngine.networkGameActive && !gameEngine.replayEngine.j()) {
                                 GameEngine.log("Enabling use of singlePlayer rules from saved game.");
-                                gameEngine.networkEngine.F = true;
+                                gameEngine.networkEngine.singleplayerServer = true;
                             }
                         }
                         gameInputStream.d("gameSetup");
@@ -427,15 +427,15 @@ public class GameSaver {
                             gameEngine.remoteMapStream = gameInputStream.readNestedStream();
                         }
                     }
-                    if (gameEngine.networkEngine.B && !gameEngine.networkEngine.isServer && z3 && gameEngine.networkEngine.aB != null && !z7) {
+                    if (gameEngine.networkEngine.networkGameActive && !gameEngine.networkEngine.isServer && z3 && gameEngine.networkEngine.receivedCustomMapStream != null && !z7) {
                         gameEngine.currentMapPath = VariableScope.nullOrMissingString;
-                        gameEngine.remoteMapStream = gameEngine.networkEngine.aB;
+                        gameEngine.remoteMapStream = gameEngine.networkEngine.receivedCustomMapStream;
                     }
                     performanceProfiler.a(ProfilerSection.load_map);
                     if (z3) {
                         gameEngine.loadLevel(true, true, GameMode.normalSave);
-                        if (GameEngine.isDesktop()) {
-                            gameEngine.pinchDistance = true;
+                        if (GameEngine.isAndroidPlatform()) {
+                            gameEngine.shouldSkipNextDraw = true;
                         }
                     } else {
                         gameEngine.loadGame(true, GameMode.normalSave);
@@ -445,23 +445,23 @@ public class GameSaver {
                         return false;
                     }
                     if (numValueOf != null) {
-                        gameEngine.currentTimeMillis = numValueOf.intValue();
+                        gameEngine.currentUnitCap = numValueOf.intValue();
                     }
                     if (numValueOf2 != null) {
-                        Integer.valueOf(gameEngine.lastTimeMillis);
+                        Integer.valueOf(gameEngine.maxUnitCap);
                     }
                     synchronized (gameEngine) {
                         performanceProfiler.b(ProfilerSection.load_map);
-                        gameEngine.lastTick = gameInputStream.readInt();
+                        gameEngine.gameTimeMillis = gameInputStream.readInt();
                         float f = gameInputStream.readFloat();
                         float f2 = gameInputStream.readFloat();
                         float f3 = gameInputStream.readFloat();
                         if (!z3) {
                             gameEngine.centerViewpoint(f, f2);
-                            gameEngine.cameraEdgeScrollZone = f3;
+                            gameEngine.targetZoom = f3;
                         }
                         if (i >= 18) {
-                            gameEngine.groupController.a = gameInputStream.readInt();
+                            gameEngine.formationEngine.a = gameInputStream.readInt();
                         }
                         gameInputStream.readInt();
                         if (i >= 19) {
@@ -499,10 +499,10 @@ public class GameSaver {
                         int i3 = 8;
                         if (i >= 49) {
                             i3 = gameInputStream.readInt();
-                            PlayerTeam.getResourceCost(i3, false);
+                            PlayerTeam.setMaxTeamId(i3, false);
                             for (int i4 = 0; i4 < PlayerTeam.TEAM_NEUTRAL; i4++) {
                                 if (i4 >= i3 && !z && (playerTeamK = PlayerTeam.k(i4)) != null) {
-                                    playerTeamK.updateTeamActiveStatus();
+                                    playerTeamK.removeFromTeamRegistry();
                                 }
                             }
                         }
@@ -517,12 +517,12 @@ public class GameSaver {
                                 if (z12) {
                                     if (playerTeamK2 == null || !(playerTeamK2 instanceof AIController)) {
                                         if (z && !z3 && playerTeamK2 != null) {
-                                            GameEngine.updatePaintTextSizeIfNeeded("Would replace team:" + i5 + " with AI, writing to dummy AI");
+                                            GameEngine.logColored("Would replace team:" + i5 + " with AI, writing to dummy AI");
                                             playerTeamK2 = new AIController(i5, false);
                                             playerTeamArr[i5] = playerTeamK2;
                                         } else {
                                             if (z3) {
-                                                GameEngine.updatePaintTextSizeIfNeeded("Adding new AI " + i5 + " on resync");
+                                                GameEngine.logColored("Adding new AI " + i5 + " on resync");
                                             }
                                             playerTeamK2 = new AIController(i5);
                                         }
@@ -530,13 +530,13 @@ public class GameSaver {
                                 } else if (z13) {
                                     if (playerTeamK2 == null || !(playerTeamK2 instanceof AIPlayer)) {
                                         if (z) {
-                                            GameEngine.updatePaintTextSizeIfNeeded("Replacing team:" + i5 + " with NetworkedPlayer");
+                                            GameEngine.logColored("Replacing team:" + i5 + " with NetworkedPlayer");
                                         }
                                         playerTeamK2 = new AIPlayer(i5);
                                     }
                                 } else if (playerTeamK2 == null || !(playerTeamK2 instanceof GameTeam)) {
                                     if (z) {
-                                        GameEngine.updatePaintTextSizeIfNeeded("Replacing team:" + i5 + " with Player");
+                                        GameEngine.logColored("Replacing team:" + i5 + " with Player");
                                         if (playerTeamK2 != null) {
                                             playerTeamK2.c("Existing");
                                         }
@@ -545,12 +545,12 @@ public class GameSaver {
                                 }
                                 Integer num = playerTeamK2.teamAIDifficultyOverride;
                                 if (i >= 2) {
-                                    playerTeamK2.getAlliedTeams(gameInputStream);
+                                    playerTeamK2.readBasicTeamState(gameInputStream);
                                 } else {
-                                    playerTeamK2.getActiveTeams(gameInputStream);
+                                    playerTeamK2.readExtendedTeamState(gameInputStream);
                                 }
                                 if (!z3) {
-                                    playerTeamK2.getTeamColorIdByName();
+                                    playerTeamK2.resetVictoryAndSurrenderState();
                                     if (z) {
                                         playerTeamK2.teamAIDifficultyOverride = num;
                                         playerTeamK2.c("networkLoad aiDifficultyOverride=" + num);
@@ -560,24 +560,24 @@ public class GameSaver {
                                     if (playerTeamK2 != null && playerTeamK2 != playerTeamK2) {
                                         playerTeamK2.c("Transfering team stats");
                                         playerTeamK2.credits = playerTeamK2.credits;
-                                        playerTeamK2.getTeamColorEffect().a(playerTeamK2.getTeamColorEffect());
+                                        playerTeamK2.getCustomResources().a(playerTeamK2.getCustomResources());
                                     }
                                 }
                             } else if (z && !gameEngine.replayEngine.j()) {
-                                GameEngine.updatePaintTextSizeIfNeeded("GameSaver: Would normally remove team:" + i5 + VariableScope.nullOrMissingString);
+                                GameEngine.logColored("GameSaver: Would normally remove team:" + i5 + VariableScope.nullOrMissingString);
                                 playerTeamArr[i5] = PlayerTeam.TEAM_NULL;
                             } else {
                                 PlayerTeam playerTeamK3 = PlayerTeam.k(i5);
                                 if (playerTeamK3 != null) {
-                                    playerTeamK3.updateTeamActiveStatus();
+                                    playerTeamK3.removeFromTeamRegistry();
                                 }
                             }
                         }
                         boolean z14 = false;
-                        gameEngine.networkEngine.aq();
+                        gameEngine.networkEngine.updateAiTeamNames();
                         if (gameEngine.replayEngine.j()) {
                             gameEngine.playerTeam = PlayerTeam.TEAM_ALL;
-                        } else if (gameEngine.networkEngine.B) {
+                        } else if (gameEngine.networkEngine.networkGameActive) {
                             if (gameEngine.networkEngine.localPlayerTeam != null) {
                                 int i6 = gameEngine.networkEngine.localPlayerTeam.teamId;
                                 if (i6 != -3) {
@@ -641,7 +641,7 @@ public class GameSaver {
                                     GameEngine.log(str2);
                                     if (!z15) {
                                         z15 = true;
-                                        NetworkEngine.g(str2);
+                                        NetworkEngine.reportDesync(str2);
                                     }
                                     customUnitConfigFindConfigByName = CustomUnitConfig.instance;
                                     if (customUnitConfigFindConfigByName == null) {
@@ -653,7 +653,7 @@ public class GameSaver {
                                     if (unitTypeC instanceof CustomUnitConfig) {
                                         customUnitConfigFindConfigByName = (CustomUnitConfig) unitTypeC;
                                     } else {
-                                        GameEngine.updatePaintTextSizeIfNeeded("replacement not a custom unit:" + unitTypeC.getUnitTypeDescriptionShort());
+                                        GameEngine.logColored("replacement not a custom unit:" + unitTypeC.getUnitTypeDescriptionShort());
                                     }
                                 }
                                 effectEmitter = customUnitConfigFindConfigByName.a();
@@ -673,9 +673,9 @@ public class GameSaver {
                             }
                             effectEmitter.objectId = gameInputStream.readLong();
                             if (effectEmitter.objectId == 0) {
-                                GameEngine.updatePaintTextSizeIfNeeded("GameSaver: Adding object with id==0");
+                                GameEngine.logColored("GameSaver: Adding object with id==0");
                                 if (effectEmitter instanceof BaseUnit) {
-                                    GameEngine.updatePaintTextSizeIfNeeded(((BaseUnit) effectEmitter).getVelocityY());
+                                    GameEngine.logColored(((BaseUnit) effectEmitter).getVelocityY());
                                 }
                             }
                             GameObject.dL();
@@ -683,7 +683,7 @@ public class GameSaver {
                         if (i >= 3) {
                             long j = gameInputStream.readLong();
                             if (j <= 0) {
-                                GameEngine.printLog("GameLoad: Trying to set next unit id <= 0: " + j);
+                                GameEngine.logErrorColored("GameLoad: Trying to set next unit id <= 0: " + j);
                                 j = 100000;
                             }
                             gameEngine.networkEngine.a(j);
@@ -691,7 +691,7 @@ public class GameSaver {
                             gameEngine.networkEngine.a(100000L);
                         }
                         if (i >= 24) {
-                            gameEngine.groupController.a(gameInputStream);
+                            gameEngine.formationEngine.a(gameInputStream);
                         }
                         if (i >= 4) {
                             gameEngine.gameUI.a(gameInputStream, z3);
@@ -710,7 +710,7 @@ public class GameSaver {
                                 }
                                 if (playerTeamK5 != null) {
                                     Integer num2 = playerTeamK5.teamAIDifficultyOverride;
-                                    playerTeamK5.getActiveTeams(gameInputStream);
+                                    playerTeamK5.readExtendedTeamState(gameInputStream);
                                     if (!z3) {
                                         if (z) {
                                             playerTeamK5.teamAIDifficultyOverride = num2;
@@ -762,7 +762,7 @@ public class GameSaver {
                             for (int i12 = 0; i12 < size; i12++) {
                                 GameObject gameObject4 = gameObjectArrA[i12];
                                 if (gameObject4.objectId == 0) {
-                                    GameEngine.updatePaintTextSizeIfNeeded("GameSaver: Fixing object with zero id.");
+                                    GameEngine.logColored("GameSaver: Fixing object with zero id.");
                                     gameObject4.objectId = gameEngine.networkEngine.y();
                                 }
                                 for (int i13 = i12 + 1; i13 < size; i13++) {
@@ -794,17 +794,17 @@ public class GameSaver {
                         gameEngine.pathfindingEngine.a((OrderableUnit) null);
                         gameEngine.pathfindingEngine.b();
                         GameEngine.log("gameSaver", "Fixing map cost done.");
-                        PlayerTeam.updateTeamVictoryStatus();
+                        PlayerTeam.markAllTeamsReady();
                         for (int i14 = 0; i14 < PlayerTeam.TEAM_NEUTRAL; i14++) {
                             PlayerTeam playerTeamK6 = PlayerTeam.k(i14);
                             if (playerTeamK6 != null) {
                                 playerTeamK6.d(false);
                             }
                         }
-                        PlayerTeam.getTeamStatistics();
+                        PlayerTeam.refreshTeamInstances();
                         GameEngine.log("gameSaver", "Rebuilt unit caches");
-                        PlayerTeam.updateTeamVictoryStatus();
-                        PlayerTeam.staticUpdateTeamColors();
+                        PlayerTeam.markAllTeamsReady();
+                        PlayerTeam.resetSpecialTeamStates();
                         PlayerTeam.TEAM_ALL.d(false);
                         PlayerTeam.TEAM_UNKNOWN.d(false);
                         for (int i15 = 0; i15 < PlayerTeam.TEAM_NEUTRAL; i15++) {
@@ -847,14 +847,14 @@ public class GameSaver {
                     return true;
                 } catch (EOFException e2) {
                     e2.printStackTrace();
-                    GameEngine.updatePaintTextSizeIfNeeded("Failed to load save. (End of file trying to read header)");
+                    GameEngine.logColored("Failed to load save. (End of file trying to read header)");
                     gameEngine.alert("Failed to load save. (End of file trying to read header)", 1);
                     return false;
                 }
             } catch (IOException e3) {
                 e3.printStackTrace();
                 String str3 = "Failed to load save. (Failed to read header: " + e3.getMessage() + ")";
-                GameEngine.updatePaintTextSizeIfNeeded(str3);
+                GameEngine.logColored(str3);
                 gameEngine.alert(str3, 1);
                 return false;
             }
@@ -902,7 +902,7 @@ public class GameSaver {
     /* JADX INFO: renamed from: a */
     public boolean resetAutosaveTimers() {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!gameEngine.settingsEngine.autosaving || GameEngine.isDebug() || !gameEngine.loadNewGame || gameEngine.reloadMap || gameEngine.replayEngine.j() || gameEngine.isNetworkGameActive()) {
+        if (!gameEngine.settingsEngine.autosaving || GameEngine.isDedicatedServer() || !gameEngine.hasLoadedLevel || gameEngine.isMenuBackgroundMap || gameEngine.replayEngine.j() || gameEngine.isNetworkGameActive()) {
             return false;
         }
         return true;
@@ -915,11 +915,11 @@ public class GameSaver {
             return;
         }
         if (this.lastAutosaveTick == -9999) {
-            this.firstTick = gameEngine.lastTick;
-            this.lastAutosaveTick = gameEngine.lastTick;
+            this.firstTick = gameEngine.gameTimeMillis;
+            this.lastAutosaveTick = gameEngine.gameTimeMillis;
         }
-        if (this.lastAutosaveTick + 300000 < gameEngine.lastTick) {
-            this.lastAutosaveTick = gameEngine.lastTick;
+        if (this.lastAutosaveTick + 300000 < gameEngine.gameTimeMillis) {
+            this.lastAutosaveTick = gameEngine.gameTimeMillis;
             long jA = PerformanceProfiler.a();
             loadSave();
             GameEngine.log("Autosaved (" + PerformanceProfiler.a(PerformanceProfiler.a(jA)) + ")");

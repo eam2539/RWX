@@ -80,7 +80,7 @@ public class DebugSocketServer implements Runnable {
     public static void start(int i, String str) {
         try {
             enabled = true;
-            GameEngine.isNetworkServerStatic2 = true;
+            GameEngine.isAutomatedTestMode = true;
             DebugSocketServer debugSocketServer = new DebugSocketServer();
             if (i != -1) {
                 debugSocketServer.serverSocket = new ServerSocket(i);
@@ -126,14 +126,14 @@ public class DebugSocketServer implements Runnable {
             strSubstring.split(" ");
         }
         if (ScriptEngine.getInstance() == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("DebugSocketConnection: waiting for ScriptEngine to start....");
+            GameEngine.logColored("DebugSocketConnection: waiting for ScriptEngine to start....");
             int i = 0;
             while (true) {
                 if (i >= 100) {
                     break;
                 }
                 if (ScriptEngine.getInstance() != null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("started");
+                    GameEngine.logColored("started");
                     break;
                 }
                 try {

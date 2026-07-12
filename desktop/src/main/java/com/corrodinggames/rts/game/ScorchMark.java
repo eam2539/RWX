@@ -49,18 +49,18 @@ public class ScorchMark extends GameObject {
 
     public static void b() {
         GameEngine gameEngine = GameEngine.getInstance();
-        k = gameEngine.graphicsEngine2.a(R.drawable.scorch_mark, true);
+        k = gameEngine.renderGraphicsEngine.a(R.drawable.scorch_mark, true);
         k.m = true;
-        l = gameEngine.graphicsEngine2.a(R.drawable.scorch_mark_nuke, true);
+        l = gameEngine.renderGraphicsEngine.a(R.drawable.scorch_mark_nuke, true);
         l.m = true;
-        m = gameEngine.graphicsEngine2.a(R.drawable.blood_mark, true);
+        m = gameEngine.renderGraphicsEngine.a(R.drawable.blood_mark, true);
         m.m = true;
     }
 
     public ScorchMark() {
         GameEngine gameEngine = GameEngine.getInstance();
         S(-1);
-        this.frame = gameEngine.lastTick;
+        this.frame = gameEngine.gameTimeMillis;
     }
 
     public static void a(float f, float f2) {

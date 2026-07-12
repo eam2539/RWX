@@ -41,13 +41,13 @@ public class ExperimentalHoverTank extends HoverLandUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        Texture textureA = gameEngine.graphicsEngine2.a(R.drawable.experimental_hovertank);
-        f = PlayerTeam.getUnitCountByType(textureA);
-        a = gameEngine.graphicsEngine2.a(R.drawable.experimental_hovertank_dead);
-        b = gameEngine.graphicsEngine2.a(R.drawable.experimental_hovertank_turret);
+        Texture textureA = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_hovertank);
+        f = PlayerTeam.getTeamColorTextures(textureA);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_hovertank_dead);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_hovertank_turret);
         c = attackUnit(textureA, textureA.m() / 1, textureA.l());
-        d = gameEngine.graphicsEngine2.a(R.drawable.experimental_hovertank_shield);
-        e = gameEngine.graphicsEngine2.a(R.drawable.shield_mid);
+        d = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_hovertank_shield);
+        e = gameEngine.renderGraphicsEngine.a(R.drawable.shield_mid);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
@@ -323,7 +323,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
         GameEngine gameEngine = GameEngine.getInstance();
         if (!this.isDestroyed && this.shield > 0.0f && this.energy == 0.0f && (textureT = T()) != null) {
             this.k.a((int) ((0.09f + ((this.shield / this.unitEnergyMax) * 0.4f) + ((Utility.clamp(this.unitShieldMax, 50.0f) / 50.0f) * 0.5f)) * 255.0f), 255, 255, 255);
-            gameEngine.graphicsEngine2.a(textureT, this.posX - gameEngine.viewpointXSnapped, (this.posY - gameEngine.viewpointYSnapped) - this.posZ, getUnitArmorRating(false) - 90.0f, this.k);
+            gameEngine.renderGraphicsEngine.a(textureT, this.posX - gameEngine.viewpointXSnapped, (this.posY - gameEngine.viewpointYSnapped) - this.posZ, getUnitArmorRating(false) - 90.0f, this.k);
             return true;
         }
         return true;

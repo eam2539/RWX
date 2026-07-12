@@ -75,7 +75,7 @@ public class FrameBufferHelper {
 
     public void b() {
         GameEngine gameEngine = GameEngine.getInstance();
-        gameEngine.graphicsEngine2.b(this.f, this.e);
-        gameEngine.graphicsEngine2.b(this.a, 0.0f, 0.0f, this.c);
+        gameEngine.renderGraphicsEngine.b(this.f, this.e);
+        gameEngine.renderGraphicsEngine.b(this.a, 0.0f, 0.0f, this.c);
     }
 }

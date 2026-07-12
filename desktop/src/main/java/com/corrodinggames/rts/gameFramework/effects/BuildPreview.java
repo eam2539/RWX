@@ -36,10 +36,10 @@ public class BuildPreview {
     public PlayerTeam team;
 
     /* JADX INFO: renamed from: g */
-    public float tempPoint;
+    public float worldX;
 
     /* JADX INFO: renamed from: h */
-    public float tempRectF1;
+    public float worldY;
 
     /* JADX INFO: renamed from: i */
     public boolean showFoundation;
@@ -48,7 +48,7 @@ public class BuildPreview {
     public PlayerTeam placingTeam;
 
     /* JADX INFO: renamed from: k */
-    public boolean someFlagK;
+    public boolean hasMinimapPosition;
 
     /* JADX INFO: renamed from: l */
     public int gridX;
@@ -69,7 +69,7 @@ public class BuildPreview {
     public float fadeInProgress;
 
     /* JADX INFO: renamed from: u */
-    public boolean someFlagU;
+    public boolean isVisibleOnMinimap;
 
     /* JADX INFO: renamed from: v */
     public BaseUnit attachedUnit;
@@ -95,7 +95,7 @@ public class BuildPreview {
     static Paint foundationPaint = new GamePaint();
 
     /* JADX INFO: renamed from: f */
-    public int someCounterF = 1;
+    public int previewUnitLevel = 1;
 
     /* JADX INFO: renamed from: p */
     boolean wasEverPlaceable = false;
@@ -184,8 +184,8 @@ public class BuildPreview {
                 if (baseUnitFindTurretPosition == null) {
                     GameEngine.log("isTileRectOverBlueprint: Failed to get shared unit for: " + buildPreview.unitType);
                 } else {
-                    baseUnitFindTurretPosition.posX = buildPreview.tempPoint;
-                    baseUnitFindTurretPosition.posY = buildPreview.tempRectF1;
+                    baseUnitFindTurretPosition.posX = buildPreview.worldX;
+                    baseUnitFindTurretPosition.posY = buildPreview.worldY;
                     rectFA = baseUnitFindTurretPosition.a(tileMap, rectFA);
                     if (Utility.getStackTrace(rectFA, rectF)) {
                         return true;
@@ -200,7 +200,7 @@ public class BuildPreview {
     public static BuildPreview findClosestPreview(PlayerTeam playerTeam, float f, float f2) {
         for (BuildPreview buildPreview : activePreviews) {
             if (buildPreview.placingTeam == playerTeam && buildPreview.isBuilding) {
-                float fDistanceSq = Utility.distanceSq(buildPreview.tempPoint, buildPreview.tempRectF1, f, f2);
+                float fDistanceSq = Utility.distanceSq(buildPreview.worldX, buildPreview.worldY, f, f2);
                 float f3 = BaseUnit.findTurretPosition(buildPreview.unitType).radius + 1.0f;
                 if (f3 < 20.0f) {
                     f3 = 20.0f;
@@ -216,7 +216,7 @@ public class BuildPreview {
     /* JADX INFO: renamed from: b */
     public boolean isValid() {
         if (this.isBuilding) {
-            if (this.builder == null || this.builder.isDestroyed || !UnitTypeEnum.canPlaceUnit(this.unitType, this.tempPoint, this.tempRectF1, 0.0f, 0.0f, this.team)) {
+            if (this.builder == null || this.builder.isDestroyed || !UnitTypeEnum.canPlaceUnit(this.unitType, this.worldX, this.worldY, 0.0f, 0.0f, this.team)) {
                 return false;
             }
             return true;
@@ -236,7 +236,7 @@ public class BuildPreview {
         if (this.isBuilding) {
             if (this.timer > 6.0f) {
                 this.timer = 0.0f;
-                boolean zHasBuildWaypointNear = this.builder.hasBuildWaypointNear(this.unitType, this.tempPoint, this.tempRectF1);
+                boolean zHasBuildWaypointNear = this.builder.hasBuildWaypointNear(this.unitType, this.worldX, this.worldY);
                 if (!this.wasEverPlaceable && zHasBuildWaypointNear) {
                     this.wasEverPlaceable = true;
                 }
@@ -261,15 +261,15 @@ public class BuildPreview {
         BaseUnit baseUnitCanAttack;
         Rect rectCd;
         GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine.playerTeam != this.placingTeam || !gameEngine.cameraFollowSpeed.b(this.tempPoint, this.tempRectF1)) {
+        if (gameEngine.playerTeam != this.placingTeam || !gameEngine.bufferedVisibleWorldRectF.b(this.worldX, this.worldY)) {
             return;
         }
         if (this.forceDraw && !this.wasEverPlaceable) {
             return;
         }
         float fFastCos = 0.0f;
-        float f2 = this.tempPoint;
-        float f3 = this.tempRectF1;
+        float f2 = this.worldX;
+        float f3 = this.worldY;
         boolean z = false;
         boolean z2 = false;
         if (this.isBuilding) {
@@ -297,23 +297,23 @@ public class BuildPreview {
             tempRectF4.d *= gameEngine.tileMap.tileWorldSizeY;
             tempRectF4.a *= gameEngine.tileMap.tileWorldSizeX;
             tempRectF4.c *= gameEngine.tileMap.tileWorldSizeX;
-            tempRectF4.a(-(baseUnitCanAttack.getUnitAIState() - gameEngine.tileMap.halfTileWorldSizeX), -(baseUnitCanAttack.getUnitAIPathfindStatus() - gameEngine.tileMap.halfTileWorldSizeY));
+            tempRectF4.a(-(baseUnitCanAttack.getTileOffsetX() - gameEngine.tileMap.halfTileWorldSizeX), -(baseUnitCanAttack.getTileOffsetY() - gameEngine.tileMap.halfTileWorldSizeY));
             Utility.grow(tempRectF4, (gameEngine.tileMap.halfTileWorldSizeX - 3) + (fFastCos * 5.0f));
-            tempRectF4.a(this.tempPoint - gameEngine.viewpointXSnapped, (this.tempRectF1 - gameEngine.viewpointYSnapped) - 0.0f);
+            tempRectF4.a(this.worldX - gameEngine.viewpointXSnapped, (this.worldY - gameEngine.viewpointYSnapped) - 0.0f);
             float f5 = 3.0f + (fFastCos * 7.0f);
             Paint paint = foundationPaint;
             if (this.fadeInProgress <= 0.0f) {
                 paint = foundationPaintInactive;
             }
-            gameEngine.graphicsEngine2.a(tempRectF4.a - f5, tempRectF4.b, tempRectF4.c + f5, tempRectF4.b, paint);
-            gameEngine.graphicsEngine2.a(tempRectF4.a - f5, tempRectF4.d, tempRectF4.c + f5, tempRectF4.d, paint);
-            gameEngine.graphicsEngine2.a(tempRectF4.a, tempRectF4.b - f5, tempRectF4.a, tempRectF4.d + f5, paint);
-            gameEngine.graphicsEngine2.a(tempRectF4.c, tempRectF4.b - f5, tempRectF4.c, tempRectF4.d + f5, paint);
+            gameEngine.renderGraphicsEngine.a(tempRectF4.a - f5, tempRectF4.b, tempRectF4.c + f5, tempRectF4.b, paint);
+            gameEngine.renderGraphicsEngine.a(tempRectF4.a - f5, tempRectF4.d, tempRectF4.c + f5, tempRectF4.d, paint);
+            gameEngine.renderGraphicsEngine.a(tempRectF4.a, tempRectF4.b - f5, tempRectF4.a, tempRectF4.d + f5, paint);
+            gameEngine.renderGraphicsEngine.a(tempRectF4.c, tempRectF4.b - f5, tempRectF4.c, tempRectF4.d + f5, paint);
         }
         float f6 = 0.0f;
         if (z2) {
             f6 = 0.0f - (10.0f * fFastCos);
         }
-        UnitTypeEnum.drawUnitWithBoolean(this.unitType, f2, f3 + f6, 0.0f, 0.0f, this.team, 1.0f, 500.0f, z, z2, this.someCounterF, z3, null);
+        UnitTypeEnum.drawUnitWithBoolean(this.unitType, f2, f3 + f6, 0.0f, 0.0f, this.team, 1.0f, 500.0f, z, z2, this.previewUnitLevel, z3, null);
     }
 }

@@ -34,10 +34,10 @@ public class Tree extends NaturalUnit {
 
     public static void b() {
         GameEngine gameEngine = GameEngine.getInstance();
-        a[0] = gameEngine.graphicsEngine2.a(R.drawable.palm_tree);
-        a[1] = gameEngine.graphicsEngine2.a(R.drawable.trees);
-        a[2] = gameEngine.graphicsEngine2.a(R.drawable.trees_snow);
-        b = gameEngine.graphicsEngine2.a(R.drawable.palm_leaves);
+        a[0] = gameEngine.renderGraphicsEngine.a(R.drawable.palm_tree);
+        a[1] = gameEngine.renderGraphicsEngine.a(R.drawable.trees);
+        a[2] = gameEngine.renderGraphicsEngine.a(R.drawable.trees_snow);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.palm_leaves);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
@@ -211,14 +211,14 @@ public class Tree extends NaturalUnit {
         float fD = du.d();
         float fE = du.e();
         dv.a(a_(false));
-        GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
+        GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
         graphicsEngine.k();
         if (this.l != 1.0f) {
             graphicsEngine.a(this.l, this.l, fD, fE);
         }
         if (this.m) {
             dv.a(this.es, 0);
-            gameEngine.graphicsEngine2.a(textureD, dv, du, (Paint) null);
+            gameEngine.renderGraphicsEngine.a(textureD, dv, du, (Paint) null);
             dv.a(-this.es, 0);
         }
         graphicsEngine.a(getUnitArmorRating(false), fD, fE);
@@ -299,7 +299,7 @@ public class Tree extends NaturalUnit {
             S(0);
             this.isAlive = false;
             this.isDestroyed = true;
-            this.unitCreationTime = gameEngine.lastTick;
+            this.unitCreationTime = gameEngine.gameTimeMillis;
             this.h = true;
             this.m = false;
             for (int i = 0; i < 1; i++) {

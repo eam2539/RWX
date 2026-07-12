@@ -24,7 +24,7 @@ public class ProjectileInterceptorHook extends CustomUnitRenderHook {
         int techLevel = customUnit.getTechLevel();
         for (int i = 0; i < techLevel; i++) {
             TurretConfig turretConfig = customUnitConfig.turrets[i];
-            if (turretConfig.shootSpeed3 != null && customUnit.f0cB > 0.0f && !customUnit.v) {
+            if (turretConfig.shootSpeed3 != null && customUnit.currentEnergy > 0.0f && !customUnit.v) {
                 float fFloatValue = turretConfig.shootSpeed3.floatValue();
                 b.a(customUnit.E(i));
                 float fM = customUnit.m();
@@ -33,8 +33,8 @@ public class ProjectileInterceptorHook extends CustomUnitRenderHook {
                 }
                 if (LaserDefense.attackTarget(customUnit, b.x, b.y, customUnit.posZ, fM, fFloatValue)) {
                 }
-                if (customUnit.f0cB < 0.0f) {
-                    customUnit.f0cB = 0.0f;
+                if (customUnit.currentEnergy < 0.0f) {
+                    customUnit.currentEnergy = 0.0f;
                     customUnit.v = true;
                 }
             }

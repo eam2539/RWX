@@ -69,10 +69,10 @@ public abstract class GameEngine {
     public Context context;
 
     /* JADX INFO: renamed from: ao */
-    public GameView activity;
+    public GameView activeGameView;
 
     /* JADX INFO: renamed from: ap */
-    public GameView activity2;
+    public GameView pendingGameView;
 
     /* JADX INFO: renamed from: aq */
     public boolean isStopped;
@@ -81,22 +81,22 @@ public abstract class GameEngine {
     public static Throwable lastThrowable;
 
     /* JADX INFO: renamed from: ay */
-    public static boolean isAndroidVersionStatic;
+    public static boolean isMenuBackgroundDisabled;
 
     /* JADX INFO: renamed from: az */
-    public static boolean isDesktopVersionStatic;
+    public static boolean isDesktopVersion;
 
     /* JADX INFO: renamed from: aA */
-    public static boolean isPausedStatic;
+    public static boolean useCurrentThreadExceptionHandler;
 
     /* JADX INFO: renamed from: aB */
-    public static boolean isNetworkServerStatic;
+    public static boolean isHeadlessMode;
 
     /* JADX INFO: renamed from: aC */
-    public static boolean isDemoVersionStatic;
+    public static boolean isTextureAtlasDisabled;
 
     /* JADX INFO: renamed from: aD */
-    public static boolean isGameStartedStatic;
+    public static boolean isCanvasGLEnabled;
 
     /* JADX INFO: renamed from: aE */
     public static boolean isUnitImageGenerationMode;
@@ -105,16 +105,16 @@ public abstract class GameEngine {
     public static boolean isUnitValidationMode;
 
     /* JADX INFO: renamed from: aG */
-    public static boolean isGamePausedOrMinimizedStatic;
+    public static boolean isOldReplayMode;
 
     /* JADX INFO: renamed from: aJ */
-    public static boolean isInGameOrLobbyStatic;
+    public static boolean isModsDisabled;
 
     /* JADX INFO: renamed from: aR */
-    public static boolean isNetworkConnectedStatic2;
+    public static boolean isMouseCaptured;
 
     /* JADX INFO: renamed from: aS */
-    public boolean isInGameOrLobby;
+    public boolean hasLoggedHighNativeHeapUsage;
 
     /* JADX INFO: renamed from: bg */
     public static Class gameEngineClass;
@@ -135,25 +135,25 @@ public abstract class GameEngine {
     public boolean isGameStarted;
 
     /* JADX INFO: renamed from: bw */
-    public boolean isGameThreadRunning;
+    public boolean isUnitInvincibilityEnabled;
 
     /* JADX INFO: renamed from: by */
-    public int lastTick;
+    public int gameTimeMillis;
 
     /* JADX INFO: renamed from: bz */
-    public int tickDelta;
+    public int renderFrameCount;
 
     /* JADX INFO: renamed from: bA */
-    public int lastTickTime;
+    public int renderTimeMillis;
 
     /* JADX INFO: renamed from: bB */
-    public int currentTimeMillis;
+    public int currentUnitCap;
 
     /* JADX INFO: renamed from: bC */
-    public int lastTimeMillis;
+    public int maxUnitCap;
 
     /* JADX INFO: renamed from: bD */
-    public boolean isGamePausedOrMinimized2;
+    public boolean isGameResumed;
 
     /* JADX INFO: renamed from: bJ */
     public int globalSeed;
@@ -171,10 +171,10 @@ public abstract class GameEngine {
     public MusicManager musicManager;
 
     /* JADX INFO: renamed from: bO */
-    public GraphicsEngine graphicsEngine2;
+    public GraphicsEngine renderGraphicsEngine;
 
     /* JADX INFO: renamed from: bP */
-    public CollisionEngine gameRenderer;
+    public CollisionEngine collisionEngine;
 
     /* JADX INFO: renamed from: bQ */
     public SettingsEngine settingsEngine;
@@ -192,7 +192,7 @@ public abstract class GameEngine {
     public PathEngine pathfindingEngine;
 
     /* JADX INFO: renamed from: bV */
-    public FormationEngine groupController;
+    public FormationEngine formationEngine;
 
     /* JADX INFO: renamed from: bW */
     public Minimap minimap;
@@ -237,7 +237,7 @@ public abstract class GameEngine {
     public float screenWidth;
 
     /* JADX INFO: renamed from: cm */
-    public float viewpointWidthRaw;
+    public float screenHeight;
 
     /* JADX INFO: renamed from: co */
     public float halfScreenWidth;
@@ -255,13 +255,13 @@ public abstract class GameEngine {
     public float scrollDeltaY;
 
     /* JADX INFO: renamed from: ct */
-    public boolean stoppedScrolling;
+    public boolean wasCameraClamped;
 
     /* JADX INFO: renamed from: cu */
-    public int cameraBoundsMaxY;
+    public int viewpointXInt;
 
     /* JADX INFO: renamed from: cv */
-    public int mapWidth;
+    public int viewpointYInt;
 
     /* JADX INFO: renamed from: cw */
     public float viewpointXSnapped;
@@ -276,10 +276,10 @@ public abstract class GameEngine {
     public float viewpointY;
 
     /* JADX INFO: renamed from: cA */
-    public float screenHeight;
+    public float visibleWorldWidth;
 
     /* JADX INFO: renamed from: cB */
-    public float viewpointHeight;
+    public float visibleWorldHeight;
 
     /* JADX INFO: renamed from: cC */
     public float cameraMovementX;
@@ -300,10 +300,10 @@ public abstract class GameEngine {
     public float currentScreenHeightPixels;
 
     /* JADX INFO: renamed from: cI */
-    public float halfViewpointWidth;
+    public float halfVisibleWorldWidth;
 
     /* JADX INFO: renamed from: cJ */
-    public float halfViewpointHeight;
+    public float halfVisibleWorldHeight;
 
     /* JADX INFO: renamed from: cR */
     public boolean wasPaused;
@@ -318,7 +318,7 @@ public abstract class GameEngine {
     public boolean isMenuOpen;
 
     /* JADX INFO: renamed from: cZ */
-    public boolean recomputeViewpoint;
+    public boolean shouldRecenterZoomOnPointer;
 
     /* JADX INFO: renamed from: da */
     public float mouseX;
@@ -342,7 +342,7 @@ public abstract class GameEngine {
     public Paint loadingPaint;
 
     /* JADX INFO: renamed from: dw */
-    public int lastPinchDistance;
+    public int selectedWaypointDrawCount;
 
     /* JADX INFO: renamed from: dA */
     float lastScreenScale;
@@ -363,28 +363,28 @@ public abstract class GameEngine {
     String pendingMessageTitle;
 
     /* JADX INFO: renamed from: e */
-    private int accumulatedKeyCodes;
+    private int accumulatedMouseWheelDelta;
 
     /* JADX INFO: renamed from: dP */
-    static byte[] tempBuffer;
+    static byte[] exceptionHandlerMemoryReserve;
 
     /* JADX INFO: renamed from: dS */
-    static ANRWatchdog anrWatchDog;
+    static ANRWatchdog anrWatchdog;
 
     /* JADX INFO: renamed from: dV */
-    static boolean hasShownOOMMessage;
+    static boolean hasShownOutOfMemoryMessage;
 
     /* JADX INFO: renamed from: dX */
-    static boolean hasShownLowMemoryWarning;
+    static boolean lowMemoryWarningPending;
 
     /* JADX INFO: renamed from: dY */
-    static boolean lowMemoryDetected;
+    static boolean hasShownLowMemoryWarning;
 
     /* JADX INFO: renamed from: ee */
     public boolean isSafeMode;
 
     /* JADX INFO: renamed from: ef */
-    public boolean forceEnglish;
+    public boolean isEnglishForcedBySafeMode;
 
     /* JADX INFO: renamed from: eg */
     public String safeModeReason;
@@ -393,46 +393,46 @@ public abstract class GameEngine {
     public boolean isExtraSafeMode;
 
     /* JADX INFO: renamed from: ei */
-    public boolean isExtraSafeMode2;
+    public boolean isExtraSafeModeLevel2;
 
     /* JADX INFO: renamed from: ej */
-    static int loadLevelNetworkAttempts;
+    static int nonFatalErrorReportCount;
 
     /* JADX INFO: renamed from: al */
     protected static GameEngine instance = null;
 
     /* JADX INFO: renamed from: as */
-    public static boolean isGameBetaStatic = true;
+    public static boolean isGameBeta = true;
 
     /* JADX INFO: renamed from: at */
-    public static boolean isSandboxModeStatic = false;
+    public static boolean isTestingBuild = false;
 
     /* JADX INFO: renamed from: au */
-    public static boolean isDebugVersionStatic = false;
+    public static boolean isRateGamePromptEnabled = false;
 
     /* JADX INFO: renamed from: aw */
-    public static boolean isIOSVersionStatic = false;
+    public static boolean isReplayDebugMode = false;
 
     /* JADX INFO: renamed from: ax */
-    public static boolean isPCVersionStatic = false;
+    public static boolean isLogColorEnabled = false;
 
     /* JADX INFO: renamed from: aH */
-    public static boolean isNetworkGameActiveStatic = false;
+    public static boolean isSteamModeEnabled = false;
 
     /* JADX INFO: renamed from: aI */
-    public static boolean isNetworkConnectedStatic = false;
+    public static boolean isLaunchSandbox = false;
 
     /* JADX INFO: renamed from: aK */
-    public static String buildVersion = null;
+    public static String pendingSteamLobbyId = null;
 
     /* JADX INFO: renamed from: aL */
-    public static boolean isGameThreadRunningStatic = false;
+    public static boolean isGameThreadActive = false;
 
     /* JADX INFO: renamed from: aM */
-    public static boolean isDedicatedServer = false;
+    public static boolean isPostProcessingEnabled = false;
 
     /* JADX INFO: renamed from: aN */
-    public static boolean isGameMinimizedStatic2 = false;
+    public static boolean isTeamShadersEnabled = false;
 
     /* JADX INFO: renamed from: aO */
     public static boolean isCommandLineMode = false;
@@ -444,73 +444,73 @@ public abstract class GameEngine {
     public static String platformName = null;
 
     /* JADX INFO: renamed from: aT */
-    public static boolean isNetworkServerStatic2 = false;
+    public static boolean isAutomatedTestMode = false;
 
     /* JADX INFO: renamed from: aU */
-    public static boolean isPausedStatic2 = false;
+    public static boolean isNonAndroidVersion = false;
 
     /* JADX INFO: renamed from: aV */
-    public static boolean isDesktopVersionStatic2 = false;
+    public static boolean isDebugServerActive = false;
 
     /* JADX INFO: renamed from: aW */
-    public static boolean isAndroidVersionStatic2 = false;
+    public static boolean isPCOrIOSVersion = false;
 
     /* JADX INFO: renamed from: aX */
-    public static boolean isIOSVersionStatic2 = false;
+    public static boolean isJavaDesktopVersion = false;
 
     /* JADX INFO: renamed from: aY */
-    public static boolean isPCVersionStatic2 = false;
+    public static boolean isGDXVersion = false;
 
     /* JADX INFO: renamed from: aZ */
-    public static boolean isDebugVersionStatic2 = false;
+    public static boolean isIOSVersion = false;
 
     /* JADX INFO: renamed from: ba */
     public static String androidVersion = null;
 
     /* JADX INFO: renamed from: bb */
-    public static boolean isSandboxModeStatic2 = false;
+    public static boolean isDesktopInitialized = false;
 
     /* JADX INFO: renamed from: bc */
-    public static boolean isGameBetaStatic2 = true;
+    public static boolean isReplayRecordingEnabledOnNonPC = true;
 
     /* JADX INFO: renamed from: bd */
-    public static boolean isDemoVersionStatic2 = true;
+    public static boolean isReplayRecordingEnabledOnPCOrIOS = true;
 
     /* JADX INFO: renamed from: be */
-    public static boolean inSpace = false;
+    public static boolean spaceGameMode = false;
 
     /* JADX INFO: renamed from: bf */
-    public static boolean inDebug = false;
+    public static boolean mapDebugMode = false;
 
     /* JADX INFO: renamed from: dy */
-    public static GameEngineFactory gameEngineUtilities = new GameLogicFactory();
+    public static GameEngineFactory gameEngineFactory = new GameLogicFactory();
 
     /* JADX INFO: renamed from: dz */
-    public static String gameEngineVersion = Build.VERSION.RELEASE;
+    public static String buildVersion = Build.VERSION.RELEASE;
 
     /* JADX INFO: renamed from: dO */
-    public static boolean isGameModeSandbox = false;
+    public static boolean hasHandledCrash = false;
 
     /* JADX INFO: renamed from: dQ */
-    static byte[] oomCheckBuffer = new byte[1000];
+    static byte[] outOfMemoryReserveBuffer = new byte[1000];
 
     /* JADX INFO: renamed from: dR */
-    static byte[] oomCheckBuffer2 = new byte[1000];
+    static byte[] secondaryOutOfMemoryReserveBuffer = new byte[1000];
 
     /* JADX INFO: renamed from: dT */
     static boolean hasDetectedANR = false;
 
     /* JADX INFO: renamed from: dU */
-    static int problemCount = 0;
+    static int reportedProblemCount = 0;
 
     /* JADX INFO: renamed from: dW */
-    static AssetType oomAssetType = null;
+    static AssetType outOfMemoryAssetType = null;
 
     /* JADX INFO: renamed from: aj */
-    public final Object gameLoopLock = new Object();
+    public final Object gameStateLock = new Object();
 
     /* JADX INFO: renamed from: ak */
-    public final Object gameLoopLock2 = new Object();
+    public final Object drawLock = new Object();
 
     /* JADX INFO: renamed from: am */
     public Context appContext = null;
@@ -525,16 +525,16 @@ public abstract class GameEngine {
     public boolean isGamePausedOrMinimized = false;
 
     /* JADX INFO: renamed from: bl */
-    public boolean isNetworkGameActive = false;
+    public boolean isDebugTempMode = false;
 
     /* JADX INFO: renamed from: bm */
-    public boolean isNetworkConnected = false;
+    public boolean showAITeamInfoOverlay = false;
 
     /* JADX INFO: renamed from: bn */
-    public boolean isNetworkServer = false;
+    public boolean isTriggerDebugMode = false;
 
     /* JADX INFO: renamed from: bo */
-    public boolean isServer = false;
+    public boolean isGameRecording = false;
 
     /* JADX INFO: renamed from: bq */
     public boolean isLoading = false;
@@ -558,10 +558,10 @@ public abstract class GameEngine {
     public volatile boolean exitGameThread = false;
 
     /* JADX INFO: renamed from: bG */
-    public volatile boolean loadNewGame = false;
+    public volatile boolean hasLoadedLevel = false;
 
     /* JADX INFO: renamed from: bH */
-    public volatile boolean reloadMap = false;
+    public volatile boolean isMenuBackgroundMap = false;
 
     /* JADX INFO: renamed from: bI */
     public volatile boolean fullReload = false;
@@ -570,64 +570,64 @@ public abstract class GameEngine {
     public TeamStats teamStats = new TeamStats();
 
     /* JADX INFO: renamed from: ch */
-    public boolean isGameEngineReady = false;
+    public boolean isLookModeEnabled = false;
 
     /* JADX INFO: renamed from: cn */
     public float gameTimer = 1.0f;
 
     /* JADX INFO: renamed from: cK */
-    public final Rect cameraBoundsEnabled = new Rect();
+    public final Rect screenClipRect = new Rect();
 
     /* JADX INFO: renamed from: cL */
-    public final Rect cameraBoundsBuffer = new Rect();
+    public final Rect viewportClipRect = new Rect();
 
     /* JADX INFO: renamed from: cM */
-    public final RectF cameraFollowMode = new RectF();
+    public final RectF visibleScreenRect = new RectF();
 
     /* JADX INFO: renamed from: cN */
-    public final Rect cameraFollowTarget = new Rect();
+    public final Rect bufferedVisibleWorldRect = new Rect();
 
     /* JADX INFO: renamed from: cO */
-    public final RectF cameraFollowSpeed = new RectF();
+    public final RectF bufferedVisibleWorldRectF = new RectF();
 
     /* JADX INFO: renamed from: cP */
-    public final RectF cameraFollowZoom = new RectF();
+    public final RectF extendedVisibleWorldRect = new RectF();
 
     /* JADX INFO: renamed from: cQ */
-    public final Rect cameraSmoothing = new Rect();
+    public final Rect visibleWorldRect = new Rect();
 
     /* JADX INFO: renamed from: cV */
-    public float cameraEdgeScrollZone = 1.0f;
+    public float targetZoom = 1.0f;
 
     /* JADX INFO: renamed from: cW */
-    public boolean cameraDragStartX = false;
+    public boolean isZoomLimitReached = false;
 
     /* JADX INFO: renamed from: cX */
     public float zoom = 1.0f;
 
     /* JADX INFO: renamed from: cY */
-    public float cameraIsDragging = 1.0f;
+    public float densityZoomScale = 1.0f;
 
     /* JADX INFO: renamed from: dc */
-    public boolean mouseScreenX = true;
+    public boolean shouldDrawHighDetailEffects = true;
 
     /* JADX INFO: renamed from: dd */
-    public boolean mouseScreenY = true;
+    public boolean shouldDrawMediumDetailEffects = true;
 
     /* JADX INFO: renamed from: de */
-    public boolean mouseWorldX = true;
+    public boolean shouldDrawSmallUnitShadows = true;
 
     /* JADX INFO: renamed from: df */
-    public boolean mouseWorldY = true;
+    public boolean shouldDrawUnitShadows = true;
 
     /* JADX INFO: renamed from: dg */
-    public boolean mousePressed = true;
+    public boolean shouldDrawUnitLegDetails = true;
 
     /* JADX INFO: renamed from: dh */
-    public float mouseRightPressed = 0.0f;
+    public float rightMouseHoldTimer = 0.0f;
 
     /* JADX INFO: renamed from: di */
-    public float mouseMiddlePressed = 0.0f;
+    public float middleMouseHoldTimer = 0.0f;
 
     /* JADX INFO: renamed from: dj */
     public boolean mouseLastClickTime = false;
@@ -636,34 +636,34 @@ public abstract class GameEngine {
     protected GameThread gameThread = null;
 
     /* JADX INFO: renamed from: dq */
-    public boolean isTouchDown = false;
+    public boolean hasWonGame = false;
 
     /* JADX INFO: renamed from: dr */
-    public boolean isTouchMoving = false;
+    public boolean isContinuingAfterGameEnd = false;
 
     /* JADX INFO: renamed from: ds */
     public float touchStartX = 0.0f;
 
     /* JADX INFO: renamed from: dt */
-    public boolean touchStartY = false;
+    public boolean hasLostGame = false;
 
     /* JADX INFO: renamed from: du */
-    public boolean isPinching = false;
+    public boolean shouldAdvanceAfterGameEnd = false;
 
     /* JADX INFO: renamed from: dv */
-    public boolean pinchDistance = false;
+    public boolean shouldSkipNextDraw = false;
 
     /* JADX INFO: renamed from: dx */
-    public float pinchStartZoom = 0.0f;
+    public float unitSelectionFadeBase = 0.0f;
 
     /* JADX INFO: renamed from: dB */
-    boolean keyPressed = false;
+    boolean paintSizeTrackersReady = false;
 
     /* JADX INFO: renamed from: dC */
-    ArrayList keyEvents = new ArrayList();
+    ArrayList paintSizeTrackers = new ArrayList();
 
     /* JADX INFO: renamed from: dD */
-    final Handler keyHandler = new Handler(Looper.b());
+    final Handler uiDispatchHandler = new Handler(Looper.b());
 
     /* JADX INFO: renamed from: a */
     private Runnable showToastRunnable = new Runnable() { // from class: com.corrodinggames.rts.gameFramework.l.1
@@ -672,19 +672,19 @@ public abstract class GameEngine {
             String str = GameEngine.this.toastMessage;
             try {
                 if (str == null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("Cannot show toast, no message");
+                    GameEngine.logColored("Cannot show toast, no message");
                 } else {
                     Toast.makeText(GameEngine.this.appContext, str, 1).show();
                 }
             } catch (Exception e) {
-                GameEngine.updatePaintTextSizeIfNeeded("Error showing toast: " + ((Object) str));
+                GameEngine.logColored("Error showing toast: " + ((Object) str));
                 e.printStackTrace();
             }
         }
     };
 
     /* JADX INFO: renamed from: b */
-    private Runnable showDialogRunnable = new Runnable() { // from class: com.corrodinggames.rts.gameFramework.l.2
+    private Runnable showMessageBoxRunnable = new Runnable() { // from class: com.corrodinggames.rts.gameFramework.l.2
         @Override // java.lang.Runnable
         public void run() {
             DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() { // from class: com.corrodinggames.rts.gameFramework.l.2.1
@@ -703,53 +703,53 @@ public abstract class GameEngine {
             try {
                 new AlertDialog.Builder(GameEngine.this.appContext).setIcon(R.drawable.ic_dialog_alert).setTitle(GameEngine.this.dialogTitle).setMessage(GameEngine.this.dialogMessage).setOnCancelListener(onCancelListener).setPositiveButton("Ok", onClickListener).show();
             } catch (WindowManager.BadTokenException e) {
-                GameEngine.updatePaintTextSizeIfNeeded("Failed to show message: " + GameEngine.this.dialogMessage);
+                GameEngine.logColored("Failed to show message: " + GameEngine.this.dialogMessage);
                 e.printStackTrace();
             }
         }
     };
 
     /* JADX INFO: renamed from: dH */
-    public com.corrodinggames.rts.gameFramework.MissionEngine missionEngine2 = null;
+    public com.corrodinggames.rts.gameFramework.PlatformCallbacks platformCallbacks = null;
 
     /* JADX INFO: renamed from: dI */
-    transient String gameModeConfig = null;
+    transient String currentLoadingStatus = null;
 
     /* JADX INFO: renamed from: dJ */
-    Object gameModeData = new Object();
+    Object pendingMessageLock = new Object();
 
     /* JADX INFO: renamed from: dM */
-    public boolean[] gameModeEnabled = new boolean[10];
+    public boolean[] touchPointerEnabled = new boolean[10];
 
     /* JADX INFO: renamed from: dN */
-    protected ConcurrentLinkedQueue taskQueue = new ConcurrentLinkedQueue();
+    protected ConcurrentLinkedQueue pendingInputEvents = new ConcurrentLinkedQueue();
 
     /* JADX INFO: renamed from: c */
-    private boolean[] graphicsSettings = new boolean[KeyEvent.a() + 1];
+    private boolean[] keyDownStates = new boolean[KeyEvent.a() + 1];
 
     /* JADX INFO: renamed from: d */
-    private boolean[] uiSettings = new boolean[KeyEvent.a() + 1];
+    private boolean[] keyPressPendingStates = new boolean[KeyEvent.a() + 1];
 
     /* JADX INFO: renamed from: dZ */
-    public byte gameModeDifficulty = 42;
+    public byte memoryProbeWriteByte = 42;
 
     /* JADX INFO: renamed from: ea */
-    public byte gameModeType = 42;
+    public byte memoryProbeReadByte = 42;
 
     /* JADX INFO: renamed from: eb */
-    public final TaskQueue taskQueue1 = new TaskQueue();
+    public final TaskQueue recurringGameThreadTasks = new TaskQueue();
 
     /* JADX INFO: renamed from: ec */
-    public final TaskQueue gameModeTimer2 = new TaskQueue();
+    public final TaskQueue pendingGameThreadTasks = new TaskQueue();
 
     /* JADX INFO: renamed from: ed */
-    public final TaskQueue gameModeTimer3 = new TaskQueue();
+    public final TaskQueue endOfFrameTasks = new TaskQueue();
 
     /* JADX INFO: renamed from: a */
     public abstract void init(Context context);
 
     /* JADX INFO: renamed from: a */
-    public abstract boolean createInstance();
+    public abstract boolean isMessageDisplayPersistent();
 
     /* JADX INFO: renamed from: a */
     public abstract boolean shouldSkipUpdate(boolean z);
@@ -788,7 +788,7 @@ public abstract class GameEngine {
     public abstract void refreshVersionName();
 
     /* JADX INFO: renamed from: v */
-    public abstract String getVersion2();
+    public abstract String getVersionString();
 
     /* JADX INFO: renamed from: a */
     public abstract void loadLevel(boolean z, boolean z2, GameMode gameMode) throws IOException;
@@ -815,15 +815,15 @@ public abstract class GameEngine {
     public abstract int getFps();
 
     /* JADX INFO: renamed from: c */
-    public abstract boolean isCustomGameMode();
+    public abstract boolean isExtraSafeModeActive();
 
     /* JADX INFO: renamed from: d */
-    public abstract boolean isExperimental();
+    public abstract boolean isExtraSafeModeLevel2Active();
 
     /* JADX INFO: renamed from: b */
-    public static boolean centerCameraOnPosition(Context context) {
+    public static boolean detectDemoPackage(Context context) {
         String strH;
-        if (isPausedStatic2) {
+        if (isNonAndroidVersion) {
             strH = "dedicatedServer";
         } else {
             strH = context.g().h();
@@ -846,13 +846,13 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: C */
-    public static final boolean printLog() {
-        return inSpace;
+    public static final boolean isSpaceGame() {
+        return spaceGameMode;
     }
 
     /* JADX INFO: renamed from: D */
-    public static final boolean getPointerIndex() {
-        return inDebug;
+    public static final boolean isMapDebugMode() {
+        return mapDebugMode;
     }
 
     /* JADX INFO: renamed from: c */
@@ -862,18 +862,18 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: a */
-    public static synchronized GameEngine createGameEngine(Context context, com.corrodinggames.rts.gameFramework.MissionEngine missionEngine) {
+    public static synchronized GameEngine createGameEngine(Context context, com.corrodinggames.rts.gameFramework.PlatformCallbacks platformCallbacks) {
         if (instance != null) {
-            if (missionEngine != null) {
-                instance.missionEngine2 = missionEngine;
+            if (platformCallbacks != null) {
+                instance.platformCallbacks = platformCallbacks;
             }
             instance.initContext(context);
             return instance;
         }
-        instance = gameEngineUtilities.createGameEngine(context);
+        instance = gameEngineFactory.createGameEngine(context);
         log("Created new gameEngine of:" + instance.getClass().getName());
-        if (missionEngine != null) {
-            instance.missionEngine2 = missionEngine;
+        if (platformCallbacks != null) {
+            instance.platformCallbacks = platformCallbacks;
         }
         instance.init(context);
         return instance;
@@ -894,12 +894,12 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: E */
-    public boolean logMessage() {
+    public boolean isKeyboardCameraScrollAllowed() {
         return true;
     }
 
     /* JADX INFO: renamed from: F */
-    public void logMessageWithTime() {
+    public void onInitialContentLoaded() {
     }
 
     /* JADX INFO: renamed from: G */
@@ -907,27 +907,27 @@ public abstract class GameEngine {
         if (isPC()) {
             return "PC";
         }
-        if (isDebugVersionStatic2) {
+        if (isIOSVersion) {
             String strA = PlatformExtension.a();
             if (strA != null) {
                 return "IOS - " + strA;
             }
             return "IOS";
         }
-        if (isPausedStatic2) {
+        if (isNonAndroidVersion) {
             return "SERVER";
         }
         return Build.MODEL;
     }
 
     /* JADX INFO: renamed from: H */
-    public String getAndroidVersion() {
-        return gameEngineVersion;
+    public String getBuildVersion() {
+        return buildVersion;
     }
 
     /* JADX INFO: renamed from: I */
-    public boolean isGameThreadRunning() {
-        if (this.reloadMap) {
+    public boolean isMenuBackgroundMapActive() {
+        if (this.isMenuBackgroundMap) {
             return true;
         }
         return false;
@@ -940,18 +940,18 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: a */
-    public static void printLog(String str) {
+    public static void logErrorColored(String str) {
         log(addColorCodes("--- ERROR: " + str, "\u001b[31m"));
     }
 
     /* JADX INFO: renamed from: b */
-    public static void updatePaintTextSizeIfNeeded(String str) {
+    public static void logColored(String str) {
         log(addColorCodes(str, "\u001b[33m"));
     }
 
     /* JADX INFO: renamed from: M */
     public boolean isNetworkGameActive() {
-        if (this.networkEngine == null || !this.networkEngine.B || this.networkEngine.F || this.replayEngine.j()) {
+        if (this.networkEngine == null || !this.networkEngine.networkGameActive || this.networkEngine.singleplayerServer || this.replayEngine.j()) {
             return false;
         }
         return true;
@@ -962,7 +962,7 @@ public abstract class GameEngine {
         if (this.networkEngine == null) {
             return false;
         }
-        return this.networkEngine.B;
+        return this.networkEngine.networkGameActive;
     }
 
     /* JADX INFO: renamed from: O */
@@ -970,44 +970,44 @@ public abstract class GameEngine {
         if (this.networkEngine == null) {
             return false;
         }
-        return this.networkEngine.F || this.networkEngine.B || this.replayEngine.j();
+        return this.networkEngine.singleplayerServer || this.networkEngine.networkGameActive || this.replayEngine.j();
     }
 
     /* JADX INFO: renamed from: P */
-    public boolean loadLevelNetwork() {
-        if (this.networkEngine == null || this.networkEngine.F) {
+    public boolean isSinglePlayerGame() {
+        if (this.networkEngine == null || this.networkEngine.singleplayerServer) {
             return true;
         }
-        return (this.networkEngine.B || this.replayEngine.j()) ? false : true;
+        return (this.networkEngine.networkGameActive || this.replayEngine.j()) ? false : true;
     }
 
     /* JADX INFO: renamed from: Q */
     public void clampCameraPosition() {
-        this.stoppedScrolling = false;
+        this.wasCameraClamped = false;
         if (this.viewpointX < 0.0f) {
             this.viewpointX = 0.0f;
-            this.stoppedScrolling = true;
+            this.wasCameraClamped = true;
         }
         if (this.viewpointY < 0.0f) {
             this.viewpointY = 0.0f;
-            this.stoppedScrolling = true;
+            this.wasCameraClamped = true;
         }
         if (this.tileMap != null) {
             if (this.viewpointX > this.tileMap.getWorldWidth() - this.viewpointWidth) {
                 this.viewpointX = this.tileMap.getWorldWidth() - this.viewpointWidth;
-                this.stoppedScrolling = true;
+                this.wasCameraClamped = true;
             }
-            if (this.viewpointY > this.tileMap.getWorldHeight() - this.viewpointHeight) {
-                this.viewpointY = this.tileMap.getWorldHeight() - this.viewpointHeight;
-                this.stoppedScrolling = true;
+            if (this.viewpointY > this.tileMap.getWorldHeight() - this.visibleWorldHeight) {
+                this.viewpointY = this.tileMap.getWorldHeight() - this.visibleWorldHeight;
+                this.wasCameraClamped = true;
             }
             if (this.viewpointWidth > this.tileMap.getWorldWidth()) {
                 this.viewpointX = (this.tileMap.getWorldWidth() / 2.0f) - (this.viewpointWidth / 2.0f);
-                this.stoppedScrolling = true;
+                this.wasCameraClamped = true;
             }
-            if (this.viewpointHeight > this.tileMap.getWorldHeight()) {
-                this.viewpointY = (this.tileMap.getWorldHeight() / 2.0f) - (this.viewpointHeight / 2.0f);
-                this.stoppedScrolling = true;
+            if (this.visibleWorldHeight > this.tileMap.getWorldHeight()) {
+                this.viewpointY = (this.tileMap.getWorldHeight() / 2.0f) - (this.visibleWorldHeight / 2.0f);
+                this.wasCameraClamped = true;
             }
         }
         setViewpoint(this.viewpointX, this.viewpointY);
@@ -1017,28 +1017,28 @@ public abstract class GameEngine {
     public void setViewpoint(float f, float f2) {
         this.viewpointX = f;
         this.viewpointY = f2;
-        this.cameraBoundsMaxY = (int) this.viewpointX;
-        this.mapWidth = (int) this.viewpointY;
+        this.viewpointXInt = (int) this.viewpointX;
+        this.viewpointYInt = (int) this.viewpointY;
         this.viewpointXSnapped = ((int) (this.viewpointX * this.zoom)) / this.zoom;
         this.viewpointYSnapped = ((int) (this.viewpointY * this.zoom)) / this.zoom;
         int i = 90;
-        if (printLog()) {
+        if (isSpaceGame()) {
             i = 210;
         }
-        this.cameraFollowTarget.a((int) (this.viewpointX - i), (int) (this.viewpointY - i), (int) (this.viewpointX + this.screenHeight + i), (int) (this.viewpointY + this.viewpointHeight + i));
-        this.cameraFollowSpeed.a(this.cameraFollowTarget);
-        this.cameraSmoothing.a((int) this.viewpointX, (int) this.viewpointY, (int) (this.viewpointX + this.screenHeight), (int) (this.viewpointY + this.viewpointHeight));
-        this.cameraFollowZoom.a((int) (this.viewpointX - 300), (int) (this.viewpointY - 300), (int) (this.viewpointX + this.screenHeight + 300), (int) (this.viewpointY + this.viewpointHeight + 300));
+        this.bufferedVisibleWorldRect.a((int) (this.viewpointX - i), (int) (this.viewpointY - i), (int) (this.viewpointX + this.visibleWorldWidth + i), (int) (this.viewpointY + this.visibleWorldHeight + i));
+        this.bufferedVisibleWorldRectF.a(this.bufferedVisibleWorldRect);
+        this.visibleWorldRect.a((int) this.viewpointX, (int) this.viewpointY, (int) (this.viewpointX + this.visibleWorldWidth), (int) (this.viewpointY + this.visibleWorldHeight));
+        this.extendedVisibleWorldRect.a((int) (this.viewpointX - 300), (int) (this.viewpointY - 300), (int) (this.viewpointX + this.visibleWorldWidth + 300), (int) (this.viewpointY + this.visibleWorldHeight + 300));
     }
 
     /* JADX INFO: renamed from: b */
     public void centerViewpoint(float f, float f2) {
-        setViewpoint(f - (this.viewpointWidth / 2.0f), f2 - (this.viewpointHeight / 2.0f));
+        setViewpoint(f - (this.viewpointWidth / 2.0f), f2 - (this.visibleWorldHeight / 2.0f));
     }
 
     /* JADX INFO: renamed from: d */
     public static boolean isBlueStacks(Context context) {
-        if (isPausedStatic2) {
+        if (isNonAndroidVersion) {
             return false;
         }
         if (Build.MODEL.equals("GT-I9100") || Build.MODEL.equals("GT-I9300")) {
@@ -1062,20 +1062,20 @@ public abstract class GameEngine {
     /* JADX INFO: renamed from: R */
     public void applyZoomTransform() {
         if (this.zoom != 1.0f) {
-            this.graphicsEngine2.a(this.zoom, this.zoom);
+            this.renderGraphicsEngine.a(this.zoom, this.zoom);
         }
     }
 
     /* JADX INFO: renamed from: S */
     public void restoreZoomTransform() {
         if (this.zoom != 1.0f) {
-            this.graphicsEngine2.a(1.0f / this.zoom, 1.0f / this.zoom);
+            this.renderGraphicsEngine.a(1.0f / this.zoom, 1.0f / this.zoom);
         }
     }
 
     /* JADX INFO: renamed from: a */
     public static void log(String str, Throwable th) {
-        updatePaintTextSizeIfNeeded(str);
+        logColored(str);
         log(VariableScope.nullOrMissingString + th.toString());
         log("cause:" + th.getCause());
         th.printStackTrace();
@@ -1083,7 +1083,7 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: a */
     public static String addColorCodes(String str, String str2) {
-        if (isPCVersionStatic && !str.contains("\u001b[0m")) {
+        if (isLogColorEnabled && !str.contains("\u001b[0m")) {
             str = str2 + str + "\u001b[0m";
         }
         return str;
@@ -1115,7 +1115,7 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: c */
     public static void logError(String str) {
-        if (isIOSVersionStatic2) {
+        if (isJavaDesktopVersion) {
             Log.b("RustedWarfare", str);
         } else {
             Log.b("RustedWarfare", str);
@@ -1123,7 +1123,7 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: d */
-    public static void m332d(String str) {
+    public static void logDebug(String str) {
         logError(str);
     }
 
@@ -1152,12 +1152,12 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: a */
     public static void reportOOM(AssetType assetType, Throwable th) {
-        oomCheckBuffer = null;
-        log("reportCaughtOutOfMemory:" + oomAssetType);
-        if (oomAssetType != null) {
+        outOfMemoryReserveBuffer = null;
+        log("reportCaughtOutOfMemory:" + outOfMemoryAssetType);
+        if (outOfMemoryAssetType != null) {
             return;
         }
-        oomAssetType = assetType;
+        outOfMemoryAssetType = assetType;
         if (th != null) {
             printStackTrace(th);
         }
@@ -1175,7 +1175,7 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: g */
     public static void logWarningAndStack(String str) {
-        updatePaintTextSizeIfNeeded(str);
+        logColored(str);
         printStackTrace();
     }
 
@@ -1185,7 +1185,7 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final boolean isTimeInRange(long j, long j2) {
+    public static final boolean hasTimeElapsed(long j, long j2) {
         long currentTimeMillis = getCurrentTimeMillis();
         if (j + j2 < currentTimeMillis || currentTimeMillis < j - 1000) {
             return true;
@@ -1225,12 +1225,12 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: Y */
-    protected void updateGraphics() {
-        Iterator it = this.keyEvents.iterator();
+    protected void refreshPaintSizeTrackers() {
+        Iterator it = this.paintSizeTrackers.iterator();
         while (it.hasNext()) {
-            this.graphicsEngine2.a(((PaintSizeTracker) it.next()).b);
+            this.renderGraphicsEngine.a(((PaintSizeTracker) it.next()).b);
         }
-        this.keyPressed = true;
+        this.paintSizeTrackersReady = true;
     }
 
     /* JADX INFO: renamed from: a */
@@ -1244,16 +1244,16 @@ public abstract class GameEngine {
         paintSizeTracker.a = f;
         paintSizeTracker.b = paint;
         paintSizeTracker.a();
-        synchronized (this.keyEvents) {
-            this.keyEvents.add(paintSizeTracker);
+        synchronized (this.paintSizeTrackers) {
+            this.paintSizeTrackers.add(paintSizeTracker);
         }
-        if (this.keyPressed) {
-            this.graphicsEngine2.a(paintSizeTracker.b);
+        if (this.paintSizeTrackersReady) {
+            this.renderGraphicsEngine.a(paintSizeTracker.b);
         }
     }
 
     /* JADX INFO: renamed from: b */
-    public void getTouchY(Paint paint, float f) {
+    public void setScaledTextSize(Paint paint, float f) {
         float screenPixels = toScreenPixels(f);
         if (paint.k() != screenPixels) {
             paint.b(screenPixels);
@@ -1267,15 +1267,15 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: a */
     public void loadLevel(String str, boolean z) {
-        this.gameModeConfig = str;
-        if (this.missionEngine2 != null) {
-            this.missionEngine2.a(str, z);
+        this.currentLoadingStatus = str;
+        if (this.platformCallbacks != null) {
+            this.platformCallbacks.a(str, z);
         }
     }
 
     /* JADX INFO: renamed from: Z */
-    public void clearLevelConfig() {
-        this.gameModeConfig = null;
+    public void clearCurrentLoadingStatus() {
+        this.currentLoadingStatus = null;
     }
 
     /* JADX INFO: renamed from: i */
@@ -1286,10 +1286,10 @@ public abstract class GameEngine {
     /* JADX INFO: renamed from: J */
     public synchronized void startGameThread() {
         log("--- setRunning ---");
-        if (!isPC() && !isDebugVersionStatic2) {
+        if (!isPC() && !isIOSVersion) {
             this.musicManager.resume();
         }
-        if (!isAndroidVersionStatic2 && !isSandboxModeStatic2 && this.gameThread == null) {
+        if (!isPCOrIOSVersion && !isDesktopInitialized && this.gameThread == null) {
             this.gameThread = new GameThread();
             this.gameThread.a(true);
             this.gameThread.start();
@@ -1298,8 +1298,8 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: aa */
     public boolean isMissionActive() {
-        if (this.missionEngine2 != null) {
-            return this.missionEngine2.c();
+        if (this.platformCallbacks != null) {
+            return this.platformCallbacks.c();
         }
         return false;
     }
@@ -1315,24 +1315,24 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: c */
     public void showMessageBox(String str, String str2) {
-        if (this.missionEngine2 != null) {
-            this.missionEngine2.a(str, str2);
+        if (this.platformCallbacks != null) {
+            this.platformCallbacks.a(str, str2);
         }
-        if (isPausedStatic2) {
-            if (this.missionEngine2 == null) {
-                updatePaintTextSizeIfNeeded("showMessageBox: not showing due to non-android:" + str2);
+        if (isNonAndroidVersion) {
+            if (this.platformCallbacks == null) {
+                logColored("showMessageBox: not showing due to non-android:" + str2);
             }
         } else {
             this.isShowingDialog = true;
             this.dialogTitle = str;
             this.dialogMessage = str2;
-            this.keyHandler.a(this.showDialogRunnable);
+            this.uiDispatchHandler.a(this.showMessageBoxRunnable);
         }
     }
 
     /* JADX INFO: renamed from: ab */
     public void showPendingMessageBox() {
-        synchronized (this.gameModeData) {
+        synchronized (this.pendingMessageLock) {
             if (this.pendingMessageBody != null) {
                 showMessageBox(this.pendingMessageTitle, this.pendingMessageBody);
                 this.pendingMessageBody = null;
@@ -1345,7 +1345,7 @@ public abstract class GameEngine {
     public void setPendingMessageBox(String str, String str2) {
         this.pendingMessageTitle = str;
         this.pendingMessageBody = str2;
-        if (isAndroidVersionStatic2) {
+        if (isPCOrIOSVersion) {
             showPendingMessageBox();
         } else {
             new Thread() { // from class: com.corrodinggames.rts.gameFramework.l.3
@@ -1363,18 +1363,18 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: ac */
     public boolean isTouchDown() {
-        if (this.isStopped || this.activity.getSettings() == null) {
+        if (this.isStopped || this.activeGameView.getSettings() == null) {
             return false;
         }
-        return this.activity.getSettings().wasDown();
+        return this.activeGameView.getSettings().wasDown();
     }
 
     /* JADX INFO: renamed from: ad */
     public void updateTouchInput() {
-        if (this.activity.getSettings() == null) {
+        if (this.activeGameView.getSettings() == null) {
             return;
         }
-        this.activity.getSettings().updateState();
+        this.activeGameView.getSettings().updateState();
     }
 
     /* JADX INFO: renamed from: ae */
@@ -1382,7 +1382,7 @@ public abstract class GameEngine {
         if (this.isStopped) {
             return 0;
         }
-        return this.activity.getSettings().getLastNumPointers();
+        return this.activeGameView.getSettings().getLastNumPointers();
     }
 
     /* JADX INFO: renamed from: af */
@@ -1392,34 +1392,34 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: ag */
     public float getTouchY() {
-        return logWarning(0);
+        return getTouchY(0);
     }
 
     /* JADX INFO: renamed from: b */
     public float getTouchX(int i) {
-        if (this.activity == null) {
+        if (this.activeGameView == null) {
             return 0.0f;
         }
         if (this.settingsEngine.renderDoubleScale) {
-            return this.activity.getSettings().getX()[i] / 2.0f;
+            return this.activeGameView.getSettings().getX()[i] / 2.0f;
         }
-        return this.activity.getSettings().getX()[i];
+        return this.activeGameView.getSettings().getX()[i];
     }
 
     /* JADX INFO: renamed from: c */
-    public float logWarning(int i) {
-        if (this.activity == null) {
+    public float getTouchY(int i) {
+        if (this.activeGameView == null) {
             return 0.0f;
         }
         if (this.settingsEngine.renderDoubleScale) {
-            return this.activity.getSettings().getY()[i] / 2.0f;
+            return this.activeGameView.getSettings().getY()[i] / 2.0f;
         }
-        return this.activity.getSettings().getY()[i];
+        return this.activeGameView.getSettings().getY()[i];
     }
 
     /* JADX INFO: renamed from: d */
     public int getTouchPointerId(int i) {
-        return this.activity.getSettings().getPointerIndices()[i];
+        return this.activeGameView.getSettings().getPointerIndices()[i];
     }
 
     /* JADX INFO: renamed from: e */
@@ -1427,18 +1427,18 @@ public abstract class GameEngine {
         if (i != 1 && i != 2 && i != 3) {
             throw new RuntimeException("Unknown mouseButton:" + i);
         }
-        if (isInDebug(i) != -1) {
+        if (findTouchPointerIndex(i) != -1) {
             return true;
         }
         return false;
     }
 
     /* JADX INFO: renamed from: f */
-    public int isInDebug(int i) {
+    public int findTouchPointerIndex(int i) {
         if (i == 0) {
             throw new RuntimeException("finding state of 0 doesn't make sense");
         }
-        int[] pointerIndices = this.activity.getSettings().getPointerIndices();
+        int[] pointerIndices = this.activeGameView.getSettings().getPointerIndices();
         for (int i2 = 0; i2 < pointerIndices.length; i2++) {
             if (pointerIndices[i2] == i) {
                 return i2;
@@ -1448,9 +1448,9 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: g */
-    public boolean setKeyReleased(int i) {
-        if (i < this.graphicsSettings.length && i >= 0 && this.graphicsSettings[i] && this.uiSettings[i]) {
-            this.uiSettings[i] = false;
+    public boolean consumeKeyPress(int i) {
+        if (i < this.keyDownStates.length && i >= 0 && this.keyDownStates[i] && this.keyPressPendingStates[i]) {
+            this.keyPressPendingStates[i] = false;
             return true;
         }
         return false;
@@ -1458,10 +1458,10 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: h */
     public boolean isKeyPressed(int i) {
-        if (i >= this.graphicsSettings.length || i < 0) {
+        if (i >= this.keyDownStates.length || i < 0) {
             return false;
         }
-        return this.graphicsSettings[i];
+        return this.keyDownStates[i];
     }
 
     /* JADX INFO: renamed from: a */
@@ -1538,11 +1538,11 @@ public abstract class GameEngine {
     public boolean isAnyKeyPressed(int i, int i2) {
         boolean z = false;
         boolean z2 = false;
-        if (i >= 0 && i < this.graphicsSettings.length) {
-            z = this.graphicsSettings[i];
+        if (i >= 0 && i < this.keyDownStates.length) {
+            z = this.keyDownStates[i];
         }
-        if (i2 >= 0 && i2 < this.graphicsSettings.length) {
-            z2 = this.graphicsSettings[i2];
+        if (i2 >= 0 && i2 < this.keyDownStates.length) {
+            z2 = this.keyDownStates[i2];
         }
         return z || z2;
     }
@@ -1556,31 +1556,31 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: k */
-    public void addKeyEvent(int i) {
-        this.taskQueue.add(new IndexedTimestampTracker(this, i));
+    public void queueMouseWheelDelta(int i) {
+        this.pendingInputEvents.add(new QueuedMouseWheelEvent(this, i));
     }
 
     /* JADX INFO: renamed from: ai */
-    public int getAccumulatedKeyCodes() {
-        return this.accumulatedKeyCodes;
+    public int getMouseWheelDelta() {
+        return this.accumulatedMouseWheelDelta;
     }
 
     /* JADX INFO: renamed from: aj */
-    protected void processKeyEvents() {
-        this.accumulatedKeyCodes = 0;
+    protected void processPendingInputEvents() {
+        this.accumulatedMouseWheelDelta = 0;
         while (true) {
-            TimestampTracker timestampTracker = (TimestampTracker) this.taskQueue.poll();
-            if (timestampTracker != null) {
-                if (timestampTracker instanceof ExtendedTimestampTracker) {
-                    ExtendedTimestampTracker extendedTimestampTracker = (ExtendedTimestampTracker) timestampTracker;
-                    if (extendedTimestampTracker.c >= this.graphicsSettings.length || extendedTimestampTracker.c < 0) {
-                        log("updateKeyState", "keyCode (" + extendedTimestampTracker.c + ") is out of range");
+            QueuedInputEvent inputEvent = (QueuedInputEvent) this.pendingInputEvents.poll();
+            if (inputEvent != null) {
+                if (inputEvent instanceof QueuedKeyStateEvent) {
+                    QueuedKeyStateEvent keyStateEvent = (QueuedKeyStateEvent) inputEvent;
+                    if (keyStateEvent.c >= this.keyDownStates.length || keyStateEvent.c < 0) {
+                        log("updateKeyState", "keyCode (" + keyStateEvent.c + ") is out of range");
                     } else {
-                        this.graphicsSettings[extendedTimestampTracker.c] = !extendedTimestampTracker.d;
-                        this.uiSettings[extendedTimestampTracker.c] = !extendedTimestampTracker.d;
+                        this.keyDownStates[keyStateEvent.c] = !keyStateEvent.d;
+                        this.keyPressPendingStates[keyStateEvent.c] = !keyStateEvent.d;
                     }
-                } else if (timestampTracker instanceof IndexedTimestampTracker) {
-                    this.accumulatedKeyCodes += ((IndexedTimestampTracker) timestampTracker).c;
+                } else if (inputEvent instanceof QueuedMouseWheelEvent) {
+                    this.accumulatedMouseWheelDelta += ((QueuedMouseWheelEvent) inputEvent).c;
                 }
             } else {
                 return;
@@ -1634,8 +1634,8 @@ public abstract class GameEngine {
             logWarningAndStack("currentThread is game thread");
         }
         this.gameThread = null;
-        if (this.activity != null) {
-            this.activity.onSizeChanged();
+        if (this.activeGameView != null) {
+            this.activeGameView.onSizeChanged();
         }
         if (this.isBenchmarking) {
             Debug.stopMethodTracing();
@@ -1742,7 +1742,7 @@ public abstract class GameEngine {
     public static File getCrashLogFile() {
         FileHelper.getExternalStoragePath();
         String str = "/SD/rustedWarfare/crashes.txt";
-        if (isDesktop()) {
+        if (isAndroidPlatform()) {
             str = "/SD/rustedWarfare/crashes.txt";
         }
         return new File(FileHelper.convertAbstractPath(str));
@@ -1752,36 +1752,36 @@ public abstract class GameEngine {
     public void updateDensity() {
         if (this.lastScreenScale != this.screenScale) {
             log("Density size changed now: " + this.screenScale + ", refreshing fonts");
-            synchronized (this.keyEvents) {
-                Iterator it = this.keyEvents.iterator();
+            synchronized (this.paintSizeTrackers) {
+                Iterator it = this.paintSizeTrackers.iterator();
                 while (it.hasNext()) {
                     ((PaintSizeTracker) it.next()).a();
                 }
             }
             this.lastScreenScale = this.screenScale;
-            if (this.graphicsEngine2 != null) {
+            if (this.renderGraphicsEngine != null) {
             }
         }
     }
 
     /* JADX INFO: renamed from: ap */
-    public static void setupANRWatchDog() {
-        if (!isSandboxModeStatic || isPausedStatic2) {
+    public static void setupANRWatchdog() {
+        if (!isTestingBuild || isNonAndroidVersion) {
             return;
         }
-        if (anrWatchDog != null) {
-            updatePaintTextSizeIfNeeded("setupANRWatchDog: activeANRWatchDog!=null");
+        if (anrWatchdog != null) {
+            logColored("setupANRWatchDog: activeANRWatchDog!=null");
             return;
         }
-        anrWatchDog = new ANRWatchdog(4000);
-        anrWatchDog.a(new ANRCallback() { // from class: com.corrodinggames.rts.gameFramework.l.4
+        anrWatchdog = new ANRWatchdog(4000);
+        anrWatchdog.a(new ANRCallback() { // from class: com.corrodinggames.rts.gameFramework.l.4
             @Override // com.corrodinggames.rts.gameFramework.utility.ANRCallback
             public void a(ANRException aNRException) {
                 if (GameEngine.hasDetectedANR) {
-                    GameEngine.updatePaintTextSizeIfNeeded("activeANRWatchDog: ANR already detected");
+                    GameEngine.logColored("activeANRWatchDog: ANR already detected");
                 }
                 GameEngine.hasDetectedANR = true;
-                GameEngine.updatePaintTextSizeIfNeeded("activeANRWatchDog: ANR detected");
+                GameEngine.logColored("activeANRWatchDog: ANR detected");
                 String stackTrace = GameEngine.getStackTrace(aNRException);
                 MasterServerClient.sendErrorReportAsync("detectedANR", stackTrace);
                 try {
@@ -1800,18 +1800,18 @@ public abstract class GameEngine {
                 }
             }
         });
-        anrWatchDog.start();
-        updatePaintTextSizeIfNeeded("setupANRWatchDog: running");
+        anrWatchdog.start();
+        logColored("setupANRWatchDog: running");
     }
 
     /* JADX INFO: renamed from: aq */
     public static void setupUncaughtExceptionHandler() {
-        if (tempBuffer == null && isPC()) {
-            tempBuffer = new byte[2500000];
-            tempBuffer[0] = 2;
-            tempBuffer[tempBuffer.length - 1] = 5;
+        if (exceptionHandlerMemoryReserve == null && isPC()) {
+            exceptionHandlerMemoryReserve = new byte[2500000];
+            exceptionHandlerMemoryReserve[0] = 2;
+            exceptionHandlerMemoryReserve[exceptionHandlerMemoryReserve.length - 1] = 5;
         }
-        if (isPausedStatic) {
+        if (useCurrentThreadExceptionHandler) {
             Thread.UncaughtExceptionHandler uncaughtExceptionHandler = Thread.currentThread().getUncaughtExceptionHandler();
             if (!(uncaughtExceptionHandler instanceof CustomExceptionHandler)) {
                 Thread.currentThread().setUncaughtExceptionHandler(new CustomExceptionHandler(uncaughtExceptionHandler));
@@ -1826,12 +1826,12 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: ar */
-    public boolean isNetworkServer() {
+    public boolean shouldUpdateFogRenderPass() {
         return true;
     }
 
     /* JADX INFO: renamed from: as */
-    public boolean isPaused() {
+    public boolean usesCoreUnitTypes() {
         return true;
     }
 
@@ -1839,44 +1839,44 @@ public abstract class GameEngine {
     public static void reportProblem(String str) {
         GameEngine gameEngine = getInstance();
         if (gameEngine != null) {
-            problemCount++;
-            if (problemCount < 1000) {
-                updatePaintTextSizeIfNeeded("reportProblem: " + str);
+            reportedProblemCount++;
+            if (reportedProblemCount < 1000) {
+                logColored("reportProblem: " + str);
             }
-            if (problemCount < 10) {
+            if (reportedProblemCount < 10) {
                 gameEngine.alert(str, 1);
             }
         }
     }
 
     /* JADX INFO: renamed from: at */
-    public static boolean isDesktop() {
-        return !isPausedStatic2;
+    public static boolean isAndroidPlatform() {
+        return !isNonAndroidVersion;
     }
 
     /* JADX INFO: renamed from: au */
-    public static boolean isAndroid() {
-        return !isAndroidVersionStatic2 || isDebugVersionStatic2;
+    public static boolean isNonPCPlatform() {
+        return !isPCOrIOSVersion || isIOSVersion;
     }
 
     /* JADX INFO: renamed from: av */
     public static boolean isPC() {
-        return isAndroidVersionStatic2 && !isDebugVersionStatic2;
+        return isPCOrIOSVersion && !isIOSVersion;
     }
 
     /* JADX INFO: renamed from: aw */
-    public static boolean isIOS() {
-        return isAndroidVersionStatic2 && !isDebugVersionStatic2;
+    public static boolean isDesktopMouseInput() {
+        return isPCOrIOSVersion && !isIOSVersion;
     }
 
     /* JADX INFO: renamed from: ax */
-    public static boolean isDebug() {
-        return isPausedStatic2 && !isAndroidVersionStatic2;
+    public static boolean isDedicatedServer() {
+        return isNonAndroidVersion && !isPCOrIOSVersion;
     }
 
     /* JADX INFO: renamed from: ay */
     public boolean isInNetworkOrReplay() {
-        return this.networkEngine.B || this.replayEngine.j();
+        return this.networkEngine.networkGameActive || this.replayEngine.j();
     }
 
     /* JADX INFO: renamed from: a */
@@ -1888,28 +1888,28 @@ public abstract class GameEngine {
     /* JADX INFO: renamed from: az */
     public static boolean areShadersSupported() {
         GameEngine gameEngine = getInstance();
-        if (gameEngine != null && gameEngine.settingsEngine.teamShaders && (gameEngine.settingsEngine.newRender || !isDesktop())) {
+        if (gameEngine != null && gameEngine.settingsEngine.teamShaders && (gameEngine.settingsEngine.newRender || !isAndroidPlatform())) {
             return true;
         }
-        return isGameMinimizedStatic2;
+        return isTeamShadersEnabled;
     }
 
     /* JADX INFO: renamed from: aA */
     public static boolean isPostProcessingSupported() {
         GameEngine gameEngine = getInstance();
-        if (gameEngine != null && gameEngine.settingsEngine.shaderEffects && (gameEngine.settingsEngine.newRender || !isDesktop())) {
+        if (gameEngine != null && gameEngine.settingsEngine.shaderEffects && (gameEngine.settingsEngine.newRender || !isAndroidPlatform())) {
             return true;
         }
-        return isDedicatedServer;
+        return isPostProcessingEnabled;
     }
 
     /* JADX INFO: renamed from: aB */
     public static boolean isFancyWaterSupported() {
         GameEngine gameEngine = getInstance();
-        if (gameEngine != null && gameEngine.settingsEngine.shaderEffects && (gameEngine.settingsEngine.newRender || !isDesktop())) {
+        if (gameEngine != null && gameEngine.settingsEngine.shaderEffects && (gameEngine.settingsEngine.newRender || !isAndroidPlatform())) {
             return true;
         }
-        return isDedicatedServer;
+        return isPostProcessingEnabled;
     }
 
     /* JADX INFO: renamed from: aC */
@@ -1940,25 +1940,25 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: a */
     public void alert(String str, int i) {
-        if (isPausedStatic2) {
+        if (isNonAndroidVersion) {
             log("alert:" + str);
         } else if (str == null) {
             logWarningAndStack("Cannot show alert, no message text");
         } else {
             this.toastMessage = str;
-            this.keyHandler.a(this.showToastRunnable);
+            this.uiDispatchHandler.a(this.showToastRunnable);
         }
-        if (this.missionEngine2 != null) {
-            this.missionEngine2.a(str, i);
+        if (this.platformCallbacks != null) {
+            this.platformCallbacks.a(str, i);
         }
     }
 
     /* JADX INFO: renamed from: b */
     public void setKeyState(int i, boolean z) {
-        if (i >= 0 && i < this.graphicsSettings.length) {
-            this.graphicsSettings[i] = z;
+        if (i >= 0 && i < this.keyDownStates.length) {
+            this.keyDownStates[i] = z;
             if (z) {
-                this.uiSettings[i] = z;
+                this.keyPressPendingStates[i] = z;
                 return;
             }
             return;
@@ -1967,9 +1967,9 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: aE */
-    public void checkMemory() {
-        if (hasShownLowMemoryWarning && !lowMemoryDetected) {
-            lowMemoryDetected = true;
+    public void showMemoryWarningsIfNeeded() {
+        if (lowMemoryWarningPending && !hasShownLowMemoryWarning) {
+            hasShownLowMemoryWarning = true;
             String str = "Warning game has less than 5mb of free space remaining. A larger battle might cause a crash. ";
             int activeModCount = this.modManager.getActiveModCount();
             if (activeModCount > 1) {
@@ -1977,23 +1977,23 @@ public abstract class GameEngine {
             }
             showMessageBox("Warning: Low memory detected", str);
         }
-        if (!hasShownOOMMessage && oomAssetType != null) {
+        if (!hasShownOutOfMemoryMessage && outOfMemoryAssetType != null) {
             log("Showing out of memory message");
-            hasShownOOMMessage = true;
+            hasShownOutOfMemoryMessage = true;
             String str2 = "trying to load data";
-            if (oomAssetType == AssetType.gameImage) {
+            if (outOfMemoryAssetType == AssetType.gameImage) {
                 str2 = "trying to load game textures";
-            } else if (oomAssetType == AssetType.gameImageCreate) {
+            } else if (outOfMemoryAssetType == AssetType.gameImageCreate) {
                 str2 = "trying to create a texture";
-            } else if (oomAssetType == AssetType.gameImageColor) {
+            } else if (outOfMemoryAssetType == AssetType.gameImageColor) {
                 str2 = "trying to colour new texture";
-            } else if (oomAssetType == AssetType.gameImageFogBuffer) {
+            } else if (outOfMemoryAssetType == AssetType.gameImageFogBuffer) {
                 str2 = "trying to create texture buffer for on-screen fog fading";
-            } else if (oomAssetType == AssetType.gameFont) {
+            } else if (outOfMemoryAssetType == AssetType.gameFont) {
                 str2 = "trying to create game fonts";
-            } else if (oomAssetType == AssetType.gameSound) {
+            } else if (outOfMemoryAssetType == AssetType.gameSound) {
                 str2 = "trying to load game sounds";
-            } else if (oomAssetType == AssetType.uiImage) {
+            } else if (outOfMemoryAssetType == AssetType.uiImage) {
                 str2 = "trying to load UI textures";
             }
             String str3 = "The game ran out of memory " + str2 + ". ";
@@ -2009,27 +2009,27 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: aF */
-    public void checkLowMemory() {
+    public void probeLowMemory() {
         try {
             byte[] bArr = new byte[5000000];
-            bArr[0] = this.gameModeDifficulty;
-            this.gameModeType = bArr[1];
+            bArr[0] = this.memoryProbeWriteByte;
+            this.memoryProbeReadByte = bArr[1];
         } catch (OutOfMemoryError e) {
             System.gc();
             log("Low memory detected");
             e.printStackTrace();
-            hasShownLowMemoryWarning = true;
+            lowMemoryWarningPending = true;
         }
     }
 
     /* JADX INFO: renamed from: a */
-    public void isPositionInBounds(Runnable runnable) {
-        this.gameModeTimer2.a(runnable);
+    public void queueGameThreadTask(Runnable runnable) {
+        this.pendingGameThreadTasks.a(runnable);
     }
 
     /* JADX INFO: renamed from: a */
-    public final boolean handleNetworkPacket(float f, float f2, float f3) {
-        return this.cameraFollowMode.a < f + f3 && f - f3 < this.cameraFollowMode.c && this.cameraFollowMode.b < f2 + f3 && f2 - f3 < this.cameraFollowMode.d;
+    public final boolean isCircleVisibleInCamera(float f, float f2, float f3) {
+        return this.visibleScreenRect.a < f + f3 && f - f3 < this.visibleScreenRect.c && this.visibleScreenRect.b < f2 + f3 && f2 - f3 < this.visibleScreenRect.d;
     }
 
     /* JADX INFO: renamed from: o */
@@ -2041,14 +2041,14 @@ public abstract class GameEngine {
     }
 
     /* JADX INFO: renamed from: p */
-    public static void canStartNewGame(String str) {
+    public static void reportNonFatalError(String str) {
         NetworkEngine networkEngine = getInstance().networkEngine;
         String str2 = VariableScope.nullOrMissingString + str;
-        updatePaintTextSizeIfNeeded(str2);
+        logColored(str2);
         printStackTrace();
-        loadLevelNetworkAttempts++;
-        if (loadLevelNetworkAttempts < 10 && networkEngine != null) {
-            networkEngine.m(str2);
+        nonFatalErrorReportCount++;
+        if (nonFatalErrorReportCount < 10 && networkEngine != null) {
+            networkEngine.sendChatMessage(str2);
         }
     }
 

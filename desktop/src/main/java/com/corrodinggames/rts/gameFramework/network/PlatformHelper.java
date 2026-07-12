@@ -11,7 +11,7 @@ public class PlatformHelper {
     }
 
     public static String a() {
-        if (!GameEngine.isDesktop()) {
+        if (!GameEngine.isAndroidPlatform()) {
             return null;
         }
         return ((GameLogic) GameEngine.getInstance()).getSignature();

@@ -284,7 +284,7 @@ public class DebugOutputStream extends GameOutputStream {
                 if (i2 + i3 > i) {
                     int i4 = i - i2;
                     if (i4 < 0) {
-                        NetworkEngine.g("writeStream: bytesTillFull is " + i4);
+                        NetworkEngine.reportDesync("writeStream: bytesTillFull is " + i4);
                         return;
                     } else {
                         this.activePrintStream.write(bArr, 0, i4);

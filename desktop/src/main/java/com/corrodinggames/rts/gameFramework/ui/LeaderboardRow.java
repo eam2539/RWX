@@ -35,9 +35,9 @@ public class LeaderboardRow {
         GameEngine gameEngine = GameEngine.getInstance();
         this.labelPaint = paint;
         this.label = str;
-        this.labelWidth = gameEngine.graphicsEngine2.b(str, paint);
+        this.labelWidth = gameEngine.renderGraphicsEngine.b(str, paint);
         this.valuePaint = paint2;
         this.value = str2;
-        this.valueWidth = gameEngine.graphicsEngine2.b(str2, paint2);
+        this.valueWidth = gameEngine.renderGraphicsEngine.b(str2, paint2);
     }
 }

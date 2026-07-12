@@ -122,7 +122,7 @@ public class NetworkConnection {
     ConcurrentLinkedQueue outboundQueue = new ConcurrentLinkedQueue();
 
     /* JADX INFO: renamed from: k */
-    public int unknownIntK = -1;
+    public int relayChannelId = -1;
     int A = -1;
     long B = -1;
     boolean C = false;
@@ -139,8 +139,8 @@ public class NetworkConnection {
         this.networkEngine = networkEngine;
         this.socket = socket;
         synchronized (this.networkEngine.sessionLock) {
-            this.connectionId = this.networkEngine.aP;
-            this.networkEngine.aP++;
+            this.connectionId = this.networkEngine.nextConnectionId;
+            this.networkEngine.nextConnectionId++;
         }
         this.sessionRandomId = Utility.getRandomIntInRange(1, 1000000);
     }
@@ -202,8 +202,8 @@ public class NetworkConnection {
         if (this.networkEngine.isServer && !this.networkEngine.n() && (gameTeam = this.player) != null) {
             this.player = null;
             if (this.networkEngine.d(gameTeam) == null) {
-                gameTeam.updateTeamActiveStatus();
-                this.networkEngine.P();
+                gameTeam.removeFromTeamRegistry();
+                this.networkEngine.markPlayerUpdatePending();
                 MultiplayerBattleroomActivity.updateUI();
             }
         }
@@ -314,10 +314,10 @@ public class NetworkConnection {
             if (this.player != null) {
                 String str4 = "player";
                 String str5 = VariableScope.nullOrMissingString;
-                if (this.player.addCredits()) {
+                if (this.player.isSpectatorTeamColor()) {
                     str4 = "spectator";
                 } else if (this.networkEngine.gameHasBeenStarted) {
-                    str5 = this.player.addUnitToTeam(false, false) == 0 ? " (Had no units)" : " (Team " + this.player.getTeamColorName() + ")";
+                    str5 = this.player.getUnitCount(false, false) == 0 ? " (Had no units)" : " (Team " + this.player.getTeamSlotLabel() + ")";
                 }
                 str3 = str4 + " '" + this.player.teamName + "' disconnected" + str5;
             } else if (this.allowLargeIncomingPackets) {
@@ -385,7 +385,7 @@ public class NetworkConnection {
 
     /* JADX INFO: renamed from: b */
     public void getRecentPingMs(String str) {
-        GameEngine.updatePaintTextSizeIfNeeded(formatLogPrefix(str));
+        GameEngine.logColored(formatLogPrefix(str));
     }
 
     /* JADX INFO: renamed from: c */

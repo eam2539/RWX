@@ -41,7 +41,7 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
         }
         float maxHealth = customUnit.getMaxHealth();
         Paint renderPaint = null;
-        boolean z3 = gameEngine.mousePressed || customUnit.isUnitParalyzed;
+        boolean z3 = gameEngine.shouldDrawUnitLegDetails || customUnit.isUnitParalyzed;
         for (int i2 = 0; i2 < legInstanceArr.length; i2++) {
             LegConfig legConfig = customUnitConfig.legConfig[i2];
             if ((legConfig.P == z || legConfig.D != null) && legConfig.Q == z2 && !legConfig.p && (legConfig.q == null || !legConfig.q.read(customUnit))) {
@@ -73,12 +73,12 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
                     }
                     float f4 = (customUnit.posX + legInstance.b) - gameEngine.viewpointXSnapped;
                     float f5 = (((customUnit.posY + legInstance.c) - gameEngine.viewpointYSnapped) - legInstance.d) - customUnit.posZ;
-                    GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
+                    GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
                     if (maxHealth != 1.0f) {
                         graphicsEngine.k();
                         graphicsEngine.a(maxHealth, maxHealth, f4, f5);
                     }
-                    if (legConfig.D != null && !z && gameEngine.mouseWorldY && legInstance.d + customUnit.posZ > 0.0f) {
+                    if (legConfig.D != null && !z && gameEngine.shouldDrawUnitShadows && legInstance.d + customUnit.posZ > 0.0f) {
                         graphicsEngine.a(legConfig.D, f4, f5 + legInstance.d + customUnit.posZ, legInstance.i + legInstance.r + legConfig.R, customUnit.getSelectionPaint());
                     }
                     if (legConfig.P == z) {
@@ -295,10 +295,10 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
                             if (legConfig2.I && !legInstance3.j) {
                                 legInstance3.j = true;
                                 if (legInstance3.l) {
-                                    if (gameEngine.mouseScreenY && customUnit.flag3) {
+                                    if (gameEngine.shouldDrawMediumDetailEffects && customUnit.flag3) {
                                         gameEngine.effectManager.createRedLaserEffect(f14, f15, legInstance3.d, 0, 0.0f, 0.0f);
                                     }
-                                } else if (gameEngine.mouseScreenX && customUnit.flag3 && (effectCreateMuzzleFlash = gameEngine.effectManager.createMuzzleFlash(f14, f15, legInstance3.d, legInstance3.i, 0)) != null) {
+                                } else if (gameEngine.shouldDrawHighDetailEffects && customUnit.flag3 && (effectCreateMuzzleFlash = gameEngine.effectManager.createMuzzleFlash(f14, f15, legInstance3.d, legInstance3.i, 0)) != null) {
                                     effectCreateMuzzleFlash.P = 0.0f;
                                     effectCreateMuzzleFlash.Q = 0.0f;
                                     effectCreateMuzzleFlash.G = 1.6f;

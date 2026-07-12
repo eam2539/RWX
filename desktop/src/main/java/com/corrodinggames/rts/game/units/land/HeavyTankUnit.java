@@ -46,10 +46,10 @@ public class HeavyTankUnit extends LandUnit {
     /* JADX INFO: renamed from: f */
     public static void loadHeavyTankTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        Texture textureA = gameEngine.graphicsEngine2.a(R.drawable.heavy_tank);
-        c = PlayerTeam.getUnitCountByType(textureA);
-        a = gameEngine.graphicsEngine2.a(R.drawable.heavy_tank_dead);
-        b = gameEngine.graphicsEngine2.a(R.drawable.heavy_tank_turret);
+        Texture textureA = gameEngine.renderGraphicsEngine.a(R.drawable.heavy_tank);
+        c = PlayerTeam.getTeamColorTextures(textureA);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.heavy_tank_dead);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.heavy_tank_turret);
         d = attackUnit(textureA, textureA.m() / 3, textureA.l());
     }
 

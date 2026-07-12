@@ -2,7 +2,7 @@ package com.corrodinggames.rts.gameFramework.pathfinding;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.k.e */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/k/e.class */
-public final class FastNodeQueue2 extends NodeQueue {
+public final class BucketedNodeQueue extends NodeQueue {
     boolean a;
     int b;
     final DirectAccessPathNodeArrayList c = new DirectAccessPathNodeArrayList(100);

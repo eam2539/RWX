@@ -186,7 +186,7 @@ public class Debug extends ScriptContext {
             return false;
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!gameEngine.networkEngine.B) {
+        if (!gameEngine.networkEngine.networkGameActive) {
             GameEngine.log("Not networked");
             return false;
         }
@@ -206,7 +206,7 @@ public class Debug extends ScriptContext {
             gameEngine.networkEngine.sendQueue.remove(networkConnection);
         }
         gameEngine.networkEngine.disconnectNetworking("backgrounded");
-        gameEngine.networkEngine.B = true;
+        gameEngine.networkEngine.networkGameActive = true;
         return true;
     }
 
@@ -337,7 +337,7 @@ public class Debug extends ScriptContext {
         if (str == null || str.trim().equals(VariableScope.nullOrMissingString)) {
             return;
         }
-        gameEngine.networkEngine.m(str.replace("\\n", "\n"));
+        gameEngine.networkEngine.sendChatMessage(str.replace("\\n", "\n"));
     }
 
     public String unicodeTest1() {
@@ -345,7 +345,7 @@ public class Debug extends ScriptContext {
     }
 
     public void setZoom(float f) {
-        GameEngine.getInstance().cameraEdgeScrollZone = f;
+        GameEngine.getInstance().targetZoom = f;
     }
 
     public boolean isNetworkGameActive() {
@@ -357,11 +357,11 @@ public class Debug extends ScriptContext {
     }
 
     public int numberOfHumanPlayers() {
-        return GameEngine.getInstance().networkEngine.an();
+        return GameEngine.getInstance().networkEngine.getHumanPlayerCount();
     }
 
     public int numberOfPlayersPlusAI() {
-        return GameEngine.getInstance().networkEngine.ao();
+        return GameEngine.getInstance().networkEngine.getPlayerAndAiCount();
     }
 
     public int numberOfPlayerConnections() {
@@ -369,7 +369,7 @@ public class Debug extends ScriptContext {
     }
 
     public boolean enableFastSync() {
-        GameEngine.getInstance().networkEngine.ai = 30;
+        GameEngine.getInstance().networkEngine.checksumIntervalFrames = 30;
         return true;
     }
 
@@ -395,7 +395,7 @@ public class Debug extends ScriptContext {
 
     public boolean networkSetIncomeMultiplier(float f) {
         GameEngine gameEngine = GameEngine.getInstance();
-        GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.e();
+        GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.getEditableRoomSettings();
         gameRoomSettingsE.incomeMultiplier = f;
         gameEngine.networkEngine.a(gameRoomSettingsE);
         return true;
@@ -448,26 +448,26 @@ public class Debug extends ScriptContext {
 
     public boolean checkDesync(int i) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine.networkEngine.ap != 0) {
-            throw new RuntimeException("numberOfDesyncErrors==" + gameEngine.networkEngine.ap);
+        if (gameEngine.networkEngine.desyncCount != 0) {
+            throw new RuntimeException("numberOfDesyncErrors==" + gameEngine.networkEngine.desyncCount);
         }
-        if (gameEngine.networkEngine.aq < i) {
-            throw new RuntimeException("game.network.numberOfDesyncPasses:" + gameEngine.networkEngine.aq + "<" + i);
+        if (gameEngine.networkEngine.desyncPassCount < i) {
+            throw new RuntimeException("game.network.numberOfDesyncPasses:" + gameEngine.networkEngine.desyncPassCount + "<" + i);
         }
-        this.root.logDebug("numberOfDesyncPasses:" + gameEngine.networkEngine.aq);
+        this.root.logDebug("numberOfDesyncPasses:" + gameEngine.networkEngine.desyncPassCount);
         return true;
     }
 
     public int getNumberOfDesyncErrors() {
-        return GameEngine.getInstance().networkEngine.ap;
+        return GameEngine.getInstance().networkEngine.desyncCount;
     }
 
     public int getNumberOfDesyncPasses() {
-        return GameEngine.getInstance().networkEngine.aq;
+        return GameEngine.getInstance().networkEngine.desyncPassCount;
     }
 
     public int getNumberOfResyncSendsOrRecv() {
-        return GameEngine.getInstance().networkEngine.ar;
+        return GameEngine.getInstance().networkEngine.resyncSendOrReceiveCount;
     }
 
     public boolean setMultiplayerMap(int i, String str) {
@@ -502,14 +502,14 @@ public class Debug extends ScriptContext {
 
     public void setNetworkaiDifficulty(int i) {
         GameEngine gameEngine = GameEngine.getInstance();
-        GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.e();
+        GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.getEditableRoomSettings();
         gameRoomSettingsE.aiDifficulty = i;
         gameEngine.networkEngine.a(gameRoomSettingsE);
     }
 
     public void setNetworkStartingUnits(int i) {
         GameEngine gameEngine = GameEngine.getInstance();
-        GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.e();
+        GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.getEditableRoomSettings();
         gameRoomSettingsE.startingUnits = i;
         gameEngine.networkEngine.a(gameRoomSettingsE);
     }
@@ -566,8 +566,8 @@ public class Debug extends ScriptContext {
     }
 
     public void checkTeamCaches() {
-        for (PlayerTeam playerTeam : PlayerTeam.addEnergy()) {
-            if (playerTeam.isTeamDefeatedCheck()) {
+        for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
+            if (playerTeam.hasTeamStatsCacheMismatch()) {
                 throw new RuntimeException("Team cache difference on team:" + playerTeam.teamId);
             }
         }
@@ -621,17 +621,17 @@ public class Debug extends ScriptContext {
                 i6++;
             }
             if (i5 != -1 && i5 != i6) {
-                GameEngine.updatePaintTextSizeIfNeeded("pathDistance inconsistency detected:" + i5 + "!=" + i6);
+                GameEngine.logColored("pathDistance inconsistency detected:" + i5 + "!=" + i6);
             }
             PathPoint pathPoint2 = (PathPoint) linkedListA.getLast();
             if (pathPoint2.a != i2 || pathPoint2.b != i3) {
-                GameEngine.updatePaintTextSizeIfNeeded("path did not react goal, got to:" + ((int) pathPoint2.a) + "," + ((int) pathPoint2.b) + " (vs " + i2 + ", " + i3 + ")");
+                GameEngine.logColored("path did not react goal, got to:" + ((int) pathPoint2.a) + "," + ((int) pathPoint2.b) + " (vs " + i2 + ", " + i3 + ")");
             }
             i5 = i6;
         }
-        GameEngine.updatePaintTextSizeIfNeeded("hotBufferWatermark:" + FastNodeQueue.a + ", nodesAdded:" + FastNodeQueue.d + ", mainQueueWatermark:" + FastNodeQueue.b + ", backlogWatermark:" + FastNodeQueue.c + ", scannedA:" + FastNodeQueue.e + ", scannedB:" + FastNodeQueue.f + ", scannedC:" + FastNodeQueue.g + ", time:" + PerformanceProfiler.a(FastNodeQueue.i) + "/" + PerformanceProfiler.a(FastNodeQueue.h) + ", dirtyPeak:" + FastNodeQueue.u + ", dis:" + i5);
+        GameEngine.logColored("hotBufferWatermark:" + FastNodeQueue.a + ", nodesAdded:" + FastNodeQueue.d + ", mainQueueWatermark:" + FastNodeQueue.b + ", backlogWatermark:" + FastNodeQueue.c + ", scannedA:" + FastNodeQueue.e + ", scannedB:" + FastNodeQueue.f + ", scannedC:" + FastNodeQueue.g + ", time:" + PerformanceProfiler.a(FastNodeQueue.i) + "/" + PerformanceProfiler.a(FastNodeQueue.h) + ", dirtyPeak:" + FastNodeQueue.u + ", dis:" + i5);
         if (PathOpenListPool.c != 0) {
-            GameEngine.updatePaintTextSizeIfNeeded("newNodesCreated:" + PathOpenListPool.c);
+            GameEngine.logColored("newNodesCreated:" + PathOpenListPool.c);
         }
         return fA;
     }

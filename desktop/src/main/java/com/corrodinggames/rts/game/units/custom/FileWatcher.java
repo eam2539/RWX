@@ -15,7 +15,7 @@ class FileWatcher {
     }
 
     public long a(boolean z) {
-        if (GameEngine.isAndroid()) {
+        if (GameEngine.isNonPCPlatform()) {
             return 0L;
         }
         long jA = FileChangeEngine.a(this.b, z);

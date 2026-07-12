@@ -51,7 +51,7 @@ enum MusicCategory {
                 GameEngine.log("Loaded track:" + strMapPath);
                 arrayList.add(strMapPath);
             } else {
-                GameEngine.updatePaintTextSizeIfNeeded("Skipping track:" + strMapPath);
+                GameEngine.logColored("Skipping track:" + strMapPath);
             }
             gameEngine.loadLevel("music", false);
         }

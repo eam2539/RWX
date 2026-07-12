@@ -301,7 +301,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                 FastArrayList var8 = new FastArrayList();
                 var6.w.a(var8, j.team, j, true);
                 if (var8.size() > 1) {
-                    GameEngine.updatePaintTextSizeIfNeeded("onCreateSpawnUnitOf: created an extra " + (var8.size() - 1) + " units");
+                    GameEngine.logColored("onCreateSpawnUnitOf: created an extra " + (var8.size() - 1) + " units");
 
                     for (int var9 = 1; var9 < var8.size(); var9++) {
                         ((BaseUnit)var8.get(var9)).getUnitAICondition();
@@ -309,11 +309,11 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                 }
 
                 if (var8.size() == 0) {
-                    GameEngine.updatePaintTextSizeIfNeeded("onCreateSpawnUnitOf: Warning no units created");
+                    GameEngine.logColored("onCreateSpawnUnitOf: Warning no units created");
                 } else {
                     BaseUnit var11 = (BaseUnit)var8.get(0);
                     if (!(var11 instanceof OrderableUnit)) {
-                        GameEngine.updatePaintTextSizeIfNeeded("onCreateSpawnUnitOf: Warning " + var11.r().getUnitTypeDescriptionShort() + " not an orderable unit type, cannot attach");
+                        GameEngine.logColored("onCreateSpawnUnitOf: Warning " + var11.r().getUnitTypeDescriptionShort() + " not an orderable unit type, cannot attach");
                         var11.getUnitAICondition();
                     } else {
                         OrderableUnit var10 = (OrderableUnit)var11;
@@ -382,7 +382,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
         CustomUnitConfig customUnitConfig = customUnit.unitConfig;
         short s = attachmentSlotDefinition.a;
         if (customUnitConfig.energyCanTransferToOtherUnits.size <= s && orderableUnit != null) {
-            GameEngine.updatePaintTextSizeIfNeeded("setAttachedUnitLookup: slot:" + ((int) s) + " larger than max slot size:" + customUnitConfig.energyCanTransferToOtherUnits.size);
+            GameEngine.logColored("setAttachedUnitLookup: slot:" + ((int) s) + " larger than max slot size:" + customUnitConfig.energyCanTransferToOtherUnits.size);
             return false;
         }
         if (customUnit.C == null) {

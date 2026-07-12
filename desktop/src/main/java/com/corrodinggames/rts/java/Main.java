@@ -62,7 +62,7 @@ public class Main extends NetworkCallbacks {
     RunnableQueue f = new RunnableQueue();
     boolean g = true;
     long o = System.nanoTime();
-    MissionEngine q = new JavaMissionEngine(this);
+    PlatformCallbacks q = new JavaMissionEngine(this);
     boolean s = true;
     Object t = new Object();
 
@@ -155,7 +155,7 @@ public class Main extends NetworkCallbacks {
             if (str != null) {
                 if (str.equals("+connect_lobby")) {
                     a("connect lobby:" + lowerCase);
-                    GameEngine.buildVersion = lowerCase;
+                    GameEngine.pendingSteamLobbyId = lowerCase;
                     str = null;
                 } else if (str.equals("-width")) {
                     numValueOf = Integer.valueOf(Integer.parseInt(lowerCase));
@@ -195,7 +195,7 @@ public class Main extends NetworkCallbacks {
                     System.setErr(printStream);
                     GameEngine.log("File logging started");
                 } catch (FileNotFoundException e) {
-                    GameEngine.printLog("Cannot open log file:" + str4);
+                    GameEngine.logErrorColored("Cannot open log file:" + str4);
                     e.printStackTrace();
                 }
             } else if (!lowerCase.equals("-nologfile")) {
@@ -207,17 +207,17 @@ public class Main extends NetworkCallbacks {
                     }
                     com.corrodinggames.rts.gameFramework.local.Locale.overrideLanguageCode = strArr[i];
                 } else if (lowerCase.equals("-logcolor")) {
-                    GameEngine.isPCVersionStatic = true;
+                    GameEngine.isLogColorEnabled = true;
                 } else if (lowerCase.equals("-nodisplay")) {
                     z = true;
                 } else if (lowerCase.equals("-canvasgl")) {
-                    GameEngine.isGameStartedStatic = true;
+                    GameEngine.isCanvasGLEnabled = true;
                 } else if (lowerCase.equals("-replay_debug")) {
-                    GameEngine.isIOSVersionStatic = true;
+                    GameEngine.isReplayDebugMode = true;
                 } else if (lowerCase.equals("-nopreferipv4")) {
                     z4 = true;
                 } else if (lowerCase.equals("-noresources")) {
-                    GameEngine.isNetworkServerStatic = true;
+                    GameEngine.isHeadlessMode = true;
                 } else if (lowerCase.equals("-nosound")) {
                     z2 = true;
                 } else if (lowerCase.equals("-nomusic")) {
@@ -229,7 +229,7 @@ public class Main extends NetworkCallbacks {
                 } else if (lowerCase.equals("-disable_vbos")) {
                     z7 = true;
                 } else if (lowerCase.equals("-disable_atlas")) {
-                    GameEngine.isDemoVersionStatic = true;
+                    GameEngine.isTextureAtlasDisabled = true;
                 } else if (lowerCase.equals("-force_vbos")) {
                     z8 = true;
                 } else if (lowerCase.equals("-allowsoftwarerender")) {
@@ -237,19 +237,19 @@ public class Main extends NetworkCallbacks {
                 } else if (lowerCase.equals("-fullscreen")) {
                     z6 = true;
                 } else if (lowerCase.equals("-nobackground")) {
-                    GameEngine.isAndroidVersionStatic = true;
+                    GameEngine.isMenuBackgroundDisabled = true;
                 } else if (lowerCase.equals("-nomods")) {
-                    GameEngine.isInGameOrLobbyStatic = true;
+                    GameEngine.isModsDisabled = true;
                 } else if (lowerCase.equals("-printunits")) {
                     GameEngine.isUnitImageGenerationMode = true;
                 } else if (lowerCase.equals("-outputunitimages")) {
                     GameEngine.isUnitValidationMode = true;
                 } else if (lowerCase.equals("-oldreplays")) {
-                    GameEngine.isGamePausedOrMinimizedStatic = true;
+                    GameEngine.isOldReplayMode = true;
                 } else if (lowerCase.equals("-teamshaders")) {
-                    GameEngine.isGameMinimizedStatic2 = true;
+                    GameEngine.isTeamShadersEnabled = true;
                 } else if (lowerCase.equals("-noteamshaders")) {
-                    GameEngine.isGameMinimizedStatic2 = false;
+                    GameEngine.isTeamShadersEnabled = false;
                 } else if (lowerCase.equals("-devdebug")) {
                     i++;
                     if (i >= strArr.length) {
@@ -258,15 +258,15 @@ public class Main extends NetworkCallbacks {
                     }
                     GameEngine.platformName = strArr[i];
                 } else if (lowerCase.equals("-postprocessing")) {
-                    GameEngine.isDedicatedServer = true;
+                    GameEngine.isPostProcessingEnabled = true;
                 } else if (lowerCase.equals("-nopostprocessing")) {
-                    GameEngine.isDedicatedServer = false;
+                    GameEngine.isPostProcessingEnabled = false;
                 } else if (lowerCase.equals("-disabletextureread")) {
                     SlickTexture.F = false;
                 } else if (lowerCase.equals("-sandbox")) {
-                    GameEngine.isNetworkConnectedStatic = true;
+                    GameEngine.isLaunchSandbox = true;
                 } else if (lowerCase.equals("-steam")) {
-                    GameEngine.isNetworkGameActiveStatic = true;
+                    GameEngine.isSteamModeEnabled = true;
                 } else if (lowerCase.equals("-width") || lowerCase.equals("-height")) {
                     str = lowerCase;
                 } else if (lowerCase.startsWith("+")) {
@@ -287,14 +287,14 @@ public class Main extends NetworkCallbacks {
             a("arg: " + str5.trim().toLowerCase(Locale.ENGLISH));
         }
         if (str2 != null) {
-            if (GameEngine.isNetworkGameActiveStatic) {
+            if (GameEngine.isSteamModeEnabled) {
                 a("Unknown options but running anyway due to being in steam");
             } else {
                 a("Exiting due to unknown option: " + str2);
                 System.exit(1);
             }
         }
-        GameEngine.isPausedStatic2 = true;
+        GameEngine.isNonAndroidVersion = true;
         GameEngine.setupUncaughtExceptionHandler();
         String property = System.getProperty("os.name");
         GameEngine.log("OS name: " + property);
@@ -316,7 +316,7 @@ public class Main extends NetworkCallbacks {
         } else {
             System.setProperty("java.net.preferIPv4Stack", "true");
         }
-        if (GameEngine.isNetworkGameActiveStatic) {
+        if (GameEngine.isSteamModeEnabled) {
             DisabledSteamEngine.a = new JavaSteamEngine();
             GameEngine.log("Early steam init");
             DisabledSteamEngine.a().b();
@@ -353,7 +353,7 @@ public class Main extends NetworkCallbacks {
         this.j.j = z2;
         this.j.k = z3;
         if (z) {
-            GameEngine.printLog("Skipping display mode call");
+            GameEngine.logErrorColored("Skipping display mode call");
             height = 800.0f;
             width = 600.0f;
         } else {
@@ -362,7 +362,7 @@ public class Main extends NetworkCallbacks {
                 height = displayMode.getHeight();
                 width = displayMode.getWidth();
             } catch (Exception e2) {
-                GameEngine.printLog("Failed to get display mode, defaulting to min size");
+                GameEngine.logErrorColored("Failed to get display mode, defaulting to min size");
                 e2.printStackTrace();
                 height = 800.0f;
                 width = 600.0f;
@@ -423,16 +423,16 @@ public class Main extends NetworkCallbacks {
         b("displayModes");
         b("starting controllers");
         this.o = System.nanoTime();
-        GameEngine.isPausedStatic2 = true;
-        GameEngine.isSandboxModeStatic2 = true;
-        if (!GameEngine.isNetworkServerStatic) {
-            if (GameEngine.isGameStartedStatic) {
-                GameEngine.isIOSVersionStatic2 = true;
-                GameEngine.isAndroidVersionStatic2 = true;
+        GameEngine.isNonAndroidVersion = true;
+        GameEngine.isDesktopInitialized = true;
+        if (!GameEngine.isHeadlessMode) {
+            if (GameEngine.isCanvasGLEnabled) {
+                GameEngine.isJavaDesktopVersion = true;
+                GameEngine.isPCOrIOSVersion = true;
                 GameEngine.gameEngineClass = SoftwareGraphicsInterface.class;
             } else {
-                GameEngine.isIOSVersionStatic2 = true;
-                GameEngine.isAndroidVersionStatic2 = true;
+                GameEngine.isJavaDesktopVersion = true;
+                GameEngine.isPCOrIOSVersion = true;
                 GameEngine.gameEngineClass = SlickGraphicsEngine.class;
             }
         }
@@ -447,7 +447,7 @@ public class Main extends NetworkCallbacks {
                 MusicManager.musicFactory = new OpenALMusicFactory(openALAudio);
             }
         } else {
-            GameEngine.updatePaintTextSizeIfNeeded("Disabling sound with NullSoundFactory");
+            GameEngine.logColored("Disabling sound with NullSoundFactory");
             SoundEngine.soundFactory = new NullSound();
             MusicManager.musicFactory = new NullMusicFactory();
         }
@@ -478,7 +478,7 @@ public class Main extends NetworkCallbacks {
         GameEngine.log("end libRocket setup");
         b("GuiEngine");
         PerformanceProfiler.a("libRocket setup took:", jA);
-        GameEngine.gameEngineVersion = this.e;
+        GameEngine.buildVersion = this.e;
         ServerContext serverContext = new ServerContext();
         b("GameEngine");
         GameEngine.screenSize = new Point(this.j.a.getWidth(), this.j.a.getHeight());
@@ -497,7 +497,7 @@ public class Main extends NetworkCallbacks {
         GameEngine.log("----- Game init finished in:" + ((jNanoTime - this.o) / 1000000.0d) + " ms");
         gameEngineCreateGameEngine.networkEngine.callbacks = this;
         gameEngineCreateGameEngine.networkEngine.playerName = "unset";
-        if (!GameEngine.isAndroidVersionStatic) {
+        if (!GameEngine.isMenuBackgroundDisabled) {
         }
     }
 
@@ -512,11 +512,11 @@ public class Main extends NetworkCallbacks {
                 MultiplayerBattleroomActivity.setupGame();
                 if (gameEngine.tileMap == null || !gameEngine.tileMap.isCursorActive) {
                     GameEngine.log("Not starting multiplayer game because map failed to load");
-                    gameEngine.networkEngine.af();
+                    gameEngine.networkEngine.onStartGameFailed();
                     return;
                 }
                 gameEngine.networkEngine.bd = true;
-                gameEngine.reloadMap = false;
+                gameEngine.isMenuBackgroundMap = false;
                 gameEngine.isStopped = false;
                 Main.this.i.showAbout(false);
                 GameMainManager.getInstance().resumeGame();

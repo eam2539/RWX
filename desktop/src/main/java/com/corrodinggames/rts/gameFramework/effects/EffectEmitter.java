@@ -154,13 +154,13 @@ public class EffectEmitter extends GameObject {
         effectEmitter.i = effect;
         if (effect == null) {
             effectEmitter.i = new Effect(effectManager);
-            GameEngine.updatePaintTextSizeIfNeeded("Error: Emitter create srcEffect==null");
+            GameEngine.logColored("Error: Emitter create srcEffect==null");
         }
         return effectEmitter;
     }
 
     public boolean c() {
-        return GameEngine.getInstance().cameraFollowZoom.b(this.posX, this.posY);
+        return GameEngine.getInstance().extendedVisibleWorldRect.b(this.posX, this.posY);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.GameObject

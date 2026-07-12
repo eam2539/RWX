@@ -63,12 +63,12 @@ public class LandFactory extends FactoryWithQueue {
     /* JADX INFO: renamed from: b */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        level1Texture = gameEngine.graphicsEngine2.a(R.drawable.land_factory_front);
-        level2Texture = gameEngine.graphicsEngine2.a(R.drawable.land_factory_front_t2);
-        backgroundTexture = gameEngine.graphicsEngine2.a(R.drawable.land_factory_back);
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.land_factory_dead);
-        level1TeamTextures = PlayerTeam.getUnitCountByType(level1Texture);
-        level2TeamTextures = PlayerTeam.getUnitCountByType(level2Texture);
+        level1Texture = gameEngine.renderGraphicsEngine.a(R.drawable.land_factory_front);
+        level2Texture = gameEngine.renderGraphicsEngine.a(R.drawable.land_factory_front_t2);
+        backgroundTexture = gameEngine.renderGraphicsEngine.a(R.drawable.land_factory_back);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.land_factory_dead);
+        level1TeamTextures = PlayerTeam.getTeamColorTextures(level1Texture);
+        level2TeamTextures = PlayerTeam.getTeamColorTextures(level2Texture);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -208,7 +208,7 @@ public class LandFactory extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: db */
-    public float getUnitAIPathfindError() {
-        return super.getUnitAIPathfindError() - 8.0f;
+    public float getSelectionRadius() {
+        return super.getSelectionRadius() - 8.0f;
     }
 }

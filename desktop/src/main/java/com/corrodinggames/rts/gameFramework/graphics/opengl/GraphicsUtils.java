@@ -32,14 +32,14 @@ public final class GraphicsUtils {
         float length = (strArrSplitByChar.length - 1) * charWidth;
         int i2 = 0;
         for (String str2 : strArrSplitByChar) {
-            gameEngine.graphicsEngine2.a(str2, f2, (f3 - (length / 2.0f)) + (i2 * charWidth) + (charWidth / 2.0f), paint);
+            gameEngine.renderGraphicsEngine.a(str2, f2, (f3 - (length / 2.0f)) + (i2 * charWidth) + (charWidth / 2.0f), paint);
             i2++;
         }
     }
 
     public static void a(GraphicsEngine graphicsEngine, float f2, float f3, float f4, Paint paint) {
-        if (GameEngine.isDesktop()) {
-            a(graphicsEngine, f2, f3, f4, 40, paint, GameEngine.getInstance().cameraSmoothing);
+        if (GameEngine.isAndroidPlatform()) {
+            a(graphicsEngine, f2, f3, f4, 40, paint, GameEngine.getInstance().visibleWorldRect);
         } else {
             graphicsEngine.a(f2, f3, f4, paint);
         }
@@ -102,7 +102,7 @@ public final class GraphicsUtils {
             GraphicsUtils.g.b(true);
         }
         final int e = paint.e();
-        if (GameEngine.isDesktop()) {
+        if (GameEngine.isAndroidPlatform()) {
             GraphicsUtils.g.a(new LightingColorFilter(e, 0));
         }
         GraphicsUtils.g.b(e);
@@ -390,7 +390,7 @@ public final class GraphicsUtils {
     }
 
     public static void a(Paint paint) {
-        if (GameEngine.isDesktop()) {
+        if (GameEngine.isAndroidPlatform()) {
             int iE = paint.e();
             paint.a(new LightingColorFilter(Utility.longToIntArray(255, (iE >> 16) & 255, (iE >> 8) & 255, iE & 255), 0));
         }

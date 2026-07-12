@@ -280,7 +280,7 @@ public final class Locale {
         while (matcher.find()) {
             i++;
             if (i > 100) {
-                GameEngine.updatePaintTextSizeIfNeeded("convertInlineBlocks: Too many loops while parsing: " + str);
+                GameEngine.logColored("convertInlineBlocks: Too many loops while parsing: " + str);
                 return str;
             }
             String strGroup = matcher.group(1);

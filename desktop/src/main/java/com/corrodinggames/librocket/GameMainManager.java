@@ -93,9 +93,9 @@ public abstract class GameMainManager {
     public synchronized void resumeGame() {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("Main::resumeGame(): game==null");
+            GameEngine.logColored("Main::resumeGame(): game==null");
         } else {
-            gameEngine.isGamePausedOrMinimized2 = true;
+            gameEngine.isGameResumed = true;
             gameEngine.colorizeLogMessage((Activity) null, this.gameView, this.isGamePaused);
         }
     }
@@ -303,7 +303,7 @@ public abstract class GameMainManager {
                 @Override // java.lang.Runnable
                 public void run() {
                     if (AnonymousClass2.this.a.a) {
-                        GameEngine.updatePaintTextSizeIfNeeded("AskPasswordCallBack already called");
+                        GameEngine.logColored("AskPasswordCallBack already called");
                         return;
                     }
                     AnonymousClass2.this.a.a = true;
@@ -317,7 +317,7 @@ public abstract class GameMainManager {
                 @Override // java.lang.Runnable
                 public void run() {
                     if (AnonymousClass2.this.a.a) {
-                        GameEngine.updatePaintTextSizeIfNeeded("AskPasswordCallBack already called");
+                        GameEngine.logColored("AskPasswordCallBack already called");
                         return;
                     }
                     AnonymousClass2.this.a.a = true;

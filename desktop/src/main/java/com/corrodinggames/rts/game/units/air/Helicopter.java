@@ -63,12 +63,12 @@ public class Helicopter extends AirUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        b = gameEngine.graphicsEngine2.a(R.drawable.helicopter);
-        c = gameEngine.graphicsEngine2.a(R.drawable.helicopter_blades);
-        d = gameEngine.graphicsEngine2.a(R.drawable.helicopter_shadow);
-        e = gameEngine.graphicsEngine2.a(R.drawable.helicopter_shadow_blades);
-        a = gameEngine.graphicsEngine2.a(R.drawable.helicopter_dead);
-        f = PlayerTeam.getUnitCountByType(b);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.helicopter);
+        c = gameEngine.renderGraphicsEngine.a(R.drawable.helicopter_blades);
+        d = gameEngine.renderGraphicsEngine.a(R.drawable.helicopter_shadow);
+        e = gameEngine.renderGraphicsEngine.a(R.drawable.helicopter_shadow_blades);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.helicopter_dead);
+        f = PlayerTeam.getTeamColorTextures(b);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -247,7 +247,7 @@ public class Helicopter extends AirUnit {
             float f3 = this.q;
             if (this.isUnitStunned) {
             }
-            gameEngine.graphicsEngine2.a(c, this.s, this.posX - GameEngine.getInstance().viewpointXSnapped, (this.posY - GameEngine.getInstance().viewpointYSnapped) - this.posZ, f3, paintAN);
+            gameEngine.renderGraphicsEngine.a(c, this.s, this.posX - GameEngine.getInstance().viewpointXSnapped, (this.posY - GameEngine.getInstance().viewpointYSnapped) - this.posZ, f3, paintAN);
             return true;
         }
         return true;

@@ -151,7 +151,7 @@ public class MasterServerClient {
                 } catch (InterruptedException e) {
                 }
                 if (futurePoll == null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("MULTI_MASTERSERVERS: poll timed out (" + param + ")");
+                    GameEngine.logColored("MULTI_MASTERSERVERS: poll timed out (" + param + ")");
                     break;
                 }
                 HttpResponseData httpResponseData4 = (HttpResponseData) futurePoll.get();
@@ -169,11 +169,11 @@ public class MasterServerClient {
                 i2++;
             }
             if (httpResponseData2 == null && httpResponseData3 != null) {
-                GameEngine.updatePaintTextSizeIfNeeded("All masterserver results included an error message (" + param + ")");
+                GameEngine.logColored("All masterserver results included an error message (" + param + ")");
                 httpResponseData2 = httpResponseData3;
             }
             if (httpResponseData2 == null) {
-                GameEngine.updatePaintTextSizeIfNeeded("No valid result found on any masterserver (" + param + ")");
+                GameEngine.logColored("No valid result found on any masterserver (" + param + ")");
                 httpResponseData2 = httpResponseData;
             }
             if (httpResponseData2 != null) {
@@ -214,7 +214,7 @@ public class MasterServerClient {
             str3 = str3 + "?" + URLEncodedUtils.format(list, "utf-8");
             httpGet = new HttpGet(str3);
         }
-        if (GameEngine.isDebug()) {
+        if (GameEngine.isDedicatedServer()) {
             str2 = "rw server";
         } else {
             str2 = "rw " + (GameEngine.isPC() ? "pc" : "android");
@@ -230,7 +230,7 @@ public class MasterServerClient {
         try {
             httpResponseExecute = androidHttpClient.execute(httpGet);
         } catch (NullPointerException e) {
-            GameEngine.updatePaintTextSizeIfNeeded("doRequest: httpclient.execute threw NullPointerException, running workaround");
+            GameEngine.logColored("doRequest: httpclient.execute threw NullPointerException, running workaround");
             androidHttpClient = httpClientManager.getDefaultHttpClient();
             httpResponseExecute = androidHttpClient.execute(httpGet);
         }
@@ -353,9 +353,9 @@ public class MasterServerClient {
     static void addServerStatusParams(List list) {
         String str;
         GameEngine gameEngine = GameEngine.getInstance();
-        addParam(list, "password_required", Utility.padString(gameEngine.networkEngine.n != null));
+        addParam(list, "password_required", Utility.padString(gameEngine.networkEngine.roomPassword != null));
         addParam(list, "created_by", gameEngine.networkEngine.playerName);
-        addParam(list, "private_ip", gameEngine.networkEngine.ah());
+        addParam(list, "private_ip", gameEngine.networkEngine.getPrimaryLocalIpAddress());
         addParam(list, "port_number", Integer.toString(gameEngine.networkEngine.m));
         if (gameEngine.networkEngine.u != null) {
             addParam(list, "game_map", FileHelper.mapPath(gameEngine.networkEngine.u));
@@ -367,7 +367,7 @@ public class MasterServerClient {
             gameModeType = GameModeType.skirmishMap;
         }
         addParam(list, "game_mode", gameModeType.name());
-        if (!gameEngine.networkEngine.v) {
+        if (!gameEngine.networkEngine.chatOnlyMode) {
             if (gameEngine.networkEngine.gameHasBeenStarted) {
                 str = "ingame";
             } else if (gameEngine.networkEngine.roomSettings.roomLock) {
@@ -381,7 +381,7 @@ public class MasterServerClient {
         }
         addParam(list, "player_count", Integer.toString(gameEngine.networkEngine.getChangeableRoomSettings()));
         String string = Integer.toString(PlayerTeam.TEAM_NEUTRAL);
-        if (gameEngine.networkEngine.v) {
+        if (gameEngine.networkEngine.chatOnlyMode) {
         }
         addParam(list, "max_player_count", string);
     }

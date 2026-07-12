@@ -51,7 +51,7 @@ public class GameStatistics {
     }
 
     public void b() {
-        int i = GameEngine.getInstance().lastTick;
+        int i = GameEngine.getInstance().gameTimeMillis;
         if (this.e && this.d <= i) {
             int i2 = 5000;
             if (i < 60000) {
@@ -83,7 +83,7 @@ public class GameStatistics {
 
     public void c() {
         this.e = false;
-        a(GameEngine.getInstance().lastTick, true, true);
+        a(GameEngine.getInstance().gameTimeMillis, true, true);
     }
 
     /* JADX INFO: renamed from: d */

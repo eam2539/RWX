@@ -75,7 +75,7 @@ public class CacheManager {
                 Utility.copyStream(inputStream, fileOutputStream);
                 fileOutputStream.close();
                 if (!FileHelper.renameFile(file2, file)) {
-                    GameEngine.updatePaintTextSizeIfNeeded("AddToCache: Failed to rename to final file: " + cachePath);
+                    GameEngine.logColored("AddToCache: Failed to rename to final file: " + cachePath);
                     return false;
                 }
                 if (DEBUG) {
@@ -266,7 +266,7 @@ public class CacheManager {
         }
         FileInputStream fromCache = readFromCache(str, str4);
         if (fromCache == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("openAssetCached: Error. Failed to reopen cache: " + str2);
+            GameEngine.logColored("openAssetCached: Error. Failed to reopen cache: " + str2);
             return FileHelper.openFileByPath(str2);
         }
         return fromCache;

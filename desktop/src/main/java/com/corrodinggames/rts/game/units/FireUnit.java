@@ -42,7 +42,7 @@ public class FireUnit extends NaturalUnit {
     public static FireUnitFinder t = new FireUnitFinder();
 
     public static void b() {
-        a[0] = GameEngine.getInstance().graphicsEngine2.a(R.drawable.fire);
+        a[0] = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.fire);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
@@ -228,13 +228,13 @@ public class FireUnit extends NaturalUnit {
         du.a(0.0f, (int) (-this.posZ));
         du.a(this.i, this.j);
         dv.a(a_(false));
-        gameEngine.graphicsEngine2.k();
+        gameEngine.renderGraphicsEngine.k();
         float fD = du.d();
         float fE = du.e();
-        gameEngine.graphicsEngine2.a(getUnitArmorRating(false), fD, fE);
-        gameEngine.graphicsEngine2.a(this.o * 2.7f, this.o * 2.7f, fD, fE);
-        gameEngine.graphicsEngine2.a(textureD, dv, du, (Paint) null);
-        gameEngine.graphicsEngine2.l();
+        gameEngine.renderGraphicsEngine.a(getUnitArmorRating(false), fD, fE);
+        gameEngine.renderGraphicsEngine.a(this.o * 2.7f, this.o * 2.7f, fD, fE);
+        gameEngine.renderGraphicsEngine.a(textureD, dv, du, (Paint) null);
+        gameEngine.renderGraphicsEngine.l();
         return true;
     }
 

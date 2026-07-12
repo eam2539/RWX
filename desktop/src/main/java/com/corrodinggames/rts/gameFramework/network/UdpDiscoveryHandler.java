@@ -101,8 +101,8 @@ final class UdpDiscoveryHandler implements Runnable {
             this.networkEngine.d("failed to send a broadcast ping: datagramSocket is null");
             return;
         }
-        InetAddress inetAddressAl = this.networkEngine.al();
-        if (inetAddressAl == null) {
+        InetAddress broadcastAddress = this.networkEngine.getUdpBroadcastAddress();
+        if (broadcastAddress == null) {
             this.networkEngine.d("failed to send a broadcast ping: could not get a broadcast address");
             return;
         }
@@ -113,8 +113,8 @@ final class UdpDiscoveryHandler implements Runnable {
             gameOutputStream.writeInt(0);
             gameOutputStream.writeStringUTF("ping");
             String bufferAsString = gameOutputStream.getBufferAsString();
-            this.networkEngine.d("sending ping on :" + inetAddressAl.toString());
-            this.datagramSocket.send(new DatagramPacket(bufferAsString.getBytes(), bufferAsString.length(), inetAddressAl, this.networkEngine.udpPort));
+            this.networkEngine.d("sending ping on :" + broadcastAddress.toString());
+            this.datagramSocket.send(new DatagramPacket(bufferAsString.getBytes(), bufferAsString.length(), broadcastAddress, this.networkEngine.udpPort));
         } catch (IOException e) {
             e.printStackTrace();
             this.networkEngine.d("failed to send a broadcast ping, IOException");

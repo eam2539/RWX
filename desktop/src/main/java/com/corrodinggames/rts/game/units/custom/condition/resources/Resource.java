@@ -316,7 +316,7 @@ public class Resource {
 
     public void a(BaseUnit baseUnit, double d) {
         if (this.t) {
-            baseUnit.team.getTeamColorEffect().a(this, d);
+            baseUnit.team.getCustomResources().a(this, d);
         } else {
             baseUnit.getUnitAICombatRange().a(this, d);
         }
@@ -324,7 +324,7 @@ public class Resource {
 
     public void b(BaseUnit baseUnit, double d) {
         if (this.t) {
-            baseUnit.team.getTeamColorEffect().b(this, d);
+            baseUnit.team.getCustomResources().b(this, d);
         } else {
             baseUnit.getUnitAICombatRange().b(this, d);
         }

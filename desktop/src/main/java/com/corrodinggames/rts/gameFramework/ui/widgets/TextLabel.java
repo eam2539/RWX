@@ -25,7 +25,7 @@ public class TextLabel extends UIElement {
     }
 
     public void a(float f) {
-        GameEngine.getInstance().getTouchY(this.b, f);
+        GameEngine.getInstance().setScaledTextSize(this.b, f);
         e();
     }
 

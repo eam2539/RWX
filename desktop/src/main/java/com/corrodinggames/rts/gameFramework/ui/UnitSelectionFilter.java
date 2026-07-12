@@ -9,9 +9,9 @@ import java.util.ArrayList;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.al */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/al.class */
-abstract class panels {
-    static panels a = new panels() { // from class: com.corrodinggames.rts.gameFramework.f.al.1
-        @Override // com.corrodinggames.rts.gameFramework.ui.panels
+abstract class UnitSelectionFilter {
+    static UnitSelectionFilter a = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.1
+        @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
             if (orderableUnit.canUnitAttack() && !orderableUnit.u() && orderableUnit.unitTransportTarget == null && orderableUnit.hasNoCurrentWaypoint()) {
                 return true;
@@ -19,8 +19,8 @@ abstract class panels {
             return false;
         }
     };
-    static panels b = new panels() { // from class: com.corrodinggames.rts.gameFramework.f.al.2
-        @Override // com.corrodinggames.rts.gameFramework.ui.panels
+    static UnitSelectionFilter b = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.2
+        @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
             if (orderableUnit.canUnitAttack() && !orderableUnit.u() && orderableUnit.unitTransportTarget == null) {
                 return true;
@@ -28,8 +28,8 @@ abstract class panels {
             return false;
         }
     };
-    static panels c = new panels() { // from class: com.corrodinggames.rts.gameFramework.f.al.3
-        @Override // com.corrodinggames.rts.gameFramework.ui.panels
+    static UnitSelectionFilter c = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.3
+        @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
             if (orderableUnit.r() != null && orderableUnit.r().p() && orderableUnit.unitTransportTarget == null) {
                 return true;
@@ -37,8 +37,8 @@ abstract class panels {
             return false;
         }
     };
-    static panels d = new panels() { // from class: com.corrodinggames.rts.gameFramework.f.al.4
-        @Override // com.corrodinggames.rts.gameFramework.ui.panels
+    static UnitSelectionFilter d = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.4
+        @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
             if (orderableUnit.r() == UnitTypeEnum.fabricator && orderableUnit.getUpgradeLevel() < 3 && orderableUnit.unitTransportTarget == null) {
                 return true;
@@ -46,8 +46,8 @@ abstract class panels {
             return false;
         }
     };
-    static panels e = new panels() { // from class: com.corrodinggames.rts.gameFramework.f.al.5
-        @Override // com.corrodinggames.rts.gameFramework.ui.panels
+    static UnitSelectionFilter e = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.5
+        @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
             if (orderableUnit.r() == UnitTypeEnum.landFactory && orderableUnit.unitTransportTarget == null) {
                 return true;
@@ -55,8 +55,8 @@ abstract class panels {
             return false;
         }
     };
-    static panels f = new panels() { // from class: com.corrodinggames.rts.gameFramework.f.al.6
-        @Override // com.corrodinggames.rts.gameFramework.ui.panels
+    static UnitSelectionFilter f = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.6
+        @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
             if (orderableUnit.r() == UnitTypeEnum.airFactory && orderableUnit.unitTransportTarget == null) {
                 return true;
@@ -67,10 +67,10 @@ abstract class panels {
 
     public abstract boolean a(OrderableUnit orderableUnit);
 
-    panels() {
+    UnitSelectionFilter() {
     }
 
-    public static void a(ArrayList arrayList, panels panelsVar, panels panelsVar2) {
+    public static void a(ArrayList arrayList, UnitSelectionFilter panelsVar, UnitSelectionFilter panelsVar2) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.gameUI.getSelectedUnitCount() != 1) {
             arrayList.clear();
@@ -107,7 +107,7 @@ abstract class panels {
         }
     }
 
-    public static OrderableUnit a(ArrayList arrayList, panels panelsVar) {
+    public static OrderableUnit a(ArrayList arrayList, UnitSelectionFilter panelsVar) {
         GameEngine gameEngine = GameEngine.getInstance();
         OrderableUnit orderableUnit = null;
         float f2 = -1.0f;
@@ -115,7 +115,7 @@ abstract class panels {
             if (baseUnit instanceof OrderableUnit) {
                 OrderableUnit orderableUnit2 = (OrderableUnit) baseUnit;
                 if (gameEngine.gameUI.canControlUnit(orderableUnit2) && panelsVar.a(orderableUnit2) && !arrayList.contains(orderableUnit2)) {
-                    float fDistanceSq = Utility.distanceSq(gameEngine.viewpointX + gameEngine.halfViewpointWidth, gameEngine.viewpointY + gameEngine.halfViewpointHeight, orderableUnit2.posX, orderableUnit2.posY);
+                    float fDistanceSq = Utility.distanceSq(gameEngine.viewpointX + gameEngine.halfVisibleWorldWidth, gameEngine.viewpointY + gameEngine.halfVisibleWorldHeight, orderableUnit2.posX, orderableUnit2.posY);
                     if (orderableUnit == null || fDistanceSq < f2) {
                         f2 = fDistanceSq;
                         orderableUnit = orderableUnit2;

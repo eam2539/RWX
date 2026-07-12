@@ -44,10 +44,10 @@ public class GunBoat extends WaterUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        gunBoatTexture = gameEngine.graphicsEngine2.a(R.drawable.gun_boat);
-        gunBoatTexture_dead = gameEngine.graphicsEngine2.a(R.drawable.gun_boat_dead);
+        gunBoatTexture = gameEngine.renderGraphicsEngine.a(R.drawable.gun_boat);
+        gunBoatTexture_dead = gameEngine.renderGraphicsEngine.a(R.drawable.gun_boat_dead);
         gunBoatShadowTexture = attackUnit(gunBoatTexture, gunBoatTexture.m(), gunBoatTexture.l());
-        gunBoatTextures_teamColors = PlayerTeam.getUnitCountByType(gunBoatTexture);
+        gunBoatTextures_teamColors = PlayerTeam.getTeamColorTextures(gunBoatTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

@@ -28,10 +28,10 @@ public class TankDestroyer extends LandUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        b = gameEngine.graphicsEngine2.a(R.drawable.tank2);
-        a = gameEngine.graphicsEngine2.a(R.drawable.tank2_dead);
-        c = gameEngine.graphicsEngine2.a(R.drawable.tank2_turret);
-        d = PlayerTeam.getUnitCountByType(b);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.tank2);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.tank2_dead);
+        c = gameEngine.renderGraphicsEngine.a(R.drawable.tank2_turret);
+        d = PlayerTeam.getTeamColorTextures(b);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

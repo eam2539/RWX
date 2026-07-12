@@ -18,7 +18,7 @@ public class GameStateManager {
     HashMap<String,GameStateData> f = new HashMap();
 
     public void a(Context context) {
-        if (GameEngine.isPausedStatic2 || this.a) {
+        if (GameEngine.isNonAndroidVersion || this.a) {
             return;
         }
         try {
@@ -53,7 +53,7 @@ public class GameStateManager {
     }
 
     public boolean a(DataOutputStream dataOutputStream) {
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return false;
         }
         try {
@@ -149,7 +149,7 @@ public class GameStateManager {
     public static GameStateManager c(Context context) {
         if (e == null) {
             e = new GameStateManager(context);
-            if (!GameEngine.isPausedStatic2) {
+            if (!GameEngine.isNonAndroidVersion) {
                 e.b(context);
             }
         }

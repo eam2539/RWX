@@ -866,7 +866,7 @@ public class LogicBooleanGameFunctions {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
         public float getValue(OrderableUnit orderableUnit) {
-            return orderableUnit.f0cB;
+            return orderableUnit.currentEnergy;
         }
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
@@ -884,7 +884,7 @@ public class LogicBooleanGameFunctions {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
         public float getValue(OrderableUnit orderableUnit) {
-            return orderableUnit.f0cB + orderableUnit.by().c;
+            return orderableUnit.currentEnergy + orderableUnit.by().c;
         }
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
@@ -1524,20 +1524,20 @@ public class LogicBooleanGameFunctions {
             }
             if (playerTeam == null) {
                 iCanAffordResource = 0;
-                for (PlayerTeam playerTeam2 : PlayerTeam.setTeamDefeated()) {
+                for (PlayerTeam playerTeam2 : PlayerTeam.getTeamInstances()) {
                     if (animationTag == null) {
                         i = iCanAffordResource;
-                        iCanAffordResource2 = playerTeam2.addUnitToTeam(this.incompleteBuildings, this.factoryQueue);
+                        iCanAffordResource2 = playerTeam2.getUnitCount(this.incompleteBuildings, this.factoryQueue);
                     } else {
                         i = iCanAffordResource;
-                        iCanAffordResource2 = playerTeam2.canAffordResource(animationTag, this.incompleteBuildings, this.factoryQueue);
+                        iCanAffordResource2 = playerTeam2.getUnitCountWithTag(animationTag, this.incompleteBuildings, this.factoryQueue);
                     }
                     iCanAffordResource = i + iCanAffordResource2;
                 }
             } else if (animationTag == null) {
-                iCanAffordResource = playerTeam.addUnitToTeam(this.incompleteBuildings, this.factoryQueue);
+                iCanAffordResource = playerTeam.getUnitCount(this.incompleteBuildings, this.factoryQueue);
             } else {
-                iCanAffordResource = playerTeam.canAffordResource(animationTag, this.incompleteBuildings, this.factoryQueue);
+                iCanAffordResource = playerTeam.getUnitCountWithTag(animationTag, this.incompleteBuildings, this.factoryQueue);
             }
             if (this.withinRange < 0.0f || iCanAffordResource == 0) {
                 return iCanAffordResource;

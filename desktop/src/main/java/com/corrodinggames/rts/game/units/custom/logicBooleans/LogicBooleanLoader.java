@@ -829,7 +829,7 @@ public class LogicBooleanLoader {
             LogicBoolean readElement(OrderableUnit orderableUnit) {
                 int number = (int) this.index.readNumber(orderableUnit);
                 if (this.targetArray == null) {
-                    GameEngine.updatePaintTextSizeIfNeeded("ArrayGet readElement targetArray==null");
+                    GameEngine.logColored("ArrayGet readElement targetArray==null");
                     return null;
                 }
                 return this.targetArray.readArrayElement(orderableUnit, number);

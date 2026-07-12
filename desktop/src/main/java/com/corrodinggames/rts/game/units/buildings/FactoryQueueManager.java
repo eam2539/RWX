@@ -261,14 +261,14 @@ public class FactoryQueueManager {
                     d2 = ((double) ((int) (d / 0.009999999776482582d))) * 0.009999999776482582d;
                 }
                 boolean z2 = false;
-                if (d2 > 0.0d && this.a.team.teamColorTexture.a(projectile.d)) {
+                if (d2 > 0.0d && this.a.team.resourceShortageTracker.a(projectile.d)) {
                     z2 = true;
                 }
                 if (!z2 && (d2 <= 0.0d || projectile.d.c(this.a, d2))) {
                     projectile.n += d2;
                 } else {
                     if (!z2) {
-                        this.a.team.teamColorTexture.a(projectile.d, this.a, d2);
+                        this.a.team.resourceShortageTracker.a(projectile.d, this.a, d2);
                     }
                     fCx = 0.0f;
                     z = false;
@@ -290,8 +290,8 @@ public class FactoryQueueManager {
                 if (projectile.a <= 0) {
                     List listF = f();
                     if (listF.size() == 0) {
-                        GameEngine.updatePaintTextSizeIfNeeded("-------------buildQueue empty for:" + projectile.j);
-                        GameEngine.updatePaintTextSizeIfNeeded("-------------");
+                        GameEngine.logColored("-------------buildQueue empty for:" + projectile.j);
+                        GameEngine.logColored("-------------");
                     } else {
                         listF.remove(0);
                     }
@@ -432,7 +432,7 @@ public class FactoryQueueManager {
             PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
             if (!z) {
                 if (abstractUnitAction.drawTooltip((BaseUnit) this.a, false) && abstractUnitAction.b(this.a)) {
-                    if ((!popupQueueAction.isHighPriority() || this.a.team.getTeamUnitCountInt() < this.a.team.getTeamBuildingCountInt()) && popupQueueAction.getDisplayText().c(this.a)) {
+                    if ((!popupQueueAction.isHighPriority() || this.a.team.getNonBuildingUnitCountIncludingQueued() < this.a.team.getUnitCap()) && popupQueueAction.getDisplayText().c(this.a)) {
                         return a(popupQueueAction, false, pointF, baseUnit);
                     }
                     return null;
@@ -455,7 +455,7 @@ public class FactoryQueueManager {
             PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
             if (!z) {
                 if (abstractUnitAction.drawTooltip((BaseUnit) this.a, true)) {
-                    if ((!popupQueueAction.isHighPriority() || this.a.team.getTeamUnitCountInt() < this.a.team.getTeamBuildingCountInt()) && popupQueueAction.getDisplayText().b(this.a, abstractUnitAction.getOptions())) {
+                    if ((!popupQueueAction.isHighPriority() || this.a.team.getNonBuildingUnitCountIncludingQueued() < this.a.team.getUnitCap()) && popupQueueAction.getDisplayText().b(this.a, abstractUnitAction.getOptions())) {
                         a(popupQueueAction, true);
                         return;
                     }

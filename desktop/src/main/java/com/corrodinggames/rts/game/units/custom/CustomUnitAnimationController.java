@@ -211,7 +211,7 @@ public final class CustomUnitAnimationController {
                     this.baseBlendValues[i] = this.unitInstance.legInstances[customUnitAnimationSet.animationId].p;
                 } else {
                     this.baseBlendValues[i] = 0.0f;
-                    GameEngine.updatePaintTextSizeIfNeeded("setBaseBlendValues: Target leg out of range for: " + this.unitInstance.r().getUnitTypeDescriptionShort());
+                    GameEngine.logColored("setBaseBlendValues: Target leg out of range for: " + this.unitInstance.r().getUnitTypeDescriptionShort());
                 }
             } else if (customUnitAnimationType == CustomUnitAnimationType.legY) {
                 if (this.unitInstance.legInstances != null && customUnitAnimationSet.animationId < this.unitInstance.legInstances.length) {
@@ -232,7 +232,7 @@ public final class CustomUnitAnimationController {
                 }
             } else if (customUnitAnimationType != CustomUnitAnimationType.event) {
                 this.baseBlendValues[i] = 0.0f;
-                GameEngine.updatePaintTextSizeIfNeeded("Unsupported blend type:" + customUnitAnimationType);
+                GameEngine.logColored("Unsupported blend type:" + customUnitAnimationType);
             }
         }
     }

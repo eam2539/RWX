@@ -194,12 +194,12 @@ public class NukeLauncher extends FactoryWithQueue {
 
     public static void b() {
         GameEngine gameEngine = GameEngine.getInstance();
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.nuke_launcher_dead);
-        Texture textureA = gameEngine.graphicsEngine2.a(R.drawable.nuke_launcher);
-        teamTextures = PlayerTeam.getUnitCountByType(textureA);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.nuke_launcher_dead);
+        Texture textureA = gameEngine.renderGraphicsEngine.a(R.drawable.nuke_launcher);
+        teamTextures = PlayerTeam.getTeamColorTextures(textureA);
         textureA.n();
-        iconTexture = gameEngine.graphicsEngine2.a(R.drawable.unit_icon_building);
-        teamIconTextures = PlayerTeam.getUnitCountByType(iconTexture);
+        iconTexture = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_building);
+        teamIconTextures = PlayerTeam.getTeamColorTextures(iconTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -435,7 +435,7 @@ public class NukeLauncher extends FactoryWithQueue {
         }
         if (abstractUnitAction == launchNukeAction) {
             if (pointF == null) {
-                NetworkEngine.g("action:" + launchNukeAction.getActionId() + " needs point but it is missing");
+                NetworkEngine.reportDesync("action:" + launchNukeAction.getActionId() + " needs point but it is missing");
                 return;
             } else {
                 a(pointF.x, pointF.y);

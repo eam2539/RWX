@@ -115,8 +115,8 @@ public class DynamicUnitPath extends Path {
         Rect rect = new Rect();
         float f = gameEngine.viewpointXSnapped;
         float f2 = gameEngine.viewpointYSnapped;
-        float f3 = gameEngine.screenHeight;
-        float f4 = gameEngine.viewpointHeight;
+        float f3 = gameEngine.visibleWorldWidth;
+        float f4 = gameEngine.visibleWorldHeight;
         MapLayer mapLayer = gameEngine.tileMap.groundLayer;
         int i4 = (int) ((f * tileMap.tileScaleX) - 1.0f);
         if (i4 < 0) {
@@ -165,7 +165,7 @@ public class DynamicUnitPath extends Path {
                     a(a(i8, i9), d);
                     float f5 = (i10 + tileMap.halfTileWorldSizeX) - f;
                     float f6 = (i11 + tileMap.halfTileWorldSizeY) - f2;
-                    gameEngine.graphicsEngine2.a(f5, f6, f5 + (d.worldX * (tileMap.tileWorldSizeX - 3)) + 1.0f, f6 + (d.worldY * (tileMap.tileWorldSizeY - 3)) + 1.0f, c);
+                    gameEngine.renderGraphicsEngine.a(f5, f6, f5 + (d.worldX * (tileMap.tileWorldSizeX - 3)) + 1.0f, f6 + (d.worldY * (tileMap.tileWorldSizeY - 3)) + 1.0f, c);
                     if (zB) {
                     }
                 }

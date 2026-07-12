@@ -23,22 +23,22 @@ public class CustomUnitSpawnList {
     }
 
     public boolean b() {
-        return this.spawnItems != null && (this.spawnItems.length != 0 || this.spawnItems == CustomUnitConfig.f55gf);
+        return this.spawnItems != null && (this.spawnItems.length != 0 || this.spawnItems == CustomUnitConfig.noneSpawnItems);
     }
 
     CustomUnitSpawnList(CustomUnitConfig customUnitConfig, String str) {
         this.customUnitConfig = customUnitConfig;
         this.rawSpawnListString = str;
-        customUnitConfig.f53gc.add(this);
+        customUnitConfig.spawnLists.add(this);
     }
 
     public void c() throws ConfigParseException {
         if (this.rawSpawnListString == null || this.rawSpawnListString.equals(VariableScope.nullOrMissingString)) {
-            this.spawnItems = CustomUnitConfig.f54ge;
+            this.spawnItems = CustomUnitConfig.emptySpawnItems;
             return;
         }
         if (this.rawSpawnListString.equalsIgnoreCase("NONE")) {
-            this.spawnItems = CustomUnitConfig.f55gf;
+            this.spawnItems = CustomUnitConfig.noneSpawnItems;
             return;
         }
         ArrayList arrayList = new ArrayList();
@@ -54,7 +54,7 @@ public class CustomUnitSpawnList {
                 arrayList.add(effectTemplateResolveEffect);
             }
         }
-        this.spawnItems = (EffectTemplate[]) arrayList.toArray(CustomUnitConfig.f54ge);
+        this.spawnItems = (EffectTemplate[]) arrayList.toArray(CustomUnitConfig.emptySpawnItems);
     }
 
     public Effect a(float f, float f2, float f3, float f4, GameObject gameObject) {

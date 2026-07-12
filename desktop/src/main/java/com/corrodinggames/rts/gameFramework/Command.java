@@ -122,7 +122,7 @@ public class Command {
     public void precomputeCommandTargets() {
         GameEngine gameEngine = GameEngine.getInstance();
         this.hasProcessedTargets = true;
-        FormationGroup formationGroupC = gameEngine.groupController.c();
+        FormationGroup formationGroupC = gameEngine.formationEngine.c();
         Iterator it = this.selectedUnits.iterator();
         while (it.hasNext()) {
             formationGroupC.units.add((OrderableUnit) it.next());
@@ -531,7 +531,7 @@ public class Command {
                 }
                 if (this.systemActionType == 200) {
                     GameEngine.log("queue quick resync");
-                    gameEngine.networkEngine.N = true;
+                    gameEngine.networkEngine.quickResyncRequested = true;
                     return;
                 }
                 if (this.systemActionType == 5) {
@@ -543,7 +543,7 @@ public class Command {
                     int buildQueueSize = this.unitCommand.getBuildQueueSize();
                     UnitType buildUnitType = this.unitCommand.getBuildUnitType();
                     boolean z = false;
-                    if (this.team != null && this.team == gameEngine.playerTeam && gameEngine.playerTeam.addUnitToTeam(false, false) == 0) {
+                    if (this.team != null && this.team == gameEngine.playerTeam && gameEngine.playerTeam.getUnitCount(false, false) == 0) {
                         z = true;
                     }
                     BaseUnit baseUnitA = buildUnitType.a();
@@ -582,7 +582,7 @@ public class Command {
         }
         if (this.sourceTeam != null) {
             this.sourceTeam.teamLastConnectionTime = System.currentTimeMillis();
-            this.sourceTeam.teamPingCount = gameEngine.lastTick;
+            this.sourceTeam.teamPingCount = gameEngine.gameTimeMillis;
         }
         if (this.sourceTeam != null) {
             String str2 = null;
@@ -625,7 +625,7 @@ public class Command {
         }
         if (this.unitCommand != null) {
             this.unitCommand.resolveTargetUnitFromId();
-            FormationGroup formationGroupB = gameEngine.groupController.b();
+            FormationGroup formationGroupB = gameEngine.formationEngine.b();
             formationGroupB.commandTargets = this.commandTargets;
             int i = 0;
             while (i <= 1) {
@@ -718,7 +718,7 @@ public class Command {
         this.allowedTeamMask = (short) 0;
         for (int i = 0; i < PlayerTeam.TEAM_NEUTRAL; i++) {
             PlayerTeam playerTeamK = PlayerTeam.k(i);
-            if (playerTeamK != null && playerTeamK.isTeamNeutral()) {
+            if (playerTeamK != null && playerTeamK.isSharedControlEnabled()) {
                 this.allowedTeamMask = (short) (this.allowedTeamMask | (1 << i));
             }
         }

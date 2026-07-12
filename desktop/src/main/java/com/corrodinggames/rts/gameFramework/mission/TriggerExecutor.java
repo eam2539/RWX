@@ -27,7 +27,7 @@ public class TriggerExecutor {
         f.a(a);
         a.i = true;
         a.j = true;
-        a.k = instance.lastTick;
+        a.k = instance.gameTimeMillis;
         boolean b2 = false;
         if (a.A != null) {
             final Message addMessage = instance.gameUI.messageManager.addMessage(null, a.A.resolveText());
@@ -36,18 +36,18 @@ public class TriggerExecutor {
                 final String b3 = a.b(s);
                 if (b3 != null) {
                     if (b3.equals("slow")) {
-                        addMessage.field_e = 18;
+                        addMessage.delayPerCharMs = 18;
                     }
                     else {
                         final int n = a.b(s, -1);
                         if (n != -1) {
-                            addMessage.field_e = n;
+                            addMessage.delayPerCharMs = n;
                         }
                     }
                 }
                 final int n = a.c("globalMessage_textColor", -1);
                 if (n != -1) {
-                    addMessage.field_f = n;
+                    addMessage.textColor = n;
                 }
             }
             b2 = true;
@@ -55,7 +55,7 @@ public class TriggerExecutor {
         final String b4 = a.b("debugMessage");
         if (b4 != null) {
             a.h("Debug: " + b4);
-            if (instance.isGameStarted && instance.isNetworkGameActive) {
+            if (instance.isGameStarted && instance.isDebugTempMode) {
                 NetworkEngine.a((String)null, "Debug: " + b4);
             }
             b2 = true;
@@ -198,11 +198,11 @@ public class TriggerExecutor {
             }
             commandForTeam.setMoveTarget(f2.x, f2.y);
             if (b) {
-                f.b("firstActivation: move at:" + instance.lastTick + " for teamId:" + a7.teamId + " to targetId:" + b5 + " (#units:" + n4 + ")");
+                f.b("firstActivation: move at:" + instance.gameTimeMillis + " for teamId:" + a7.teamId + " to targetId:" + b5 + " (#units:" + n4 + ")");
             }
             if (a.b("unload") != null) {
                 for (final BaseUnit baseUnit3 : BaseUnit.bE) {
-                    if (baseUnit3.team == a7 && baseUnit3 instanceof OrderableUnit && a.a(baseUnit3) && a.b(baseUnit3) && baseUnit3.getUnitAIPathfindCost()) {
+                    if (baseUnit3.team == a7 && baseUnit3 instanceof OrderableUnit && a.a(baseUnit3) && a.b(baseUnit3) && baseUnit3.canTransportUnits()) {
                         final OrderableUnit targetUnit = (OrderableUnit)baseUnit3;
                         final Command commandForTeam2 = instance.commandController.createCommandForTeam(a7);
                         commandForTeam2.isQueued = true;

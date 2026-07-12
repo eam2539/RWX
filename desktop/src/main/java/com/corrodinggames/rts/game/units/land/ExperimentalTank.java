@@ -36,10 +36,10 @@ public class ExperimentalTank extends LandUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        Texture textureA = gameEngine.graphicsEngine2.a(R.drawable.experimental_tank);
-        d = PlayerTeam.getUnitCountByType(textureA);
-        a = gameEngine.graphicsEngine2.a(R.drawable.experimental_tank_dead);
-        b = gameEngine.graphicsEngine2.a(R.drawable.experimental_tank_turret);
+        Texture textureA = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_tank);
+        d = PlayerTeam.getTeamColorTextures(textureA);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_tank_dead);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_tank_turret);
         c = attackUnit(textureA, textureA.m() / 2, textureA.l());
     }
 

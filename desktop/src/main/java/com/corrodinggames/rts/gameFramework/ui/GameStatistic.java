@@ -17,10 +17,10 @@ public class GameStatistic {
     public String stringValue;
 
     /* JADX INFO: renamed from: c */
-    public float floatValue;
+    public float numericValue;
 
     /* JADX INFO: renamed from: d */
-    public float field_d;
+    public float revealProgress;
 
     public GameStatistic(String str, String str2) {
         this.name = str;
@@ -29,7 +29,7 @@ public class GameStatistic {
 
     public GameStatistic(String str, float f) {
         this.name = str;
-        this.floatValue = f;
+        this.numericValue = f;
         this.stringValue = null;
     }
 
@@ -48,7 +48,7 @@ public class GameStatistic {
                     arrayList.add(new GameStatistic("Wave difficulty: " + gameEngine.networkEngine.c(gameEngine.missionEngine.y), VariableScope.nullOrMissingString));
                 }
             }
-            arrayList.add(new GameStatistic("Game Time", Utility.copyStream(gameEngine.lastTick / 1000)));
+            arrayList.add(new GameStatistic("Game Time", Utility.copyStream(gameEngine.gameTimeMillis / 1000)));
             arrayList.add(new GameStatistic("=============================", VariableScope.nullOrMissingString));
             arrayList.add(new GameStatistic("Units Killed", statisticsDataA.c));
             arrayList.add(new GameStatistic("Buildings Killed", statisticsDataA.d));

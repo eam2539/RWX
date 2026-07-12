@@ -75,7 +75,7 @@ public class Leaderboard {
             leaderboardRow.teamId = gameObjectComparator.d();
             arrayList.add(leaderboardRow);
         }
-        float fB = gameEngine.graphicsEngine2.b(str, this.textPaint);
+        float fB = gameEngine.renderGraphicsEngine.b(str, this.textPaint);
         float f2 = 0.0f;
         for (LeaderboardRow leaderboardRow2 : arrayList) {
             if (leaderboardRow2.labelWidth > f2) {
@@ -100,13 +100,13 @@ public class Leaderboard {
         GamePaint gamePaint = new GamePaint();
         gamePaint.b(Color.a(100, 0, 0, 0));
         gamePaint.a(Paint.Style.FILL_AND_STROKE);
-        gameEngine.graphicsEngine2.a(this.backgroundRect, gamePaint);
+        gameEngine.renderGraphicsEngine.a(this.backgroundRect, gamePaint);
         for (int i6 = 0; i6 < arrayList.size(); i6++) {
             LeaderboardRow leaderboardRow4 = (LeaderboardRow) arrayList.get(i6);
             leaderboardRow4.labelPaint.b(leaderboardRow4.teamId);
-            gameEngine.graphicsEngine2.a(leaderboardRow4.label, i5, i2, leaderboardRow4.labelPaint);
+            gameEngine.renderGraphicsEngine.a(leaderboardRow4.label, i5, i2, leaderboardRow4.labelPaint);
             leaderboardRow4.valuePaint.b(leaderboardRow4.color);
-            gameEngine.graphicsEngine2.a(leaderboardRow4.value, i5 + leaderboardRow4.labelWidth, i2, leaderboardRow4.valuePaint);
+            gameEngine.renderGraphicsEngine.a(leaderboardRow4.value, i5 + leaderboardRow4.labelWidth, i2, leaderboardRow4.valuePaint);
             i2 += i4;
         }
         return i2 + i4;

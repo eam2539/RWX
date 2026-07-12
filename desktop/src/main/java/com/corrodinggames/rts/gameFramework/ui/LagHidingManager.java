@@ -34,14 +34,14 @@ public class LagHidingManager {
             unitSnapshotA.a = baseUnit.objectId;
             unitSnapshotA.b = baseUnit.unitLevel;
             unitSnapshotA.c = baseUnit.unitExperience;
-            unitSnapshotA.d = GameEngine.getInstance().networkEngine.X;
+            unitSnapshotA.d = GameEngine.getInstance().networkEngine.nextBlockingFrame;
             a.add(unitSnapshotA);
         }
         return unitSnapshotA;
     }
 
     public static void a(BaseUnit baseUnit, UnitPrice unitPrice) {
-        if (!GameEngine.getInstance().networkEngine.B) {
+        if (!GameEngine.getInstance().networkEngine.networkGameActive) {
             return;
         }
         UnitSnapshot unitSnapshotA = a(baseUnit);
@@ -53,7 +53,7 @@ public class LagHidingManager {
     }
 
     public static void b(BaseUnit baseUnit, UnitPrice unitPrice) {
-        if (!GameEngine.getInstance().networkEngine.B) {
+        if (!GameEngine.getInstance().networkEngine.networkGameActive) {
             return;
         }
         UnitSnapshot unitSnapshotA = a(baseUnit);
@@ -107,7 +107,7 @@ public class LagHidingManager {
         if (a.size() == 0) {
             return;
         }
-        int i = GameEngine.getInstance().networkEngine.X;
+        int i = GameEngine.getInstance().networkEngine.nextBlockingFrame;
         for (int size = a.size() - 1; size >= 0; size--) {
             UnitSnapshot unitSnapshot = (UnitSnapshot) a.get(size);
             if (unitSnapshot.a == orderableUnit.objectId) {

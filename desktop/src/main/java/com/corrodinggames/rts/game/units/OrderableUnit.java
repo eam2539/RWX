@@ -118,10 +118,10 @@ public abstract class OrderableUnit extends UnitBase {
     private boolean isActing;
 
     /* JADX INFO: renamed from: X */
-    public float health;
+    public float previousPathRetryTimer;
 
     /* JADX INFO: renamed from: Y */
-    public float residentTimer;
+    public float waypointDwellTimer;
 
     /* JADX INFO: renamed from: j */
     private boolean canAttack;
@@ -200,7 +200,7 @@ public abstract class OrderableUnit extends UnitBase {
     protected int activePathCount;
 
     /* JADX INFO: renamed from: u */
-    public boolean isVisible;
+    public boolean isPathIncomplete;
     private int v;
     private int w;
     public boolean ax;
@@ -420,7 +420,7 @@ public abstract class OrderableUnit extends UnitBase {
                 int length = i3;
                 orderableUnit2.ensureWaypointCapacityForIndex(length);
                 if (length >= orderableUnit2.waypoints.length) {
-                    GameEngine.updatePaintTextSizeIfNeeded("Too many waypoints:" + i3);
+                    GameEngine.logColored("Too many waypoints:" + i3);
                     length = orderableUnit2.waypoints.length - 1;
                 }
                 if (orderableUnit2.waypoints[length] == null) {
@@ -469,7 +469,7 @@ public abstract class OrderableUnit extends UnitBase {
         float f2;
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.performanceProfiler.a(ProfilerSection.update_do_all_collisions);
-        int i = gameEngine.lastTick;
+        int i = gameEngine.gameTimeMillis;
         UnitList unitList = aM;
         BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
         int size = BaseUnit.bE.size();
@@ -502,7 +502,7 @@ public abstract class OrderableUnit extends UnitBase {
                         orderableUnit.resolveSoftCollisionWithUnit(baseUnitArrA2[i5], f, true);
                     }
                     if (orderableUnit.nearbyCollisionSize > 9 && orderableUnit.unitFlags1 > i - 400) {
-                        orderableUnit.nextCollisionQueryTick = gameEngine.lastTick + 5 + (i3 % 5);
+                        orderableUnit.nextCollisionQueryTick = gameEngine.gameTimeMillis + 5 + (i3 % 5);
                         orderableUnit.isMoving = true;
                     }
                 }
@@ -663,7 +663,7 @@ public abstract class OrderableUnit extends UnitBase {
         gameOutputStream.writeFloat(this.lastPathTargetY);
         gameOutputStream.writeFloat(this.transportRecoveryTime);
         gameOutputStream.writeFloat(this.transportRecoveryDelay);
-        gameOutputStream.writeBoolean(this.isVisible);
+        gameOutputStream.writeBoolean(this.isPathIncomplete);
         gameOutputStream.writeFloat(this.transportAttackAssistTimer);
         gameOutputStream.writeInt(this.pathTargetRadius);
         gameOutputStream.writeFloat(this.pathRetryTimer);
@@ -673,7 +673,7 @@ public abstract class OrderableUnit extends UnitBase {
         gameOutputStream.writeShort(this.ah);
         gameOutputStream.writeFloat(this.ab);
         gameOutputStream.writeInt(this.w);
-        gameOutputStream.writeFloat(this.health);
+        gameOutputStream.writeFloat(this.previousPathRetryTimer);
         gameOutputStream.writeFloat(this.bodyMovementFreezeTimer);
         gameOutputStream.writeFloat(this.legacyMovementTimer);
         AirUnitEffectManager.a(this, gameOutputStream);
@@ -704,7 +704,7 @@ public abstract class OrderableUnit extends UnitBase {
             int length = i2;
             ensureWaypointCapacityForIndex(length);
             if (length >= this.waypoints.length) {
-                GameEngine.updatePaintTextSizeIfNeeded("Too many waypoints:" + i2);
+                GameEngine.logColored("Too many waypoints:" + i2);
                 length = this.waypoints.length - 1;
             }
             if (this.waypoints[length] == null) {
@@ -770,7 +770,7 @@ public abstract class OrderableUnit extends UnitBase {
             this.transportRecoveryDelay = gameInputStream.readFloat();
         }
         if (b >= 3) {
-            this.isVisible = gameInputStream.readBoolean();
+            this.isPathIncomplete = gameInputStream.readBoolean();
         }
         if (b >= 4) {
             this.transportAttackAssistTimer = gameInputStream.readFloat();
@@ -794,7 +794,7 @@ public abstract class OrderableUnit extends UnitBase {
             this.w = gameInputStream.readInt();
         }
         if (b >= 10) {
-            this.health = gameInputStream.readFloat();
+            this.previousPathRetryTimer = gameInputStream.readFloat();
         }
         if (b >= 11) {
             this.bodyMovementFreezeTimer = gameInputStream.readFloat();
@@ -1604,9 +1604,9 @@ public abstract class OrderableUnit extends UnitBase {
             boolean z = false;
             if (unitCommand.targetUnit.bI()) {
                 if (fDistanceSq < 961.0f) {
-                    this.residentTimer += f;
+                    this.waypointDwellTimer += f;
                 }
-                if (this.residentTimer > 240.0f) {
+                if (this.waypointDwellTimer > 240.0f) {
                     z = true;
                 }
                 float f2 = 21.0f;
@@ -1717,12 +1717,12 @@ public abstract class OrderableUnit extends UnitBase {
         }
         float f2 = 7.0f;
         if (fDistanceSq < 1681.0f) {
-            this.residentTimer += f;
+            this.waypointDwellTimer += f;
         }
-        if (this.residentTimer > 240.0f) {
+        if (this.waypointDwellTimer > 240.0f) {
             f2 = 16.0f;
         }
-        if (this.residentTimer > 340.0f) {
+        if (this.waypointDwellTimer > 340.0f) {
             f2 = 36.0f;
         }
         if (unitCommand != null && unitCommand.commandType == UnitCommandType.patrol) {
@@ -2060,9 +2060,9 @@ public abstract class OrderableUnit extends UnitBase {
             if (baseUnit.bI()) {
                 float unitAIPathfindHeuristic = baseUnit.getUnitAIPathfindHeuristic() + 10.0f;
                 if (fDistanceSq < unitAIPathfindHeuristic * unitAIPathfindHeuristic) {
-                    this.residentTimer += f;
+                    this.waypointDwellTimer += f;
                 }
-                if (this.residentTimer > 240.0f) {
+                if (this.waypointDwellTimer > 240.0f) {
                     z = true;
                 }
                 float f2 = 21.0f;
@@ -2157,14 +2157,14 @@ public abstract class OrderableUnit extends UnitBase {
         }
         if (unitCommand != null && !z && z2 && unitCommand.targetUnit != null) {
             boolean z3 = true;
-            if (this.lastReclaimSearchTick < gameEngine.lastTick - 100) {
+            if (this.lastReclaimSearchTick < gameEngine.gameTimeMillis - 100) {
                 z3 = false;
             }
             if (!g(unitCommand.targetUnit, z3)) {
                 z = true;
             }
             if (!z) {
-                this.lastReclaimSearchTick = gameEngine.lastTick;
+                this.lastReclaimSearchTick = gameEngine.gameTimeMillis;
             }
         }
         if (unitCommand != null && z) {
@@ -2215,7 +2215,7 @@ public abstract class OrderableUnit extends UnitBase {
         }
         if (unitCommand != null && unitCommand.commandType == UnitCommandType.reclaim && unitCommand.targetUnit.team != this.team && unitCommand.targetUnit.getUnitHealthPercent() == 0.0f) {
             boolean z5 = true;
-            if (gameEngine.loadLevelNetwork() && this.team.d(unitCommand.targetUnit.team)) {
+            if (gameEngine.isSinglePlayerGame() && this.team.d(unitCommand.targetUnit.team)) {
                 z5 = false;
             }
             if (z5) {
@@ -2332,14 +2332,14 @@ public abstract class OrderableUnit extends UnitBase {
                                 d2 = ((double) ((int) (d / 0.0010000000474974513d))) * 0.0010000000474974513d;
                             }
                             boolean z10 = false;
-                            if (d2 > 0.0d && this.team.teamColorTexture.a(repairOrReclaimPrice)) {
+                            if (d2 > 0.0d && this.team.resourceShortageTracker.a(repairOrReclaimPrice)) {
                                 z10 = true;
                             }
                             if (!z10 && (d2 <= 0.0d || repairOrReclaimPrice.c(this, d2))) {
                                 baseUnit.movementAngle = (float) (((double) baseUnit.movementAngle) + d2);
                             } else {
                                 if (!z10) {
-                                    this.team.teamColorTexture.a(repairOrReclaimPrice, this, d2);
+                                    this.team.resourceShortageTracker.a(repairOrReclaimPrice, this, d2);
                                 }
                                 f4 = 0.0f;
                                 z8 = false;
@@ -2460,7 +2460,7 @@ public abstract class OrderableUnit extends UnitBase {
                         }
                     }
                     baseUnit.isDestroyed = true;
-                    baseUnit.unitCreationTime = gameEngine.lastTick;
+                    baseUnit.unitCreationTime = gameEngine.gameTimeMillis;
                     baseUnit.getUnitAICondition();
                     if ((baseUnit instanceof OrderableUnit) && baseUnit.bI()) {
                         gameEngine.pathfindingEngine.a((OrderableUnit) baseUnit);
@@ -2565,7 +2565,7 @@ public abstract class OrderableUnit extends UnitBase {
             this.ar = true;
         }
         if (this.ar) {
-            if (this.f0cB < ((double) bd()) * 0.6d || (f < 40000.0f && this.f0cB < bd())) {
+            if (this.currentEnergy < ((double) bd()) * 0.6d || (f < 40000.0f && this.currentEnergy < bd())) {
                 this.pathTargetX += Utility.fastCos(this.aq + 180.0f) * 600.0f;
                 this.pathTargetY += Utility.fastSin(this.aq + 180.0f) * 600.0f;
             } else {
@@ -2587,7 +2587,7 @@ public abstract class OrderableUnit extends UnitBase {
         OrderableUnit orderableUnit = this.transportedBy;
         float f5 = orderableUnit.posX + this.transportOffsetX;
         float f6 = orderableUnit.posY + this.transportOffsetY;
-        int i = gameEngine.lastTick - orderableUnit.lastTransportPathUpdateTick;
+        int i = gameEngine.gameTimeMillis - orderableUnit.lastTransportPathUpdateTick;
         float fDistanceSq = Utility.distanceSq(this.posX, this.posY, f5, f6);
         if (i > 300 || this.blockedRecoveryTime > 1.0f) {
             this.transportRecoveryTime += f;
@@ -2796,7 +2796,7 @@ public abstract class OrderableUnit extends UnitBase {
                 unitStateTracker.isReset = false;
             }
             if (this.ae && this.transportedUnitCount > 0 && aG()) {
-                this.lastTransportPathUpdateTick = gameEngine.lastTick;
+                this.lastTransportPathUpdateTick = gameEngine.gameTimeMillis;
             }
             if (currentWaypoint2 != null && this.transportedBy != null && unitStateTracker.isReset && (currentWaypoint = this.transportedBy.getCurrentWaypoint()) != null && !currentWaypoint.isSameCommand(currentWaypoint2)) {
                 unitStateTracker.isReset = false;
@@ -2811,7 +2811,7 @@ public abstract class OrderableUnit extends UnitBase {
                 boolean z = false;
                 if (this.aU == null) {
                     if (currentPathPosition == null) {
-                        if (this.isVisible && this.s < 450.0f && this.aU == null) {
+                        if (this.isPathIncomplete && this.s < 450.0f && this.aU == null) {
                             z = true;
                         }
                         if (this.s == 0.0f) {
@@ -3008,7 +3008,7 @@ public abstract class OrderableUnit extends UnitBase {
                 if (z3) {
                     this.transportRecoveryTime = 0.0f;
                     this.moveThrottle = 0.0f;
-                    if (!this.isVisible && this.transportedBy == null && unitCommand != null && unitCommand.commandType == UnitCommandType.move) {
+                    if (!this.isPathIncomplete && this.transportedBy == null && unitCommand != null && unitCommand.commandType == UnitCommandType.move) {
                         advanceWaypointWithTransportedUnits();
                     }
                 }
@@ -3537,7 +3537,7 @@ public abstract class OrderableUnit extends UnitBase {
         UnitCommand unitCommand2 = this.waypoints[0];
         unitCommand2.resetCommand();
         this.wayPointTimer = 0.0f;
-        this.residentTimer = 0.0f;
+        this.waypointDwellTimer = 0.0f;
         this.pathRetryTimer = 0.0f;
         onCurrentWaypointChanged(unitCommand2);
         clearPathData();
@@ -3603,7 +3603,7 @@ public abstract class OrderableUnit extends UnitBase {
     public boolean isValidNewWaypoint(UnitCommand unitCommand, boolean z) {
         if (unitCommand == null) {
             if (z) {
-                GameEngine.updatePaintTextSizeIfNeeded("isValidNewWaypoint: Skipping null waypoint");
+                GameEngine.logColored("isValidNewWaypoint: Skipping null waypoint");
                 return false;
             }
             return false;
@@ -3611,7 +3611,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (unitCommand.getCommandType() == UnitCommandType.build) {
             if (unitCommand.buildUnitType == null) {
                 if (z) {
-                    GameEngine.updatePaintTextSizeIfNeeded("isValidNewWaypoint: Skipping build waypoint with no buildType");
+                    GameEngine.logColored("isValidNewWaypoint: Skipping build waypoint with no buildType");
                     return false;
                 }
                 return false;
@@ -3619,7 +3619,7 @@ public abstract class OrderableUnit extends UnitBase {
             AbstractUnitAction abstractUnitActionFindActionForUnitTypeWithQueueSize = findActionForUnitTypeWithQueueSize(unitCommand.buildUnitType, unitCommand.buildQueueSize, false);
             if (abstractUnitActionFindActionForUnitTypeWithQueueSize == null) {
                 if (z) {
-                    GameEngine.updatePaintTextSizeIfNeeded("Unit '" + r().getUnitTypeDescriptionShort() + "' can not queue build:" + unitCommand.buildUnitType.getUnitTypeDescriptionShort());
+                    GameEngine.logColored("Unit '" + r().getUnitTypeDescriptionShort() + "' can not queue build:" + unitCommand.buildUnitType.getUnitTypeDescriptionShort());
                     return false;
                 }
                 return false;
@@ -3627,14 +3627,14 @@ public abstract class OrderableUnit extends UnitBase {
             if (!unitCommand.isForceMove) {
                 if (abstractUnitActionFindActionForUnitTypeWithQueueSize.isNotAvailable(this)) {
                     if (z) {
-                        GameEngine.updatePaintTextSizeIfNeeded("Builder '" + r().getUnitTypeDescriptionShort() + "' tried to queue a locked building:" + abstractUnitActionFindActionForUnitTypeWithQueueSize.getActionIdString());
+                        GameEngine.logColored("Builder '" + r().getUnitTypeDescriptionShort() + "' tried to queue a locked building:" + abstractUnitActionFindActionForUnitTypeWithQueueSize.getActionIdString());
                         return false;
                     }
                     return false;
                 }
                 if (!abstractUnitActionFindActionForUnitTypeWithQueueSize.b(this)) {
                     if (z) {
-                        GameEngine.updatePaintTextSizeIfNeeded("Builder '" + r().getUnitTypeDescriptionShort() + "' tried to queue a unavailable building:" + abstractUnitActionFindActionForUnitTypeWithQueueSize.getActionIdString());
+                        GameEngine.logColored("Builder '" + r().getUnitTypeDescriptionShort() + "' tried to queue a unavailable building:" + abstractUnitActionFindActionForUnitTypeWithQueueSize.getActionIdString());
                         return false;
                     }
                     return false;
@@ -3772,7 +3772,7 @@ public abstract class OrderableUnit extends UnitBase {
     /* JADX INFO: renamed from: ay */
     public void advanceWaypoint() {
         this.wayPointTimer = 0.0f;
-        this.residentTimer = 0.0f;
+        this.waypointDwellTimer = 0.0f;
         this.pathRetryTimer = 0.0f;
         this.ar = false;
         this.aq = -999.0f;
@@ -3819,7 +3819,7 @@ public abstract class OrderableUnit extends UnitBase {
             onCurrentWaypointRemoved(this.waypoints[0]);
         }
         this.wayPointTimer = 0.0f;
-        this.residentTimer = 0.0f;
+        this.waypointDwellTimer = 0.0f;
         this.ar = false;
         this.aq = -999.0f;
         this.as = false;
@@ -3967,12 +3967,12 @@ public abstract class OrderableUnit extends UnitBase {
             return false;
         }
         if (getMoveSpeed() > 0.5d) {
-            if (this.pathRetryTimer > 150.0f || this.health > 150.0f) {
+            if (this.pathRetryTimer > 150.0f || this.previousPathRetryTimer > 150.0f) {
                 return true;
             }
             return false;
         }
-        if (this.pathRetryTimer > 300.0f || this.health > 300.0f) {
+        if (this.pathRetryTimer > 300.0f || this.previousPathRetryTimer > 300.0f) {
             return true;
         }
         return false;
@@ -3981,11 +3981,11 @@ public abstract class OrderableUnit extends UnitBase {
     /* JADX INFO: renamed from: aH */
     public void clearPathData() {
         this.activePathCount = 0;
-        this.isVisible = false;
+        this.isPathIncomplete = false;
         this.v = 0;
         this.s = 0.0f;
         this.pathRetryTimer = 0.0f;
-        this.health = 0.0f;
+        this.previousPathRetryTimer = 0.0f;
         this.pathRetryCount = (byte) 0;
     }
 
@@ -4000,7 +4000,7 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: aJ */
     public void advancePathPosition() {
-        this.health = this.pathRetryTimer;
+        this.previousPathRetryTimer = this.pathRetryTimer;
         this.pathRetryTimer = 0.0f;
         if (this.au != null) {
             this.au.c(this);
@@ -4061,7 +4061,7 @@ public abstract class OrderableUnit extends UnitBase {
         this.lastPathTargetX = f;
         this.lastPathTargetY = f2;
         if (z3) {
-            this.isVisible = false;
+            this.isPathIncomplete = false;
             this.activePathCount = 0;
             this.au = null;
             float fClampWorldX = tileMap.clampWorldX(f);
@@ -4071,7 +4071,7 @@ public abstract class OrderableUnit extends UnitBase {
                 float fDistance = Utility.distance(this.posX, this.posY, fClampWorldX, fOpenOriginalMapStream);
                 if (fDistance > 60.0f) {
                     fDistance = 60.0f;
-                    this.isVisible = true;
+                    this.isPathIncomplete = true;
                     if (this.s > 10.0f) {
                         this.s = 10.0f;
                     }
@@ -4089,7 +4089,7 @@ public abstract class OrderableUnit extends UnitBase {
             i4 = 3;
         }
         if (PathfindingUtils.a(h(), this.posX, this.posY, f, f2, 80, i4, 1)) {
-            this.isVisible = false;
+            this.isPathIncomplete = false;
             this.activePathCount = 0;
             this.au = null;
             float fClampWorldX2 = tileMap.clampWorldX(f);
@@ -4116,7 +4116,7 @@ public abstract class OrderableUnit extends UnitBase {
                     setPathPosition(this.activePathCount, f3, f4);
                     this.activePathCount++;
                     if (this.activePathCount >= 119) {
-                        this.isVisible = true;
+                        this.isPathIncomplete = true;
                         break;
                     }
                 } else {
@@ -4124,12 +4124,12 @@ public abstract class OrderableUnit extends UnitBase {
                 }
                 i7++;
             }
-            if (!this.isVisible) {
+            if (!this.isPathIncomplete) {
                 if (this.activePathCount < 119) {
                     setPathPosition(this.activePathCount, fClampWorldX2, fOpenOriginalMapStream2);
                     this.activePathCount++;
                 } else {
-                    this.isVisible = true;
+                    this.isPathIncomplete = true;
                 }
             }
             this.v = this.activePathCount;
@@ -4207,7 +4207,7 @@ public abstract class OrderableUnit extends UnitBase {
                 this.au = this.aU.a(this);
                 Path path = this.aU;
                 this.activePathCount = 0;
-                this.isVisible = false;
+                this.isPathIncomplete = false;
                 Iterator it = linkedListA.iterator();
                 while (true) {
                     if (!it.hasNext()) {
@@ -4218,7 +4218,7 @@ public abstract class OrderableUnit extends UnitBase {
                     setPathPosition(this.activePathCount, tileMap.cursorTileX + tileMap.halfTileWorldSizeX, tileMap.cursorTileY + tileMap.halfTileWorldSizeY);
                     this.activePathCount++;
                     if (this.activePathCount >= 120) {
-                        this.isVisible = true;
+                        this.isPathIncomplete = true;
                         break;
                     }
                 }
@@ -4228,7 +4228,7 @@ public abstract class OrderableUnit extends UnitBase {
                 boolean z = false;
                 if (linkedListA.size() != 0) {
                     tileMap.setCursorTileIndexFromWorldPoint(this.lastPathTargetX, this.lastPathTargetY);
-                    if (!this.isVisible && ((PathPoint) linkedListA.getLast()).a == tileMap.cursorTileX && ((PathPoint) linkedListA.getLast()).b == tileMap.cursorTileY) {
+                    if (!this.isPathIncomplete && ((PathPoint) linkedListA.getLast()).a == tileMap.cursorTileX && ((PathPoint) linkedListA.getLast()).b == tileMap.cursorTileY) {
                         z = true;
                     }
                 }
@@ -4247,7 +4247,7 @@ public abstract class OrderableUnit extends UnitBase {
                 }
                 this.aU = null;
                 if (this.activePathCount > 120) {
-                    GameEngine.updatePaintTextSizeIfNeeded("activePathCount>maxPathNodes: activePathCount:" + this.activePathCount);
+                    GameEngine.logColored("activePathCount>maxPathNodes: activePathCount:" + this.activePathCount);
                     this.activePathCount = 120;
                 }
                 this.v = this.activePathCount;
@@ -4363,7 +4363,7 @@ public abstract class OrderableUnit extends UnitBase {
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
     public boolean c(float f) {
         GameEngine gameEngine = GameEngine.getInstance();
-        GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
+        GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
         Paint renderPaint = getRenderPaint();
         float fCD = getMaxHealth();
         if (this.ew) {
@@ -4429,17 +4429,17 @@ public abstract class OrderableUnit extends UnitBase {
     public boolean drawShadow() {
         if (this.shadowTexture != null && canDrawShadow()) {
             GameEngine gameEngine = GameEngine.getInstance();
-            if (!gameEngine.mouseWorldX && this.radius < 18.0f && this.posZ < 0.5d) {
+            if (!gameEngine.shouldDrawSmallUnitShadows && this.radius < 18.0f && this.posZ < 0.5d) {
                 return true;
             }
-            if (!gameEngine.mouseWorldY && this.radius < 28.0f && this.posZ < 5.0f) {
+            if (!gameEngine.shouldDrawUnitShadows && this.radius < 28.0f && this.posZ < 5.0f) {
                 return true;
             }
             PointF shadowOffset = getShadowOffset();
             float f = (this.posX + shadowOffset.x) - gameEngine.viewpointXSnapped;
             float f2 = (this.posY + shadowOffset.y) - gameEngine.viewpointYSnapped;
             float fCD = getMaxHealth();
-            GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
+            GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
             if (fCD != 1.0f) {
                 graphicsEngine.k();
                 graphicsEngine.a(fCD, fCD, f, f2);
@@ -4467,7 +4467,7 @@ public abstract class OrderableUnit extends UnitBase {
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: s_ */
     public boolean isBuilding() {
-        return RectF.a(GameEngine.getInstance().cameraFollowMode, getUnitMassBounds());
+        return RectF.a(GameEngine.getInstance().visibleScreenRect, getUnitMassBounds());
     }
 
     /* JADX INFO: renamed from: aR */
@@ -4959,7 +4959,7 @@ public abstract class OrderableUnit extends UnitBase {
         rectF.a *= gameEngine.tileMap.tileWorldSizeX;
         rectF.c *= gameEngine.tileMap.tileWorldSizeX;
         rectF.a(this.posX, this.posY);
-        rectF.a(-getUnitAIState(), -getUnitAIPathfindStatus());
+        rectF.a(-getTileOffsetX(), -getTileOffsetY());
         rectF.b -= 10.0f;
         rectF.d += 10.0f;
         rectF.a -= 10.0f;
@@ -5038,7 +5038,7 @@ public abstract class OrderableUnit extends UnitBase {
             int i6 = i2 + rectCd.c;
             int i7 = i3 + rectCd.d;
             if (i != -2) {
-                gameEngine.tileMap.renderBuildPlacementOverlay(this, i4, i5, i6, i7, (int) gameEngine.viewpointXSnapped, (int) gameEngine.viewpointYSnapped, gameEngine.graphicsEngine2, true, i);
+                gameEngine.tileMap.renderBuildPlacementOverlay(this, i4, i5, i6, i7, (int) gameEngine.viewpointXSnapped, (int) gameEngine.viewpointYSnapped, gameEngine.renderGraphicsEngine, true, i);
             }
         }
     }
@@ -5224,20 +5224,20 @@ public abstract class OrderableUnit extends UnitBase {
         GameEngine gameEngine = GameEngine.getInstance();
         AbstractUnitAction abstractUnitActionFindActionForUnitTypeWithQueueSize = findActionForUnitTypeWithQueueSize(unitType, i, false);
         if (abstractUnitActionFindActionForUnitTypeWithQueueSize == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("Unit '" + r().getUnitTypeDescriptionShort() + "' can not build:" + unitType.getUnitTypeDescriptionShort());
+            GameEngine.logColored("Unit '" + r().getUnitTypeDescriptionShort() + "' can not build:" + unitType.getUnitTypeDescriptionShort());
             return bn.a();
         }
         if (!unitCommand.isForceMove) {
             if (abstractUnitActionFindActionForUnitTypeWithQueueSize.isNotAvailable(this)) {
-                GameEngine.updatePaintTextSizeIfNeeded("Builder '" + r().getUnitTypeDescriptionShort() + "' tried to build a locked building:" + abstractUnitActionFindActionForUnitTypeWithQueueSize.getActionIdString());
+                GameEngine.logColored("Builder '" + r().getUnitTypeDescriptionShort() + "' tried to build a locked building:" + abstractUnitActionFindActionForUnitTypeWithQueueSize.getActionIdString());
                 return bn.a();
             }
             if (!abstractUnitActionFindActionForUnitTypeWithQueueSize.b(this) && !abstractUnitActionFindActionForUnitTypeWithQueueSize.isActivated(this)) {
-                GameEngine.updatePaintTextSizeIfNeeded("Builder '" + r().getUnitTypeDescriptionShort() + "' tried to build a unavailable building:" + abstractUnitActionFindActionForUnitTypeWithQueueSize.getActionIdString() + " (add isLocked:false to fix)");
+                GameEngine.logColored("Builder '" + r().getUnitTypeDescriptionShort() + "' tried to build a unavailable building:" + abstractUnitActionFindActionForUnitTypeWithQueueSize.getActionIdString() + " (add isLocked:false to fix)");
                 return bn.a();
             }
         }
-        if (!unitType.k() && !abstractUnitActionFindActionForUnitTypeWithQueueSize.isRightClickAction() && this.team.getTeamUnitCountInt() >= this.team.getTeamBuildingCountInt()) {
+        if (!unitType.k() && !abstractUnitActionFindActionForUnitTypeWithQueueSize.isRightClickAction() && this.team.getNonBuildingUnitCountIncludingQueued() >= this.team.getUnitCap()) {
             if (this.team == gameEngine.playerTeam) {
                 gameEngine.gameUI.showMediumPriorityMessage(gameEngine.gameUI.interfaceRenderer.unitCapReachedText);
             }
@@ -5262,9 +5262,9 @@ public abstract class OrderableUnit extends UnitBase {
         }
         baseUnitG.deceleration = 0.0f;
         baseUnitG.movementAngle = 0.0f;
-        gameEngine.tileMap.exportTmxToFile((f - baseUnitG.getUnitAIState()) + 1.0f, (f2 - baseUnitG.getUnitAIPathfindStatus()) + 1.0f);
-        baseUnitG.posX = gameEngine.tileMap.cursorTileX + baseUnitG.getUnitAIState();
-        baseUnitG.posY = gameEngine.tileMap.cursorTileY + baseUnitG.getUnitAIPathfindStatus();
+        gameEngine.tileMap.exportTmxToFile((f - baseUnitG.getTileOffsetX()) + 1.0f, (f2 - baseUnitG.getTileOffsetY()) + 1.0f);
+        baseUnitG.posX = gameEngine.tileMap.cursorTileX + baseUnitG.getTileOffsetX();
+        baseUnitG.posY = gameEngine.tileMap.cursorTileY + baseUnitG.getTileOffsetY();
         baseUnitG.f(this.team);
         baseUnitG.getUnitType(this);
         if (i != 1 && (baseUnitG instanceof OrderableUnit)) {
@@ -5304,7 +5304,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (!displayText.c(this)) {
             baseUnitG.remove();
             TriggerDebugAction triggerDebugActionA2 = bn.a();
-            this.lastAttackTick = gameEngine.lastTick;
+            this.lastAttackTick = gameEngine.gameTimeMillis;
             if (this.wayPointTimer < 1000.0f) {
                 triggerDebugActionA2.isActive = true;
                 BuildPreview buildPreviewFindClosestPreview = BuildPreview.findClosestPreview(this.team, baseUnitG.posX, baseUnitG.posY);
@@ -5344,7 +5344,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (this.parentEntity.isDestroyed) {
         }
         if (!this.parentEntity.b(this)) {
-            GameEngine.updatePaintTextSizeIfNeeded("Deattach failed, forcing deattach. Child:" + getVelocityX() + " Parent:" + this.parentEntity.getVelocityX());
+            GameEngine.logColored("Deattach failed, forcing deattach. Child:" + getVelocityX() + " Parent:" + this.parentEntity.getVelocityX());
             this.parentEntity = null;
             this.attachmentData = null;
         }

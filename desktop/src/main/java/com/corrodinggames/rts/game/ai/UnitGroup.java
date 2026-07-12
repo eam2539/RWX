@@ -231,7 +231,7 @@ public class UnitGroup extends AIUnitGroupBase {
     }
 
     public BaseUnit a(float f) {
-        if (GameEngine.getInstance().lastTick - (f * 1000.0f) < this.C) {
+        if (GameEngine.getInstance().gameTimeMillis - (f * 1000.0f) < this.C) {
             return this.D;
         }
         return null;
@@ -511,7 +511,7 @@ public class UnitGroup extends AIUnitGroupBase {
                         }
                         Iterator it2 = this.F.iterator();
                         while (it2.hasNext()) {
-                            if (((OrderableUnit) it2.next()).bs > gameEngine.lastTick - 1000) {
+                            if (((OrderableUnit) it2.next()).bs > gameEngine.gameTimeMillis - 1000) {
                                 this.q = false;
                                 a("Not staging due to damage");
                             }

@@ -145,10 +145,10 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
 
     public static void L() {
         GameEngine gameEngine = GameEngine.getInstance();
-        b = gameEngine.graphicsEngine2.a(R.drawable.dropship);
-        c = gameEngine.graphicsEngine2.a(R.drawable.dropship_shadow);
-        a = gameEngine.graphicsEngine2.a(R.drawable.dropship_dead);
-        d = PlayerTeam.getUnitCountByType(b);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.dropship);
+        c = gameEngine.renderGraphicsEngine.a(R.drawable.dropship_shadow);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.dropship_dead);
+        d = PlayerTeam.getTeamColorTextures(b);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -461,7 +461,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cr */
-    public boolean getUnitAIPathfindCost() {
+    public boolean canTransportUnits() {
         return true;
     }
 

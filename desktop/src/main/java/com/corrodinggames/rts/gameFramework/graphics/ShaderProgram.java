@@ -68,7 +68,7 @@ public class ShaderProgram {
     public ShaderProgram(String str) throws IOException {
         this.d = VariableScope.nullOrMissingString;
         this.p = new ShaderUniform[0];
-        a(GameEngine.isPCVersionStatic2 ? "assets/shaders/plainGDX.vert" : "assets/shaders/plain.vert", str);
+        a(GameEngine.isGDXVersion ? "assets/shaders/plainGDX.vert" : "assets/shaders/plain.vert", str);
     }
 
     public void a(String str, String str2) throws IOException {
@@ -106,9 +106,9 @@ public class ShaderProgram {
     public void c(String str) {
         if (this.r < 3) {
             this.r++;
-            GameEngine.canStartNewGame("shader(" + this.c + "): " + str);
+            GameEngine.reportNonFatalError("shader(" + this.c + "): " + str);
         }
-        GameEngine.printLog("shader(" + this.c + "): " + str);
+        GameEngine.logErrorColored("shader(" + this.c + "): " + str);
         this.o = 1;
     }
 
@@ -156,6 +156,6 @@ public class ShaderProgram {
     }
 
     public void c() {
-        GameEngine.getInstance().graphicsEngine2.a(this);
+        GameEngine.getInstance().renderGraphicsEngine.a(this);
     }
 }

@@ -79,7 +79,7 @@ public class TransportAction extends LogicAction {
                     for (int size = customUnit.transportedUnits.size() - 1; size >= 0; size--) {
                         BaseUnit baseUnit2 = (BaseUnit) customUnit.transportedUnits.get(size);
                         if (baseUnit2 == null) {
-                            GameEngine.updatePaintTextSizeIfNeeded("deleteNumUnitsFromTransport unit==null");
+                            GameEngine.logColored("deleteNumUnitsFromTransport unit==null");
                         } else if (this.deleteNumUnitsFromTransport_onlyWithTags == null || AnimationTag.a(this.deleteNumUnitsFromTransport_onlyWithTags, baseUnit2.getUnitCombatAnimation())) {
                             customUnit.transportedUnits.remove(size);
                             customUnit.unloadTransportedUnit(baseUnit2);

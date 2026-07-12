@@ -76,8 +76,8 @@ public final class LayerBufferManager {
         this.cellWorldExtent = (int) (this.cellBufferPixelSize / this.renderScale);
         this.cellWorldStepSize = (int) (this.cellInnerBufferPixelSize / this.renderScale);
         this.invCellWorldStepSize = 1.0f / this.cellWorldStepSize;
-        this.gridOriginWorldX = gameEngine.cameraBoundsMaxY - (this.cellWorldExtent / 2);
-        this.gridOriginWorldY = gameEngine.mapWidth - (this.cellWorldExtent / 2);
+        this.gridOriginWorldX = gameEngine.viewpointXInt - (this.cellWorldExtent / 2);
+        this.gridOriginWorldY = gameEngine.viewpointYInt - (this.cellWorldExtent / 2);
         float f = 1.0f / 20;
         this.gridOriginWorldX = ((int) (this.gridOriginWorldX * f)) * 20;
         this.gridOriginWorldY = ((int) (this.gridOriginWorldY * f)) * 20;
@@ -345,7 +345,7 @@ public final class LayerBufferManager {
             this.bufferLayerGraphics.a(texture, rect, rectF, this.copyBlitPaint);
         }
         this.bufferLayerGraphics.p();
-        if (GameEngine.isAndroidVersionStatic2) {
+        if (GameEngine.isPCOrIOSVersion) {
             layerBufferCell.cellGraphicsCopy.a(0, PorterDuff.Mode.CLEAR);
         }
         layerBufferCell.cellGraphicsCopy.b(this.bufferLayerTexture, 0.0f, 0.0f, (Paint) null);
@@ -366,17 +366,17 @@ public final class LayerBufferManager {
         if (gameEngine.settingsEngine.renderFancyWater) {
             z = true;
         }
-        if (GameEngine.printLog() || GameEngine.getPointerIndex()) {
+        if (GameEngine.isSpaceGame() || GameEngine.isMapDebugMode()) {
             z = true;
         }
         if (z) {
             graphicsEngine.a(0, PorterDuff.Mode.CLEAR);
         } else {
             boolean z2 = false;
-            if (GameEngine.printLog()) {
+            if (GameEngine.isSpaceGame()) {
                 z2 = true;
             }
-            if (GameEngine.isIOSVersionStatic2) {
+            if (GameEngine.isJavaDesktopVersion) {
                 z2 = true;
             }
             if (GameUI.bO) {
@@ -387,7 +387,7 @@ public final class LayerBufferManager {
                 graphicsEngine.b(-16777216);
             }
         }
-        if (GameEngine.isIOSVersionStatic2) {
+        if (GameEngine.isJavaDesktopVersion) {
             graphicsEngine.a(0, PorterDuff.Mode.CLEAR);
         }
         int i3 = this.gridOriginWorldX + (i * this.cellWorldStepSize);
@@ -449,7 +449,7 @@ public final class LayerBufferManager {
         layerBufferCell.fadeFrameCount = 0;
         layerBufferCell.preRendered = false;
         graphicsEngine.p();
-        if (z || GameEngine.isAndroidVersionStatic2) {
+        if (z || GameEngine.isPCOrIOSVersion) {
             layerBufferCell.cellGraphicsCopy.a(0, PorterDuff.Mode.CLEAR);
         }
         layerBufferCell.cellGraphicsCopy.b(this.bufferLayerTexture, 0.0f, 0.0f, (Paint) null);
@@ -462,7 +462,7 @@ public final class LayerBufferManager {
 
     /* JADX INFO: renamed from: d */
     public void update() {
-        if (GameEngine.isPausedStatic2 && !GameEngine.isIOSVersionStatic2 && !GameEngine.isPCVersionStatic2) {
+        if (GameEngine.isNonAndroidVersion && !GameEngine.isJavaDesktopVersion && !GameEngine.isGDXVersion) {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
@@ -475,7 +475,7 @@ public final class LayerBufferManager {
         if (this.gridCells == null) {
             GameEngine.log("map", "setupLayerBuffers for size:" + iMax);
             long jNanoTime = System.nanoTime();
-            if (GameEngine.isIOSVersionStatic2 || GameEngine.isPCVersionStatic2) {
+            if (GameEngine.isJavaDesktopVersion || GameEngine.isGDXVersion) {
                 this.cellBufferPixelSize = 1024;
                 this.gridCellsPerAxis = (int) ((iMax / this.cellBufferPixelSize) + 1.5f);
             } else {
@@ -484,12 +484,12 @@ public final class LayerBufferManager {
                 this.cellBufferPixelSize = ((int) ((this.cellBufferPixelSize * (1.0f / 20)) + 0.5f)) * 20;
             }
             if (this.cellBufferPixelSize * this.gridCellsPerAxis < iMax + this.cellBufferPixelSize + 1) {
-                GameEngine.updatePaintTextSizeIfNeeded("layerBufferSize is too small");
-                GameEngine.updatePaintTextSizeIfNeeded("layerBufferCount:" + this.gridCellsPerAxis);
-                GameEngine.updatePaintTextSizeIfNeeded("(layerBufferSize*(layerBufferCount):" + (this.cellBufferPixelSize * this.gridCellsPerAxis));
-                GameEngine.updatePaintTextSizeIfNeeded("longest+layerBufferSize+1:" + (iMax + this.cellBufferPixelSize + 1));
-                GameEngine.updatePaintTextSizeIfNeeded("longest:" + iMax);
-                if (GameEngine.isIOSVersionStatic2 || GameEngine.isPCVersionStatic2) {
+                GameEngine.logColored("layerBufferSize is too small");
+                GameEngine.logColored("layerBufferCount:" + this.gridCellsPerAxis);
+                GameEngine.logColored("(layerBufferSize*(layerBufferCount):" + (this.cellBufferPixelSize * this.gridCellsPerAxis));
+                GameEngine.logColored("longest+layerBufferSize+1:" + (iMax + this.cellBufferPixelSize + 1));
+                GameEngine.logColored("longest:" + iMax);
+                if (GameEngine.isJavaDesktopVersion || GameEngine.isGDXVersion) {
                     this.gridCellsPerAxis++;
                 } else {
                     this.cellBufferPixelSize += 100;
@@ -497,26 +497,26 @@ public final class LayerBufferManager {
             }
             GameEngine.log("layerBufferSize:" + this.cellBufferPixelSize);
             this.cellInnerBufferPixelSize = this.cellBufferPixelSize - 4;
-            GameEngine.updatePaintTextSizeIfNeeded("layerBuffer:" + this.gridCellsPerAxis + "x" + this.gridCellsPerAxis + " = " + (this.gridCellsPerAxis * this.gridCellsPerAxis) + (TileMap.softFogFadingEnabled ? " x2 for soft fade " : VariableScope.nullOrMissingString));
+            GameEngine.logColored("layerBuffer:" + this.gridCellsPerAxis + "x" + this.gridCellsPerAxis + " = " + (this.gridCellsPerAxis * this.gridCellsPerAxis) + (TileMap.softFogFadingEnabled ? " x2 for soft fade " : VariableScope.nullOrMissingString));
             this.gridCells = new LayerBufferCell[this.gridCellsPerAxis][this.gridCellsPerAxis];
             boolean z = false;
             if (gameEngine.settingsEngine.renderFancyWater) {
                 z = true;
             }
-            if (GameEngine.printLog() || GameEngine.getPointerIndex()) {
+            if (GameEngine.isSpaceGame() || GameEngine.isMapDebugMode()) {
                 z = true;
             }
             if (this.cellBufferPixelSize <= 0) {
-                GameEngine.updatePaintTextSizeIfNeeded("layerBuffer buffer size was too small at: " + this.cellBufferPixelSize);
+                GameEngine.logColored("layerBuffer buffer size was too small at: " + this.cellBufferPixelSize);
                 this.cellBufferPixelSize = 512;
             }
             if (z) {
-                this.bufferLayerTexture = gameEngine.graphicsEngine2.a(this.cellBufferPixelSize, this.cellBufferPixelSize, true);
+                this.bufferLayerTexture = gameEngine.renderGraphicsEngine.a(this.cellBufferPixelSize, this.cellBufferPixelSize, true);
             } else {
-                this.bufferLayerTexture = gameEngine.graphicsEngine2.a(this.cellBufferPixelSize, this.cellBufferPixelSize, false);
+                this.bufferLayerTexture = gameEngine.renderGraphicsEngine.a(this.cellBufferPixelSize, this.cellBufferPixelSize, false);
             }
             this.bufferLayerTexture.b(true);
-            this.bufferLayerGraphics = gameEngine.graphicsEngine2.b(this.bufferLayerTexture);
+            this.bufferLayerGraphics = gameEngine.renderGraphicsEngine.b(this.bufferLayerTexture);
             initMissingLayerBufferImages();
             GameEngine.log("----- layerBuffers create in:" + ((System.nanoTime() - jNanoTime) / 1000000.0d) + " ms");
         }
@@ -573,25 +573,25 @@ public final class LayerBufferManager {
                     this.redrawFrameCounter++;
                     this.gridCells[i][i2] = layerBufferCell;
                     if (this.cellBufferPixelSize <= 0) {
-                        GameEngine.updatePaintTextSizeIfNeeded("initMissingLayerBufferImages: layerBuffer buffer size was too small at: " + this.cellBufferPixelSize);
+                        GameEngine.logColored("initMissingLayerBufferImages: layerBuffer buffer size was too small at: " + this.cellBufferPixelSize);
                         this.cellBufferPixelSize = 512;
                     }
                     if (z) {
-                        layerBufferCell.cellLayerTexture = gameEngine.graphicsEngine2.r();
+                        layerBufferCell.cellLayerTexture = gameEngine.renderGraphicsEngine.r();
                     } else if (gameEngine.settingsEngine.renderFancyWater) {
-                        layerBufferCell.cellLayerTexture = gameEngine.graphicsEngine2.a(this.cellBufferPixelSize, this.cellBufferPixelSize, true);
+                        layerBufferCell.cellLayerTexture = gameEngine.renderGraphicsEngine.a(this.cellBufferPixelSize, this.cellBufferPixelSize, true);
                     } else {
-                        layerBufferCell.cellLayerTexture = gameEngine.graphicsEngine2.a(this.cellBufferPixelSize, this.cellBufferPixelSize, false);
+                        layerBufferCell.cellLayerTexture = gameEngine.renderGraphicsEngine.a(this.cellBufferPixelSize, this.cellBufferPixelSize, false);
                     }
                     layerBufferCell.cellLayerTexture.b(true);
                     if (layerBufferCell.cellLayerTexture.A()) {
                         if (!z) {
-                            GameEngine.updatePaintTextSizeIfNeeded("initMissingLayerBufferImages: Failed to create map buffer at :" + this.cellBufferPixelSize + "px");
+                            GameEngine.logColored("initMissingLayerBufferImages: Failed to create map buffer at :" + this.cellBufferPixelSize + "px");
                         }
                         layerBufferCell.cellGraphicsCopy = new NullGraphicsInterface();
                     } else {
                         try {
-                            layerBufferCell.cellGraphicsCopy = gameEngine.graphicsEngine2.b(layerBufferCell.cellLayerTexture);
+                            layerBufferCell.cellGraphicsCopy = gameEngine.renderGraphicsEngine.b(layerBufferCell.cellLayerTexture);
                         } catch (OutOfMemoryError e) {
                             if (!z) {
                                 GameEngine.reportOOM(AssetType.gameImageCreate, e);
@@ -617,7 +617,7 @@ public final class LayerBufferManager {
                         layerBufferCell2.initFadeBufferTexture();
                     } catch (OutOfMemoryError e2) {
                         disableSmoothFogFading();
-                        GameEngine.updatePaintTextSizeIfNeeded("Not enough free memory to enable smooth fog fading");
+                        GameEngine.logColored("Not enough free memory to enable smooth fog fading");
                         System.gc();
                     }
                 }
@@ -691,32 +691,32 @@ public final class LayerBufferManager {
                 z2 = true;
             }
         }
-        if (gameEngine.cameraBoundsMaxY + gameEngine.screenHeight + 4.0f > this.gridOriginWorldX + (this.gridCellsPerAxis * this.cellWorldStepSize)) {
+        if (gameEngine.viewpointXInt + gameEngine.visibleWorldWidth + 4.0f > this.gridOriginWorldX + (this.gridCellsPerAxis * this.cellWorldStepSize)) {
             this.gridOriginWorldX += this.cellWorldStepSize;
             scrollGridX(1);
         }
-        if (gameEngine.cameraBoundsMaxY - 1 < this.gridOriginWorldX) {
+        if (gameEngine.viewpointXInt - 1 < this.gridOriginWorldX) {
             this.gridOriginWorldX -= this.cellWorldStepSize;
             scrollGridX(-1);
         }
-        if (gameEngine.mapWidth + gameEngine.viewpointHeight + 4.0f > this.gridOriginWorldY + (this.gridCellsPerAxis * this.cellWorldStepSize)) {
+        if (gameEngine.viewpointYInt + gameEngine.visibleWorldHeight + 4.0f > this.gridOriginWorldY + (this.gridCellsPerAxis * this.cellWorldStepSize)) {
             this.gridOriginWorldY += this.cellWorldStepSize;
             scrollGridY(1);
         }
-        if (gameEngine.mapWidth - 1 < this.gridOriginWorldY) {
+        if (gameEngine.viewpointYInt - 1 < this.gridOriginWorldY) {
             this.gridOriginWorldY -= this.cellWorldStepSize;
             scrollGridY(-1);
         }
-        if (gameEngine.cameraBoundsMaxY + gameEngine.screenHeight + 4.0f > this.gridOriginWorldX + (this.gridCellsPerAxis * this.cellWorldStepSize)) {
+        if (gameEngine.viewpointXInt + gameEngine.visibleWorldWidth + 4.0f > this.gridOriginWorldX + (this.gridCellsPerAxis * this.cellWorldStepSize)) {
             z2 = true;
         }
-        if (gameEngine.cameraBoundsMaxY - 1 < this.gridOriginWorldX) {
+        if (gameEngine.viewpointXInt - 1 < this.gridOriginWorldX) {
             z2 = true;
         }
-        if (gameEngine.mapWidth + gameEngine.viewpointHeight + 4.0f > this.gridOriginWorldY + (this.gridCellsPerAxis * this.cellWorldStepSize)) {
+        if (gameEngine.viewpointYInt + gameEngine.visibleWorldHeight + 4.0f > this.gridOriginWorldY + (this.gridCellsPerAxis * this.cellWorldStepSize)) {
             z2 = true;
         }
-        if (gameEngine.mapWidth - 1 < this.gridOriginWorldY) {
+        if (gameEngine.viewpointYInt - 1 < this.gridOriginWorldY) {
             z2 = true;
         }
         if (z2) {
@@ -729,12 +729,12 @@ public final class LayerBufferManager {
         float f6 = (gameEngine.currentScreenWidthPixels / f5) + 2.0f;
         float f7 = (gameEngine.currentScreenHeightPixels / f5) + 2.0f;
         if (f5 != 1.0f) {
-            gameEngine.graphicsEngine2.k();
-            gameEngine.graphicsEngine2.a(f5, f5);
-            tileMap.tempRectTile.a(gameEngine.cameraBoundsEnabled);
+            gameEngine.renderGraphicsEngine.k();
+            gameEngine.renderGraphicsEngine.a(f5, f5);
+            tileMap.tempRectTile.a(gameEngine.screenClipRect);
             tileMap.tempRectTile.c = ((int) (tileMap.tempRectTile.a + (tileMap.tempRectTile.b() / f5))) + 2;
             tileMap.tempRectTile.d = ((int) (tileMap.tempRectTile.b + (tileMap.tempRectTile.c() / f5))) + 2;
-            gameEngine.graphicsEngine2.a(tileMap.tempRectTile);
+            gameEngine.renderGraphicsEngine.a(tileMap.tempRectTile);
         }
         float f8 = (this.gridOriginWorldX - gameEngine.viewpointXSnapped) * this.renderScale;
         float f9 = (this.gridOriginWorldY - gameEngine.viewpointYSnapped) * this.renderScale;
@@ -836,13 +836,13 @@ public final class LayerBufferManager {
                                                 e.printStackTrace();
                                                 GameEngine.reportOOM(AssetType.gameImageCreate, e);
                                                 disableSmoothFogFading();
-                                                GameEngine.updatePaintTextSizeIfNeeded("Not enough free memory to keep smooth fog fading");
+                                                GameEngine.logColored("Not enough free memory to keep smooth fog fading");
                                                 System.gc();
                                             }
                                             if (TileMap.softFogFadingEnabled && layerBufferCell.fadeOutTexture == null) {
                                                 gameEngine.alert("Disabling smooth fog fading due to error");
                                                 disableSmoothFogFading();
-                                                GameEngine.updatePaintTextSizeIfNeeded("fadeOutBitmap == null");
+                                                GameEngine.logColored("fadeOutBitmap == null");
                                                 System.gc();
                                             }
                                         }
@@ -864,13 +864,13 @@ public final class LayerBufferManager {
                                     } else {
                                         layerBufferCell.fadeProgressRatio = 0.0f;
                                     }
-                                    if (GameEngine.isDesktop() && !z4) {
+                                    if (GameEngine.isAndroidPlatform() && !z4) {
                                         TileMap.acquireFogAtlasLock();
                                         z4 = true;
                                     }
-                                    gameEngine.graphicsEngine2.i();
+                                    gameEngine.renderGraphicsEngine.i();
                                     renderCell(i3, i4);
-                                    gameEngine.graphicsEngine2.j();
+                                    gameEngine.renderGraphicsEngine.j();
                                     if (TileMap.fogProfilingEnabled) {
                                         PerformanceProfiler.a("re-drawTile", jA);
                                     }
@@ -884,15 +884,15 @@ public final class LayerBufferManager {
                             if (layerBufferCell.fadeProgressRatio > 0.0f) {
                                 layerBufferCell.fadeBlendPaint.a(z3);
                                 layerBufferCell.fadeBlendPaint.c((int) ((1.0f - layerBufferCell.fadeProgressRatio) * 255.0f));
-                                gameEngine.graphicsEngine2.a(layerBufferCell.fadeOutTexture, layerBufferCell.tileSrcRect, layerBufferCell.screenDstRectF, this.copyBlitPaint);
+                                gameEngine.renderGraphicsEngine.a(layerBufferCell.fadeOutTexture, layerBufferCell.tileSrcRect, layerBufferCell.screenDstRectF, this.copyBlitPaint);
                                 if (layerBufferCell.fadeProgressRatio < 0.98d) {
-                                    gameEngine.graphicsEngine2.a(layerBufferCell.cellLayerTexture, layerBufferCell.tileSrcRect, layerBufferCell.screenDstRectF, layerBufferCell.fadeBlendPaint);
+                                    gameEngine.renderGraphicsEngine.a(layerBufferCell.cellLayerTexture, layerBufferCell.tileSrcRect, layerBufferCell.screenDstRectF, layerBufferCell.fadeBlendPaint);
                                 }
                                 layerBufferCell.fadeProgressRatio -= 0.1f * f;
                             } else if (layerBufferCell.cellLayerTexture.A()) {
-                                gameEngine.graphicsEngine2.a(layerBufferCell.cellLayerTexture, layerBufferCell.screenDstRectF, this.copyBlitPaint, 0.0f, 0.0f, 0, 0);
+                                gameEngine.renderGraphicsEngine.a(layerBufferCell.cellLayerTexture, layerBufferCell.screenDstRectF, this.copyBlitPaint, 0.0f, 0.0f, 0, 0);
                             } else {
-                                gameEngine.graphicsEngine2.a(layerBufferCell.cellLayerTexture, layerBufferCell.tileSrcRect, layerBufferCell.screenDstRectF, this.copyBlitPaint);
+                                gameEngine.renderGraphicsEngine.a(layerBufferCell.cellLayerTexture, layerBufferCell.tileSrcRect, layerBufferCell.screenDstRectF, this.copyBlitPaint);
                             }
                         }
                     }
@@ -904,7 +904,7 @@ public final class LayerBufferManager {
             }
         }
         if (f5 != 1.0f) {
-            gameEngine.graphicsEngine2.l();
+            gameEngine.renderGraphicsEngine.l();
         }
         if (!z) {
             this.useFogBlitComposite = false;

@@ -36,8 +36,8 @@ public class Ladybug extends LandUnit {
     }
 
     public static void f() {
-        b = GameEngine.getInstance().graphicsEngine2.a(R.drawable.ladybug);
-        d = PlayerTeam.getUnitCountByType(b);
+        b = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.ladybug);
+        d = PlayerTeam.getTeamColorTextures(b);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

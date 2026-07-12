@@ -132,7 +132,7 @@ public class LaserDefense extends FactoryWithQueue {
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryWithQueue, com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
         gameOutputStream.writeBoolean(this.isUpgraded);
-        gameOutputStream.writeFloat(this.f0cB);
+        gameOutputStream.writeFloat(this.currentEnergy);
         gameOutputStream.writeBoolean(this.isRecharging);
         gameOutputStream.writeFloat(this.laserEffectTimer);
         super.a(gameOutputStream);
@@ -141,7 +141,7 @@ public class LaserDefense extends FactoryWithQueue {
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryWithQueue, com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject
     public void a(GameInputStream gameInputStream) throws IOException {
         this.isUpgraded = gameInputStream.readBoolean();
-        this.f0cB = gameInputStream.readFloat();
+        this.currentEnergy = gameInputStream.readFloat();
         this.isRecharging = gameInputStream.readBoolean();
         if (gameInputStream.getProtocolVersion() >= 38) {
             this.laserEffectTimer = gameInputStream.readFloat();
@@ -160,15 +160,15 @@ public class LaserDefense extends FactoryWithQueue {
     /* JADX INFO: renamed from: b */
     public static void initializeTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.laser_defence_dead);
-        Texture textureA = gameEngine.graphicsEngine2.a(R.drawable.laser_defence);
-        Texture textureA2 = gameEngine.graphicsEngine2.a(R.drawable.laser_defence_t2);
-        level1Textures = PlayerTeam.getUnitCountByType(textureA);
-        level2Textures = PlayerTeam.getUnitCountByType(textureA2);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.laser_defence_dead);
+        Texture textureA = gameEngine.renderGraphicsEngine.a(R.drawable.laser_defence);
+        Texture textureA2 = gameEngine.renderGraphicsEngine.a(R.drawable.laser_defence_t2);
+        level1Textures = PlayerTeam.getTeamColorTextures(textureA);
+        level2Textures = PlayerTeam.getTeamColorTextures(textureA2);
         textureA.n();
         textureA2.n();
-        iconTexture = gameEngine.graphicsEngine2.a(R.drawable.unit_icon_building_turrent);
-        shadowTexture = PlayerTeam.getUnitCountByType(iconTexture);
+        iconTexture = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_building_turrent);
+        shadowTexture = PlayerTeam.getTeamColorTextures(iconTexture);
     }
 
     public LaserDefense(boolean z) {
@@ -176,7 +176,7 @@ public class LaserDefense extends FactoryWithQueue {
         this.laserOriginPoint = new PointF();
         this.drawRect = new Rect();
         a(level1Textures[0], 2);
-        this.f0cB = 1.0f;
+        this.currentEnergy = 1.0f;
         this.radius = 19.0f;
         this.displayRadius = this.radius;
         this.maxHealth = 500.0f;
@@ -230,13 +230,13 @@ public class LaserDefense extends FactoryWithQueue {
         if (this.isUpgraded) {
             f3 += 2.0E-4f * f;
         }
-        this.f0cB = Utility.distanceSq(this.f0cB, 1.0f, f3);
-        if (this.f0cB >= 1.0f) {
+        this.currentEnergy = Utility.distanceSq(this.currentEnergy, 1.0f, f3);
+        if (this.currentEnergy >= 1.0f) {
             this.isRecharging = false;
         }
         this.laserEffectTimer -= f;
         this.laserOriginPoint.a(E(0));
-        if (this.f0cB > 0.0f && !this.isRecharging) {
+        if (this.currentEnergy > 0.0f && !this.isRecharging) {
             if (!this.isUpgraded) {
                 f2 = 0.11f;
             } else {
@@ -245,8 +245,8 @@ public class LaserDefense extends FactoryWithQueue {
             if (attackTarget(this, this.laserOriginPoint.x, this.laserOriginPoint.y, this.posZ, m(), f2)) {
                 this.laserEffectTimer = 3.0f;
             }
-            if (this.f0cB < 0.0f) {
-                this.f0cB = 0.0f;
+            if (this.currentEnergy < 0.0f) {
+                this.currentEnergy = 0.0f;
                 this.isRecharging = true;
             }
         }
@@ -308,7 +308,7 @@ public class LaserDefense extends FactoryWithQueue {
                         }
                         gameEngine.soundEngine.playSoundAt(SoundEngine.laserDeflect2Sound, 0.2f, 1.0f + Utility.randomFloatInRange(-0.07f, 0.07f), projectile.posX, projectile.posY);
                     }
-                    orderableUnit.f0cB -= f5;
+                    orderableUnit.currentEnergy -= f5;
                     return true;
                 }
             }
@@ -369,8 +369,8 @@ public class LaserDefense extends FactoryWithQueue {
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: bW */
     public float getUnitTeamData() {
-        if (this.f0cB != 1.0f) {
-            return this.f0cB;
+        if (this.currentEnergy != 1.0f) {
+            return this.currentEnergy;
         }
         return super.getUnitTeamData();
     }
@@ -439,19 +439,19 @@ public class LaserDefense extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cZ */
-    public float getUnitAIState() {
+    public float getTileOffsetX() {
         return GameEngine.getInstance().tileMap.tileWorldSizeX;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: da */
-    public float getUnitAIPathfindStatus() {
+    public float getTileOffsetY() {
         return GameEngine.getInstance().tileMap.tileWorldSizeY;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: db */
-    public float getUnitAIPathfindError() {
-        return super.getUnitAIPathfindError() - 8.0f;
+    public float getSelectionRadius() {
+        return super.getSelectionRadius() - 8.0f;
     }
 }

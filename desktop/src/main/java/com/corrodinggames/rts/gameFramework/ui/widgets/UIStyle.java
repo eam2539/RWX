@@ -107,7 +107,7 @@ public class UIStyle {
     public void a(GraphicsEngine graphicsEngine, Rect rect) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (this.p != null) {
-            gameEngine.graphicsEngine2.a(this.p, rect, this.o, 0, 0, 0, 0);
+            gameEngine.renderGraphicsEngine.a(this.p, rect, this.o, 0, 0, 0, 0);
         } else if (this.o != null) {
             graphicsEngine.b(rect, this.o);
         }

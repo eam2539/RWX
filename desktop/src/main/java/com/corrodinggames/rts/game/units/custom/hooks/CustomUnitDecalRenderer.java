@@ -622,7 +622,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
 
                         var44 += var14.V;
                         if (var11 && var14.C != null) {
-                            GraphicsEngine var54 = var39.graphicsEngine2;
+                            GraphicsEngine var54 = var39.renderGraphicsEngine;
                             float var60 = var40 - var39.viewpointXSnapped + var14.D;
                             float var64 = var42 - var39.viewpointYSnapped + var14.E;
                             Paint var70 = jx.getSelectionPaint();
@@ -635,7 +635,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                         }
 
                         if (var14.u) {
-                            GraphicsEngine var52 = var39.graphicsEngine2;
+                            GraphicsEngine var52 = var39.renderGraphicsEngine;
                             float var58 = var40 - var39.viewpointXSnapped;
                             float var62 = var42 - var39.viewpointYSnapped - var44;
                             float var66 = var18;
@@ -825,7 +825,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                                 }
                             }
 
-                            var39.graphicsEngine2.a(var59, var63, var67, var69, (Paint)var74);
+                            var39.renderGraphicsEngine.a(var59, var63, var67, var69, (Paint)var74);
                         }
                     }
                 }

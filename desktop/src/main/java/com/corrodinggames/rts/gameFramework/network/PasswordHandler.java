@@ -37,9 +37,9 @@ public class PasswordHandler {
             }
         }
         if (gameEngine.networkEngine.isServer) {
-            GameEngine.printLog("Cannot enter a password when we are a server");
+            GameEngine.logErrorColored("Cannot enter a password when we are a server");
         } else {
-            gameEngine.networkEngine.n = str;
+            gameEngine.networkEngine.roomPassword = str;
             gameEngine.networkEngine.sendRegisterConnectionsToAll();
         }
     }
@@ -48,6 +48,6 @@ public class PasswordHandler {
     public void cancelPasswordEntry() {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.networkEngine.disconnectNetworking("exited password");
-        gameEngine.networkEngine.K();
+        gameEngine.networkEngine.closeBattleroom();
     }
 }

@@ -99,7 +99,7 @@ public class LevelSelectActivity extends TaskQueueActivity {
                 if (numberOfPlayersInMap > 0 && numberOfPlayersInMap - 1 < i4) {
                     i4 = numberOfPlayersInMap - 1;
                 }
-                PlayerTeam.staticInitTeamData();
+                PlayerTeam.resetTeamRegistry();
                 gameEngine.playerTeam = new GameTeam(0);
                 gameEngine.playerTeam.teamName = "Player";
                 int i5 = 0;
@@ -136,7 +136,7 @@ public class LevelSelectActivity extends TaskQueueActivity {
                     }
                     i9++;
                 }
-                gameEngine.networkEngine.aq();
+                gameEngine.networkEngine.updateAiTeamNames();
                 if (!z3) {
                     gameEngine.loadGame(false, GameMode.normal);
                 }

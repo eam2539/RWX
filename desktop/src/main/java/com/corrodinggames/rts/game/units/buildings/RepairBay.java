@@ -78,9 +78,9 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
     /* JADX INFO: renamed from: M */
     public static void initializeTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.graphicsEngine2.a(R.drawable.repair_bay);
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.repair_bay_dead);
-        teamTextures = PlayerTeam.getUnitCountByType(baseTexture);
+        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.repair_bay);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.repair_bay_dead);
+        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
     }
 
     public RepairBay(boolean z) {

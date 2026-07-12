@@ -127,11 +127,11 @@ public class SupplyDepot extends FactoryWithQueue {
 
     public static void K() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.graphicsEngine2.a(R.drawable.supply_depot);
-        tier2Texture = gameEngine.graphicsEngine2.a(R.drawable.supply_depot_t2);
-        baseTeamTextures = PlayerTeam.getUnitCountByType(baseTexture);
-        tier2TeamTextures = PlayerTeam.getUnitCountByType(tier2Texture);
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.supply_depot_dead);
+        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.supply_depot);
+        tier2Texture = gameEngine.renderGraphicsEngine.a(R.drawable.supply_depot_t2);
+        baseTeamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
+        tier2TeamTextures = PlayerTeam.getTeamColorTextures(tier2Texture);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.supply_depot_dead);
     }
 
     public SupplyDepot(boolean z) {

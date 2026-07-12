@@ -7,9 +7,9 @@ import com.corrodinggames.rts.game.units.UnitType;
 class WaveUnitEntry {
     UnitType a;
     int b = 1;
-    final /* synthetic */ waveunits c;
+    final /* synthetic */ WaveUnitGroup c;
 
-    WaveUnitEntry(waveunits waveunitsVar) {
+    WaveUnitEntry(WaveUnitGroup waveunitsVar) {
         this.c = waveunitsVar;
     }
 }

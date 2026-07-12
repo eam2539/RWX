@@ -206,7 +206,7 @@ public class InputController {
             }
         }
         if (keyBinding == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("loadKey: could not find:" + strTrim);
+            GameEngine.logColored("loadKey: could not find:" + strTrim);
             return;
         }
         String[] strArrSplit = str2.split(",");

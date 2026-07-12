@@ -226,17 +226,17 @@ public class ResourceExtractor extends FactoryWithQueue {
     /* JADX INFO: renamed from: K */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        Texture textureA = gameEngine.graphicsEngine2.a(R.drawable.extractor);
-        Texture textureA2 = gameEngine.graphicsEngine2.a(R.drawable.extractor_t2);
-        Texture textureA3 = gameEngine.graphicsEngine2.a(R.drawable.extractor_t3);
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.extractor_dead);
-        level1Textures = PlayerTeam.getUnitCountByType(textureA);
-        level2Textures = PlayerTeam.getUnitCountByType(textureA2);
-        level3Textures = PlayerTeam.getUnitCountByType(textureA3);
+        Texture textureA = gameEngine.renderGraphicsEngine.a(R.drawable.extractor);
+        Texture textureA2 = gameEngine.renderGraphicsEngine.a(R.drawable.extractor_t2);
+        Texture textureA3 = gameEngine.renderGraphicsEngine.a(R.drawable.extractor_t3);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.extractor_dead);
+        level1Textures = PlayerTeam.getTeamColorTextures(textureA);
+        level2Textures = PlayerTeam.getTeamColorTextures(textureA2);
+        level3Textures = PlayerTeam.getTeamColorTextures(textureA3);
         textureA.n();
         textureA2.n();
         textureA3.n();
-        backgroundTexture = gameEngine.graphicsEngine2.a(R.drawable.extractor_back);
+        backgroundTexture = gameEngine.renderGraphicsEngine.a(R.drawable.extractor_back);
     }
 
     public ResourceExtractor(boolean z) {
@@ -351,9 +351,9 @@ public class ResourceExtractor extends FactoryWithQueue {
             }
         }
         this.resourceGenerationTimer += f;
-        if (this.resourceGenerationTimer > PlayerTeam.teamColorGreen - 0.1f) {
-            this.resourceGenerationTimer -= PlayerTeam.teamColorGreen;
-            this.team.b(cy() * (PlayerTeam.teamColorGreen / PlayerTeam.teamColorRed));
+        if (this.resourceGenerationTimer > PlayerTeam.resourceIncomeUpdateInterval - 0.1f) {
+            this.resourceGenerationTimer -= PlayerTeam.resourceIncomeUpdateInterval;
+            this.team.b(cy() * (PlayerTeam.resourceIncomeUpdateInterval / PlayerTeam.resourceIncomeRatePeriod));
         }
     }
 

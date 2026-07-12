@@ -86,7 +86,7 @@ public class SlickTexture extends Texture {
 
     public void D() {
         if (this.z == null && this.x != null) {
-            GameEngine.updatePaintTextSizeIfNeeded("reloadFromImageData: slickImageData==null and slickImage!=null. Ignoring");
+            GameEngine.logColored("reloadFromImageData: slickImageData==null and slickImage!=null. Ignoring");
             return;
         }
         if (this.x != null) {
@@ -305,7 +305,7 @@ public class SlickTexture extends Texture {
             o();
         }
         if (this.x != null) {
-            GameEngine.updatePaintTextSizeIfNeeded("SlickBitmapOrTexture: Leak detection: finalize called with slickImage!=null");
+            GameEngine.logColored("SlickBitmapOrTexture: Leak detection: finalize called with slickImage!=null");
         }
     }
 
@@ -322,7 +322,7 @@ public class SlickTexture extends Texture {
 
     public void E() {
         if (this.x == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("slickImage==null");
+            GameEngine.logColored("slickImage==null");
             GameEngine.printStackTrace();
         }
         if (!this.o) {

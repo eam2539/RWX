@@ -36,11 +36,11 @@ public class MammothTank extends LandUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        Texture textureA = gameEngine.graphicsEngine2.a(R.drawable.mammoth_tank);
-        c = PlayerTeam.getUnitCountByType(textureA);
-        a = gameEngine.graphicsEngine2.a(R.drawable.mammoth_tank_dead);
-        b = gameEngine.graphicsEngine2.a(R.drawable.mammoth_tank_turret);
-        e = gameEngine.graphicsEngine2.a(R.drawable.lighting_charge);
+        Texture textureA = gameEngine.renderGraphicsEngine.a(R.drawable.mammoth_tank);
+        c = PlayerTeam.getTeamColorTextures(textureA);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.mammoth_tank_dead);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.mammoth_tank_turret);
+        e = gameEngine.renderGraphicsEngine.a(R.drawable.lighting_charge);
         d = attackUnit(textureA, textureA.m() / 2, textureA.l());
     }
 

@@ -145,14 +145,14 @@ public class AmphibiousJet extends AirUnit {
 
     public static void L() {
         GameEngine gameEngine = GameEngine.getInstance();
-        b = gameEngine.graphicsEngine2.a(R.drawable.amphibious_jet);
-        c = gameEngine.graphicsEngine2.a(R.drawable.amphibious_jet_shadow);
-        a = gameEngine.graphicsEngine2.a(R.drawable.amphibious_jet_dead);
-        e = PlayerTeam.getUnitCountByType(b);
-        Texture textureA = gameEngine.graphicsEngine2.a(R.drawable.amphibious_jet_p1);
-        Texture textureA2 = gameEngine.graphicsEngine2.a(R.drawable.amphibious_jet_p2);
-        f = PlayerTeam.getUnitCountByType(textureA);
-        g = PlayerTeam.getUnitCountByType(textureA2);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.amphibious_jet);
+        c = gameEngine.renderGraphicsEngine.a(R.drawable.amphibious_jet_shadow);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.amphibious_jet_dead);
+        e = PlayerTeam.getTeamColorTextures(b);
+        Texture textureA = gameEngine.renderGraphicsEngine.a(R.drawable.amphibious_jet_p1);
+        Texture textureA2 = gameEngine.renderGraphicsEngine.a(R.drawable.amphibious_jet_p2);
+        f = PlayerTeam.getTeamColorTextures(textureA);
+        g = PlayerTeam.getTeamColorTextures(textureA2);
         o = getUnitTextureSize(textureA);
         p = getUnitTextureSize(textureA2);
     }
@@ -183,11 +183,11 @@ public class AmphibiousJet extends AirUnit {
                     if (fE != 0.0f) {
                         GameEngine gameEngine = GameEngine.getInstance();
                         PointF pointFE = E(i);
-                        gameEngine.graphicsEngine2.i();
-                        gameEngine.graphicsEngine2.b(pointFE.x - gameEngine.viewpointXSnapped, (pointFE.y - gameEngine.viewpointYSnapped) - this.posZ);
-                        gameEngine.graphicsEngine2.a(fE * 0.7f, fE * 0.7f);
-                        gameEngine.graphicsEngine2.a(MammothTank.e, 0.0f, 0.0f, (Paint) null);
-                        gameEngine.graphicsEngine2.j();
+                        gameEngine.renderGraphicsEngine.i();
+                        gameEngine.renderGraphicsEngine.b(pointFE.x - gameEngine.viewpointXSnapped, (pointFE.y - gameEngine.viewpointYSnapped) - this.posZ);
+                        gameEngine.renderGraphicsEngine.a(fE * 0.7f, fE * 0.7f);
+                        gameEngine.renderGraphicsEngine.a(MammothTank.e, 0.0f, 0.0f, (Paint) null);
+                        gameEngine.renderGraphicsEngine.j();
                     }
                 }
             }
@@ -230,7 +230,7 @@ public class AmphibiousJet extends AirUnit {
                 }
                 f2 = unitArmorRating - 0.0f;
             }
-            gameEngine.graphicsEngine2.a(texture, f3, f4, f2, paintAN);
+            gameEngine.renderGraphicsEngine.a(texture, f3, f4, f2, paintAN);
         }
     }
 

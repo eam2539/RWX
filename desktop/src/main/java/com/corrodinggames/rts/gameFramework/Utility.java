@@ -127,7 +127,7 @@ public final class Utility {
         GameEngine gameEngine = GameEngine.getInstance();
         if (i2 >= i3) {
             if (i2 > i3) {
-                GameEngine.updatePaintTextSizeIfNeeded("min>max");
+                GameEngine.logColored("min>max");
             }
             return i2;
         }
@@ -159,7 +159,7 @@ public final class Utility {
         GameEngine gameEngine = GameEngine.getInstance();
         if (i2 >= i3) {
             if (i2 > i3) {
-                GameEngine.updatePaintTextSizeIfNeeded("min>max");
+                GameEngine.logColored("min>max");
             }
             return i2;
         }
@@ -170,7 +170,7 @@ public final class Utility {
         }
         int i7 = i6 + i2;
         if (i7 < i2 || i7 > i3) {
-            GameEngine.updatePaintTextSizeIfNeeded("notRandInt number not in range: " + i7 + " min:" + i2 + " max:" + i3);
+            GameEngine.logColored("notRandInt number not in range: " + i7 + " min:" + i2 + " max:" + i3);
         }
         return i7;
     }

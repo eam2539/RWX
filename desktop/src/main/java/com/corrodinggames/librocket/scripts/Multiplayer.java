@@ -132,11 +132,11 @@ public class Multiplayer extends ScriptContext {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.networkEngine.isServer) {
             if (gameEngine.networkEngine.roomSettings.gameModeType == GameModeType.skirmishMap) {
-                gameEngine.networkEngine.az = "maps/skirmish/" + gameEngine.networkEngine.roomSettings.mapPath;
+                gameEngine.networkEngine.selectedMapPath = "maps/skirmish/" + gameEngine.networkEngine.roomSettings.mapPath;
             } else if (gameEngine.networkEngine.roomSettings.gameModeType == GameModeType.customMap) {
-                gameEngine.networkEngine.az = "/SD/rusted_warfare_maps/" + gameEngine.networkEngine.roomSettings.mapPath;
+                gameEngine.networkEngine.selectedMapPath = "/SD/rusted_warfare_maps/" + gameEngine.networkEngine.roomSettings.mapPath;
             } else if (gameEngine.networkEngine.roomSettings.gameModeType == GameModeType.savedGame) {
-                gameEngine.networkEngine.az = null;
+                gameEngine.networkEngine.selectedMapPath = null;
             } else {
                 this.libRocket.showMessageBox2("Error: No map type selected");
                 return;
@@ -145,7 +145,7 @@ public class Multiplayer extends ScriptContext {
                 this.libRocket.showMessageBox2("Error: No map selected");
                 return;
             } else {
-                gameEngine.networkEngine.ae();
+                gameEngine.networkEngine.startBattleRoomGame();
                 return;
             }
         }
@@ -162,10 +162,10 @@ public class Multiplayer extends ScriptContext {
         refreshUI();
         this.root.refreshChat();
         ElementDocument activeDocument = this.libRocket.getActiveDocument();
-        if (activeDocument != null && gameEngine.networkEngine.F) {
+        if (activeDocument != null && gameEngine.networkEngine.singleplayerServer) {
             activeDocument.addClass("singlePlayer");
         }
-        gameEngine.networkEngine.as();
+        gameEngine.networkEngine.startMasterServerUpdateTimer();
     }
 
     public void refreshUI() {
@@ -188,27 +188,27 @@ public class Multiplayer extends ScriptContext {
         for (Element element : activeDocument.findElementsByClassName("forUnlockedTeamsNonHost")) {
             element.show(z3);
         }
-        if (gameEngine.loadLevelNetwork()) {
+        if (gameEngine.isSinglePlayerGame()) {
             for (Element element : activeDocument.findElementsByClassName("forRealNetworkOnly")) {
                 element.show(false);
             }
         }
         activeElementById.compareAndSetText(gameEngine.networkEngine.getPublicIpStatusText());
-        String strAv = gameEngine.networkEngine.av();
+        String networkMapPath = gameEngine.networkEngine.getNetworkMapPath();
         if (gameEngine.networkEngine.roomSettings.gameModeType == GameModeType.savedGame) {
-            strAv = "saves/" + gameEngine.networkEngine.roomSettings.mapPath;
+            networkMapPath = "saves/" + gameEngine.networkEngine.roomSettings.mapPath;
         }
         Element activeElementById2 = this.libRocket.getActiveElementById("mapImage");
-        if (gameEngine.networkEngine.v) {
+        if (gameEngine.networkEngine.chatOnlyMode) {
             activeElementById2.hide();
         }
         String attribute = activeElementById2.getAttribute("src");
-        if (strAv == null) {
+        if (networkMapPath == null) {
             if (!VariableScope.nullOrMissingString.equals(attribute)) {
                 activeElementById2.setAttribute("src", VariableScope.nullOrMissingString);
             }
         } else {
-            String mapThumbnail = this.root.getMapThumbnail(strAv);
+            String mapThumbnail = this.root.getMapThumbnail(networkMapPath);
             if (mapThumbnail == null) {
                 mapThumbnail = VariableScope.nullOrMissingString;
             }
@@ -240,8 +240,8 @@ public class Multiplayer extends ScriptContext {
         ArrayList arrayList = tableData.rows;
         int i = -1;
         int i2 = 0;
-        ArrayList<PlayerTeam> teamDataFromStream = PlayerTeam.readTeamDataFromStream(true);
-        for (PlayerTeam playerTeam : teamDataFromStream) {
+        ArrayList<PlayerTeam> sortedTeams = PlayerTeam.getSortedTeams(true);
+        for (PlayerTeam playerTeam : sortedTeams) {
             if (playerTeam != null) {
                 if (i != -1 && i != playerTeam.teamColorId) {
                     i2++;
@@ -250,7 +250,7 @@ public class Multiplayer extends ScriptContext {
             }
         }
         int i3 = -1;
-        for (PlayerTeam playerTeam2 : teamDataFromStream) {
+        for (PlayerTeam playerTeam2 : sortedTeams) {
             if (playerTeam2 != null) {
                 if (i3 != -1 && i3 != playerTeam2.teamColorId && i2 <= 3) {
                     Root.TableRow tableRow = new Root.TableRow();
@@ -266,23 +266,23 @@ public class Multiplayer extends ScriptContext {
                 }
                 String strZ = playerTeam2.z();
                 String string = Integer.toString(playerTeam2.teamId + 1);
-                boolean zAddCredits = playerTeam2.addCredits();
+                boolean zAddCredits = playerTeam2.isSpectatorTeamColor();
                 if (zAddCredits) {
                     string = "S";
                 }
-                if (!zAddCredits && playerTeam2.teamAIBehaviourOverride != null && playerTeam2.teamAIBehaviourOverride.intValue() != gameEngine.networkEngine.roomSettings.startingUnits) {
-                    string = string + " - " + gameEngine.networkEngine.d(playerTeam2.teamAIBehaviourOverride.intValue());
+                if (!zAddCredits && playerTeam2.startingUnitsOverride != null && playerTeam2.startingUnitsOverride.intValue() != gameEngine.networkEngine.roomSettings.startingUnits) {
+                    string = string + " - " + gameEngine.networkEngine.d(playerTeam2.startingUnitsOverride.intValue());
                 }
-                String teamColorName = playerTeam2.getTeamColorName();
+                String teamColorName = playerTeam2.getTeamSlotLabel();
                 Root.TableRow tableRow2 = new Root.TableRow();
                 Root.TableCell tableCellAddCell = tableRow2.addCell(str);
-                if (playerTeam2.teamAIControlOverride != null) {
-                    tableCellAddCell.color = Integer.valueOf(PlayerTeam.i(playerTeam2.teamAIControlOverride.intValue()));
+                if (playerTeam2.playerColorOverride != null) {
+                    tableCellAddCell.color = Integer.valueOf(PlayerTeam.i(playerTeam2.playerColorOverride.intValue()));
                 }
                 if (playerTeam2 == gameEngine.networkEngine.localPlayerTeam) {
                     tableCellAddCell.addClass("boldText");
                 }
-                tableRow2.addCell(string).color = Integer.valueOf(playerTeam2.getTeamBuildingCount());
+                tableRow2.addCell(string).color = Integer.valueOf(playerTeam2.getTeamSlotColorArgb());
                 tableRow2.addCell(teamColorName).color = Integer.valueOf(PlayerTeam.i(playerTeam2.teamColorId));
                 tableRow2.addCell(strZ);
                 tableRow2.setLibrocketOnClick("mp.showPlayerConfig('" + playerTeam2.teamId + "')");
@@ -336,7 +336,7 @@ public class Multiplayer extends ScriptContext {
             this.root.logWarn("showPlayerConfig: " + str + "==null");
             return;
         }
-        if ((gameEngine.networkEngine.aw() || (gameEngine.networkEngine.localPlayerTeam == playerTeamK && !gameEngine.networkEngine.roomSettings.teamLock)) && (elementDocumentCreateAndShowPopup = this.root.createAndShowPopup("battleroom_player.rml", playerTeamK, playerTeamK.teamName)) != null) {
+        if ((gameEngine.networkEngine.isServerOrProxyController() || (gameEngine.networkEngine.localPlayerTeam == playerTeamK && !gameEngine.networkEngine.roomSettings.teamLock)) && (elementDocumentCreateAndShowPopup = this.root.createAndShowPopup("battleroom_player.rml", playerTeamK, playerTeamK.teamName)) != null) {
             Element elementById = elementDocumentCreateAndShowPopup.getElementById("team_id");
             Element elementById2 = elementDocumentCreateAndShowPopup.getElementById("spawnPoint");
             Element elementById3 = elementDocumentCreateAndShowPopup.getElementById("allyTeam");
@@ -353,7 +353,7 @@ public class Multiplayer extends ScriptContext {
             }
             elementById.setValue(VariableScope.nullOrMissingString + playerTeamK.teamId);
             String str2 = VariableScope.nullOrMissingString + (playerTeamK.teamId + 1);
-            if (playerTeamK.addCredits()) {
+            if (playerTeamK.isSpectatorTeamColor()) {
                 str2 = "-2";
             }
             elementById2.setValue(str2);
@@ -385,22 +385,22 @@ public class Multiplayer extends ScriptContext {
                 GameEngine.log("s1");
             }
             if (!GameEngine.isPlatformName("s2")) {
-                if (playerTeamK.teamAIBehaviourOverride == null) {
+                if (playerTeamK.startingUnitsOverride == null) {
                     elementById5.setValue("-99");
                 } else {
-                    GameEngine.log("startingUnitOverride: " + playerTeamK.teamAIBehaviourOverride);
-                    elementById5.setValue(VariableScope.nullOrMissingString + playerTeamK.teamAIBehaviourOverride);
+                    GameEngine.log("startingUnitOverride: " + playerTeamK.startingUnitsOverride);
+                    elementById5.setValue(VariableScope.nullOrMissingString + playerTeamK.startingUnitsOverride);
                 }
             } else {
                 GameEngine.log("s2");
             }
             if (!GameEngine.isPlatformName("s3")) {
-                if (playerTeamK.teamAIControlOverride == null) {
+                if (playerTeamK.playerColorOverride == null) {
                     elementById6.setValue("-99");
                     return;
                 } else {
-                    GameEngine.log("playerColor: " + playerTeamK.teamAIControlOverride);
-                    elementById6.setValue(VariableScope.nullOrMissingString + playerTeamK.teamAIControlOverride);
+                    GameEngine.log("playerColor: " + playerTeamK.playerColorOverride);
+                    elementById6.setValue(VariableScope.nullOrMissingString + playerTeamK.playerColorOverride);
                     return;
                 }
             }
@@ -425,7 +425,7 @@ public class Multiplayer extends ScriptContext {
         } else if ("spectators".equalsIgnoreCase(value)) {
             gameEngine.networkEngine.a(TeamLayoutType.layout_spectators);
         } else {
-            GameEngine.updatePaintTextSizeIfNeeded("teamsSet_apply: unknown layout: " + value);
+            GameEngine.logColored("teamsSet_apply: unknown layout: " + value);
         }
         refreshUI();
     }
@@ -543,9 +543,9 @@ public class Multiplayer extends ScriptContext {
         } else {
             numValueOf = Integer.valueOf(iIntValue4);
         }
-        if (playerTeamK.teamAIBehaviourOverride != numValueOf) {
+        if (playerTeamK.startingUnitsOverride != numValueOf) {
             if (gameEngine.networkEngine.isServer) {
-                playerTeamK.teamAIBehaviourOverride = numValueOf;
+                playerTeamK.startingUnitsOverride = numValueOf;
             } else {
                 GameEngine.log("startingUnitOverride: not server or proxy controller");
             }
@@ -557,9 +557,9 @@ public class Multiplayer extends ScriptContext {
         } else {
             numValueOf2 = Integer.valueOf(iIntValue5);
         }
-        if (playerTeamK.teamAIControlOverride != numValueOf2) {
+        if (playerTeamK.playerColorOverride != numValueOf2) {
             if (gameEngine.networkEngine.isServer) {
-                playerTeamK.teamAIControlOverride = numValueOf2;
+                playerTeamK.playerColorOverride = numValueOf2;
             } else {
                 GameEngine.log("colorOverride: not server or proxy controller");
             }
@@ -573,8 +573,8 @@ public class Multiplayer extends ScriptContext {
                 gameEngine.networkEngine.b(playerTeamK, iIntValue);
             }
         }
-        gameEngine.networkEngine.f();
-        gameEngine.networkEngine.M();
+        gameEngine.networkEngine.refreshAIDifficultyForTeams();
+        gameEngine.networkEngine.refreshTeamSortAndAiGroups();
         refreshUI();
     }
 
@@ -613,14 +613,14 @@ public class Multiplayer extends ScriptContext {
     public void sendReturnToBattleroomEvent() {
         GameEngine.log("mp.sendReturnToBattleroomEvent()");
         GameEngine gameEngine = GameEngine.getInstance();
-        gameEngine.networkEngine.ag();
+        gameEngine.networkEngine.scheduleDefaultReturnToBattleroom();
         gameEngine.gameUI.isDraggingSelection = false;
     }
 
     public void addAI() {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.networkEngine.isServer) {
-            gameEngine.networkEngine.ap();
+            gameEngine.networkEngine.addAIToGame();
         } else if (gameEngine.networkEngine.isProxyController) {
             gameEngine.networkEngine.k("-addai");
         } else {
@@ -652,7 +652,7 @@ public class Multiplayer extends ScriptContext {
         GameEngine gameEngine = GameEngine.getInstance();
         String valueById = this.root.getValueById("username");
         if (valueById == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("getUsernameFromInterface: Cannot find username");
+            GameEngine.logColored("getUsernameFromInterface: Cannot find username");
             return;
         }
         String strTrim = valueById.trim();
@@ -717,7 +717,7 @@ public class Multiplayer extends ScriptContext {
             elementById6.setValue(VariableScope.nullOrMissingString + gameEngine.networkEngine.roomSettings.aiDifficulty);
             return;
         }
-        GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.e();
+        GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.getEditableRoomSettings();
         if (gameRoomSettingsE != null) {
             String value = null;
             if (this.useMapDropdown) {
@@ -776,7 +776,7 @@ public class Multiplayer extends ScriptContext {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.e();
+        GameRoomSettings gameRoomSettingsE = gameEngine.networkEngine.getEditableRoomSettings();
         if (gameRoomSettingsE != null) {
             String fileNameWithoutExtension = str;
             if (!fileNameWithoutExtension.contains("MOD|")) {
@@ -806,7 +806,7 @@ public class Multiplayer extends ScriptContext {
     public void askPasswordEntered(String str) {
         GameEngine.log("mp.askPasswordEntered()");
         GameEngine gameEngine = GameEngine.getInstance();
-        gameEngine.networkEngine.n = str;
+        gameEngine.networkEngine.roomPassword = str;
         gameEngine.networkEngine.sendRegisterConnectionsToAll();
         this.root.closePopup();
     }

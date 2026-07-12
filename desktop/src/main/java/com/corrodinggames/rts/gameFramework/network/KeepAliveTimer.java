@@ -24,9 +24,9 @@ class KeepAliveTimer extends TimerTask {
     public void run() {
         try {
             long jCurrentTimeMillis = System.currentTimeMillis();
-            if (this.networkEngine.au != 0 && (jCurrentTimeMillis > this.networkEngine.au + 5 || jCurrentTimeMillis < this.networkEngine.au)) {
-                this.networkEngine.au = 0L;
-                this.networkEngine.Q();
+            if (this.networkEngine.playerUpdatePendingTimestamp != 0 && (jCurrentTimeMillis > this.networkEngine.playerUpdatePendingTimestamp + 5 || jCurrentTimeMillis < this.networkEngine.playerUpdatePendingTimestamp)) {
+                this.networkEngine.playerUpdatePendingTimestamp = 0L;
+                this.networkEngine.sendPlayerUpdateNow();
             }
             if (jCurrentTimeMillis > this.lastPingTime + 1000 || jCurrentTimeMillis < this.lastPingTime) {
                 this.lastPingTime = jCurrentTimeMillis;
@@ -36,7 +36,7 @@ class KeepAliveTimer extends TimerTask {
                     gameOutputStream.writeByte(0);
                     this.networkEngine.g(gameOutputStream.buildPacketData(108));
                 } else {
-                    this.networkEngine.P();
+                    this.networkEngine.markPlayerUpdatePending();
                 }
                 this.isRunning = !this.isRunning;
             }

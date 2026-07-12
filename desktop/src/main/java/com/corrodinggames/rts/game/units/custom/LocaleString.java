@@ -72,7 +72,7 @@ public class LocaleString {
                 languagePart.a(str, str2);
             }
         } else {
-            GameEngine.updatePaintTextSizeIfNeeded("LocaleString: replaceAll with null strings");
+            GameEngine.logColored("LocaleString: replaceAll with null strings");
         }
         this.cachedReloadCount = -1;
     }

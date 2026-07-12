@@ -73,7 +73,7 @@ public class FileLoader {
 
     /* JADX INFO: renamed from: b */
     public boolean isAbstractPath(String str) {
-        if (GameEngine.isPausedStatic2 || str.startsWith("/") || str.startsWith("/SD/")) {
+        if (GameEngine.isNonAndroidVersion || str.startsWith("/") || str.startsWith("/SD/")) {
             return false;
         }
         return true;
@@ -84,11 +84,11 @@ public class FileLoader {
         if (str.startsWith("/") || str.startsWith("\\")) {
             return true;
         }
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             if (str.startsWith("mods")) {
                 return true;
             }
-            if (GameEngine.isDebugVersionStatic2 && str.startsWith("converted-sounds")) {
+            if (GameEngine.isIOSVersion && str.startsWith("converted-sounds")) {
                 return true;
             }
         }
@@ -179,7 +179,7 @@ public class FileLoader {
     /* JADX INFO: renamed from: f */
     public String convertAbstractPath(String str) {
         String strApplyModPath = applyModPath(str);
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             if (strApplyModPath.startsWith("/SD/rusted_warfare_maps")) {
                 strApplyModPath = "/SD/mods/maps" + strApplyModPath.substring("/SD/rusted_warfare_maps".length());
                 GameEngine.log(this.TAG + "convertAbstractPath: Changing to:" + strApplyModPath);
@@ -303,7 +303,7 @@ public class FileLoader {
                 File file = new File(strConvertAbstractPath);
                 if (file == null || !file.exists()) {
                     String str2 = "listDir: path doesn't exist:" + strConvertAbstractPath;
-                    GameEngine.updatePaintTextSizeIfNeeded(str2);
+                    GameEngine.logColored(str2);
                     FileHelper.setWritePath(str2);
                     return null;
                 }
@@ -378,7 +378,7 @@ public class FileLoader {
         String str2 = str;
         String str3 = "assets/" + str;
         AssetManager assetManagerD = AppFrameworkUtils.getContext().d();
-        if (GameEngine.isPCVersionStatic2) {
+        if (GameEngine.isGDXVersion) {
         }
         try {
             try {
@@ -464,7 +464,7 @@ public class FileLoader {
     }
 
     public String b() {
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return VariableScope.nullOrMissingString;
         }
         return getExternalStoragePath() + "/rustedWarfare/";
@@ -472,7 +472,7 @@ public class FileLoader {
 
     /* JADX INFO: renamed from: c */
     public String getCachePath() {
-        if (GameEngine.isDesktop()) {
+        if (GameEngine.isAndroidPlatform()) {
             String absolutePath = AppFrameworkUtils.getContext().i().getAbsolutePath();
             if (!absolutePath.endsWith("/")) {
                 absolutePath = absolutePath + "/";
@@ -501,7 +501,7 @@ public class FileLoader {
 
     /* JADX INFO: renamed from: a */
     public void scanFile(File file) {
-        if (GameEngine.isDesktop()) {
+        if (GameEngine.isAndroidPlatform()) {
         }
     }
 
@@ -513,10 +513,10 @@ public class FileLoader {
             if (!FileHelper.fileExists(parentFile.getAbsolutePath())) {
                 GameEngine.log("Making missing parent dir: " + parentFile.getAbsolutePath());
                 if (!FileHelper.deleteFile(parentFile.getAbsolutePath())) {
-                    GameEngine.updatePaintTextSizeIfNeeded("getRWFile: Could not create parent directory");
+                    GameEngine.logColored("getRWFile: Could not create parent directory");
                 }
             }
-            if (GameEngine.isDesktop()) {
+            if (GameEngine.isAndroidPlatform()) {
             }
         }
         return file;

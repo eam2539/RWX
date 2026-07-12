@@ -371,7 +371,7 @@ public class TurretConfig {
             if (turretConfig.parentTurret == turretConfig) {
                 throw new RuntimeException("Turret cannot be attachedTo self");
             }
-            customUnitConfig.f51fU = true;
+            customUnitConfig.hasAttachedTurrets = true;
         }
         Float f4 = iniFile.getFloat(str, "idleDir", (Float) null);
         if (f4 != null) {
@@ -546,12 +546,12 @@ public class TurretConfig {
         Texture textureA2 = customUnitConfig.a(iniFile, str, "chargeEffectImage");
         if (textureA2 != null) {
             turretConfig.texture2 = textureA2;
-            customUnitConfig.f49fP = true;
+            customUnitConfig.hasTurretChargeEffectImage = true;
         }
-        if (customUnitConfig.f50fR[turretConfig.R] == null) {
+        if (customUnitConfig.projectileTemplatesById[turretConfig.R] == null) {
             throw new RuntimeException("Turret [" + str + "]: cannot find linked projectile:" + turretConfig.R);
         }
-        if (turretConfig.S >= 0 && customUnitConfig.f50fR[turretConfig.S] == null) {
+        if (turretConfig.S >= 0 && customUnitConfig.projectileTemplatesById[turretConfig.S] == null) {
             throw new RuntimeException("Turret [" + str + "]altProjectile: cannot find linked projectile");
         }
         turretConfig.spawnLogicCondition = LogicBoolean.convertAlwaysTrueToNull(turretConfig.spawnLogicCondition);

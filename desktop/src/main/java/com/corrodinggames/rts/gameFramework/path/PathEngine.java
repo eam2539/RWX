@@ -61,7 +61,7 @@ public final class PathEngine {
     ArrayList<PathSolver> H = new ArrayList();
 
     static {
-        b = !GameEngine.isGameBetaStatic;
+        b = !GameEngine.isGameBeta;
         c = false;
         d = false;
         f = false;
@@ -214,8 +214,8 @@ public final class PathEngine {
         Rect rect = new Rect();
         float f2 = gameEngine.viewpointXSnapped;
         float f3 = gameEngine.viewpointYSnapped;
-        float f4 = gameEngine.screenHeight;
-        float f5 = gameEngine.viewpointHeight;
+        float f4 = gameEngine.visibleWorldWidth;
+        float f5 = gameEngine.visibleWorldHeight;
         MapLayer mapLayer = gameEngine.tileMap.groundLayer;
         int i5 = (int) ((f2 * this.q.tileScaleX) - 1.0f);
         if (i5 < 0) {
@@ -264,9 +264,9 @@ public final class PathEngine {
                             i4 = i13 * 2;
                         }
                         this.F.a(128, i2, i3, i4);
-                        gameEngine.graphicsEngine2.b(rect, this.F);
+                        gameEngine.renderGraphicsEngine.b(rect, this.F);
                         if (zB && pathCostMap.f != null) {
-                            gameEngine.graphicsEngine2.a("o:" + ((int) pathCostMap.f[(i9 * this.t) + i10]), rect.d(), rect.e(), gameEngine.loadingPaint);
+                            gameEngine.renderGraphicsEngine.a("o:" + ((int) pathCostMap.f[(i9 * this.t) + i10]), rect.d(), rect.e(), gameEngine.loadingPaint);
                         }
                     }
                 }
@@ -381,7 +381,7 @@ public final class PathEngine {
         } else if (iAbs < 2000 && iAbs2 < 2000) {
             path.t = 200.0f;
         }
-        if (!gameEngine.networkEngine.B && !gameEngine.replayEngine.i()) {
+        if (!gameEngine.networkEngine.networkGameActive && !gameEngine.replayEngine.i()) {
             if (iAbs < 1000 && iAbs2 < 1000) {
                 path.t = 180.0f;
             } else {

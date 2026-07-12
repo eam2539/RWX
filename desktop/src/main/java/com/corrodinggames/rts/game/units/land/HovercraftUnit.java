@@ -140,10 +140,10 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
 
     public static void L() {
         GameEngine gameEngine = GameEngine.getInstance();
-        a = gameEngine.graphicsEngine2.a(R.drawable.hovercraft);
-        c = gameEngine.graphicsEngine2.a(R.drawable.hovercraft_shadow);
-        b = gameEngine.graphicsEngine2.a(R.drawable.hovercraft_dead);
-        d = PlayerTeam.getUnitCountByType(a);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.hovercraft);
+        c = gameEngine.renderGraphicsEngine.a(R.drawable.hovercraft_shadow);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.hovercraft_dead);
+        d = PlayerTeam.getTeamColorTextures(a);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -449,7 +449,7 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cr */
-    public boolean getUnitAIPathfindCost() {
+    public boolean canTransportUnits() {
         return true;
     }
 

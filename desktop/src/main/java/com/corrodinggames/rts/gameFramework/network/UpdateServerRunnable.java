@@ -26,7 +26,7 @@ class UpdateServerRunnable implements Runnable {
             }
             MasterServerClient.addParam(arrayList, "id", str);
             MasterServerClient.addParam(arrayList, "private_token", gameEngine.networkEngine.sessionToken);
-            if (GameEngine.isDebug()) {
+            if (GameEngine.isDedicatedServer()) {
                 MasterServerClient.addParam(arrayList, "check_port", "false");
             }
             MasterServerClient.addServerStatusParams(arrayList);

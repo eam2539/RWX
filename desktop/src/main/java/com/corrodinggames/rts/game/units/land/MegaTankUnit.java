@@ -32,10 +32,10 @@ public class MegaTankUnit extends LandUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        b = gameEngine.graphicsEngine2.a(R.drawable.mega_tank);
-        a = gameEngine.graphicsEngine2.a(R.drawable.mega_tank_dead);
-        c = gameEngine.graphicsEngine2.a(R.drawable.mega_tank_turret);
-        d = PlayerTeam.getUnitCountByType(b);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.mega_tank);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.mega_tank_dead);
+        c = gameEngine.renderGraphicsEngine.a(R.drawable.mega_tank_turret);
+        d = PlayerTeam.getTeamColorTextures(b);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

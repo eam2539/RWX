@@ -114,10 +114,10 @@ public class AntiAirTurret extends TurretFactory {
     /* JADX INFO: renamed from: b */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        level1Texture = gameEngine.graphicsEngine2.a(R.drawable.anti_air_top);
-        level2Texture = gameEngine.graphicsEngine2.a(R.drawable.anti_air_top_l2);
-        unitIconTexture = gameEngine.graphicsEngine2.a(R.drawable.unit_icon_building_air_turrent);
-        teamIconTextures = PlayerTeam.getUnitCountByType(unitIconTexture);
+        level1Texture = gameEngine.renderGraphicsEngine.a(R.drawable.anti_air_top);
+        level2Texture = gameEngine.renderGraphicsEngine.a(R.drawable.anti_air_top_l2);
+        unitIconTexture = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_building_air_turrent);
+        teamIconTextures = PlayerTeam.getTeamColorTextures(unitIconTexture);
     }
 
     public AntiAirTurret(boolean z) {

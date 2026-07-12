@@ -88,14 +88,14 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
     /* JADX INFO: renamed from: K */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        builderTexture = gameEngine.graphicsEngine2.a(R.drawable.builder);
-        builderTexture_dead = gameEngine.graphicsEngine2.a(R.drawable.builder_dead);
+        builderTexture = gameEngine.renderGraphicsEngine.a(R.drawable.builder);
+        builderTexture_dead = gameEngine.renderGraphicsEngine.a(R.drawable.builder_dead);
         builderShadowTexture = attackUnit(builderTexture, builderTexture.m(), builderTexture.l());
-        builderTexture_teamColors = PlayerTeam.getUnitCountByType(builderTexture);
-        builderChargeTexture = gameEngine.graphicsEngine2.a(R.drawable.builder_charge);
-        builderDechargeTexture = gameEngine.graphicsEngine2.a(R.drawable.builder_decharge);
-        builderIconTexture = gameEngine.graphicsEngine2.a(R.drawable.unit_icon_builder);
-        builderIconTexture_teamColors = PlayerTeam.getUnitCountByType(builderIconTexture);
+        builderTexture_teamColors = PlayerTeam.getTeamColorTextures(builderTexture);
+        builderChargeTexture = gameEngine.renderGraphicsEngine.a(R.drawable.builder_charge);
+        builderDechargeTexture = gameEngine.renderGraphicsEngine.a(R.drawable.builder_decharge);
+        builderIconTexture = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_builder);
+        builderIconTexture_teamColors = PlayerTeam.getTeamColorTextures(builderIconTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -221,16 +221,16 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
             for (PointF pointF : pointFArrB) {
                 float f2 = (currentRepairOrReclaimTarget.posX + pointF.x) - gameEngine.viewpointXSnapped;
                 float f3 = ((currentRepairOrReclaimTarget.posY - currentRepairOrReclaimTarget.posZ) + pointF.y) - gameEngine.viewpointYSnapped;
-                gameEngine.graphicsEngine2.a((vector3DBn.a + (pointF.x * 0.15f)) - gameEngine.viewpointXSnapped, (((vector3DBn.b - vector3DBn.c) + (pointF.y * 0.15f)) - gameEngine.viewpointYSnapped) - orderableUnit.posZ, f2, f3, paint);
-                gameEngine.graphicsEngine2.k();
-                gameEngine.graphicsEngine2.b(f2, f3);
-                gameEngine.graphicsEngine2.a(0.5f, 0.5f);
+                gameEngine.renderGraphicsEngine.a((vector3DBn.a + (pointF.x * 0.15f)) - gameEngine.viewpointXSnapped, (((vector3DBn.b - vector3DBn.c) + (pointF.y * 0.15f)) - gameEngine.viewpointYSnapped) - orderableUnit.posZ, f2, f3, paint);
+                gameEngine.renderGraphicsEngine.k();
+                gameEngine.renderGraphicsEngine.b(f2, f3);
+                gameEngine.renderGraphicsEngine.a(0.5f, 0.5f);
                 if (zIsCurrentCommandReclaim) {
-                    gameEngine.graphicsEngine2.a(builderDechargeTexture, 0.0f, 0.0f, chargePaint);
+                    gameEngine.renderGraphicsEngine.a(builderDechargeTexture, 0.0f, 0.0f, chargePaint);
                 } else {
-                    gameEngine.graphicsEngine2.a(builderChargeTexture, 0.0f, 0.0f, chargePaint);
+                    gameEngine.renderGraphicsEngine.a(builderChargeTexture, 0.0f, 0.0f, chargePaint);
                 }
-                gameEngine.graphicsEngine2.l();
+                gameEngine.renderGraphicsEngine.l();
             }
         }
     }
@@ -272,15 +272,15 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
             float fE = this.movementLevels[0].speed / e(0);
             if (fE != 0.0f) {
                 Vector3D vector3DBn = bn();
-                gameEngine.graphicsEngine2.i();
-                gameEngine.graphicsEngine2.b(vector3DBn.a - gameEngine.viewpointXSnapped, (vector3DBn.b - vector3DBn.c) - gameEngine.viewpointYSnapped);
-                gameEngine.graphicsEngine2.a(fE, fE);
+                gameEngine.renderGraphicsEngine.i();
+                gameEngine.renderGraphicsEngine.b(vector3DBn.a - gameEngine.viewpointXSnapped, (vector3DBn.b - vector3DBn.c) - gameEngine.viewpointYSnapped);
+                gameEngine.renderGraphicsEngine.a(fE, fE);
                 if (isCurrentCommandReclaim()) {
-                    gameEngine.graphicsEngine2.a(builderDechargeTexture, 0.0f, 0.0f, (Paint) null);
+                    gameEngine.renderGraphicsEngine.a(builderDechargeTexture, 0.0f, 0.0f, (Paint) null);
                 } else {
-                    gameEngine.graphicsEngine2.a(builderChargeTexture, 0.0f, 0.0f, (Paint) null);
+                    gameEngine.renderGraphicsEngine.a(builderChargeTexture, 0.0f, 0.0f, (Paint) null);
                 }
-                gameEngine.graphicsEngine2.j();
+                gameEngine.renderGraphicsEngine.j();
                 return true;
             }
             return true;

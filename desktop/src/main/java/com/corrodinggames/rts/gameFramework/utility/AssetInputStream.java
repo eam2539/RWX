@@ -106,8 +106,8 @@ public class AssetInputStream extends InputStream {
 
     protected void finalize() {
         if (!this.closed) {
-            GameEngine.updatePaintTextSizeIfNeeded("AssetInputStream was finalized with being closed");
-            GameEngine.updatePaintTextSizeIfNeeded(this.buildVersion);
+            GameEngine.logColored("AssetInputStream was finalized with being closed");
+            GameEngine.logColored(this.buildVersion);
         }
     }
 

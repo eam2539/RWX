@@ -64,8 +64,8 @@ public abstract class BaseBuilding extends OrderableUnit {
         GameEngine gameEngine = GameEngine.getInstance();
         OrderableUnit orderableUnit = (OrderableUnit) BaseUnit.findTurretPosition(unitType);
         gameEngine.tileMap.exportTmxToFile(f, f2);
-        orderableUnit.posX = gameEngine.tileMap.cursorTileX + orderableUnit.getUnitAIState();
-        orderableUnit.posY = gameEngine.tileMap.cursorTileY + orderableUnit.getUnitAIState();
+        orderableUnit.posX = gameEngine.tileMap.cursorTileX + orderableUnit.getTileOffsetX();
+        orderableUnit.posY = gameEngine.tileMap.cursorTileY + orderableUnit.getTileOffsetX();
         orderableUnit.setUnitTeam(playerTeam);
         return orderableUnit.canPlaceAtCurrentPosition((PlayerTeam) null);
     }
@@ -89,8 +89,8 @@ public abstract class BaseBuilding extends OrderableUnit {
     }
 
     public static void dt() {
-        buildingIconTexture = GameEngine.getInstance().graphicsEngine2.a(R.drawable.unit_icon_building);
-        teamColoredIconTextures = PlayerTeam.getUnitCountByType(buildingIconTexture);
+        buildingIconTexture = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.unit_icon_building);
+        teamColoredIconTextures = PlayerTeam.getTeamColorTextures(buildingIconTexture);
     }
 
     public BaseBuilding(boolean z) {
@@ -338,7 +338,7 @@ public abstract class BaseBuilding extends OrderableUnit {
         int i = this.currentAnimationFrame * this.es;
         RectF rectFCF = getUnitBounds();
         dv.a(i, 0, i + this.es, 0 + this.et);
-        gameEngine.graphicsEngine2.a(this.baseTexture, dv, rectFCF, getBuildingPaint());
+        gameEngine.renderGraphicsEngine.a(this.baseTexture, dv, rectFCF, getBuildingPaint());
         return true;
     }
 
@@ -350,12 +350,12 @@ public abstract class BaseBuilding extends OrderableUnit {
         }
         GameEngine gameEngine = GameEngine.getInstance();
         if (isBuildingActive()) {
-            gameEngine.graphicsEngine2.b(this.overlayTexture, (this.posX - ((int) (this.overlayTexture.t + 0.1f))) - gameEngine.viewpointXSnapped, (this.posY - ((int) (this.overlayTexture.u + 0.1f))) - gameEngine.viewpointYSnapped, getBuildingPaint());
+            gameEngine.renderGraphicsEngine.b(this.overlayTexture, (this.posX - ((int) (this.overlayTexture.t + 0.1f))) - gameEngine.viewpointXSnapped, (this.posY - ((int) (this.overlayTexture.u + 0.1f))) - gameEngine.viewpointYSnapped, getBuildingPaint());
             return;
         }
         RectF rectFCF = getUnitBounds();
         dv.a(0, 0, 0 + this.es, 0 + this.et);
-        gameEngine.graphicsEngine2.a(this.overlayTexture, dv, rectFCF, getBuildingPaint());
+        gameEngine.renderGraphicsEngine.a(this.overlayTexture, dv, rectFCF, getBuildingPaint());
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit

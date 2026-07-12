@@ -59,8 +59,8 @@ public abstract class WaterUnit extends MovableUnit {
 
     /* JADX INFO: renamed from: M */
     public static void loadTextures() {
-        waterUnitIconTexture = GameEngine.getInstance().graphicsEngine2.a(R.drawable.unit_icon_water);
-        waterUnitIconTextures = PlayerTeam.getUnitCountByType(waterUnitIconTexture);
+        waterUnitIconTexture = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.unit_icon_water);
+        waterUnitIconTextures = PlayerTeam.getTeamColorTextures(waterUnitIconTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit

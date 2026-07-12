@@ -86,7 +86,7 @@ public class MessageManager {
         GameEngine gameEngine = GameEngine.getInstance();
         pruneMessages();
         int i2 = (int) (20.0f * gameEngine.screenScale);
-        boolean zCreateInstance = gameEngine.createInstance();
+        boolean messageDisplayPersistent = gameEngine.isMessageDisplayPersistent();
         for (int size = this.messages.size() - 1; size >= 0; size--) {
             Message message = (Message) this.messages.get(size);
             if (message.shouldDisplay()) {
@@ -95,11 +95,11 @@ public class MessageManager {
                 } else {
                     strSubstring = message.author + ": " + message.text;
                 }
-                if (zCreateInstance) {
+                if (messageDisplayPersistent) {
                     strSubstring = message.formattedTimestamp + ": " + strSubstring;
                 }
-                if (message.field_e > 0) {
-                    int timeDifference = message.getTimeDifference() / message.field_e;
+                if (message.delayPerCharMs > 0) {
+                    int timeDifference = message.getTimeDifference() / message.delayPerCharMs;
                     if (timeDifference < 0) {
                         timeDifference = 0;
                     }
@@ -107,8 +107,8 @@ public class MessageManager {
                         strSubstring = strSubstring.substring(0, timeDifference);
                     }
                 }
-                this.textPaint.b(message.field_f);
-                gameEngine.graphicsEngine2.a(strSubstring, 20, i, this.textPaint);
+                this.textPaint.b(message.textColor);
+                gameEngine.renderGraphicsEngine.a(strSubstring, 20, i, this.textPaint);
                 i += i2;
             }
         }

@@ -73,7 +73,7 @@ public final class EffectManager {
     public int maxEffectsVeryHigh = 120;
 
     /* JADX INFO: renamed from: y */
-    private boolean[] someBooleanArray = new boolean[5];
+    private boolean[] activeEffectLayerFlags = new boolean[5];
 
     /* JADX INFO: renamed from: t */
     EffectQuality overrideEffectQuality = null;
@@ -570,14 +570,14 @@ public final class EffectManager {
         this.forceHighQuality = false;
         if (this.onlyOnScreen) {
             this.onlyOnScreen = false;
-            if (!gameEngine.cameraFollowZoom.b(f, f2)) {
+            if (!gameEngine.extendedVisibleWorldRect.b(f, f2)) {
                 return null;
             }
         }
         if (!z && gameEngine.tileMap != null && !gameEngine.tileMap.isWorldPointVisibleForTeam(f, f2, gameEngine.playerTeam)) {
             return null;
         }
-        if (gameEngine.cameraFollowSpeed.b(f, f2)) {
+        if (gameEngine.bufferedVisibleWorldRectF.b(f, f2)) {
             if (effectQuality == EffectQuality.verylow) {
                 effectQuality = EffectQuality.low;
             } else if (effectQuality == EffectQuality.low) {
@@ -585,7 +585,7 @@ public final class EffectManager {
             } else if (effectQuality == EffectQuality.high) {
                 effectQuality = EffectQuality.veryhigh;
             }
-        } else if (z2 || gameEngine.cameraFollowZoom.b(f, f2)) {
+        } else if (z2 || gameEngine.extendedVisibleWorldRect.b(f, f2)) {
         }
         Effect newEffect = getNewEffect(effectQuality);
         if (newEffect == null) {
@@ -655,7 +655,7 @@ public final class EffectManager {
         this.linePaint.a(true);
         this.linePaint.a(2.0f);
         this.linePaint.a(Paint.Cap.ROUND);
-        if (GameEngine.isAndroidVersionStatic2) {
+        if (GameEngine.isPCOrIOSVersion) {
             this.linePaint.a(3.0f);
         }
         effectTemplates = new SpriteSheet[20];
@@ -666,7 +666,7 @@ public final class EffectManager {
         spriteSheet.e = 1;
         spriteSheet.f = 26;
         spriteSheet.g = 26;
-        spriteSheet.i = gameEngine.graphicsEngine2.a(R.drawable.effects, true);
+        spriteSheet.i = gameEngine.renderGraphicsEngine.a(R.drawable.effects, true);
         spriteSheet.a = "effects";
         spriteSheet.createOutline();
         effectTemplates[0] = spriteSheet;
@@ -677,12 +677,12 @@ public final class EffectManager {
         spriteSheet2.e = 1;
         spriteSheet2.f = 40;
         spriteSheet2.g = 41;
-        spriteSheet2.i = gameEngine.graphicsEngine2.a(R.drawable.explode_big, true);
+        spriteSheet2.i = gameEngine.renderGraphicsEngine.a(R.drawable.explode_big, true);
         spriteSheet2.a = "explode_big";
         effectTemplates[1] = spriteSheet2;
         SpriteSheet spriteSheet3 = new SpriteSheet();
         spriteSheet3.k = true;
-        spriteSheet3.i = gameEngine.graphicsEngine2.a(R.drawable.light_50, true);
+        spriteSheet3.i = gameEngine.renderGraphicsEngine.a(R.drawable.light_50, true);
         spriteSheet3.a = "light_50";
         effectTemplates[2] = spriteSheet3;
         SpriteSheet spriteSheet4 = new SpriteSheet();
@@ -692,7 +692,7 @@ public final class EffectManager {
         spriteSheet4.e = 0;
         spriteSheet4.f = 20;
         spriteSheet4.g = 25;
-        spriteSheet4.i = gameEngine.graphicsEngine2.a(R.drawable.flame, true);
+        spriteSheet4.i = gameEngine.renderGraphicsEngine.a(R.drawable.flame, true);
         spriteSheet4.a = "flame";
         effectTemplates[3] = spriteSheet4;
         SpriteSheet spriteSheet5 = new SpriteSheet();
@@ -702,7 +702,7 @@ public final class EffectManager {
         spriteSheet5.e = 0;
         spriteSheet5.f = spriteSheet5.b;
         spriteSheet5.g = spriteSheet5.c;
-        spriteSheet5.i = gameEngine.graphicsEngine2.a(R.drawable.dust, true);
+        spriteSheet5.i = gameEngine.renderGraphicsEngine.a(R.drawable.dust, true);
         spriteSheet5.a = "dust";
         effectTemplates[4] = spriteSheet5;
         SpriteSheet spriteSheet6 = new SpriteSheet();
@@ -712,7 +712,7 @@ public final class EffectManager {
         spriteSheet6.e = 0;
         spriteSheet6.f = spriteSheet6.b;
         spriteSheet6.g = spriteSheet6.c;
-        spriteSheet6.i = gameEngine.graphicsEngine2.a(R.drawable.smoke_black, true);
+        spriteSheet6.i = gameEngine.renderGraphicsEngine.a(R.drawable.smoke_black, true);
         spriteSheet6.a = "smoke_black";
         spriteSheet6.createOutline();
         effectTemplates[5] = spriteSheet6;
@@ -723,7 +723,7 @@ public final class EffectManager {
         spriteSheet7.e = 0;
         spriteSheet7.f = spriteSheet7.b;
         spriteSheet7.g = spriteSheet7.c;
-        spriteSheet7.i = gameEngine.graphicsEngine2.a(R.drawable.shockwave, true);
+        spriteSheet7.i = gameEngine.renderGraphicsEngine.a(R.drawable.shockwave, true);
         spriteSheet7.a = "shockwave";
         effectTemplates[6] = spriteSheet7;
         SpriteSheet spriteSheet8 = new SpriteSheet();
@@ -733,7 +733,7 @@ public final class EffectManager {
         spriteSheet8.e = 0;
         spriteSheet8.f = spriteSheet8.b;
         spriteSheet8.g = spriteSheet8.c;
-        spriteSheet8.i = gameEngine.graphicsEngine2.a(R.drawable.fire, true);
+        spriteSheet8.i = gameEngine.renderGraphicsEngine.a(R.drawable.fire, true);
         spriteSheet8.a = "fire";
         effectTemplates[7] = spriteSheet8;
         SpriteSheet spriteSheet9 = new SpriteSheet();
@@ -741,7 +741,7 @@ public final class EffectManager {
         spriteSheet9.c = 30;
         spriteSheet9.f = spriteSheet9.b + 2;
         spriteSheet9.g = spriteSheet9.c;
-        spriteSheet9.i = gameEngine.graphicsEngine2.a(R.drawable.lava_bubble, true);
+        spriteSheet9.i = gameEngine.renderGraphicsEngine.a(R.drawable.lava_bubble, true);
         spriteSheet9.a = "lava_bubble";
         effectTemplates[8] = spriteSheet9;
         SpriteSheet spriteSheet10 = new SpriteSheet();
@@ -751,7 +751,7 @@ public final class EffectManager {
         spriteSheet10.e = 0;
         spriteSheet10.f = spriteSheet10.b + 1;
         spriteSheet10.g = spriteSheet10.c + 1;
-        spriteSheet10.i = gameEngine.graphicsEngine2.a(R.drawable.effects2, true);
+        spriteSheet10.i = gameEngine.renderGraphicsEngine.a(R.drawable.effects2, true);
         spriteSheet10.a = "effects2";
         effectTemplates[9] = spriteSheet10;
         SpriteSheet spriteSheet11 = new SpriteSheet();
@@ -761,7 +761,7 @@ public final class EffectManager {
         spriteSheet11.e = 0;
         spriteSheet11.f = 20;
         spriteSheet11.g = 25;
-        spriteSheet11.i = gameEngine.graphicsEngine2.a(R.drawable.plasma_shot, true);
+        spriteSheet11.i = gameEngine.renderGraphicsEngine.a(R.drawable.plasma_shot, true);
         spriteSheet11.a = "plasma_shot";
         effectTemplates[10] = spriteSheet11;
         SpriteSheet spriteSheet12 = new SpriteSheet();
@@ -771,7 +771,7 @@ public final class EffectManager {
         spriteSheet12.e = 0;
         spriteSheet12.f = spriteSheet12.b;
         spriteSheet12.g = spriteSheet12.c;
-        spriteSheet12.i = gameEngine.graphicsEngine2.a(R.drawable.shockwave_large, true);
+        spriteSheet12.i = gameEngine.renderGraphicsEngine.a(R.drawable.shockwave_large, true);
         spriteSheet12.a = "shockwave_large";
         effectTemplates[11] = spriteSheet12;
         SpriteSheet spriteSheet13 = new SpriteSheet();
@@ -781,7 +781,7 @@ public final class EffectManager {
         spriteSheet13.e = 0;
         spriteSheet13.f = spriteSheet13.b;
         spriteSheet13.g = spriteSheet13.c;
-        spriteSheet13.i = gameEngine.graphicsEngine2.a(R.drawable.explode_bits, true);
+        spriteSheet13.i = gameEngine.renderGraphicsEngine.a(R.drawable.explode_bits, true);
         spriteSheet13.a = "explode_bits";
         spriteSheet13.createOutline();
         effectTemplates[12] = spriteSheet13;
@@ -792,7 +792,7 @@ public final class EffectManager {
         spriteSheet14.e = 1;
         spriteSheet14.f = 40;
         spriteSheet14.g = 41;
-        spriteSheet14.i = gameEngine.graphicsEngine2.a(R.drawable.explode_big2, true);
+        spriteSheet14.i = gameEngine.renderGraphicsEngine.a(R.drawable.explode_big2, true);
         spriteSheet14.a = "explode_big2";
         effectTemplates[13] = spriteSheet14;
         SpriteSheet spriteSheet15 = new SpriteSheet();
@@ -802,7 +802,7 @@ public final class EffectManager {
         spriteSheet15.e = 0;
         spriteSheet15.f = spriteSheet15.b;
         spriteSheet15.g = spriteSheet15.c;
-        spriteSheet15.i = gameEngine.graphicsEngine2.a(R.drawable.explode_bits_bug, true);
+        spriteSheet15.i = gameEngine.renderGraphicsEngine.a(R.drawable.explode_bits_bug, true);
         spriteSheet15.a = "explode_bits_bug";
         spriteSheet15.createOutline();
         effectTemplates[14] = spriteSheet15;
@@ -813,7 +813,7 @@ public final class EffectManager {
         spriteSheet16.e = 0;
         spriteSheet16.f = spriteSheet16.b;
         spriteSheet16.g = spriteSheet16.c;
-        spriteSheet16.i = gameEngine.graphicsEngine2.a(R.drawable.projectiles, true);
+        spriteSheet16.i = gameEngine.renderGraphicsEngine.a(R.drawable.projectiles, true);
         spriteSheet16.a = "projectiles";
         spriteSheet16.createOutline();
         effectTemplates[15] = spriteSheet16;
@@ -824,7 +824,7 @@ public final class EffectManager {
         spriteSheet17.e = 0;
         spriteSheet17.f = spriteSheet17.b;
         spriteSheet17.g = spriteSheet17.c;
-        spriteSheet17.i = gameEngine.graphicsEngine2.a(R.drawable.projectiles2, true);
+        spriteSheet17.i = gameEngine.renderGraphicsEngine.a(R.drawable.projectiles2, true);
         spriteSheet17.a = "projectiles2";
         spriteSheet17.createOutline();
         effectTemplates[16] = spriteSheet17;
@@ -835,7 +835,7 @@ public final class EffectManager {
         spriteSheet18.e = 0;
         spriteSheet18.f = spriteSheet18.b + 1;
         spriteSheet18.g = spriteSheet18.c + 1;
-        spriteSheet18.i = gameEngine.graphicsEngine2.a(R.drawable.effects3, true);
+        spriteSheet18.i = gameEngine.renderGraphicsEngine.a(R.drawable.effects3, true);
         spriteSheet18.a = "effects3";
         effectTemplates[17] = spriteSheet18;
         SpriteSheet spriteSheet19 = new SpriteSheet();
@@ -845,7 +845,7 @@ public final class EffectManager {
         spriteSheet19.e = 0;
         spriteSheet19.f = spriteSheet19.b;
         spriteSheet19.g = spriteSheet19.c;
-        spriteSheet19.i = gameEngine.graphicsEngine2.a(R.drawable.smoke_white, true);
+        spriteSheet19.i = gameEngine.renderGraphicsEngine.a(R.drawable.smoke_white, true);
         spriteSheet19.a = "smoke_white";
         spriteSheet19.createOutline();
         effectTemplates[18] = spriteSheet19;
@@ -856,7 +856,7 @@ public final class EffectManager {
         spriteSheet20.e = 0;
         spriteSheet20.f = spriteSheet20.b;
         spriteSheet20.g = spriteSheet20.c;
-        spriteSheet20.i = gameEngine.graphicsEngine2.a(R.drawable.shockwave2, true);
+        spriteSheet20.i = gameEngine.renderGraphicsEngine.a(R.drawable.shockwave2, true);
         spriteSheet20.a = "shockwave2";
         spriteSheet20.createOutline();
         effectTemplates[19] = spriteSheet20;
@@ -912,7 +912,7 @@ public final class EffectManager {
         this.lastUpdate += f;
         if (this.lastUpdate > 10.0f) {
             this.lastUpdate = 0.0f;
-            gameEngine.tileMap.setCursorTileIndexFromWorldPoint(gameEngine.cameraBoundsMaxY + Utility.getRandomIntInRange(0, (int) gameEngine.screenHeight), gameEngine.mapWidth + Utility.getRandomIntInRange(0, (int) gameEngine.viewpointHeight));
+            gameEngine.tileMap.setCursorTileIndexFromWorldPoint(gameEngine.viewpointXInt + Utility.getRandomIntInRange(0, (int) gameEngine.visibleWorldWidth), gameEngine.viewpointYInt + Utility.getRandomIntInRange(0, (int) gameEngine.visibleWorldHeight));
             int i2 = gameEngine.tileMap.cursorTileX;
             int i3 = gameEngine.tileMap.cursorTileY;
             MapTile tileAt = gameEngine.tileMap.getTileAt(i2, i3);
@@ -927,14 +927,14 @@ public final class EffectManager {
     public int getEffectCount(float f) {
         GameEngine gameEngine = GameEngine.getInstance();
         int i = 0;
-        for (int i2 = 0; i2 < this.someBooleanArray.length; i2++) {
-            this.someBooleanArray[i2] = false;
+        for (int i2 = 0; i2 < this.activeEffectLayerFlags.length; i2++) {
+            this.activeEffectLayerFlags[i2] = false;
         }
         for (int i3 = 0; i3 < nextFreeEffect; i3++) {
             Effect effect = effects[i3];
             if (effect.o) {
-                if (!this.someBooleanArray[effect.ar]) {
-                    this.someBooleanArray[effect.ar] = true;
+                if (!this.activeEffectLayerFlags[effect.ar]) {
+                    this.activeEffectLayerFlags[effect.ar] = true;
                 }
                 if (effect.p) {
                     effect.draw(f);
@@ -949,7 +949,7 @@ public final class EffectManager {
 
     /* JADX INFO: renamed from: a */
     public int drawEffect(float f, int i) {
-        if (!this.someBooleanArray[i]) {
+        if (!this.activeEffectLayerFlags[i]) {
             return 0;
         }
         GameEngine gameEngine = GameEngine.getInstance();
@@ -977,7 +977,7 @@ public final class EffectManager {
             }
         }
         if (this.activeEffectsCount != 0) {
-            GameEngine.printLog("EffectEngine::removeAll: effectListActiveSize == " + this.activeEffectsCount);
+            GameEngine.logErrorColored("EffectEngine::removeAll: effectListActiveSize == " + this.activeEffectsCount);
         }
         nextFreeEffect = 0;
     }

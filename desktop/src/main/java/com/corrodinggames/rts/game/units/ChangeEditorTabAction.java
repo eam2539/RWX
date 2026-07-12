@@ -47,7 +47,7 @@ class ChangeEditorTabAction extends NoneAction {
     public void n() {
         EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
         if (editorOrBuilderL == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("Editor not active");
+            GameEngine.logColored("Editor not active");
         } else {
             if (this.b) {
                 return;

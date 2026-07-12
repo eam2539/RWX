@@ -228,7 +228,7 @@ public class ModInfo implements Comparable<ModInfo> {
         if (this.slowExternalPath != null) {
             str2 = str2 + " Storage: slow external unpacked";
         }
-        if (GameEngine.isDesktop() && this.sourceFolder != null && FileHelper.isManagedPath(this.sourceFolder) && !this.isArchive) {
+        if (GameEngine.isAndroidPlatform() && this.sourceFolder != null && FileHelper.isManagedPath(this.sourceFolder) && !this.isArchive) {
             str2 = str2 + " Warning: slow external storage";
         }
         return str + "\n (" + str2 + ")";
@@ -310,7 +310,7 @@ public class ModInfo implements Comparable<ModInfo> {
 
     /* JADX INFO: renamed from: a */
     public void addError(String str) {
-        GameEngine.updatePaintTextSizeIfNeeded("Adding error for mod: " + getPaddedTitle() + (isEnabled() ? VariableScope.nullOrMissingString : "(disabled)") + ": " + str);
+        GameEngine.logColored("Adding error for mod: " + getPaddedTitle() + (isEnabled() ? VariableScope.nullOrMissingString : "(disabled)") + ": " + str);
         if (this.firstError == null) {
             if (!this.disabled) {
                 GameEngine gameEngine = GameEngine.getInstance();
@@ -364,7 +364,7 @@ public class ModInfo implements Comparable<ModInfo> {
 
     /* JADX INFO: renamed from: n */
     public void fixSourceFolder() throws IOException {
-        if (GameEngine.getInstance().isExperimental()) {
+        if (GameEngine.getInstance().isExtraSafeModeLevel2Active()) {
             GameEngine.log("SAFE MODE: skipping setSourceFolder");
             return;
         }
@@ -404,7 +404,7 @@ public class ModInfo implements Comparable<ModInfo> {
             if (inputStreamOpenFileByPath == null && (strFindModInfoFile = findModInfoFile(this.sourceFolder, 1)) != null) {
                 AssetInputStream assetInputStreamOpenFileByPath = FileHelper.openFileByPath(str);
                 if (assetInputStreamOpenFileByPath != null) {
-                    GameEngine.printLog("mod-info.txt cache seems to be invalid for: " + str);
+                    GameEngine.logErrorColored("mod-info.txt cache seems to be invalid for: " + str);
                     CacheManager.deleteFromCache("mods-info", str);
                     inputStreamOpenFileByPath = assetInputStreamOpenFileByPath;
                 } else {
@@ -456,7 +456,7 @@ public class ModInfo implements Comparable<ModInfo> {
 
     /* JADX INFO: renamed from: r */
     public void refreshData() throws IOException {
-        if (GameEngine.getInstance().isExperimental()) {
+        if (GameEngine.getInstance().isExtraSafeModeLevel2Active()) {
             GameEngine.log("SAFE MODE: refreshData: Skipping mod read");
             this.description = "<< SAFE MODE ACTIVE: MOD DATA SKIPPED. RESTART IN NORMAL MODE. >>";
             return;
@@ -576,10 +576,10 @@ public class ModInfo implements Comparable<ModInfo> {
         if (this.isBuiltIn) {
             return false;
         }
-        if (GameEngine.isDebugVersionStatic2 && this.isArchive) {
+        if (GameEngine.isIOSVersion && this.isArchive) {
             return true;
         }
-        if (GameEngine.isDesktop() && this.isArchive) {
+        if (GameEngine.isAndroidPlatform() && this.isArchive) {
             return true;
         }
         return false;

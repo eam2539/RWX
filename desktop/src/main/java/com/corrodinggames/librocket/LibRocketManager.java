@@ -78,10 +78,10 @@ public abstract class LibRocketManager extends LibRocket {
             String strSubstring = strUrlDecode.substring("assets:".length());
             String strConvertAbstractPath = FileHelper.convertAbstractPath(strSubstring);
             boolean z = true;
-            if (GameEngine.isDebugVersionStatic2 && strConvertAbstractPath != null && strConvertAbstractPath.startsWith(basePath)) {
+            if (GameEngine.isIOSVersion && strConvertAbstractPath != null && strConvertAbstractPath.startsWith(basePath)) {
                 z = false;
             }
-            if (GameEngine.isDebugVersionStatic2 && strConvertAbstractPath != null && strConvertAbstractPath.startsWith("/private")) {
+            if (GameEngine.isIOSVersion && strConvertAbstractPath != null && strConvertAbstractPath.startsWith("/private")) {
                 z = false;
             }
             GameEngine.log("convertTexturePath  (basePath:" + z + "):" + strSubstring + " > " + strConvertAbstractPath);
@@ -595,12 +595,12 @@ public abstract class LibRocketManager extends LibRocket {
         } catch (Exception e) {
             ScriptEngine.throwDelayedException("TranslateString exception on: " + str, e);
             GameEngine.log("Exception in TranslateString", (Throwable) e);
-            GameEngine.updatePaintTextSizeIfNeeded("start");
+            GameEngine.logColored("start");
             e.printStackTrace();
-            GameEngine.updatePaintTextSizeIfNeeded("end");
-            GameEngine.updatePaintTextSizeIfNeeded("start logStack");
+            GameEngine.logColored("end");
+            GameEngine.logColored("start logStack");
             GameEngine.printStackTrace();
-            GameEngine.updatePaintTextSizeIfNeeded("end logStack");
+            GameEngine.logColored("end logStack");
             System.err.flush();
             System.out.flush();
             return null;

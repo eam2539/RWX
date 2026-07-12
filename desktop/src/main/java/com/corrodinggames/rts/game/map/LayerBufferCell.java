@@ -72,7 +72,7 @@ public class LayerBufferCell {
     /* JADX INFO: renamed from: a */
     public void initFadeBufferTexture() {
         GameEngine gameEngine = GameEngine.getInstance();
-        this.fadeOutTexture = gameEngine.graphicsEngine2.a(this.cellLayerTexture.p, this.cellLayerTexture.q, true);
+        this.fadeOutTexture = gameEngine.renderGraphicsEngine.a(this.cellLayerTexture.p, this.cellLayerTexture.q, true);
         if (this.fadeOutTexture != null && !this.fadeOutTexture.A()) {
             this.fadeOutTexture.a("fadeOutBitmap");
         }
@@ -80,7 +80,7 @@ public class LayerBufferCell {
             throw new OutOfMemoryError("Failed to create fade out bitmap");
         }
         this.fadeOutTexture.b(true);
-        this.fadeOutGraphics = gameEngine.graphicsEngine2.b(this.fadeOutTexture);
+        this.fadeOutGraphics = gameEngine.renderGraphicsEngine.b(this.fadeOutTexture);
     }
 
     /* JADX INFO: renamed from: b */

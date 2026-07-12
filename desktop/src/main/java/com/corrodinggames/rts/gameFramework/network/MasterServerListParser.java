@@ -121,7 +121,7 @@ class MasterServerListParser implements Runnable {
                                             try {
                                                 serverInfoFindOrCreateServerById.gameVersionCode = Integer.parseInt(serverInfoFindOrCreateServerById.gameVersionCodeText);
                                             } catch (NumberFormatException e2) {
-                                                GameEngine.updatePaintTextSizeIfNeeded("game_version_int:" + e2.getMessage());
+                                                GameEngine.logColored("game_version_int:" + e2.getMessage());
                                             }
                                             serverInfoFindOrCreateServerById.createdBy = str11;
                                             serverInfoFindOrCreateServerById.mapPath = str13;
@@ -142,12 +142,12 @@ class MasterServerListParser implements Runnable {
                                             try {
                                                 serverInfoFindOrCreateServerById.currentPlayers = Integer.parseInt(serverInfoFindOrCreateServerById.currentPlayersText);
                                             } catch (NumberFormatException e3) {
-                                                GameEngine.updatePaintTextSizeIfNeeded("game_player_count_int:" + e3.getMessage());
+                                                GameEngine.logColored("game_player_count_int:" + e3.getMessage());
                                             }
                                             try {
                                                 serverInfoFindOrCreateServerById.maxPlayers = Integer.parseInt(serverInfoFindOrCreateServerById.maxPlayersText);
                                             } catch (NumberFormatException e4) {
-                                                GameEngine.updatePaintTextSizeIfNeeded("game_max_player_count_int:" + e4.getMessage());
+                                                GameEngine.logColored("game_max_player_count_int:" + e4.getMessage());
                                             }
                                             serverInfoFindOrCreateServerById.isDedicatedServer = Boolean.parseBoolean(str20);
                                             if (serverInfoFindOrCreateServerById.lastSeenSequence < i) {

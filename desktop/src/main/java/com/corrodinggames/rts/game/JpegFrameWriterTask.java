@@ -20,7 +20,7 @@ class JpegFrameWriterTask implements Runnable {
                 fileOutputStream.close();
             } catch (Exception e) {
                 e.printStackTrace();
-                this.c.isServer = false;
+                this.c.isGameRecording = false;
                 this.c.alert("Error saving jpg, recording has stopped. Is there free space remaining on the SD card?", 1);
             }
         }

@@ -593,7 +593,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             String str = "Ally";
             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
             if (editorOrBuilderL != null) {
-                str = "Ally: " + editorOrBuilderL.team.getTeamColorName();
+                str = "Ally: " + editorOrBuilderL.team.getTeamSlotLabel();
             }
             return str;
         }
@@ -654,26 +654,26 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                 GameEngine.log("Already in a replay");
                 return false;
             }
-            gameEngine.isPositionInBounds(new Runnable() { // from class: com.corrodinggames.rts.game.units.h.2.1
+            gameEngine.queueGameThreadTask(new Runnable() { // from class: com.corrodinggames.rts.game.units.h.2.1
                 @Override // java.lang.Runnable
                 public void run() {
                     GameEngine gameEngine2 = GameEngine.getInstance();
                     if (!gameEngine2.replayEngine.k()) {
                         EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
                         gameEngine2.gameUI.e = true;
-                        if (!gameEngine2.networkEngine.B) {
+                        if (!gameEngine2.networkEngine.networkGameActive) {
                             long j = gameEngine2.networkEngine.nextUnitId;
-                            gameEngine2.networkEngine.o = true;
+                            gameEngine2.networkEngine.requireActiveMods = true;
                             int i = gameEngine2.networkEngine.roomSettings.fodMode;
-                            gameEngine2.networkEngine.R();
+                            gameEngine2.networkEngine.startSandboxServer();
                             gameEngine2.networkEngine.roomSettings.fodMode = i;
                             gameEngine2.networkEngine.nextUnitId = j;
                             gameEngine2.networkEngine.gameHasBeenStarted = true;
                             gameEngine2.currentTick = 0;
-                            gameEngine2.networkEngine.X = gameEngine2.currentTick + 1;
+                            gameEngine2.networkEngine.nextBlockingFrame = gameEngine2.currentTick + 1;
                             gameEngine2.networkEngine.w();
                         }
-                        String str = "[sandbox]" + gameEngine2.getCurrentMapName() + " [v" + gameEngine2.getVersion2() + "] (" + Utility.formatDate("d MMM yyyy HH.mm.ss") + ").replay";
+                        String str = "[sandbox]" + gameEngine2.getCurrentMapName() + " [v" + gameEngine2.getVersionString() + "] (" + Utility.formatDate("d MMM yyyy HH.mm.ss") + ").replay";
                         gameEngine2.replayEngine.d(str);
                         gameEngine2.gameUI.e = false;
                         GameEngine.addUIMessage(null, "Replay started as: " + str);
@@ -683,7 +683,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                             editorOrBuilderL2.editorIconTexture10 = str;
                             return;
                         } else {
-                            GameEngine.updatePaintTextSizeIfNeeded("Failed copySettingsFromAnotherEditor");
+                            GameEngine.logColored("Failed copySettingsFromAnotherEditor");
                             return;
                         }
                     }
@@ -754,18 +754,18 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                         if (!gameEngine2.replayEngine.j()) {
                             boolean z3 = gameEngine2.tileMap.fogEnabled;
                             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
-                            boolean z4 = gameEngine2.isTouchDown;
-                            boolean z5 = gameEngine2.isTouchMoving;
+                            boolean z4 = gameEngine2.hasWonGame;
+                            boolean z5 = gameEngine2.isContinuingAfterGameEnd;
                             gameEngine2.replayEngine.h = true;
-                            gameEngine2.replayEngine.c(str);
+                            gameEngine2.replayEngine.loadReplay(str);
                             gameEngine2.replayEngine.h = false;
-                            gameEngine2.isTouchDown = z4;
-                            gameEngine2.isTouchMoving = z5;
+                            gameEngine2.hasWonGame = z4;
+                            gameEngine2.isContinuingAfterGameEnd = z5;
                             EditorOrBuilder editorOrBuilderL2 = EditorOrBuilder.L();
                             if (editorOrBuilderL2 != null && editorOrBuilderL != null) {
                                 editorOrBuilderL2.a(editorOrBuilderL);
                             } else {
-                                GameEngine.updatePaintTextSizeIfNeeded("Failed copySettingsFromAnotherEditor");
+                                GameEngine.logColored("Failed copySettingsFromAnotherEditor");
                             }
                             gameEngine2.isGameStarted = true;
                             if (gameEngine2.tileMap != null) {
@@ -786,14 +786,14 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                     @Override // com.corrodinggames.rts.gameFramework.ui.widgets.UIEventHandler
                     public boolean a(UIEvent uIEvent) {
                         menuDialogA.i();
-                        gameEngine.isPositionInBounds(runnable);
+                        gameEngine.queueGameThreadTask(runnable);
                         return true;
                     }
                 });
                 gameEngine.gameUI.a(menuDialogA);
                 return false;
             }
-            gameEngine.isPositionInBounds(new Runnable() { // from class: com.corrodinggames.rts.game.units.h.3.3
+            gameEngine.queueGameThreadTask(new Runnable() { // from class: com.corrodinggames.rts.game.units.h.3.3
                 @Override // java.lang.Runnable
                 public void run() {
                     GameEngine gameEngine2 = GameEngine.getInstance();
@@ -1055,7 +1055,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
         public String getCostForUnit() {
-            if (!GameEngine.getInstance().isNetworkGameActive) {
+            if (!GameEngine.getInstance().isDebugTempMode) {
                 return "Debug: Off";
             }
             return "Debug: On";
@@ -1088,7 +1088,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
         public String getCostForUnit() {
-            if (!GameEngine.getInstance().isNetworkServer) {
+            if (!GameEngine.getInstance().isTriggerDebugMode) {
                 return "Trigger Debug: Off";
             }
             return "Trigger Debug: On";
@@ -1096,7 +1096,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean b(BaseUnit baseUnit) {
-            return GameEngine.getInstance().isNetworkGameActive;
+            return GameEngine.getInstance().isDebugTempMode;
         }
     };
     static AbstractUnitAction C = new NoneAction("clearSaveHistory") { // from class: com.corrodinggames.rts.game.units.h.14
@@ -1115,7 +1115,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean b(BaseUnit baseUnit) {
-            return GameEngine.getInstance().isNetworkGameActive;
+            return GameEngine.getInstance().isDebugTempMode;
         }
     };
     static ActionFilter K = new ActionFilter() { // from class: com.corrodinggames.rts.game.units.h.16
@@ -1186,7 +1186,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     }
 
     public static void K() {
-        editorSelectionTexture2 = GameEngine.getInstance().graphicsEngine2.a(R.drawable.icon_search);
+        editorSelectionTexture2 = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.icon_search);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -1302,12 +1302,12 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         if (f < 0.3f) {
             f = 0.3f;
         }
-        if (this.ax && this.team.addCredits()) {
+        if (this.ax && this.team.isSpectatorTeamColor()) {
             int i = 0;
             while (true) {
                 if (i < PlayerTeam.TEAM_NEUTRAL) {
                     PlayerTeam playerTeamK = PlayerTeam.k(i);
-                    if (playerTeamK == null || playerTeamK.addCredits()) {
+                    if (playerTeamK == null || playerTeamK.isSpectatorTeamColor()) {
                         i++;
                     } else {
                         isSelectable(playerTeamK);
@@ -1444,7 +1444,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                 while (true) {
                     if (i < PlayerTeam.TEAM_NEUTRAL) {
                         PlayerTeam playerTeamK2 = PlayerTeam.k(i);
-                        if (playerTeamK2 == null || playerTeamK2.addCredits()) {
+                        if (playerTeamK2 == null || playerTeamK2.isSpectatorTeamColor()) {
                             i++;
                         } else {
                             playerTeamK = playerTeamK2;
@@ -1475,7 +1475,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                     while (true) {
                         if (i2 < PlayerTeam.TEAM_NEUTRAL) {
                             PlayerTeam playerTeamK3 = PlayerTeam.k(i2);
-                            if (playerTeamK3 == null || playerTeamK3.addCredits()) {
+                            if (playerTeamK3 == null || playerTeamK3.isSpectatorTeamColor()) {
                                 i2++;
                             } else {
                                 playerTeamK = playerTeamK3;
@@ -1498,7 +1498,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                 while (true) {
                     if (i3 >= 0) {
                         PlayerTeam playerTeamK4 = PlayerTeam.k(i3);
-                        if (playerTeamK4 == null || playerTeamK4.addCredits()) {
+                        if (playerTeamK4 == null || playerTeamK4.isSpectatorTeamColor()) {
                             i3--;
                         } else {
                             playerTeam = playerTeamK4;
@@ -1513,7 +1513,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                     while (true) {
                         if (i4 >= 0) {
                             PlayerTeam playerTeamK5 = PlayerTeam.k(i4);
-                            if (playerTeamK5 == null || playerTeamK5.addCredits()) {
+                            if (playerTeamK5 == null || playerTeamK5.isSpectatorTeamColor()) {
                                 i4--;
                             } else {
                                 playerTeam = playerTeamK5;
@@ -1621,7 +1621,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
         if (abstractUnitAction == editorSelectionTexture3) {
             if (w()) {
-                GameEngine.updatePaintTextSizeIfNeeded("Not reloading units: Need to keep network sync");
+                GameEngine.logColored("Not reloading units: Need to keep network sync");
                 gameEngine.gameUI.showMediumPriorityMessage("Not reloading units: Need to keep network sync");
                 return;
             }
@@ -1634,7 +1634,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             GameEngine.log("Reload units requested");
             gameEngine.modManager.applyMods(true, false);
-            for (PlayerTeam playerTeam : PlayerTeam.addEnergy()) {
+            for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
                 if (playerTeam instanceof AIController) {
                     ((AIController) playerTeam).initializeBuildStrategies();
                 }
@@ -1643,7 +1643,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
         if (abstractUnitAction == editorIconTexture) {
             if (w()) {
-                GameEngine.updatePaintTextSizeIfNeeded("Not reloading units: Need to keep network sync");
+                GameEngine.logColored("Not reloading units: Need to keep network sync");
                 return;
             }
             if (z2) {
@@ -1655,7 +1655,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             GameEngine.log("Reload active only requested");
             gameEngine.modManager.applyMods(true, true);
-            for (PlayerTeam playerTeam2 : PlayerTeam.addEnergy()) {
+            for (PlayerTeam playerTeam2 : PlayerTeam.getTeams()) {
                 if (playerTeam2 instanceof AIController) {
                     ((AIController) playerTeam2).initializeBuildStrategies();
                 }
@@ -1754,7 +1754,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         if (abstractUnitAction == u) {
             boolean z3 = false;
             boolean z4 = false;
-            for (PlayerTeam playerTeam5 : PlayerTeam.addEnergy()) {
+            for (PlayerTeam playerTeam5 : PlayerTeam.getTeams()) {
                 if (playerTeam5 instanceof AIController) {
                     if (((AIController) playerTeam5).aiUnitManagementTimer > 0.0f) {
                         z3 = true;
@@ -1776,13 +1776,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         if (abstractUnitAction == x) {
         }
         if (abstractUnitAction == z) {
-            gameEngine.isNetworkGameActive = !gameEngine.isNetworkGameActive;
+            gameEngine.isDebugTempMode = !gameEngine.isDebugTempMode;
         }
         if (abstractUnitAction == A) {
             AIController.unitCountsUpdated = !AIController.unitCountsUpdated;
         }
         if (abstractUnitAction == B) {
-            gameEngine.isNetworkServer = !gameEngine.isNetworkServer;
+            gameEngine.isTriggerDebugMode = !gameEngine.isTriggerDebugMode;
         }
         if (abstractUnitAction == C) {
             gameEngine.gameStatistics.a();
@@ -1794,7 +1794,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     }
 
     public void M() {
-        for (PlayerTeam playerTeam : PlayerTeam.addEnergy()) {
+        for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
             if (playerTeam instanceof AIController) {
                 AIController aIController = (AIController) playerTeam;
                 if (!this.controlPointPaints) {
@@ -1856,7 +1856,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         arrayList2.add(editorIconTexture9);
         arrayList2.add(s);
         arrayList2.add(t);
-        if (GameEngine.isSandboxModeStatic) {
+        if (GameEngine.isTestingBuild) {
             arrayList2.add(A);
         }
         arrayList2.add(B);

@@ -112,7 +112,7 @@ public class VariableScope {
             } else if (returnType == LogicBoolean.ReturnType.unit) {
                 variableDataUnitArray = new VariableDataUnitArray();
             } else {
-                GameEngine.updatePaintTextSizeIfNeeded("Unhandled array type: " + returnType);
+                GameEngine.logColored("Unhandled array type: " + returnType);
                 return;
             }
             setDataRaw(variableName, variableDataUnitArray);
@@ -952,7 +952,7 @@ public class VariableScope {
                 if (returnType == LogicBoolean.ReturnType.unitArray) {
                     return LogicBooleanLoader.unitArrayContextReader;
                 }
-                GameEngine.updatePaintTextSizeIfNeeded("Unhandled array context type: " + returnType);
+                GameEngine.logColored("Unhandled array context type: " + returnType);
                 return LogicBooleanLoader.voidContextReader;
             }
             return super.createContext();

@@ -47,11 +47,11 @@ public class FlowFieldPathPositionProvider extends PathPositionProvider {
             float f3 = positionDataE.posX;
             float f4 = positionDataE.posY;
             DynamicUnitPath.c.b(-16776961);
-            gameEngine.graphicsEngine2.a(baseUnit.posX - f, baseUnit.posY - f2, f3 - f, f4 - f2, DynamicUnitPath.c);
+            gameEngine.renderGraphicsEngine.a(baseUnit.posX - f, baseUnit.posY - f2, f3 - f, f4 - f2, DynamicUnitPath.c);
             PositionData positionDataB = b(baseUnit);
             if (positionDataB != null) {
                 DynamicUnitPath.c.b(-7829368);
-                gameEngine.graphicsEngine2.a(f3 - f, f4 - f2, positionDataB.posX - f, positionDataB.posY - f2, DynamicUnitPath.c);
+                gameEngine.renderGraphicsEngine.a(f3 - f, f4 - f2, positionDataB.posX - f, positionDataB.posY - f2, DynamicUnitPath.c);
             }
         }
         PositionData positionDataA = a(baseUnit);
@@ -59,7 +59,7 @@ public class FlowFieldPathPositionProvider extends PathPositionProvider {
             float f5 = positionDataA.posX;
             float f6 = positionDataA.posY;
             DynamicUnitPath.c.b(-256);
-            gameEngine.graphicsEngine2.a(baseUnit.posX - f, baseUnit.posY - f2, f5 - f, f6 - f2, DynamicUnitPath.c);
+            gameEngine.renderGraphicsEngine.a(baseUnit.posX - f, baseUnit.posY - f2, f5 - f, f6 - f2, DynamicUnitPath.c);
         }
     }
 

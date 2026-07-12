@@ -52,8 +52,8 @@ public abstract class AirUnit extends MovableUnit {
 
     /* JADX INFO: renamed from: K */
     public static void loadAirUnitTextures() {
-        m = GameEngine.getInstance().graphicsEngine2.a(R.drawable.unit_icon_air);
-        n = PlayerTeam.getUnitCountByType(m);
+        m = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.unit_icon_air);
+        n = PlayerTeam.getTeamColorTextures(m);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit

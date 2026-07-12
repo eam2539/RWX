@@ -99,7 +99,7 @@ public class TeamColorTexture extends Texture {
             } catch (OutOfMemoryError e) {
                 GameEngine.log("Colouring failed with OOM");
                 GameEngine.reportOOM(AssetType.gameImageColor, e);
-                this.I = GameEngine.getInstance().graphicsEngine2.r();
+                this.I = GameEngine.getInstance().renderGraphicsEngine.r();
                 return;
             }
         }

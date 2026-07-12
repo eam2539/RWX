@@ -100,8 +100,8 @@ public class AnimationTrackingManager {
                         if (fDistanceSq < (texture.q - 2) * (texture.q - 2)) {
                             fSqrt = Utility.sqrt((int) fDistanceSq);
                         }
-                        gameEngine.graphicsEngine2.k();
-                        gameEngine.graphicsEngine2.a(angleBetweenPoints + 90.0f, f3, f4);
+                        gameEngine.renderGraphicsEngine.k();
+                        gameEngine.renderGraphicsEngine.a(angleBetweenPoints + 90.0f, f3, f4);
                         a.a(0, (int) (texture.q - fSqrt), texture.p, texture.q);
                         b.a(f3 - texture.r, f4 - fSqrt, f3 + texture.r, f4);
                         Paint paint = GamePaint.r;
@@ -113,11 +113,11 @@ public class AnimationTrackingManager {
                             }
                             paint.a(255, 255, 255 - iAbs, 255 - iAbs);
                         }
-                        gameEngine.graphicsEngine2.a(texture, a, b, paint);
-                        gameEngine.graphicsEngine2.l();
+                        gameEngine.renderGraphicsEngine.a(texture, a, b, paint);
+                        gameEngine.renderGraphicsEngine.l();
                     }
                     if (animationTrackingEntry.f != null) {
-                        gameEngine.graphicsEngine2.a(baseUnit.posX - gameEngine.viewpointXSnapped, (baseUnit.posY - gameEngine.viewpointYSnapped) - baseUnit.posZ, baseUnit2.posX - gameEngine.viewpointXSnapped, (baseUnit2.posY - gameEngine.viewpointYSnapped) - baseUnit2.posZ, animationTrackingEntry.f);
+                        gameEngine.renderGraphicsEngine.a(baseUnit.posX - gameEngine.viewpointXSnapped, (baseUnit.posY - gameEngine.viewpointYSnapped) - baseUnit.posZ, baseUnit2.posX - gameEngine.viewpointXSnapped, (baseUnit2.posY - gameEngine.viewpointYSnapped) - baseUnit2.posZ, animationTrackingEntry.f);
                     }
                 }
             }

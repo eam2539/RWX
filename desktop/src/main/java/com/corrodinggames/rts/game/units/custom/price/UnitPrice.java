@@ -237,7 +237,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
             iMin = Utility.min(9999, (int) (baseUnit.team.credits / ((double) this.b)));
         }
         if (this.c > 0.0f) {
-            iMin = Utility.min(iMin, (int) (baseUnit.f0cB / this.c));
+            iMin = Utility.min(iMin, (int) (baseUnit.currentEnergy / this.c));
         }
         if (this.d > 0.0f) {
             iMin = Utility.min(iMin, (int) (baseUnit.currentHealth / this.d));
@@ -259,10 +259,10 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
 
     @Override // com.corrodinggames.rts.game.units.custom.price.PriceCondition
     public boolean b(BaseUnit baseUnit, double d) {
-        if (this.b > 0 && !baseUnit.team.getTeamColorName(((double) this.b) * d)) {
+        if (this.b > 0 && !baseUnit.team.hasCredits(((double) this.b) * d)) {
             return false;
         }
-        if (this.c > 0.0f && baseUnit.f0cB < ((double) this.c) * d) {
+        if (this.c > 0.0f && baseUnit.currentEnergy < ((double) this.c) * d) {
             return false;
         }
         if (this.d > 0.0f && baseUnit.currentHealth < ((double) this.d) * d) {
@@ -282,10 +282,10 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
 
     @Override // com.corrodinggames.rts.game.units.custom.price.PriceCondition
     public boolean b(BaseUnit baseUnit) {
-        if (this.b > 0 && !baseUnit.team.getTeamColorName(this.b)) {
+        if (this.b > 0 && !baseUnit.team.hasCredits(this.b)) {
             return false;
         }
-        if (this.c > 0.0f && baseUnit.f0cB < this.c) {
+        if (this.c > 0.0f && baseUnit.currentEnergy < this.c) {
             return false;
         }
         if (this.d > 0.0f && baseUnit.currentHealth < this.d) {
@@ -312,11 +312,11 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
     }
 
     public static void d(BaseUnit baseUnit) {
-        if (baseUnit.f0cB < 0.0f) {
-            baseUnit.f0cB = 0.0f;
+        if (baseUnit.currentEnergy < 0.0f) {
+            baseUnit.currentEnergy = 0.0f;
         }
-        if (baseUnit.f0cB > baseUnit.bd()) {
-            baseUnit.f0cB = baseUnit.bd();
+        if (baseUnit.currentEnergy > baseUnit.bd()) {
+            baseUnit.currentEnergy = baseUnit.bd();
         }
         if (baseUnit.shield < 0.0f) {
             baseUnit.shield = 0.0f;
@@ -376,7 +376,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
     @Override // com.corrodinggames.rts.game.units.custom.price.PriceCondition
     public void a(BaseUnit baseUnit) {
         baseUnit.team.credits -= (double) this.b;
-        baseUnit.f0cB -= this.c;
+        baseUnit.currentEnergy -= this.c;
         baseUnit.currentHealth -= this.d;
         baseUnit.shield -= this.e;
         baseUnit.unitLevel -= this.f;
@@ -390,7 +390,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
     @Override // com.corrodinggames.rts.game.units.custom.price.PriceCondition
     public void a(BaseUnit baseUnit, double d) {
         baseUnit.team.credits -= ((double) this.b) * d;
-        baseUnit.f0cB = (float) (((double) baseUnit.f0cB) - (((double) this.c) * d));
+        baseUnit.currentEnergy = (float) (((double) baseUnit.currentEnergy) - (((double) this.c) * d));
         baseUnit.currentHealth = (float) (((double) baseUnit.currentHealth) - (((double) this.d) * d));
         baseUnit.shield = (float) (((double) baseUnit.shield) - (((double) this.e) * d));
         baseUnit.unitLevel = (int) (((double) baseUnit.unitLevel) - (((double) this.f) * d));
@@ -407,7 +407,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         } else {
             baseUnit.team.credits += (double) this.b;
         }
-        baseUnit.f0cB += this.c;
+        baseUnit.currentEnergy += this.c;
         baseUnit.currentHealth += this.d;
         baseUnit.shield += this.e;
         baseUnit.unitLevel += this.f;
@@ -420,7 +420,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
 
     public void h(BaseUnit baseUnit) {
         baseUnit.team.credits += (double) this.b;
-        baseUnit.f0cB += this.c;
+        baseUnit.currentEnergy += this.c;
         baseUnit.currentHealth += this.d;
         baseUnit.shield += this.e;
         baseUnit.unitLevel += this.f;
@@ -435,7 +435,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         if (z) {
             baseUnit.team.credits += ((double) this.b) * d;
         }
-        baseUnit.f0cB = (float) (((double) baseUnit.f0cB) + (((double) this.c) * d));
+        baseUnit.currentEnergy = (float) (((double) baseUnit.currentEnergy) + (((double) this.c) * d));
         baseUnit.currentHealth = (float) (((double) baseUnit.currentHealth) + (((double) this.d) * d));
         baseUnit.shield = (float) (((double) baseUnit.shield) + (((double) this.e) * d));
         baseUnit.unitLevel = (int) (((double) baseUnit.unitLevel) + (((double) this.f) * d));
@@ -651,7 +651,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
     }
 
     public boolean c(BaseUnit baseUnit, boolean z) {
-        if (this.b > 0 && !baseUnit.team.isTeamIndexActive(this.b)) {
+        if (this.b > 0 && !baseUnit.team.hasCreditsIncludingAntiLagCredit(this.b)) {
             return false;
         }
         if (z) {

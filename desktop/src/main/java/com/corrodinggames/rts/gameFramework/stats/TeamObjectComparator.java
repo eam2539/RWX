@@ -20,7 +20,7 @@ public class TeamObjectComparator extends GameObjectComparator {
     public TeamObjectComparator(int i, ArrayList arrayList) {
         this.teamColorId = i;
         this.teams = arrayList;
-        this.name = "Team " + PlayerTeam.updateFogOfWar(i);
+        this.name = "Team " + PlayerTeam.getTeamSlotLabel(i);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.stats.GameObjectComparator

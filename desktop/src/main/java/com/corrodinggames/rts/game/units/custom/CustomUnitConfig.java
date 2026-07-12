@@ -75,7 +75,7 @@ public final class CustomUnitConfig implements UnitType {
     public boolean isHover;
 
     /* JADX INFO: renamed from: C */
-    public Rect tech;
+    public Rect largeImageBounds;
 
     /* JADX INFO: renamed from: D */
     public String configPath;
@@ -153,13 +153,13 @@ public final class CustomUnitConfig implements UnitType {
     public float image_offsetH;
 
     /* JADX INFO: renamed from: ak */
-    public boolean bool4;
+    public boolean hasImageOffset;
 
     /* JADX INFO: renamed from: am */
     public boolean image_back_always_use_full_image;
 
     /* JADX INFO: renamed from: aq */
-    public boolean bool3;
+    public boolean hasShadowFrames;
 
     /* JADX INFO: renamed from: as */
     public Texture[] energy;
@@ -355,10 +355,10 @@ public final class CustomUnitConfig implements UnitType {
     public boolean stayNeutral;
 
     /* JADX INFO: renamed from: bY */
-    CustomUnitSpawnList createOnNeutralTeam;
+    CustomUnitSpawnList reclaimEffect;
 
     /* JADX INFO: renamed from: bZ */
-    CustomUnitSpawnList createOnSameTeamAsParent;
+    CustomUnitSpawnList reclaimEffectAtTarget;
 
     /* JADX INFO: renamed from: cc */
     public boolean canBeBuiltBy;
@@ -436,13 +436,13 @@ public final class CustomUnitConfig implements UnitType {
     public boolean rotateWithDirection;
 
     /* JADX INFO: renamed from: da */
-    public float canBeBuiltByOrTagsAndLogicOrTagsOrLogicOrTags;
+    public float buildingToFootprintOffsetX;
 
     /* JADX INFO: renamed from: db */
-    public float canBeBuiltByOrTagsAndLogicOrTagsOrLogicAndTags;
+    public float buildingToFootprintOffsetY;
 
     /* JADX INFO: renamed from: dc */
-    public boolean canBeBuiltByOrTagsAndLogicAndTagsAndLogicOrTags;
+    public boolean hasSetRallyAction;
     /* JADX INFO: renamed from: dC */
     public boolean lockBodyRotationWithMainTurret;
     /* JADX INFO: renamed from: dD */
@@ -473,9 +473,9 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: dP */
     public boolean ignoreMoveOrders;
     /* JADX INFO: renamed from: dQ */
-    public boolean bool8;
+    public boolean landOnGround;
     /* JADX INFO: renamed from: dR */
-    public boolean bool9;
+    public boolean landOnGroundOnlyIdle;
     /* JADX INFO: renamed from: dT */
     public float targetHeightDrift;
     /* JADX INFO: renamed from: dX */
@@ -499,7 +499,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: ej */
     public float moveYAxisScaling;
     /* JADX INFO: renamed from: ek */
-    public float float2;
+    public float inverseMoveYAxisScaling;
     /* JADX INFO: renamed from: el */
     public float reverseSpeedPercentage;
     /* JADX INFO: renamed from: eo */
@@ -515,13 +515,13 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: et */
     public LogicBoolean canAttackNotTouchingWaterUnits;
     /* JADX INFO: renamed from: eu */
-    public boolean bool11;
+    public boolean hasAttackTagRestrictions;
     /* JADX INFO: renamed from: ev */
     public AnimationSet canOnlyAttackUnitsWithTags;
     /* JADX INFO: renamed from: ew */
     public AnimationSet canOnlyAttackUnitsWithoutTags;
     /* JADX INFO: renamed from: ex */
-    public boolean bool12;
+    public boolean allFiringTurretsHaveTagRestrictions;
     /* JADX INFO: renamed from: ey */
     public boolean isFixedFiring;
     /* JADX INFO: renamed from: ez */
@@ -621,7 +621,7 @@ public final class CustomUnitConfig implements UnitType {
     public float nonGlobalExtraPriority;
 
     /* JADX INFO: renamed from: fd */
-    public LogicBoolean f17fd;
+    public LogicBoolean transportUnitsCanUnloadCondition;
 
     /* JADX INFO: renamed from: ff */
     public PlacementRules customUnitMetadata;
@@ -630,7 +630,7 @@ public final class CustomUnitConfig implements UnitType {
     public UnitMovementType movementType;
 
     /* JADX INFO: renamed from: fh */
-    public UnitMovementType f19fh;
+    public UnitMovementType effectiveMovementType;
     /* JADX INFO: renamed from: fE */
     public int whenUsingAsHarvester_recommendedInEachBase;
     /* JADX INFO: renamed from: fF */
@@ -650,13 +650,13 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: U */
     public int total_frames = 1;
     /* JADX INFO: renamed from: V */
-    public int int2 = Integer.MAX_VALUE;
+    public int frameColumns = Integer.MAX_VALUE;
     /* JADX INFO: renamed from: W */
     public int frame_width = -1;
     public int frame_height = -1;
 
     /* JADX INFO: renamed from: fu */
-    public boolean f29fu;
+    public boolean canBuildUnits;
     /* JADX INFO: renamed from: al */
     public Texture image_back = null;
     /* JADX INFO: renamed from: an */
@@ -668,7 +668,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: au */
     public Texture texture = null;
     /* JADX INFO: renamed from: av */
-    public boolean bool5 = false;
+    public boolean hasCustomShieldImage = false;
     /* JADX INFO: renamed from: ax */
     public LegConfig[] legConfig = null;
     /* JADX INFO: renamed from: aG */
@@ -685,10 +685,10 @@ public final class CustomUnitConfig implements UnitType {
     public UnitPrice borrowResourcesWhileAlive = UnitPrice.a;
 
     /* JADX INFO: renamed from: fI */
-    public String f43fI;
+    public String aiUpgradedFrom;
 
     /* JADX INFO: renamed from: fJ */
-    public boolean f44fJ;
+    public boolean hasAiHighPriorityAction;
     /* JADX INFO: renamed from: cw */
     public UnitPrice borrowResourcesWhileBuilt = UnitPrice.a;
     /* JADX INFO: renamed from: cI */
@@ -697,13 +697,13 @@ public final class CustomUnitConfig implements UnitType {
     public UnitStats unitStats = new UnitStats(true);
 
     /* JADX INFO: renamed from: fP */
-    public boolean f49fP;
+    public boolean hasTurretChargeEffectImage;
 
     /* JADX INFO: renamed from: fR */
-    public CustomProjectileTemplate[] f50fR;
+    public CustomProjectileTemplate[] projectileTemplatesById;
 
     /* JADX INFO: renamed from: fX */
-    boolean f52fX;
+    boolean hasAutoTriggerConditions;
 
     /* JADX INFO: renamed from: fY */
     CustomUnitCondition[] autoTriggerConditionsEveryFrame;
@@ -715,7 +715,7 @@ public final class CustomUnitConfig implements UnitType {
     CustomUnitCondition[] autoTriggerConditionsEvery8Frames;
 
     /* JADX INFO: renamed from: gi */
-    public boolean f56gi;
+    public boolean hasBuildCostActions;
 
     /* JADX INFO: renamed from: gk */
     String cachedUnitName;
@@ -760,10 +760,10 @@ public final class CustomUnitConfig implements UnitType {
     public static LogicBoolean logic_notOverLiquid = LogicBoolean.create(null, "if not self.isOverLiquid()");
 
     /* JADX INFO: renamed from: ge */
-    static final EffectTemplate[] f54ge = new EffectTemplate[0];
+    static final EffectTemplate[] emptySpawnItems = new EffectTemplate[0];
 
     /* JADX INFO: renamed from: gf */
-    static final EffectTemplate[] f55gf = new EffectTemplate[0];
+    static final EffectTemplate[] noneSpawnItems = new EffectTemplate[0];
 
     /* JADX INFO: renamed from: h */
     public final FastArrayList onCreateListeners = new FastArrayList();
@@ -818,18 +818,18 @@ public final class CustomUnitConfig implements UnitType {
     public Texture baseTexture = null;
 
     /* JADX INFO: renamed from: ae */
-    public boolean hp = true;
+    public boolean imageFloatingPointSize = true;
     /* JADX INFO: renamed from: dV */
     public float fallingAcceleration = 0.03f;
     /* JADX INFO: renamed from: dW */
     public float fallingAccelerationDead = 0.06f;
     /* JADX INFO: renamed from: em */
-    public int currentTurrentIndex = -1;
+    public int currentTurretIndex = -1;
 
     /* JADX INFO: renamed from: ap */
     public Texture shieldRegenMoving = null;
     /* JADX INFO: renamed from: en */
-    public int int3 = -1;
+    public int warmupBarTurretIndex = -1;
 
     /* JADX INFO: renamed from: at */
     public Texture[] maxEnergy = null;
@@ -855,7 +855,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: eZ */
     public int transportSlotsNeeded = 1;
     /* JADX INFO: renamed from: bJ */
-    boolean splastEffect;
+    boolean splashEffect;
 
     /* JADX INFO: renamed from: bA */
     public int canAttackLand = -1;
@@ -875,7 +875,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: cb */
     public UpdateFrequency autoTriggerCheckRate = UpdateFrequency.everyFrame;
     /* JADX INFO: renamed from: bK */
-    boolean splastEffectReverse;
+    boolean splashEffectReverse;
 
     /* JADX INFO: renamed from: co */
     public UnitPrice generationTemplate = UnitPrice.a;
@@ -898,9 +898,9 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: bN */
     boolean dustEffectReverse;
     /* JADX INFO: renamed from: bO */
-    CustomUnitSpawnList list1;
+    CustomUnitSpawnList movementEffect;
     /* JADX INFO: renamed from: bP */
-    CustomUnitSpawnList list2;
+    CustomUnitSpawnList movementEffectReverse;
     /* JADX INFO: renamed from: bQ */
     boolean movementEffectReverseFlipEffects;
     /* JADX INFO: renamed from: bR */
@@ -908,11 +908,11 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: bT */
     float repairEffectRate;
     /* JADX INFO: renamed from: bU */
-    CustomUnitSpawnList list3;
+    CustomUnitSpawnList repairEffect;
     /* JADX INFO: renamed from: bV */
-    CustomUnitSpawnList list4;
+    CustomUnitSpawnList repairEffectAtTarget;
     /* JADX INFO: renamed from: bW */
-    boolean bool2;
+    boolean hasReclaimEffect;
     /* JADX INFO: renamed from: bX */
     float reclaimEffectRate;
     /* JADX INFO: renamed from: dv */
@@ -942,7 +942,7 @@ public final class CustomUnitConfig implements UnitType {
     public boolean f18fe = true;
 
     /* JADX INFO: renamed from: fK */
-    public float f45fK = -1.0f;
+    public float aiUpgradePriority = -1.0f;
 
     /* JADX INFO: renamed from: fL */
     public FastArrayList<UnitType> relatedUnits = new FastArrayList();
@@ -957,7 +957,7 @@ public final class CustomUnitConfig implements UnitType {
     ArrayList<CustomProjectileTemplate> projectileTemplates = new ArrayList();
 
     /* JADX INFO: renamed from: fU */
-    boolean f51fU = false;
+    boolean hasAttachedTurrets = false;
 
     /* JADX INFO: renamed from: fV */
     TurretConfig defaultTurret = null;
@@ -969,7 +969,7 @@ public final class CustomUnitConfig implements UnitType {
     FastArrayList configProcessors = new FastArrayList();
 
     /* JADX INFO: renamed from: gc */
-    ArrayList f53gc = new ArrayList();
+    ArrayList spawnLists = new ArrayList();
 
     /* JADX INFO: renamed from: gd */
     ArrayList<EffectTemplate> customEffects = new ArrayList();
@@ -1132,7 +1132,7 @@ public final class CustomUnitConfig implements UnitType {
                     unitCompatibilityReport.serverUnitConfig = customUnitConfig2;
                     unitCompatibilityReport.clientUnitConfig = nullableString2;
                     arrayList2.add(unitCompatibilityReport);
-                    GameEngine.updatePaintTextSizeIfNeeded(unitCompatibilityReport.generateErrorMessage());
+                    GameEngine.logColored(unitCompatibilityReport.generateErrorMessage());
                 } else {
                     languageValue.b++;
                     arrayList.add(customUnitConfig);
@@ -1301,8 +1301,8 @@ public final class CustomUnitConfig implements UnitType {
                         gameEngine.tileMap.setCursorTileIndexFromTileIndex(point.worldX, point.worldY);
                         baseUnitA.posX = gameEngine.tileMap.cursorTileX;
                         baseUnitA.posY = gameEngine.tileMap.cursorTileY;
-                        baseUnitA.posX += baseUnitA.getUnitAIState();
-                        baseUnitA.posY += baseUnitA.getUnitAIPathfindStatus();
+                        baseUnitA.posX += baseUnitA.getTileOffsetX();
+                        baseUnitA.posY += baseUnitA.getTileOffsetY();
                         if (spawnPointType == SpawnPointType.emptyResourcePools_asNeutral && (baseUnitA instanceof OrderableUnit) && ((OrderableUnit) baseUnitA).hasBlockingUnitNearby((BaseUnit) null, (PlayerTeam) null)) {
                             baseUnitA.getUnitAICondition();
                         } else {
@@ -1316,27 +1316,27 @@ public final class CustomUnitConfig implements UnitType {
                         gameEngine.tileMap.exportTmxToFile(gameEngine.tileMap.getWorldWidth() / 2.0f, gameEngine.tileMap.getWorldHeight() / 2.0f);
                         baseUnitA2.posX = gameEngine.tileMap.cursorTileX;
                         baseUnitA2.posY = gameEngine.tileMap.cursorTileY;
-                        baseUnitA2.posX += baseUnitA2.getUnitAIState();
-                        baseUnitA2.posY += baseUnitA2.getUnitAIPathfindStatus();
+                        baseUnitA2.posX += baseUnitA2.getTileOffsetX();
+                        baseUnitA2.posY += baseUnitA2.getTileOffsetY();
                         PlayerTeam.c(baseUnitA2);
                     }
                     if (spawnPointType == SpawnPointType.mapCenter_eachActiveTeam) {
-                        for (PlayerTeam playerTeam : PlayerTeam.addEnergy()) {
-                            if (playerTeam.addUnitToTeam(true, false) > 0) {
+                        for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
+                            if (playerTeam.getUnitCount(true, false) > 0) {
                                 BaseUnit baseUnitA3 = customUnitConfig.a();
                                 baseUnitA3.setUnitTeam(playerTeam);
                                 gameEngine.tileMap.exportTmxToFile(gameEngine.tileMap.getWorldWidth() / 2.0f, gameEngine.tileMap.getWorldHeight() / 2.0f);
                                 baseUnitA3.posX = gameEngine.tileMap.cursorTileX;
                                 baseUnitA3.posY = gameEngine.tileMap.cursorTileY;
-                                baseUnitA3.posX += baseUnitA3.getUnitAIState();
-                                baseUnitA3.posY += baseUnitA3.getUnitAIPathfindStatus();
+                                baseUnitA3.posX += baseUnitA3.getTileOffsetX();
+                                baseUnitA3.posY += baseUnitA3.getTileOffsetY();
                                 PlayerTeam.c(baseUnitA3);
                             }
                         }
                     }
                 } else if (spawnPointType == SpawnPointType.spawnPoint_eachActiveTeam) {
-                    for (PlayerTeam playerTeam2 : PlayerTeam.addEnergy()) {
-                        if (playerTeam2.addUnitToTeam(true, false) > 0) {
+                    for (PlayerTeam playerTeam2 : PlayerTeam.getTeams()) {
+                        if (playerTeam2.getUnitCount(true, false) > 0) {
                             PointF pointF = new PointF();
                             GameViewUtils.a(playerTeam2, pointF);
                             BaseUnit baseUnitA4 = customUnitConfig.a();
@@ -1344,13 +1344,13 @@ public final class CustomUnitConfig implements UnitType {
                             gameEngine.tileMap.exportTmxToFile(pointF.x, pointF.y);
                             baseUnitA4.posX = gameEngine.tileMap.cursorTileX;
                             baseUnitA4.posY = gameEngine.tileMap.cursorTileY;
-                            baseUnitA4.posX += baseUnitA4.getUnitAIState();
-                            baseUnitA4.posY += baseUnitA4.getUnitAIPathfindStatus();
+                            baseUnitA4.posX += baseUnitA4.getTileOffsetX();
+                            baseUnitA4.posY += baseUnitA4.getTileOffsetY();
                             PlayerTeam.c(baseUnitA4);
                         }
                     }
                 } else {
-                    GameEngine.updatePaintTextSizeIfNeeded("onNewMapSpawn unhandled: " + customUnitConfig.onNewMapSpawn);
+                    GameEngine.logColored("onNewMapSpawn unhandled: " + customUnitConfig.onNewMapSpawn);
                 }
             }
         }
@@ -1935,14 +1935,14 @@ public final class CustomUnitConfig implements UnitType {
         if ((this.stayNeutral && this.createNeutral) || this.createOnAggressiveTeam) {
             z = true;
         }
-        Texture[] textureArrCompareToNew = PlayerTeam.compareToNew(texture, colorMode, z);
-        for (int i = 0; i < textureArrCompareToNew.length; i++) {
+        Texture[] teamColorTextures = PlayerTeam.getTeamColorTextures(texture, colorMode, z);
+        for (int i = 0; i < teamColorTextures.length; i++) {
             if (z && this.modInfo != null && this.isBug && i == 1) {
-                textureArrCompareToNew[i].w();
+                teamColorTextures[i].w();
             }
         }
-        CustomUnitConfigParser.a_texture_array(textureArrCompareToNew);
-        return textureArrCompareToNew;
+        CustomUnitConfigParser.a_texture_array(teamColorTextures);
+        return teamColorTextures;
     }
 
     public static CustomUnit a(boolean z, CustomUnitConfig customUnitConfig) {
@@ -1965,11 +1965,11 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: q */
     public void logWarning(String str) {
         String str2 = "Warning (on " + getConfigDisplayPath() + "): " + str;
-        GameEngine.updatePaintTextSizeIfNeeded(str2);
+        GameEngine.logColored(str2);
         this.warnings.add(str);
         if (this.modInfo == null) {
             GameEngine.getInstance().alert(str2, 1);
-            if (GameEngine.isNetworkServerStatic2) {
+            if (GameEngine.isAutomatedTestMode) {
                 GameEngine.log("Crashing on allowed unit warning because automated testing is active");
                 throw new RuntimeException(str2);
             }
@@ -1979,11 +1979,11 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: r */
     public void logWarningToMod(String str) {
         String str2 = "Warning (on " + getConfigDisplayPath() + "): " + str;
-        GameEngine.updatePaintTextSizeIfNeeded(str2);
+        GameEngine.logColored(str2);
         this.warnings.add(str);
         if (this.modInfo == null) {
             GameEngine.getInstance().alert(str2, 1);
-            if (GameEngine.isNetworkServerStatic2) {
+            if (GameEngine.isAutomatedTestMode) {
                 GameEngine.log("Crashing on allowed unit warning because automated testing is active");
                 throw new RuntimeException(str2);
             }

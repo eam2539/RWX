@@ -11,7 +11,7 @@ public class WorkshopDownloadRequest {
     Runnable b;
 
     public void a(SteamResult steamResult) {
-        GameEngine.updatePaintTextSizeIfNeeded("PendingDownload onFinish for: " + this.a);
+        GameEngine.logColored("PendingDownload onFinish for: " + this.a);
         if (this.b != null) {
             this.b.run();
         }

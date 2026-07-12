@@ -54,7 +54,7 @@ public class SelectUnitTypeAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
     public ActionDisplayType isAlsoSelected() {
-        if (GameEngine.isDesktop() && !GameUI.bO) {
+        if (GameEngine.isAndroidPlatform() && !GameUI.bO) {
             return ActionDisplayType.infoOnlyNoBox;
         }
         return ActionDisplayType.infoOnly;

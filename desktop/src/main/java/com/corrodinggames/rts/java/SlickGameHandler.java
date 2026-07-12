@@ -133,7 +133,7 @@ public class SlickGameHandler extends BasicGame {
         gameContainer.setForceExit(true);
         gameContainer.setShowFPS(false);
         gameContainer.setTargetFrameRate(300);
-        if (GameEngine.isAndroidVersionStatic) {
+        if (GameEngine.isMenuBackgroundDisabled) {
             gameContainer.setShowFPS(true);
             gameContainer.setTargetFrameRate(30);
         }
@@ -175,7 +175,7 @@ public class SlickGameHandler extends BasicGame {
             if (!this.v) {
                 Mouse.setCursorPosition((int) (this.w * this.P), (int) (Display.getHeight() - (this.x * this.P)));
             }
-            GameEngine.isNetworkConnectedStatic2 = this.v;
+            GameEngine.isMouseCaptured = this.v;
         }
         this.a.setSmoothDeltas(this.e.settingsEngine.renderSmoothDelta);
         if (this.o != Display.isActive()) {
@@ -205,7 +205,7 @@ public class SlickGameHandler extends BasicGame {
             this.b = new Main();
         }
         this.b.h();
-        if (GameEngine.isNetworkConnectedStatic) {
+        if (GameEngine.isLaunchSandbox) {
             GameEngine.log("switching to sandbox");
             ScriptEngine.getInstance().addScriptToQueue("open('sandboxOptions.rml', 'maps/skirmish/[z;p10]Crossing Large (10p).tmx'); loadConfigAndStartNewSandbox('maps/skirmish/[z;p10]Crossing Large (10p).tmx');");
         }
@@ -213,7 +213,7 @@ public class SlickGameHandler extends BasicGame {
     }
 
     public void a(HeadlessGameView headlessGameView) {
-        GameEngine.updatePaintTextSizeIfNeeded("SlickContainer:setup");
+        GameEngine.logColored("SlickContainer:setup");
         this.e = GameEngine.getInstance();
         this.f = headlessGameView;
         this.f.d = new MultiTouchPointerState();
@@ -333,7 +333,7 @@ public class SlickGameHandler extends BasicGame {
         if (d()) {
             this.b.p.processMouseWheel((-(i / 120)) * 2, 0);
         } else if (this.e != null) {
-            this.e.addKeyEvent(i);
+            this.e.queueMouseWheelDelta(i);
         }
     }
 
@@ -436,12 +436,12 @@ public class SlickGameHandler extends BasicGame {
                 if (!str.equals("native")) {
                     String[] strArrSplit = str.split("x");
                     if (strArrSplit.length != 2) {
-                        GameEngine.updatePaintTextSizeIfNeeded("Unknown resolution format:" + str);
+                        GameEngine.logColored("Unknown resolution format:" + str);
                     } else {
                         Integer intOrNull = Utility.parseIntOrNull(strArrSplit[0]);
                         Integer intOrNull2 = Utility.parseIntOrNull(strArrSplit[1]);
                         if (intOrNull == null || intOrNull2 == null) {
-                            GameEngine.updatePaintTextSizeIfNeeded("Bad resolution int:" + str);
+                            GameEngine.logColored("Bad resolution int:" + str);
                         } else {
                             screenWidth = intOrNull.intValue();
                             screenHeight = intOrNull2.intValue();
@@ -621,7 +621,7 @@ public class SlickGameHandler extends BasicGame {
             }
         }
         if (this.e == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("render: game==null");
+            GameEngine.logColored("render: game==null");
             return;
         }
         a();
@@ -661,7 +661,7 @@ public class SlickGameHandler extends BasicGame {
         }
         boolean z = false;
         SlickGraphicsEngine slickGraphicsEngine = null;
-        if (!this.e.loadNewGame) {
+        if (!this.e.hasLoadedLevel) {
             graphics.setColor(Color.gray);
             graphics.resetTransform();
             graphics.clearClip();
@@ -678,19 +678,19 @@ public class SlickGameHandler extends BasicGame {
             this.X = 0;
         }
         boolean zA = this.e.inputController.ae.a();
-        boolean z2 = this.e.isNetworkGameActive && this.e.inputController.af.a();
+        boolean z2 = this.e.isDebugTempMode && this.e.inputController.af.a();
         if (z2) {
             zA = true;
         }
-        if (this.e.loadNewGame) {
+        if (this.e.hasLoadedLevel) {
             graphics.resetTransform();
-            if (!this.e.pinchDistance) {
+            if (!this.e.shouldSkipNextDraw) {
                 graphics.clearClip();
                 graphics.clear();
             }
             graphics.setColor(Color.black);
-            if (!GameEngine.isNetworkServerStatic) {
-                slickGraphicsEngine = (SlickGraphicsEngine) this.e.graphicsEngine2;
+            if (!GameEngine.isHeadlessMode) {
+                slickGraphicsEngine = (SlickGraphicsEngine) this.e.renderGraphicsEngine;
                 if (slickGraphicsEngine != null) {
                     slickGraphicsEngine.slickGraphics = graphics;
                     slickGraphicsEngine.uiScale = this.P;
@@ -713,7 +713,7 @@ public class SlickGameHandler extends BasicGame {
                 this.e.isPaused = z3;
             }
             this.t = 0;
-            if (!GameEngine.isNetworkServerStatic && z) {
+            if (!GameEngine.isHeadlessMode && z) {
                 b(slickGraphicsEngine);
             }
         } else {
@@ -806,14 +806,14 @@ public class SlickGameHandler extends BasicGame {
                 }
                 int i3 = (int) (headlessGameView.a * 2.0f);
                 int i4 = (int) (headlessGameView.b * 2.0f);
-                GraphicsEngine graphicsEngine = this.e.graphicsEngine2;
+                GraphicsEngine graphicsEngine = this.e.renderGraphicsEngine;
                 this.Y.a(graphicsEngine, i3, i4, 0);
                 GameLogic gameLogic = (GameLogic) this.e;
                 boolean z2 = this.e.isPaused;
                 gameLogic.beginPostProcessing(this.Y);
                 this.e.isPaused = true;
                 try {
-                    this.e.graphicsEngine2.b(android.graphics.Color.a(0, 0, 0));
+                    this.e.renderGraphicsEngine.b(android.graphics.Color.a(0, 0, 0));
                     headlessGameView.lockCanvas(true);
                     gameLogic.updateWindowResolution(i3, i4);
                     gameLogic.updateCameraSystem();

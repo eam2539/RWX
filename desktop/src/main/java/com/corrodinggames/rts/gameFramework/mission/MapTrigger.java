@@ -196,7 +196,7 @@ public class MapTrigger {
 
     public MapLoadException a(String str, Exception exc) {
         String str2 = "MapTrigger-Error (" + this.a + " id:" + this.b + "): " + str;
-        NetworkEngine.g(str2);
+        NetworkEngine.reportDesync(str2);
         if (exc == null) {
             return new MapLoadException(str2);
         }
@@ -204,7 +204,7 @@ public class MapTrigger {
     }
 
     public void g(String str) {
-        NetworkEngine.g("MapTrigger-Error (" + this.a + " id:" + this.b + " type:" + this.g + "): " + str);
+        NetworkEngine.reportDesync("MapTrigger-Error (" + this.a + " id:" + this.b + " type:" + this.g + "): " + str);
     }
 
     public void h(String str) {
@@ -229,7 +229,7 @@ public class MapTrigger {
         if (playerTeamA != null && baseUnit.team != playerTeamA) {
             return false;
         }
-        if (c("onlyIfEmpty") && baseUnit.getUnitAIPathfindCost() && (baseUnit instanceof TransportUnitInterface) && ((TransportUnitInterface) baseUnit).getTransportedUnitCount() > 0) {
+        if (c("onlyIfEmpty") && baseUnit.canTransportUnits() && (baseUnit instanceof TransportUnitInterface) && ((TransportUnitInterface) baseUnit).getTransportedUnitCount() > 0) {
             return false;
         }
         return true;
@@ -237,7 +237,7 @@ public class MapTrigger {
 
     public boolean d() {
         boolean z;
-        int i = GameEngine.getInstance().lastTick;
+        int i = GameEngine.getInstance().gameTimeMillis;
         boolean z2 = true;
         boolean z3 = false;
         if (!this.m && this.r != -1) {

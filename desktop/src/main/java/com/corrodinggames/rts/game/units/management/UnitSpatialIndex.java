@@ -296,7 +296,7 @@ public final class UnitSpatialIndex {
     public void a(BaseUnit baseUnit) {
         if (this.e == null) {
             if (GameEngine.getInstance().currentTick != 0) {
-                GameEngine.updatePaintTextSizeIfNeeded("updateUnitGeoIndex: areaList not active");
+                GameEngine.logColored("updateUnitGeoIndex: areaList not active");
             }
             baseUnit.unitAnimationFrame = -1;
             baseUnit.unitAnimationSpeed = -1;

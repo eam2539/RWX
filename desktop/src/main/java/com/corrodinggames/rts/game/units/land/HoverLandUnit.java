@@ -33,8 +33,8 @@ public abstract class HoverLandUnit extends LandUnit {
     }
 
     public static void K() {
-        m = GameEngine.getInstance().graphicsEngine2.a(R.drawable.unit_icon_hover);
-        n = PlayerTeam.getUnitCountByType(m);
+        m = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.unit_icon_hover);
+        n = PlayerTeam.getTeamColorTextures(m);
     }
 
     @Override // com.corrodinggames.rts.game.units.land.LandUnit, com.corrodinggames.rts.game.units.BaseUnit

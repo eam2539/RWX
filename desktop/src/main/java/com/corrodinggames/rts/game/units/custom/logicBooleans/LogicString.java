@@ -63,7 +63,7 @@ public abstract class LogicString extends LogicBoolean {
     public static class TeamName extends LogicString {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public String readString(OrderableUnit orderableUnit) {
-            return orderableUnit.team.getTeamColorName();
+            return orderableUnit.team.getTeamSlotLabel();
         }
     }
 
@@ -107,7 +107,7 @@ public abstract class LogicString extends LogicBoolean {
     public static class DebugPassthrough extends WrappingLogicString {
         public void addMessage(OrderableUnit orderableUnit) {
             GameEngine gameEngine = GameEngine.getInstance();
-            if (gameEngine.isGameStarted && gameEngine.isNetworkGameActive) {
+            if (gameEngine.isGameStarted && gameEngine.isDebugTempMode) {
                 String str = VariableScope.nullOrMissingString;
                 if (orderableUnit != null) {
                     str = orderableUnit.r().getUnitTypeDescriptionShort() + "(" + orderableUnit.objectId + ") ";

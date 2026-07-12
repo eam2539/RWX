@@ -325,7 +325,7 @@ public final class StoredResources {
         for (int i2 = 0; i2 < i; i2++) {
             StoredResourceEntry storedResourceEntry = (StoredResourceEntry) objArrA[i2];
             if (storedResourceEntry.a.t) {
-                baseUnit.team.getTeamColorEffect().d(storedResourceEntry.a, storedResourceEntry.b);
+                baseUnit.team.getCustomResources().d(storedResourceEntry.a, storedResourceEntry.b);
             } else {
                 baseUnit.getUnitAICombatRange().d(storedResourceEntry.a, storedResourceEntry.b);
             }
@@ -338,7 +338,7 @@ public final class StoredResources {
         for (int i2 = 0; i2 < i; i2++) {
             StoredResourceEntry storedResourceEntry = (StoredResourceEntry) objArrA[i2];
             if (storedResourceEntry.a.t) {
-                baseUnit.team.getTeamColorEffect().d(storedResourceEntry.a, storedResourceEntry.b * d);
+                baseUnit.team.getCustomResources().d(storedResourceEntry.a, storedResourceEntry.b * d);
             } else {
                 baseUnit.getUnitAICombatRange().d(storedResourceEntry.a, storedResourceEntry.b * d);
             }
@@ -351,7 +351,7 @@ public final class StoredResources {
         for (int i2 = 0; i2 < i; i2++) {
             StoredResourceEntry storedResourceEntry = (StoredResourceEntry) objArrA[i2];
             if (storedResourceEntry.a.t) {
-                baseUnit.team.getTeamColorEffect().b(storedResourceEntry.a, storedResourceEntry.b);
+                baseUnit.team.getCustomResources().b(storedResourceEntry.a, storedResourceEntry.b);
             } else {
                 baseUnit.getUnitAICombatRange().b(storedResourceEntry.a, storedResourceEntry.b);
             }
@@ -364,7 +364,7 @@ public final class StoredResources {
         for (int i2 = 0; i2 < i; i2++) {
             StoredResourceEntry storedResourceEntry = (StoredResourceEntry) objArrA[i2];
             if (storedResourceEntry.a.t) {
-                baseUnit.team.getTeamColorEffect().b(storedResourceEntry.a, storedResourceEntry.b * d);
+                baseUnit.team.getCustomResources().b(storedResourceEntry.a, storedResourceEntry.b * d);
             } else {
                 baseUnit.getUnitAICombatRange().b(storedResourceEntry.a, storedResourceEntry.b * d);
             }

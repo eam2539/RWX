@@ -21,9 +21,9 @@ public class WallVertical extends FactoryWithQueue {
 
     public static void b() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.graphicsEngine2.a(R.drawable.wall_v);
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.wall_v);
-        teamTextures = PlayerTeam.getUnitCountByType(baseTexture);
+        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.wall_v);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.wall_v);
+        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

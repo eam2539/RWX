@@ -67,14 +67,14 @@ public class CommandController {
         GameEngine gameEngine = GameEngine.getInstance();
         Command command = new Command(this);
         command.team = playerTeam;
-        command.createdTick = gameEngine.lastTick;
+        command.createdTick = gameEngine.gameTimeMillis;
         if (DEBUG_TRACE_ENABLED) {
             GameEngine.log("Tracing source");
             command.debugStackTrace = GameEngine.getStackTrace(new Exception("Test"));
         }
-        if (!gameEngine.networkEngine.B) {
+        if (!gameEngine.networkEngine.networkGameActive) {
             if (!command.prepareAndValidateCommand()) {
-                GameEngine.updatePaintTextSizeIfNeeded("Command failed prepareAndCheckOnServer()");
+                GameEngine.logColored("Command failed prepareAndCheckOnServer()");
             }
             this.pendingCommands.add(command);
         } else {
@@ -87,7 +87,7 @@ public class CommandController {
     public void executeAllCommands() throws IOException {
         GameEngine gameEngine = GameEngine.getInstance();
         logRateLimitCounter = 0;
-        if (!gameEngine.networkEngine.B) {
+        if (!gameEngine.networkEngine.networkGameActive) {
             executeLocalCommands();
         } else {
             executeNetworkCommands();

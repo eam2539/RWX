@@ -8,7 +8,7 @@ public final class PathOpenListPool {
     int a;
     int b;
     public static int c;
-    final FastNodeQueue2 e = new FastNodeQueue2();
+    final BucketedNodeQueue e = new BucketedNodeQueue();
     final DirectAccessPathNodeArrayList d = new DirectAccessPathNodeArrayList(1000 + 100);
 
     PathOpenListPool() {

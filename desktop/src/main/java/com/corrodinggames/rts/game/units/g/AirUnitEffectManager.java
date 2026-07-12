@@ -15,7 +15,7 @@ public final class AirUnitEffectManager {
         if (fastArrayList == null) {
             return;
         }
-        int i = GameEngine.getInstance().lastTick;
+        int i = GameEngine.getInstance().gameTimeMillis;
         Object[] objArrA = fastArrayList.a();
         for (int i2 = fastArrayList.size - 1; i2 >= 0; i2--) {
             AirUnitEffect airUnitEffect = (AirUnitEffect) objArrA[i2];

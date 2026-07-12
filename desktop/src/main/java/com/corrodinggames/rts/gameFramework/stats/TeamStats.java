@@ -35,16 +35,16 @@ public class TeamStats {
         if (this.statType == StatType.none) {
             return;
         }
-        ArrayList<PlayerTeam> arrayListIsEnemyToTeam = PlayerTeam.isEnemyToTeam(false);
+        ArrayList<PlayerTeam> playerTeams = PlayerTeam.getTeams(false);
         if (this.statGroup == StatGroup.player) {
-            Iterator it = arrayListIsEnemyToTeam.iterator();
+            Iterator it = playerTeams.iterator();
             while (it.hasNext()) {
                 this.comparators.add(new TeamComparator((PlayerTeam) it.next()));
             }
         } else if (this.statGroup == StatGroup.allyGroup) {
-            for (Integer num : PlayerTeam.getAllTeams()) {
+            for (Integer num : PlayerTeam.getTeamColorIds()) {
                 ArrayList arrayList = new ArrayList();
-                for (PlayerTeam playerTeam : arrayListIsEnemyToTeam) {
+                for (PlayerTeam playerTeam : playerTeams) {
                     if (playerTeam.teamColorId == num.intValue()) {
                         arrayList.add(playerTeam);
                     }
@@ -53,10 +53,10 @@ public class TeamStats {
             }
         } else if (this.statGroup == StatGroup.combinedPlayerAndGroup) {
             int size = 0;
-            ArrayList<Integer> allTeams = PlayerTeam.getAllTeams();
-            for (Integer num2 : allTeams) {
+            ArrayList<Integer> teamColorIds = PlayerTeam.getTeamColorIds();
+            for (Integer num2 : teamColorIds) {
                 ArrayList arrayList2 = new ArrayList();
-                for (PlayerTeam playerTeam2 : arrayListIsEnemyToTeam) {
+                for (PlayerTeam playerTeam2 : playerTeams) {
                     if (playerTeam2.teamColorId == num2.intValue()) {
                         arrayList2.add(playerTeam2);
                     }
@@ -66,14 +66,14 @@ public class TeamStats {
                 }
             }
             if (size <= 1) {
-                Iterator it2 = arrayListIsEnemyToTeam.iterator();
+                Iterator it2 = playerTeams.iterator();
                 while (it2.hasNext()) {
                     this.comparators.add(new TeamComparator((PlayerTeam) it2.next()));
                 }
             } else {
-                for (Integer num3 : allTeams) {
+                for (Integer num3 : teamColorIds) {
                     ArrayList arrayList3 = new ArrayList();
-                    for (PlayerTeam playerTeam3 : arrayListIsEnemyToTeam) {
+                    for (PlayerTeam playerTeam3 : playerTeams) {
                         if (playerTeam3.teamColorId == num3.intValue()) {
                             arrayList3.add(playerTeam3);
                         }

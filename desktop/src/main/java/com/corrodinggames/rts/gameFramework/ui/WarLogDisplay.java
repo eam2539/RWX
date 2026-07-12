@@ -89,7 +89,7 @@ public class WarLogDisplay {
     public synchronized void a(float f) {
         c();
         GameEngine gameEngine = GameEngine.getInstance();
-        int i = (int) (gameEngine.viewpointWidthRaw - (130.0f * gameEngine.screenScale));
+        int i = (int) (gameEngine.screenHeight - (130.0f * gameEngine.screenScale));
         int i2 = (int) (20.0f * gameEngine.screenScale);
         for (WarLogEntry warLogEntry : this.c) {
             String strA = warLogEntry.a();
@@ -100,7 +100,7 @@ public class WarLogDisplay {
                     } else {
                         this.b.a(255, 255, 255, 255);
                     }
-                    gameEngine.graphicsEngine2.a(strA, 20, i, this.b);
+                    gameEngine.renderGraphicsEngine.a(strA, 20, i, this.b);
                     i -= i2;
                 } else {
                     return;

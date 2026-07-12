@@ -195,7 +195,7 @@ public class GameInputStream {
         }
         Object[] enumConstants = cls.getEnumConstants();
         if (i < 0 || i >= enumConstants.length) {
-            NetworkEngine.g("readEnum:" + i + " is out of range for " + cls.toString());
+            NetworkEngine.reportDesync("readEnum:" + i + " is out of range for " + cls.toString());
             return null;
         }
         return (Enum) enumConstants[i];
@@ -210,21 +210,21 @@ public class GameInputStream {
             String utf = readUTF();
             CustomUnitConfig customUnitConfigFindConfigByName = CustomUnitConfig.findConfigByName(utf);
             if (customUnitConfigFindConfigByName == null) {
-                NetworkEngine.g("readUnitType: Could not find customUnitMetadata:" + utf);
+                NetworkEngine.reportDesync("readUnitType: Could not find customUnitMetadata:" + utf);
             }
             UnitType unitTypeC = CustomUnitConfig.c(customUnitConfigFindConfigByName);
             if (unitTypeC != null) {
                 if (unitTypeC instanceof CustomUnitConfig) {
                     customUnitConfigFindConfigByName = (CustomUnitConfig) unitTypeC;
                 } else {
-                    GameEngine.updatePaintTextSizeIfNeeded("replacement not a custom unit:" + unitTypeC.getUnitTypeDescriptionShort());
+                    GameEngine.logColored("replacement not a custom unit:" + unitTypeC.getUnitTypeDescriptionShort());
                 }
             }
             return customUnitConfigFindConfigByName;
         }
         Object[] enumConstants = UnitTypeEnum.class.getEnumConstants();
         if (i < 0 || i >= enumConstants.length) {
-            NetworkEngine.g("readUnitType:" + i + " is out of range for UnitType");
+            NetworkEngine.reportDesync("readUnitType:" + i + " is out of range for UnitType");
             return null;
         }
         return (UnitTypeEnum) enumConstants[i];
@@ -269,7 +269,7 @@ public class GameInputStream {
 
     public void a(String str) throws IOException {
         if (readShortValue() != 12345) {
-            NetworkEngine.g("Mark wasn't read for:" + str);
+            NetworkEngine.reportDesync("Mark wasn't read for:" + str);
             if (GameEngine.getInstance().isMissionActive()) {
                 throw new RuntimeException("Mark wasn't read for:" + str);
             }

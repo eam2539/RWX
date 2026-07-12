@@ -26,7 +26,7 @@ public class GameThread extends Thread {
     public void run() {
         long j;
         GameEngine.setupUncaughtExceptionHandler();
-        if (!GameEngine.isPausedStatic2) {
+        if (!GameEngine.isNonAndroidVersion) {
             Process.setThreadPriority(-4);
         }
         a();

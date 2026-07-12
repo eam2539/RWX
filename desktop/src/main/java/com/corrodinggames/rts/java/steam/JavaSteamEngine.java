@@ -47,7 +47,7 @@ public class JavaSteamEngine extends DisabledSteamEngine {
         GameEngine.log("SteamEngine - java steamEngine init()");
         try {
             if (!SteamAPI.init()) {
-                GameEngine.updatePaintTextSizeIfNeeded("steamAPI init failed");
+                GameEngine.logColored("steamAPI init failed");
                 d();
                 return;
             }
@@ -77,17 +77,17 @@ public class JavaSteamEngine extends DisabledSteamEngine {
     public void a(float f) {
         SteamAPI.runCallbacks();
         if (this.h != null) {
-            if (GameEngine.buildVersion != null) {
-                GameEngine.log("Joining game from commandline invite:" + GameEngine.buildVersion);
-                long j = Long.parseLong(GameEngine.buildVersion);
-                GameEngine.buildVersion = null;
+            if (GameEngine.pendingSteamLobbyId != null) {
+                GameEngine.log("Joining game from commandline invite:" + GameEngine.pendingSteamLobbyId);
+                long j = Long.parseLong(GameEngine.pendingSteamLobbyId);
+                GameEngine.pendingSteamLobbyId = null;
                 this.d.joinLobby(SteamID.createFromNativeHandle(j));
             }
             while (true) {
                 int iIsP2PPacketAvailable = this.h.isP2PPacketAvailable(0);
                 if (iIsP2PPacketAvailable != 0) {
                     if (iIsP2PPacketAvailable > this.m.capacity()) {
-                        GameEngine.updatePaintTextSizeIfNeeded("nextPacketSize:" + iIsP2PPacketAvailable + " larger then byteBuffer:" + this.m.capacity() + " resizing");
+                        GameEngine.logColored("nextPacketSize:" + iIsP2PPacketAvailable + " larger then byteBuffer:" + this.m.capacity() + " resizing");
                         this.m = ByteBuffer.allocateDirect(iIsP2PPacketAvailable);
                     }
                     SteamID steamID = new SteamID();
@@ -95,11 +95,11 @@ public class JavaSteamEngine extends DisabledSteamEngine {
                         this.m.clear();
                         int p2PPacket = this.h.readP2PPacket(steamID, this.m, 0);
                         if (p2PPacket == 0) {
-                            GameEngine.updatePaintTextSizeIfNeeded("readP2PPacket with rtn==" + p2PPacket);
+                            GameEngine.logColored("readP2PPacket with rtn==" + p2PPacket);
                         }
                         SteamSocket steamSocket = (SteamSocket) this.l.get(steamID);
                         if (steamSocket != null && steamSocket.isClosed()) {
-                            GameEngine.updatePaintTextSizeIfNeeded("Removing stale steam socket");
+                            GameEngine.logColored("Removing stale steam socket");
                             this.l.remove(steamID);
                             steamSocket = null;
                         }
@@ -126,7 +126,7 @@ public class JavaSteamEngine extends DisabledSteamEngine {
 
     @Override // com.corrodinggames.rts.gameFramework.steam.DisabledSteamEngine
     public void d() {
-        GameEngine.updatePaintTextSizeIfNeeded("JavaSteamEngine: disableSteam");
+        GameEngine.logColored("JavaSteamEngine: disableSteam");
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine != null) {
             gameEngine.alert("Steam connection failed.");
@@ -151,7 +151,7 @@ public class JavaSteamEngine extends DisabledSteamEngine {
     }
 
     public void b(String str) {
-        GameEngine.updatePaintTextSizeIfNeeded("Steam: " + str);
+        GameEngine.logColored("Steam: " + str);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.steam.DisabledSteamEngine
@@ -187,7 +187,7 @@ public class JavaSteamEngine extends DisabledSteamEngine {
             networkConnection.startWorkers();
             gameEngine.networkEngine.sendQueue.add(networkConnection);
             this.l.put(steamID, steamSocket2);
-            gameEngine.networkEngine.Q();
+            gameEngine.networkEngine.sendPlayerUpdateNow();
             return networkConnection;
         } catch (IOException e2) {
             e2.printStackTrace();

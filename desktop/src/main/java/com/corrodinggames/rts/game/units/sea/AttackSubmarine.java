@@ -106,12 +106,12 @@ public class AttackSubmarine extends WaterUnit {
 
     public static void b() {
         GameEngine gameEngine = GameEngine.getInstance();
-        e = gameEngine.graphicsEngine2.a(R.drawable.attack_submarine);
+        e = gameEngine.renderGraphicsEngine.a(R.drawable.attack_submarine);
         f = attackUnit(e, e.m(), e.l());
-        d = gameEngine.graphicsEngine2.a(R.drawable.attack_submarine_dead);
-        g = gameEngine.graphicsEngine2.a(R.drawable.unit_icon_water);
-        h = PlayerTeam.getUnitCountByType(g);
-        i = PlayerTeam.getUnitCountByType(e);
+        d = gameEngine.renderGraphicsEngine.a(R.drawable.attack_submarine_dead);
+        g = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_water);
+        h = PlayerTeam.getTeamColorTextures(g);
+        i = PlayerTeam.getTeamColorTextures(e);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

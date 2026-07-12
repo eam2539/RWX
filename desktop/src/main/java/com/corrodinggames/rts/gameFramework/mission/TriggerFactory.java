@@ -80,7 +80,7 @@ public class TriggerFactory {
                     mapTrigger.B.a(Paint.Align.CENTER);
                     mapTrigger.B.a(Typeface.a(Typeface.c, 1));
                     mapTrigger.B.b(mapTrigger.c("textColor", -1));
-                    gameEngine.getTouchY(mapTrigger.B, mapTrigger.a("textSize", 20));
+                    gameEngine.setScaledTextSize(mapTrigger.B, mapTrigger.a("textSize", 20));
                     if (mapTrigger.B.f() == 0) {
                         mapTrigger.g("Text has an alpha of 0");
                     }

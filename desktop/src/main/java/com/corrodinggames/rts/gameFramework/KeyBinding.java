@@ -145,7 +145,7 @@ public class KeyBinding {
             this.c.add(controllerBinding);
             return this;
         } catch (IndexOutOfBoundsException e) {
-            GameEngine.updatePaintTextSizeIfNeeded("Failed to bind Axis:" + i3 + " on joystick:" + i2);
+            GameEngine.logColored("Failed to bind Axis:" + i3 + " on joystick:" + i2);
             return this;
         }
     }

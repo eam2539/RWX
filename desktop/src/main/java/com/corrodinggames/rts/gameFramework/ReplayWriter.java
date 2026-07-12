@@ -49,7 +49,7 @@ class ReplayWriter implements Runnable {
             ReplayEngine.a("Replay stop: warning: replaying==true");
         }
         this.b = gameEngine.currentTick;
-        this.c = gameEngine.lastTick;
+        this.c = gameEngine.gameTimeMillis;
         this.d = this.k.A;
         this.e = this.k.B;
         if (this.b < this.f) {

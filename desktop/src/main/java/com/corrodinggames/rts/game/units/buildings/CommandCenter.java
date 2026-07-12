@@ -80,10 +80,10 @@ public class CommandCenter extends FactoryWithQueue {
     /* JADX INFO: renamed from: b */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.graphicsEngine2.a(R.drawable.base);
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.base_dead);
-        backgroundTexture = gameEngine.graphicsEngine2.a(R.drawable.base_back);
-        teamTextures = PlayerTeam.getUnitCountByType(baseTexture);
+        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base_dead);
+        backgroundTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base_back);
+        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -212,9 +212,9 @@ public class CommandCenter extends FactoryWithQueue {
         }
         this.animationTimer2 += f;
         this.resourceGenerationTimer += f;
-        if (this.resourceGenerationTimer > PlayerTeam.teamColorGreen - 0.1f) {
-            this.resourceGenerationTimer -= PlayerTeam.teamColorGreen;
-            this.team.b(cy() * (PlayerTeam.teamColorGreen / PlayerTeam.teamColorRed));
+        if (this.resourceGenerationTimer > PlayerTeam.resourceIncomeUpdateInterval - 0.1f) {
+            this.resourceGenerationTimer -= PlayerTeam.resourceIncomeUpdateInterval;
+            this.team.b(cy() * (PlayerTeam.resourceIncomeUpdateInterval / PlayerTeam.resourceIncomeRatePeriod));
         }
     }
 

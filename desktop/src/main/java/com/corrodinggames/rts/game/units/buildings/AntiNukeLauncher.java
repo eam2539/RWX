@@ -204,12 +204,12 @@ public class AntiNukeLauncher extends FactoryWithQueue {
     /* JADX INFO: renamed from: b */
     public static void initializeTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        deadTexture = gameEngine.graphicsEngine2.a(R.drawable.antinuke_launcher_dead);
-        Texture textureA = gameEngine.graphicsEngine2.a(R.drawable.antinuke_launcher);
-        teamTextures = PlayerTeam.getUnitCountByType(textureA);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.antinuke_launcher_dead);
+        Texture textureA = gameEngine.renderGraphicsEngine.a(R.drawable.antinuke_launcher);
+        teamTextures = PlayerTeam.getTeamColorTextures(textureA);
         textureA.n();
-        iconTexture = gameEngine.graphicsEngine2.a(R.drawable.unit_icon_building_turrent);
-        iconTeamTextures = PlayerTeam.getUnitCountByType(iconTexture);
+        iconTexture = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_building_turrent);
+        iconTeamTextures = PlayerTeam.getTeamColorTextures(iconTexture);
     }
 
     public AntiNukeLauncher(boolean z) {

@@ -18,7 +18,7 @@ public class FileLoaderFactory {
 
     /* JADX INFO: renamed from: a */
     public static boolean isZipFSEnabled() {
-        if (GameEngine.isDesktop()) {
+        if (GameEngine.isAndroidPlatform()) {
             return true;
         }
         return false;

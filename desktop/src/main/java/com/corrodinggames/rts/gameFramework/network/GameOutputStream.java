@@ -317,7 +317,7 @@ public class GameOutputStream {
                 if (i2 + i3 > i) {
                     int i4 = i - i2;
                     if (i4 < 0) {
-                        NetworkEngine.g("writeStream: bytesTillFull is " + i4);
+                        NetworkEngine.reportDesync("writeStream: bytesTillFull is " + i4);
                         return;
                     } else {
                         this.currentDataOutput.write(bArr, 0, i4);
@@ -399,11 +399,11 @@ public class GameOutputStream {
             streamBlock.close();
         } catch (Exception e) {
             if (e instanceof DataFormatException) {
-                if (!GameEngine.isDebugVersionStatic2) {
-                    GameEngine.updatePaintTextSizeIfNeeded("DataFormatException error calling streamBlock.close() (this is expected on android 4.4)");
+                if (!GameEngine.isIOSVersion) {
+                    GameEngine.logColored("DataFormatException error calling streamBlock.close() (this is expected on android 4.4)");
                 }
             } else {
-                GameEngine.updatePaintTextSizeIfNeeded("Error calling streamBlock.close() to clean up memory");
+                GameEngine.logColored("Error calling streamBlock.close() to clean up memory");
                 e.printStackTrace();
             }
         }

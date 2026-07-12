@@ -32,13 +32,13 @@ public class TextRenderLayout {
                     if (renderElement2 instanceof TextureRenderer) {
                         final TextureRenderer textureRenderer = (TextureRenderer)renderElement2;
                         final Texture a = textureRenderer.a;
-                        instance.graphicsEngine2.a(a, (float)n3, n4 - a.q * textureRenderer.b, TextRenderQueue.c, 0.0f, textureRenderer.b);
+                        instance.renderGraphicsEngine.a(a, (float)n3, n4 - a.q * textureRenderer.b, TextRenderQueue.c, 0.0f, textureRenderer.b);
                     }
                     renderElement = renderElement2;
                 }
                 else {
                     final TextRenderer textRenderer = (TextRenderer)renderElement2;
-                    instance.graphicsEngine2.a(textRenderer.d, (float)n3, (float)n4, textRenderer.b(this.c));
+                    instance.renderGraphicsEngine.a(textRenderer.d, (float)n3, (float)n4, textRenderer.b(this.c));
                     renderElement = renderElement2;
                 }
             }

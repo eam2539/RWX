@@ -75,7 +75,7 @@ public class ReplayEngine {
     }
 
     public static void b(String str) {
-        GameEngine.updatePaintTextSizeIfNeeded("Replay: " + str);
+        GameEngine.logColored("Replay: " + str);
     }
 
     public static void a(String str, Exception exc) {
@@ -332,7 +332,7 @@ public class ReplayEngine {
         }
     }
 
-    public boolean c(String str)  {
+    public boolean loadReplay(String str)  {
         return a(str, a(str, false));
     }
 
@@ -348,9 +348,9 @@ public class ReplayEngine {
     public boolean a(String str, File file) {
         if (this.P) {
             if (this.u) {
-                GameEngine.updatePaintTextSizeIfNeeded("startReplayingFile: A replay is already playing");
+                GameEngine.logColored("startReplayingFile: A replay is already playing");
             } else {
-                GameEngine.updatePaintTextSizeIfNeeded("startReplayingFile: A replay is already saving");
+                GameEngine.logColored("startReplayingFile: A replay is already saving");
             }
         }
         e();
@@ -398,7 +398,7 @@ public class ReplayEngine {
                 gameEngine.alert(str2, 1);
                 a("Replay version: " + i2 + " (" + i + ")");
                 a("GameSaver.thisSaveVersion: 96 (" + gameEngine.getVersionCode(true) + ")");
-                if (!GameEngine.isGamePausedOrMinimizedStatic) {
+                if (!GameEngine.isOldReplayMode) {
                     this.P = false;
                     return false;
                 }
@@ -416,29 +416,29 @@ public class ReplayEngine {
             if (!this.O) {
                 a("ReplayEngine: --- No game setup read ----");
                 gameEngine.networkEngine.roomSettings.noNukes = true;
-                gameEngine.lastTimeMillis = gameEngine.settingsEngine.teamUnitCapHostedGame;
-                gameEngine.currentTimeMillis = gameEngine.lastTimeMillis;
+                gameEngine.maxUnitCap = gameEngine.settingsEngine.teamUnitCapHostedGame;
+                gameEngine.currentUnitCap = gameEngine.maxUnitCap;
             }
             if (!this.h) {
                 l();
             }
             a("--- Reply settings ---");
-            a("Unit cap: " + gameEngine.lastTimeMillis);
+            a("Unit cap: " + gameEngine.maxUnitCap);
             a(gameEngine.networkEngine.roomSettings.getSettingsSummary());
             a("Starting frame:" + gameEngine.currentTick);
             if (!this.h) {
                 for (int i3 = 0; i3 < PlayerTeam.TEAM_NEUTRAL; i3++) {
                     PlayerTeam playerTeamK = PlayerTeam.k(i3);
                     if (playerTeamK != null && playerTeamK.teamName != null) {
-                        gameEngine.gameUI.messageManager.addMessage(VariableScope.nullOrMissingString, "Player '" + playerTeamK.teamName + "' playing as " + playerTeamK.getTeamName().toLowerCase() + " (team:" + playerTeamK.getTeamColorName() + ")");
+                        gameEngine.gameUI.messageManager.addMessage(VariableScope.nullOrMissingString, "Player '" + playerTeamK.teamName + "' playing as " + playerTeamK.getTeamColorDisplayName().toLowerCase() + " (team:" + playerTeamK.getTeamSlotLabel() + ")");
                     }
                 }
             }
-            if (GameEngine.isIOSVersionStatic) {
-                NetworkEngine.g("Warning: editor will desync checksums.");
+            if (GameEngine.isReplayDebugMode) {
+                NetworkEngine.reportDesync("Warning: editor will desync checksums.");
                 gameEngine.isGameStarted = true;
-                gameEngine.isNetworkGameActive = true;
-                gameEngine.isNetworkServer = true;
+                gameEngine.isDebugTempMode = true;
+                gameEngine.isTriggerDebugMode = true;
             }
             return true;
         } catch (IOException e2) {
@@ -447,16 +447,16 @@ public class ReplayEngine {
     }
 
     public void a(boolean z) {
-        if (GameEngine.isAndroidVersionStatic2) {
-            if (!GameEngine.isDemoVersionStatic2) {
+        if (GameEngine.isPCOrIOSVersion) {
+            if (!GameEngine.isReplayRecordingEnabledOnPCOrIOS) {
                 return;
             }
-        } else if (!GameEngine.isGameBetaStatic2) {
+        } else if (!GameEngine.isReplayRecordingEnabledOnNonPC) {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine.networkEngine.B && !z && !this.N && gameEngine.settingsEngine.saveMultiplayerReplays) {
-            d(gameEngine.getCurrentMapName() + " [v" + gameEngine.getVersion2() + "] (" + Utility.formatDate("d MMM yyyy HH.mm.ss") + ").replay");
+        if (gameEngine.networkEngine.networkGameActive && !z && !this.N && gameEngine.settingsEngine.saveMultiplayerReplays) {
+            d(gameEngine.getCurrentMapName() + " [v" + gameEngine.getVersionString() + "] (" + Utility.formatDate("d MMM yyyy HH.mm.ss") + ").replay");
         }
     }
 
@@ -494,7 +494,7 @@ public class ReplayEngine {
             this.J.writeStringUTF("rustedWarfareReplay");
             this.J.writeInt(gameEngine.getVersionCode(true));
             this.J.writeInt(96);
-            this.J.writeStringUTF(gameEngine.getVersion2());
+            this.J.writeStringUTF(gameEngine.getVersionString());
             this.J.writeBoolean(gameEngine.isDemo);
             this.J.startBlock("gamesave");
             gameEngine.gameSaver.createTempFile(this.J);
@@ -595,7 +595,7 @@ public class ReplayEngine {
             int i2 = this.F.readInt();
             if (!this.n) {
                 if (gameEngine.currentTick != i2) {
-                    GameEngine.updatePaintTextSizeIfNeeded("replay.updateGameFrame: expected:" + i2 + " got:" + gameEngine.currentTick);
+                    GameEngine.logColored("replay.updateGameFrame: expected:" + i2 + " got:" + gameEngine.currentTick);
                 }
                 GameInputStream gameInputStream = new GameInputStream(this.F.readBytesWithLength());
                 boolean z = false;
@@ -639,7 +639,7 @@ public class ReplayEngine {
             gameEngine.gameSaver.writeSaveToStream(new GameInputStream(this.F.readBytesWithLength()), true, true, true);
             l();
             gameEngine.currentTick = i4;
-            gameEngine.lastTick = i5;
+            gameEngine.gameTimeMillis = i5;
             gameEngine.networkEngine.stateChecksum.totalChecksum = 0L;
             if (f2 < 0.1d) {
                 NetworkEngine.a("replay setCurrentStepRate:" + f2 + " is too small", true);
@@ -726,7 +726,7 @@ public class ReplayEngine {
                     } else if (gameEngine.currentTick >= this.w.a) {
                         if (this.w.e != null) {
                             if (gameEngine.currentTick > this.w.a) {
-                                GameEngine.updatePaintTextSizeIfNeeded("updateGameFrame: replay incorrect frameNumber, skipping command:" + gameEngine.currentTick + " vs " + this.w.a);
+                                GameEngine.logColored("updateGameFrame: replay incorrect frameNumber, skipping command:" + gameEngine.currentTick + " vs " + this.w.a);
                             } else {
                                 if (d) {
                                     if (this.w.e.sourceTeam == null) {
@@ -735,7 +735,7 @@ public class ReplayEngine {
                                             GameEngine.log("Precommand Team id:" + this.w.e.team.teamId + " credits:" + this.w.e.team.credits);
                                         }
                                     } else {
-                                        GameEngine.log("Precommand Team id:" + this.w.e.sourceTeam.teamId + " credits:" + this.w.e.sourceTeam.credits + " count:" + this.w.e.sourceTeam.getTeamUnitCountInt() + " max:" + this.w.e.sourceTeam.getTeamBuildingCountInt());
+                                        GameEngine.log("Precommand Team id:" + this.w.e.sourceTeam.teamId + " credits:" + this.w.e.sourceTeam.credits + " count:" + this.w.e.sourceTeam.getNonBuildingUnitCountIncludingQueued() + " max:" + this.w.e.sourceTeam.getUnitCap());
                                     }
                                 }
                                 if (this.w.e.isSystemAction && this.w.e.systemActionType != 0) {
@@ -744,7 +744,7 @@ public class ReplayEngine {
                                 this.w.e.executeCommand();
                                 if (d) {
                                     if (this.w.e.sourceTeam != null) {
-                                        GameEngine.log("Postcommand credits:" + this.w.e.sourceTeam.credits + " count:" + this.w.e.sourceTeam.getTeamUnitCountInt() + " max:" + this.w.e.sourceTeam.getTeamBuildingCountInt());
+                                        GameEngine.log("Postcommand credits:" + this.w.e.sourceTeam.credits + " count:" + this.w.e.sourceTeam.getNonBuildingUnitCountIncludingQueued() + " max:" + this.w.e.sourceTeam.getUnitCap());
                                     } else if (this.w.e.team != null) {
                                         GameEngine.log("Postcommand Team id:" + this.w.e.team.teamId + " credits:" + this.w.e.team.credits);
                                     }

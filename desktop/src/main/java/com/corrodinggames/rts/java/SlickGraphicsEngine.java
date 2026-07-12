@@ -176,7 +176,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
         if (this.renderTarget != null) {
             return this.i;
         }
-        return (int) GameEngine.getInstance().viewpointWidthRaw;
+        return (int) GameEngine.getInstance().screenHeight;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
@@ -202,7 +202,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
         generalErrorImage.a("General Error");
         largeThumbnailImage = new SlickTextureWrapper((SlickTexture) a(com.corrodinggames.rts.R.drawable.error_toolargethumb));
         generalErrorImage.a("Too Large Thumbnail Error");
-        if (!GameEngine.isDemoVersionStatic) {
+        if (!GameEngine.isTextureAtlasDisabled) {
             this.textureAtlas = new TextureAtlas(1024, 1024);
         }
     }
@@ -764,7 +764,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
             if (inputStream instanceof AssetInputStream) {
                 path = ((AssetInputStream) inputStream).getPath();
             } else {
-                GameEngine.updatePaintTextSizeIfNeeded("loadImage InputStream is not AssetInputStream");
+                GameEngine.logColored("loadImage InputStream is not AssetInputStream");
                 GameEngine.printStackTrace();
             }
             this.F++;

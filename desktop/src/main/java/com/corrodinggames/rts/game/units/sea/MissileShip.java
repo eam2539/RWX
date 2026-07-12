@@ -33,10 +33,10 @@ public class MissileShip extends WaterUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        b = gameEngine.graphicsEngine2.a(R.drawable.scout_ship);
-        a = gameEngine.graphicsEngine2.a(R.drawable.scout_ship_dead);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.scout_ship);
+        a = gameEngine.renderGraphicsEngine.a(R.drawable.scout_ship_dead);
         c = attackUnit(b, b.m(), b.l());
-        d = PlayerTeam.getUnitCountByType(b);
+        d = PlayerTeam.getTeamColorTextures(b);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

@@ -21,7 +21,7 @@ class UnitActionTimer {
     boolean isNegative;
 
     /* JADX INFO: renamed from: e */
-    boolean field_e;
+    boolean isCurrentActionContext;
 
     /* JADX INFO: renamed from: f */
     static FastArrayList<UnitActionTimer> timers = new FastArrayList();
@@ -40,13 +40,13 @@ class UnitActionTimer {
         unitActionTimerFindTimer.action = abstractUnitAction;
         unitActionTimerFindTimer.timer = 10.0f;
         unitActionTimerFindTimer.isNegative = z;
-        unitActionTimerFindTimer.field_e = z2;
+        unitActionTimerFindTimer.isCurrentActionContext = z2;
     }
 
     /* JADX INFO: renamed from: a */
     public static UnitActionTimer findTimer(BaseUnit baseUnit, AbstractUnitAction abstractUnitAction, boolean z) {
         for (UnitActionTimer unitActionTimer : timers) {
-            if (unitActionTimer.unit == baseUnit && unitActionTimer.action == abstractUnitAction && unitActionTimer.field_e == z) {
+            if (unitActionTimer.unit == baseUnit && unitActionTimer.action == abstractUnitAction && unitActionTimer.isCurrentActionContext == z) {
                 return unitActionTimer;
             }
         }

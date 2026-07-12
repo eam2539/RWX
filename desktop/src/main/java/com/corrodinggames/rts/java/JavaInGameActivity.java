@@ -34,21 +34,21 @@ public class JavaInGameActivity extends InGameActivity {
                 GameEngine.log("TODO");
                 break;
             case 4:
-                GameEngine.getInstance().isGameEngineReady = !GameEngine.getInstance().isGameEngineReady;
+                GameEngine.getInstance().isLookModeEnabled = !GameEngine.getInstance().isLookModeEnabled;
                 break;
             case 5:
                 GameEngine.log("TODO");
                 break;
             case 6:
                 GameEngine gameEngine = GameEngine.getInstance();
-                gameEngine.isNetworkGameActive = !gameEngine.isNetworkGameActive;
+                gameEngine.isDebugTempMode = !gameEngine.isDebugTempMode;
                 break;
             case 9:
                 GameEngine gameEngine2 = GameEngine.getInstance();
-                if (!gameEngine2.isServer) {
-                    gameEngine2.isServer = true;
+                if (!gameEngine2.isGameRecording) {
+                    gameEngine2.isGameRecording = true;
                 } else {
-                    gameEngine2.isServer = false;
+                    gameEngine2.isGameRecording = false;
                 }
                 break;
             case 10:
@@ -70,7 +70,7 @@ public class JavaInGameActivity extends InGameActivity {
             case 14:
                 GameEngine gameEngine4 = GameEngine.getInstance();
                 if (gameEngine4.networkEngine != null) {
-                    gameEngine4.networkEngine.H();
+                    gameEngine4.networkEngine.showPlayerListPopup();
                 }
                 break;
             case 15:

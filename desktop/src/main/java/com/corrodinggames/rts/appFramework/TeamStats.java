@@ -60,7 +60,7 @@ public class TeamStats {
             return false;
         }
         if (this.maxTeamCount == 1) {
-            gameEngine.gameUI.messageManager.addMessage((String) null, "Warning: Uneven map - Player " + (this.maxTeam.teamId + 1) + " on team " + this.maxTeam.getTeamColorName() + ": " + this.statName + " is " + this.maxValue + " vs " + this.minValue);
+            gameEngine.gameUI.messageManager.addMessage((String) null, "Warning: Uneven map - Player " + (this.maxTeam.teamId + 1) + " on team " + this.maxTeam.getTeamSlotLabel() + ": " + this.statName + " is " + this.maxValue + " vs " + this.minValue);
             return true;
         }
         gameEngine.gameUI.messageManager.addMessage((String) null, "Warning: Uneven map - " + this.maxTeamCount + " players including player " + (this.maxTeam.teamId + 1) + " on team " + (this.maxTeam.teamColorId + 1) + ": " + this.statName + " is " + this.maxValue + " vs " + this.minValue);

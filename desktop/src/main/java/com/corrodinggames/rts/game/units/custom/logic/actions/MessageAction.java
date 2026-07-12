@@ -79,7 +79,7 @@ public class MessageAction extends LogicAction {
         if (this.showQuickWarLogToAllPlayers != null) {
             gameEngine.gameUI.warLogDisplay.a(a(customUnit, this.showQuickWarLogToAllPlayers.b(customUnit)));
         }
-        if (this.debugMessage != null && gameEngine.isGameStarted && gameEngine.isNetworkGameActive) {
+        if (this.debugMessage != null && gameEngine.isGameStarted && gameEngine.isDebugTempMode) {
             NetworkEngine.a((String) null, customUnit.r().getUnitTypeDescriptionShort() + "(" + customUnit.objectId + ") Debug: " + a(customUnit, this.debugMessage.b(customUnit)));
             return true;
         }

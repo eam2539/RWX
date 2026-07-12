@@ -22,7 +22,7 @@ public class CrystalResource extends BaseBuilding {
     }
 
     public static void a_() {
-        a = GameEngine.getInstance().graphicsEngine2.a(R.drawable.crystal);
+        a = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.crystal);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -92,7 +92,7 @@ public class CrystalResource extends BaseBuilding {
     public boolean isBuilding() {
         GameEngine gameEngine = GameEngine.getInstance();
         du.a(getUnitMassBounds());
-        return RectF.a(gameEngine.cameraFollowMode, du);
+        return RectF.a(gameEngine.visibleScreenRect, du);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

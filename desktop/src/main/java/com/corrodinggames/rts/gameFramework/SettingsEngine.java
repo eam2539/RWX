@@ -210,28 +210,28 @@ public class SettingsEngine {
     }
 
     public boolean getBooleanPref(String str, boolean z) {
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return z;
         }
         return this.prefs.getBoolean(str, z);
     }
 
     public int getIntPref(String str, int i) {
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return i;
         }
         return this.prefs.getInt(str, i);
     }
 
     public float getFloatPref(String str, float f) {
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return f;
         }
         return this.prefs.getFloat(str, f);
     }
 
     public String getStringPref(String str, String str2) {
-        if (GameEngine.isPausedStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
             return str2;
         }
         return this.prefs.getString(str, str2);
@@ -255,12 +255,12 @@ public class SettingsEngine {
             if (this.settingFields.get(name) != null) {
                 GameEngine.log("SettingsEngine: fields: " + name + " already exists");
             }
-            if (GameEngine.isDebugVersionStatic2) {
+            if (GameEngine.isIOSVersion) {
                 GameEngine.log("SettingsEngine: field:" + name);
             }
             this.settingFields.put(name, field);
         }
-        if (!GameEngine.isPausedStatic2) {
+        if (!GameEngine.isNonAndroidVersion) {
             this.prefs = context.a("rts_settings", 0);
         }
         int intPref = getIntPref("settingVersion", 1);
@@ -302,9 +302,9 @@ public class SettingsEngine {
         this.displayOverCutout = getBooleanPref("displayOverCutout", false);
         this.renderDoubleScale = getBooleanPref("renderDoubleScale", false);
         this.showUnitGroups = getBooleanPref("showUnitGroups", true);
-        this.renderClouds = getBooleanPref("renderClouds", GameEngine.isDebugVersionStatic2 ? true : GameEngine.isPC());
+        this.renderClouds = getBooleanPref("renderClouds", GameEngine.isIOSVersion ? true : GameEngine.isPC());
         this.renderWithLineWidth = getBooleanPref("renderWithLineWidth", true);
-        this.softFogFading = getBooleanPref("softFogFading", GameEngine.isDebugVersionStatic2 ? true : GameEngine.isPC());
+        this.softFogFading = getBooleanPref("softFogFading", GameEngine.isIOSVersion ? true : GameEngine.isPC());
         this.showUnitWaypoints = getBooleanPref("showUnitWaypoints", true);
         this.useMinimapAllyColors = getBooleanPref("useMinimapAllyColors", true);
         this.showWarLogOnScreen = getBooleanPref("showWarLogOnScreen", GameEngine.isPC());
@@ -333,7 +333,7 @@ public class SettingsEngine {
         this.shownAudioWarning = getBooleanPref("shownAudioWarning", false);
         this.mouseSupport = getBooleanPref("mouseSupport", !GameEngine.isBlueStacks(context));
         this.keyboardSupport = getBooleanPref("keyboardSupport", true);
-        this.forceEnglish = getBooleanPref("forceEnglish", GameEngine.isDebugVersionStatic2);
+        this.forceEnglish = getBooleanPref("forceEnglish", GameEngine.isIOSVersion);
         boolean z2 = GameEngine.isPC();
         this.saveMultiplayerReplays = getBooleanPref("saveMultiplayerReplays", z2);
         if (intPref <= 1) {
@@ -374,7 +374,7 @@ public class SettingsEngine {
         this.modSettings = getStringPref("modSettings", VariableScope.nullOrMissingString);
         this.modSettingsVersion = getIntPref("modSettingsVersion", 0);
         boolean z3 = false;
-        if (GameEngine.isDesktop() && AppFrameworkUtils.hasStoragePermission(AppFrameworkUtils.getContext())) {
+        if (GameEngine.isAndroidPlatform() && AppFrameworkUtils.hasStoragePermission(AppFrameworkUtils.getContext())) {
             z3 = true;
         }
         this.storageType = getIntPref("storageType", z3 ? 2 : 0);
@@ -394,7 +394,7 @@ public class SettingsEngine {
         this.mouseOrders = getIntPref("mouseOrders", 1);
         this.mousePlacement = getIntPref("mousePlacement", 1);
         this.autosaving = getBooleanPref("autosaving", true);
-        if (GameEngine.isAndroidVersionStatic2) {
+        if (GameEngine.isPCOrIOSVersion) {
             loadFromFileSystem();
         }
         if (this.settingsGameVersion < 174) {
@@ -494,7 +494,7 @@ public class SettingsEngine {
             for (Map.Entry<String, Field> stringFieldEntry : this.settingFields.entrySet()) {
                 String str = (String) ((Map.Entry) stringFieldEntry).getKey();
                 String string = iniFile.getString("settings", str, (String) null);
-                if (GameEngine.isDebugVersionStatic2) {
+                if (GameEngine.isIOSVersion) {
                     GameEngine.log(str + "= " + string);
                 }
                 if (string != null && !VariableScope.nullOrMissingString.equals(string)) {
@@ -524,8 +524,8 @@ public class SettingsEngine {
 
     public synchronized boolean save() {
         this.settingsGameVersion = 176;
-        if (GameEngine.isPausedStatic2) {
-            if (GameEngine.isAndroidVersionStatic2) {
+        if (GameEngine.isNonAndroidVersion) {
+            if (GameEngine.isPCOrIOSVersion) {
                 return saveToFileSystem();
             }
             return true;
@@ -643,12 +643,12 @@ public class SettingsEngine {
     }
 
     public boolean loadMainExternalFolder(boolean z) {
-        if (!GameEngine.isDesktop()) {
+        if (!GameEngine.isAndroidPlatform()) {
             return false;
         }
         GameEngine.log("loadMainExternalFolder..");
         GameEngine gameEngine = GameEngine.getInstance();
-        if (z && gameEngine.isCustomGameMode()) {
+        if (z && gameEngine.isExtraSafeModeActive()) {
             GameEngine.log("Not loading due to extra safe mode");
             return false;
         }

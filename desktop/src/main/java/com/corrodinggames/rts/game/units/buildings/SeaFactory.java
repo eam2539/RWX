@@ -41,11 +41,11 @@ public class SeaFactory extends FactoryWithQueue {
     /* JADX INFO: renamed from: b */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseFactoryTexture = gameEngine.graphicsEngine2.a(R.drawable.sea_factory);
-        tier2FactoryTexture = gameEngine.graphicsEngine2.a(R.drawable.sea_factory_t2);
-        deadFactoryTexture = gameEngine.graphicsEngine2.a(R.drawable.sea_factory_dead);
-        baseFactoryTeamTextures = PlayerTeam.getUnitCountByType(baseFactoryTexture);
-        tier2FactoryTeamTextures = PlayerTeam.getUnitCountByType(tier2FactoryTexture);
+        baseFactoryTexture = gameEngine.renderGraphicsEngine.a(R.drawable.sea_factory);
+        tier2FactoryTexture = gameEngine.renderGraphicsEngine.a(R.drawable.sea_factory_t2);
+        deadFactoryTexture = gameEngine.renderGraphicsEngine.a(R.drawable.sea_factory_dead);
+        baseFactoryTeamTextures = PlayerTeam.getTeamColorTextures(baseFactoryTexture);
+        tier2FactoryTeamTextures = PlayerTeam.getTeamColorTextures(tier2FactoryTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit

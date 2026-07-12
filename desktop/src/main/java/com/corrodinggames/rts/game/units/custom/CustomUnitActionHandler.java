@@ -45,7 +45,7 @@ public class CustomUnitActionHandler {
 
     public void a(CustomUnit customUnit, PointF pointF, BaseUnit baseUnit, int i, int i2) {
         if (this.actions == null) {
-            NetworkEngine.g("Action on " + customUnit.r().getUnitTypeDescriptionShort() + " has not been linked");
+            NetworkEngine.reportDesync("Action on " + customUnit.r().getUnitTypeDescriptionShort() + " has not been linked");
             return;
         }
         Iterator it = this.actions.iterator();
@@ -56,7 +56,7 @@ public class CustomUnitActionHandler {
 
     public FastArrayList a() {
         if (this.actions == null) {
-            NetworkEngine.g("Action on [" + this.actionDescription + "]" + this.actionName + " has not been linked");
+            NetworkEngine.reportDesync("Action on [" + this.actionDescription + "]" + this.actionName + " has not been linked");
             return new FastArrayList();
         }
         return this.actions;
@@ -64,7 +64,7 @@ public class CustomUnitActionHandler {
 
     public void a(CustomUnit customUnit, PointF pointF, BaseUnit baseUnit) {
         if (this.actions == null) {
-            NetworkEngine.g("Action on " + customUnit.r().getUnitTypeDescriptionShort() + " has not been linked");
+            NetworkEngine.reportDesync("Action on " + customUnit.r().getUnitTypeDescriptionShort() + " has not been linked");
             return;
         }
         Iterator it = this.actions.iterator();

@@ -45,16 +45,16 @@ public abstract class LandUnit extends MovableUnit {
     /* JADX INFO: renamed from: dt */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        landUnitIconTexture = gameEngine.graphicsEngine2.a(R.drawable.unit_icon_land);
+        landUnitIconTexture = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_land);
         if (landUnitIconTexture == null) {
             throw new RuntimeException("IMAGE_ICON is null");
         }
-        landUnitIconTextures = PlayerTeam.getUnitCountByType(landUnitIconTexture);
-        landUnitIconTextureExp = gameEngine.graphicsEngine2.a(R.drawable.unit_icon_land_exp);
+        landUnitIconTextures = PlayerTeam.getTeamColorTextures(landUnitIconTexture);
+        landUnitIconTextureExp = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_land_exp);
         if (landUnitIconTextureExp == null) {
             throw new RuntimeException("IMAGE_ICON_EXP is null");
         }
-        landUnitIconTexturesExp = PlayerTeam.getUnitCountByType(landUnitIconTextureExp);
+        landUnitIconTexturesExp = PlayerTeam.getTeamColorTextures(landUnitIconTextureExp);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject

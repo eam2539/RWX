@@ -272,7 +272,7 @@ public class Mods extends ScriptContext {
         for (ModInfo modInfo2 : arrayListLoadAllMods) {
             Element elementById3 = activeDocument.getElementById(modInfo2.uuid);
             if (elementById3 == null) {
-                GameEngine.updatePaintTextSizeIfNeeded("Could not find:" + modInfo2.dirName);
+                GameEngine.logColored("Could not find:" + modInfo2.dirName);
             } else {
                 elementById3.setCheckbox(!modInfo2.disabled);
             }
@@ -293,7 +293,7 @@ public class Mods extends ScriptContext {
             if (!id.equals("_ID_")) {
                 ModInfo modByUuid = gameEngine.modManager.getModByUuid(id);
                 if (modByUuid == null) {
-                    GameEngine.printLog("Could not find mod:" + element.getInnerRML());
+                    GameEngine.logErrorColored("Could not find mod:" + element.getInnerRML());
                 } else {
                     boolean z = !element.getCheckbox();
                     if (modByUuid.wasDisabled != z) {
@@ -314,7 +314,7 @@ public class Mods extends ScriptContext {
             if (id != null && !id.equals(VariableScope.nullOrMissingString) && !id.equals("_ID_")) {
                 ModInfo modByUuid = gameEngine.modManager.getModByUuid(id);
                 if (modByUuid == null) {
-                    GameEngine.printLog("Could not find mod:" + element.getInnerRML() + " id:" + id);
+                    GameEngine.logErrorColored("Could not find mod:" + element.getInnerRML() + " id:" + id);
                 } else if (modByUuid.selectionChanged) {
                     if (modByUuid.wasDisabled != (!element.getCheckbox())) {
                         element.setCheckbox(!modByUuid.wasDisabled);
@@ -361,7 +361,7 @@ public class Mods extends ScriptContext {
         GameEngine gameEngine = GameEngine.getInstance();
         int enabledModCount = gameEngine.modManager.getEnabledModCount(false);
         int enabledModsWithLevelsCount = gameEngine.modManager.getEnabledModsWithLevelsCount();
-        if (gameEngine.networkEngine.B) {
+        if (gameEngine.networkEngine.networkGameActive) {
             GameEngine.log("savesMods: in network game");
             this.root.showAlert("You are currently in a network game, changes will be checked and applied on next game");
             return;
@@ -380,7 +380,7 @@ public class Mods extends ScriptContext {
                 return;
             }
             String str2 = "Mod selection saved. But " + enabledModCount + " mod(s) aren't loaded. Load them now?";
-            if (!gameEngine.isGameThreadRunning()) {
+            if (!gameEngine.isMenuBackgroundMapActive()) {
                 str2 = str2 + " (This will end your current game).";
             }
             this.root.showPopup("Reload needed", str2, true, "[onenter]Reload:closePopup(); mods.reloadModData();", null);
@@ -403,7 +403,7 @@ public class Mods extends ScriptContext {
     }
 
     public void reloadModDataAsk() throws ConfigParseException {
-        if (GameEngine.getInstance().isGameThreadRunning()) {
+        if (GameEngine.getInstance().isMenuBackgroundMapActive()) {
             GameEngine.log("Menu active, reloading without asking");
             reloadModData();
         } else {

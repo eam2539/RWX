@@ -149,14 +149,14 @@ public class UtilityTests extends Test {
                 Assert.assertEqualsDebug(mergedFileLoader.convertAbstractPath("/SD/rustedWarfare/"), "/tmp/rustedWarfareTests/");
                 Assert.assertEqualsDebug(mergedFileLoader.convertAbstractPath("/SD/rustedWarfare/maps/coolMap.tmx"), "/tmp/rustedWarfareTests/mods/maps/coolMap.tmx");
                 GameEngine.log("FileLoaderBackend - android fake");
-                boolean z = GameEngine.isPausedStatic2;
-                GameEngine.isPausedStatic2 = false;
+                boolean z = GameEngine.isNonAndroidVersion;
+                GameEngine.isNonAndroidVersion = false;
                 try {
                     Assert.assertEqualsDebug(customPathFileLoader.convertAbstractPath("/SD/rustedWarfare/"), "/tmp/rustedWarfareTests/");
                     Assert.assertEqualsDebug(customPathFileLoader.convertAbstractPath("/SD/rustedWarfare/maps/coolMap.tmx"), "/tmp/rustedWarfareTests/maps/coolMap.tmx");
                     Assert.assertEqualsDebug(customPathFileLoader.convertAbstractPath("/SD/rustedWarfare/maps/coolMap.tmx"), "/tmp/rustedWarfareTests/maps/coolMap.tmx");
                     Assert.assertEqualsDebug(customPathFileLoader.convertAbstractPath("units/test.ini"), "units/test.ini");
-                    GameEngine.isPausedStatic2 = z;
+                    GameEngine.isNonAndroidVersion = z;
                     if (1 != 0) {
                         GameEngine.log("FileLoaderBackend - real file tests");
                         File file = new File(customPathFileLoader.convertAbstractPath("/SD/rustedWarfare/testDir"));
@@ -263,7 +263,7 @@ public class UtilityTests extends Test {
                         }
                     }
                 } catch (Throwable th2) {
-                    GameEngine.isPausedStatic2 = z;
+                    GameEngine.isNonAndroidVersion = z;
                     throw th2;
                 }
             } catch (ConfigParseException e3) {
@@ -302,7 +302,7 @@ public class UtilityTests extends Test {
             z2 = true;
         } catch (ConfigParseException e) {
             if (z) {
-                GameEngine.updatePaintTextSizeIfNeeded(e.getMessage());
+                GameEngine.logColored(e.getMessage());
             }
             z2 = false;
         }

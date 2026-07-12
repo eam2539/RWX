@@ -37,7 +37,7 @@ public class TeamHistoryChart {
             int i3 = i2 == 10 ? 255 : i2 * 25;
             this.d[i2] = new GamePaint();
             this.d[i2].a(2.0f);
-            if (GameEngine.isDebugVersionStatic2) {
+            if (GameEngine.isIOSVersion) {
                 this.d[i2].a(3.0f);
             }
             this.d[i2].a(Paint.Cap.ROUND);

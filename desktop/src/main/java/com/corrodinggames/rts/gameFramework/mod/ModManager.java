@@ -365,8 +365,8 @@ public class ModManager {
         GameEngine.log("loading mod custom units at:" + str);
         String[] strArrListFiles = FileHelper.listFiles(str);
         if (strArrListFiles == null) {
-            GameEngine.updatePaintTextSizeIfNeeded("getAllModList: ERROR");
-            GameEngine.updatePaintTextSizeIfNeeded("getAllModList: Failed to load:" + str);
+            GameEngine.logColored("getAllModList: ERROR");
+            GameEngine.logColored("getAllModList: Failed to load:" + str);
             return;
         }
         for (String str2 : strArrListFiles) {
@@ -533,15 +533,15 @@ public class ModManager {
             }
         }
         CustomUnitConfig.load();
-        PlayerTeam.updateTeamDefeatStatus();
+        PlayerTeam.markTeamStatsDirtyFromMetadataChange();
         GameUI.notifySelectionChanged();
     }
 
     /* JADX INFO: renamed from: m */
     public void triggerStatisticsUpdate() {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine.missionEngine2 != null) {
-            gameEngine.missionEngine2.d();
+        if (gameEngine.platformCallbacks != null) {
+            gameEngine.platformCallbacks.d();
         } else {
             GameEngine.log("No active callbacks");
         }
@@ -557,7 +557,7 @@ public class ModManager {
                 arrayList.add(str2);
             }
         }
-        if (GameEngine.isDesktop() && "/SD/rusted_warfare_maps".equals(str) && (strArrListFilesRecursive = FileHelper.listFilesRecursive("/SD/rustedWarfare/maps", true)) != null) {
+        if (GameEngine.isAndroidPlatform() && "/SD/rusted_warfare_maps".equals(str) && (strArrListFilesRecursive = FileHelper.listFilesRecursive("/SD/rustedWarfare/maps", true)) != null) {
             for (String str3 : strArrListFilesRecursive) {
                 arrayList.add("NEW_PATH|maps2/" + str3);
             }
@@ -601,7 +601,7 @@ public class ModManager {
         legacyDisabledMod.modId = str;
         legacyDisabledMod.modInfo = modInfo;
         if (modInfo.sourceFolder == null) {
-            GameEngine.printLog("Skipping:" + str + " as mod sourceFolder is null");
+            GameEngine.logErrorColored("Skipping:" + str + " as mod sourceFolder is null");
             return;
         }
         String strSubstring = str;
@@ -614,7 +614,7 @@ public class ModManager {
                 strSubstring = strMapPath.substring(str2.length());
                 GameEngine.log("Mod path:" + modInfo.sourceFolder + " in map path without tag:" + strSubstring);
             } else {
-                GameEngine.printLog("Mod path:" + modInfo.sourceFolder + " not in map path:" + strSubstring);
+                GameEngine.logErrorColored("Mod path:" + modInfo.sourceFolder + " not in map path:" + strSubstring);
             }
         }
         legacyDisabledMod.modPath = strSubstring;

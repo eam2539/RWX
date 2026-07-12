@@ -429,7 +429,7 @@ public final class Effect {
                 rectF.a(this.b.posX, this.b.posY);
             }
         }
-        if ((!z2 || this.L) && !Utility.readFileToString(gameEngine.cameraFollowTarget, rectF)) {
+        if ((!z2 || this.L) && !Utility.readFileToString(gameEngine.bufferedVisibleWorldRect, rectF)) {
             return false;
         }
         if (!this.e && !z2 && !this.f) {
@@ -497,7 +497,7 @@ public final class Effect {
             fClampTo255 = 0.0f;
         }
         boolean z5 = false;
-        GraphicsEngine graphicsEngine = gameEngine.graphicsEngine2;
+        GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
         if (this.Y != 0.0f) {
             if (0 == 0) {
                 z5 = true;
@@ -519,7 +519,7 @@ public final class Effect {
             f4 = 0.0f;
             z4 = true;
         }
-        if (z4 && GameEngine.isDesktop() && !z && this.B == null) {
+        if (z4 && GameEngine.isAndroidPlatform() && !z && this.B == null) {
             int iLongToIntArray = Utility.longToIntArray(255, (int) (f2 * 255.0f), (int) (f3 * 255.0f), (int) (f4 * 255.0f));
             if (C != null && D == iLongToIntArray) {
                 this.B = C;
@@ -553,7 +553,7 @@ public final class Effect {
                 ShaderProgram shaderProgram = EffectManager.shader;
                 shaderProgram.a("screenBase", this.ay.texture);
                 shaderProgram.b("screenBaseSize", this.ay.texture);
-                shaderProgram.a("u_resolution", gameEngine.screenWidth, gameEngine.viewpointWidthRaw);
+                shaderProgram.a("u_resolution", gameEngine.screenWidth, gameEngine.screenHeight);
                 shaderProgram.a("u_offsetBy", 0.12f * gameEngine.zoom);
                 this.at.a(shaderProgram);
                 z4 = true;

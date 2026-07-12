@@ -258,7 +258,7 @@ public final class PathSolver implements Runnable {
         int n3;
         int n4;
         int n5;
-        if (PathEngine.l && !GameEngine.getInstance().reloadMap) {
+        if (PathEngine.l && !GameEngine.getInstance().isMenuBackgroundMap) {
             Debug.startMethodTracing((String)"pathTrace", (int)110000000);
         }
         Path path = this.D;
@@ -632,7 +632,7 @@ public final class PathSolver implements Runnable {
             long l4 = this.z - this.y;
             Log.d("RustedWarfare", "path(" + path.e + ") finished in:" + l4);
         }
-        if (PathEngine.l && !GameEngine.getInstance().reloadMap) {
+        if (PathEngine.l && !GameEngine.getInstance().isMenuBackgroundMap) {
             Debug.stopMethodTracing();
             PathEngine.l = false;
         }
@@ -670,7 +670,7 @@ public final class PathSolver implements Runnable {
     public void g() {
         final DynamicUnitPath e = (DynamicUnitPath)this.D;
         final FlowField b = new FlowField(this.g, this.h);
-        if (PathEngine.l && !GameEngine.getInstance().reloadMap) {
+        if (PathEngine.l && !GameEngine.getInstance().isMenuBackgroundMap) {
             Debug.startMethodTracing("pathTrace", 110000000);
         }
         final int n = 7;
@@ -997,7 +997,7 @@ public final class PathSolver implements Runnable {
         if (PathEngine.a) {
             Log.d("RustedWarfare", "path(" + e.e + ") finished in:" + (this.z - this.y));
         }
-        if (PathEngine.l && !GameEngine.getInstance().reloadMap) {
+        if (PathEngine.l && !GameEngine.getInstance().isMenuBackgroundMap) {
             Debug.stopMethodTracing();
             PathEngine.l = false;
         }

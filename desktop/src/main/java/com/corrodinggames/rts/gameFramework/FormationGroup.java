@@ -177,7 +177,7 @@ public class FormationGroup {
             }
             orderableUnit2.clearTransportState();
             orderableUnit2.ah = (short) 0;
-            orderableUnit2.lastTransportPathUpdateTick = gameEngine.lastTick;
+            orderableUnit2.lastTransportPathUpdateTick = gameEngine.gameTimeMillis;
             orderableUnit2.waypointSyncGroupId = this.formationId;
         }
         int i = 0;

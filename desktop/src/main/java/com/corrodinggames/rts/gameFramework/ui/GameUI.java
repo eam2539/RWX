@@ -478,7 +478,7 @@ public final class GameUI extends Serializable {
 
     /* JADX INFO: renamed from: a */
     public boolean shouldUseCircleSelect() {
-        if (GameEngine.isIOS()) {
+        if (GameEngine.isDesktopMouseInput()) {
             return false;
         }
         return GameEngine.getInstance().settingsEngine.useCircleSelect;
@@ -577,12 +577,12 @@ public final class GameUI extends Serializable {
         this.selectedUnits.clear();
         if (!z) {
             gameEngine.gameSpeed = 1.0f;
-            gameEngine.isGameThreadRunning = false;
+            gameEngine.isUnitInvincibilityEnabled = false;
             gameEngine.isGameStarted = false;
-            gameEngine.isNetworkGameActive = false;
-            gameEngine.isNetworkServer = false;
+            gameEngine.isDebugTempMode = false;
+            gameEngine.isTriggerDebugMode = false;
         }
-        if (gameEngine.isNetworkConnected() && gameEngine.loadLevelNetwork()) {
+        if (gameEngine.isNetworkConnected() && gameEngine.isSinglePlayerGame()) {
             gameEngine.isGameStarted = gameEngine.networkEngine.p;
         }
         LagHidingManager.a();
@@ -600,12 +600,12 @@ public final class GameUI extends Serializable {
             a = true;
             bQ = true;
         }
-        if (GameEngine.isPCVersionStatic2) {
+        if (GameEngine.isGDXVersion) {
             bO = true;
             bP = true;
             bQ = true;
         }
-        if (GameEngine.isDesktop() && !GameEngine.getInstance().settingsEngine.classicInterface) {
+        if (GameEngine.isAndroidPlatform() && !GameEngine.getInstance().settingsEngine.classicInterface) {
             bO = true;
             bP = true;
             bQ = true;
@@ -615,7 +615,7 @@ public final class GameUI extends Serializable {
     /* JADX INFO: renamed from: a */
     public void initializeUIResources(Context context) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (GameEngine.printLog()) {
+        if (GameEngine.isSpaceGame()) {
             this.isUILoggingEnabled = true;
         }
         setupInterfaceFlags();
@@ -631,36 +631,36 @@ public final class GameUI extends Serializable {
         this.warLogDisplay = new WarLogDisplay(gameEngine);
         this.leaderboard = new Leaderboard(gameEngine, this);
         this.endGameScreen = new EndGameScreen();
-        if (GameEngine.isAndroid()) {
+        if (GameEngine.isNonPCPlatform()) {
             this.b = true;
         }
-        this.ba = gameEngine.graphicsEngine2.a(R.drawable.button_no);
-        this.bb = gameEngine.graphicsEngine2.a(R.drawable.button_yes);
-        this.bc = gameEngine.graphicsEngine2.a(R.drawable.button_more);
+        this.ba = gameEngine.renderGraphicsEngine.a(R.drawable.button_no);
+        this.bb = gameEngine.renderGraphicsEngine.a(R.drawable.button_yes);
+        this.bc = gameEngine.renderGraphicsEngine.a(R.drawable.button_more);
         this.tooltipBackgroundPaint = new Paint();
         this.tooltipBackgroundPaint.d(true);
         this.tooltipBorderPaint = new Paint();
         this.tooltipBorderPaint.d(true);
         this.tooltipBorderPaint.a(40, 255, 255, 255);
-        this.bh = gameEngine.graphicsEngine2.a(R.drawable.button_add);
-        this.bi = gameEngine.graphicsEngine2.a(R.drawable.button_subtract);
-        this.bj = gameEngine.graphicsEngine2.a(R.drawable.icon_rally);
-        this.uiTexture1 = gameEngine.graphicsEngine2.a(R.drawable.rounded_glow_button);
-        this.uiTexture2 = gameEngine.graphicsEngine2.a(R.drawable.rounded_white_button);
+        this.bh = gameEngine.renderGraphicsEngine.a(R.drawable.button_add);
+        this.bi = gameEngine.renderGraphicsEngine.a(R.drawable.button_subtract);
+        this.bj = gameEngine.renderGraphicsEngine.a(R.drawable.icon_rally);
+        this.uiTexture1 = gameEngine.renderGraphicsEngine.a(R.drawable.rounded_glow_button);
+        this.uiTexture2 = gameEngine.renderGraphicsEngine.a(R.drawable.rounded_white_button);
         this.ninePatchStyle1 = new NinePatchStyle(this.uiTexture1, 32, 27);
-        this.ninePatchStyle2 = new NinePatchStyle(gameEngine.graphicsEngine2.a(R.drawable.rounded_glow_highlight_button), 32, 27);
+        this.ninePatchStyle2 = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_glow_highlight_button), 32, 27);
         this.ninePatchStyle3 = this.ninePatchStyle1.clone();
         this.ninePatchStyle3.v = this.ninePatchStyle2;
-        this.ninePatchStyle4 = new NinePatchStyle(gameEngine.graphicsEngine2.a(R.drawable.rounded_dark_box), 32, 27);
-        this.ninePatchStyle5 = new NinePatchStyle(gameEngine.graphicsEngine2.a(R.drawable.rounded_dark_box_titled), 36, 36);
-        this.ninePatchStyle5.r = new NinePatchStyle(gameEngine.graphicsEngine2.a(R.drawable.rounded_shadow), 36, 36);
+        this.ninePatchStyle4 = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_dark_box), 32, 27);
+        this.ninePatchStyle5 = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_dark_box_titled), 36, 36);
+        this.ninePatchStyle5.r = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_shadow), 36, 36);
         this.ninePatchStyle5.f = true;
-        this.ninePatchStyle6 = new NinePatchStyle(gameEngine.graphicsEngine2.a(R.drawable.rounded_green), 36, 36);
+        this.ninePatchStyle6 = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_green), 36, 36);
         this.ninePatchStyle6.r = this.ninePatchStyle5.r;
         this.ninePatchStyle6.u = 20;
-        this.bk = gameEngine.graphicsEngine2.a(R.drawable.icon_upgrade);
-        this.bl = gameEngine.graphicsEngine2.a(R.drawable.metal_dark, false);
-        this.bm = gameEngine.graphicsEngine2.a(R.drawable.touch_indicator, false);
+        this.bk = gameEngine.renderGraphicsEngine.a(R.drawable.icon_upgrade);
+        this.bl = gameEngine.renderGraphicsEngine.a(R.drawable.metal_dark, false);
+        this.bm = gameEngine.renderGraphicsEngine.a(R.drawable.touch_indicator, false);
         UIStyle.b();
         this.bE.a(145, 0, 175, 0);
         this.bE.a(6.0f);
@@ -830,7 +830,7 @@ public final class GameUI extends Serializable {
                 this.tooltipDelay = 0.0f;
             }
         }
-        gameEngine.pinchStartZoom = 4.0f * this.tooltipHeight;
+        gameEngine.unitSelectionFadeBase = 4.0f * this.tooltipHeight;
         float f2 = 1.0f * f;
         if (!this.isMousePressed) {
             float f3 = this.lastMouseX * f;
@@ -851,7 +851,7 @@ public final class GameUI extends Serializable {
         this.lastMouseX = Utility.fastCos(angleBetweenPoints) * fMoveTowardsZero;
         this.lastMouseY = Utility.fastSin(angleBetweenPoints) * fMoveTowardsZero;
         this.showDebugInfo = false;
-        this.isMousePressed = gameEngine.isTouchDown() && gameEngine.gameModeEnabled[0] && this.tooltipX == 0.0f;
+        this.isMousePressed = gameEngine.isTouchDown() && gameEngine.touchPointerEnabled[0] && this.tooltipX == 0.0f;
         if (this.tooltipY != 0.0f) {
             if (!this.isMousePressed) {
                 this.tooltipY = 0.0f;
@@ -887,7 +887,7 @@ public final class GameUI extends Serializable {
         if (this.isMousePressed) {
             this.uiScale += f;
             this.selectionBoxStartX = gameEngine.getTouchX(0);
-            this.selectionBoxStartY = gameEngine.logWarning(0);
+            this.selectionBoxStartY = gameEngine.getTouchY(0);
             this.selectionBoxMinWidth = this.selectionBoxStartX;
             this.selectionBoxMinHeight = this.selectionBoxStartY;
             this.lastTouchCount = gameEngine.getTouchPointerId(0);
@@ -897,7 +897,7 @@ public final class GameUI extends Serializable {
                 if (this.touchStartTime < 30.0f) {
                     float fDistanceSq = Utility.distanceSq(this.touchX, this.touchY, this.selectionBoxStartX, this.selectionBoxStartY);
                     float f5 = 10.0f * gameEngine.screenScale;
-                    if (GameEngine.isAndroid()) {
+                    if (GameEngine.isNonPCPlatform()) {
                         f5 = (float) (((double) f5) * 1.5d);
                     }
                     if (fDistanceSq < f5 * f5) {
@@ -949,7 +949,7 @@ public final class GameUI extends Serializable {
                 }
             }
         }
-        if (GameEngine.isPC() && !gameEngine.isStopped && gameEngine.activity != null && ((gameEngine.activity.isRendering() || GameEngine.isNetworkConnectedStatic2) && (!this.isMousePressed || this.interfaceRenderer.isDragging))) {
+        if (GameEngine.isPC() && !gameEngine.isStopped && gameEngine.activeGameView != null && ((gameEngine.activeGameView.isRendering() || GameEngine.isMouseCaptured) && (!this.isMousePressed || this.interfaceRenderer.isDragging))) {
             float f7 = (24.0f * gameEngine.settingsEngine.edgeScrollSpeed) / gameEngine.zoom;
             float f8 = gameEngine.viewpointX;
             float f9 = gameEngine.viewpointY;
@@ -964,7 +964,7 @@ public final class GameUI extends Serializable {
             if (this.selectionBoxMinHeight <= 1.0f) {
                 f11 = 0.0f - (f7 * f);
             }
-            if (this.selectionBoxMinHeight >= gameEngine.viewpointWidthRaw - 1.0f) {
+            if (this.selectionBoxMinHeight >= gameEngine.screenHeight - 1.0f) {
                 f11 += f7 * f;
             }
             gameEngine.viewpointX += f10;
@@ -975,7 +975,7 @@ public final class GameUI extends Serializable {
         }
         InputController inputController = gameEngine.inputController;
         if (gameEngine.settingsEngine.keyboardSupport) {
-            if (gameEngine.logMessage()) {
+            if (gameEngine.isKeyboardCameraScrollAllowed()) {
                 float f12 = 12.0f * gameEngine.settingsEngine.scrollSpeed;
                 if (inputController.p.b()) {
                     gameEngine.viewpointX -= f12 * f;
@@ -990,10 +990,10 @@ public final class GameUI extends Serializable {
                     gameEngine.viewpointY += f12 * f;
                 }
                 if (inputController.r.b()) {
-                    gameEngine.cameraEdgeScrollZone += 0.1f;
+                    gameEngine.targetZoom += 0.1f;
                 }
                 if (inputController.s.b()) {
-                    gameEngine.cameraEdgeScrollZone -= 0.1f;
+                    gameEngine.targetZoom -= 0.1f;
                 }
             }
             if (inputController.y.a()) {
@@ -1029,19 +1029,19 @@ public final class GameUI extends Serializable {
                 }
             }
             if (inputController.C.a()) {
-                panels.a(this.selectedUnits, panels.a, panels.b);
+                UnitSelectionFilter.a(this.selectedUnits, UnitSelectionFilter.a, UnitSelectionFilter.b);
             }
             if (inputController.D.a()) {
-                panels.a(this.selectedUnits, panels.c, null);
+                UnitSelectionFilter.a(this.selectedUnits, UnitSelectionFilter.c, null);
             }
             if (inputController.E.a()) {
-                panels.a(this.selectedUnits, panels.d, null);
+                UnitSelectionFilter.a(this.selectedUnits, UnitSelectionFilter.d, null);
             }
             if (inputController.F.a()) {
-                panels.a(this.selectedUnits, panels.e, null);
+                UnitSelectionFilter.a(this.selectedUnits, UnitSelectionFilter.e, null);
             }
             if (inputController.G.a()) {
-                panels.a(this.selectedUnits, panels.f, null);
+                UnitSelectionFilter.a(this.selectedUnits, UnitSelectionFilter.f, null);
             }
             if (inputController.x.a()) {
                 this.interfaceRenderer.a(12);
@@ -1078,7 +1078,7 @@ public final class GameUI extends Serializable {
                 GameEngine.log("showing send team chat");
                 this.interfaceRenderer.a(16);
             }
-            if (gameEngine.loadLevelNetwork() || gameEngine.replayEngine.j()) {
+            if (gameEngine.isSinglePlayerGame() || gameEngine.replayEngine.j()) {
                 if (inputController.L.a()) {
                     if (gameEngine.gameSpeed != 0.0f) {
                         if (!gameEngine.replayEngine.j()) {
@@ -1143,19 +1143,19 @@ public final class GameUI extends Serializable {
                 gameEngine.pauseTransition = 180.0f;
             }
             if (gameEngine.isGameStarted && inputController.ab.a()) {
-                gameEngine.isNetworkGameActive = !gameEngine.isNetworkGameActive;
-                GameEngine.log("debugTempMode now: " + gameEngine.isNetworkGameActive);
-                showMediumPriorityMessage("debug: " + gameEngine.isNetworkGameActive);
+                gameEngine.isDebugTempMode = !gameEngine.isDebugTempMode;
+                GameEngine.log("debugTempMode now: " + gameEngine.isDebugTempMode);
+                showMediumPriorityMessage("debug: " + gameEngine.isDebugTempMode);
             }
-            if (gameEngine.isGameStarted && gameEngine.isNetworkGameActive && inputController.ac.a()) {
+            if (gameEngine.isGameStarted && gameEngine.isDebugTempMode && inputController.ac.a()) {
                 AIController.unitCountsUpdated = !AIController.unitCountsUpdated;
                 showMediumPriorityMessage("AI debug view: " + AIController.unitCountsUpdated);
             }
-            if (gameEngine.isGameStarted && gameEngine.isNetworkGameActive && inputController.ad.a()) {
+            if (gameEngine.isGameStarted && gameEngine.isDebugTempMode && inputController.ad.a()) {
                 MissionEngine.a = !MissionEngine.a;
                 showMediumPriorityMessage("Map debug: " + MissionEngine.a);
             }
-            if (gameEngine.loadLevelNetwork() || gameEngine.replayEngine.j()) {
+            if (gameEngine.isSinglePlayerGame() || gameEngine.replayEngine.j()) {
                 if (gameEngine.isGameStarted) {
                     if (inputController.V.a()) {
                         gameEngine.isShowingDialog = !gameEngine.isShowingDialog;
@@ -1169,10 +1169,10 @@ public final class GameUI extends Serializable {
                     }
                     if (inputController.X.a()) {
                         GameEngine.log("Adding test popup");
-                        gameEngine.networkEngine.U();
+                        gameEngine.networkEngine.showReconnectDialog();
                     }
                     if (inputController.Z.a()) {
-                        gameEngine.isGameThreadRunning = !gameEngine.isGameThreadRunning;
+                        gameEngine.isUnitInvincibilityEnabled = !gameEngine.isUnitInvincibilityEnabled;
                     }
                     if (inputController.aa.a()) {
                         for (GameObject gameObject3 : GameObject.fastGameObjectList) {
@@ -1193,7 +1193,7 @@ public final class GameUI extends Serializable {
                 }
             }
         }
-        if (gameEngine.isGameStarted && !gameEngine.loadLevelNetwork() && !gameEngine.replayEngine.j()) {
+        if (gameEngine.isGameStarted && !gameEngine.isSinglePlayerGame() && !gameEngine.replayEngine.j()) {
             gameEngine.isGameStarted = false;
         }
         if (gameEngine.isGameStarted) {
@@ -1312,34 +1312,34 @@ public final class GameUI extends Serializable {
         if (this.selectionBoxStartTime > 360.0f) {
             this.selectionBoxStartTime -= 360.0f;
         }
-        this.bx.a((int) (gameEngine.screenWidth - gameEngine.sidebarWidth), 0, (int) gameEngine.screenWidth, (int) gameEngine.viewpointWidthRaw);
+        this.bx.a((int) (gameEngine.screenWidth - gameEngine.sidebarWidth), 0, (int) gameEngine.screenWidth, (int) gameEngine.screenHeight);
         if (!bO) {
             if (this.isUILoggingEnabled) {
                 this.bA.a();
                 this.bA.b(Color.a(255, 33, 40, 52));
                 this.bA.a(Paint.Style.FILL);
-                gameEngine.graphicsEngine2.b(this.bx, this.bA);
+                gameEngine.renderGraphicsEngine.b(this.bx, this.bA);
             } else {
-                gameEngine.graphicsEngine2.a(this.bl, this.bx, (Paint) null);
+                gameEngine.renderGraphicsEngine.a(this.bl, this.bx, (Paint) null);
             }
             this.bA.a();
             this.bA.b(Color.a(255, 0, 0, 0));
             this.bA.a(Paint.Style.STROKE);
-            gameEngine.graphicsEngine2.b(this.bx, this.bA);
+            gameEngine.renderGraphicsEngine.b(this.bx, this.bA);
         }
         this.cf = 0;
         this.ch = 0;
         this.cg = 0;
         this.ck = this.cl;
         this.cl = 0;
-        if (gameEngine.replayEngine.j() || (gameEngine.playerTeam != null && gameEngine.playerTeam.addCredits())) {
+        if (gameEngine.replayEngine.j() || (gameEngine.playerTeam != null && gameEngine.playerTeam.isSpectatorTeamColor())) {
             OrderableUnit firstSelectedUnit = getFirstSelectedUnit();
             if (firstSelectedUnit != null) {
                 drawTeamResources(gameEngine, firstSelectedUnit.team, false, true);
             }
         } else {
             OrderableUnit firstControllableSelectedUnit = getFirstControllableSelectedUnit();
-            if (gameEngine.playerTeam != null && gameEngine.playerTeam != PlayerTeam.TEAM_ALL && !gameEngine.playerTeam.addCredits() && !gameEngine.replayEngine.j()) {
+            if (gameEngine.playerTeam != null && gameEngine.playerTeam != PlayerTeam.TEAM_ALL && !gameEngine.playerTeam.isSpectatorTeamColor() && !gameEngine.replayEngine.j()) {
                 drawTeamResources(gameEngine, gameEngine.playerTeam, false, true);
             }
             if (firstControllableSelectedUnit != null && gameEngine.playerTeam != firstControllableSelectedUnit.team && canControlUnit(firstControllableSelectedUnit)) {
@@ -1354,11 +1354,11 @@ public final class GameUI extends Serializable {
             if (gameEngine.gameSpeed != 1.0f) {
                 str = str + "Game Speed: " + gameEngine.gameSpeed + "x\n";
             }
-            if (gameEngine.isGameThreadRunning) {
+            if (gameEngine.isUnitInvincibilityEnabled) {
                 str = str + "Invincible Units\n";
             }
             boolean z = false;
-            for (PlayerTeam playerTeam : PlayerTeam.addEnergy()) {
+            for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
                 if (playerTeam instanceof AIController) {
                     z = ((AIController) playerTeam).aiUnitManagementTimer > 0.0f;
                 }
@@ -1371,11 +1371,11 @@ public final class GameUI extends Serializable {
             this.bA.a(Paint.Style.FILL);
             float f2 = 70.0f * gameEngine.screenScale;
             float f3 = 40.0f;
-            if (gameEngine.screenWidth < 600.0f && gameEngine.viewpointWidthRaw > 650.0f) {
+            if (gameEngine.screenWidth < 600.0f && gameEngine.screenHeight > 650.0f) {
                 f2 = 10.0f;
                 f3 = 60.0f * gameEngine.screenScale;
             }
-            gameEngine.graphicsEngine2.a(str, f2, f3, this.unitSelectionBorderPaint, this.bA, 6.0f);
+            gameEngine.renderGraphicsEngine.a(str, f2, f3, this.unitSelectionBorderPaint, this.bA, 6.0f);
         }
         emptyGameEngineCall();
         this.rootUIElement.f();
@@ -1389,10 +1389,10 @@ public final class GameUI extends Serializable {
     /* JADX INFO: renamed from: a */
     public void drawTeamResources(GameEngine gameEngine, PlayerTeam playerTeam, boolean isAily, boolean showDetails) {
         if (playerTeam.isTeamControlledByAI) {
-            highlightRect(gameEngine, playerTeam, isAily, CreditsResource.D, playerTeam.getDisplayedResourcesTotal(), (StoredResources) null, 0, (Resource) null);
+            highlightRect(gameEngine, playerTeam, isAily, CreditsResource.D, playerTeam.getDisplayedCreditsTotal(), (StoredResources) null, 0, (Resource) null);
         }
         if (showDetails) {
-            this.temporaryResources.g(playerTeam.getTeamColorEffect2());
+            this.temporaryResources.g(playerTeam.getDisplayedCustomResources());
             for (Resource resource : Resource.f()) {
                 if (resource.d() && (resource.p || resource.j)) {
                     this.temporaryResources.c(resource);
@@ -1430,9 +1430,9 @@ public final class GameUI extends Serializable {
         final int n2 = 6;
         String string = a4.a(double5, true);
         final int b2 = n.b(a4);
-        final int allyToTeam = n.isAllyToTeam(a4);
-        if (allyToTeam != 0) {
-            string = string + "(+" + b2 + ")(-" + allyToTeam + ")";
+        final int resourceDrainRate = n.getResourceDrainRate(a4);
+        if (resourceDrainRate != 0) {
+            string = string + "(+" + b2 + ")(-" + resourceDrainRate + ")";
         }
         else if (b2 != 0) {
             if (b2 >= 0) {
@@ -1456,8 +1456,8 @@ public final class GameUI extends Serializable {
                 paint4.b(h);
             }
         }
-        final float n4 = (float)l.graphicsEngine2.b(string, paint4);
-        final float n5 = (float)l.graphicsEngine2.a(string, paint4);
+        final float n4 = (float)l.renderGraphicsEngine.b(string, paint4);
+        final float n5 = (float)l.renderGraphicsEngine.a(string, paint4);
         this.ci = n5 + n2;
         if (this.cl < n4) {
             this.cl = (int)n4;
@@ -1502,7 +1502,7 @@ public final class GameUI extends Serializable {
             n9 = 0;
         }
         if (b && a4.k && !b4) {
-            b3 = l.graphicsEngine2.b("AA", paint4);
+            b3 = l.renderGraphicsEngine.b("AA", paint4);
         }
         n3 -= b3;
         final Texture k = a4.k();
@@ -1523,7 +1523,7 @@ public final class GameUI extends Serializable {
         float float3 = n3 - n4 - cg;
         TextUtils.drawTextWithBackground(string, float3 - n2, (float)(n6 + n2), paint4, this.unitSelectionPaint, (float)n8, (float)n7, (float)n9, (float)n10);
         if (k != null) {
-            l.graphicsEngine2.a(k, (float)(int)(float3 - n12 / 2.0f - k.r * scale - 3.0f), (float)(int)(n6 + n2 + n5 / 2.0f - k.s * scale), this.bD, 0.0f, scale);
+            l.renderGraphicsEngine.a(k, (float)(int)(float3 - n12 / 2.0f - k.r * scale - 3.0f), (float)(int)(n6 + n2 + n5 / 2.0f - k.s * scale), this.bD, 0.0f, scale);
         }
         if (integer == 0) {
             if (ch == 0) {
@@ -1563,21 +1563,21 @@ public final class GameUI extends Serializable {
         float f = gameEngine.screenScale * 0.6f;
         int i = (int) (100.0f * f);
         int i2 = (int) (10.0f * f);
-        int i3 = (int) ((gameEngine.viewpointWidthRaw - ((int) (9.0f * f))) - (i * this.tooltipTimer));
+        int i3 = (int) ((gameEngine.screenHeight - ((int) (9.0f * f))) - (i * this.tooltipTimer));
         if (bR) {
             i3 = (int) (i3 - gameEngine.minimap.height);
         }
         if (confirmationResult == ConfirmationResult.more) {
             int i4 = ((int) (20.0f * f)) + i + ((int) (20.0f * f)) + i;
             this.by.a(i2 + i4, i3, i2 + i4 + i, i3 + i);
-            gameEngine.graphicsEngine2.a(this.bc, this.by.a, this.by.b, this.tooltipBackgroundPaint, 0.0f, f);
+            gameEngine.renderGraphicsEngine.a(this.bc, this.by.a, this.by.b, this.tooltipBackgroundPaint, 0.0f, f);
         } else if (confirmationResult == ConfirmationResult.yes) {
             this.by.a(i2, i3, i2 + i, i3 + i);
-            gameEngine.graphicsEngine2.a(this.bb, this.by.a, this.by.b, this.tooltipBackgroundPaint, 0.0f, f);
+            gameEngine.renderGraphicsEngine.a(this.bb, this.by.a, this.by.b, this.tooltipBackgroundPaint, 0.0f, f);
         } else {
             int i5 = ((int) (20.0f * f)) + i;
             this.by.a(i2 + i5, i3, i2 + i5 + i, i3 + i);
-            gameEngine.graphicsEngine2.a(this.ba, this.by.a, this.by.b, this.tooltipBackgroundPaint, 0.0f, f);
+            gameEngine.renderGraphicsEngine.a(this.ba, this.by.a, this.by.b, this.tooltipBackgroundPaint, 0.0f, f);
         }
         boolean z2 = false;
         Utility.grow(this.by, 10.0f * f);
@@ -1622,7 +1622,7 @@ public final class GameUI extends Serializable {
             f3 = (this.selectionBoxStartY / gameEngine.zoom) + gameEngine.viewpointYSnapped;
         }
         this.buildingRotation = Utility.moveTowardsZero(this.buildingRotation, f);
-        this.bx.a((int) (gameEngine.screenWidth - gameEngine.sidebarWidth), 0, (int) gameEngine.screenWidth, (int) gameEngine.viewpointWidthRaw);
+        this.bx.a((int) (gameEngine.screenWidth - gameEngine.sidebarWidth), 0, (int) gameEngine.screenWidth, (int) gameEngine.screenHeight);
         if (!bO && ((this.isSelectionBoxActive || this.isMousePressed) && this.bx.b((int) this.selectionBoxStartX, (int) this.selectionBoxStartY))) {
             this.showDebugInfo = true;
         }
@@ -1748,21 +1748,21 @@ public final class GameUI extends Serializable {
             if (this.uiScale > 20.0f && shouldUseCircleSelect()) {
                 float fCalculateUIWidth2 = calculateUIWidth();
                 this.unitHealthBarPaint.a(100, 0, 255, 0);
-                gameEngine.graphicsEngine2.a(this.selectionBoxStartX, this.selectionBoxStartY, fCalculateUIWidth2, this.unitHealthBarPaint);
+                gameEngine.renderGraphicsEngine.a(this.selectionBoxStartX, this.selectionBoxStartY, fCalculateUIWidth2, this.unitHealthBarPaint);
                 this.unitHealthBarPaint.a(Paint.Style.STROKE);
                 this.unitHealthBarPaint.a(1.0f);
                 this.unitHealthBarPaint.a(200, 0, 255, 0);
-                gameEngine.graphicsEngine2.a(this.selectionBoxStartX, this.selectionBoxStartY, fCalculateUIWidth2, this.unitHealthBarPaint);
+                gameEngine.renderGraphicsEngine.a(this.selectionBoxStartX, this.selectionBoxStartY, fCalculateUIWidth2, this.unitHealthBarPaint);
             }
         }
         if (gameEngine.isGamePausedOrMinimized && gameEngine.isTouchDown() && gameEngine.getTouchPointerCount() > 0) {
             Paint paint = new Paint();
             paint.c(100);
             for (int i = 0; i < gameEngine.getTouchPointerCount(); i++) {
-                gameEngine.graphicsEngine2.i();
-                gameEngine.graphicsEngine2.a(0.7f, 0.7f, gameEngine.getTouchX(i), gameEngine.logWarning(i));
-                gameEngine.graphicsEngine2.a(this.bm, gameEngine.getTouchX(i), gameEngine.logWarning(i), paint);
-                gameEngine.graphicsEngine2.j();
+                gameEngine.renderGraphicsEngine.i();
+                gameEngine.renderGraphicsEngine.a(0.7f, 0.7f, gameEngine.getTouchX(i), gameEngine.getTouchY(i));
+                gameEngine.renderGraphicsEngine.a(this.bm, gameEngine.getTouchX(i), gameEngine.getTouchY(i), paint);
+                gameEngine.renderGraphicsEngine.j();
             }
         }
         if (!this.isMousePressed) {
@@ -1869,19 +1869,19 @@ public final class GameUI extends Serializable {
                 boolean zCancelCurrentAction = cancelCurrentAction();
                 boolean z = (!this.isSelectionBoxActive || this.isKeyboardCtrlPressed || !this.isGamePaused || this.isInputDisabled || shouldShowMouseCursor()) ? false : true;
                 if (this.currentAction.isInstant()) {
-                    if (GameEngine.isIOS()) {
+                    if (GameEngine.isDesktopMouseInput()) {
                         z = isMouseInputActive() && !this.isKeyboardCtrlPressed && this.isGamePaused && !this.isMiddleMousePressed && isInputEnabled();
                     } else {
                         z = this.isMousePressed && !this.isKeyboardCtrlPressed && this.isGamePaused && !this.isMiddleMousePressed && isInputEnabled();
                     }
                 }
                 if (baseUnitF2 != null && (baseUnitF2 instanceof OrderableUnit)) {
-                    gameEngine.graphicsEngine2.i();
+                    gameEngine.renderGraphicsEngine.i();
                     gameEngine.applyZoomTransform();
                     boolean z2 = (!this.isMousePressed || this.isInputDisabled || this.isKeyboardCtrlPressed || this.isMiddleMousePressed || point != null) ? false : true;
                     float touchX = f2;
                     float touchY = f3;
-                    if (GameEngine.isIOS() && gameEngine.settingsEngine.mouseSupport) {
+                    if (GameEngine.isDesktopMouseInput() && gameEngine.settingsEngine.mouseSupport) {
                         touchX = (gameEngine.getTouchX() / gameEngine.zoom) + gameEngine.viewpointXSnapped;
                         touchY = (gameEngine.getTouchY() / gameEngine.zoom) + gameEngine.viewpointYSnapped;
                         z2 = true;
@@ -1893,7 +1893,7 @@ public final class GameUI extends Serializable {
                         z2 = false;
                     }
                     ((OrderableUnit) baseUnitF2).a(abstractUnitAction, z2, touchX, touchY);
-                    gameEngine.graphicsEngine2.j();
+                    gameEngine.renderGraphicsEngine.j();
                 }
                 if (zCancelCurrentAction || isMouseSelectionActive()) {
                     clearCurrentAction();
@@ -1983,7 +1983,7 @@ public final class GameUI extends Serializable {
                         if (this.currentAction instanceof PingMapAction) {
                             applyActionToCommand(f2, f3, point, (PingMapAction) this.currentAction);
                         } else {
-                            GameEngine.updatePaintTextSizeIfNeeded("orderBuildingSpecialAction is not a PingMapAction, it is: " + this.currentAction.getClass().getName());
+                            GameEngine.logColored("orderBuildingSpecialAction is not a PingMapAction, it is: " + this.currentAction.getClass().getName());
                         }
                         clearCurrentAction();
                         this.isSelectionBoxActive = false;
@@ -2018,7 +2018,7 @@ public final class GameUI extends Serializable {
         boolean b3 = false;
         boolean b4 = false;
         boolean isKeyboardShiftPressed = false;
-        if (GameEngine.isIOS() && instance.settingsEngine.mouseSupport) {
+        if (GameEngine.isDesktopMouseInput() && instance.settingsEngine.mouseSupport) {
             b2 = true;
             isKeyboardShiftPressed = this.isKeyboardShiftPressed;
         }
@@ -2070,20 +2070,20 @@ public final class GameUI extends Serializable {
             }
         }
         boolean b11 = false;
-        if (GameEngine.isIOS() && instance.settingsEngine.mouseSupport) {
+        if (GameEngine.isDesktopMouseInput() && instance.settingsEngine.mouseSupport) {
             b11 = true;
         }
         if (this.isSelectionBoxActive && !this.isInputDisabled) {
             b11 = true;
         }
-        if (GameEngine.isAndroid()) {
+        if (GameEngine.isNonPCPlatform()) {
             b4 = true;
             if (instance.getTouchPointerCount() == 2) {
                 b11 = true;
                 screenFlashRed = instance.getTouchX(0) / instance.zoom;
-                screenFlashGreen = instance.logWarning(0) / instance.zoom;
+                screenFlashGreen = instance.getTouchY(0) / instance.zoom;
                 final float screenFlashIntensity = instance.getTouchX(1) / instance.zoom;
-                final float screenFlashDecay = instance.logWarning(1) / instance.zoom;
+                final float screenFlashDecay = instance.getTouchY(1) / instance.zoom;
                 this.isScreenFlashActive = true;
                 this.screenFlashIntensity = screenFlashIntensity;
                 this.screenFlashDecay = screenFlashDecay;
@@ -2113,7 +2113,7 @@ public final class GameUI extends Serializable {
         final UnitType unitType = this.currentAction.getUnitType();
         final int queueSize = this.currentAction.getQueueSize();
         boolean b12 = false;
-        if (GameEngine.isIOS() && instance.settingsEngine.mouseSupport && !instance.cameraBoundsEnabled.b((int)this.selectionBoxMinWidth, (int)this.selectionBoxMinHeight)) {
+        if (GameEngine.isDesktopMouseInput() && instance.settingsEngine.mouseSupport && !instance.screenClipRect.b((int)this.selectionBoxMinWidth, (int)this.selectionBoxMinHeight)) {
             b12 = true;
         }
         BaseUnit baseUnit = BaseUnit.canAttack(unitType);
@@ -2140,9 +2140,9 @@ public final class GameUI extends Serializable {
                 y.rotationSpeed = -90.0f;
             }
             final OrderableUnit orderableUnit = y;
-            orderableUnit.posX += y.getUnitAIState();
+            orderableUnit.posX += y.getTileOffsetX();
             final OrderableUnit orderableUnit2 = y;
-            orderableUnit2.posY += y.getUnitAIPathfindStatus();
+            orderableUnit2.posY += y.getTileOffsetY();
             y.setUnitTeam(this.selectedBuilder.team);
             y.a(queueSize);
             y.isUnitParalyzed = true;
@@ -2167,11 +2167,11 @@ public final class GameUI extends Serializable {
             }
             if (b) {
                 if (b3) {
-                    if (GameEngine.isPC() || (GameEngine.isAndroid() && instance.getTouchPointerCount() == 2)) {
-                        instance.graphicsEngine2.a(screenFlashRed * instance.zoom, screenFlashGreen * instance.zoom, (screenFlashIntensity - instance.viewpointXSnapped) * instance.zoom, (screenFlashDecay - instance.viewpointYSnapped) * instance.zoom, this.bE);
+                    if (GameEngine.isPC() || (GameEngine.isNonPCPlatform() && instance.getTouchPointerCount() == 2)) {
+                        instance.renderGraphicsEngine.a(screenFlashRed * instance.zoom, screenFlashGreen * instance.zoom, (screenFlashIntensity - instance.viewpointXSnapped) * instance.zoom, (screenFlashDecay - instance.viewpointYSnapped) * instance.zoom, this.bE);
                     }
                     else {
-                        instance.graphicsEngine2.a((y.posX - instance.viewpointXSnapped) * instance.zoom, (y.posY - instance.viewpointYSnapped) * instance.zoom, (screenFlashIntensity - instance.viewpointXSnapped) * instance.zoom, (screenFlashDecay - instance.viewpointYSnapped) * instance.zoom, this.bE);
+                        instance.renderGraphicsEngine.a((y.posX - instance.viewpointXSnapped) * instance.zoom, (y.posY - instance.viewpointYSnapped) * instance.zoom, (screenFlashIntensity - instance.viewpointXSnapped) * instance.zoom, (screenFlashDecay - instance.viewpointYSnapped) * instance.zoom, this.bE);
                     }
                     final boolean boolean6 = true;
                     string = null;
@@ -2290,12 +2290,12 @@ public final class GameUI extends Serializable {
                             if (firstControllableSelectedUnit != null) {
                                 final BuildPreview buildPreview = new BuildPreview();
                                 buildPreview.unitType = unitType;
-                                buildPreview.tempPoint = pointF.x;
-                                buildPreview.tempRectF1 = pointF.y;
+                                buildPreview.worldX = pointF.x;
+                                buildPreview.worldY = pointF.y;
                                 buildPreview.isBuilding = true;
                                 buildPreview.builder = firstControllableSelectedUnit;
                                 buildPreview.team = instance.playerTeam;
-                                buildPreview.someCounterF = queueSize;
+                                buildPreview.previewUnitLevel = queueSize;
                                 buildPreview.placingTeam = instance.playerTeam;
                                 buildPreview.buildQueueId = this.buildQueueId;
                                 buildPreview.fadeInProgress = 1.0f + 0.15f * n4;
@@ -2307,7 +2307,7 @@ public final class GameUI extends Serializable {
                         }
                     }
                     this.tooltipX = 5.0f;
-                    if (GameEngine.isIOS()) {
+                    if (GameEngine.isDesktopMouseInput()) {
                         this.tooltipX = 1.0f;
                     }
                     this.isScreenFlashActive = false;
@@ -2366,8 +2366,8 @@ public final class GameUI extends Serializable {
                         final ArrayList<PointF> list = new ArrayList<PointF>();
                         float n9 = posX + 200.0f * n8;
                         float n10 = posY + 200.0f * n7;
-                        final float n11 = -y.getUnitAIState() + 1.0f;
-                        final float n12 = -y.getUnitAIPathfindStatus() + 1.0f;
+                        final float n11 = -y.getTileOffsetX() + 1.0f;
+                        final float n12 = -y.getTileOffsetY() + 1.0f;
                         final boolean b15 = false;
                         this.a(y, posX + n11, posY + n12, n9 + n11, n10 + n12, b15, list, null);
                         if (list.size() > 0) {
@@ -2441,7 +2441,7 @@ public final class GameUI extends Serializable {
     /* JADX INFO: renamed from: m */
     public boolean shouldShowMouseCursor() {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (GameEngine.isIOS() && gameEngine.settingsEngine.mouseSupport && !isMouseSelectionActive() && !canUseMouseSelection()) {
+        if (GameEngine.isDesktopMouseInput() && gameEngine.settingsEngine.mouseSupport && !isMouseSelectionActive() && !canUseMouseSelection()) {
             return true;
         }
         return false;
@@ -2450,7 +2450,7 @@ public final class GameUI extends Serializable {
     /* JADX INFO: renamed from: n */
     public boolean isMouseSelectionActive() {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (GameEngine.isIOS() && gameEngine.settingsEngine.mouseSupport && this.isSelectionBoxActive && !this.isInputDisabled && !this.showDebugInfo) {
+        if (GameEngine.isDesktopMouseInput() && gameEngine.settingsEngine.mouseSupport && this.isSelectionBoxActive && !this.isInputDisabled && !this.showDebugInfo) {
             int i = 1;
             int i2 = 2;
             if (gameEngine.settingsEngine.mousePlacement == 2) {
@@ -2530,7 +2530,7 @@ public final class GameUI extends Serializable {
             boolean z3 = false;
             boolean z4 = false;
             boolean z5 = false;
-            if (baseUnit.getUnitAIPathfindCost() && canSelectedUnitsReachUnit(baseUnit)) {
+            if (baseUnit.canTransportUnits() && canSelectedUnitsReachUnit(baseUnit)) {
                 z3 = true;
             }
             Iterator it = this.selectedUnitsList.iterator();
@@ -2600,7 +2600,7 @@ public final class GameUI extends Serializable {
                 return true;
             }
         }
-        if (baseUnit.getUnitAIPathfindCost() && canSelectedUnitsReachUnit(baseUnit)) {
+        if (baseUnit.canTransportUnits() && canSelectedUnitsReachUnit(baseUnit)) {
             issueLoadIntoCommand(baseUnit);
             return true;
         }
@@ -2980,14 +2980,14 @@ public final class GameUI extends Serializable {
     public boolean applyActionToCommandWithFlag(CommandType commandType, BaseUnit baseUnit) {
         if (baseUnit instanceof OrderableUnit) {
             OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
-            if ((commandType == CommandType.attack || commandType == CommandType.move) && !GameEngine.isTimeInRange(this.lastActionConfirmTime, 1000L)) {
+            if ((commandType == CommandType.attack || commandType == CommandType.move) && !GameEngine.hasTimeElapsed(this.lastActionConfirmTime, 1000L)) {
                 return true;
             }
             if (commandType == CommandType.newSelection) {
                 if (GameEngine.getInstance().currentTick < 10) {
                     return false;
                 }
-                if (!GameEngine.isTimeInRange(this.lastActionCancelTime, 1000L)) {
+                if (!GameEngine.hasTimeElapsed(this.lastActionCancelTime, 1000L)) {
                     return true;
                 }
             }
@@ -3109,7 +3109,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: a */
-    public void unknownFun(AbstractUnitAction abstractUnitAction, PointF pointF, BaseUnit baseUnit, Command command) {
+    public void prepareUnitActionCommand(AbstractUnitAction abstractUnitAction, PointF pointF, BaseUnit baseUnit, Command command) {
         if (abstractUnitAction instanceof CustomAction) {
             GameEngine.getInstance();
         }
@@ -3126,7 +3126,7 @@ public final class GameUI extends Serializable {
             drawButtonAndHandleEventAdvanced(commandCreateCommandForSelectedUnits, abstractUnitAction, false);
         }
         commandCreateCommandForSelectedUnits.setActionTarget(abstractUnitAction.getActionId(), pointF, (BaseUnit) null);
-        unknownFun(abstractUnitAction, pointF, (BaseUnit) null, commandCreateCommandForSelectedUnits);
+        prepareUnitActionCommand(abstractUnitAction, pointF, (BaseUnit) null, commandCreateCommandForSelectedUnits);
         if (!abstractUnitAction.a(f, f2)) {
             gameEngine.soundEngine.playInterfaceSound(SoundEngine.moveSound, 0.2f);
             Effect effectCreateEffect = gameEngine.effectManager.createEffect(f, f2, 0.0f, EffectType.custom, true, EffectQuality.critical);
@@ -3229,8 +3229,8 @@ public final class GameUI extends Serializable {
                 effectCreateEffect2.ao = -0.5f;
                 effectCreateEffect2.H = true;
                 if (playerTeam != null) {
-                    effectCreateEffect2.x = playerTeam.getTeamUnitCount();
-                    if (GameEngine.isDesktop()) {
+                    effectCreateEffect2.x = playerTeam.getTeamColorArgb();
+                    if (GameEngine.isAndroidPlatform()) {
                         effectCreateEffect2.B = new LightingColorFilter(effectCreateEffect2.x, 0);
                     }
                 }
@@ -3267,8 +3267,8 @@ public final class GameUI extends Serializable {
                 effectCreateEffect3.T = 60.0f;
                 effectCreateEffect3.ao = -0.5f;
                 if (playerTeam != null) {
-                    effectCreateEffect3.x = playerTeam.getTeamUnitCount();
-                    if (GameEngine.isDesktop()) {
+                    effectCreateEffect3.x = playerTeam.getTeamColorArgb();
+                    if (GameEngine.isAndroidPlatform()) {
                         effectCreateEffect3.B = new LightingColorFilter(effectCreateEffect3.x, 0);
                     }
                 }
@@ -3300,7 +3300,7 @@ public final class GameUI extends Serializable {
     public Command createBaseCommand() {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateCommandForTeam = gameEngine.commandController.createCommandForTeam(gameEngine.playerTeam);
-        if (gameEngine.networkEngine.B) {
+        if (gameEngine.networkEngine.networkGameActive) {
             commandCreateCommandForTeam.sourceTeam = gameEngine.playerTeam;
         }
         return commandCreateCommandForTeam;
@@ -3607,7 +3607,7 @@ public final class GameUI extends Serializable {
             return;
         }
         baseUnit.isSelected = true;
-        baseUnit.lastSelectedTick = GameEngine.getInstance().lastTickTime;
+        baseUnit.lastSelectedTick = GameEngine.getInstance().renderTimeMillis;
         this.selectedUnitCount++;
         if (!(baseUnit instanceof EditorOrBuilder)) {
             lastSelectedNonBuilderUnit = baseUnit;
@@ -3830,10 +3830,10 @@ public final class GameUI extends Serializable {
         gameEngine.tileMap.exportTmxToFile(f, f2);
         float f7 = gameEngine.tileMap.cursorTileX;
         float f8 = gameEngine.tileMap.cursorTileY;
-        float fCZ = f7 + orderableUnit.getUnitAIState();
-        float fDa = f8 + orderableUnit.getUnitAIPathfindStatus();
-        float fCZ2 = f3 + orderableUnit.getUnitAIState();
-        float fDa2 = f4 + orderableUnit.getUnitAIPathfindStatus();
+        float fCZ = f7 + orderableUnit.getTileOffsetX();
+        float fDa = f8 + orderableUnit.getTileOffsetY();
+        float fCZ2 = f3 + orderableUnit.getTileOffsetX();
+        float fDa2 = f4 + orderableUnit.getTileOffsetY();
         float fDistance = Utility.distance(fCZ, fDa, fCZ2, fDa2);
         float angleBetweenPoints = Utility.getAngleBetweenPoints(fCZ, fDa, fCZ2, fDa2);
         int i = 0;
@@ -3841,11 +3841,11 @@ public final class GameUI extends Serializable {
         while (true) {
             float f10 = f9;
             if (f10 <= fDistance) {
-                gameEngine.tileMap.exportTmxToFile((fCZ + (Utility.fastCos(angleBetweenPoints) * f10)) - orderableUnit.getUnitAIState(), (fDa + (Utility.fastSin(angleBetweenPoints) * f10)) - orderableUnit.getUnitAIPathfindStatus());
+                gameEngine.tileMap.exportTmxToFile((fCZ + (Utility.fastCos(angleBetweenPoints) * f10)) - orderableUnit.getTileOffsetX(), (fDa + (Utility.fastSin(angleBetweenPoints) * f10)) - orderableUnit.getTileOffsetY());
                 float f11 = gameEngine.tileMap.cursorTileX;
                 float f12 = gameEngine.tileMap.cursorTileY;
-                float fCZ3 = f11 + orderableUnit.getUnitAIState();
-                float fDa3 = f12 + orderableUnit.getUnitAIPathfindStatus();
+                float fCZ3 = f11 + orderableUnit.getTileOffsetX();
+                float fDa3 = f12 + orderableUnit.getTileOffsetY();
                 orderableUnit.posX = fCZ3;
                 orderableUnit.posY = fDa3;
                 if ((!z2 || orderableUnit2 == null || (!BuildPreview.doUnitsOverlap(orderableUnit, orderableUnit2) && !orderableUnit.isUnitOverlappingRadius(orderableUnit2))) && 0 == 0) {
@@ -3907,7 +3907,7 @@ public final class GameUI extends Serializable {
         orderableUnit.isUnitCapturable = !zCanPlaceAtCurrentPosition;
         orderableUnit.isUnitUntargetable = z2;
         if (z) {
-            gameEngine.graphicsEngine2.k();
+            gameEngine.renderGraphicsEngine.k();
             gameEngine.applyZoomTransform();
             orderableUnit.d(0.0f);
             orderableUnit.c(0.0f);
@@ -3920,7 +3920,7 @@ public final class GameUI extends Serializable {
             if (!z2) {
                 orderableUnit.drawPlacementOverlay(-1);
             }
-            gameEngine.graphicsEngine2.l();
+            gameEngine.renderGraphicsEngine.l();
         }
         orderableUnit.posX = f3;
         orderableUnit.posY = f4;
@@ -3933,10 +3933,10 @@ public final class GameUI extends Serializable {
     public void startGameEndSequence() {
         clearCurrentAction();
         GameEngine gameEngine = GameEngine.getInstance();
-        gameEngine.isTouchDown = true;
+        gameEngine.hasWonGame = true;
         gameEngine.gameStatistics.c();
-        if (gameEngine.lastTick < 1500 && gameEngine.gameUI.editorOrBuilder != null) {
-            gameEngine.isTouchMoving = true;
+        if (gameEngine.gameTimeMillis < 1500 && gameEngine.gameUI.editorOrBuilder != null) {
+            gameEngine.isContinuingAfterGameEnd = true;
         }
         this.endGameScreen.update(0.0f);
         this.endGameScreen.loadStats();
@@ -3946,7 +3946,7 @@ public final class GameUI extends Serializable {
     public void endGameSequence() {
         clearCurrentAction();
         GameEngine gameEngine = GameEngine.getInstance();
-        gameEngine.touchStartY = true;
+        gameEngine.hasLostGame = true;
         gameEngine.gameStatistics.c();
         this.endGameScreen.update(0.0f);
         this.endGameScreen.loadStats();
@@ -3971,7 +3971,7 @@ public final class GameUI extends Serializable {
             }
             Paint paint4 = paint3;
             int lineHeight = TextUtils.getLineHeight(paint4);
-            gameEngine.graphicsEngine2.a(str2, rect.d(), rect.b + (lineHeight / 2) + (i * lineHeight), paint4);
+            gameEngine.renderGraphicsEngine.a(str2, rect.d(), rect.b + (lineHeight / 2) + (i * lineHeight), paint4);
             i++;
         }
     }
@@ -3987,7 +3987,7 @@ public final class GameUI extends Serializable {
         String s2 = null;
         boolean b = false;
         boolean b2 = true;
-        if (GameEngine.isIOS()) {
+        if (GameEngine.isDesktopMouseInput()) {
             b2 = false;
         }
         if (am != null && s.isTargetingAction(am)) {
@@ -4059,7 +4059,7 @@ public final class GameUI extends Serializable {
         else {
             b7 = 40;
         }
-        if (GameEngine.isAndroid() && float6 > 0.0f) {
+        if (GameEngine.isNonPCPlatform() && float6 > 0.0f) {
             b7 = (int)float6;
             b = true;
         }
@@ -4120,8 +4120,8 @@ public final class GameUI extends Serializable {
             final Rect bw3 = this.bw;
             bw3.d += (int)(55.0f * instance.screenScale);
         }
-        if (this.bw.d > instance.viewpointWidthRaw) {
-            final int n3 = (int)(instance.viewpointWidthRaw - this.bw.d);
+        if (this.bw.d > instance.screenHeight) {
+            final int n3 = (int)(instance.screenHeight - this.bw.d);
             this.bv.a(0, n3);
             this.bw.a(0, n3);
         }
@@ -4139,7 +4139,7 @@ public final class GameUI extends Serializable {
             this.bw.a(0, n4);
         }
         if (b9) {
-            final float float7 = instance.viewpointWidthRaw - 30.0f;
+            final float float7 = instance.screenHeight - 30.0f;
             final int n5 = (int)(float7 - this.bw.d);
             this.bw.a(0, n5);
             this.bv.a(0, n5);
@@ -4149,14 +4149,14 @@ public final class GameUI extends Serializable {
             this.bw.a(0, n4);
             this.bv.a(0, n4);
         }
-        if (this.bw.d > instance.viewpointWidthRaw - 20.0f) {
-            final float float7 = instance.viewpointWidthRaw - 20.0f;
+        if (this.bw.d > instance.screenHeight - 20.0f) {
+            final float float7 = instance.screenHeight - 20.0f;
             final int n5 = (int)(float7 - this.bw.d);
             this.bw.a(0, n5);
             this.bv.a(0, n5);
         }
-        instance.graphicsEngine2.b(this.bw, this.minimapViewportBorderPaint);
-        instance.graphicsEngine2.b(this.bw, this.minimapPaint);
+        instance.renderGraphicsEngine.b(this.bw, this.minimapViewportBorderPaint);
+        instance.renderGraphicsEngine.b(this.bw, this.minimapPaint);
         if (b3) {}
         if (unitType != null && am != null) {
             final float float7 = 30.0f * instance.screenScale;
@@ -4188,7 +4188,7 @@ public final class GameUI extends Serializable {
                 if (timerValue < -0.5) {
                     --clampTo255;
                 }
-                instance.graphicsEngine2.a("" + active, (float)this.bw.d(), clampTo255, this.fogOfWarPaint);
+                instance.renderGraphicsEngine.a("" + active, (float)this.bw.d(), clampTo255, this.fogOfWarPaint);
             }
             boolean b10 = false;
             boolean b11 = false;
@@ -4221,7 +4221,7 @@ public final class GameUI extends Serializable {
             if (timerValue > 0.5) {
                 this.by.a(0, 1);
             }
-            instance.graphicsEngine2.a(this.bh, (float)this.by.a, (float)this.by.b, paint4, 0.0f, float7);
+            instance.renderGraphicsEngine.a(this.bh, (float)this.by.a, (float)this.by.b, paint4, 0.0f, float7);
             Utility.grow(this.by, this.by.b() * 0.8f);
             if (this.isSelectionBoxActive && !this.isInputDisabled && !b4 && this.by.b((int)this.selectionBoxStartX, (int)this.selectionBoxStartY)) {
                 this.isSelectionBoxActive = false;
@@ -4254,7 +4254,7 @@ public final class GameUI extends Serializable {
             if (timerValue < -0.5) {
                 this.by.a(0, 1);
             }
-            instance.graphicsEngine2.a(this.bi, (float)this.by.a, (float)this.by.b, paint5, 0.0f, float7);
+            instance.renderGraphicsEngine.a(this.bi, (float)this.by.a, (float)this.by.b, paint5, 0.0f, float7);
             Utility.grow(this.by, this.by.b() * 0.8f);
             if (this.isSelectionBoxActive && !this.isInputDisabled && this.by.b((int)this.selectionBoxStartX, (int)this.selectionBoxStartY)) {
                 this.isSelectionBoxActive = false;
@@ -4270,7 +4270,7 @@ public final class GameUI extends Serializable {
                 }
             }
             if (b10) {
-                if (s.isHighPriority() && instance.playerTeam.getTeamBuildingCountInt() <= instance.playerTeam.getTeamUnitCountInt()) {
+                if (s.isHighPriority() && instance.playerTeam.getUnitCap() <= instance.playerTeam.getNonBuildingUnitCountIncludingQueued()) {
                     this.showMediumPriorityMessage(this.interfaceRenderer.unitCapReachedText);
                 }
                 if (b12) {
@@ -4284,7 +4284,7 @@ public final class GameUI extends Serializable {
                     }
                     this.drawActionPreviewWithTarget(baseCommand, s);
                     baseCommand.setActionId(s.getQueueId());
-                    this.unknownFun(s, null, null, baseCommand);
+                    this.prepareUnitActionCommand(s, null, null, baseCommand);
                 }
             }
             if (b11) {
@@ -4303,13 +4303,13 @@ public final class GameUI extends Serializable {
                 return true;
             }
         }
-        return !b2 && GameEngine.isAndroid() && this.isSelectionBoxActive && !this.isInputDisabled && !this.bw.b((int)this.selectionBoxStartX, (int)this.selectionBoxStartY);
+        return !b2 && GameEngine.isNonPCPlatform() && this.isSelectionBoxActive && !this.isInputDisabled && !this.bw.b((int)this.selectionBoxStartX, (int)this.selectionBoxStartY);
     }
 
     public void a(Rect rect, Paint paint, Paint paint2) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (bO) {
-            gameEngine.graphicsEngine2.a(this.bl, rect, paint2, rect.a, rect.b, 0, 0);
+            gameEngine.renderGraphicsEngine.a(this.bl, rect, paint2, rect.a, rect.b, 0, 0);
             if (paint != null) {
                 int iF = paint.f();
                 if (iF > 255) {
@@ -4319,7 +4319,7 @@ public final class GameUI extends Serializable {
             }
         }
         if (paint != null) {
-            gameEngine.graphicsEngine2.b(rect, paint);
+            gameEngine.renderGraphicsEngine.b(rect, paint);
         }
     }
 
@@ -4328,7 +4328,7 @@ public final class GameUI extends Serializable {
         this.bF.b(i);
         this.bF.a(Paint.Style.STROKE);
         this.bF.a(1.0f);
-        gameEngine.graphicsEngine2.b(rect, this.bF);
+        gameEngine.renderGraphicsEngine.b(rect, this.bF);
         if (this.isUILoggingEnabled) {
             this.bF.b(Color.a(255, 116, 136, 160));
             int i2 = 1;
@@ -4341,7 +4341,7 @@ public final class GameUI extends Serializable {
             this.bz.b += i2;
             this.bz.a += i2;
             this.bz.c -= i2;
-            gameEngine.graphicsEngine2.b(this.bz, this.bF);
+            gameEngine.renderGraphicsEngine.b(this.bz, this.bF);
         }
     }
 
@@ -4350,10 +4350,10 @@ public final class GameUI extends Serializable {
         this.bx.a(i, i2, i + i3, i2 + i4);
         this.bF.b(i5);
         if (uIStyle != null) {
-            uIStyle.a(gameEngine.graphicsEngine2, this.bx, uIState);
+            uIStyle.a(gameEngine.renderGraphicsEngine, this.bx, uIState);
         } else if (!z) {
             this.bF.a(Paint.Style.FILL);
-            gameEngine.graphicsEngine2.b(this.bx, this.bF);
+            gameEngine.renderGraphicsEngine.b(this.bx, this.bF);
         } else {
             a(this.bx, (Paint) null, this.bF);
         }
@@ -4370,10 +4370,10 @@ public final class GameUI extends Serializable {
     public void a(int i, int i2, int i3, int i4, String str, int i5, Paint paint) {
         GameEngine gameEngine = GameEngine.getInstance();
         this.bx.a(i, i2, i + i3, i2 + i4);
-        if (GameEngine.isAndroidVersionStatic2) {
-            gameEngine.graphicsEngine2.a(str, this.bx.d(), this.bx.e() + (gameEngine.graphicsEngine2.a(str, paint) / 2), paint);
+        if (GameEngine.isPCOrIOSVersion) {
+            gameEngine.renderGraphicsEngine.a(str, this.bx.d(), this.bx.e() + (gameEngine.renderGraphicsEngine.a(str, paint) / 2), paint);
         } else {
-            gameEngine.graphicsEngine2.a(str, this.bx.d(), this.bx.e() - ((paint.l() + paint.m()) / 2.0f), paint);
+            gameEngine.renderGraphicsEngine.a(str, this.bx.d(), this.bx.e() - ((paint.l() + paint.m()) / 2.0f), paint);
         }
     }
 
@@ -4435,7 +4435,7 @@ public final class GameUI extends Serializable {
     public boolean a(int i, int i2, int i3, int i4, IconGroup iconGroup) {
         this.bx.a(i, i2, i + i3, i2 + i4);
         GameEngine gameEngine = GameEngine.getInstance();
-        if (GameEngine.isIOS() && gameEngine.settingsEngine.mouseSupport && this.bx.b((int) gameEngine.getTouchX(), (int) gameEngine.getTouchY())) {
+        if (GameEngine.isDesktopMouseInput() && gameEngine.settingsEngine.mouseSupport && this.bx.b((int) gameEngine.getTouchX(), (int) gameEngine.getTouchY())) {
             return true;
         }
         return false;
@@ -4452,10 +4452,10 @@ public final class GameUI extends Serializable {
     /* JADX INFO: renamed from: r */
     public float getUnitSelectionFadeEffect(BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (baseUnit.lastSelectedTick < gameEngine.lastTickTime && baseUnit.lastSelectedTick + 200 > gameEngine.lastTickTime) {
-            return (1.0f - ((gameEngine.lastTickTime - baseUnit.lastSelectedTick) / 200.0f)) * 6.0f;
+        if (baseUnit.lastSelectedTick < gameEngine.renderTimeMillis && baseUnit.lastSelectedTick + 200 > gameEngine.renderTimeMillis) {
+            return (1.0f - ((gameEngine.renderTimeMillis - baseUnit.lastSelectedTick) / 200.0f)) * 6.0f;
         }
-        return GameEngine.getInstance().pinchStartZoom;
+        return GameEngine.getInstance().unitSelectionFadeBase;
     }
 
     public void a(MenuDialog menuDialog) {

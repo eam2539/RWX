@@ -28,8 +28,8 @@ public class GamePaint extends Paint {
     @Override // android.graphics.Paint
     public void b(float f) {
         if (this.u) {
-            GameEngine.updatePaintTextSizeIfNeeded("UniquePaint changed when locked down:");
-            GameEngine.updatePaintTextSizeIfNeeded("from:" + k() + " to: " + f);
+            GameEngine.logColored("UniquePaint changed when locked down:");
+            GameEngine.logColored("from:" + k() + " to: " + f);
             GameEngine.printStackTrace();
         }
         super.b(f);
@@ -38,7 +38,7 @@ public class GamePaint extends Paint {
     @Override // android.graphics.Paint
     public Typeface a(Typeface typeface) {
         if (this.u) {
-            GameEngine.updatePaintTextSizeIfNeeded("UniquePaint changed when locked down:");
+            GameEngine.logColored("UniquePaint changed when locked down:");
             GameEngine.printStackTrace();
         }
         return super.a(typeface);

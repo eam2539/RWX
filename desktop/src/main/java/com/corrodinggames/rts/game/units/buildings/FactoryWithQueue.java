@@ -230,7 +230,7 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
     public void getUnitAISettings() {
         if (this.z.b != null) {
             final GameEngine instance = GameEngine.getInstance();
-            instance.graphicsEngine2.a((float)(int)(this.posX - instance.viewpointXSnapped), (float)(int)(this.posY - instance.viewpointYSnapped), (float)(int)(this.z.b.x - instance.viewpointXSnapped), (float)(int)(this.z.b.y - instance.viewpointYSnapped), FactoryWithQueue.y);
+            instance.renderGraphicsEngine.a((float)(int)(this.posX - instance.viewpointXSnapped), (float)(int)(this.posY - instance.viewpointYSnapped), (float)(int)(this.z.b.x - instance.viewpointXSnapped), (float)(int)(this.z.b.y - instance.viewpointYSnapped), FactoryWithQueue.y);
         }
     }
 

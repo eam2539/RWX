@@ -304,13 +304,13 @@ public final class TileMap {
         fogAtlasDebugGreenStrokePaint.a(1.0f);
         fogAtlasDebugRedStrokePaintAlt.a(150, 255, 0, 0);
         long jA = PerformanceProfiler.a();
-        Texture textureA = gameEngine.graphicsEngine2.a(R.drawable.fog_smooth);
-        fogSmoothAtlasTexture = gameEngine.graphicsEngine2.b(((20 + 2) * 16) + 1, ((20 + 2) * 16) + 1, true);
+        Texture textureA = gameEngine.renderGraphicsEngine.a(R.drawable.fog_smooth);
+        fogSmoothAtlasTexture = gameEngine.renderGraphicsEngine.b(((20 + 2) * 16) + 1, ((20 + 2) * 16) + 1, true);
         fogSmoothAtlasTexture.m = true;
         fogSmoothAtlasTexture.b(true);
-        fogAtlasRenderer = gameEngine.graphicsEngine2.b(fogSmoothAtlasTexture);
-        Texture textureB = gameEngine.graphicsEngine2.b(20 + 1, 20 + 1, true);
-        GraphicsEngine graphicsEngineB = gameEngine.graphicsEngine2.b(textureB);
+        fogAtlasRenderer = gameEngine.renderGraphicsEngine.b(fogSmoothAtlasTexture);
+        Texture textureB = gameEngine.renderGraphicsEngine.b(20 + 1, 20 + 1, true);
+        GraphicsEngine graphicsEngineB = gameEngine.renderGraphicsEngine.b(textureB);
         composeFogPattern(singletonMask(1), 2, 5, true, textureB, graphicsEngineB, textureA);
         composeFogPattern(singletonMask(2), 0, 5, true, textureB, graphicsEngineB, textureA);
         composeFogPattern(singletonMask(4), 0, 3, true, textureB, graphicsEngineB, textureA);
@@ -367,7 +367,7 @@ public final class TileMap {
         }
         softFogFadingInitialized = true;
         softFogFadingEnabled = GameEngine.getInstance().settingsEngine.softFogFading;
-        if (GameEngine.isDesktop() && Build.VERSION.SDK_INT > 26) {
+        if (GameEngine.isAndroidPlatform() && Build.VERSION.SDK_INT > 26) {
             long jMaxMemory = Runtime.getRuntime().maxMemory() / 1048576;
             GameEngine.log("MaxHeapSizeInMB:" + jMaxMemory);
             if (jMaxMemory > 200) {
@@ -495,7 +495,7 @@ public final class TileMap {
         if (this.nextUniqueTileIndex < 32766) {
             this.nextUniqueTileIndex++;
         } else {
-            GameEngine.updatePaintTextSizeIfNeeded("Max unique tile limit reached at: " + this.nextUniqueTileIndex);
+            GameEngine.logColored("Max unique tile limit reached at: " + this.nextUniqueTileIndex);
         }
         this.uniqueTiles[i] = mapTile;
         return (short) i;
@@ -621,7 +621,7 @@ public final class TileMap {
 
     /* JADX INFO: renamed from: a */
     void convertWorldRectToTileRect(RectF rectF) {
-        if (GameEngine.printLog()) {
+        if (GameEngine.isSpaceGame()) {
             rectF.a *= this.tileWorldSizeX / 20;
             rectF.c *= this.tileWorldSizeX / 20;
             rectF.b *= this.tileWorldSizeY / 20;
@@ -632,7 +632,7 @@ public final class TileMap {
     public TileMap() {
         this.tileWorldSizeX = 20;
         this.tileWorldSizeY = 20;
-        if (GameEngine.printLog()) {
+        if (GameEngine.isSpaceGame()) {
             this.tileWorldSizeX = 60;
             this.tileWorldSizeY = 60;
         }
@@ -852,7 +852,7 @@ public final class TileMap {
             FileHelper.deleteFile(parentFile.getAbsolutePath());
         }
         if (!FileHelper.isDirectoryNonZip(parentFile.getAbsolutePath())) {
-            GameEngine.updatePaintTextSizeIfNeeded("Save Map: Could not create parent directory");
+            GameEngine.logColored("Save Map: Could not create parent directory");
         }
         try {
             OutputStream outputStreamOpenOutputStreamByPath = FileHelper.openOutputStreamByPath(strConvertAbstractPath, false);
@@ -1045,7 +1045,7 @@ public final class TileMap {
             if (this.uniqueTiles == null || this.uniqueTiles.length == 0) {
                 throw new MapLoadException("Invalid map, no tiles have been set");
             }
-            if (!GameEngine.printLog() && !GameEngine.getPointerIndex()) {
+            if (!GameEngine.isSpaceGame() && !GameEngine.isMapDebugMode()) {
                 for (int i9 = 0; i9 < this.tileCountX; i9++) {
                     for (int i10 = 0; i10 < this.tileCountY; i10++) {
                         if (this.groundLayer.getTileAt(i9, i10) == null) {
@@ -1114,16 +1114,16 @@ public final class TileMap {
                 if ("mission".equalsIgnoreCase(description2) || "survival".equalsIgnoreCase(description2) || "challenge".equalsIgnoreCase(description2) || "skirmish".equalsIgnoreCase(description2)) {
                     str = description2;
                 } else {
-                    GameEngine.updatePaintTextSizeIfNeeded("Unknown map type:" + description2);
+                    GameEngine.logColored("Unknown map type:" + description2);
                 }
             } else {
-                GameEngine.updatePaintTextSizeIfNeeded("Map type not found on mapInfo");
+                GameEngine.logColored("Map type not found on mapInfo");
             }
             if (str == null) {
-                GameEngine.updatePaintTextSizeIfNeeded("Defaulting to skirmish map type");
+                GameEngine.logColored("Defaulting to skirmish map type");
                 str = "skirmish";
             } else {
-                GameEngine.updatePaintTextSizeIfNeeded("Map type: " + str);
+                GameEngine.logColored("Map type: " + str);
             }
             gameEngine.missionEngine = new MissionEngine();
             gameEngine.missionEngine.a(z);
@@ -1173,7 +1173,7 @@ public final class TileMap {
 
     /* JADX INFO: renamed from: a */
     public void enqueueScorchMark(ScorchMark scorchMark) {
-        if (GameEngine.isPausedStatic2 && !GameEngine.isAndroidVersionStatic2) {
+        if (GameEngine.isNonAndroidVersion && !GameEngine.isPCOrIOSVersion) {
             return;
         }
         layerBufferManager.applyScorchToCells(scorchMark);
@@ -1225,13 +1225,13 @@ public final class TileMap {
     /* JADX INFO: renamed from: d */
     public void updateFogRenderPass(float f) {
         GameEngine gameEngine = GameEngine.getInstance();
-        boolean zIsDesktop = GameEngine.isDesktop();
-        if (zIsDesktop) {
-            gameEngine.graphicsEngine2.a(fogAtlasLock);
+        boolean zIsAndroidPlatform = GameEngine.isAndroidPlatform();
+        if (zIsAndroidPlatform) {
+            gameEngine.renderGraphicsEngine.a(fogAtlasLock);
         }
         renderFogOverlayAndCursorSelection(f);
-        if (zIsDesktop) {
-            gameEngine.graphicsEngine2.b(fogAtlasLock);
+        if (zIsAndroidPlatform) {
+            gameEngine.renderGraphicsEngine.b(fogAtlasLock);
         }
         if (this.isCursorSelectionActive) {
             new Rect();
@@ -1239,7 +1239,7 @@ public final class TileMap {
             int i = this.cursorStartTileX * this.tileWorldSizeX;
             int i2 = this.cursorStartTileY * this.tileWorldSizeY;
             rect.a(i, i2, i + this.tileWorldSizeX, i2 + this.tileWorldSizeY);
-            rect.a(-GameEngine.getInstance().cameraBoundsMaxY, -GameEngine.getInstance().mapWidth);
+            rect.a(-GameEngine.getInstance().viewpointXInt, -GameEngine.getInstance().viewpointYInt);
         }
     }
 
@@ -1492,7 +1492,7 @@ public final class TileMap {
             }
             LayerBufferManager layerBufferManager2 = layerBufferManager;
             boolean z2 = false;
-            boolean zIsTeamSpectatorCheck = playerTeam.isTeamSpectatorCheck();
+            boolean isCurrentPlayerTeam = playerTeam.isCurrentPlayerTeam();
             for (int i9 = i5; i9 <= i7; i9++) {
                 for (int i10 = i6; i10 <= i8; i10++) {
                     byte b3 = bArr[i9][i10];
@@ -1501,7 +1501,7 @@ public final class TileMap {
                         if (fDistanceSq <= f4) {
                             if (b3 > 0) {
                                 bArr[i9][i10] = 0;
-                                if (zIsTeamSpectatorCheck) {
+                                if (isCurrentPlayerTeam) {
                                     layerBufferManager2.invalidateTileArea(i9, i10, true);
                                     z2 = true;
                                     if (fDistanceSq <= f3 && z) {
@@ -1513,7 +1513,7 @@ public final class TileMap {
                             }
                         } else if (fDistanceSq <= f5 && b3 > (b2 = (byte) ((fDistanceSq - f4) * f6))) {
                             bArr[i9][i10] = b2;
-                            if (zIsTeamSpectatorCheck) {
+                            if (isCurrentPlayerTeam) {
                                 layerBufferManager2.invalidateTileArea(i9, i10, true);
                                 z2 = true;
                                 invalidateLayerCellsAround(i9, i10);
@@ -1523,7 +1523,7 @@ public final class TileMap {
                 }
             }
             if (z2) {
-                gameEngine.minimap.field_O = true;
+                gameEngine.minimap.isFogRefreshPending = true;
             }
         }
     }
@@ -1567,17 +1567,17 @@ public final class TileMap {
                             }
                         }
                         if (playerTeamK.fogOfWarData == null) {
-                            GameEngine.updatePaintTextSizeIfNeeded("fogOfWar_map==null for:" + i);
+                            GameEngine.logColored("fogOfWar_map==null for:" + i);
                         }
                         boolean z2 = false;
-                        boolean zIsTeamSpectatorCheck = playerTeamK.isTeamSpectatorCheck();
+                        boolean isCurrentPlayerTeam = playerTeamK.isCurrentPlayerTeam();
                         byte[][] bArr = playerTeamK.fogOfWarData;
                         byte[][] bArr2 = this.fogOfWarNext;
                         for (int i3 = 0; i3 < this.tileCountX; i3++) {
                             for (int i4 = 0; i4 < this.tileCountY; i4++) {
                                 if (bArr[i3][i4] < 5) {
                                     bArr[i3][i4] = 5;
-                                    if (zIsTeamSpectatorCheck) {
+                                    if (isCurrentPlayerTeam) {
                                         layerBufferManager.invalidateTileArea(i3, i4, true);
                                         z2 = true;
                                         bArr2[i3][i4] = 127;
@@ -1586,7 +1586,7 @@ public final class TileMap {
                             }
                         }
                         if (z2) {
-                            gameEngine.minimap.field_O = true;
+                            gameEngine.minimap.isFogRefreshPending = true;
                         }
                     }
                 }

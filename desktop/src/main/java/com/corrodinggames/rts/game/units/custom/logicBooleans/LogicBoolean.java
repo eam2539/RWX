@@ -727,7 +727,7 @@ public abstract class LogicBoolean implements Cloneable {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public String getMatchFailReasonForPlayer(OrderableUnit orderableUnit) {
-            String str = getName() + "=" + msToSecondsString(GameEngine.getInstance().lastTick - getTime(orderableUnit));
+            String str = getName() + "=" + msToSecondsString(GameEngine.getInstance().gameTimeMillis - getTime(orderableUnit));
             if (this.laterThanSeconds != -1.0f) {
                 str = str + ">" + msToSecondsString(this.laterThanSeconds * 1000.0f);
             }
@@ -743,7 +743,7 @@ public abstract class LogicBoolean implements Cloneable {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public float readNumber(OrderableUnit orderableUnit) {
-            return (GameEngine.getInstance().lastTick - getTime(orderableUnit)) * 0.001f;
+            return (GameEngine.getInstance().gameTimeMillis - getTime(orderableUnit)) * 0.001f;
         }
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
@@ -751,10 +751,10 @@ public abstract class LogicBoolean implements Cloneable {
             int time = getTime(orderableUnit);
             boolean z = true;
             GameEngine gameEngine = GameEngine.getInstance();
-            if (this.withinSeconds > 0.0f && gameEngine.lastTick - (this.withinSeconds * 1000.0f) > time) {
+            if (this.withinSeconds > 0.0f && gameEngine.gameTimeMillis - (this.withinSeconds * 1000.0f) > time) {
                 z = false;
             }
-            if (this.laterThanSeconds > 0.0f && gameEngine.lastTick - (this.laterThanSeconds * 1000.0f) < time) {
+            if (this.laterThanSeconds > 0.0f && gameEngine.gameTimeMillis - (this.laterThanSeconds * 1000.0f) < time) {
                 z = false;
             }
             return z;

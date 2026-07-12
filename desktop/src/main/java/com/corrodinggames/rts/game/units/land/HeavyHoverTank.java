@@ -36,10 +36,10 @@ public class HeavyHoverTank extends HoverLandUnit {
 
     public static void f() {
         GameEngine gameEngine = GameEngine.getInstance();
-        c = gameEngine.graphicsEngine2.a(R.drawable.heavy_hover_tank);
-        b = gameEngine.graphicsEngine2.a(R.drawable.heavy_hover_tank_dead);
-        d = gameEngine.graphicsEngine2.a(R.drawable.heavy_hover_tank_shadow);
-        e = PlayerTeam.getUnitCountByType(c);
+        c = gameEngine.renderGraphicsEngine.a(R.drawable.heavy_hover_tank);
+        b = gameEngine.renderGraphicsEngine.a(R.drawable.heavy_hover_tank_dead);
+        d = gameEngine.renderGraphicsEngine.a(R.drawable.heavy_hover_tank_shadow);
+        e = PlayerTeam.getTeamColorTextures(c);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

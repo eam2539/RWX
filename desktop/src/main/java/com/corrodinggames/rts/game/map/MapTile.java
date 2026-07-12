@@ -89,7 +89,7 @@ public final class MapTile {
 
     /* JADX INFO: renamed from: a */
     public static void reportMissingUnit(String str) {
-        GameEngine.updatePaintTextSizeIfNeeded(str);
+        GameEngine.logColored(str);
         GameEngine.getInstance().alert("Missing unit data while loading map: " + str, 1);
         try {
             Thread.sleep(2L);
@@ -127,7 +127,7 @@ public final class MapTile {
                         GameEngine.log("map", "skipping unit without player:" + property2 + " at: " + ((int) s) + "," + ((int) s2) + " team:" + property4);
                         return null;
                     }
-                    if (playerTeamK.addCredits()) {
+                    if (playerTeamK.isSpectatorTeamColor()) {
                         GameEngine.log("map", "Unit team is marked as spectator:" + property2 + " (skipping unit)");
                         return null;
                     }
@@ -145,7 +145,7 @@ public final class MapTile {
                         if (unitTypeC instanceof CustomUnitConfig) {
                             customUnitConfigFindConfigByName = (CustomUnitConfig) unitTypeC;
                         } else {
-                            GameEngine.updatePaintTextSizeIfNeeded("replacement not a custom unit:" + unitTypeC.getUnitTypeDescriptionShort());
+                            GameEngine.logColored("replacement not a custom unit:" + unitTypeC.getUnitTypeDescriptionShort());
                         }
                     }
                     missileShip = CustomUnitConfig.a(false, customUnitConfigFindConfigByName);
@@ -169,8 +169,8 @@ public final class MapTile {
                     }
                 }
                 tileMap.setCursorTileIndexFromTileIndex((int) s, (int) s2);
-                missileShip.posX = tileMap.cursorTileX + missileShip.getUnitAIState();
-                missileShip.posY = tileMap.cursorTileY + missileShip.getUnitAIPathfindStatus();
+                missileShip.posX = tileMap.cursorTileX + missileShip.getTileOffsetX();
+                missileShip.posY = tileMap.cursorTileY + missileShip.getTileOffsetY();
                 if (playerTeamK != null) {
                     missileShip.setUnitTeam(playerTeamK);
                     if (embeddedPngBase64.getProperty("type") != null) {
