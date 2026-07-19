@@ -45,7 +45,7 @@ public class LaserTankUnit extends LandUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return e[this.team.getTeamColorIndex()];
@@ -59,7 +59,7 @@ public class LaserTankUnit extends LandUnit {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDestroyed;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDead;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -190,7 +190,7 @@ public class LaserTankUnit extends LandUnit {
         }
         GameEngine gameEngine = GameEngine.getInstance();
         GameViewUtils.a((OrderableUnit) this);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             float fE = this.movementLevels[0].speed / e(0);
             if (fE != 0.0f) {
                 PointF pointFE = E(0);

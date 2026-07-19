@@ -105,7 +105,7 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return deadTexture;
         }
         if (this.team == null) {
@@ -175,7 +175,7 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
             return;
         }
         this.repairTimer += f;
@@ -183,7 +183,7 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
             this.repairTimer = 0.0f;
             a((OrderableUnit) this, f, 0.0f, false);
         }
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             BuilderUnit.updateTargetPriorityPoints(f, this);
         }
     }
@@ -196,7 +196,7 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
     public void a(float f, boolean z) {
         super.a(f, z);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             BuilderUnit.drawTargetPriorityPoints(f, this);
         }
     }

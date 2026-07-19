@@ -8,7 +8,7 @@ public class DummyNonUnitWithTeam extends DummyUnit {
     public static DummyNonUnitWithTeam a(PlayerTeam playerTeam) {
         DummyNonUnitWithTeam dummyNonUnitWithTeam = new DummyNonUnitWithTeam(true);
         dummyNonUnitWithTeam.setUnitTeam(playerTeam);
-        dummyNonUnitWithTeam.isDestroyed = true;
+        dummyNonUnitWithTeam.isDead = true;
         return dummyNonUnitWithTeam;
     }
 

@@ -32,7 +32,7 @@ public class UnitGroupMarker extends Serializable {
     public void a() {
         BaseUnit baseUnit = null;
         for (BaseUnit baseUnit2 : this.a) {
-            if (!baseUnit2.isDestroyed && baseUnit2.unitTransportTarget == null && this.i.gameUI.selectUnit(baseUnit2) && baseUnit2.getWeight()) {
+            if (!baseUnit2.isDead && baseUnit2.unitTransportTarget == null && this.i.gameUI.selectUnit(baseUnit2) && baseUnit2.getWeight()) {
                 baseUnit = baseUnit2;
             }
         }
@@ -90,7 +90,7 @@ public class UnitGroupMarker extends Serializable {
         }
         Iterator it = this.a.iterator();
         while (it.hasNext()) {
-            if (((BaseUnit) it.next()).isDestroyed) {
+            if (((BaseUnit) it.next()).isDead) {
                 it.remove();
             }
         }
@@ -104,7 +104,7 @@ public class UnitGroupMarker extends Serializable {
         Iterator it = this.a.iterator();
         while (it.hasNext()) {
             BaseUnit baseUnitA = GameObject.a(((BaseUnit) it.next()).objectId, true);
-            if (baseUnitA != null && !baseUnitA.isDestroyed) {
+            if (baseUnitA != null && !baseUnitA.isDead) {
                 arrayList.add(baseUnitA);
             }
         }

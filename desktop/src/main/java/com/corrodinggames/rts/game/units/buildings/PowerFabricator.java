@@ -272,7 +272,7 @@ public class PowerFabricator extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return deadTexture;
         }
         if (this.team == null) {
@@ -295,7 +295,7 @@ public class PowerFabricator extends FactoryWithQueue {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
             return;
         }
         this.animationTimer = Utility.moveTowardsZero(this.animationTimer, f);

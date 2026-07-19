@@ -46,7 +46,7 @@ public class FormationGroup {
     public void a(UnitCommand unitCommand) {
         UnitCommand currentWaypoint;
         for (OrderableUnit orderableUnit : this.units) {
-            if (!orderableUnit.isDestroyed && (currentWaypoint = orderableUnit.getCurrentWaypoint()) != null && currentWaypoint.isSameCommand(unitCommand)) {
+            if (!orderableUnit.isDead && (currentWaypoint = orderableUnit.getCurrentWaypoint()) != null && currentWaypoint.isSameCommand(unitCommand)) {
                 orderableUnit.advanceWaypoint();
             }
         }

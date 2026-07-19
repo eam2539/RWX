@@ -2123,7 +2123,7 @@ public final class AIController extends PlayerTeam {
         int size = BaseUnit.bE.size();
         for (int i2 = 0; i2 < size; i2++) {
             BaseUnit baseUnit2 = baseUnitArrA[i2];
-            if (!baseUnit2.isDestroyed && baseUnit2.unitTransportTarget == null && this == baseUnit2.team && isCombatCustomUnit(baseUnit2)) {
+            if (!baseUnit2.isDead && baseUnit2.unitTransportTarget == null && this == baseUnit2.team && isCombatCustomUnit(baseUnit2)) {
                 i++;
             }
         }
@@ -2135,7 +2135,7 @@ public final class AIController extends PlayerTeam {
                 break;
             }
             BaseUnit baseUnit3 = (BaseUnit) it.next();
-            if (!baseUnit3.isDestroyed && baseUnit3.unitTransportTarget == null && this == baseUnit3.team && isCombatCustomUnit(baseUnit3)) {
+            if (!baseUnit3.isDead && baseUnit3.unitTransportTarget == null && this == baseUnit3.team && isCombatCustomUnit(baseUnit3)) {
                 if (i3 == iRandom) {
                     baseUnit = baseUnit3;
                     break;
@@ -2154,7 +2154,7 @@ public final class AIController extends PlayerTeam {
         int size = BaseUnit.bE.size();
         for (int i2 = 0; i2 < size; i2++) {
             BaseUnit baseUnit2 = baseUnitArrA[i2];
-            if (!baseUnit2.isDestroyed && baseUnit2.unitTransportTarget == null && !baseUnit2.u() && c(baseUnit2.team) && isUnitAllowedForSelection(baseUnit2)) {
+            if (!baseUnit2.isDead && baseUnit2.unitTransportTarget == null && !baseUnit2.u() && c(baseUnit2.team) && isUnitAllowedForSelection(baseUnit2)) {
                 i++;
             }
         }
@@ -2166,7 +2166,7 @@ public final class AIController extends PlayerTeam {
                 break;
             }
             BaseUnit baseUnit3 = (BaseUnit) it.next();
-            if (!baseUnit3.isDestroyed && baseUnit3.unitTransportTarget == null && !baseUnit3.u() && c(baseUnit3.team) && isUnitAllowedForSelection(baseUnit3)) {
+            if (!baseUnit3.isDead && baseUnit3.unitTransportTarget == null && !baseUnit3.u() && c(baseUnit3.team) && isUnitAllowedForSelection(baseUnit3)) {
                 if (i3 == iRandom) {
                     baseUnit = baseUnit3;
                     break;
@@ -2185,7 +2185,7 @@ public final class AIController extends PlayerTeam {
         int size = BaseUnit.bE.size();
         for (int i2 = 0; i2 < size; i2++) {
             BaseUnit baseUnit2 = baseUnitArrA[i2];
-            if (!baseUnit2.isDestroyed && baseUnit2.unitTransportTarget == null && !baseUnit2.u() && c(baseUnit2.team) && isUnitAllowedForSelection(baseUnit2)) {
+            if (!baseUnit2.isDead && baseUnit2.unitTransportTarget == null && !baseUnit2.u() && c(baseUnit2.team) && isUnitAllowedForSelection(baseUnit2)) {
                 i++;
             }
         }
@@ -2197,7 +2197,7 @@ public final class AIController extends PlayerTeam {
                 break;
             }
             BaseUnit baseUnit3 = (BaseUnit) it.next();
-            if (!baseUnit3.isDestroyed && baseUnit3.unitTransportTarget == null && !baseUnit3.u() && c(baseUnit3.team) && isUnitAllowedForSelection(baseUnit3)) {
+            if (!baseUnit3.isDead && baseUnit3.unitTransportTarget == null && !baseUnit3.u() && c(baseUnit3.team) && isUnitAllowedForSelection(baseUnit3)) {
                 if (i3 == iRandom) {
                     baseUnit = baseUnit3;
                     break;

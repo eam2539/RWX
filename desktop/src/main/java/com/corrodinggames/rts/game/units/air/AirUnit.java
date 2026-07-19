@@ -66,7 +66,7 @@ public abstract class AirUnit extends MovableUnit {
     public void update(float f) {
         Effect effectCreateSmokeEffect;
         super.update(f);
-        if (this.isDestroyed) {
+        if (this.isDead) {
             if (this.posZ > 0.0f) {
                 this.h += 0.06f * f;
                 this.posZ -= this.h * f;

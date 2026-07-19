@@ -31,7 +31,8 @@ public class Path {
     public UnitMovementType o;
     public boolean p;
     public int q;
-    public boolean r;
+    /* JADX INFO: renamed from: r */
+    public boolean isLowPriority;
     public float s;
     public float t;
     public boolean u;

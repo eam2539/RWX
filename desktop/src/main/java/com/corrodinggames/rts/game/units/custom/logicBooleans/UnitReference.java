@@ -471,7 +471,7 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.UnitReference
         public BaseUnit getSingleRaw(OrderableUnit orderableUnit) {
             BaseUnit baseUnit = orderableUnit.unitTarget2;
-            if (baseUnit == null || baseUnit.isDestroyed) {
+            if (baseUnit == null || baseUnit.isDead) {
                 return null;
             }
             return baseUnit;
@@ -498,7 +498,7 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.UnitReference
         public BaseUnit getSingleRaw(OrderableUnit orderableUnit) {
             BaseUnit baseUnit = orderableUnit.unitTarget3;
-            if (baseUnit == null || baseUnit.isDestroyed) {
+            if (baseUnit == null || baseUnit.isDead) {
                 return null;
             }
             return baseUnit;
@@ -525,7 +525,7 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.UnitReference
         public BaseUnit getSingleRaw(OrderableUnit orderableUnit) {
             BaseUnit baseUnit = orderableUnit.unitTarget1;
-            if (baseUnit == null || baseUnit.isDestroyed) {
+            if (baseUnit == null || baseUnit.isDead) {
                 return null;
             }
             return baseUnit;

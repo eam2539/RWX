@@ -231,7 +231,7 @@ public abstract class BaseBuilding extends OrderableUnit {
         float f = gameEngine.tileMap.cursorTileX + gameEngine.tileMap.halfTileWorldSizeX;
         float f2 = gameEngine.tileMap.cursorTileY + gameEngine.tileMap.halfTileWorldSizeY;
         for (BaseUnit baseUnit : gameEngine.unitSpatialIndex.b(f, f2, 0.0f)) {
-            if (baseUnit.bI() && !baseUnit.isDestroyed && baseUnit.checkAttackCooldown(f, f2, 0.0f)) {
+            if (baseUnit.bI() && !baseUnit.isDead && baseUnit.checkAttackCooldown(f, f2, 0.0f)) {
                 return baseUnit;
             }
         }

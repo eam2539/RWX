@@ -35,7 +35,7 @@ public class FireUnitFinder extends FilteredUnitCallback {
 
     @Override // com.corrodinggames.rts.game.units.spatial.UnitSpatialCallback
     public void callback(OrderableUnit orderableUnit, float f, BaseUnit baseUnit) {
-        if ((baseUnit instanceof FireUnit) && !baseUnit.isDestroyed && baseUnit.checkAttackCooldown(this.a, this.b, 0.0f)) {
+        if ((baseUnit instanceof FireUnit) && !baseUnit.isDead && baseUnit.checkAttackCooldown(this.a, this.b, 0.0f)) {
             this.c = (FireUnit) baseUnit;
         }
     }

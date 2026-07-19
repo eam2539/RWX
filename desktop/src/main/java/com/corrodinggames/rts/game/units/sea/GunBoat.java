@@ -52,7 +52,7 @@ public class GunBoat extends WaterUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return gunBoatTexture_dead;
         }
         return gunBoatTextures_teamColors[this.team.getTeamColorIndex()];

@@ -73,7 +73,7 @@ public class Tree extends NaturalUnit {
         }
         b(this.d, this.e);
         super.a(gameInputStream);
-        if (this.isDestroyed) {
+        if (this.isDead) {
             this.m = false;
         }
     }
@@ -298,7 +298,7 @@ public class Tree extends NaturalUnit {
             this.g = 0.0f;
             S(0);
             this.isAlive = false;
-            this.isDestroyed = true;
+            this.isDead = true;
             this.unitCreationTime = gameEngine.gameTimeMillis;
             this.h = true;
             this.m = false;
@@ -389,9 +389,9 @@ public class Tree extends NaturalUnit {
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: a */
     public float setTarget(BaseUnit baseUnit, float f, Projectile projectile) {
-        boolean z = this.isDestroyed;
+        boolean z = this.isDead;
         float fA = super.setTarget(baseUnit, f, projectile);
-        if (!z && this.isDestroyed && projectile != null) {
+        if (!z && this.isDead && projectile != null) {
             this.rotationSpeed = Utility.getAngleBetweenPoints(this.posX, this.posY, projectile.posX, projectile.posY) + 180.0f;
         }
         return fA;

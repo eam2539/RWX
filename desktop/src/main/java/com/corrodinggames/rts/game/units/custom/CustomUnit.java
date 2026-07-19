@@ -550,7 +550,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit
     public void bu() {
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             a(UnitEventType.destroyed);
         }
         Object[] objArrA = this.unitConfig.onCreateListeners.a();
@@ -655,7 +655,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed && this.unitConfig.image_wreak != null) {
+        if (this.isDead && this.unitConfig.image_wreak != null) {
             return this.unitConfig.image_wreak;
         }
         return this.unitConfig.textures[this.team.getTeamColorIndex()];
@@ -669,7 +669,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && (!this.isDestroyed || this.posZ >= 1.0f) && this.posZ >= -1.0f;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && (!this.isDead || this.posZ >= 1.0f) && this.posZ >= -1.0f;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -1039,7 +1039,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         this.ew = false;
         this.radius = this.unitConfig.radius;
         this.displayRadius = this.unitConfig.displayRadius;
-        if (this.isDestroyed) {
+        if (this.isDead) {
             this.animationFrameIndex = 0;
         } else {
             this.animationFrameIndex = this.unitConfig.default_frame;
@@ -1106,7 +1106,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         this.moveSpeedMultiplier = 1.0f;
         if (this.unitConfig.drawLayer != -2) {
         }
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             dF();
         }
         if (this.unitConfig.isMelee) {
@@ -1183,7 +1183,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public void f_() {
-        if (!this.unitConfig.isBuildingUnit && !this.isDestroyed) {
+        if (!this.unitConfig.isBuildingUnit && !this.isDead) {
             this.isAlive = true;
             if (this.unitConfig.disableAllUnitCollisions2) {
                 this.isAlive = false;
@@ -1582,12 +1582,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (turretConfig.canTargetAir3) {
             this.movementLevels[i].targetUnit = null;
         }
-        if (this.unitConfig.dieOnAttack && !this.isDestroyed) {
+        if (this.unitConfig.dieOnAttack && !this.isDead) {
             bv();
         }
-        if (this.unitConfig.removeOnAttack && !this.isDestroyed) {
+        if (this.unitConfig.removeOnAttack && !this.isDead) {
             remove();
-            this.isDestroyed = true;
+            this.isDead = true;
         }
         return projectileA;
     }
@@ -1627,7 +1627,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         CustomUnitConfig customUnitConfig = this.unitConfig;
         super.update(f);
-        if (this.isDestroyed && !this.isDeathFallComplete) {
+        if (this.isDead && !this.isDeathFallComplete) {
             if (this.posZ > 0.0f) {
                 if (customUnitConfig.slowDeathFall && !(this.rotation == 0.0f && this.velocityX == 0.0f && this.velocityY == 0.0f)) {
                     this.frameAnimationDelay += 0.017f * f;
@@ -1725,7 +1725,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 this.isDeathFallComplete = true;
             }
         }
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return;
         }
         GameEngine gameEngine2 = GameEngine.getInstance();
@@ -2350,7 +2350,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         float fClamp;
         float f2;
         CustomUnitConfig customUnitConfig = this.unitConfig;
-        boolean z = this.isDestroyed;
+        boolean z = this.isDead;
         if (this.legInstances != null && !z) {
             CustomUnitLegController.a(this, f, false, false);
         }
@@ -2739,7 +2739,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (z && !this.unitConfig.hasShadowFrames) {
             return super.a_(z);
         }
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return super.a_(z);
         }
         CustomUnitConfig customUnitConfig = this.unitConfig;
@@ -3487,7 +3487,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
     public void d(float f) {
         super.d(f);
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return;
         }
         this.unitCustomComponents.a(f, this);
@@ -3516,7 +3516,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 gameEngine.renderGraphicsEngine.l();
             }
         }
-        if (this.unitConfig.energyCanBeRecievedFromInAnotherUnit && this.legInstances != null && !this.isDestroyed) {
+        if (this.unitConfig.energyCanBeRecievedFromInAnotherUnit && this.legInstances != null && !this.isDead) {
             CustomUnitLegController.a(this, f, false, true);
         }
     }
@@ -3668,7 +3668,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
     public void a(float f, boolean z) {
         super.a(f, z);
-        if (!this.isDestroyed && canMove()) {
+        if (!this.isDead && canMove()) {
             if (isCurrentCommandReclaim()) {
                 if (!this.unitConfig.hasReclaimEffect) {
                     BuilderUnit.drawTargetPriorityPoints(f, this);

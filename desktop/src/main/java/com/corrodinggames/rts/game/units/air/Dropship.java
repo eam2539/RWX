@@ -153,7 +153,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return d[this.team.getTeamColorIndex()];
@@ -215,7 +215,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return;
         }
         boolean zCK = isMoving();

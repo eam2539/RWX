@@ -409,7 +409,7 @@ public final class PathCostMap {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit.bI() && !baseUnit.isDestroyed) {
+            if (baseUnit.bI() && !baseUnit.isDead) {
                 Point pointA = baseUnit.a(tileMap, this.n);
                 int i2 = pointA.worldX;
                 int i3 = pointA.worldY;
@@ -442,7 +442,7 @@ public final class PathCostMap {
         final BaseUnit[] a = BaseUnit.bE.a();
         for (int i = 0; i < BaseUnit.bE.size(); ++i) {
             final BaseUnit baseUnit = a[i];
-            if (baseUnit.isAlive && !baseUnit.bI() && !baseUnit.isInitialized && !(baseUnit instanceof Tree) && !baseUnit.isDestroyed && !baseUnit.i() && baseUnit.unitTransportTarget == null && !baseUnit.Q()) {
+            if (baseUnit.isAlive && !baseUnit.bI() && !baseUnit.isInitialized && !(baseUnit instanceof Tree) && !baseUnit.isDead && !baseUnit.i() && baseUnit.unitTransportTarget == null && !baseUnit.Q()) {
                 int n = 2;
                 q.setCursorTileIndexFromWorldPoint(baseUnit.posX, baseUnit.posY);
                 final int cursorTileX = q.cursorTileX;

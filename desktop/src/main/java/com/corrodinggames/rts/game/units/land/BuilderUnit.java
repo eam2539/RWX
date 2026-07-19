@@ -109,7 +109,7 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return builderTexture_dead;
         }
         return builderTexture_teamColors[this.team.getTeamColorIndex()];
@@ -239,7 +239,7 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             updateTargetPriorityPoints(f, this);
         }
     }
@@ -247,7 +247,7 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
     public void a(float f, boolean z) {
         super.a(f, z);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             drawTargetPriorityPoints(f, this);
         }
     }
@@ -268,7 +268,7 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
             return false;
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             float fE = this.movementLevels[0].speed / e(0);
             if (fE != 0.0f) {
                 Vector3D vector3DBn = bn();
@@ -388,7 +388,7 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDestroyed;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDead;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

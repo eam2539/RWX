@@ -204,7 +204,7 @@ public class UnitGroup extends AIUnitGroupBase {
 
     public void c() {
         for (BaseUnit baseUnit : BaseUnit.bE) {
-            if (!baseUnit.isDestroyed && baseUnit.team == this.aiController && this.A > this.F.size() && (baseUnit instanceof OrderableUnit)) {
+            if (!baseUnit.isDead && baseUnit.team == this.aiController && this.A > this.F.size() && (baseUnit instanceof OrderableUnit)) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
                 if (!orderableUnit.isActive && !orderableUnit.isAIUnit && orderableUnit.aB == null && this.aiController.isCombatCustomUnit(orderableUnit) && this.aiController.isEligibleUnitForRandomSelection(orderableUnit)) {
                     if (this.B) {
@@ -387,7 +387,7 @@ public class UnitGroup extends AIUnitGroupBase {
             destroy();
         }
         if (this.c) {
-            if (this.g == null || this.g.isDestroyed) {
+            if (this.g == null || this.g.isDead) {
                 destroy();
             }
         }
@@ -483,7 +483,7 @@ public class UnitGroup extends AIUnitGroupBase {
     public void e(float f) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (this.v) {
-            if (this.w == null || !this.w.isAlive() || this.w.isDestroyed || !this.r) {
+            if (this.w == null || !this.w.isAlive() || this.w.isDead || !this.r) {
                 this.w = this.aiController.getRandomEnemyUnit();
                 if (this.w != null && !a(this.w, true)) {
                     this.w = null;

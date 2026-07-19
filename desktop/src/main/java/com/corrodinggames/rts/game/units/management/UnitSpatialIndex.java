@@ -287,7 +287,7 @@ public final class UnitSpatialIndex {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit.isDestroyed || ((int) (baseUnit.posX * f)) != baseUnit.unitAnimationFrame || ((int) (baseUnit.posY * f2)) != baseUnit.unitAnimationSpeed || baseUnit.team == null || baseUnit.unitAnimationType != baseUnit.team.teamId) {
+            if (baseUnit.isDead || ((int) (baseUnit.posX * f)) != baseUnit.unitAnimationFrame || ((int) (baseUnit.posY * f2)) != baseUnit.unitAnimationSpeed || baseUnit.team == null || baseUnit.unitAnimationType != baseUnit.team.teamId) {
                 a(baseUnit);
             }
         }
@@ -302,7 +302,7 @@ public final class UnitSpatialIndex {
             baseUnit.unitAnimationSpeed = -1;
             return;
         }
-        if (baseUnit.isDestroyed) {
+        if (baseUnit.isDead) {
             if (baseUnit.unitAnimationFrame != -1 && baseUnit.unitAnimationSpeed != -1) {
                 this.e[baseUnit.unitAnimationFrame][baseUnit.unitAnimationSpeed].b(baseUnit);
                 baseUnit.unitAnimationFrame = -1;

@@ -180,7 +180,7 @@ public class DebugOutputStream extends GameOutputStream {
     @Override // com.corrodinggames.rts.gameFramework.network.GameOutputStream
     /* JADX INFO: renamed from: b */
     public void writeUnitIdIfAlive(BaseUnit baseUnit) {
-        if (baseUnit != null && !baseUnit.isDestroyed && !baseUnit.isDestroyed) {
+        if (baseUnit != null && !baseUnit.isDestroyed && !baseUnit.isDead) {
             writeObjectId((GameObject) baseUnit);
         } else {
             writeObjectId((GameObject) null);

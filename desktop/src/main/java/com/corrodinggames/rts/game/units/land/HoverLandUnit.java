@@ -46,7 +46,7 @@ public abstract class HoverLandUnit extends LandUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (isAlive() && !this.isDestroyed && isMoving()) {
+        if (isAlive() && !this.isDead && isMoving()) {
             if (this.rotation > 0.0f) {
                 this.l += f;
             }

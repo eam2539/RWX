@@ -266,7 +266,7 @@ public class ResourceExtractor extends FactoryWithQueue {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public void S() {
         super.S();
-        if (this.isDestroyed) {
+        if (this.isDead) {
             this.overlayTexture = null;
         } else {
             this.overlayTexture = backgroundTexture;
@@ -281,7 +281,7 @@ public class ResourceExtractor extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return deadTexture;
         }
         if (this.team == null) {
@@ -334,7 +334,7 @@ public class ResourceExtractor extends FactoryWithQueue {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
             return;
         }
         this.animationTimer = Utility.moveTowardsZero(this.animationTimer, f * this.extractorLevel);

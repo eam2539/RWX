@@ -61,7 +61,7 @@ public abstract class LandUnit extends MovableUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (this.isDestroyed) {
+        if (this.isDead) {
             float f2 = 0.0f;
             if (isMoving()) {
                 f2 = -10.0f;
@@ -77,7 +77,7 @@ public abstract class LandUnit extends MovableUnit {
                 }
             }
         }
-        if (!isAlive() || this.isDestroyed || (this instanceof HoverLandUnit)) {
+        if (!isAlive() || this.isDead || (this instanceof HoverLandUnit)) {
             return;
         }
         if (this.posZ < 0.0f) {

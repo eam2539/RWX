@@ -778,7 +778,7 @@ public class GameSaver {
                         GameEngine.log("Unit.fastLiveUnitList before:" + BaseUnit.bE.size());
                         Iterator it3 = BaseUnit.bE.iterator();
                         while (it3.hasNext()) {
-                            if (((BaseUnit) it3.next()).isDestroyed) {
+                            if (((BaseUnit) it3.next()).isDead) {
                                 it3.remove();
                             }
                         }

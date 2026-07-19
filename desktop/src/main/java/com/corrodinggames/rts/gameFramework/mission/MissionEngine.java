@@ -975,7 +975,7 @@ public class MissionEngine extends Serializable {
                 boolean z4 = true;
                 for (BaseUnit baseUnit3 : BaseUnit.bE) {
                     if ((baseUnit3 instanceof CommandCenter) || baseUnit3.isTargetable) {
-                        if (!baseUnit3.isDestroyed && !baseUnit3.u() && baseUnit3.team == gameEngine.playerTeam) {
+                        if (!baseUnit3.isDead && !baseUnit3.u() && baseUnit3.team == gameEngine.playerTeam) {
                             z4 = false;
                         }
                     }
@@ -989,7 +989,7 @@ public class MissionEngine extends Serializable {
     }
 
     public boolean a(WaveSpawnMode waveSpawnMode, BaseUnit baseUnit) {
-        if (!(baseUnit instanceof OrderableUnit) || baseUnit.isDestroyed || baseUnit.getUnitVersion() || waveSpawnMode == WaveSpawnMode.none) {
+        if (!(baseUnit instanceof OrderableUnit) || baseUnit.isDead || baseUnit.getUnitVersion() || waveSpawnMode == WaveSpawnMode.none) {
             return false;
         }
         if (waveSpawnMode == WaveSpawnMode.allUnitsAndBuildings) {

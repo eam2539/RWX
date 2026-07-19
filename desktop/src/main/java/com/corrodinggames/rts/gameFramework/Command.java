@@ -467,7 +467,7 @@ public class Command {
         this.pendingUnitIds.clear();
         Iterator it2 = this.selectedUnits.iterator();
         while (it2.hasNext()) {
-            if (((OrderableUnit) it2.next()).isDestroyed) {
+            if (((OrderableUnit) it2.next()).isDead) {
                 it2.remove();
             }
         }

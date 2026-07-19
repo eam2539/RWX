@@ -152,7 +152,7 @@ public abstract class OrderableUnit extends UnitBase {
     private float s;
 
     /* JADX INFO: renamed from: t */
-    private boolean isDead;
+    private boolean isLowPriority;
 
     /* JADX INFO: renamed from: Z */
     public BaseUnit lastDamagedBy;
@@ -628,7 +628,7 @@ public abstract class OrderableUnit extends UnitBase {
         }
         gameOutputStream.writeEnumOrdinal(this.attackMode);
         BaseUnit baseUnit = this.attackTarget;
-        if (baseUnit != null && baseUnit.isDestroyed) {
+        if (baseUnit != null && baseUnit.isDead) {
             baseUnit = null;
         }
         gameOutputStream.writeUnitIdOrNullBaseUnit(baseUnit);
@@ -804,7 +804,7 @@ public abstract class OrderableUnit extends UnitBase {
             AirUnitEffectManager.a(this, gameInputStream);
         }
         super.a(gameInputStream);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             this.attackTarget = GameObject.a(longOptional, false);
             for (int i6 = 0; i6 < this.waypointCount; i6++) {
                 if (this.waypoints[i6] == null) {
@@ -815,7 +815,7 @@ public abstract class OrderableUnit extends UnitBase {
             }
         }
         S();
-        if (this.isDestroyed) {
+        if (this.isDead) {
             this.ew = true;
         }
     }
@@ -843,7 +843,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (this.spawnExitLockTimer != 0.0f) {
             this.spawnExitLockTimer = Utility.moveTowardsZero(this.spawnExitLockTimer, f);
         }
-        if (!this.isDestroyed && isAlive()) {
+        if (!this.isDead && isAlive()) {
             GameEngine gameEngine = GameEngine.getInstance();
             if (this.bodyMovementFreezeTimer > 0.0f) {
                 this.bodyMovementFreezeTimer = Utility.moveTowardsZero(this.bodyMovementFreezeTimer, f);
@@ -1399,7 +1399,7 @@ public abstract class OrderableUnit extends UnitBase {
     public BaseUnit getCurrentRepairOrReclaimTarget() {
         UnitCommand currentWaypoint;
         if (this.isActing && (currentWaypoint = getCurrentWaypoint()) != null) {
-            if ((currentWaypoint.commandType == UnitCommandType.repair || currentWaypoint.commandType == UnitCommandType.reclaim) && currentWaypoint.targetUnit != null && !currentWaypoint.targetUnit.isDestroyed) {
+            if ((currentWaypoint.commandType == UnitCommandType.repair || currentWaypoint.commandType == UnitCommandType.reclaim) && currentWaypoint.targetUnit != null && !currentWaypoint.targetUnit.isDead) {
                 return currentWaypoint.targetUnit;
             }
             return null;
@@ -1463,7 +1463,7 @@ public abstract class OrderableUnit extends UnitBase {
         boolean z2 = unitCommand.commandType == UnitCommandType.guard;
         BaseUnit baseUnit = unitCommand.targetUnit;
         if (z) {
-            if (baseUnit == null || baseUnit.isDestroyed) {
+            if (baseUnit == null || baseUnit.isDead) {
                 advanceWaypoint();
                 unitCommand = null;
             }
@@ -1505,7 +1505,7 @@ public abstract class OrderableUnit extends UnitBase {
                 this.w = 0;
             }
             unitStateTracker.isReset = false;
-            if (0 == 0 && this.attackTarget != null && !this.attackTarget.isDestroyed) {
+            if (0 == 0 && this.attackTarget != null && !this.attackTarget.isDead) {
                 boolean z4 = false;
                 if (b(this.attackTarget, false)) {
                     z4 = true;
@@ -1596,7 +1596,7 @@ public abstract class OrderableUnit extends UnitBase {
         float targetX = unitCommand.getTargetX();
         float targetY = unitCommand.getTargetY();
         float fDistanceSq = Utility.distanceSq(this.posX, this.posY, targetX, targetY);
-        if (unitCommand.targetUnit == null || unitCommand.targetUnit.isDestroyed) {
+        if (unitCommand.targetUnit == null || unitCommand.targetUnit.isDead) {
             advanceWaypoint();
             unitCommand = null;
         }
@@ -1660,7 +1660,7 @@ public abstract class OrderableUnit extends UnitBase {
         float targetX = unitCommand.getTargetX();
         float targetY = unitCommand.getTargetY();
         float fDistanceSq = Utility.distanceSq(this.posX, this.posY, targetX, targetY);
-        if (unitCommand.targetUnit == null || unitCommand.targetUnit.isDestroyed || !unitCommand.targetUnit.isAlive()) {
+        if (unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || !unitCommand.targetUnit.isAlive()) {
             advanceWaypoint();
             unitCommand = null;
         }
@@ -1751,7 +1751,7 @@ public abstract class OrderableUnit extends UnitBase {
                     }
                 } else if (unitCommand.commandType == UnitCommandType.attackMove) {
                     boolean z3 = false;
-                    if (this.attackTarget != null && !this.attackTarget.isDestroyed && a(this.attackTarget, false)) {
+                    if (this.attackTarget != null && !this.attackTarget.isDead && a(this.attackTarget, false)) {
                         z3 = true;
                     }
                     if (!z3) {
@@ -1768,14 +1768,14 @@ public abstract class OrderableUnit extends UnitBase {
                 this.pathTargetY = targetY;
                 this.pathTargetRadius = 0;
                 if (unitCommand.commandType == UnitCommandType.patrol) {
-                    this.isDead = true;
+                    this.isLowPriority = true;
                     clearTransportState();
                 }
             }
         }
         if (unitCommand != null) {
             if (unitCommand.commandType == UnitCommandType.attackMove || unitCommand.commandType == UnitCommandType.patrol) {
-                if (this.attackTarget != null && !this.attackTarget.isDestroyed && a(this.attackTarget, false)) {
+                if (this.attackTarget != null && !this.attackTarget.isDead && a(this.attackTarget, false)) {
                     updateAttackTargetState(f, this.attackTarget, unitStateTracker, true);
                 }
                 if (this.transportedBy != null && this.transportedBy.attackTarget != null) {
@@ -1988,8 +1988,8 @@ public abstract class OrderableUnit extends UnitBase {
     private void updateAttackCommand(float f, UnitCommand unitCommand, UnitStateTracker unitStateTracker) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (be() == UnitBehaviorType.bomber) {
-            if (unitCommand != null && ((unitCommand.targetUnit == null || unitCommand.targetUnit.isDestroyed || unitCommand.targetUnit.team == this.team) && !this.as)) {
-                if (this.attackTarget != null && this.attackTarget.isDestroyed) {
+            if (unitCommand != null && ((unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.team == this.team) && !this.as)) {
+                if (this.attackTarget != null && this.attackTarget.isDead) {
                     this.attackTarget = null;
                 }
                 queryNearbyCollisionUnits(gameEngine, f, getTargetSearchRange(true) + 200.0f);
@@ -2002,18 +2002,18 @@ public abstract class OrderableUnit extends UnitBase {
                     this.ar = true;
                 }
             }
-            if (unitCommand != null && ((unitCommand.targetUnit == null || unitCommand.targetUnit.isDestroyed || unitCommand.targetUnit.team == this.team) && (unitCommand.targetUnit == null || !this.ar))) {
+            if (unitCommand != null && ((unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.team == this.team) && (unitCommand.targetUnit == null || !this.ar))) {
                 advanceWaypoint();
                 unitCommand = null;
             }
-        } else if (unitCommand.targetUnit == null || unitCommand.targetUnit.isDestroyed || unitCommand.targetUnit.team == this.team) {
+        } else if (unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.team == this.team) {
             boolean z = true;
             if (getWaypointCount() > 1) {
                 z = false;
             }
             unitCommand.targetUnit = null;
             if (z) {
-                if (this.attackTarget != null && this.attackTarget.isDestroyed) {
+                if (this.attackTarget != null && this.attackTarget.isDead) {
                     this.attackTarget = null;
                 }
                 queryNearbyCollisionUnits(gameEngine, f, getTargetSearchRange(true));
@@ -2028,7 +2028,7 @@ public abstract class OrderableUnit extends UnitBase {
                 unitCommand = null;
             }
         }
-        if (unitCommand != null && unitCommand.targetUnit != null && !unitCommand.targetUnit.isDestroyed && !unitCommand.targetUnit.getUnitAIPriority() && this.team.c(unitCommand.targetUnit.team) && !PathfindingUtils.b(this, unitCommand.targetUnit)) {
+        if (unitCommand != null && unitCommand.targetUnit != null && !unitCommand.targetUnit.isDead && !unitCommand.targetUnit.getUnitAIPriority() && this.team.c(unitCommand.targetUnit.team) && !PathfindingUtils.b(this, unitCommand.targetUnit)) {
             advanceWaypoint();
             return;
         }
@@ -2046,7 +2046,7 @@ public abstract class OrderableUnit extends UnitBase {
         float targetX = unitCommand.getTargetX();
         float targetY = unitCommand.getTargetY();
         float fDistanceSq = Utility.distanceSq(this.posX, this.posY, targetX, targetY);
-        if (unitCommand.targetUnit == null || unitCommand.targetUnit.isDestroyed) {
+        if (unitCommand.targetUnit == null || unitCommand.targetUnit.isDead) {
             advanceWaypoint();
             unitCommand = null;
         }
@@ -2147,7 +2147,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (unitCommand != null && unitCommand.commandType == UnitCommandType.reclaim && unitCommand.targetUnit != null && unitCommand.targetUnit.getUnitHealthPercent() > 0.0f) {
             z2 = true;
         }
-        if (unitCommand != null && (unitCommand.targetUnit == null || unitCommand.targetUnit.isDestroyed || unitCommand.targetUnit.unitTransportTarget != null)) {
+        if (unitCommand != null && (unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.unitTransportTarget != null)) {
             if (z2) {
                 z = true;
             } else {
@@ -2441,7 +2441,7 @@ public abstract class OrderableUnit extends UnitBase {
                         }
                     }
                 }
-                if (z11 && !baseUnit.isDestroyed) {
+                if (z11 && !baseUnit.isDead) {
                     if (!zY) {
                         UnitPrice unitDisplayName2 = baseUnit.getUnitDisplayName();
                         if (unitDisplayName2 != null) {
@@ -2459,7 +2459,7 @@ public abstract class OrderableUnit extends UnitBase {
                             }
                         }
                     }
-                    baseUnit.isDestroyed = true;
+                    baseUnit.isDead = true;
                     baseUnit.unitCreationTime = gameEngine.gameTimeMillis;
                     baseUnit.getUnitAICondition();
                     if ((baseUnit instanceof OrderableUnit) && baseUnit.bI()) {
@@ -2493,7 +2493,7 @@ public abstract class OrderableUnit extends UnitBase {
         this.canAttack = false;
         boolean z = this.isPathingActive;
         this.isPathingActive = false;
-        this.isDead = false;
+        this.isLowPriority = false;
         this.repathDistanceThreshold = 150;
         if (currentWaypoint != null && currentWaypoint.maxWayPointSurvivingTime > 0.0f && currentWaypoint.maxWayPointSurvivingTime < this.wayPointTimer) {
             advanceWaypointWithTransportedUnits();
@@ -2753,8 +2753,8 @@ public abstract class OrderableUnit extends UnitBase {
             pathPositionAt6.posY = orderableUnit.posY;
         }
         float fDistanceSq2 = Utility.distanceSq(this.posX, this.posY, pathPositionAt6.posX, pathPositionAt6.posY);
-        float f13 = this.radius + this.radius + 15.0f;
-        float f14 = this.radius + this.radius + 100.0f;
+        float f13 = this.radius + orderableUnit.radius + 15.0f;
+        float f14 = this.radius + orderableUnit.radius + 100.0f;
         if (fDistanceSq2 < f13 * f13) {
             this.transportRecoveryTime = 0.0f;
             this.moveThrottle = 0.0f;
@@ -2783,7 +2783,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (this.aU != null) {
             applyPendingPathResult(gameEngine);
         }
-        if (this.transportedBy != null && (this.transportedBy.isDestroyed || !this.transportedBy.isAlive())) {
+        if (this.transportedBy != null && (this.transportedBy.isDead || !this.transportedBy.isAlive())) {
             setTransportParent((OrderableUnit) null);
         }
         if (this.isPathingActive) {
@@ -2841,7 +2841,7 @@ public abstract class OrderableUnit extends UnitBase {
                 }
                 if (z) {
                     this.s = 500.0f;
-                    requestPathToTarget(this.pathTargetX, this.pathTargetY, this.pathTargetRadius, this.ae && this.ah > 1, this.isDead);
+                    requestPathToTarget(this.pathTargetX, this.pathTargetY, this.pathTargetRadius, this.ae && this.ah > 1, this.isLowPriority);
                 }
                 if (currentPathPosition != null && this.au == null && this.activePathCount >= 2 && getMoveSpeed() > 5.0f) {
                     PositionData positionData = this.pathPositions[1];
@@ -3041,7 +3041,7 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: aa */
     public boolean hasActiveMovementTarget() {
-        if (this.attackTarget != null && !this.attackTarget.isDestroyed) {
+        if (this.attackTarget != null && !this.attackTarget.isDead) {
             int techLevel = getTechLevel();
             for (int i = 0; i < techLevel; i++) {
                 if (this.movementLevels[i].targetUnit != null && r(i)) {
@@ -3055,11 +3055,11 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: ab */
     public BaseUnit getCommandOrAttackTarget() {
-        if (this.attackTarget != null && !this.attackTarget.isDestroyed) {
+        if (this.attackTarget != null && !this.attackTarget.isDead) {
             return this.attackTarget;
         }
         UnitCommand currentWaypoint = getCurrentWaypoint();
-        if (currentWaypoint != null && currentWaypoint.targetUnit != null && !currentWaypoint.targetUnit.isDestroyed) {
+        if (currentWaypoint != null && currentWaypoint.targetUnit != null && !currentWaypoint.targetUnit.isDead) {
             return currentWaypoint.targetUnit;
         }
         return null;
@@ -3454,7 +3454,7 @@ public abstract class OrderableUnit extends UnitBase {
     }
 
     public final boolean a(BaseUnit baseUnit, boolean z) {
-        if (this.team == baseUnit.team || baseUnit.isDestroyed || !this.team.c(baseUnit.team) || this.attackMode == AttackMode.holdFire || this.attackMode == AttackMode.returnFire || baseUnit.unitTransportTarget != null || !canAttackUnitType(baseUnit) || !baseUnit.d((BaseUnit) this)) {
+        if (this.team == baseUnit.team || baseUnit.isDead || !this.team.c(baseUnit.team) || this.attackMode == AttackMode.holdFire || this.attackMode == AttackMode.returnFire || baseUnit.unitTransportTarget != null || !canAttackUnitType(baseUnit) || !baseUnit.d((BaseUnit) this)) {
             return false;
         }
         if (!z) {
@@ -3878,8 +3878,7 @@ public abstract class OrderableUnit extends UnitBase {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit instanceof OrderableUnit) {
-                OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
+            if (baseUnit instanceof OrderableUnit orderableUnit) {
                 if (orderableUnit.transportedBy == this) {
                     boolean z = Utility.distanceSq(this.posX, this.posY, orderableUnit.posX, orderableUnit.posY) < 108900.0f;
                     boolean z2 = false;
@@ -4176,7 +4175,7 @@ public abstract class OrderableUnit extends UnitBase {
         pathA.a((short) tileMap.cursorTileX, (short) tileMap.cursorTileY, (short) i);
         pathA.p = z;
         pathA.q = bh();
-        pathA.r = z3;
+        pathA.isLowPriority = z3;
         boolean z5 = this.isInitialized;
         this.isInitialized = true;
         if (z2 && pathA.b()) {
@@ -4966,7 +4965,7 @@ public abstract class OrderableUnit extends UnitBase {
         rectF.c += 10.0f;
         for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
             if ((baseUnit instanceof BaseUnit) && baseUnit != this && baseUnit.heal(rectF)) {
-                if ((baseUnit instanceof OrderableUnit) && baseUnit.isDestroyed) {
+                if ((baseUnit instanceof OrderableUnit) && baseUnit.isDead) {
                     baseUnit.remove();
                 }
                 if (baseUnit instanceof Tree) {
@@ -5076,7 +5075,7 @@ public abstract class OrderableUnit extends UnitBase {
             BaseUnit baseUnit2 = baseUnitArrA[i];
             float f6 = baseUnit2.posX;
             float f7 = baseUnit2.posY;
-            if (f2 <= f6 && f6 <= f3 && f4 <= f7 && f7 <= f5 && baseUnit2 != this && ((z || baseUnit2.bI()) && !baseUnit2.isDestroyed && isUnitOverlappingRadius(baseUnit2) && baseUnit2 != baseUnit && (playerTeam == null || baseUnit2.d(playerTeam)))) {
+            if (f2 <= f6 && f6 <= f3 && f4 <= f7 && f7 <= f5 && baseUnit2 != this && ((z || baseUnit2.bI()) && !baseUnit2.isDead && isUnitOverlappingRadius(baseUnit2) && baseUnit2 != baseUnit && (playerTeam == null || baseUnit2.d(playerTeam)))) {
                 return true;
             }
         }
@@ -5086,9 +5085,8 @@ public abstract class OrderableUnit extends UnitBase {
     /* JADX INFO: renamed from: bs */
     public OrderableUnit findNearbySameTypeUnitForPlacement() {
         for (BaseUnit baseUnit : BaseUnit.bE) {
-            if (baseUnit != this && (baseUnit instanceof OrderableUnit)) {
-                OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
-                if (!orderableUnit.isDestroyed && orderableUnit.team == this.team && orderableUnit.r() == r() && setWidth(orderableUnit)) {
+            if (baseUnit != this && (baseUnit instanceof OrderableUnit orderableUnit)) {
+                if (!orderableUnit.isDead && orderableUnit.team == this.team && orderableUnit.r() == r() && setWidth(orderableUnit)) {
                     return orderableUnit;
                 }
             }
@@ -5341,7 +5339,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (this.parentEntity == null) {
             return;
         }
-        if (this.parentEntity.isDestroyed) {
+        if (this.parentEntity.isDead) {
         }
         if (!this.parentEntity.b(this)) {
             GameEngine.logColored("Deattach failed, forcing deattach. Child:" + getVelocityX() + " Parent:" + this.parentEntity.getVelocityX());

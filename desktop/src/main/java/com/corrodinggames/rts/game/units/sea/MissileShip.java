@@ -41,7 +41,7 @@ public class MissileShip extends WaterUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return d[this.team.getTeamColorIndex()];

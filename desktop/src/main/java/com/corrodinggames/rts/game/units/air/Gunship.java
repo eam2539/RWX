@@ -41,7 +41,7 @@ public class Gunship extends AirUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return e[this.team.getTeamColorIndex()];
@@ -96,7 +96,7 @@ public class Gunship extends AirUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return;
         }
         this.f += 2.0f * f;

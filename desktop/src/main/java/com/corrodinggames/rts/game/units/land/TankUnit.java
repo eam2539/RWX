@@ -64,7 +64,7 @@ public class TankUnit extends LandUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return tankTexture;
         }
         return tankTextures_teamColors[this.team.getTeamColorIndex()];
@@ -78,7 +78,7 @@ public class TankUnit extends LandUnit {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDestroyed;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDead;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -122,7 +122,7 @@ public class TankUnit extends LandUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!this.isDestroyed && this.rotation != 0.0f) {
+        if (!this.isDead && this.rotation != 0.0f) {
             this.animationTimer += f;
             if (this.animationTimer > 1.0f) {
                 this.animationTimer = 0.0f;
@@ -209,7 +209,7 @@ public class TankUnit extends LandUnit {
             return false;
         }
         GameViewUtils.a((OrderableUnit) this);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
         }
         return true;
     }
@@ -247,7 +247,7 @@ public class TankUnit extends LandUnit {
         if (z) {
             return super.a_(z);
         }
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return super.a_(z);
         }
         return super.a(z, this.animationFrame);

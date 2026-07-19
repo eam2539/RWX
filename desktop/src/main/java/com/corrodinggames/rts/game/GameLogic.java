@@ -805,7 +805,7 @@ public class GameLogic extends GameEngine {
                                 z5 = false;
                             }
                             for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
-                                if ((baseUnit instanceof BaseUnit) && !baseUnit.isDestroyed && baseUnit.team == playerTeamK3) {
+                                if ((baseUnit instanceof BaseUnit) && !baseUnit.isDead && baseUnit.team == playerTeamK3) {
                                     if (baseUnit.isSelectable && !z3) {
                                         z3 = true;
                                         fValueOf = Float.valueOf(baseUnit.posX);
@@ -1599,13 +1599,13 @@ public class GameLogic extends GameEngine {
             this.cleanupCounter = 0;
             int i3 = 0;
             for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
-                if (baseUnit.isDestroyed && !(baseUnit instanceof Tree)) {
+                if (baseUnit.isDead && !(baseUnit instanceof Tree)) {
                     i3++;
                 }
             }
             if (i3 > 70) {
                 for (BaseUnit baseUnit2 : BaseUnit.getGlobalUnitList()) {
-                    if ((baseUnit2 instanceof BaseUnit) && baseUnit2.isDestroyed && !(baseUnit2 instanceof Tree) && baseUnit2.unitCreationTime < this.gameTimeMillis - 30000 && i3 > 70) {
+                    if ((baseUnit2 instanceof BaseUnit) && baseUnit2.isDead && !(baseUnit2 instanceof Tree) && baseUnit2.unitCreationTime < this.gameTimeMillis - 30000 && i3 > 70) {
                         baseUnit2.remove();
                         i3--;
                     }

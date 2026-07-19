@@ -726,7 +726,7 @@ public class VariableScope {
             int i = 0;
             while (i < this.size) {
                 BaseUnit baseUnit = this.dataArray[i];
-                if (baseUnit == null || (!VariableScope.isMarker(baseUnit) && baseUnit.isDestroyed)) {
+                if (baseUnit == null || (!VariableScope.isMarker(baseUnit) && baseUnit.isDead)) {
                     for (int i2 = i + 1; i2 < this.size; i2++) {
                         this.dataArray[i2 - 1] = this.dataArray[i2];
                     }

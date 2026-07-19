@@ -42,7 +42,7 @@ public class AirShip extends AirUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return e[this.team.getTeamColorIndex()];
@@ -97,7 +97,7 @@ public class AirShip extends AirUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return;
         }
         this.posZ = Utility.distanceSq(this.posZ, 20.0f, 0.3f * f);

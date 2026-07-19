@@ -772,7 +772,7 @@ public final class TileMap {
         elementCreateElement.setAttribute("name", "UnitObjects");
         for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
             if ((baseUnit instanceof BaseUnit) && (!(baseUnit instanceof Tree) || !((Tree) baseUnit).isActive)) {
-                if (!baseUnit.isDestroyed && !baseUnit.u()) {
+                if (!baseUnit.isDead && !baseUnit.u()) {
                     AttachmentSlotDefinition attachmentSlotDefinitionDn = baseUnit.dn();
                     if (baseUnit.parentEntity != null && attachmentSlotDefinitionDn != null) {
                         if (!attachmentSlotDefinitionDn.D) {
@@ -1594,7 +1594,7 @@ public final class TileMap {
                     GameObject gameObject2 = gameObjectArrA[i5];
                     if (gameObject2 instanceof OrderableUnit) {
                         OrderableUnit orderableUnit2 = (OrderableUnit) gameObject2;
-                        if (!orderableUnit2.isDestroyed) {
+                        if (!orderableUnit2.isDead) {
                             orderableUnit2.c(false);
                         }
                     }

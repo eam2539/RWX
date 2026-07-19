@@ -64,7 +64,7 @@ public class BattleShip extends WaterUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return battleShipTexture;
         }
         return battleShipTextures_teamColors[this.team.getTeamColorIndex()];

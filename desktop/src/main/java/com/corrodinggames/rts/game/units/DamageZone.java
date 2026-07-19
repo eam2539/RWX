@@ -85,7 +85,7 @@ public class DamageZone extends DummyUnit {
         this.g = gameInputStream.readBoolean();
         this.h = gameInputStream.readFloat();
         super.a(gameInputStream);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             GameEngine.getInstance().minimap.addGraphicsOperation(this);
         }
     }
@@ -115,7 +115,7 @@ public class DamageZone extends DummyUnit {
 
     public DamageZone f() {
         for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
-            if ((baseUnit instanceof DamageZone) && !baseUnit.isDestroyed && baseUnit != this) {
+            if ((baseUnit instanceof DamageZone) && !baseUnit.isDead && baseUnit != this) {
                 DamageZone damageZone = (DamageZone) baseUnit;
                 if (damageZone.q == this.q) {
                     return damageZone;
@@ -129,7 +129,7 @@ public class DamageZone extends DummyUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return;
         }
         if (this.g) {
@@ -181,7 +181,7 @@ public class DamageZone extends DummyUnit {
             return;
         }
         this.c -= f;
-        if (!this.isDestroyed && this.c <= 0.0f && !this.q) {
+        if (!this.isDead && this.c <= 0.0f && !this.q) {
             this.c = 2.0f;
             float fFastCos = this.a * Utility.fastCos(45.0f);
             float f3 = this.posX - fFastCos;
@@ -191,7 +191,7 @@ public class DamageZone extends DummyUnit {
             float f7 = this.a * this.a;
             for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
                 if (baseUnit.posX <= f3 || baseUnit.posX >= f4 || baseUnit.posY <= f5 || baseUnit.posY >= f6) {
-                    if (Utility.distanceSq(this.posX, this.posY, baseUnit.posX, baseUnit.posY) >= f7 && !baseUnit.isDestroyed && !(baseUnit instanceof Tree) && !baseUnit.u() && baseUnit.unitTransportTarget == null) {
+                    if (Utility.distanceSq(this.posX, this.posY, baseUnit.posX, baseUnit.posY) >= f7 && !baseUnit.isDead && !(baseUnit instanceof Tree) && !baseUnit.u() && baseUnit.unitTransportTarget == null) {
                         baseUnit.setTarget(this, (0.5f + (baseUnit.currentHealth * 0.002f) + (baseUnit.maxHealth * 0.001f)) * this.h, (Projectile) null);
                     }
                 }

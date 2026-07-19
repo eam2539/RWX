@@ -73,7 +73,7 @@ public class Helicopter extends AirUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return f[this.team.getTeamColorIndex()];
@@ -139,7 +139,7 @@ public class Helicopter extends AirUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f2) {
         super.update(f2);
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return;
         }
         this.o = Utility.distanceSq(this.o, 0.5f, 0.003f * f2);
@@ -240,7 +240,7 @@ public class Helicopter extends AirUnit {
         if (!super.c(f2)) {
             return false;
         }
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             Paint paintAN = getRenderPaint();
             GameEngine gameEngine = GameEngine.getInstance();
             this.s.a(0, 0, c.m(), c.l());

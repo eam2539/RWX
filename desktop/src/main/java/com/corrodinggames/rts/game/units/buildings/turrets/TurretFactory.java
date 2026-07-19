@@ -512,7 +512,7 @@ public class TurretFactory extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return deadTexture;
         }
         if (this.team == null) {
@@ -613,7 +613,7 @@ public class TurretFactory extends FactoryWithQueue {
         if (!super.c(f)) {
             return false;
         }
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             drawTurret();
             return true;
         }

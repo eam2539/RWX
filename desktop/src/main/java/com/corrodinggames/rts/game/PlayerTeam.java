@@ -1671,7 +1671,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 resetFogOfWar();
                 for (BaseUnit baseUnit2 : BaseUnit.bE) {
                     if (baseUnit2.team == this && !baseUnit2.u()) {
-                        if (z6 && !baseUnit2.isDestroyed && baseUnit2.getUnitVersion()) {
+                        if (z6 && !baseUnit2.isDead && baseUnit2.getUnitVersion()) {
                             UnitType unitTypeR = baseUnit2.r();
                             String str = baseUnit2.getUnitShortName() + " Warning: This unit got ignored in defeated check and now being removed";
                             if ((unitTypeR instanceof CustomUnitConfig) && ((CustomUnitConfig) unitTypeR).canNotBeDirectlyAttacked) {
@@ -1717,7 +1717,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     }
 
     public static void c(BaseUnit baseUnit) {
-        if (baseUnit.team != null && !baseUnit.isHidden && baseUnit.isHighlighted && !baseUnit.isDestroyed) {
+        if (baseUnit.team != null && !baseUnit.isHidden && baseUnit.isHighlighted && !baseUnit.isDead) {
             baseUnit.isHidden = true;
             PlayerTeam playerTeam = baseUnit.team;
             playerTeam.teamStatistics.a(baseUnit);
@@ -1957,7 +1957,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit.team == this && !baseUnit.isDestroyed) {
+            if (baseUnit.team == this && !baseUnit.isDead) {
                 UnitType unitType = baseUnit.unitType;
                 boolean z = false;
                 Iterator it = fastArrayList.iterator();

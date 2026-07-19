@@ -148,7 +148,7 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return b;
         }
         return d[this.team.getTeamColorIndex()];
@@ -283,7 +283,7 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (this.isDestroyed || !isAlive()) {
+        if (this.isDead || !isAlive()) {
             return;
         }
         if (this.spawnExitLockTimer == 0.0f && this.syncType != 3) {

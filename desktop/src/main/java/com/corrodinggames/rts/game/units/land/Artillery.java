@@ -39,7 +39,7 @@ public class Artillery extends LandUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return b;
         }
         return d[this.team.getTeamColorIndex()];
@@ -53,7 +53,7 @@ public class Artillery extends LandUnit {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDestroyed;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDead;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

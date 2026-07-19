@@ -601,7 +601,7 @@ public class Projectile extends PositionedObject {
         if (gameEngine.isUnitInvincibilityEnabled && f2 > 0.0f) {
             f2 = 0.0f;
         }
-        if (baseUnit2 != null && !baseUnit2.isDestroyed) {
+        if (baseUnit2 != null && !baseUnit2.isDead) {
             if (projectile != null && projectile.g.bc && baseUnit != null) {
                 baseUnit2.isSelectable(baseUnit.team);
             }
@@ -616,7 +616,7 @@ public class Projectile extends PositionedObject {
             if (f2 < 0.0f) {
                 baseUnit2.calculateTurnSpeed(baseUnit, -f2, projectile);
             } else {
-                boolean z2 = !baseUnit2.isDestroyed && baseUnit2.currentHealth > 0.0f;
+                boolean z2 = !baseUnit2.isDead && baseUnit2.currentHealth > 0.0f;
                 baseUnit2.setTarget(baseUnit, f2, projectile);
                 float f3 = f2;
                 if (baseUnit2.mo193J()) {
@@ -627,13 +627,13 @@ public class Projectile extends PositionedObject {
                 }
                 if (baseUnit != null) {
                     baseUnit.unitCargoMass += f3;
-                    if (z2 && (baseUnit2.isDestroyed || baseUnit2.currentHealth < 0.0f)) {
+                    if (z2 && (baseUnit2.isDead || baseUnit2.currentHealth < 0.0f)) {
                         baseUnit.unitCargoType++;
                         baseUnit.a(UnitEventType.killedAnyUnit, baseUnit2);
                     }
                 }
             }
-            if (projectile != null && !baseUnit2.isDestroyed) {
+            if (projectile != null && !baseUnit2.isDead) {
                 float fBQ = baseUnit2.bQ();
                 if (fBQ != -1.0f) {
                     float angleBetweenPoints = Utility.getAngleBetweenPoints(projectile.posX, projectile.posY, baseUnit2.posX, baseUnit2.posY);
@@ -691,7 +691,7 @@ public class Projectile extends PositionedObject {
         }
         this.h = Utility.moveTowardsZero(this.h, f2);
         boolean z = false;
-        if (this.aG && (this.l == null || this.l.isDestroyed)) {
+        if (this.aG && (this.l == null || this.l.isDead)) {
             z = true;
         }
         if (z) {

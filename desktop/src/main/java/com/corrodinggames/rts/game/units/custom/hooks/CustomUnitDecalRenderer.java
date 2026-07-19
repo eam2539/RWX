@@ -492,7 +492,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
 
             for (int var13 = 0; var13 < var5; var13++) {
                 DecalDefinition var14 = (DecalDefinition)var12[var13];
-                if ((!var14.b || var6 || var7) && !(var14.j > var10) && (!var14.k || jx.isAlive()) && (!var14.l || !jx.isDestroyed)) {
+                if ((!var14.b || var6 || var7) && !(var14.j > var10) && (!var14.k || jx.isAlive()) && (!var14.l || !jx.isDead)) {
                     if (var14.b) {
                         boolean var15 = var6;
                         if (var14.g && var7) {

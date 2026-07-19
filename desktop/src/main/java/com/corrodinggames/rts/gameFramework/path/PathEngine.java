@@ -388,7 +388,7 @@ public final class PathEngine {
                 path.t = 360.0f;
             }
         }
-        if (path.r) {
+        if (path.isLowPriority) {
             path.t *= 2.0f;
             path.t += 50.0f;
         }
@@ -464,7 +464,7 @@ public final class PathEngine {
         for (Path path : this.I) {
             if (path.t <= 0.0f && !path.c()) {
                 if (str == null) {
-                    str = "[distance:" + Utility.distance(path.h, path.i, path.l, path.m) + ", allowedDelay:" + path.s + " lowPriority:" + path.r + "]";
+                    str = "[distance:" + Utility.distance(path.h, path.i, path.l, path.m) + ", allowedDelay:" + path.s + " lowPriority:" + path.isLowPriority + "]";
                 }
                 i2++;
             }

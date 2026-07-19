@@ -44,7 +44,7 @@ public abstract class AIUnitGroupBase extends AIStrategyNode {
         Iterator it = this.F.iterator();
         while (it.hasNext()) {
             OrderableUnit orderableUnit = (OrderableUnit) it.next();
-            if (orderableUnit == null || orderableUnit.isDestroyed) {
+            if (orderableUnit == null || orderableUnit.isDead) {
                 if (orderableUnit != null && orderableUnit.aB == this) {
                     orderableUnit.aB = null;
                 }
@@ -60,7 +60,7 @@ public abstract class AIUnitGroupBase extends AIStrategyNode {
         Iterator it = this.G.iterator();
         while (it.hasNext()) {
             OrderableUnit orderableUnit = (OrderableUnit) it.next();
-            if (orderableUnit == null || orderableUnit.isDestroyed || orderableUnit.unitTransportTarget != null || orderableUnit.parentEntity != null) {
+            if (orderableUnit == null || orderableUnit.isDead || orderableUnit.unitTransportTarget != null || orderableUnit.parentEntity != null) {
                 it.remove();
             }
         }

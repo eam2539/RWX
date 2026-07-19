@@ -92,7 +92,7 @@ public class AirFactory extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return deadTexture;
         }
         if (this.team == null) {
@@ -123,7 +123,7 @@ public class AirFactory extends FactoryWithQueue {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
             return;
         }
         this.animationTiming = Utility.moveTowardsZero(this.animationTiming, f);

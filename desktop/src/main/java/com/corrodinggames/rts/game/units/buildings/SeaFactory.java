@@ -69,7 +69,7 @@ public class SeaFactory extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return deadFactoryTexture;
         }
         if (this.team == null) {

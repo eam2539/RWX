@@ -173,7 +173,7 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
             return;
         }
         this.z.a(f);

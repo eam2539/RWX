@@ -55,7 +55,7 @@ public class HeavyTankUnit extends LandUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return c[this.team.getTeamColorIndex()];
@@ -74,7 +74,7 @@ public class HeavyTankUnit extends LandUnit {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDestroyed && this.deceleration >= 1.0f && !this.isUnitInvulnerable;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDead && this.deceleration >= 1.0f && !this.isUnitInvulnerable;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -113,7 +113,7 @@ public class HeavyTankUnit extends LandUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!this.isDestroyed && this.rotation != 0.0f) {
+        if (!this.isDead && this.rotation != 0.0f) {
             this.turretAnimationTimer += f;
             if (this.turretAnimationTimer > 1.4d) {
                 this.turretAnimationTimer = 0.0f;
@@ -285,7 +285,7 @@ public class HeavyTankUnit extends LandUnit {
         if (z) {
             return super.a_(z);
         }
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return super.a_(z);
         }
         return super.a(z, this.turretFrameIndex);

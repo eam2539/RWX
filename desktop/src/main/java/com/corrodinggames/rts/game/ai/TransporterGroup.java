@@ -111,7 +111,7 @@ public class TransporterGroup extends AIUnitGroupBase {
 
     public void c() {
         for (BaseUnit baseUnit : BaseUnit.bE) {
-            if (!baseUnit.isDestroyed && baseUnit.team == this.aiController && this.l > this.F.size() && (baseUnit instanceof OrderableUnit)) {
+            if (!baseUnit.isDead && baseUnit.team == this.aiController && this.l > this.F.size() && (baseUnit instanceof OrderableUnit)) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
                 if (!orderableUnit.isAIUnit && orderableUnit.aB == null && this.aiController.isNonCombatCustomUnit(orderableUnit) && this.aiController.isEligibleUnitForRandomSelection(orderableUnit)) {
                     a(orderableUnit);
@@ -185,7 +185,7 @@ public class TransporterGroup extends AIUnitGroupBase {
         if (!this.q) {
             if (this.m != null) {
                 ArrayList<OrderableUnit> arrayList = this.m.G;
-                if (this.n != null && (this.n.isDestroyed || this.n.unitTransportTarget != null || this.n.parentEntity != null)) {
+                if (this.n != null && (this.n.isDead || this.n.unitTransportTarget != null || this.n.parentEntity != null)) {
                     arrayList.remove(this.n);
                     this.n = null;
                 }
@@ -315,7 +315,7 @@ public class TransporterGroup extends AIUnitGroupBase {
             }
             boolean z2 = false;
             for (OrderableUnit orderableUnit7 : this.F) {
-                if (!orderableUnit7.isDestroyed && ((TransportUnitInterface) orderableUnit7).getTransportedUnitCount() != 0) {
+                if (!orderableUnit7.isDead && ((TransportUnitInterface) orderableUnit7).getTransportedUnitCount() != 0) {
                     z2 = true;
                 }
             }

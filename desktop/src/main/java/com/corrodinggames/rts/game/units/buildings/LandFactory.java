@@ -94,7 +94,7 @@ public class LandFactory extends FactoryWithQueue {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public void S() {
         super.S();
-        if (this.isDestroyed) {
+        if (this.isDead) {
             this.overlayTexture = null;
         } else {
             this.overlayTexture = backgroundTexture;
@@ -103,7 +103,7 @@ public class LandFactory extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return deadTexture;
         }
         if (this.team == null) {

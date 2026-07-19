@@ -815,7 +815,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: a */
-    public void updateInput(float f) throws ConfigParseException {
+    public void updateInput(float f) {
         GameEngine gameEngine = GameEngine.getInstance();
         this.gameTime += (double) f;
         this.tooltipX = Utility.moveTowardsZero(this.tooltipX, f);
@@ -1009,7 +1009,7 @@ public final class GameUI extends Serializable {
                 for (GameObject gameObject : GameObject.fastGameObjectList) {
                     if (gameObject instanceof OrderableUnit) {
                         OrderableUnit orderableUnit = (OrderableUnit) gameObject;
-                        if (!orderableUnit.isDestroyed && orderableUnit.team == gameEngine.playerTeam && orderableUnit.canAttack() && !orderableUnit.canMove() && orderableUnit.aS() && orderableUnit.unitTransportTarget == null) {
+                        if (!orderableUnit.isDead && orderableUnit.team == gameEngine.playerTeam && orderableUnit.canAttack() && !orderableUnit.canMove() && orderableUnit.aS() && orderableUnit.unitTransportTarget == null) {
                             selectUnit(orderableUnit);
                         }
                     }
@@ -1021,7 +1021,7 @@ public final class GameUI extends Serializable {
                 for (GameObject gameObject2 : GameObject.fastGameObjectList) {
                     if (gameObject2 instanceof OrderableUnit) {
                         OrderableUnit orderableUnit2 = (OrderableUnit) gameObject2;
-                        if (orderableUnit2.team == gameEngine.playerTeam && orderableUnit2.r() == UnitTypeEnum.commandCenter && !orderableUnit2.isDestroyed && orderableUnit2.unitTransportTarget == null) {
+                        if (orderableUnit2.team == gameEngine.playerTeam && orderableUnit2.r() == UnitTypeEnum.commandCenter && !orderableUnit2.isDead && orderableUnit2.unitTransportTarget == null) {
                             selectUnit(orderableUnit2);
                             gameEngine.centerViewpoint(orderableUnit2.posX, orderableUnit2.posY);
                         }
@@ -1197,7 +1197,7 @@ public final class GameUI extends Serializable {
             gameEngine.isGameStarted = false;
         }
         if (gameEngine.isGameStarted) {
-            if (this.editorOrBuilder != null && (this.editorOrBuilder.isDestroyed || this.editorOrBuilder.isDestroyed)) {
+            if (this.editorOrBuilder != null && (this.editorOrBuilder.isDestroyed || this.editorOrBuilder.isDead)) {
                 this.editorOrBuilder = null;
             }
             if (this.editorOrBuilder == null) {
@@ -1213,7 +1213,7 @@ public final class GameUI extends Serializable {
                 CustomUnitConfigParser.reloadChangedUnitConfigs();
             }
         } else {
-            if (this.editorOrBuilder != null && (this.editorOrBuilder.isDestroyed || this.editorOrBuilder.isDestroyed)) {
+            if (this.editorOrBuilder != null && (this.editorOrBuilder.isDestroyed || this.editorOrBuilder.isDead)) {
                 this.editorOrBuilder = null;
             }
             if (this.editorOrBuilder != null && !gameEngine.replayEngine.j()) {
@@ -3511,7 +3511,7 @@ public final class GameUI extends Serializable {
         PlayerTeam var10 = this.getSelectedUnitsTeam();
 
         for (BaseUnit var12 : BaseUnit.bE) {
-            if ((boolean3 ? !var12.t() : !var12.getUnitState()) && !var12.isDestroyed && var12.unitTransportTarget == null) {
+            if ((boolean3 ? !var12.t() : !var12.getUnitState()) && !var12.isDead && var12.unitTransportTarget == null) {
                 float var13 = Utility.distanceSq(float1, float2, var12.posX, var12.posY - var12.posZ);
                 float var14 = var12.radius;
                 if (!var12.isSelected) {
@@ -3541,7 +3541,7 @@ public final class GameUI extends Serializable {
         for (GameObject gameObject : GameObject.fastGameObjectList) {
             if (gameObject instanceof BaseUnit) {
                 BaseUnit baseUnit = (BaseUnit) gameObject;
-                if (!baseUnit.isDestroyed && baseUnit.unitTransportTarget == null && baseUnit.team == gameEngine.playerTeam && Utility.distanceSq(x, y, baseUnit.posX, baseUnit.posY - baseUnit.posZ) < radius * radius) {
+                if (!baseUnit.isDead && baseUnit.unitTransportTarget == null && baseUnit.team == gameEngine.playerTeam && Utility.distanceSq(x, y, baseUnit.posX, baseUnit.posY - baseUnit.posZ) < radius * radius) {
                     selectUnit(baseUnit);
                 }
             }
@@ -3555,7 +3555,7 @@ public final class GameUI extends Serializable {
         for (GameObject gameObject : GameObject.fastGameObjectList) {
             if (gameObject instanceof BaseUnit) {
                 BaseUnit baseUnit2 = (BaseUnit) gameObject;
-                if (!baseUnit2.isDestroyed && baseUnit2.unitTransportTarget == null && baseUnit2.team == baseUnit.team && baseUnit2.isBuilding() && GameInterfaceRenderer.a(baseUnit2, baseUnit) && (baseUnit2.team == gameEngine.playerTeam || baseUnit2.getWeight())) {
+                if (!baseUnit2.isDead && baseUnit2.unitTransportTarget == null && baseUnit2.team == baseUnit.team && baseUnit2.isBuilding() && GameInterfaceRenderer.a(baseUnit2, baseUnit) && (baseUnit2.team == gameEngine.playerTeam || baseUnit2.getWeight())) {
                     selectUnit(baseUnit2);
                 }
             }

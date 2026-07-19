@@ -71,7 +71,7 @@ public class BuilderShip extends WaterUnit implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return e[this.team.getTeamColorIndex()];
@@ -178,7 +178,7 @@ public class BuilderShip extends WaterUnit implements UnitPathPoints {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             BuilderUnit.updateTargetPriorityPoints(f, this);
         }
     }
@@ -186,7 +186,7 @@ public class BuilderShip extends WaterUnit implements UnitPathPoints {
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
     public void a(float f, boolean z) {
         super.a(f, z);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             BuilderUnit.drawTargetPriorityPoints(f, this);
         }
     }
@@ -198,7 +198,7 @@ public class BuilderShip extends WaterUnit implements UnitPathPoints {
         }
         GameEngine gameEngine = GameEngine.getInstance();
         GameViewUtils.a((OrderableUnit) this);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             float fE = this.movementLevels[0].speed / e(0);
             if (fE != 0.0f) {
                 PointF pointFE = E(0);

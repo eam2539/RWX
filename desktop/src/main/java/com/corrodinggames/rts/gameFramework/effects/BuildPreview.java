@@ -216,7 +216,7 @@ public class BuildPreview {
     /* JADX INFO: renamed from: b */
     public boolean isValid() {
         if (this.isBuilding) {
-            if (this.builder == null || this.builder.isDestroyed || !UnitTypeEnum.canPlaceUnit(this.unitType, this.worldX, this.worldY, 0.0f, 0.0f, this.team)) {
+            if (this.builder == null || this.builder.isDead || !UnitTypeEnum.canPlaceUnit(this.unitType, this.worldX, this.worldY, 0.0f, 0.0f, this.team)) {
                 return false;
             }
             return true;

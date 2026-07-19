@@ -604,7 +604,7 @@ public class Debug extends ScriptContext {
             pathA.a((short) tileMap.cursorTileX, (short) tileMap.cursorTileY, (short) 0);
             pathA.p = true;
             pathA.q = 0;
-            pathA.r = false;
+            pathA.isLowPriority = false;
             gameEngine.pathfindingEngine.a(pathA, false, this.forceNonThreaded);
             arrayList.add(pathA);
         }

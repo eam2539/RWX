@@ -115,7 +115,7 @@ public class GameStatistics {
 
     public void a(BaseUnit baseUnit, BaseUnit baseUnit2, float f2) {
         if (baseUnit != null) {
-            boolean z = baseUnit2.isDestroyed;
+            boolean z = baseUnit2.isDead;
             StatisticsData statisticsDataA = a(baseUnit);
             StatisticsData statisticsDataA2 = a(baseUnit2);
             if (z) {

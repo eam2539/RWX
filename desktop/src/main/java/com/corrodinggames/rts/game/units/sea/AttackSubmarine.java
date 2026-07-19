@@ -134,7 +134,7 @@ public class AttackSubmarine extends WaterUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return d;
         }
         return i[this.team.getTeamColorIndex()];
@@ -222,7 +222,7 @@ public class AttackSubmarine extends WaterUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f2) {
         super.update(f2);
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
         }
     }
 

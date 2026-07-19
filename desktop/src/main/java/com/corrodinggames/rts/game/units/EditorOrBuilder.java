@@ -1197,7 +1197,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return BuilderUnit.builderTexture_dead;
         }
         return BuilderUnit.builderTexture_teamColors[this.team.getTeamColorIndex()];
@@ -1319,7 +1319,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
         }
         super.update(f);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             a(f, this);
         }
         this.currentHealth = this.maxHealth;
@@ -1327,7 +1327,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
     public void a(float f, boolean z2) {
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
         }
     }
 
@@ -1690,7 +1690,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                     } else if (abstractUnitAction != editorIconTexture2) {
                         continue;
                     } else if (i3 <= 4) {
-                        if (!baseUnit2.bI() && !(baseUnit2 instanceof Tree) && !baseUnit2.isDestroyed && baseUnit2.unitTransportTarget == null && baseUnit2.parentEntity == null) {
+                        if (!baseUnit2.bI() && !(baseUnit2 instanceof Tree) && !baseUnit2.isDead && baseUnit2.unitTransportTarget == null && baseUnit2.parentEntity == null) {
                             i3++;
                             UnitType unitTypeR = baseUnit2.r();
                             for (int i4 = -25; i4 < 25; i4++) {
@@ -1938,7 +1938,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDestroyed;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDead;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

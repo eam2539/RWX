@@ -90,7 +90,7 @@ public abstract class WaterUnit extends MovableUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (this.isDestroyed) {
+        if (this.isDead) {
             if (this.posZ > -10.0f) {
                 this.sinkVelocity += 0.002f * f;
                 this.posZ -= this.sinkVelocity * f;
@@ -104,7 +104,7 @@ public abstract class WaterUnit extends MovableUnit {
                 return;
             }
         }
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
             return;
         }
         adjustZPosition(f);

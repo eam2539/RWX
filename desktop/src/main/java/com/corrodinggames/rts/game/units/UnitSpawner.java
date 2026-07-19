@@ -60,7 +60,7 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return BuilderUnit.builderTexture_dead;
         }
         return BuilderUnit.builderTexture_teamColors[this.team.getTeamColorIndex()];
@@ -159,7 +159,7 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
     /* JADX INFO: renamed from: a */
     public void update(float f2) {
         super.update(f2);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             a(f2, this);
         }
         this.currentHealth = this.maxHealth;
@@ -214,7 +214,7 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
     public void a(float f2, boolean z) {
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
         }
     }
 
@@ -328,7 +328,7 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDestroyed;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDead;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

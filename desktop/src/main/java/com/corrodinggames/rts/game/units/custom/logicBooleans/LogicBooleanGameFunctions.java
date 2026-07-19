@@ -827,7 +827,7 @@ public class LogicBooleanGameFunctions {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public boolean read(OrderableUnit orderableUnit) {
             boolean z = false;
-            if (orderableUnit.isDestroyed) {
+            if (orderableUnit.isDead) {
                 z = true;
             }
             return z;

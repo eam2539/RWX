@@ -151,7 +151,7 @@ public final class GameViewUtils {
     }
 
     public static void a(OrderableUnit orderableUnit) {
-        if (!orderableUnit.isDestroyed) {
+        if (!orderableUnit.isDead) {
             int techLevel = orderableUnit.getTechLevel();
             for (int i = 0; i < techLevel; i++) {
                 a(orderableUnit, i);
@@ -160,7 +160,7 @@ public final class GameViewUtils {
     }
 
     public static void a(OrderableUnit orderableUnit, Texture texture, float f2, int i) {
-        if (!orderableUnit.isDestroyed && f2 != 0.0f) {
+        if (!orderableUnit.isDead && f2 != 0.0f) {
             GameEngine gameEngine = GameEngine.getInstance();
             Vector3D vector3DD = orderableUnit.D(i);
             gameEngine.renderGraphicsEngine.k();
@@ -402,7 +402,7 @@ public final class GameViewUtils {
         GameEngine gameEngine = GameEngine.getInstance();
         for (int i = 0; i <= 2; i++) {
             for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
-                if ((baseUnit instanceof BaseUnit) && !baseUnit.isDestroyed && baseUnit.team == playerTeam) {
+                if ((baseUnit instanceof BaseUnit) && !baseUnit.isDead && baseUnit.team == playerTeam) {
                     if (i == 0 && baseUnit.isSelectable) {
                         pointF.a(baseUnit.posX, baseUnit.posY);
                         return;

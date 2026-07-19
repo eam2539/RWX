@@ -188,7 +188,7 @@ public class LaserDefense extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return deadTexture;
         }
         if (this.team == null) {
@@ -222,7 +222,7 @@ public class LaserDefense extends FactoryWithQueue {
     public void update(float f) {
         float f2;
         super.update(f);
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
             return;
         }
         GameEngine.getInstance();

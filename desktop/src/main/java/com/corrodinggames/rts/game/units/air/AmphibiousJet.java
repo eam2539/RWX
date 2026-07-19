@@ -172,11 +172,11 @@ public class AmphibiousJet extends AirUnit {
         if (!super.c(f2)) {
             return false;
         }
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return true;
         }
         f(false);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             for (int i = 0; i < getTechLevel(); i++) {
                 if (i != ds()) {
                     float fE = this.movementLevels[i].speed / e(i);
@@ -271,7 +271,7 @@ public class AmphibiousJet extends AirUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return e[this.team.getTeamColorIndex()];
@@ -334,7 +334,7 @@ public class AmphibiousJet extends AirUnit {
     public void update(float f2) {
         float fFastSin;
         super.update(f2);
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();

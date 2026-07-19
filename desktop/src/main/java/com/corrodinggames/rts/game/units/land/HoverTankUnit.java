@@ -41,7 +41,7 @@ public class HoverTankUnit extends HoverLandUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return b;
         }
         return e[this.team.getTeamColorIndex()];
@@ -83,7 +83,7 @@ public class HoverTankUnit extends HoverLandUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (this.isDestroyed || !isAlive()) {
+        if (this.isDead || !isAlive()) {
             return;
         }
         this.a += 3.0f * f;

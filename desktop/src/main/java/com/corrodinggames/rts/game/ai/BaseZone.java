@@ -269,7 +269,7 @@ public class BaseZone extends AIStrategyNode {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit.team == this.aiController && !baseUnit.isDestroyed && !baseUnit.u() && countUnitsForStrategy(baseUnit)) {
+            if (baseUnit.team == this.aiController && !baseUnit.isDead && !baseUnit.u() && countUnitsForStrategy(baseUnit)) {
                 this.unitsInZone.add(baseUnit);
                 UnitType unitType = baseUnit.unitType;
                 if (!this.unitTypesInZone.contains(unitType)) {

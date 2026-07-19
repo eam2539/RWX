@@ -114,7 +114,7 @@ public abstract class BaseUnit extends SizedObject {
     public int collisionGroup;
 
     /* JADX INFO: renamed from: bV */
-    public boolean isDestroyed;
+    public boolean isDead;
 
     /* JADX INFO: renamed from: bW */
     public long unitCreationTime;
@@ -368,7 +368,7 @@ public abstract class BaseUnit extends SizedObject {
         this.targetUnit = null;
         this.isAlive = true;
         this.collisionGroup = 1;
-        this.isDestroyed = false;
+        this.isDead = false;
         this.unitCreationTime = 0L;
         this.worldX = 0.0f;
         this.worldY = 0.0f;
@@ -651,7 +651,7 @@ public abstract class BaseUnit extends SizedObject {
         gameOutputStream.writeUnitIdOrNullBaseUnit(this.attackTargetUnit);
         gameOutputStream.writeFloat(this.bS);
         gameOutputStream.writeBoolean(this.isAlive);
-        gameOutputStream.writeBoolean(this.isDestroyed);
+        gameOutputStream.writeBoolean(this.isDead);
         gameOutputStream.writeLong(this.unitCreationTime);
         gameOutputStream.writeTeamIdByte(this.team);
         gameOutputStream.writeFloat(this.worldX);
@@ -689,7 +689,7 @@ public abstract class BaseUnit extends SizedObject {
             gameOutputStream.writeFloat(unitMovementData.h);
             gameOutputStream.writeFloat(unitMovementData.i);
             BaseUnit baseUnit = unitMovementData.targetUnit;
-            if (baseUnit != null && baseUnit.isDestroyed) {
+            if (baseUnit != null && baseUnit.isDead) {
                 baseUnit = null;
             }
             gameOutputStream.writeUnitIdOrNullBaseUnit(baseUnit);
@@ -751,7 +751,7 @@ public abstract class BaseUnit extends SizedObject {
         this.attackTargetUnit = gameInputStream.readBaseUnit();
         this.bS = gameInputStream.readFloat();
         this.isAlive = gameInputStream.readBoolean();
-        this.isDestroyed = gameInputStream.readBoolean();
+        this.isDead = gameInputStream.readBoolean();
         this.unitCreationTime = gameInputStream.readLong();
         setUnitTeam(gameInputStream.readRequiredPlayerTeam());
         this.worldX = gameInputStream.readFloat();
@@ -892,7 +892,7 @@ public abstract class BaseUnit extends SizedObject {
         if (b >= 26) {
             this.movementAngle = gameInputStream.readFloat();
         }
-        if (this.isDestroyed) {
+        if (this.isDead) {
             GameEngine gameEngine = GameEngine.getInstance();
             bE.remove(this);
             gameEngine.unitSpatialIndex.a(this);
@@ -1049,7 +1049,7 @@ public abstract class BaseUnit extends SizedObject {
         int iLongToIntArray2;
         int iLongToIntArray3;
         int iLongToIntArray4;
-        if (this.isDestroyed || this.unitTransportTarget != null) {
+        if (this.isDead || this.unitTransportTarget != null) {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
@@ -1195,7 +1195,7 @@ public abstract class BaseUnit extends SizedObject {
 
     @Override // com.corrodinggames.rts.gameFramework.GameObject
     public void p(float f) {
-        if (!this.isDestroyed && this.unitTransportTarget == null && this.isSelected) {
+        if (!this.isDead && this.unitTransportTarget == null && this.isSelected) {
             GameEngine gameEngine = GameEngine.getInstance();
             if (this.team == gameEngine.playerTeam || gameEngine.gameUI.canControlUnit(this)) {
                 if (gameEngine.settingsEngine.showUnitWaypoints && gameEngine.selectedWaypointDrawCount <= 40) {
@@ -1380,7 +1380,7 @@ public abstract class BaseUnit extends SizedObject {
         if (textureV == null) {
             return false;
         }
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return true;
         }
         GameEngine gameEngine = GameEngine.getInstance();
@@ -1440,7 +1440,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     public void f_() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             this.isAlive = false;
         } else {
             this.isAlive = true;
@@ -1451,7 +1451,7 @@ public abstract class BaseUnit extends SizedObject {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         Effect effectCreateEffectInternal;
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return;
         }
         if (this.unitArmor > 0.0f) {
@@ -1611,7 +1611,7 @@ public abstract class BaseUnit extends SizedObject {
 
     /* JADX INFO: renamed from: ch */
     public void updateUnitAI() {
-        if (!this.isDestroyed && this.currentHealth <= 0.0f) {
+        if (!this.isDead && this.currentHealth <= 0.0f) {
             bv();
         }
     }
@@ -1633,7 +1633,7 @@ public abstract class BaseUnit extends SizedObject {
         PlayerTeam.a(this);
         if (bE.remove(this)) {
         }
-        this.isDestroyed = true;
+        this.isDead = true;
         this.unitCreationTime = gameEngine.gameTimeMillis;
         if (this.currentHealth > 0.0f) {
             this.currentHealth = 0.0f;
@@ -1987,10 +1987,10 @@ public abstract class BaseUnit extends SizedObject {
         if (this.team != null) {
             str = str + " t:" + this.team.teamId;
         }
-        if (this.isDestroyed) {
+        if (this.isDead) {
             str = str + " [dead]";
         }
-        if (this.isDestroyed) {
+        if (super.isDestroyed) {
             str = str + " [deleted]";
         }
         return str + ")";
@@ -1998,7 +1998,7 @@ public abstract class BaseUnit extends SizedObject {
 
     /* JADX INFO: renamed from: cC */
     public String getVelocityY() {
-        String str = (r().getUnitTypeDescriptionShort() + "(pos:" + ((int) this.posX) + "," + ((int) this.posY) + " id:" + this.objectId + VariableScope.nullOrMissingString) + ", hp:" + this.currentHealth + ", dead:" + this.isDestroyed + ", deleted:" + this.isDestroyed + " tags:" + getUnitCombatAnimation();
+        String str = (r().getUnitTypeDescriptionShort() + "(pos:" + ((int) this.posX) + "," + ((int) this.posY) + " id:" + this.objectId + VariableScope.nullOrMissingString) + ", hp:" + this.currentHealth + ", dead:" + this.isDead + ", deleted:" + this.isDead + " tags:" + getUnitCombatAnimation();
         if (this.team != null) {
             str = str + " t:" + this.team.teamId;
         }
@@ -2285,7 +2285,7 @@ public abstract class BaseUnit extends SizedObject {
             }
         }
         UnitEffectData unitEffectData = this.unitEffects[playerTeam.teamId];
-        if (this.isDestroyed) {
+        if (this.isDead) {
             if (unitEffectData.a && d(playerTeam)) {
                 unitEffectData.a = false;
                 return;

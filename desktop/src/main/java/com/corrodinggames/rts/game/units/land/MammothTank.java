@@ -46,7 +46,7 @@ public class MammothTank extends LandUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return c[this.team.getTeamColorIndex()];
@@ -65,7 +65,7 @@ public class MammothTank extends LandUnit {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && this.posZ > -2.0f && !this.isDestroyed;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && this.posZ > -2.0f && !this.isDead;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -196,7 +196,7 @@ public class MammothTank extends LandUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public Rect a_(boolean z) {
-        if (this.isDestroyed && !z) {
+        if (this.isDead && !z) {
             return super.a_(z);
         }
         return super.a(z, this.f);

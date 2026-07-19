@@ -207,7 +207,7 @@ public class GameOutputStream {
 
     /* JADX INFO: renamed from: b */
     public void writeUnitIdIfAlive(BaseUnit baseUnit) throws IOException {
-        if (baseUnit != null && !baseUnit.isDestroyed && !baseUnit.isDestroyed) {
+        if (baseUnit != null && !baseUnit.isDestroyed && !baseUnit.isDead) {
             writeObjectId((GameObject) baseUnit);
         } else {
             writeObjectId((GameObject) null);

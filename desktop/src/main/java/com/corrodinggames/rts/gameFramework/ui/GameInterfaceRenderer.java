@@ -718,7 +718,7 @@ public class GameInterfaceRenderer extends Serializable {
     }
 
     private boolean a(UnitBase unitBase) {
-        if (!unitBase.isDestroyed && unitBase.unitTransportTarget == null) {
+        if (!unitBase.isDead && unitBase.unitTransportTarget == null) {
             float f = unitBase.posX;
             float f2 = unitBase.posY - unitBase.posZ;
             if (f2 <= 0.0f) {
@@ -2313,10 +2313,10 @@ public class GameInterfaceRenderer extends Serializable {
                 if (customUnit2.parentEntity != null) {
                     str2 = str2 + "attachedTo: " + customUnit2.parentEntity.getVelocityX() + str;
                 }
-                if (customUnit2.unitTarget2 != null && !customUnit2.unitTarget2.isDestroyed) {
+                if (customUnit2.unitTarget2 != null && !customUnit2.unitTarget2.isDead) {
                     str2 = str2 + "customTarget1: " + customUnit2.unitTarget2.getVelocityX() + str;
                 }
-                if (customUnit2.unitTarget3 != null && !customUnit2.unitTarget3.isDestroyed) {
+                if (customUnit2.unitTarget3 != null && !customUnit2.unitTarget3.isDead) {
                     str2 = str2 + "customTarget2: " + customUnit2.unitTarget3.getVelocityX() + str;
                 }
                 if (customUnit2.unitFlags2 != -9999) {

@@ -668,7 +668,7 @@ public class Minimap {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (!baseUnit.isDestroyed && baseUnit.unitTransportTarget == null && baseUnit.getWeight() && baseUnit.c_() && !baseUnit.u()) {
+            if (!baseUnit.isDead && baseUnit.unitTransportTarget == null && baseUnit.getWeight() && baseUnit.c_() && !baseUnit.u()) {
                 Point pointWorldToScreen = worldToScreen(baseUnit.posX, baseUnit.posY);
                 baseUnit.unitCargoCount = pointWorldToScreen.worldX;
                 baseUnit.unitCargoMax = pointWorldToScreen.worldY;
@@ -885,7 +885,7 @@ public class Minimap {
             Iterator it = this._graphicsOperations.iterator();
             while (it.hasNext()) {
                 MinimapGraphicsOperation minimapGraphicsOperation = (MinimapGraphicsOperation) it.next();
-                if (minimapGraphicsOperation.unit.isDestroyed) {
+                if (minimapGraphicsOperation.unit.isDead) {
                     it.remove();
                 } else {
                     BaseUnit baseUnit = minimapGraphicsOperation.unit;

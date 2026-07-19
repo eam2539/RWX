@@ -67,7 +67,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return f[this.team.getTeamColorIndex()];
@@ -144,10 +144,10 @@ public class ExperimentalHoverTank extends HoverLandUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f2) {
         super.update(f2);
-        if (this.isDestroyed || !isAlive()) {
+        if (this.isDead || !isAlive()) {
             return;
         }
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             if (this.spawnExitLockTimer != 0.0f) {
                 S(2);
             } else {
@@ -295,7 +295,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public Rect a_(boolean z) {
-        if (this.isDestroyed && !z) {
+        if (this.isDead && !z) {
             return super.a_(z);
         }
         if (z) {
@@ -313,7 +313,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
             return false;
         }
         GameViewUtils.a((OrderableUnit) this);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             float fClamp = 0.0f;
             if (this.i != null) {
                 fClamp = Utility.clamp(this.i.e(), 0.25f) * 3.0f;
@@ -321,7 +321,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
             GameViewUtils.a(this, MammothTank.e, fClamp, 0);
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!this.isDestroyed && this.shield > 0.0f && this.energy == 0.0f && (textureT = T()) != null) {
+        if (!this.isDead && this.shield > 0.0f && this.energy == 0.0f && (textureT = T()) != null) {
             this.k.a((int) ((0.09f + ((this.shield / this.unitEnergyMax) * 0.4f) + ((Utility.clamp(this.unitShieldMax, 50.0f) / 50.0f) * 0.5f)) * 255.0f), 255, 255, 255);
             gameEngine.renderGraphicsEngine.a(textureT, this.posX - gameEngine.viewpointXSnapped, (this.posY - gameEngine.viewpointYSnapped) - this.posZ, getUnitArmorRating(false) - 90.0f, this.k);
             return true;

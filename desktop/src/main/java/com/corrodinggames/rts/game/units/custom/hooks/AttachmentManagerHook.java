@@ -156,7 +156,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
         for (int i2 = fastArrayList2.size - 1; i2 >= 0; i2--) {
             OrderableUnit orderableUnit = (OrderableUnit) objArrA2[i2];
             if (orderableUnit != null) {
-                if (orderableUnit.isDestroyed) {
+                if (orderableUnit.isDead) {
                     orderableUnit.bx();
                     objArrA2[i2] = null;
                 } else {

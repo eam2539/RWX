@@ -163,7 +163,7 @@ public class TakeResourcesAction extends LogicAction {
         fastArrayList.clear();
         if (this.takeResources_includeUnitsInTransport) {
             for (BaseUnit baseUnit2 : customUnit.transportedUnits) {
-                if (baseUnit2 != null && !baseUnit2.isDestroyed) {
+                if (baseUnit2 != null && !baseUnit2.isDead) {
                     fastArrayList.add(baseUnit2);
                 }
             }
@@ -171,7 +171,7 @@ public class TakeResourcesAction extends LogicAction {
         if (this.takeResources_includeParent && (customUnit.parentEntity != null || customUnit.unitTransportTarget != null)) {
             fastArrayList.add(customUnit.parentEntity);
         }
-        if (this.takeResources_includeReference != null && (unit = this.takeResources_includeReference.readUnit(customUnit)) != null && !unit.isDestroyed) {
+        if (this.takeResources_includeReference != null && (unit = this.takeResources_includeReference.readUnit(customUnit)) != null && !unit.isDead) {
             fastArrayList.add(unit);
         }
         if (this.takeResources_includeUnitsWithinRange > 0.0f) {

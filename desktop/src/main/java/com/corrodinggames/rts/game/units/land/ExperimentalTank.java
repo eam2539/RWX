@@ -45,7 +45,7 @@ public class ExperimentalTank extends LandUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return a;
         }
         return d[this.team.getTeamColorIndex()];
@@ -107,7 +107,7 @@ public class ExperimentalTank extends LandUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!this.isDestroyed) {
+        if (!this.isDead) {
             if (this.spawnExitLockTimer != 0.0f) {
                 S(2);
             } else {
@@ -273,7 +273,7 @@ public class ExperimentalTank extends LandUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public Rect a_(boolean z) {
-        if (this.isDestroyed && !z) {
+        if (this.isDead && !z) {
             return super.a_(z);
         }
         if (z) {

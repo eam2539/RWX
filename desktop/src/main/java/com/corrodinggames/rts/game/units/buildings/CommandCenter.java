@@ -117,7 +117,7 @@ public class CommandCenter extends FactoryWithQueue {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public void S() {
         super.S();
-        if (this.isDestroyed) {
+        if (this.isDead) {
             this.overlayTexture = null;
         } else {
             this.overlayTexture = backgroundTexture;
@@ -126,7 +126,7 @@ public class CommandCenter extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return deadTexture;
         }
         return teamTextures[this.team.getTeamColorIndex()];
@@ -187,7 +187,7 @@ public class CommandCenter extends FactoryWithQueue {
     public void update(float f) {
         GameEngine.getInstance();
         super.update(f);
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
             return;
         }
         this.frameTimer = Utility.moveTowardsZero(this.frameTimer, f);

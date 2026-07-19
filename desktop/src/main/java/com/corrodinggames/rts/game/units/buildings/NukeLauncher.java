@@ -223,7 +223,7 @@ public class NukeLauncher extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        if (this.isDestroyed) {
+        if (this.isDead) {
             return deadTexture;
         }
         return teamTextures[this.team.getTeamColorIndex()];
@@ -277,7 +277,7 @@ public class NukeLauncher extends FactoryWithQueue {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (!isAlive() || this.isDestroyed) {
+        if (!isAlive() || this.isDead) {
         }
     }
 
