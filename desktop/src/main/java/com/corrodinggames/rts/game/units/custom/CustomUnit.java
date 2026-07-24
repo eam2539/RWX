@@ -411,7 +411,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (this.transportedUnits.size() == 0) {
             return false;
         }
-        return b((BaseUnit) this.transportedUnits.remove(this.transportedUnits.size() - 1), z, this.transportedUnits.size() % 2 == 0);
+        boolean unloadOnEvenSide = this.transportedUnits.size() % 2 == 0;
+        BaseUnit transportedUnit = (BaseUnit) this.transportedUnits.remove(this.transportedUnits.size() - 1);
+        return b(transportedUnit, z, unloadOnEvenSide);
     }
 
     /* JADX INFO: renamed from: a */

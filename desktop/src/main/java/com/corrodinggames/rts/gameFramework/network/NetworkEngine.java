@@ -2504,7 +2504,6 @@ public final class NetworkEngine {
                         gameEngine.setPendingMessageBox(str, e.getMessage());
                         return;
                     }
-                    break;
                 }
                 if (b2 >= 4) {
                     this.roomSettings.sharedControl = gameInputStream2.readBoolean();
