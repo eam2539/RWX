@@ -73,19 +73,19 @@ public class ResourceExtractor extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return Locale.get("units.extractor.upgrade.description", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("gui.actions.upgradeT2", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return UnitTypeEnum.extractor.getUpgradeCost(2);
         }
 
@@ -96,12 +96,12 @@ public class ResourceExtractor extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             ResourceExtractor resourceExtractor = (ResourceExtractor) baseUnit;
             if (resourceExtractor.extractorLevel != 1 || resourceExtractor.a(getActionId(), z) > 0) {
                 return false;
             }
-            return super.drawTooltip(baseUnit, z);
+            return super.canAfford(baseUnit, z);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -112,7 +112,7 @@ public class ResourceExtractor extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.upgrade;
         }
     };
@@ -127,19 +127,19 @@ public class ResourceExtractor extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return Locale.get("units.extractor.upgrade.descriptionT3", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("gui.actions.upgradeT3", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return UnitTypeEnum.extractor.getUpgradeCost(3);
         }
 
@@ -150,12 +150,12 @@ public class ResourceExtractor extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             ResourceExtractor resourceExtractor = (ResourceExtractor) baseUnit;
             if (resourceExtractor.extractorLevel != 2 || resourceExtractor.a(getActionId(), z) > 0) {
                 return false;
             }
-            return super.drawTooltip(baseUnit, z);
+            return super.canAfford(baseUnit, z);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -166,7 +166,7 @@ public class ResourceExtractor extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.upgrade;
         }
     };
@@ -353,12 +353,12 @@ public class ResourceExtractor extends FactoryWithQueue {
         this.resourceGenerationTimer += f;
         if (this.resourceGenerationTimer > PlayerTeam.resourceIncomeUpdateInterval - 0.1f) {
             this.resourceGenerationTimer -= PlayerTeam.resourceIncomeUpdateInterval;
-            this.team.b(cy() * (PlayerTeam.resourceIncomeUpdateInterval / PlayerTeam.resourceIncomeRatePeriod));
+            this.team.b(getCreditIncomeRate() * (PlayerTeam.resourceIncomeUpdateInterval / PlayerTeam.resourceIncomeRatePeriod));
         }
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
-    public float cy() {
+    public float getCreditIncomeRate() {
         if (this.extractorLevel == 3) {
             return 18.0f;
         }

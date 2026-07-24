@@ -89,7 +89,7 @@ public class ScorchMark extends GameObject {
     }
 
     public static void a(OrderableUnit orderableUnit, int i2) {
-        if (!orderableUnit.m147cJ()) {
+        if (!orderableUnit.isOverWater()) {
             ExplosionType explosionType = i2 == 2 ? ExplosionType.nuke : ExplosionType.normal;
             if (!b(orderableUnit.posX, orderableUnit.posY, explosionType)) {
                 return;

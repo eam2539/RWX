@@ -58,7 +58,7 @@ public class Projectile extends Serializable {
         this.b = gameInputStream.readFloat();
         int i = 0;
         if (gameInputStream.getProtocolVersion() >= 4) {
-            this.j = ActionId.isSameInstance(String.valueOf(gameInputStream.readInt()));
+            this.j = ActionId.intern(String.valueOf(gameInputStream.readInt()));
         }
         if (gameInputStream.getProtocolVersion() >= 6) {
             i = gameInputStream.readInt();
@@ -68,7 +68,7 @@ public class Projectile extends Serializable {
         }
         if (gameInputStream.getProtocolVersion() >= 33) {
             gameInputStream.readUTF();
-            this.j = ActionId.isSameInstance(gameInputStream.readUTF());
+            this.j = ActionId.intern(gameInputStream.readUTF());
         }
         if (gameInputStream.getProtocolVersion() >= 61) {
             this.i = gameInputStream.readBaseUnit();

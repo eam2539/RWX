@@ -696,7 +696,7 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     }
 
     public static SlickTexture b(int i, boolean z) {
-        String number = Utility.formatNumber(i);
+        String number = Utility.getResourcePath(i);
         try {
             FileInputStream fileInputStream = new FileInputStream(number);
             ImageData imageDataA = a(fileInputStream);

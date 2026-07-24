@@ -71,9 +71,9 @@ public class CrystalResource extends BaseBuilding {
         }
     }
 
-    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: g */
-    public float getUnitHealthPercent() {
+    public float getResourceRate() {
         return 0.02f;
     }
 
@@ -89,9 +89,9 @@ public class CrystalResource extends BaseBuilding {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: s_ */
-    public boolean isBuilding() {
+    public boolean isVisibleOnScreen() {
         GameEngine gameEngine = GameEngine.getInstance();
-        du.a(getUnitMassBounds());
+        du.a(getVisibilityBounds());
         return RectF.a(gameEngine.visibleScreenRect, du);
     }
 

@@ -22,7 +22,7 @@ public class CacheManager {
 
     /* JADX INFO: renamed from: a */
     public static String encodeChar(String str, char c) {
-        if (Utility.endsWithChar(str, c)) {
+        if (Utility.containsChar(str, c)) {
             str = Utility.readStreamToString(str, String.valueOf(c), "%" + getCharAsString(c));
         }
         return str;

@@ -41,7 +41,7 @@ class MasterServerListParser implements Runnable {
                     GameEngine gameEngine2 = GameEngine.getInstance();
                     String line = bufferedReader.readLine();
                     if (line == null || !line.contains("CORRODINGGAMES")) {
-                        String str2 = i2 + ": Unknown header from the master server: '" + Utility.padLeft(line, 30) + "'";
+                        String str2 = i2 + ": Unknown header from the master server: '" + Utility.truncateToLength(line, 30) + "'";
                         GameEngine.log("LoadFromMasterServer", str2);
                         this.errorOrResponseText = str2;
                         try {

@@ -59,7 +59,7 @@ public class ExperimentalTank extends LandUnit {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && this.posZ > -2.0f && this.deceleration >= 1.0f;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && this.posZ > -2.0f && this.buildProgress >= 1.0f;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -114,7 +114,7 @@ public class ExperimentalTank extends LandUnit {
                 S(4);
             }
         }
-        if (this.isInitialized) {
+        if (this.isMoving) {
             this.f += f;
             if (this.f > 5.0f) {
                 this.f = 0.0f;
@@ -149,7 +149,7 @@ public class ExperimentalTank extends LandUnit {
             projectileA.aQ = true;
             projectileA.P = (short) 9;
             projectileA.x = 1.0f;
-            projectileA.syncType = this.syncType;
+            projectileA.drawLayer = this.drawLayer;
             GameEngine gameEngine = GameEngine.getInstance();
             gameEngine.effectManager.createLightEffect(pointFE.x, pointFE.y, this.posZ, 16745216);
             gameEngine.effectManager.createFlameEffect(pointFE.x, pointFE.y, this.posZ, this.movementLevels[i].targetX);
@@ -172,7 +172,7 @@ public class ExperimentalTank extends LandUnit {
         projectileA2.aM = true;
         projectileA2.aQ = true;
         projectileA2.aG = true;
-        projectileA2.syncType = this.syncType;
+        projectileA2.drawLayer = this.drawLayer;
         GameEngine gameEngine2 = GameEngine.getInstance();
         gameEngine2.soundEngine.playSound(SoundEngine.missileFireSound, 0.2f, this.posX, this.posY);
         gameEngine2.effectManager.createLightEffect(projectileA2, -1118720);
@@ -349,13 +349,13 @@ public class ExperimentalTank extends LandUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cw */
-    public int getUnitAIPathfindIterations() {
+    public int getTransportSlotsNeeded() {
         return 5;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: dd */
-    public boolean getUnitAICombatTarget() {
+    public boolean isExperimental() {
         return true;
     }
 

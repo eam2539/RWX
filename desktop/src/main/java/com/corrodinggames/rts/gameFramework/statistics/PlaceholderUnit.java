@@ -28,7 +28,7 @@ public class PlaceholderUnit extends DummyUnit {
     public void update(float f) {
         super.update(f);
         GameEngine.logErrorColored("PlaceholderUnit was updated");
-        getUnitAICondition();
+        removeFromGame();
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -43,7 +43,7 @@ public class PlaceholderUnit extends DummyUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: df */
-    public StoredResources getUnitAICombatRange() {
+    public StoredResources getCustomResources() {
         return this.a;
     }
 

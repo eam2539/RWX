@@ -28,7 +28,7 @@ class FlamethrowerTurret extends TurretImplementation {
 
     @Override // com.corrodinggames.rts.game.units.buildings.turrets.TurretImplementation
     public int d() {
-        return UnitTypeEnum.turret.c() + TurretFactory.upgradeToFlamethrowerAction.isConfirmed();
+        return UnitTypeEnum.turret.c() + TurretFactory.upgradeToFlamethrowerAction.getCostAmount();
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.turrets.TurretImplementation
@@ -74,7 +74,7 @@ class FlamethrowerTurret extends TurretImplementation {
         projectileA.o = pointFA.y;
         projectileA.n += (-15) + ((this.turretFactory.turretType * 13) % 30);
         projectileA.o += (-15) + ((63 + (this.turretFactory.turretType * 33)) % 30);
-        projectileA.syncType = 3;
+        projectileA.drawLayer = 3;
         projectileA.Y = getAttackDamage(i);
         projectileA.Z = 65.0f;
         projectileA.aa = true;

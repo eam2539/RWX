@@ -59,7 +59,7 @@ public class FactoryQueueManager {
         for (int i2 = 0; i2 < i; i2++) {
             Projectile projectile = new Projectile();
             projectile.readFromStream(gameInputStream);
-            if (AbstractUnitAction.isMove(projectile.j)) {
+            if (AbstractUnitAction.isActionIdSpecified(projectile.j)) {
                 if (this.a.validateActionId(projectile.j) == null) {
                     GameEngine.log("Factory", this.a.r() + " no longer has the action:" + projectile.j);
                 } else {
@@ -166,7 +166,7 @@ public class FactoryQueueManager {
         projectile.e = popupQueueAction.getAnimationSet();
         projectile.f = popupQueueAction.isHighPriority();
         projectile.g = popupQueueAction.getUnitType();
-        projectile.l = popupQueueAction.isAttack();
+        projectile.l = popupQueueAction.isHighPriorityQueue();
         if (!z) {
             PlayerTeam.b((BaseUnit) this.a);
             if (projectile.l) {
@@ -223,7 +223,7 @@ public class FactoryQueueManager {
         if (this.f == null || this.f.d == null) {
             return null;
         }
-        return UnitPrice.a(this.f.d, -(this.f.b * this.a.getUnitAIPathfindMemory() * 60.0f));
+        return UnitPrice.a(this.f.d, -(this.f.b * this.a.getNanoFactorySpeed() * 60.0f));
     }
 
     public AbstractUnitAction d() {
@@ -246,7 +246,7 @@ public class FactoryQueueManager {
                 }
                 a(projectile);
             }
-            float fCx = projectile.b * this.a.getUnitAIPathfindMemory() * f;
+            float fCx = projectile.b * this.a.getNanoFactorySpeed() * f;
             boolean z = false;
             if (projectile.d != null) {
                 if (this.e + fCx > 1.0f) {
@@ -309,7 +309,7 @@ public class FactoryQueueManager {
             if (projectile2.b > 10.0f && projectile2.m <= 0.0f) {
                 projectile2.m = 1.0f;
                 AbstractUnitAction abstractUnitActionA = this.a.validateActionId(projectile2.j);
-                if (abstractUnitActionA != null && abstractUnitActionA.getOptions()) {
+                if (abstractUnitActionA != null && abstractUnitActionA.usesExtraLagHidingInUI()) {
                     abstractUnitActionA.a(this.a);
                 }
             }
@@ -431,7 +431,7 @@ public class FactoryQueueManager {
         if (abstractUnitAction instanceof PopupQueueAction) {
             PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
             if (!z) {
-                if (abstractUnitAction.drawTooltip((BaseUnit) this.a, false) && abstractUnitAction.b(this.a)) {
+                if (abstractUnitAction.canAfford((BaseUnit) this.a, false) && abstractUnitAction.b(this.a)) {
                     if ((!popupQueueAction.isHighPriority() || this.a.team.getNonBuildingUnitCountIncludingQueued() < this.a.team.getUnitCap()) && popupQueueAction.getDisplayText().c(this.a)) {
                         return a(popupQueueAction, false, pointF, baseUnit);
                     }
@@ -454,8 +454,8 @@ public class FactoryQueueManager {
         if (abstractUnitAction instanceof PopupQueueAction) {
             PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
             if (!z) {
-                if (abstractUnitAction.drawTooltip((BaseUnit) this.a, true)) {
-                    if ((!popupQueueAction.isHighPriority() || this.a.team.getNonBuildingUnitCountIncludingQueued() < this.a.team.getUnitCap()) && popupQueueAction.getDisplayText().b(this.a, abstractUnitAction.getOptions())) {
+                if (abstractUnitAction.canAfford((BaseUnit) this.a, true)) {
+                    if ((!popupQueueAction.isHighPriority() || this.a.team.getNonBuildingUnitCountIncludingQueued() < this.a.team.getUnitCap()) && popupQueueAction.getDisplayText().b(this.a, abstractUnitAction.usesExtraLagHidingInUI())) {
                         a(popupQueueAction, true);
                         return;
                     }
@@ -464,7 +464,7 @@ public class FactoryQueueManager {
                 return;
             }
             if (b(popupQueueAction, true) != null) {
-                popupQueueAction.getDisplayText().e(this.a, abstractUnitAction.getOptions());
+                popupQueueAction.getDisplayText().e(this.a, abstractUnitAction.usesExtraLagHidingInUI());
             }
         }
     }
@@ -479,9 +479,9 @@ public class FactoryQueueManager {
             }
             if (projectile != null) {
                 if (!projectile.k) {
-                    projectile.c.e(this.a, abstractUnitAction.getOptions());
+                    projectile.c.e(this.a, abstractUnitAction.usesExtraLagHidingInUI());
                 } else {
-                    projectile.c.d(this.a, abstractUnitAction.getOptions());
+                    projectile.c.d(this.a, abstractUnitAction.usesExtraLagHidingInUI());
                 }
                 this.d.remove(projectile);
             }

@@ -53,7 +53,7 @@ public class AnimationAction extends LogicAction {
             animationAction.playAnimation = customUnitAnimationReferenceLoadCore;
             animationAction.playAnimationIfNotPlaying = customUnitAnimationReferenceLoadCore2;
             animationAction.playAnimationLowPriority = iniFile.getBoolean(str, str2 + "playAnimation_lowPriority", (Boolean) false).booleanValue();
-            customActionDef.ac.add(animationAction);
+            customActionDef.logicActions.add(animationAction);
         }
     }
 

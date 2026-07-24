@@ -53,7 +53,7 @@ public class FogRevealer extends DummyUnit {
         super.update(f);
         this.lifeTimer -= f;
         if (this.lifeTimer < 0.0f) {
-            getUnitAICondition();
+            removeFromGame();
         }
     }
 

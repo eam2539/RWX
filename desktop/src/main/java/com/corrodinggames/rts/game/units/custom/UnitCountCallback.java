@@ -38,10 +38,10 @@ public class UnitCountCallback extends FilteredUnitCallback {
         if (orderableUnit == baseUnit) {
             return;
         }
-        AnimationSet unitCombatAnimation = baseUnit.getUnitCombatAnimation();
+        AnimationSet unitCombatAnimation = baseUnit.getTags();
         AnimationSet animationSet = this.c.c;
         if ((animationSet == null || (unitCombatAnimation != null && AnimationTag.a(animationSet, unitCombatAnimation))) && Utility.distanceSq(this.a, this.b, baseUnit.posX, baseUnit.posY) < this.c.f) {
-            if (baseUnit.deceleration < 1.0f && this.c.i) {
+            if (baseUnit.buildProgress < 1.0f && this.c.i) {
                 return;
             }
             if (this.c.j && !baseUnit.bI()) {

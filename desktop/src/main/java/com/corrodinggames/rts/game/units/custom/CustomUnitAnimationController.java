@@ -219,7 +219,7 @@ public final class CustomUnitAnimationController {
                 }
             } else if (customUnitAnimationType == CustomUnitAnimationType.legDir) {
                 if (this.unitInstance.legInstances != null && customUnitAnimationSet.animationId < this.unitInstance.legInstances.length) {
-                    this.unitInstance.legInstances[customUnitAnimationSet.animationId].r = Utility.countOccurrences(this.unitInstance.legInstances[customUnitAnimationSet.animationId].r, false);
+                    this.unitInstance.legInstances[customUnitAnimationSet.animationId].r = Utility.normalizeAngle(this.unitInstance.legInstances[customUnitAnimationSet.animationId].r, false);
                     this.baseBlendValues[i] = this.unitInstance.legInstances[customUnitAnimationSet.animationId].r;
                 }
             } else if (customUnitAnimationType == CustomUnitAnimationType.legHeight) {
@@ -253,7 +253,7 @@ public final class CustomUnitAnimationController {
         for (int i = 0; i < fastArrayList.size(); i++) {
             CustomUnitAnimationSet customUnitAnimationSet = (CustomUnitAnimationSet) fastArrayList.get(i);
             CustomUnitAnimationType customUnitAnimationType = customUnitAnimationSet.animationType;
-            if (customUnitAnimationType != CustomUnitAnimationType.frame || this.unitInstance.flag3 || z) {
+            if (customUnitAnimationType != CustomUnitAnimationType.frame || this.unitInstance.shouldDraw || z) {
                 if (z) {
                     fB = 0.0f;
                     if (customUnitAnimationType == CustomUnitAnimationType.scale) {

@@ -192,7 +192,7 @@ public class WaypointAction extends LogicAction {
                 waypointAction.triggerActionIfFailed = customUnitAction;
                 waypointAction.triggerActionIfMatched = customUnitAction2;
             }
-            customActionDef.ac.add(waypointAction);
+            customActionDef.logicActions.add(waypointAction);
         }
     }
 

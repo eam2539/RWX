@@ -558,7 +558,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
             str = str + strA;
         }
         if (str != null) {
-            return Utility.booleanToString(str, ", ");
+            return Utility.removeSuffix(str, ", ");
         }
         return null;
     }

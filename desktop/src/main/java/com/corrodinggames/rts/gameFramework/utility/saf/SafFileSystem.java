@@ -187,7 +187,7 @@ class SafFileSystem {
             SafFileLoader.j("renameFile: fileUri==null for:" + str);
             return false;
         }
-        String fileNameWithoutExtension = Utility.getFileNameWithoutExtension(str2);
+        String fileNameWithoutExtension = Utility.getFileName(str2);
         SafFileLoader.i("Rename: " + uriF + " to " + fileNameWithoutExtension);
         try {
             Uri uriRenameFile = SafFileLoader.a.renameFile(c(), uriF, fileNameWithoutExtension);

@@ -50,39 +50,39 @@ public class AmphibiousJet extends AirUnit {
     public static final AbstractUnitAction y = new NoneAction(151) { // from class: com.corrodinggames.rts.game.units.b.c.1
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "-Surface unit.";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Fly";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             return !((AmphibiousJet) baseUnit).r;
         }
     };
     public static final AbstractUnitAction z = new NoneAction(152) { // from class: com.corrodinggames.rts.game.units.b.c.2
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "-Dive unit underwater.";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Dive";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
-            return ((AmphibiousJet) baseUnit).r && ((OrderableUnit) baseUnit).m147cJ();
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return ((AmphibiousJet) baseUnit).r && ((OrderableUnit) baseUnit).isOverWater();
         }
     };
     static ArrayList A = new ArrayList();
@@ -365,7 +365,7 @@ public class AmphibiousJet extends AirUnit {
         this.posZ = Utility.distanceSq(this.posZ, fFastSin, this.t * f2);
         boolean z2 = false;
         if (this.s && Q()) {
-            if (!m147cJ()) {
+            if (!isOverWater()) {
                 this.r = true;
             } else {
                 this.s = false;

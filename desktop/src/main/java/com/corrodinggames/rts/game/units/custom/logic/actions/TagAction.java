@@ -38,7 +38,7 @@ public class TagAction extends LogicAction {
             tagAction.resetToDefaultTags = zBooleanValue;
             tagAction.temporarilyAddTags = animationSet;
             tagAction.temporarilyRemoveTags = animationSet2;
-            customActionDef.ac.add(tagAction);
+            customActionDef.logicActions.add(tagAction);
         }
         AnimationSet animationSet3 = iniFile.getAnimationSet(customUnitConfig, str, str2 + "addGlobalTeamTags", (AnimationSet) null);
         AnimationSet animationSet4 = iniFile.getAnimationSet(customUnitConfig, str, str2 + "removeGlobalTeamTags", (AnimationSet) null);
@@ -46,7 +46,7 @@ public class TagAction extends LogicAction {
             TagAction tagAction2 = new TagAction();
             tagAction2.addGlobalTeamTags = animationSet3;
             tagAction2.removeGlobalTeamTags = animationSet4;
-            customActionDef.ac.add(tagAction2);
+            customActionDef.logicActions.add(tagAction2);
         }
     }
 

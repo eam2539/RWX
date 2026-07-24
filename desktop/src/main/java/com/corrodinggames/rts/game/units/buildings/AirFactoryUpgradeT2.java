@@ -21,19 +21,19 @@ class AirFactoryUpgradeT2 extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public String isLocked() {
+    public String getDescription() {
         return "-Allows factory to build Tech 2 units";
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public String getCostForUnit() {
+    public String getDisplayName() {
         return Locale.get("gui.actions.upgradeT2", new Object[0]);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
-    public int isConfirmed() {
+    public int getCostAmount() {
         return UnitTypeEnum.airFactory.getUpgradeCost(2);
     }
 
@@ -44,12 +44,12 @@ class AirFactoryUpgradeT2 extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+    public boolean canAfford(BaseUnit baseUnit, boolean z) {
         AirFactory airFactory = (AirFactory) baseUnit;
         if (airFactory.factoryLevel != 1 || airFactory.a(getActionId(), z) > 0) {
             return false;
         }
-        return super.drawTooltip(baseUnit, z);
+        return super.canAfford(baseUnit, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -60,7 +60,7 @@ class AirFactoryUpgradeT2 extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
+    public ActionDisplayType getActionDisplayType() {
         return ActionDisplayType.upgrade;
     }
 }

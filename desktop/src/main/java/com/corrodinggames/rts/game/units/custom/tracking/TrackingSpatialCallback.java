@@ -38,7 +38,7 @@ public class TrackingSpatialCallback extends FilteredUnitCallback {
     @Override // com.corrodinggames.rts.game.units.spatial.UnitSpatialCallback
     public void callback(OrderableUnit orderableUnit, float f, BaseUnit baseUnit) {
         AnimationSet unitAICombatTimer;
-        if (orderableUnit != baseUnit && (unitAICombatTimer = baseUnit.getUnitAICombatTimer()) != null && AnimationTag.a(this.b.a, unitAICombatTimer)) {
+        if (orderableUnit != baseUnit && (unitAICombatTimer = baseUnit.getTrackingTags()) != null && AnimationTag.a(this.b.a, unitAICombatTimer)) {
             if (orderableUnit.team != baseUnit.team) {
                 if (orderableUnit.team.d(baseUnit.team)) {
                     if (!this.b.b) {

@@ -93,7 +93,7 @@ public class TeamStats {
     public void update() {
         Iterator it = this.comparators.iterator();
         while (it.hasNext()) {
-            ((GameObjectComparator) it.next()).getName(this.statType);
+            ((GameObjectComparator) it.next()).updateCachedStat(this.statType);
         }
     }
 

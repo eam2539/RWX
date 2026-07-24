@@ -31,7 +31,7 @@ class GunTurretT3 extends TurretImplementation {
 
     @Override // com.corrodinggames.rts.game.units.buildings.turrets.TurretImplementation
     public int d() {
-        return UnitTypeEnum.turret.c() + TurretFactory.upgradeToT2Action.isConfirmed() + TurretFactory.upgradeToT3Action.isConfirmed();
+        return UnitTypeEnum.turret.c() + TurretFactory.upgradeToT2Action.getCostAmount() + TurretFactory.upgradeToT3Action.getCostAmount();
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.turrets.TurretImplementation

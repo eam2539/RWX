@@ -18,10 +18,10 @@ public class UnitFilter {
     public CustomUnitSpawnList g;
 
     public boolean a(BaseUnit baseUnit) {
-        if (this.b != null && AnimationTag.a(this.b, baseUnit.getUnitCombatAnimation())) {
+        if (this.b != null && AnimationTag.a(this.b, baseUnit.getTags())) {
             return false;
         }
-        if (this.a != null && !AnimationTag.a(this.a, baseUnit.getUnitCombatAnimation())) {
+        if (this.a != null && !AnimationTag.a(this.a, baseUnit.getTags())) {
             return false;
         }
         return true;

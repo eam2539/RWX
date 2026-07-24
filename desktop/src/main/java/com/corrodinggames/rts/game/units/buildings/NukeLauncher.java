@@ -58,25 +58,25 @@ public class NukeLauncher extends FactoryWithQueue {
     static AbstractUnitAction launchNukeAction = new AbstractUnitAction(142) { // from class: com.corrodinggames.rts.game.units.d.q.1
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return Locale.get("gui.actions.launchNuke", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("gui.actions.launchNuke", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 0;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z) {
             return ((NukeLauncher) baseUnit).nukeCount;
         }
 
@@ -87,13 +87,13 @@ public class NukeLauncher extends FactoryWithQueue {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public ActionType e() {
+        public ActionType getActionType() {
             return ActionType.targetGround;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.action;
         }
 
@@ -105,7 +105,7 @@ public class NukeLauncher extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             return ((NukeLauncher) baseUnit).nukeCount > 0;
         }
     };
@@ -120,19 +120,19 @@ public class NukeLauncher extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return Locale.get("gui.actions.buildNuke.description", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("gui.actions.buildNuke", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 11000;
         }
 
@@ -143,12 +143,12 @@ public class NukeLauncher extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             NukeLauncher nukeLauncher = (NukeLauncher) baseUnit;
             if (nukeLauncher.nukeCount + nukeLauncher.a(getActionId(), z) >= 4.0f) {
                 return false;
             }
-            return super.drawTooltip(baseUnit, z);
+            return super.canAfford(baseUnit, z);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -159,7 +159,7 @@ public class NukeLauncher extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.queueUnit;
         }
     };

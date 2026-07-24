@@ -420,19 +420,19 @@ public class MasterServerClient {
         }
         if (i > 0) {
             if (i < 100000) {
-                return Utility.padLeft(Utility.getParentDir("x" + i), 10);
+                return Utility.truncateToLength(Utility.md5Hex("x" + i), 10);
             }
             if (i < 200000) {
-                return Utility.padLeft(Utility.getParentDir("y" + i), 11);
+                return Utility.truncateToLength(Utility.md5Hex("y" + i), 11);
             }
             if (i < 300000) {
-                return Utility.padLeft(Utility.getParentDir("z" + i), 12);
+                return Utility.truncateToLength(Utility.md5Hex("z" + i), 12);
             }
             if (i < 1000000) {
-                return Utility.padLeft(Utility.getParentDir("xx" + i), 13) + "-" + GameEngine.getInstance().networkEngine.g(i - 300000);
+                return Utility.truncateToLength(Utility.md5Hex("xx" + i), 13) + "-" + GameEngine.getInstance().networkEngine.g(i - 300000);
             }
             if (i < 2000000) {
-                return Utility.padLeft(Utility.getParentDir("yy" + i), 14) + "-" + GameEngine.getInstance().networkEngine.g(i - 1000000);
+                return Utility.truncateToLength(Utility.md5Hex("yy" + i), 14) + "-" + GameEngine.getInstance().networkEngine.g(i - 1000000);
             }
             return "NA";
         }

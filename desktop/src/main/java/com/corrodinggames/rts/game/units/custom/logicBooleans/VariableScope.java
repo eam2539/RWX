@@ -1431,7 +1431,7 @@ public class VariableScope {
                     str3 = strArrC[1];
                 }
                 String strSubstring = null;
-                if (Utility.getRandomBoolean(str2, "[")) {
+                if (Utility.containsSubstring(str2, "[")) {
                     int iIndexOf = str2.indexOf(91);
                     int iB = StringUtils.b(str2, "]", iIndexOf);
                     if (iIndexOf == -1 || iB == -1) {

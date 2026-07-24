@@ -358,7 +358,7 @@ public class MissionEngine extends Serializable {
             if ("fall".equalsIgnoreCase(mapObject.type)) {
                 for (final BaseUnit am2 : BaseUnit.bE) {
                     if (am2 instanceof OrderableUnit && !am2.bI() && mapObject.containsUnitPosition(am2)) {
-                        am2.getUnitAICombatState();
+                        am2.startFalling();
                     }
                 }
             }
@@ -597,7 +597,7 @@ public class MissionEngine extends Serializable {
                 }
                 else {
                     final int n3 = (int)(23.0f + this.G.k() / 2.0f);
-                    String string = "Wave " + (this.r + 1) + " in " + Utility.formatSize(String.valueOf((int)(this.z / 60.0)), 3);
+                    String string = "Wave " + (this.r + 1) + " in " + Utility.padRight(String.valueOf((int)(this.z / 60.0)), 3);
                     if (this.m) {
                         string = "Defeat - Wave " + this.r;
                     }
@@ -621,7 +621,7 @@ public class MissionEngine extends Serializable {
             if (d != null) {
                 final int n4 = d.e - instance.gameTimeMillis / 1000;
                 final int n3 = (int)(23.0f + this.G.k() / 2.0f);
-                String string2 = "Wave " + (this.r + 1) + " in " + Utility.formatSize(String.valueOf(n4), 3);
+                String string2 = "Wave " + (this.r + 1) + " in " + Utility.padRight(String.valueOf(n4), 3);
                 if (this.m) {
                     string2 = "Defeat - Wave " + this.r;
                 }
@@ -709,11 +709,11 @@ public class MissionEngine extends Serializable {
             return;
         }
         WaveUnitSpawner waveUnitSpawner = (WaveUnitSpawner) this.S.get(i % size);
-        int iCreateAndOpenFile = (int) Utility.createAndOpenFile((int) (((double) (i + 3)) * 0.5d * ((double) waveUnitSpawner.b) * ((double) f)), 0.8f);
-        if (iCreateAndOpenFile < 1) {
-            iCreateAndOpenFile = 1;
+        int waveUnitCount = (int) Utility.pow((int) (((double) (i + 3)) * 0.5d * ((double) waveUnitSpawner.b) * ((double) f)), 0.8f);
+        if (waveUnitCount < 1) {
+            waveUnitCount = 1;
         }
-        waveunitsVar.b(waveUnitSpawner.a, iCreateAndOpenFile);
+        waveunitsVar.b(waveUnitSpawner.a, waveUnitCount);
     }
 
     public WaveUnitGroup b(boolean z) {
@@ -989,7 +989,7 @@ public class MissionEngine extends Serializable {
     }
 
     public boolean a(WaveSpawnMode waveSpawnMode, BaseUnit baseUnit) {
-        if (!(baseUnit instanceof OrderableUnit) || baseUnit.isDead || baseUnit.getUnitVersion() || waveSpawnMode == WaveSpawnMode.none) {
+        if (!(baseUnit instanceof OrderableUnit) || baseUnit.isDead || baseUnit.isExcludedFromDefeatCheck() || waveSpawnMode == WaveSpawnMode.none) {
             return false;
         }
         if (waveSpawnMode == WaveSpawnMode.allUnitsAndBuildings) {
@@ -1082,7 +1082,7 @@ public class MissionEngine extends Serializable {
                         var10 = var9.team == var2.playerTeam;
                     } else {
                         var10 = !var9.team.isTeamSpectator;
-                        if (var6.isUnitIcon()) {
+                        if (var6.canBeCapturedByAI()) {
                             var10 = true;
                         }
                     }
@@ -1098,7 +1098,7 @@ public class MissionEngine extends Serializable {
                             && var9.isAlive()
                             && Utility.distanceSq(var9.posX, var9.posY, var6.posX, var6.posY) < 28900.0F) {
                         var6.isSelectable(var9.team);
-                        var6.unitBuildProgress = 60.0F;
+                        var6.selectionFlashTimer = 60.0F;
                         var1 = true;
                         break;
                     }

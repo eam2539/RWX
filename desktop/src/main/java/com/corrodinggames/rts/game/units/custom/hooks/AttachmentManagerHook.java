@@ -185,22 +185,22 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                         orderableUnit.posY = f7;
                         orderableUnit.posZ = f8;
                     }
-                    if (orderableUnit.deceleration < 1.0f && attachmentSlotDefinition2.x) {
-                        orderableUnit.r(customUnit.deceleration);
-                        orderableUnit.movementAngle = customUnit.deceleration;
+                    if (orderableUnit.buildProgress < 1.0f && attachmentSlotDefinition2.x) {
+                        orderableUnit.r(customUnit.buildProgress);
+                        orderableUnit.paidBuildProgress = customUnit.buildProgress;
                     }
                     if (attachmentSlotDefinition2.A) {
-                        if (orderableUnit.syncType <= customUnit.syncType) {
+                        if (orderableUnit.drawLayer <= customUnit.drawLayer) {
                             int i3 = 0;
                             if (orderableUnit instanceof CustomUnit) {
                                 i3 = ((CustomUnit) orderableUnit).unitConfig.drawLayer;
                             }
-                            orderableUnit.syncType = customUnit.syncType;
-                            orderableUnit.value2 = customUnit.value2 + 1 + i3;
+                            orderableUnit.drawLayer = customUnit.drawLayer;
+                            orderableUnit.drawOrder = customUnit.drawOrder + 1 + i3;
                         }
-                    } else if (attachmentSlotDefinition2.B && orderableUnit.syncType >= customUnit.syncType) {
-                        orderableUnit.syncType = customUnit.syncType;
-                        orderableUnit.value2 = customUnit.value2 - 1;
+                    } else if (attachmentSlotDefinition2.B && orderableUnit.drawLayer >= customUnit.drawLayer) {
+                        orderableUnit.drawLayer = customUnit.drawLayer;
+                        orderableUnit.drawOrder = customUnit.drawOrder - 1;
                     }
                     if (customUnit.isRotating) {
                         f2 = customUnit.rotationSpeed + attachmentSlotDefinition2.g;
@@ -263,7 +263,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                 orderableUnit.bx();
                 objArrA[i] = null;
                 if (z && !attachmentSlotDefinition.v) {
-                    orderableUnit.getUnitAICondition();
+                    orderableUnit.removeFromGame();
                 }
             }
         }
@@ -295,7 +295,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                         continue;
                     }
 
-                    var7.getUnitAICondition();
+                    var7.removeFromGame();
                 }
 
                 FastArrayList var8 = new FastArrayList();
@@ -304,7 +304,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                     GameEngine.logColored("onCreateSpawnUnitOf: created an extra " + (var8.size() - 1) + " units");
 
                     for (int var9 = 1; var9 < var8.size(); var9++) {
-                        ((BaseUnit)var8.get(var9)).getUnitAICondition();
+                        ((BaseUnit)var8.get(var9)).removeFromGame();
                     }
                 }
 
@@ -314,14 +314,14 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                     BaseUnit var11 = (BaseUnit)var8.get(0);
                     if (!(var11 instanceof OrderableUnit)) {
                         GameEngine.logColored("onCreateSpawnUnitOf: Warning " + var11.r().getUnitTypeDescriptionShort() + " not an orderable unit type, cannot attach");
-                        var11.getUnitAICondition();
+                        var11.removeFromGame();
                     } else {
                         OrderableUnit var10 = (OrderableUnit)var11;
                         if (j.a(var10, var6)) {
                             var10.unitTransportCapacity = -9999;
-                            if (j.deceleration < 1.0F && var6.x) {
-                                var10.r(j.deceleration);
-                                var10.movementAngle = j.deceleration;
+                            if (j.buildProgress < 1.0F && var6.x) {
+                                var10.r(j.buildProgress);
+                                var10.paidBuildProgress = j.buildProgress;
                             }
 
                             var2 = true;
@@ -349,7 +349,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
         for (int size = fastArrayList.size() - 1; size >= 0; size--) {
             OrderableUnit orderableUnit = (OrderableUnit) fastArrayList.get(size);
             if (orderableUnit != null && size >= fastArrayList2.size()) {
-                orderableUnit.getUnitAICondition();
+                orderableUnit.removeFromGame();
                 fastArrayList.remove(size);
             }
         }

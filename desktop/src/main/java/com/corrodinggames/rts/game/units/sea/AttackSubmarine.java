@@ -36,38 +36,38 @@ public class AttackSubmarine extends WaterUnit {
     public static final AbstractUnitAction j = new NoneAction(151) { // from class: com.corrodinggames.rts.game.units.h.e.1
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "-Surface unit. Allows it to fire missiles";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Surface";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             return !((AttackSubmarine) baseUnit).a;
         }
     };
     public static final AbstractUnitAction k = new NoneAction(152) { // from class: com.corrodinggames.rts.game.units.h.e.2
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "-Dive unit underwater. Evades most attacks";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Dive";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             return ((AttackSubmarine) baseUnit).a;
         }
     };

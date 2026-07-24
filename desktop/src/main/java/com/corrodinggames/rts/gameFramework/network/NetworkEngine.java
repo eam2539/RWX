@@ -486,13 +486,13 @@ public final class NetworkEngine {
         if (gameRoomSettings2.revealedMap != gameRoomSettings.revealedMap) {
             gameEngine.networkEngine.k("-revealedmap " + (!gameRoomSettings.revealedMap ? "true" : "false"));
         }
-        if (gameRoomSettings2.fodMode != gameRoomSettings.fodMode) {
-            gameEngine.networkEngine.k("-fog " + gameEngine.networkEngine.a(gameRoomSettings.fodMode));
+        if (gameRoomSettings2.fogMode != gameRoomSettings.fogMode) {
+            gameEngine.networkEngine.k("-fog " + gameEngine.networkEngine.a(gameRoomSettings.fogMode));
         }
         if (gameRoomSettings2.startingCredits != gameRoomSettings.startingCredits) {
             gameEngine.networkEngine.k("-credits " + gameEngine.networkEngine.e(gameRoomSettings.startingCredits));
         }
-        if (!Utility.isLessThan(gameRoomSettings2.incomeMultiplier, gameRoomSettings.incomeMultiplier)) {
+        if (!Utility.approximatelyEqualStrict(gameRoomSettings2.incomeMultiplier, gameRoomSettings.incomeMultiplier)) {
             gameEngine.networkEngine.k("-income " + Utility.padString(gameRoomSettings.incomeMultiplier, 1));
         }
         if (gameRoomSettings2.noNukes != gameRoomSettings.noNukes) {
@@ -510,13 +510,13 @@ public final class NetworkEngine {
     }
 
     public String g() {
-        if (this.roomSettings.fodMode == 0) {
+        if (this.roomSettings.fogMode == 0) {
             return "No fog";
         }
-        if (this.roomSettings.fodMode == 1) {
+        if (this.roomSettings.fogMode == 1) {
             return "Basic fog";
         }
-        if (this.roomSettings.fodMode == 2) {
+        if (this.roomSettings.fogMode == 2) {
             return "Line of Sight";
         }
         return "Unknown";
@@ -2112,7 +2112,7 @@ public final class NetworkEngine {
                 gameOutputStream.writeStringUTF(this.roomSettings.mapPath == null ? "<NULL>" : FileHelper.mapPath(this.roomSettings.mapPath));
             }
             gameOutputStream.writeInt(this.roomSettings.startingCredits);
-            gameOutputStream.writeInt(this.roomSettings.fodMode);
+            gameOutputStream.writeInt(this.roomSettings.fogMode);
             gameOutputStream.writeBoolean(this.roomSettings.revealedMap);
             gameOutputStream.writeInt(this.roomSettings.aiDifficulty);
             gameOutputStream.writeByte(8);
@@ -2363,7 +2363,7 @@ public final class NetworkEngine {
                     if (gameOutputStream.getMaxSize() >= 90) {
                         gameOutputStream.endBlock("teams");
                     }
-                    gameOutputStream.writeInt(this.roomSettings.fodMode);
+                    gameOutputStream.writeInt(this.roomSettings.fogMode);
                     gameOutputStream.writeInt(this.roomSettings.startingCredits);
                     gameOutputStream.writeBoolean(this.roomSettings.revealedMap);
                     gameOutputStream.writeInt(this.roomSettings.aiDifficulty);
@@ -2405,7 +2405,7 @@ public final class NetworkEngine {
     public synchronized boolean startSandboxServer()  {
         if (startSingleplayerServer()) {
             this.p = true;
-            this.roomSettings.fodMode = 0;
+            this.roomSettings.fogMode = 0;
             return true;
         }
         return false;
@@ -2470,7 +2470,7 @@ public final class NetworkEngine {
                 this.roomSettings.gameModeType = (GameModeType) gameInputStream2.readEnumOrdinalOrNull(GameModeType.class);
                 this.roomSettings.mapPath = gameInputStream2.readUTF();
                 this.roomSettings.startingCredits = gameInputStream2.readInt();
-                this.roomSettings.fodMode = gameInputStream2.readInt();
+                this.roomSettings.fogMode = gameInputStream2.readInt();
                 this.roomSettings.revealedMap = gameInputStream2.readBoolean();
                 this.roomSettings.aiDifficulty = gameInputStream2.readInt();
                 byte b2 = gameInputStream2.readByte();
@@ -2868,7 +2868,7 @@ public final class NetworkEngine {
                     gameInputStream8.d("teams");
                 }
                 this.localPlayerTeam = playerTeam;
-                this.roomSettings.fodMode = gameInputStream8.readInt();
+                this.roomSettings.fogMode = gameInputStream8.readInt();
                 this.roomSettings.startingCredits = gameInputStream8.readInt();
                 this.roomSettings.revealedMap = gameInputStream8.readBoolean();
                 this.roomSettings.aiDifficulty = gameInputStream8.readInt();

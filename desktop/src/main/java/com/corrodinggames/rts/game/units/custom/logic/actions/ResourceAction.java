@@ -42,7 +42,7 @@ public class ResourceAction extends LogicAction {
             resourceAction.resourceSetValue = iniFile.getDouble(str, str2 + "resourceAmount_setValue", -1.7976931348623157E308d);
             resourceAction.addResourceAmount = iniFile.getAttachmentData(customUnitConfig, str, str2 + "resourceAmount_addOtherResource", (Resource) null, true);
             resourceAction.resourceMultiplyBy = iniFile.getFloat(str, str2 + "resourceAmount_multiplyBy", Float.valueOf(1.0f)).floatValue();
-            customActionDef.ac.add(resourceAction);
+            customActionDef.logicActions.add(resourceAction);
         }
         DynamicResourcePrice dynamicResourcePriceA = DynamicResourcePrice.a(customUnitConfig, iniFile, str, str2 + "addResourcesWithLogic", null);
         DynamicResourcePrice dynamicResourcePriceA2 = DynamicResourcePrice.a(customUnitConfig, iniFile, str, str2 + "setResourcesWithLogic", null);
@@ -50,7 +50,7 @@ public class ResourceAction extends LogicAction {
             ResourceAction resourceAction2 = new ResourceAction();
             resourceAction2.setResourcesWithLogic = dynamicResourcePriceA2;
             resourceAction2.addResourcesWithLogic = dynamicResourcePriceA;
-            customActionDef.ac.add(resourceAction2);
+            customActionDef.logicActions.add(resourceAction2);
         }
     }
 

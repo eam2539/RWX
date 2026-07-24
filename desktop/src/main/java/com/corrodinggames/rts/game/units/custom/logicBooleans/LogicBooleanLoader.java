@@ -83,7 +83,7 @@ public class LogicBooleanLoader {
         String[] strArr2 = {"or", "and", "==", "!=", "<=", ">=", "<", ">", "%", "-", "+", "*", "/", "="};
         for (String s : strArr2) {
             String str3 = s;
-            if (Utility.getRandomBoolean(lowerCase, str3)) {
+            if (Utility.containsSubstring(lowerCase, str3)) {
                 boolean z3 = false;
                 boolean z4 = false;
                 if (str3.equals("and") || str3.equals("or")) {
@@ -226,7 +226,7 @@ public class LogicBooleanLoader {
             } else {
                 str2 = strArrB[i4];
             }
-            if (Utility.endsWithChar(str2, '[') && (iB = StringUtils.b(str2, "[", 0)) != -1) {
+            if (Utility.containsChar(str2, '[') && (iB = StringUtils.b(str2, "[", 0)) != -1) {
                 if (iB == 0) {
                     int iB2 = StringUtils.b(str2, "]", 0);
                     if (iB2 == -1 || iB >= iB2) {
@@ -566,8 +566,8 @@ public class LogicBooleanLoader {
             }
             return booleanBlock;
         }
-        if (Utility.isInteger(strTrim)) {
-            if (!Utility.getRandomBoolean(strTrim, ".")) {
+        if (Utility.isValidNumber(strTrim)) {
+            if (!Utility.containsSubstring(strTrim, ".")) {
                 if (cls == String.class) {
                     return strTrim;
                 }
@@ -587,11 +587,11 @@ public class LogicBooleanLoader {
         }
         Matcher matcherMatch = match(singleQuotePattern, strTrim);
         if (matcherMatch != null) {
-            return Utility.isAlphanumeric(matcherMatch.group(1));
+            return Utility.removeEscapeCharacters(matcherMatch.group(1));
         }
         Matcher matcherMatch2 = match(doubleQuotePattern, strTrim);
         if (matcherMatch2 != null) {
-            return Utility.isAlphanumeric(matcherMatch2.group(1));
+            return Utility.removeEscapeCharacters(matcherMatch2.group(1));
         }
         Matcher matcherMatch3 = match(integerPattern, strTrim);
         if (matcherMatch3 != null) {

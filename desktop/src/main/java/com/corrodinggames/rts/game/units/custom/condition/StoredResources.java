@@ -327,7 +327,7 @@ public final class StoredResources {
             if (storedResourceEntry.a.t) {
                 baseUnit.team.getCustomResources().d(storedResourceEntry.a, storedResourceEntry.b);
             } else {
-                baseUnit.getUnitAICombatRange().d(storedResourceEntry.a, storedResourceEntry.b);
+                baseUnit.getCustomResources().d(storedResourceEntry.a, storedResourceEntry.b);
             }
         }
     }
@@ -340,7 +340,7 @@ public final class StoredResources {
             if (storedResourceEntry.a.t) {
                 baseUnit.team.getCustomResources().d(storedResourceEntry.a, storedResourceEntry.b * d);
             } else {
-                baseUnit.getUnitAICombatRange().d(storedResourceEntry.a, storedResourceEntry.b * d);
+                baseUnit.getCustomResources().d(storedResourceEntry.a, storedResourceEntry.b * d);
             }
         }
     }
@@ -353,7 +353,7 @@ public final class StoredResources {
             if (storedResourceEntry.a.t) {
                 baseUnit.team.getCustomResources().b(storedResourceEntry.a, storedResourceEntry.b);
             } else {
-                baseUnit.getUnitAICombatRange().b(storedResourceEntry.a, storedResourceEntry.b);
+                baseUnit.getCustomResources().b(storedResourceEntry.a, storedResourceEntry.b);
             }
         }
     }
@@ -366,7 +366,7 @@ public final class StoredResources {
             if (storedResourceEntry.a.t) {
                 baseUnit.team.getCustomResources().b(storedResourceEntry.a, storedResourceEntry.b * d);
             } else {
-                baseUnit.getUnitAICombatRange().b(storedResourceEntry.a, storedResourceEntry.b * d);
+                baseUnit.getCustomResources().b(storedResourceEntry.a, storedResourceEntry.b * d);
             }
         }
     }

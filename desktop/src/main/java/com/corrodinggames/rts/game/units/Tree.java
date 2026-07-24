@@ -256,7 +256,7 @@ public class Tree extends NaturalUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: s_ */
-    public boolean isBuilding() {
+    public boolean isVisibleOnScreen() {
         return true;
     }
 
@@ -367,7 +367,7 @@ public class Tree extends NaturalUnit {
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public void n() {
         super.n();
-        this.rotationSpeed = Utility.countOccurrences((this.posY * 5.0f) + (this.posX * 3.0f), false);
+        this.rotationSpeed = Utility.normalizeAngle((this.posY * 5.0f) + (this.posX * 3.0f), false);
         if (this.d == 0) {
             this.f = ((int) ((this.posY * 5.0f) + (this.posX * 3.0f))) % 1;
         }

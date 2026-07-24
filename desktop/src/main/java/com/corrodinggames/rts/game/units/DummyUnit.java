@@ -172,7 +172,7 @@ public abstract class DummyUnit extends OrderableUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: J */
-    public boolean mo193J() {
+    public boolean isDamageImmune() {
         return true;
     }
 

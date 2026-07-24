@@ -43,7 +43,7 @@ public class AirFactory extends FactoryWithQueue {
     static Texture deadTexture = null;
 
     /* JADX INFO: renamed from: h */
-    static final ActionId upgradeActionId = ActionId.isSameInstance(String.valueOf(110));
+    static final ActionId upgradeActionId = ActionId.intern(String.valueOf(110));
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryWithQueue, com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {

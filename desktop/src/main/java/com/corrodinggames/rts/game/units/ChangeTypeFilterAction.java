@@ -25,7 +25,7 @@ class ChangeTypeFilterAction extends NoneAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public String getCostForUnit() {
+    public String getDisplayName() {
         if (this.b) {
             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
             if (editorOrBuilderL != null) {
@@ -62,7 +62,7 @@ class ChangeTypeFilterAction extends NoneAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public String isLocked() {
+    public String getDescription() {
         return "Change filtered type";
     }
 
@@ -86,18 +86,18 @@ class ChangeTypeFilterAction extends NoneAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.NoneAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
+    public ActionDisplayType getActionDisplayType() {
         if (this.b) {
             return ActionDisplayType.infoOnly;
         }
-        return super.isAlsoSelected();
+        return super.getActionDisplayType();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.NoneAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-    public ActionType e() {
+    public ActionType getActionType() {
         if (this.b) {
             return ActionType.infoOnly;
         }
-        return super.e();
+        return super.getActionType();
     }
 }

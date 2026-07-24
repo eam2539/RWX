@@ -79,7 +79,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         if (textureA2 != null) {
             customProjectileTemplate.C = textureA2;
         }
-        customProjectileTemplate.ad = iniFile.getFloat(str, "beamImageOffsetRate", Float.valueOf(customProjectileTemplate.ad)).floatValue();
+        customProjectileTemplate.beamImageOffsetRate = iniFile.getFloat(str, "beamImageOffsetRate", Float.valueOf(customProjectileTemplate.beamImageOffsetRate)).floatValue();
         Texture textureA3 = customUnitConfig.a(iniFile, str, "beamImage");
         if (textureA3 != null) {
             customProjectileTemplate.Y = textureA3;
@@ -132,29 +132,29 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
                 customProjectileTemplate.af = false;
             } else {
                 customProjectileTemplate.af = false;
-                customProjectileTemplate.ah = customUnitConfig.addConfigExtension(string, (CustomUnitSpawnList) null);
+                customProjectileTemplate.trailEffect = customUnitConfig.addConfigExtension(string, (CustomUnitSpawnList) null);
             }
         }
         String string2 = iniFile.getString(str, "effectOnCreate", (String) null);
         if (string2 != null) {
-            customProjectileTemplate.ai = customUnitConfig.addConfigExtension(string2, (CustomUnitSpawnList) null);
+            customProjectileTemplate.effectOnCreate = customUnitConfig.addConfigExtension(string2, (CustomUnitSpawnList) null);
         }
         customProjectileTemplate.ag = iniFile.getFloat(str, "trailEffectRate", Float.valueOf(customProjectileTemplate.ag)).floatValue();
         if (customProjectileTemplate.af) {
-            customProjectileTemplate.ao = -1118720;
+            customProjectileTemplate.lightColor = -1118720;
         }
-        customProjectileTemplate.am = iniFile.getFloat(str, "wobbleAmplitude", Float.valueOf(customProjectileTemplate.am)).floatValue();
-        customProjectileTemplate.an = iniFile.getTime(str, "wobbleFrequency", Float.valueOf(customProjectileTemplate.an)).floatValue();
-        if (customProjectileTemplate.an <= 0.0f) {
+        customProjectileTemplate.wobbleAmplitude = iniFile.getFloat(str, "wobbleAmplitude", Float.valueOf(customProjectileTemplate.wobbleAmplitude)).floatValue();
+        customProjectileTemplate.wobbleFrequency = iniFile.getTime(str, "wobbleFrequency", Float.valueOf(customProjectileTemplate.wobbleFrequency)).floatValue();
+        if (customProjectileTemplate.wobbleFrequency <= 0.0f) {
             throw new RuntimeException("wobbleFrequency must be greater than 0");
         }
-        customProjectileTemplate.ak = UnitSpawnList.a(customUnitConfig, iniFile, str, "spawnProjectilesOnEndOfLife", (UnitSpawnList) null);
-        customProjectileTemplate.aj = UnitSpawnList.a(customUnitConfig, iniFile, str, "spawnProjectilesOnExplode", (UnitSpawnList) null);
-        customProjectileTemplate.al = UnitSpawnList.a(customUnitConfig, iniFile, str, "spawnProjectilesOnCreate", (UnitSpawnList) null);
-        customProjectileTemplate.ao = iniFile.getColorAsInt(str, "lightColor", Integer.valueOf(customProjectileTemplate.ao)).intValue();
-        customProjectileTemplate.ap = iniFile.getFloat(str, "lightSize", Float.valueOf(customProjectileTemplate.ap)).floatValue();
-        customProjectileTemplate.aq = iniFile.getBoolean(str, "lightCastOnGround", Boolean.valueOf(customProjectileTemplate.aq)).booleanValue();
-        customProjectileTemplate.ar = iniFile.getBoolean(str, "largeHitEffect", Boolean.valueOf(customProjectileTemplate.ar)).booleanValue();
+        customProjectileTemplate.spawnProjectilesOnEndOfLife = UnitSpawnList.a(customUnitConfig, iniFile, str, "spawnProjectilesOnEndOfLife", (UnitSpawnList) null);
+        customProjectileTemplate.spawnProjectilesOnExplode = UnitSpawnList.a(customUnitConfig, iniFile, str, "spawnProjectilesOnExplode", (UnitSpawnList) null);
+        customProjectileTemplate.spawnProjectilesOnCreate = UnitSpawnList.a(customUnitConfig, iniFile, str, "spawnProjectilesOnCreate", (UnitSpawnList) null);
+        customProjectileTemplate.lightColor = iniFile.getColorAsInt(str, "lightColor", Integer.valueOf(customProjectileTemplate.lightColor)).intValue();
+        customProjectileTemplate.lightSize = iniFile.getFloat(str, "lightSize", Float.valueOf(customProjectileTemplate.lightSize)).floatValue();
+        customProjectileTemplate.lightCastOnGround = iniFile.getBoolean(str, "lightCastOnGround", Boolean.valueOf(customProjectileTemplate.lightCastOnGround)).booleanValue();
+        customProjectileTemplate.largeHitEffect = iniFile.getBoolean(str, "largeHitEffect", Boolean.valueOf(customProjectileTemplate.largeHitEffect)).booleanValue();
         customProjectileTemplate.O = iniFile.getFloat(str, "turnSpeed", Float.valueOf(customProjectileTemplate.O)).floatValue();
         customProjectileTemplate.P = iniFile.getFloat(str, "turnSpeedWhenNear", Float.valueOf(customProjectileTemplate.P)).floatValue();
         customProjectileTemplate.Q = iniFile.getFloat(str, "sweepSpeed", Float.valueOf(customProjectileTemplate.Q)).floatValue();
@@ -164,7 +164,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         customProjectileTemplate.V = iniFile.getBoolean(str, "lightingEffect", Boolean.valueOf(customProjectileTemplate.V)).booleanValue();
         customProjectileTemplate.W = iniFile.getBoolean(str, "laserEffect", Boolean.valueOf(customProjectileTemplate.W)).booleanValue();
         if (customProjectileTemplate.W && customProjectileTemplate.Y == null) {
-            customProjectileTemplate.aE = Color.a(80, 255, 0, 0);
+            customProjectileTemplate.color = Color.a(80, 255, 0, 0);
         }
         if (customProjectileTemplate.V && customProjectileTemplate.s) {
             throw new RuntimeException("lightingEffect must be targeted, cannot be targetGround");
@@ -172,68 +172,68 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         if (customProjectileTemplate.W && customProjectileTemplate.s) {
             throw new RuntimeException("laserEffect must be targeted, cannot be targetGround");
         }
-        customProjectileTemplate.as = iniFile.getFloat(str, "ballistic_delaymove_height", Float.valueOf(customProjectileTemplate.as)).floatValue();
-        customProjectileTemplate.at = iniFile.getFloat(str, "ballistic_height", Float.valueOf(customProjectileTemplate.at)).floatValue();
-        customProjectileTemplate.au = iniFile.getFloat(str, "targetSpeed", Float.valueOf(customProjectileTemplate.au)).floatValue();
-        customProjectileTemplate.av = iniFile.getFloat(str, "targetSpeedAcceleration", Float.valueOf(customProjectileTemplate.av)).floatValue();
-        customProjectileTemplate.aw = iniFile.getBoolean(str, "autoTargetingOnDeadTarget", Boolean.valueOf(customProjectileTemplate.aw)).booleanValue();
-        customProjectileTemplate.ax = iniFile.getFloat(str, "autoTargetingOnDeadTargetRange", Float.valueOf(customProjectileTemplate.ax)).floatValue();
-        customProjectileTemplate.ay = iniFile.getFloat(str, "autoTargetingOnDeadTargetLead", Float.valueOf(customProjectileTemplate.ay)).floatValue();
-        customProjectileTemplate.az = iniFile.getBoolean(str, "retargetingInFlight", Boolean.valueOf(customProjectileTemplate.az)).booleanValue();
-        customProjectileTemplate.aA = iniFile.getFloat(str, "retargetingInFlightSearchDelay", Float.valueOf(customProjectileTemplate.aA)).floatValue();
-        customProjectileTemplate.aB = iniFile.getFloat(str, "retargetingInFlightSearchRange", Float.valueOf(customProjectileTemplate.aB)).floatValue();
-        customProjectileTemplate.aC = iniFile.getFloat(str, "retargetingInFlightSearchLead", Float.valueOf(customProjectileTemplate.aC)).floatValue();
-        customProjectileTemplate.aD = iniFile.getAnimationSet(customUnitConfig, str, "retargetingInFlightSearchOnlyTags", (AnimationSet) null);
-        if (customProjectileTemplate.ax > 1500.0f) {
+        customProjectileTemplate.ballisticDelayMoveHeight = iniFile.getFloat(str, "ballistic_delaymove_height", Float.valueOf(customProjectileTemplate.ballisticDelayMoveHeight)).floatValue();
+        customProjectileTemplate.ballisticHeight = iniFile.getFloat(str, "ballistic_height", Float.valueOf(customProjectileTemplate.ballisticHeight)).floatValue();
+        customProjectileTemplate.targetSpeed = iniFile.getFloat(str, "targetSpeed", Float.valueOf(customProjectileTemplate.targetSpeed)).floatValue();
+        customProjectileTemplate.targetSpeedAcceleration = iniFile.getFloat(str, "targetSpeedAcceleration", Float.valueOf(customProjectileTemplate.targetSpeedAcceleration)).floatValue();
+        customProjectileTemplate.autoTargetingOnDeadTarget = iniFile.getBoolean(str, "autoTargetingOnDeadTarget", Boolean.valueOf(customProjectileTemplate.autoTargetingOnDeadTarget)).booleanValue();
+        customProjectileTemplate.autoTargetingOnDeadTargetRange = iniFile.getFloat(str, "autoTargetingOnDeadTargetRange", Float.valueOf(customProjectileTemplate.autoTargetingOnDeadTargetRange)).floatValue();
+        customProjectileTemplate.autoTargetingOnDeadTargetLead = iniFile.getFloat(str, "autoTargetingOnDeadTargetLead", Float.valueOf(customProjectileTemplate.autoTargetingOnDeadTargetLead)).floatValue();
+        customProjectileTemplate.retargetingInFlight = iniFile.getBoolean(str, "retargetingInFlight", Boolean.valueOf(customProjectileTemplate.retargetingInFlight)).booleanValue();
+        customProjectileTemplate.retargetingInFlightSearchDelay = iniFile.getFloat(str, "retargetingInFlightSearchDelay", Float.valueOf(customProjectileTemplate.retargetingInFlightSearchDelay)).floatValue();
+        customProjectileTemplate.retargetingInFlightSearchRange = iniFile.getFloat(str, "retargetingInFlightSearchRange", Float.valueOf(customProjectileTemplate.retargetingInFlightSearchRange)).floatValue();
+        customProjectileTemplate.retargetingInFlightSearchLead = iniFile.getFloat(str, "retargetingInFlightSearchLead", Float.valueOf(customProjectileTemplate.retargetingInFlightSearchLead)).floatValue();
+        customProjectileTemplate.retargetingInFlightSearchOnlyTags = iniFile.getAnimationSet(customUnitConfig, str, "retargetingInFlightSearchOnlyTags", (AnimationSet) null);
+        if (customProjectileTemplate.autoTargetingOnDeadTargetRange > 1500.0f) {
             throw new RuntimeException("for performance autoTargetingOnDeadTargetRange cannot be >1500");
         }
-        if (customProjectileTemplate.aB > 1500.0f) {
+        if (customProjectileTemplate.retargetingInFlightSearchRange > 1500.0f) {
             throw new RuntimeException("for performance retargetingInFlightSearchRange cannot be >1500");
         }
-        customProjectileTemplate.aE = iniFile.getColorAsInt(str, "color", Integer.valueOf(customProjectileTemplate.aE)).intValue();
-        customProjectileTemplate.aG = iniFile.getFloat(str, "teamColorRatio", Float.valueOf(customProjectileTemplate.aG)).floatValue();
-        if (customProjectileTemplate.aG < 0.0f || customProjectileTemplate.aG > 1.0f) {
-            throw new RuntimeException("teamColorRatio should be between 0-1 got:" + customProjectileTemplate.aG);
+        customProjectileTemplate.color = iniFile.getColorAsInt(str, "color", Integer.valueOf(customProjectileTemplate.color)).intValue();
+        customProjectileTemplate.teamColorRatio = iniFile.getFloat(str, "teamColorRatio", Float.valueOf(customProjectileTemplate.teamColorRatio)).floatValue();
+        if (customProjectileTemplate.teamColorRatio < 0.0f || customProjectileTemplate.teamColorRatio > 1.0f) {
+            throw new RuntimeException("teamColorRatio should be between 0-1 got:" + customProjectileTemplate.teamColorRatio);
         }
-        customProjectileTemplate.aH = iniFile.getFloat(str, "teamColorRatio_sourceRatio", Float.valueOf(1.0f - customProjectileTemplate.aG)).floatValue();
-        if (customProjectileTemplate.aH < 0.0f || customProjectileTemplate.aH > 1.0f) {
-            throw new RuntimeException("teamColorRatio_sourceRatio should be between 0-1 got:" + customProjectileTemplate.aH);
+        customProjectileTemplate.teamColorRatioSourceRatio = iniFile.getFloat(str, "teamColorRatio_sourceRatio", Float.valueOf(1.0f - customProjectileTemplate.teamColorRatio)).floatValue();
+        if (customProjectileTemplate.teamColorRatioSourceRatio < 0.0f || customProjectileTemplate.teamColorRatioSourceRatio > 1.0f) {
+            throw new RuntimeException("teamColorRatio_sourceRatio should be between 0-1 got:" + customProjectileTemplate.teamColorRatioSourceRatio);
         }
-        if (customProjectileTemplate.aG == 0.0f && customProjectileTemplate.aH != 1.0f) {
+        if (customProjectileTemplate.teamColorRatio == 0.0f && customProjectileTemplate.teamColorRatioSourceRatio != 1.0f) {
             throw new RuntimeException("teamColorRatio_sourceRatio requires teamColorRatio");
         }
-        customProjectileTemplate.aF = iniFile.getFloat(str, "drawSize", Float.valueOf(customProjectileTemplate.aF)).floatValue();
-        customProjectileTemplate.aI = iniFile.getBoolean(str, "flameWeapon", Boolean.valueOf(customProjectileTemplate.aI)).booleanValue();
-        customProjectileTemplate.aJ = iniFile.getBoolean(str, "hitSound", Boolean.valueOf(customProjectileTemplate.aJ)).booleanValue();
-        customProjectileTemplate.aL = iniFile.getFloat(str, "targetGroundHeightOffset", Float.valueOf(customProjectileTemplate.aL)).floatValue();
-        customProjectileTemplate.aK = iniFile.getFloat(str, "targetGroundSpread", Float.valueOf(customProjectileTemplate.aK)).floatValue();
-        customProjectileTemplate.aM = iniFile.getFloat(str, "speedSpread", Float.valueOf(customProjectileTemplate.aM)).floatValue();
-        customProjectileTemplate.aO = iniFile.getBoolean(str, "explodeOnEndOfLife", Boolean.valueOf(customProjectileTemplate.aO)).booleanValue();
-        customProjectileTemplate.aN = iniFile.getBoolean(str, "ignoreParentShootDamageMultiplier", Boolean.valueOf(customProjectileTemplate.aN)).booleanValue();
-        customProjectileTemplate.aP = iniFile.getFloat(str, "pushForce", Float.valueOf(customProjectileTemplate.aP)).floatValue();
-        customProjectileTemplate.aQ = iniFile.getFloat(str, "pushVelocity", Float.valueOf(customProjectileTemplate.aQ)).floatValue();
-        customProjectileTemplate.aR = iniFile.getFloat(str, "buildingDamageMultiplier", Float.valueOf(customProjectileTemplate.aR)).floatValue();
-        customProjectileTemplate.aS = iniFile.getFloat(str, "shieldDamageMultiplier", Float.valueOf(customProjectileTemplate.aS)).floatValue();
-        customProjectileTemplate.aT = iniFile.getFloat(str, "shieldDefectionMultiplier", Float.valueOf(customProjectileTemplate.aT)).floatValue();
-        customProjectileTemplate.aU = iniFile.getFloat(str, "hullDamageMultiplier", Float.valueOf(customProjectileTemplate.aU)).floatValue();
-        customProjectileTemplate.aV = iniFile.getFloat(str, "armourIgnoreAmount", Float.valueOf(customProjectileTemplate.aV)).floatValue();
-        customProjectileTemplate.aW = iniFile.getFloat(str, "areaExpandTime", Float.valueOf(customProjectileTemplate.aW)).floatValue();
+        customProjectileTemplate.drawSize = iniFile.getFloat(str, "drawSize", Float.valueOf(customProjectileTemplate.drawSize)).floatValue();
+        customProjectileTemplate.flameWeapon = iniFile.getBoolean(str, "flameWeapon", Boolean.valueOf(customProjectileTemplate.flameWeapon)).booleanValue();
+        customProjectileTemplate.hitSound = iniFile.getBoolean(str, "hitSound", Boolean.valueOf(customProjectileTemplate.hitSound)).booleanValue();
+        customProjectileTemplate.targetGroundHeightOffset = iniFile.getFloat(str, "targetGroundHeightOffset", Float.valueOf(customProjectileTemplate.targetGroundHeightOffset)).floatValue();
+        customProjectileTemplate.targetGroundSpread = iniFile.getFloat(str, "targetGroundSpread", Float.valueOf(customProjectileTemplate.targetGroundSpread)).floatValue();
+        customProjectileTemplate.speedSpread = iniFile.getFloat(str, "speedSpread", Float.valueOf(customProjectileTemplate.speedSpread)).floatValue();
+        customProjectileTemplate.explodeOnEndOfLife = iniFile.getBoolean(str, "explodeOnEndOfLife", Boolean.valueOf(customProjectileTemplate.explodeOnEndOfLife)).booleanValue();
+        customProjectileTemplate.ignoreParentShootDamageMultiplier = iniFile.getBoolean(str, "ignoreParentShootDamageMultiplier", Boolean.valueOf(customProjectileTemplate.ignoreParentShootDamageMultiplier)).booleanValue();
+        customProjectileTemplate.pushForce = iniFile.getFloat(str, "pushForce", Float.valueOf(customProjectileTemplate.pushForce)).floatValue();
+        customProjectileTemplate.pushVelocity = iniFile.getFloat(str, "pushVelocity", Float.valueOf(customProjectileTemplate.pushVelocity)).floatValue();
+        customProjectileTemplate.buildingDamageMultiplier = iniFile.getFloat(str, "buildingDamageMultiplier", Float.valueOf(customProjectileTemplate.buildingDamageMultiplier)).floatValue();
+        customProjectileTemplate.shieldDamageMultiplier = iniFile.getFloat(str, "shieldDamageMultiplier", Float.valueOf(customProjectileTemplate.shieldDamageMultiplier)).floatValue();
+        customProjectileTemplate.shieldDeflectionMultiplier = iniFile.getFloat(str, "shieldDefectionMultiplier", Float.valueOf(customProjectileTemplate.shieldDeflectionMultiplier)).floatValue();
+        customProjectileTemplate.hullDamageMultiplier = iniFile.getFloat(str, "hullDamageMultiplier", Float.valueOf(customProjectileTemplate.hullDamageMultiplier)).floatValue();
+        customProjectileTemplate.armourIgnoreAmount = iniFile.getFloat(str, "armourIgnoreAmount", Float.valueOf(customProjectileTemplate.armourIgnoreAmount)).floatValue();
+        customProjectileTemplate.areaExpandTime = iniFile.getFloat(str, "areaExpandTime", Float.valueOf(customProjectileTemplate.areaExpandTime)).floatValue();
         String string3 = iniFile.getString(str, "explodeEffect", (String) null);
         if (string3 != null) {
-            customProjectileTemplate.aX = customUnitConfig.addConfigExtension(string3, (CustomUnitSpawnList) null);
+            customProjectileTemplate.explodeEffect = customUnitConfig.addConfigExtension(string3, (CustomUnitSpawnList) null);
         }
         String string4 = iniFile.getString(str, "explodeEffectOnShield", (String) null);
         if (string4 != null) {
-            customProjectileTemplate.aY = customUnitConfig.addConfigExtension(string4, (CustomUnitSpawnList) null);
+            customProjectileTemplate.explodeEffectOnShield = customUnitConfig.addConfigExtension(string4, (CustomUnitSpawnList) null);
         }
         UnitSpawner unitSpawnerA = UnitSpawner.a(customUnitConfig, iniFile, str, "spawnUnit");
         if (unitSpawnerA != null && !unitSpawnerA.b()) {
-            customProjectileTemplate.aZ = unitSpawnerA;
+            customProjectileTemplate.spawnUnit = unitSpawnerA;
         }
-        customProjectileTemplate.ba = iniFile.getLogicBooleanUnit(str, "unloadUpToXUnitsFromSource", Integer.valueOf(customProjectileTemplate.ba)).intValue();
-        customProjectileTemplate.bb = iniFile.getBoolean(str, "teleportSource", Boolean.valueOf(customProjectileTemplate.bb)).booleanValue();
-        customProjectileTemplate.bc = iniFile.getBoolean(str, "convertHitToSourceTeam", Boolean.valueOf(customProjectileTemplate.bc)).booleanValue();
-        customProjectileTemplate.bd = AnimationTag.a(iniFile.getString(str, "tags", (String) null));
+        customProjectileTemplate.unloadUpToXUnitsFromSource = iniFile.getLogicBooleanUnit(str, "unloadUpToXUnitsFromSource", Integer.valueOf(customProjectileTemplate.unloadUpToXUnitsFromSource)).intValue();
+        customProjectileTemplate.teleportSource = iniFile.getBoolean(str, "teleportSource", Boolean.valueOf(customProjectileTemplate.teleportSource)).booleanValue();
+        customProjectileTemplate.convertHitToSourceTeam = iniFile.getBoolean(str, "convertHitToSourceTeam", Boolean.valueOf(customProjectileTemplate.convertHitToSourceTeam)).booleanValue();
+        customProjectileTemplate.tags = AnimationTag.a(iniFile.getString(str, "tags", (String) null));
         FastArrayList keysStartingWith = iniFile.getKeysStartingWith(str, "mutator");
         FastArrayList<String> fastArrayList = new FastArrayList();
         Iterator it = keysStartingWith.iterator();
@@ -279,10 +279,10 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             }
             boolean z = false;
             boolean z2 = false;
-            if (!Utility.isLessThan(unitFilter.c, 1.0f)) {
+            if (!Utility.approximatelyEqualStrict(unitFilter.c, 1.0f)) {
                 z = true;
             }
-            if (!Utility.isLessThan(unitFilter.d, 1.0f) && customProjectileTemplate.c != 0 && customProjectileTemplate.i > 0) {
+            if (!Utility.approximatelyEqualStrict(unitFilter.d, 1.0f) && customProjectileTemplate.c != 0 && customProjectileTemplate.i > 0) {
                 z2 = true;
             }
             if (unitFilter.e != null) {
@@ -314,7 +314,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         if (customProjectileTemplate.c != 0 && customProjectileTemplate.i > 0) {
             customProjectileTemplate.e = true;
         }
-        if ((customProjectileTemplate.aP != 0.0f || customProjectileTemplate.aQ != 0.0f) && customProjectileTemplate.i > 0) {
+        if ((customProjectileTemplate.pushForce != 0.0f || customProjectileTemplate.pushVelocity != 0.0f) && customProjectileTemplate.i > 0) {
             customProjectileTemplate.e = true;
         }
         customProjectileTemplate.f = !customProjectileTemplate.e;
@@ -349,22 +349,22 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             projectile.aC = true;
             projectile.n = f;
             projectile.o = f2;
-            if (this.aK != 0.0f) {
-                projectile.n += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.aK) * 100.0f), (int) (this.aK * 100.0f), 2) / 100.0f;
+            if (this.targetGroundSpread != 0.0f) {
+                projectile.n += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 2) / 100.0f;
                 baseUnit.unitFlags4 = (int) (baseUnit.unitFlags4 + projectile.n);
-                projectile.o += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.aK) * 100.0f), (int) (this.aK * 100.0f), 3) / 100.0f;
+                projectile.o += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 3) / 100.0f;
                 baseUnit.unitFlags4 = (int) (baseUnit.unitFlags4 + projectile.o);
             }
             projectile.p = 0.0f;
-            projectile.p += this.aL;
+            projectile.p += this.targetGroundHeightOffset;
             return;
         }
         if (projectile.m) {
             projectile.aC = true;
             if (!this.J) {
                 float f4 = projectile.t;
-                if (this.au != -1.0f) {
-                    f4 = this.au;
+                if (this.targetSpeed != -1.0f) {
+                    f4 = this.targetSpeed;
                 }
                 if (this.K >= 0.0f) {
                     f4 = this.K;
@@ -381,10 +381,10 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             } else {
                 projectile.p = 0.0f;
             }
-            projectile.p += this.aL;
-            if (this.aK != 0.0f) {
-                projectile.n += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.aK) * 100.0f), (int) (this.aK * 100.0f), 2) / 100.0f;
-                projectile.o += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.aK) * 100.0f), (int) (this.aK * 100.0f), 7) / 100.0f;
+            projectile.p += this.targetGroundHeightOffset;
+            if (this.targetGroundSpread != 0.0f) {
+                projectile.n += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 2) / 100.0f;
+                projectile.o += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 7) / 100.0f;
                 return;
             }
             return;

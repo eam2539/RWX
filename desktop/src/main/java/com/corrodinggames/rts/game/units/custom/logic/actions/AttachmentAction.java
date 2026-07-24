@@ -70,7 +70,7 @@ public class AttachmentAction extends LogicAction {
             attachmentAction.disconnectFromParent = zBooleanValue3;
             attachmentAction.disconnect = zBooleanValue;
             attachmentAction.unload = zBooleanValue2;
-            customActionDef.ac.add(attachmentAction);
+            customActionDef.logicActions.add(attachmentAction);
         }
     }
 
@@ -136,7 +136,7 @@ public class AttachmentAction extends LogicAction {
                                 if (!z2) {
                                 }
                             }
-                            baseUnit3.getUnitAICondition();
+                            baseUnit3.removeFromGame();
                             break;
                         }
                     }

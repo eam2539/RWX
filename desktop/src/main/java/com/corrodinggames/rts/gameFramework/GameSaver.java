@@ -675,7 +675,7 @@ public class GameSaver {
                             if (effectEmitter.objectId == 0) {
                                 GameEngine.logColored("GameSaver: Adding object with id==0");
                                 if (effectEmitter instanceof BaseUnit) {
-                                    GameEngine.logColored(((BaseUnit) effectEmitter).getVelocityY());
+                                    GameEngine.logColored(((BaseUnit) effectEmitter).getUnitDebugDetails());
                                 }
                             }
                             GameObject.dL();
@@ -742,7 +742,7 @@ public class GameSaver {
                                 if (gameObject3 instanceof BaseUnit) {
                                     BaseUnit baseUnit = (BaseUnit) gameObject3;
                                     if (!gameEngine.replayEngine.j() && !gameEngine.isGameStarted && baseUnit.r() == UnitTypeEnum.editorOrBuilder) {
-                                        baseUnit.getUnitAICondition();
+                                        baseUnit.removeFromGame();
                                     }
                                 }
                             }

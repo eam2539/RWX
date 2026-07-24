@@ -257,7 +257,7 @@ public final class LayerBufferManager {
             for (int i2 = 0; i2 < this.gridCellsPerAxis; i2++) {
                 if (this.gridCells != null) {
                     LayerBufferCell layerBufferCell = this.gridCells[i][i2];
-                    if (Utility.readFileToString(layerBufferCell.getWorldBoundsRect(), rectFC)) {
+                    if (Utility.rectanglesOverlap(layerBufferCell.getWorldBoundsRect(), rectFC)) {
                         boolean z = this.renderScale != 1.0f;
                         if (z) {
                         }

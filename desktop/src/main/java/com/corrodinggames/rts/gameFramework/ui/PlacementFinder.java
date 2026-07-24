@@ -27,7 +27,7 @@ public class PlacementFinder {
             for (int i7 = i5 - i3; i7 <= i5 + i3; i7++) {
                 if (gameEngine.tileMap.isInBounds(i6, i7) && (pathingOverrideTileAt = gameEngine.tileMap.getPathingOverrideTileAt(i6, i7)) != null && pathingOverrideTileAt.isResourcePool) {
                     BaseUnit baseUnitB = BaseBuilding.b(i6, i7);
-                    if (baseUnitB != null && !baseUnitB.getWeight()) {
+                    if (baseUnitB != null && !baseUnitB.isVisibleToLocalPlayer()) {
                         baseUnitB = null;
                     }
                     if (baseUnitB == null) {

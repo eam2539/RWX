@@ -44,19 +44,19 @@ public class AntiAirTurret extends TurretFactory {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "-Increases HP, attack damage, and range";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Upgrade";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 1200;
         }
 
@@ -67,12 +67,12 @@ public class AntiAirTurret extends TurretFactory {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             TurretFactory turretFactory = (TurretFactory) baseUnit;
             if (turretFactory.isUpgraded || turretFactory.a(getActionId(), z) > 0) {
                 return false;
             }
-            return super.drawTooltip(baseUnit, z);
+            return super.canAfford(baseUnit, z);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -91,7 +91,7 @@ public class AntiAirTurret extends TurretFactory {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.upgrade;
         }
     };

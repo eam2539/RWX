@@ -18,7 +18,7 @@ public abstract class PopupQueueAction extends AbstractUnitAction {
     /* JADX WARN: Multi-variable type inference failed */
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public int isActive(BaseUnit baseUnit, boolean z) {
+    public int getActiveCount(BaseUnit baseUnit, boolean z) {
         if (!(baseUnit instanceof FactoryQueueInterface)) {
             return 99;
         }
@@ -30,7 +30,7 @@ public abstract class PopupQueueAction extends AbstractUnitAction {
     /* JADX INFO: renamed from: p */
     public float getProgress(BaseUnit baseUnit) {
         Projectile projectileDw;
-        if (!(baseUnit instanceof FactoryQueueInterface) || (projectileDw = ((FactoryQueueInterface) baseUnit).dw()) == null || !isAvailableForUnit(projectileDw.j)) {
+        if (!(baseUnit instanceof FactoryQueueInterface) || (projectileDw = ((FactoryQueueInterface) baseUnit).dw()) == null || !matchesActionId(projectileDw.j)) {
             return -1.0f;
         }
         float f = projectileDw.m;
@@ -54,7 +54,7 @@ public abstract class PopupQueueAction extends AbstractUnitAction {
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-    public ActionType e() {
+    public ActionType getActionType() {
         return ActionType.popupQueue;
     }
 }

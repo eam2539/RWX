@@ -148,7 +148,7 @@ public class LegConfig {
         if (textureA != null) {
             legConfig.B = textureA;
             if (zBooleanValue) {
-                legConfig.C = customUnitConfig.a(legConfig.B, customUnitConfig.baseDamage);
+                legConfig.C = customUnitConfig.a(legConfig.B, customUnitConfig.teamColoringMode);
             } else {
                 legConfig.C = null;
             }
@@ -157,7 +157,7 @@ public class LegConfig {
         if (textureA2 != null) {
             legConfig.B = textureA2;
             if (zBooleanValue) {
-                legConfig.C = customUnitConfig.a(legConfig.B, customUnitConfig.baseDamage);
+                legConfig.C = customUnitConfig.a(legConfig.B, customUnitConfig.teamColoringMode);
             } else {
                 legConfig.C = null;
             }
@@ -180,7 +180,7 @@ public class LegConfig {
         }
         boolean zBooleanValue2 = iniFile.getBoolean(str, "image_middle_teamColors", (Boolean) false).booleanValue();
         if (legConfig.x != null && zBooleanValue2) {
-            legConfig.y = customUnitConfig.a(legConfig.x, customUnitConfig.baseDamage);
+            legConfig.y = customUnitConfig.a(legConfig.x, customUnitConfig.teamColoringMode);
         } else {
             legConfig.y = null;
         }

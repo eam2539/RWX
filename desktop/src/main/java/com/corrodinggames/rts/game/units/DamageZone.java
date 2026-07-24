@@ -139,7 +139,7 @@ public class DamageZone extends DummyUnit {
                 damageZoneF.e = this.posX;
                 damageZoneF.f = this.posY;
                 damageZoneF.d = this.d;
-                getUnitAICondition();
+                removeFromGame();
             } else {
                 this.e = this.posX;
                 this.f = this.posY;
@@ -177,7 +177,7 @@ public class DamageZone extends DummyUnit {
             this.b = 0.0f;
         }
         if (this.d < 0.0f) {
-            getUnitAICondition();
+            removeFromGame();
             return;
         }
         this.c -= f;

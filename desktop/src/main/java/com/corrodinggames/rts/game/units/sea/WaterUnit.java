@@ -70,7 +70,7 @@ public abstract class WaterUnit extends MovableUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cv */
-    public boolean getUnitAIPathfindTimeout() {
+    public boolean isWaterUnit() {
         return true;
     }
 
@@ -114,7 +114,7 @@ public abstract class WaterUnit extends MovableUnit {
             }
             if (this.smokeEffectTimer > 10.0f) {
                 this.smokeEffectTimer = 0.0f;
-                if (isBuilding()) {
+                if (isVisibleOnScreen()) {
                     GameEngine gameEngine = GameEngine.getInstance();
                     float f2 = this.rotationSpeed + 180.0f;
                     if (this.rotation < 0.0f) {

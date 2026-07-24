@@ -34,7 +34,7 @@ public final class TeamUnitStats {
     /* JADX WARN: Multi-variable type inference failed */
     public void a(BaseUnit baseUnit) {
         this.d++;
-        if (baseUnit.deceleration < 1.0f) {
+        if (baseUnit.buildProgress < 1.0f) {
             this.f++;
         } else {
             this.c++;
@@ -61,18 +61,18 @@ public final class TeamUnitStats {
             }
         }
         c(baseUnit);
-        float fCy = baseUnit.cy();
-        if (fCy != 0.0f && baseUnit.deceleration >= 1.0f) {
+        float fCy = baseUnit.getCreditIncomeRate();
+        if (fCy != 0.0f && baseUnit.buildProgress >= 1.0f) {
             this.g = (int) (this.g + fCy);
         }
-        StoredResources unitRotationData = baseUnit.getUnitRotationData();
-        if (!unitRotationData.c() && baseUnit.deceleration >= 1.0f) {
+        StoredResources unitRotationData = baseUnit.getGlobalCustomResourceGenerationRates();
+        if (!unitRotationData.c() && baseUnit.buildProgress >= 1.0f) {
             this.h.b(unitRotationData);
             this.i.a(unitRotationData, 0.0d, Double.MAX_VALUE);
             this.j.a(unitRotationData, -1.7976931348623157E308d, 0.0d);
         }
-        if (baseUnit.getUnitFlags()) {
-            int iB = baseUnit.getUnitDescription().b();
+        if (baseUnit.isIncludedInUnitValue()) {
+            int iB = baseUnit.getBuildPrice().b();
             UnitPrice unitPriceB = unitTypeR.B();
             if (unitPriceB != null) {
                 iB += unitPriceB.b();
@@ -88,7 +88,7 @@ public final class TeamUnitStats {
     /* JADX WARN: Multi-variable type inference failed */
     public void b(BaseUnit baseUnit) {
         this.d--;
-        if (baseUnit.deceleration < 1.0f) {
+        if (baseUnit.buildProgress < 1.0f) {
             this.f--;
         } else {
             this.c--;
@@ -112,18 +112,18 @@ public final class TeamUnitStats {
             }
         }
         d(baseUnit);
-        float fCy = baseUnit.cy();
-        if (fCy != 0.0f && baseUnit.deceleration >= 1.0f) {
+        float fCy = baseUnit.getCreditIncomeRate();
+        if (fCy != 0.0f && baseUnit.buildProgress >= 1.0f) {
             this.g = (int) (this.g - fCy);
         }
-        StoredResources unitRotationData = baseUnit.getUnitRotationData();
-        if (!unitRotationData.c() && baseUnit.deceleration >= 1.0f) {
+        StoredResources unitRotationData = baseUnit.getGlobalCustomResourceGenerationRates();
+        if (!unitRotationData.c() && baseUnit.buildProgress >= 1.0f) {
             this.h.c(unitRotationData);
             this.i.b(unitRotationData, 0.0d, Double.MAX_VALUE);
             this.j.b(unitRotationData, -1.7976931348623157E308d, 0.0d);
         }
-        if (baseUnit.getUnitFlags()) {
-            int iB = baseUnit.getUnitDescription().b();
+        if (baseUnit.isIncludedInUnitValue()) {
+            int iB = baseUnit.getBuildPrice().b();
             UnitPrice unitPriceB = unitTypeR.B();
             if (unitPriceB != null) {
                 iB += unitPriceB.b();
@@ -137,11 +137,11 @@ public final class TeamUnitStats {
     }
 
     private final void c(BaseUnit baseUnit) {
-        AnimationSet unitCombatAnimation = baseUnit.getUnitCombatAnimation();
+        AnimationSet unitCombatAnimation = baseUnit.getTags();
         if (unitCombatAnimation != null) {
             for (AnimationTag animationTag : unitCombatAnimation.a) {
                 AnimationTagEntry animationTagEntryA = a(animationTag);
-                if (baseUnit.deceleration < 1.0f) {
+                if (baseUnit.buildProgress < 1.0f) {
                     animationTagEntryA.c++;
                 } else {
                     animationTagEntryA.b++;
@@ -151,11 +151,11 @@ public final class TeamUnitStats {
     }
 
     private final void d(BaseUnit baseUnit) {
-        AnimationSet unitCombatAnimation = baseUnit.getUnitCombatAnimation();
+        AnimationSet unitCombatAnimation = baseUnit.getTags();
         if (unitCombatAnimation != null) {
             for (AnimationTag animationTag : unitCombatAnimation.a) {
                 AnimationTagEntry animationTagEntryA = a(animationTag);
-                if (baseUnit.deceleration < 1.0f) {
+                if (baseUnit.buildProgress < 1.0f) {
                     animationTagEntryA.c--;
                 } else {
                     animationTagEntryA.b--;

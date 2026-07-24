@@ -179,7 +179,7 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
         for (int i = 0; i < 6000; i++) {
             w();
         }
-        getUnitAICondition();
+        removeFromGame();
     }
 
     public void w() {
@@ -282,7 +282,7 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: A */
     public float getMaxTurnSpeed() {
-        if (isMoving()) {
+        if (isOverLiquid()) {
             return 4.7f;
         }
         return 4.8f;
@@ -360,7 +360,7 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: J */
-    public boolean mo193J() {
+    public boolean isDamageImmune() {
         return true;
     }
 

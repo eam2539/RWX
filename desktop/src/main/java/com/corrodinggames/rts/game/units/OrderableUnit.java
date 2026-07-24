@@ -479,10 +479,10 @@ public abstract class OrderableUnit extends UnitBase {
         for (int i3 = 0; i3 < size; i3++) {
             if (baseUnitArrA[i3] instanceof OrderableUnit) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnitArrA[i3];
-                if ((orderableUnit.movementActiveThisFrame || orderableUnit.isMoving) && orderableUnit.I() && orderableUnit.nextCollisionQueryTick <= i) {
-                    orderableUnit.isMoving = false;
+                if ((orderableUnit.movementActiveThisFrame || orderableUnit.collisionActive) && orderableUnit.I() && orderableUnit.nextCollisionQueryTick <= i) {
+                    orderableUnit.collisionActive = false;
                     orderableUnit.movementActiveThisFrame = true;
-                    if (orderableUnit.isInitialized) {
+                    if (orderableUnit.isMoving) {
                         f2 = orderableUnit.radius + 7.0f;
                         if (orderableUnit.nearbyCollisionSize > 9) {
                             orderableUnit.nextCollisionQueryTick = i + 200 + (i3 % 50);
@@ -503,7 +503,7 @@ public abstract class OrderableUnit extends UnitBase {
                     }
                     if (orderableUnit.nearbyCollisionSize > 9 && orderableUnit.unitFlags1 > i - 400) {
                         orderableUnit.nextCollisionQueryTick = gameEngine.gameTimeMillis + 5 + (i3 % 5);
-                        orderableUnit.isMoving = true;
+                        orderableUnit.collisionActive = true;
                     }
                 }
             }
@@ -514,8 +514,8 @@ public abstract class OrderableUnit extends UnitBase {
             if (baseUnitArrA[i6] instanceof OrderableUnit) {
                 OrderableUnit orderableUnit2 = (OrderableUnit) baseUnitArrA[i6];
                 if (orderableUnit2.movementActiveThisFrame && (b = orderableUnit2.nearbyCollisionSize) > 0 && orderableUnit2.I()) {
-                    if (!orderableUnit2.isMoving) {
-                        orderableUnit2.isMoving = true;
+                    if (!orderableUnit2.collisionActive) {
+                        orderableUnit2.collisionActive = true;
                     }
                     for (int i7 = 0; i7 < b; i7++) {
                         orderableUnit2.resolveSoftCollisionWithUnit(orderableUnit2.nearbyUnits[i7], f, false);
@@ -1467,7 +1467,7 @@ public abstract class OrderableUnit extends UnitBase {
                 advanceWaypoint();
                 unitCommand = null;
             }
-            if (unitCommand != null && baseUnit != null && !baseUnit.getUnitAIPriority() && this.team.c(baseUnit.team)) {
+            if (unitCommand != null && baseUnit != null && !baseUnit.isVisibleToEnemies() && this.team.c(baseUnit.team)) {
                 advanceWaypoint();
                 unitCommand = null;
             }
@@ -1479,12 +1479,12 @@ public abstract class OrderableUnit extends UnitBase {
                 f3 += baseUnit.radius;
             }
             if (unitCommand.commandType == UnitCommandType.follow) {
-                if (this.isInitialized) {
+                if (this.isMoving) {
                     f2 = f3 + 30.0f;
                 } else {
                     f2 = f3 + 50.0f;
                 }
-            } else if (this.isInitialized) {
+            } else if (this.isMoving) {
                 f2 = f3 + 80.0f;
             } else {
                 f2 = f3 + 100.0f;
@@ -1573,7 +1573,7 @@ public abstract class OrderableUnit extends UnitBase {
                     this.canAttack = true;
                 }
             }
-            if (z2 && !z3 && canRepairTarget(baseUnit) && ((baseUnit.currentHealth < baseUnit.maxHealth || baseUnit.deceleration < 1.0f) && canRepairTarget(baseUnit) && (unitCommandQueueNextWaypoint2 = queueNextWaypoint()) != null)) {
+            if (z2 && !z3 && canRepairTarget(baseUnit) && ((baseUnit.currentHealth < baseUnit.maxHealth || baseUnit.buildProgress < 1.0f) && canRepairTarget(baseUnit) && (unitCommandQueueNextWaypoint2 = queueNextWaypoint()) != null)) {
                 unitCommandQueueNextWaypoint2.setRepairCommand(baseUnit);
                 unitCommandQueueNextWaypoint2.isRepeating = true;
                 z3 = true;
@@ -1869,7 +1869,7 @@ public abstract class OrderableUnit extends UnitBase {
                         baseUnit = triggerDebugActionA.targetUnit;
                     }
                     if (baseUnit != null) {
-                        triggerDebugActionA.action.isPickAction(this, baseUnit);
+                        triggerDebugActionA.action.onTargetSelected(this, baseUnit);
                         if (!canRepairTarget(baseUnit)) {
                             advanceWaypoint();
                         } else if (getDistanceToTarget(baseUnit) > 10000.0f) {
@@ -1973,7 +1973,7 @@ public abstract class OrderableUnit extends UnitBase {
                 this.s = 90.0f;
             }
             if (fDistanceSq < 810000.0f) {
-                if (getUnitAIPathfindMaxDepth() || useVelocityExtendedRange()) {
+                if (isAirborne() || useVelocityExtendedRange()) {
                     this.canAttack = true;
                 }
                 if (!unitStateTracker.isReset && this.transportAttackAssistTimer < 120.0f) {
@@ -2028,7 +2028,7 @@ public abstract class OrderableUnit extends UnitBase {
                 unitCommand = null;
             }
         }
-        if (unitCommand != null && unitCommand.targetUnit != null && !unitCommand.targetUnit.isDead && !unitCommand.targetUnit.getUnitAIPriority() && this.team.c(unitCommand.targetUnit.team) && !PathfindingUtils.b(this, unitCommand.targetUnit)) {
+        if (unitCommand != null && unitCommand.targetUnit != null && !unitCommand.targetUnit.isDead && !unitCommand.targetUnit.isVisibleToEnemies() && this.team.c(unitCommand.targetUnit.team) && !PathfindingUtils.b(this, unitCommand.targetUnit)) {
             advanceWaypoint();
             return;
         }
@@ -2144,7 +2144,7 @@ public abstract class OrderableUnit extends UnitBase {
         float targetX = unitCommand.getTargetX();
         float targetY = unitCommand.getTargetY();
         float fDistanceSq = Utility.distanceSq(this.posX, this.posY, targetX, targetY);
-        if (unitCommand != null && unitCommand.commandType == UnitCommandType.reclaim && unitCommand.targetUnit != null && unitCommand.targetUnit.getUnitHealthPercent() > 0.0f) {
+        if (unitCommand != null && unitCommand.commandType == UnitCommandType.reclaim && unitCommand.targetUnit != null && unitCommand.targetUnit.getResourceRate() > 0.0f) {
             z2 = true;
         }
         if (unitCommand != null && (unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.unitTransportTarget != null)) {
@@ -2170,9 +2170,9 @@ public abstract class OrderableUnit extends UnitBase {
         if (unitCommand != null && z) {
             AnimationSet unitTypeId = null;
             if (unitCommand.targetUnit != null) {
-                unitTypeId = unitCommand.targetUnit.getUnitTypeId();
+                unitTypeId = unitCommand.targetUnit.getSimilarResourcesTag();
             }
-            BaseUnit baseUnitA = a(this, unitCommand.targetUnit.posX, unitCommand.targetUnit.posY, getUnitType(), unitTypeId);
+            BaseUnit baseUnitA = a(this, unitCommand.targetUnit.posX, unitCommand.targetUnit.posY, getReclaimSearchRange(), unitTypeId);
             if (baseUnitA != null) {
                 unitCommand.targetUnit = baseUnitA;
                 targetX = unitCommand.getTargetX();
@@ -2195,7 +2195,7 @@ public abstract class OrderableUnit extends UnitBase {
                 unitCommand = null;
             }
         }
-        if (unitCommand != null && unitCommand.commandType == UnitCommandType.repair && unitCommand.targetUnit != null && unitCommand.targetUnit.currentHealth >= unitCommand.targetUnit.maxHealth && unitCommand.targetUnit.deceleration >= 1.0f) {
+        if (unitCommand != null && unitCommand.commandType == UnitCommandType.repair && unitCommand.targetUnit != null && unitCommand.targetUnit.currentHealth >= unitCommand.targetUnit.maxHealth && unitCommand.targetUnit.buildProgress >= 1.0f) {
             advanceWaypointWithTransportedUnits();
             unitCommand = null;
         }
@@ -2203,7 +2203,7 @@ public abstract class OrderableUnit extends UnitBase {
             advanceWaypoint();
             unitCommand = null;
         }
-        if (unitCommand != null && unitCommand != null && unitCommand.targetUnit != null && unitCommand.targetUnit.getUnitHealthPercent() != 0.0f) {
+        if (unitCommand != null && unitCommand != null && unitCommand.targetUnit != null && unitCommand.targetUnit.getResourceRate() != 0.0f) {
             boolean z4 = false;
             if (unitCommand.commandType == UnitCommandType.repair) {
                 z4 = true;
@@ -2213,7 +2213,7 @@ public abstract class OrderableUnit extends UnitBase {
                 unitCommand = null;
             }
         }
-        if (unitCommand != null && unitCommand.commandType == UnitCommandType.reclaim && unitCommand.targetUnit.team != this.team && unitCommand.targetUnit.getUnitHealthPercent() == 0.0f) {
+        if (unitCommand != null && unitCommand.commandType == UnitCommandType.reclaim && unitCommand.targetUnit.team != this.team && unitCommand.targetUnit.getResourceRate() == 0.0f) {
             boolean z5 = true;
             if (gameEngine.isSinglePlayerGame() && this.team.d(unitCommand.targetUnit.team)) {
                 z5 = false;
@@ -2312,7 +2312,7 @@ public abstract class OrderableUnit extends UnitBase {
             if (z7) {
                 BaseUnit baseUnit = unitCommand.targetUnit;
                 if (unitCommand.commandType != UnitCommandType.reclaim) {
-                    if (baseUnit.deceleration < 1.0f) {
+                    if (baseUnit.buildProgress < 1.0f) {
                         updateUnitMovement();
                         float repairProgressRate = getRepairProgressRate(baseUnit);
                         float f4 = repairProgressRate * f;
@@ -2320,14 +2320,14 @@ public abstract class OrderableUnit extends UnitBase {
                         boolean z9 = false;
                         UnitPrice repairOrReclaimPrice = getRepairOrReclaimPrice(baseUnit);
                         if (repairOrReclaimPrice != null) {
-                            if (baseUnit.deceleration + f4 > 1.0f) {
-                                f4 = 1.0f - baseUnit.deceleration;
+                            if (baseUnit.buildProgress + f4 > 1.0f) {
+                                f4 = 1.0f - baseUnit.buildProgress;
                                 z8 = true;
                             }
-                            double d = (baseUnit.deceleration + f4) - baseUnit.movementAngle;
+                            double d = (baseUnit.buildProgress + f4) - baseUnit.paidBuildProgress;
                             double d2 = 0.0d;
                             if (z8) {
-                                d2 = 1.0f - baseUnit.movementAngle;
+                                d2 = 1.0f - baseUnit.paidBuildProgress;
                             } else if (d >= 0.0010000000474974513d) {
                                 d2 = ((double) ((int) (d / 0.0010000000474974513d))) * 0.0010000000474974513d;
                             }
@@ -2336,7 +2336,7 @@ public abstract class OrderableUnit extends UnitBase {
                                 z10 = true;
                             }
                             if (!z10 && (d2 <= 0.0d || repairOrReclaimPrice.c(this, d2))) {
-                                baseUnit.movementAngle = (float) (((double) baseUnit.movementAngle) + d2);
+                                baseUnit.paidBuildProgress = (float) (((double) baseUnit.paidBuildProgress) + d2);
                             } else {
                                 if (!z10) {
                                     this.team.resourceShortageTracker.a(repairOrReclaimPrice, this, d2);
@@ -2348,7 +2348,7 @@ public abstract class OrderableUnit extends UnitBase {
                         }
                         if (!z9) {
                             a(baseUnit, f, defaultTurretIndex);
-                            float f5 = baseUnit.deceleration + f4;
+                            float f5 = baseUnit.buildProgress + f4;
                             if (z8) {
                                 f5 = 1.0f;
                             }
@@ -2377,13 +2377,13 @@ public abstract class OrderableUnit extends UnitBase {
                 boolean z11 = false;
                 boolean zY = y(baseUnit);
                 float fZ = calculateUnitSpeed(baseUnit);
-                boolean z12 = unitCommand.targetUnit.getUnitHealthPercent() > 0.0f;
+                boolean z12 = unitCommand.targetUnit.getResourceRate() > 0.0f;
                 UnitPrice repairOrReclaimPrice2 = getRepairOrReclaimPrice(baseUnit);
                 if (z12 || repairOrReclaimPrice2 != null) {
                 }
                 boolean z13 = false;
                 if (!z12 && this.wayPointTimer < 100.0f && !z12) {
-                    if (baseUnit.deceleration < 0.5d) {
+                    if (baseUnit.buildProgress < 0.5d) {
                         if (repairOrReclaimPrice2 == null) {
                             z13 = true;
                         }
@@ -2392,19 +2392,19 @@ public abstract class OrderableUnit extends UnitBase {
                     }
                 }
                 if (!z13) {
-                    if (baseUnit.deceleration < 1.0f) {
+                    if (baseUnit.buildProgress < 1.0f) {
                         float reclaimRate = getReclaimRate(baseUnit) * f;
-                        if (reclaimRate >= baseUnit.deceleration) {
-                            reclaimRate = baseUnit.deceleration;
-                            baseUnit.deceleration = 0.0f;
+                        if (reclaimRate >= baseUnit.buildProgress) {
+                            reclaimRate = baseUnit.buildProgress;
+                            baseUnit.buildProgress = 0.0f;
                         } else {
-                            baseUnit.deceleration -= reclaimRate;
+                            baseUnit.buildProgress -= reclaimRate;
                         }
-                        baseUnit.movementAngle = baseUnit.deceleration;
+                        baseUnit.paidBuildProgress = baseUnit.buildProgress;
                         if (repairOrReclaimPrice2 != null) {
                             repairOrReclaimPrice2.a((BaseUnit) this, reclaimRate, true);
                         }
-                        if (baseUnit.deceleration <= 0.0f) {
+                        if (baseUnit.buildProgress <= 0.0f) {
                             z11 = true;
                         }
                     } else {
@@ -2418,8 +2418,8 @@ public abstract class OrderableUnit extends UnitBase {
                         baseUnit.unitAnimationScale = 1000.0f;
                         if (zY) {
                             float f7 = f6 / baseUnit.maxHealth;
-                            UnitPrice unitDescription = baseUnit.getUnitDescription();
-                            UnitPrice unitDisplayName = baseUnit.getUnitDisplayName();
+                            UnitPrice unitDescription = baseUnit.getBuildPrice();
+                            UnitPrice unitDisplayName = baseUnit.getReclaimPrice();
                             if (unitDisplayName != null) {
                                 unitDescription = unitDisplayName;
                             }
@@ -2443,25 +2443,25 @@ public abstract class OrderableUnit extends UnitBase {
                 }
                 if (z11 && !baseUnit.isDead) {
                     if (!zY) {
-                        UnitPrice unitDisplayName2 = baseUnit.getUnitDisplayName();
+                        UnitPrice unitDisplayName2 = baseUnit.getReclaimPrice();
                         if (unitDisplayName2 != null) {
                             GameEngine.log("refund: " + unitDisplayName2.a(false, true, 10, true));
                             unitDisplayName2.a((BaseUnit) this, 1.0d, true);
                         } else {
-                            UnitPrice unitDescription2 = baseUnit.getUnitDescription();
+                            UnitPrice unitDescription2 = baseUnit.getBuildPrice();
                             if (baseUnit.unitData1 != null) {
                                 unitDescription2 = baseUnit.unitData1;
                                 GameEngine.log("refund==null overridePriceBuildCost: " + unitDescription2.a(false, true, 10, true));
                             }
                             unitDescription2.a((BaseUnit) this, 0.800000011920929d, true);
-                            if (baseUnit.deceleration >= 1.0f && repairOrReclaimPrice2 != null) {
+                            if (baseUnit.buildProgress >= 1.0f && repairOrReclaimPrice2 != null) {
                                 repairOrReclaimPrice2.a((BaseUnit) this, 0.800000011920929d, true);
                             }
                         }
                     }
                     baseUnit.isDead = true;
                     baseUnit.unitCreationTime = gameEngine.gameTimeMillis;
-                    baseUnit.getUnitAICondition();
+                    baseUnit.removeFromGame();
                     if ((baseUnit instanceof OrderableUnit) && baseUnit.bI()) {
                         gameEngine.pathfindingEngine.a((OrderableUnit) baseUnit);
                     }
@@ -2818,7 +2818,7 @@ public abstract class OrderableUnit extends UnitBase {
                             z = true;
                         }
                     }
-                    if (this.s == 0.0f && (getUnitAIPathfindMaxDepth() || useVelocityExtendedRange())) {
+                    if (this.s == 0.0f && (isAirborne() || useVelocityExtendedRange())) {
                         float fM = m() - 1.0f;
                         if (Utility.abs(this.lastPathTargetX - this.pathTargetX) > fM || Utility.abs(this.lastPathTargetY - this.pathTargetY) > fM) {
                             z = true;
@@ -3030,7 +3030,7 @@ public abstract class OrderableUnit extends UnitBase {
                 this.rotation = Utility.distanceSq(this.rotation, fBc, D() * f);
             }
         }
-        this.isInitialized = unitStateTracker.stateFlag2 && z;
+        this.isMoving = unitStateTracker.stateFlag2 && z;
     }
 
     @Deprecated
@@ -3367,7 +3367,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (baseUnit.Q()) {
             return canAttackSubmergedUnits();
         }
-        if (!ah() && !baseUnit.checkTransportSlots()) {
+        if (!ah() && !baseUnit.isTouchingWater()) {
             return false;
         }
         return canAttackSurfaceUnits();
@@ -3380,7 +3380,7 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: l */
     public boolean canReclaimTarget(BaseUnit baseUnit) {
-        if (baseUnit.getUnitHealthPercent() != 0.0f && h(baseUnit, true)) {
+        if (baseUnit.getResourceRate() != 0.0f && h(baseUnit, true)) {
             return true;
         }
         return canRepairTarget(baseUnit);
@@ -3410,12 +3410,12 @@ public abstract class OrderableUnit extends UnitBase {
         if (arrayListN.size() > 0) {
             for (AbstractUnitAction abstractUnitAction2 : arrayListN) {
                 UnitType attachedUnitType = abstractUnitAction2.getAttachedUnitType();
-                if (z && (actionType = abstractUnitAction2.getActionType()) != null) {
+                if (z && (actionType = abstractUnitAction2.getAiConsiderSameAsBuildingUnitType()) != null) {
                     attachedUnitType = actionType;
                 }
                 if (attachedUnitType == unitType && (i == -1 || i == abstractUnitAction2.getQueueSize())) {
                     abstractUnitAction = abstractUnitAction2;
-                    if (abstractUnitAction2.b(this) && abstractUnitAction2.drawTooltip((BaseUnit) this, false)) {
+                    if (abstractUnitAction2.b(this) && abstractUnitAction2.canAfford((BaseUnit) this, false)) {
                         return abstractUnitAction2;
                     }
                 }
@@ -3469,7 +3469,7 @@ public abstract class OrderableUnit extends UnitBase {
     }
 
     public final boolean b(BaseUnit baseUnit, boolean z) {
-        if (baseUnit.getUnitAIPathfindMaxNodes()) {
+        if (baseUnit.isNotPassivelyTargetedByOtherUnits()) {
             return false;
         }
         return a(baseUnit, z);
@@ -3556,7 +3556,7 @@ public abstract class OrderableUnit extends UnitBase {
     public void onCurrentWaypointChanged(UnitCommand unitCommand) {
         updateUnitMovement();
         this.lastReclaimSearchTick = -9999;
-        if (this.attackTarget != null && this.attackTarget.getUnitAIPathfindMaxNodes()) {
+        if (this.attackTarget != null && this.attackTarget.isNotPassivelyTargetedByOtherUnits()) {
             this.attackTarget = null;
         }
     }
@@ -4024,7 +4024,7 @@ public abstract class OrderableUnit extends UnitBase {
     public boolean isCurrentTileBlocked() {
         GameEngine gameEngine = GameEngine.getInstance();
         boolean z = false;
-        if (getUnitAIPathfindMaxDepth()) {
+        if (isAirborne()) {
             z = true;
         }
         gameEngine.tileMap.setCursorTileIndexFromWorldPoint(this.posX, this.posY);
@@ -4041,10 +4041,10 @@ public abstract class OrderableUnit extends UnitBase {
         GameEngine gameEngine = GameEngine.getInstance();
         PathEngine pathEngine = gameEngine.pathfindingEngine;
         TileMap tileMap = gameEngine.tileMap;
-        this.isInitialized = true;
+        this.isMoving = true;
         boolean z3 = false;
         boolean z4 = false;
-        if (getUnitAIPathfindMaxDepth()) {
+        if (isAirborne()) {
             z3 = true;
         }
         tileMap.setCursorTileIndexFromWorldPoint(this.posX, this.posY);
@@ -4176,8 +4176,8 @@ public abstract class OrderableUnit extends UnitBase {
         pathA.p = z;
         pathA.q = bh();
         pathA.isLowPriority = z3;
-        boolean z5 = this.isInitialized;
-        this.isInitialized = true;
+        boolean z5 = this.isMoving;
+        this.isMoving = true;
         if (z2 && pathA.b()) {
             Iterator it = aV.iterator();
             while (it.hasNext()) {
@@ -4190,7 +4190,7 @@ public abstract class OrderableUnit extends UnitBase {
             }
         }
         pathEngine.a(pathA, z2);
-        this.isInitialized = z5;
+        this.isMoving = z5;
         if (z2 && pathA.b()) {
             aV.add(pathA);
         }
@@ -4311,8 +4311,8 @@ public abstract class OrderableUnit extends UnitBase {
         } else {
             iA = -1;
         }
-        if (this.deceleration < 1.0f && this.deceleration < getPathStepScale()) {
-            iA = Color.a((int) (20.0f + ((this.deceleration / getPathStepScale()) * 220.0f)), 140, 255, 140);
+        if (this.buildProgress < 1.0f && this.buildProgress < getPathStepScale()) {
+            iA = Color.a((int) (20.0f + ((this.buildProgress / getPathStepScale()) * 220.0f)), 140, 255, 140);
             porterDuffColorFilter = overlayFilterLightGreen;
         }
         if (this.isUnitParalyzed) {
@@ -4364,9 +4364,9 @@ public abstract class OrderableUnit extends UnitBase {
         GameEngine gameEngine = GameEngine.getInstance();
         GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
         Paint renderPaint = getRenderPaint();
-        float fCD = getMaxHealth();
+        float fCD = getRenderScale();
         if (this.ew) {
-            PointF pointFCY = getUnitAIPosition();
+            PointF pointFCY = getRenderOffset();
             float f2 = (this.posX + pointFCY.x) - gameEngine.viewpointXSnapped;
             float f3 = ((this.posY + pointFCY.y) - gameEngine.viewpointYSnapped) - this.posZ;
             drawShadow();
@@ -4381,7 +4381,7 @@ public abstract class OrderableUnit extends UnitBase {
             }
             return true;
         }
-        PointF pointFCY2 = getUnitAIPosition();
+        PointF pointFCY2 = getRenderOffset();
         RectF rectFCF = getUnitBounds();
         float f4 = pointFCY2.x;
         float f5 = pointFCY2.y - this.posZ;
@@ -4405,7 +4405,7 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return this.posZ > 0.0f && this.deceleration >= 1.0f && !this.isUnitInvulnerable;
+        return this.posZ > 0.0f && this.buildProgress >= 1.0f && !this.isUnitInvulnerable;
     }
 
     /* JADX INFO: renamed from: aP */
@@ -4437,13 +4437,13 @@ public abstract class OrderableUnit extends UnitBase {
             PointF shadowOffset = getShadowOffset();
             float f = (this.posX + shadowOffset.x) - gameEngine.viewpointXSnapped;
             float f2 = (this.posY + shadowOffset.y) - gameEngine.viewpointYSnapped;
-            float fCD = getMaxHealth();
+            float fCD = getRenderScale();
             GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
             if (fCD != 1.0f) {
                 graphicsEngine.k();
                 graphicsEngine.a(fCD, fCD, f, f2);
             }
-            if (isUnitTransportWeight()) {
+            if (hasShadowFrames()) {
                 Rect rectA_ = a_(true);
                 RectF rectF = dB;
                 rectF.a(f - this.eu, f2 - this.ev, f + this.eu, f2 + this.ev);
@@ -4465,8 +4465,8 @@ public abstract class OrderableUnit extends UnitBase {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: s_ */
-    public boolean isBuilding() {
-        return RectF.a(GameEngine.getInstance().visibleScreenRect, getUnitMassBounds());
+    public boolean isVisibleOnScreen() {
+        return RectF.a(GameEngine.getInstance().visibleScreenRect, getVisibilityBounds());
     }
 
     /* JADX INFO: renamed from: aR */
@@ -4891,7 +4891,7 @@ public abstract class OrderableUnit extends UnitBase {
                 if (!bO()) {
                     bo();
                 }
-                if (unitSize != UnitSize.buildingNoShockwaveOrSmoke && !isMoving()) {
+                if (unitSize != UnitSize.buildingNoShockwaveOrSmoke && !isOverLiquid()) {
                     EffectEmitter.a(this.posX, this.posY);
                     EffectEmitter.b(this.posX, this.posY);
                     bq();
@@ -4921,7 +4921,7 @@ public abstract class OrderableUnit extends UnitBase {
     }
 
     public int bp() {
-        if (getUnitAICombatTarget()) {
+        if (isExperimental()) {
             return 8;
         }
         if (bI()) {
@@ -4931,7 +4931,7 @@ public abstract class OrderableUnit extends UnitBase {
     }
 
     public void bq() {
-        if (!isMoving()) {
+        if (!isOverLiquid()) {
             ScorchMark.a(this.posX, this.posY);
         }
     }
@@ -5176,7 +5176,7 @@ public abstract class OrderableUnit extends UnitBase {
         this.turretTurnSpeed = Utility.moveTowardsZero(this.turretTurnSpeed, f);
         if (this.turretTurnSpeed == 0.0f) {
             this.turretTurnSpeed = 5.0f;
-            if (isBuilding()) {
+            if (isVisibleOnScreen()) {
                 Vector3D vector3DBn = bn();
                 Effect effectCreateEffectInternal = GameEngine.getInstance().effectManager.createEffectInternal(vector3DBn.a, vector3DBn.b, this.posZ + vector3DBn.c, EffectType.custom, false, EffectQuality.low);
                 if (effectCreateEffectInternal != null) {
@@ -5199,7 +5199,7 @@ public abstract class OrderableUnit extends UnitBase {
         this.turretTurnSpeed = Utility.moveTowardsZero(this.turretTurnSpeed, f);
         if (this.turretTurnSpeed == 0.0f) {
             this.turretTurnSpeed = 5.0f;
-            if (isBuilding()) {
+            if (isVisibleOnScreen()) {
                 PointF pointFE = E(0);
                 Effect effectCreateEffectInternal = GameEngine.getInstance().effectManager.createEffectInternal(baseUnit.posX, baseUnit.posY, baseUnit.posZ, EffectType.custom, false, EffectQuality.low);
                 if (effectCreateEffectInternal != null) {
@@ -5258,8 +5258,8 @@ public abstract class OrderableUnit extends UnitBase {
             baseUnitG.unitData1 = null;
             baseUnitG.unitData2 = null;
         }
-        baseUnitG.deceleration = 0.0f;
-        baseUnitG.movementAngle = 0.0f;
+        baseUnitG.buildProgress = 0.0f;
+        baseUnitG.paidBuildProgress = 0.0f;
         gameEngine.tileMap.exportTmxToFile((f - baseUnitG.getTileOffsetX()) + 1.0f, (f2 - baseUnitG.getTileOffsetY()) + 1.0f);
         baseUnitG.posX = gameEngine.tileMap.cursorTileX + baseUnitG.getTileOffsetX();
         baseUnitG.posY = gameEngine.tileMap.cursorTileY + baseUnitG.getTileOffsetY();
@@ -5342,7 +5342,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (this.parentEntity.isDead) {
         }
         if (!this.parentEntity.b(this)) {
-            GameEngine.logColored("Deattach failed, forcing deattach. Child:" + getVelocityX() + " Parent:" + this.parentEntity.getVelocityX());
+            GameEngine.logColored("Deattach failed, forcing deattach. Child:" + getUnitDebugName() + " Parent:" + this.parentEntity.getUnitDebugName());
             this.parentEntity = null;
             this.attachmentData = null;
         }
@@ -5420,7 +5420,7 @@ public abstract class OrderableUnit extends UnitBase {
         UnitCommand currentWaypoint;
         BaseUnit currentRepairOrReclaimTarget = getCurrentRepairOrReclaimTarget();
         if (currentRepairOrReclaimTarget != null && (currentWaypoint = getCurrentWaypoint()) != null) {
-            if (currentWaypoint.commandType == UnitCommandType.repair && currentRepairOrReclaimTarget.deceleration < 1.0f) {
+            if (currentWaypoint.commandType == UnitCommandType.repair && currentRepairOrReclaimTarget.buildProgress < 1.0f) {
                 UnitPrice repairOrReclaimPrice = getRepairOrReclaimPrice(currentRepairOrReclaimTarget);
                 float repairProgressRate = getRepairProgressRate(currentRepairOrReclaimTarget) * 60.0f;
                 if (repairOrReclaimPrice != null) {
@@ -5430,7 +5430,7 @@ public abstract class OrderableUnit extends UnitBase {
             if (currentWaypoint.commandType != UnitCommandType.reclaim) {
                 return null;
             }
-            if (currentRepairOrReclaimTarget.deceleration < 1.0f) {
+            if (currentRepairOrReclaimTarget.buildProgress < 1.0f) {
                 UnitPrice repairOrReclaimPrice2 = getRepairOrReclaimPrice(currentRepairOrReclaimTarget);
                 float reclaimRate = getReclaimRate(currentRepairOrReclaimTarget) * 60.0f;
                 if (repairOrReclaimPrice2 != null) {
@@ -5440,8 +5440,8 @@ public abstract class OrderableUnit extends UnitBase {
             }
             if (y(currentRepairOrReclaimTarget)) {
                 float fZ = calculateUnitSpeed(currentRepairOrReclaimTarget);
-                UnitPrice unitDescription = currentRepairOrReclaimTarget.getUnitDescription();
-                UnitPrice unitDisplayName = currentRepairOrReclaimTarget.getUnitDisplayName();
+                UnitPrice unitDescription = currentRepairOrReclaimTarget.getBuildPrice();
+                UnitPrice unitDisplayName = currentRepairOrReclaimTarget.getReclaimPrice();
                 if (unitDisplayName != null) {
                     unitDescription = unitDisplayName;
                 }

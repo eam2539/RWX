@@ -105,7 +105,7 @@ public class Ladybug extends LandUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (this.isInitialized) {
+        if (this.isMoving) {
             if (this.e == 0) {
                 this.e = 1;
             } else {

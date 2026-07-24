@@ -40,10 +40,10 @@ public class PlaceBuildingAction extends AbstractUnitAction {
         UnitType unitTypeC = CustomUnitConfig.c(unitType);
         if (unitTypeC != null) {
             unitType = unitTypeC;
-            canAfford("b_" + unitType.v());
+            setActionId("b_" + unitType.v());
         }
         if (i != 1) {
-            canAfford(getActionId() + "_" + i);
+            setActionId(getActionId() + "_" + i);
         }
         this.a = unitType;
         this.b = i;
@@ -72,7 +72,7 @@ public class PlaceBuildingAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public String isLocked() {
+    public String getDescription() {
         String strF = getUnitType().f();
         BaseUnit baseUnitCanAttack = BaseUnit.canAttack(getUnitType());
         if (this.b != 1 && (baseUnitCanAttack instanceof OrderableUnit)) {
@@ -87,7 +87,7 @@ public class PlaceBuildingAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public String getCostForUnit() {
+    public String getDisplayName() {
         UnitType unitType = getUnitType();
         String unitName = getUnitType().getUnitName();
         if (!(unitType instanceof CustomUnitConfig)) {
@@ -103,7 +103,7 @@ public class PlaceBuildingAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
-    public int isConfirmed() {
+    public int getCostAmount() {
         return getDisplayText().a();
     }
 
@@ -129,18 +129,18 @@ public class PlaceBuildingAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public int isActive(BaseUnit baseUnit, boolean z) {
+    public int getActiveCount(BaseUnit baseUnit, boolean z) {
         return -1;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-    public ActionType e() {
+    public ActionType getActionType() {
         return ActionType.placeBuilding;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
+    public ActionDisplayType getActionDisplayType() {
         return ActionDisplayType.building;
     }
 
@@ -174,7 +174,7 @@ public class PlaceBuildingAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: D */
-    public boolean getDisplayTextForUnit() {
+    public boolean shouldShowUnitPreview() {
         return false;
     }
 
@@ -182,8 +182,8 @@ public class PlaceBuildingAction extends AbstractUnitAction {
     /* JADX INFO: renamed from: p */
     public float getProgress(BaseUnit baseUnit) {
         BaseUnit currentRepairOrReclaimTarget;
-        if ((baseUnit instanceof OrderableUnit) && (currentRepairOrReclaimTarget = ((OrderableUnit) baseUnit).getCurrentRepairOrReclaimTarget()) != null && currentRepairOrReclaimTarget.deceleration < 1.0f && currentRepairOrReclaimTarget.r() == getUnitType()) {
-            return currentRepairOrReclaimTarget.deceleration;
+        if ((baseUnit instanceof OrderableUnit) && (currentRepairOrReclaimTarget = ((OrderableUnit) baseUnit).getCurrentRepairOrReclaimTarget()) != null && currentRepairOrReclaimTarget.buildProgress < 1.0f && currentRepairOrReclaimTarget.r() == getUnitType()) {
+            return currentRepairOrReclaimTarget.buildProgress;
         }
         return -1.0f;
     }

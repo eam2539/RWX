@@ -319,7 +319,7 @@ public class MusicManager {
 
     /* JADX INFO: renamed from: b */
     public String getMusicDisplayName(String str) {
-        return Utility.getFileNameFromPath(Utility.getFileNameWithoutExtension(str)).replace("[noloop]", VariableScope.nullOrMissingString).replace("_", " ");
+        return Utility.getFileNameWithoutExtension(Utility.getFileName(str)).replace("[noloop]", VariableScope.nullOrMissingString).replace("_", " ");
     }
 
     /* JADX INFO: renamed from: b */
@@ -404,7 +404,7 @@ public class MusicManager {
             boolean z3 = false;
             ModInfo modInfo = null;
             if (str != null) {
-                ArrayList allUnitBlueprintsFromEnabledMods = GameEngine.getInstance().modManager.getAllUnitBlueprintsFromEnabledMods();
+                ArrayList allUnitBlueprintsFromEnabledMods = GameEngine.getInstance().modManager.getAllMusicTrackPathsFromEnabledMods();
                 allUnitBlueprintsFromEnabledMods.addAll(getAllMusicPaths());
                 if (str.endsWith(".ogg") || str.endsWith(".wav")) {
                     getMusicDisplayName(str);
@@ -426,8 +426,8 @@ public class MusicManager {
                 }
             }
             ModInfo lastSelectedUnitModInfo2 = GameUI.getLastSelectedUnitModInfo();
-            if (randomMusicPath == null && lastSelectedUnitModInfo2 != null && lastSelectedUnitModInfo2.hasImages < 10 && lastSelectedUnitModInfo2.playMusicExclusively) {
-                ArrayList unitBlueprints = lastSelectedUnitModInfo2.getUnitBlueprints();
+            if (randomMusicPath == null && lastSelectedUnitModInfo2 != null && lastSelectedUnitModInfo2.musicErrorCount < 10 && lastSelectedUnitModInfo2.playMusicExclusively) {
+                ArrayList unitBlueprints = lastSelectedUnitModInfo2.getMusicTrackPaths();
                 if (unitBlueprints.size() > 0) {
                     z3 = true;
                     modInfo = lastSelectedUnitModInfo2;
@@ -495,7 +495,7 @@ public class MusicManager {
                             this.errorCount++;
                         }
                         if (modInfo != null) {
-                            modInfo.hasImages++;
+                            modInfo.musicErrorCount++;
                             return;
                         }
                         return;
@@ -507,7 +507,7 @@ public class MusicManager {
                         this.errorCount++;
                     }
                     if (modInfo != null) {
-                        modInfo.hasImages++;
+                        modInfo.musicErrorCount++;
                         return;
                     }
                     return;

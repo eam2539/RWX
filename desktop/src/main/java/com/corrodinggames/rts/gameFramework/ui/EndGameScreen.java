@@ -132,7 +132,7 @@ public class EndGameScreen {
             float realAssetPath = 0.0f;
             if (gameUI.c) {
                 gameUI.d += (2.0f * f) / 60.0f;
-                realAssetPath = Utility.getRealAssetPath(Utility.clampTo255(gameUI.d, 0.0f, 1.0f));
+                realAssetPath = Utility.easeInOutQuad(Utility.clampTo255(gameUI.d, 0.0f, 1.0f));
             }
             int screenPixels5 = gameEngine.toScreenPixels(40) + (screenPixels4 * size);
             int screenPixels6 = gameEngine.toScreenPixels(140);
@@ -140,12 +140,12 @@ public class EndGameScreen {
                 screenPixels6 += gameEngine.toScreenPixels(50);
             }
             if (gameUI.c) {
-                screenPixels5 = (int) Utility.fromHexString(screenPixels5, gameEngine.currentScreenWidthPixels * 0.9f, realAssetPath);
-                screenPixels6 = (int) Utility.fromHexString(screenPixels6, gameEngine.currentScreenHeightPixels * 0.9f, realAssetPath);
+                screenPixels5 = (int) Utility.lerp(screenPixels5, gameEngine.currentScreenWidthPixels * 0.9f, realAssetPath);
+                screenPixels6 = (int) Utility.lerp(screenPixels6, gameEngine.currentScreenHeightPixels * 0.9f, realAssetPath);
             }
             float fFromHexString = gameEngine.halfScreenHeight - (screenPixels6 / 2);
             if (!gameUI.c) {
-                fFromHexString = Utility.fromHexString(fFromHexString, fFromHexString / 2.0f, 1.0f - realAssetPath);
+                fFromHexString = Utility.lerp(fFromHexString, fFromHexString / 2.0f, 1.0f - realAssetPath);
             }
             if (fFromHexString < 20.0f) {
                 fFromHexString = 20.0f;
@@ -205,7 +205,7 @@ public class EndGameScreen {
             int i = (int) ((gameEngine.currentScreenWidthPixels / 2.0f) - (((screenPixels2 * size) + ((size - 1) * screenPixels3)) / 2));
             float f2 = 0.0f;
             if (gameUI.c) {
-                f2 = Utility.getRealAssetPath(Utility.clampTo255(gameUI.d, 0.0f, 1.0f)) >= 1.0f ? 1.0f : 0.0f;
+                f2 = Utility.easeInOutQuad(Utility.clampTo255(gameUI.d, 0.0f, 1.0f)) >= 1.0f ? 1.0f : 0.0f;
             }
             if (z) {
                 float f3 = gameUI.ninePatchStyle5.g;

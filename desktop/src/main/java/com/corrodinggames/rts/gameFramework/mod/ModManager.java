@@ -383,11 +383,11 @@ public class ModManager {
     }
 
     /* JADX INFO: renamed from: i */
-    public ArrayList<String> getAllUnitBlueprintsFromEnabledMods() {
+    public ArrayList<String> getAllMusicTrackPathsFromEnabledMods() {
         ArrayList<String> arrayList = new ArrayList<>();
         for (ModInfo modInfo : this.mods) {
             if (modInfo.isEnabled()) {
-                arrayList.addAll(modInfo.getUnitBlueprints());
+                arrayList.addAll(modInfo.getMusicTrackPaths());
             }
         }
         return arrayList;

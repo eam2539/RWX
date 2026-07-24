@@ -81,13 +81,13 @@ public class UnitStatsAction extends LogicAction {
             if (string != null) {
                 unitStatsAction.setUnitStats = UnitStats.a(string, customUnitConfig, str, str2 + "setUnitStats");
             }
-            customActionDef.ac.add(unitStatsAction);
+            customActionDef.logicActions.add(unitStatsAction);
         }
         boolean zBooleanValue2 = iniFile.getBoolean(str, str2 + "deleteSelf", (Boolean) false).booleanValue();
         if (zBooleanValue2) {
             UnitStatsAction unitStatsAction2 = new UnitStatsAction();
             unitStatsAction2.deleteSelf = zBooleanValue2;
-            customActionDef.ac.add(unitStatsAction2);
+            customActionDef.logicActions.add(unitStatsAction2);
         }
         boolean zBooleanValue3 = iniFile.getBoolean(str, str2 + "switchToNeutralTeam", (Boolean) false).booleanValue();
         boolean zBooleanValue4 = iniFile.getBoolean(str, str2 + "switchToAggressiveTeam", (Boolean) false).booleanValue();
@@ -97,25 +97,25 @@ public class UnitStatsAction extends LogicAction {
             unitStatsAction3.switchToNeutralTeam = zBooleanValue3;
             unitStatsAction3.switchToAggressiveTeam = zBooleanValue4;
             unitStatsAction3.switchToTeam = logicBooleanWithReturnType;
-            customActionDef.ac.add(unitStatsAction3);
+            customActionDef.logicActions.add(unitStatsAction3);
         }
         LogicBoolean logicBooleanNumber = iniFile.getLogicBooleanNumber(customUnitConfig, str, str2 + "setBodyRotation", null);
         if (logicBooleanNumber != null) {
             UnitStatsAction unitStatsAction4 = new UnitStatsAction();
             unitStatsAction4.setBodyRotation = logicBooleanNumber;
-            customActionDef.ac.add(unitStatsAction4);
+            customActionDef.logicActions.add(unitStatsAction4);
         }
         LogicBoolean logicBooleanNumber2 = iniFile.getLogicBooleanNumber(customUnitConfig, str, str2 + "setHeight", null);
         if (logicBooleanNumber2 != null) {
             UnitStatsAction unitStatsAction5 = new UnitStatsAction();
             unitStatsAction5.setHeight = logicBooleanNumber2;
-            customActionDef.ac.add(unitStatsAction5);
+            customActionDef.logicActions.add(unitStatsAction5);
         }
         LogicBoolean logicBoolean = iniFile.getInt(customUnitConfig, str, str2 + "teleportTo", null);
         if (logicBoolean != null) {
             UnitStatsAction unitStatsAction6 = new UnitStatsAction();
             unitStatsAction6.teleportTo = logicBoolean;
-            customActionDef.ac.add(unitStatsAction6);
+            customActionDef.logicActions.add(unitStatsAction6);
         }
         float fFloatValue = iniFile.getFloat(str, str2 + "setBuilt", Float.valueOf(-1.0f)).floatValue();
         if (fFloatValue > 1.0f) {
@@ -150,7 +150,7 @@ public class UnitStatsAction extends LogicAction {
             unitStatsAction7.offsetSelfAbsolute = resourceOrAsset;
             unitStatsAction7.removeAllQueuedItemsWithoutRefund = zBooleanValue6;
             unitStatsAction7.refundAllQueuedItems = zBooleanValue7;
-            customActionDef.ac.add(unitStatsAction7);
+            customActionDef.logicActions.add(unitStatsAction7);
         }
     }
 
@@ -175,7 +175,7 @@ public class UnitStatsAction extends LogicAction {
             UnitPrice.d(customUnit);
         }
         if (this.deleteSelf) {
-            customUnit.getUnitAICondition();
+            customUnit.removeFromGame();
             if (customUnit.bI()) {
                 GameEngine.getInstance().pathfindingEngine.a(customUnit);
             }
@@ -222,12 +222,12 @@ public class UnitStatsAction extends LogicAction {
         }
         if (this.setBuilt >= 0.0f) {
             customUnit.r(this.setBuilt);
-            customUnit.movementAngle = this.setBuilt;
+            customUnit.paidBuildProgress = this.setBuilt;
         }
         if (this.offsetSelfAbsolute != null) {
             customUnit.b(customUnit.posX + this.offsetSelfAbsolute.a, customUnit.posY + this.offsetSelfAbsolute.b);
             customUnit.posZ += this.offsetSelfAbsolute.c;
-            customUnit.isInitialized = true;
+            customUnit.isMoving = true;
             return true;
         }
         return true;

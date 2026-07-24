@@ -31,7 +31,7 @@ public class GunTurretT2 extends TurretImplementation {
 
     @Override // com.corrodinggames.rts.game.units.buildings.turrets.TurretImplementation
     public int d() {
-        return UnitTypeEnum.turret.c() + TurretFactory.upgradeToT2Action.isConfirmed();
+        return UnitTypeEnum.turret.c() + TurretFactory.upgradeToT2Action.getCostAmount();
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.turrets.TurretImplementation

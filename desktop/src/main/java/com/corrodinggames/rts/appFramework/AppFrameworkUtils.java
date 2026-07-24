@@ -43,7 +43,7 @@ public class AppFrameworkUtils {
     public static int getNumberOfPlayersInMap(String str) {
         String fileNameWithoutExtension = null;
         if (str != null) {
-            fileNameWithoutExtension = Utility.getFileNameWithoutExtension(str);
+            fileNameWithoutExtension = Utility.getFileName(str);
         }
         if (fileNameWithoutExtension != null) {
             Matcher matcher = Pattern.compile("^ *\\[([^\\]]*)\\].*").matcher(fileNameWithoutExtension);

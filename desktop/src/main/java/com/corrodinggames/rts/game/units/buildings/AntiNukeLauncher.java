@@ -66,26 +66,26 @@ public class AntiNukeLauncher extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return VariableScope.nullOrMissingString;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("gui.actions.antiNukeCount", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 0;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
-            if (isActive(baseUnit, false) == 0) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
+            if (getActiveCount(baseUnit, false) == 0) {
                 return false;
             }
             return true;
@@ -98,19 +98,19 @@ public class AntiNukeLauncher extends FactoryWithQueue {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public ActionType e() {
+        public ActionType getActionType() {
             return ActionType.none;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.none;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z) {
             return ((AntiNukeLauncher) baseUnit).antiNukeCount;
         }
     };
@@ -125,19 +125,19 @@ public class AntiNukeLauncher extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return Locale.get("gui.actions.buildAntiNuke.description", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("gui.actions.buildAntiNuke", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 4000;
         }
 
@@ -148,12 +148,12 @@ public class AntiNukeLauncher extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             AntiNukeLauncher antiNukeLauncher = (AntiNukeLauncher) baseUnit;
             if (antiNukeLauncher.antiNukeCount + antiNukeLauncher.a(getActionId(), z) >= 12.0f) {
                 return false;
             }
-            return super.drawTooltip(baseUnit, z);
+            return super.canAfford(baseUnit, z);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -164,7 +164,7 @@ public class AntiNukeLauncher extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.queueUnit;
         }
     };
@@ -405,7 +405,7 @@ public class AntiNukeLauncher extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: ck */
-    public boolean isUnitEnergyCost() {
+    public boolean isUpgradeable() {
         return false;
     }
 

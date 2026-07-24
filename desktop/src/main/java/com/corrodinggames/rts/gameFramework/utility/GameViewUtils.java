@@ -122,7 +122,7 @@ public final class GameViewUtils {
         if ((z && ((baseUnit instanceof AirUnit) || (baseUnit instanceof WaterUnit))) || baseUnit.bI()) {
             return false;
         }
-        if ((z && (baseUnit.getUnitAIPathfindTimeout() || baseUnit.getUnitAIPathfindMaxDepth())) || baseUnit.P() || baseUnit.unitTransportTarget != null || baseUnit.parentEntity != null) {
+        if ((z && (baseUnit.isWaterUnit() || baseUnit.isAirborne())) || baseUnit.P() || baseUnit.unitTransportTarget != null || baseUnit.parentEntity != null) {
             return false;
         }
         return true;
@@ -279,7 +279,7 @@ public final class GameViewUtils {
     }
 
     public static final Paint a(int i, int i2, int i3, int i4, Paint.Style style) {
-        return a(Utility.longToIntArray(i, i2, i3, i4), style);
+        return a(Utility.packArgb(i, i2, i3, i4), style);
     }
 
     public static final Paint a(int i, Paint.Style style) {

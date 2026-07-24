@@ -20,7 +20,7 @@ public class QueueUnitAction extends PopupQueueAction {
         UnitType unitTypeC = CustomUnitConfig.c(unitType);
         if (unitTypeC != null) {
             unitType = unitTypeC;
-            canAfford("u_" + unitType.v());
+            setActionId("u_" + unitType.v());
         }
         this.sortOrder = f;
         this.a = unitType;
@@ -28,19 +28,19 @@ public class QueueUnitAction extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public String isLocked() {
+    public String getDescription() {
         return this.a.f() + "\n\n" + GameInterfaceRenderer.a(BaseUnit.canAttack(this.a), false, false, true);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public String getCostForUnit() {
+    public String getDisplayName() {
         return this.a.getUnitName();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
-    public int isConfirmed() {
+    public int getCostAmount() {
         return getDisplayText().a();
     }
 
@@ -77,7 +77,7 @@ public class QueueUnitAction extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
+    public ActionDisplayType getActionDisplayType() {
         return ActionDisplayType.queueUnit;
     }
 

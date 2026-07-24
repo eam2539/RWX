@@ -60,11 +60,11 @@ public class UnitSearchCallback extends FilteredUnitCallback {
 
     @Override // com.corrodinggames.rts.game.units.spatial.UnitSpatialCallback
     public void callback(OrderableUnit orderableUnit, float f, BaseUnit baseUnit) {
-        AnimationSet unitCombatAnimation = baseUnit.getUnitCombatAnimation();
+        AnimationSet unitCombatAnimation = baseUnit.getTags();
         if (this.unitTags == null || (unitCombatAnimation != null && AnimationTag.a(this.unitTags, unitCombatAnimation))) {
             float fDistanceSq = Utility.distanceSq(orderableUnit.posX, orderableUnit.posY, baseUnit.posX, baseUnit.posY);
             if (fDistanceSq < this.maxRange) {
-                if (baseUnit.deceleration < 1.0f && !this.includeNotBuilt) {
+                if (baseUnit.buildProgress < 1.0f && !this.includeNotBuilt) {
                     return;
                 }
                 if (this.teamFilter != null && !orderableUnit.team.a(this.teamFilter, baseUnit.team)) {

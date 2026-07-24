@@ -154,7 +154,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
                 S(4);
             }
         }
-        if (this.isInitialized) {
+        if (this.isMoving) {
         }
         this.h += 1.0f * f2;
         if (this.h > 360.0f) {
@@ -236,7 +236,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
         projectileA.J = 70.0f;
         projectileA.F = 230.0f;
         projectileA.ak = 0.75f;
-        projectileA.syncType = this.syncType;
+        projectileA.drawLayer = this.drawLayer;
         this.i = projectileA;
     }
 
@@ -372,13 +372,13 @@ public class ExperimentalHoverTank extends HoverLandUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cw */
-    public int getUnitAIPathfindIterations() {
+    public int getTransportSlotsNeeded() {
         return 5;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: dd */
-    public boolean getUnitAICombatTarget() {
+    public boolean isExperimental() {
         return true;
     }
 

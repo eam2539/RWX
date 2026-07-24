@@ -333,8 +333,8 @@ public final class GraphicsUtils {
         }
         float f3 = i8 / (float) (i10 * iB);
         float f4 = i9 / (float) (i11 * iC);
-        float fFromHexString = Utility.fromHexString(1.0f, f3, f2);
-        float fFromHexString2 = Utility.fromHexString(1.0f, f4, f2);
+        float fFromHexString = Utility.lerp(1.0f, f3, f2);
+        float fFromHexString2 = Utility.lerp(1.0f, f4, f2);
         if (Math.abs(fFromHexString) < 0.0001f) {
             fFromHexString = 1.0f;
         }
@@ -392,7 +392,7 @@ public final class GraphicsUtils {
     public static void a(Paint paint) {
         if (GameEngine.isAndroidPlatform()) {
             int iE = paint.e();
-            paint.a(new LightingColorFilter(Utility.longToIntArray(255, (iE >> 16) & 255, (iE >> 8) & 255, iE & 255), 0));
+            paint.a(new LightingColorFilter(Utility.packArgb(255, (iE >> 16) & 255, (iE >> 8) & 255, iE & 255), 0));
         }
     }
 }

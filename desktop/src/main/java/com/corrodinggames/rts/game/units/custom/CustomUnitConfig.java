@@ -81,13 +81,13 @@ public final class CustomUnitConfig implements UnitType {
     public String configPath;
 
     /* JADX INFO: renamed from: E */
-    public String generation_delay;
+    public String sourceFilePath;
 
     /* JADX INFO: renamed from: F */
-    public String generation_free_in_sandbox;
+    public String resourceLoadPath;
 
     /* JADX INFO: renamed from: H */
-    public int generation_unit;
+    public int configHash;
 
     /* JADX INFO: renamed from: I */
     public String overrideAndReplace;
@@ -105,7 +105,7 @@ public final class CustomUnitConfig implements UnitType {
     public String name;
 
     /* JADX INFO: renamed from: O */
-    public AnimationSet image_shield;
+    public AnimationSet tags;
 
     /* JADX INFO: renamed from: P */
     public AnimationSet tag2;
@@ -135,13 +135,13 @@ public final class CustomUnitConfig implements UnitType {
     public boolean imageSmoothing;
 
     /* JADX INFO: renamed from: ac */
-    public ColorMode baseDamage;
+    public ColorMode teamColoringMode;
 
     /* JADX INFO: renamed from: af */
-    public int maxHp;
+    public int frameWidth;
 
     /* JADX INFO: renamed from: ag */
-    public int mass;
+    public int frameHeight;
 
     /* JADX INFO: renamed from: ah */
     public int image_offsetX;
@@ -162,7 +162,7 @@ public final class CustomUnitConfig implements UnitType {
     public boolean hasShadowFrames;
 
     /* JADX INFO: renamed from: as */
-    public Texture[] energy;
+    public Texture[] teamColoredIconTextures;
 
     /* JADX INFO: renamed from: aw */
     public Texture icon_build;
@@ -415,7 +415,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: dg */
     public int buildingSelectionOffset;
     /* JADX INFO: renamed from: dh */
-    public int fogOfWarSightRangeWhileNotBuilt2;
+    public int fogOfWarSightRangeWhileNotBuilt;
     /* JADX INFO: renamed from: di */
     public float exit_x;
     /* JADX INFO: renamed from: dj */
@@ -452,7 +452,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: dF */
     public TurretConfig defaultTurret2;
     /* JADX INFO: renamed from: dG */
-    public int defaultTurretRotationSpeed;
+    public int mainTurretIndex;
     /* JADX INFO: renamed from: dH */
     public float whenBeingBuiltMakeTransparentTill;
     /* JADX INFO: renamed from: dJ */
@@ -493,7 +493,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: eg */
     public boolean stopTargetingAfterFiring;
     /* JADX INFO: renamed from: eh */
-    public boolean turretMultiTargeting2;
+    public boolean turretMultiTargeting;
     /* JADX INFO: renamed from: ei */
     public boolean joinsGroupFormations;
     /* JADX INFO: renamed from: ej */
@@ -540,7 +540,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: ee */
     public float attackMovementSpread;
     /* JADX INFO: renamed from: eC */
-    public boolean disableAllUnitCollisions2;
+    public boolean disableAllUnitCollisions;
     /* JADX INFO: renamed from: eD */
     public boolean isBio;
     /* JADX INFO: renamed from: eE */
@@ -664,9 +664,9 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: ao */
     public Texture image_turret = null;
     /* JADX INFO: renamed from: ar */
-    public Texture[] textures = new Texture[10];
+    public Texture[] teamColoredBaseTextures = new Texture[10];
     /* JADX INFO: renamed from: au */
-    public Texture texture = null;
+    public Texture shieldTexture = null;
     /* JADX INFO: renamed from: av */
     public boolean hasCustomShieldImage = false;
     /* JADX INFO: renamed from: ax */
@@ -827,12 +827,12 @@ public final class CustomUnitConfig implements UnitType {
     public int currentTurretIndex = -1;
 
     /* JADX INFO: renamed from: ap */
-    public Texture shieldRegenMoving = null;
+    public Texture shadowTexture = null;
     /* JADX INFO: renamed from: en */
     public int warmupBarTurretIndex = -1;
 
     /* JADX INFO: renamed from: at */
-    public Texture[] maxEnergy = null;
+    public Texture[] teamColoredTurretTextures = null;
     /* JADX INFO: renamed from: eJ */
     public boolean hideScorchMark = false;
     /* JADX INFO: renamed from: eK */
@@ -861,13 +861,13 @@ public final class CustomUnitConfig implements UnitType {
     public int canAttackLand = -1;
 
     /* JADX INFO: renamed from: bB */
-    public int canAttackUnderwater = -1;
+    public int fireTurretAtSelfOnDeathIndex = -1;
 
     /* JADX INFO: renamed from: bH */
-    public float targetOwnTeam = 1.0f;
+    public float imageScale = 1.0f;
 
     /* JADX INFO: renamed from: bI */
-    public float targetNeutralTeam = 1.0f;
+    public float turretImageScale = 1.0f;
 
     /* JADX INFO: renamed from: ca */
     public float autoTriggerCooldownTime = 60.0f;
@@ -1061,7 +1061,7 @@ public final class CustomUnitConfig implements UnitType {
         gameOutputStream.writeInt(activeConfigs.size());
         for (CustomUnitConfig customUnitConfig : activeConfigs) {
             gameOutputStream.writeStringUTF(customUnitConfig.name);
-            gameOutputStream.writeInt(customUnitConfig.generation_unit);
+            gameOutputStream.writeInt(customUnitConfig.configHash);
             gameOutputStream.writeBoolean(true);
             gameOutputStream.writeStringNullable(customUnitConfig.getOwningModDisplayTitle());
             long j = 0;
@@ -1104,11 +1104,11 @@ public final class CustomUnitConfig implements UnitType {
                 synchronized (allConfigs) {
                     for (CustomUnitConfig customUnitConfig3 : allConfigs) {
                         if (utf.equals(customUnitConfig3.name)) {
-                            if (i3 == customUnitConfig3.generation_unit) {
+                            if (i3 == customUnitConfig3.configHash) {
                                 customUnitConfig = customUnitConfig3;
                             } else {
                                 customUnitConfig2 = customUnitConfig3;
-                                i4 = customUnitConfig3.generation_unit;
+                                i4 = customUnitConfig3.configHash;
                             }
                         }
                     }
@@ -1304,7 +1304,7 @@ public final class CustomUnitConfig implements UnitType {
                         baseUnitA.posX += baseUnitA.getTileOffsetX();
                         baseUnitA.posY += baseUnitA.getTileOffsetY();
                         if (spawnPointType == SpawnPointType.emptyResourcePools_asNeutral && (baseUnitA instanceof OrderableUnit) && ((OrderableUnit) baseUnitA).hasBlockingUnitNearby((BaseUnit) null, (PlayerTeam) null)) {
-                            baseUnitA.getUnitAICondition();
+                            baseUnitA.removeFromGame();
                         } else {
                             PlayerTeam.c(baseUnitA);
                         }
@@ -1663,7 +1663,7 @@ public final class CustomUnitConfig implements UnitType {
 
     @Override // com.corrodinggames.rts.game.units.UnitType
     public AnimationSet x() {
-        return this.image_shield;
+        return this.tags;
     }
 
     /* JADX INFO: renamed from: e */
@@ -1855,7 +1855,7 @@ public final class CustomUnitConfig implements UnitType {
         int size = arrayListA.size();
         for (int i = 0; i < size; i++) {
             AbstractUnitAction abstractUnitAction = (AbstractUnitAction) arrayListA.get(i);
-            if (abstractUnitAction.isAvailableForUnit(actionId)) {
+            if (abstractUnitAction.matchesActionId(actionId)) {
                 return abstractUnitAction;
             }
         }
@@ -1893,7 +1893,7 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     public Texture a(IniFile iniFile, String str, String str2, boolean z) {
-        return a(this.generation_free_in_sandbox, iniFile.getString(str, str2, (String) null), z, str, str2);
+        return a(this.resourceLoadPath, iniFile.getString(str, str2, (String) null), z, str, str2);
     }
 
     public Texture a(String str, String str2, boolean z, String str3, String str4) {
@@ -1919,7 +1919,7 @@ public final class CustomUnitConfig implements UnitType {
         for (AbstractUnitAction abstractUnitAction : a(this.techLevel)) {
             if (abstractUnitAction instanceof CustomAction) {
                 CustomAction customAction = (CustomAction) abstractUnitAction;
-                if (customAction.a.displayName.equalsIgnoreCase(str)) {
+                if (customAction.actionDef.displayName.equalsIgnoreCase(str)) {
                     return customAction;
                 }
             }

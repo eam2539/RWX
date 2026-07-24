@@ -288,7 +288,7 @@ public class LogicBooleanGameFunctions {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public boolean read(OrderableUnit orderableUnit) {
             boolean z = false;
-            if (orderableUnit.isInitialized) {
+            if (orderableUnit.isMoving) {
                 z = true;
             }
             return z;
@@ -397,7 +397,7 @@ public class LogicBooleanGameFunctions {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public boolean read(OrderableUnit orderableUnit) {
             boolean z = false;
-            if (orderableUnit.checkTransportSlots()) {
+            if (orderableUnit.isTouchingWater()) {
                 z = true;
             }
             return z;
@@ -414,7 +414,7 @@ public class LogicBooleanGameFunctions {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public boolean read(OrderableUnit orderableUnit) {
             boolean z = false;
-            if (orderableUnit.m147cJ()) {
+            if (orderableUnit.isOverWater()) {
                 z = true;
             }
             return z;
@@ -431,7 +431,7 @@ public class LogicBooleanGameFunctions {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public boolean read(OrderableUnit orderableUnit) {
             boolean z = false;
-            if (orderableUnit.isMoving()) {
+            if (orderableUnit.isOverLiquid()) {
                 z = true;
             }
             return z;
@@ -448,7 +448,7 @@ public class LogicBooleanGameFunctions {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public boolean read(OrderableUnit orderableUnit) {
             boolean z = false;
-            if (orderableUnit.isUnitTransportCategory()) {
+            if (orderableUnit.isOverCliff()) {
                 z = true;
             }
             return z;
@@ -490,7 +490,7 @@ public class LogicBooleanGameFunctions {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public boolean read(OrderableUnit orderableUnit) {
             boolean z = false;
-            if (orderableUnit.deceleration >= 1.0f) {
+            if (orderableUnit.buildProgress >= 1.0f) {
                 z = true;
             }
             return z;
@@ -546,7 +546,7 @@ public class LogicBooleanGameFunctions {
                         OrderableUnit orderableUnit2 = (OrderableUnit) objArrA[i];
                         if (orderableUnit2 != null && (this.slot == -1 || i == this.slot)) {
                             if (this._withTag != null) {
-                                if (AnimationTag.a(this._withTag, orderableUnit2.getUnitCombatAnimation())) {
+                                if (AnimationTag.a(this._withTag, orderableUnit2.getTags())) {
                                     transportedUnitCount++;
                                 }
                             }
@@ -700,7 +700,7 @@ public class LogicBooleanGameFunctions {
         public boolean read(OrderableUnit orderableUnit) {
             AnimationSet animationSetDe;
             boolean z = true;
-            if (this.includesTag != null && ((animationSetDe = orderableUnit.getUnitCombatAnimation()) == null || !AnimationTag.a(this.includesTag, animationSetDe))) {
+            if (this.includesTag != null && ((animationSetDe = orderableUnit.getTags()) == null || !AnimationTag.a(this.includesTag, animationSetDe))) {
                 z = false;
             }
             return z;
@@ -795,7 +795,7 @@ public class LogicBooleanGameFunctions {
             if (this.includesTag != null && (transportedUnitList = orderableUnit.getTransportedUnitList()) != null) {
                 Object[] objArrA = transportedUnitList.a();
                 for (int i = 0; i < transportedUnitList.size; i++) {
-                    AnimationSet unitCombatAnimation = ((BaseUnit) objArrA[i]).getUnitCombatAnimation();
+                    AnimationSet unitCombatAnimation = ((BaseUnit) objArrA[i]).getTags();
                     if (unitCombatAnimation != null && AnimationTag.a(this.includesTag, unitCombatAnimation)) {
                         z = true;
                     }
@@ -1152,7 +1152,7 @@ public class LogicBooleanGameFunctions {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
         public float getValue(OrderableUnit orderableUnit) {
-            return orderableUnit.deceleration;
+            return orderableUnit.buildProgress;
         }
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
@@ -1580,9 +1580,9 @@ public class LogicBooleanGameFunctions {
 
             @Override // com.corrodinggames.rts.game.units.spatial.UnitSpatialCallback
             public void callback(OrderableUnit orderableUnit, float f, BaseUnit baseUnit) {
-                AnimationSet unitCombatAnimation = baseUnit.getUnitCombatAnimation();
+                AnimationSet unitCombatAnimation = baseUnit.getTags();
                 if ((this.tag == null || (unitCombatAnimation != null && AnimationTag.a(this.tag, unitCombatAnimation))) && Utility.distanceSq(orderableUnit.posX, orderableUnit.posY, baseUnit.posX, baseUnit.posY) < this.withinRangeSq) {
-                    if (baseUnit.deceleration < 1.0f && !this.incompleteBuildings) {
+                    if (baseUnit.buildProgress < 1.0f && !this.incompleteBuildings) {
                         return;
                     }
                     this.count++;
@@ -1696,9 +1696,9 @@ public class LogicBooleanGameFunctions {
 
             @Override // com.corrodinggames.rts.game.units.spatial.UnitSpatialCallback
             public void callback(OrderableUnit orderableUnit, float f, BaseUnit baseUnit) {
-                AnimationSet unitCombatAnimation = baseUnit.getUnitCombatAnimation();
+                AnimationSet unitCombatAnimation = baseUnit.getTags();
                 if ((this.tag == null || (unitCombatAnimation != null && AnimationTag.a(this.tag, unitCombatAnimation))) && Utility.distanceSq(orderableUnit.posX, orderableUnit.posY, baseUnit.posX, baseUnit.posY) < this.withinRangeSq) {
-                    if (baseUnit.deceleration < 1.0f && !this.incompleteBuildings) {
+                    if (baseUnit.buildProgress < 1.0f && !this.incompleteBuildings) {
                         return;
                     }
                     this.count++;
@@ -1738,9 +1738,9 @@ public class LogicBooleanGameFunctions {
                 if (this.ally == baseUnit.team || !this.ally.d(baseUnit.team)) {
                     return;
                 }
-                AnimationSet unitCombatAnimation = baseUnit.getUnitCombatAnimation();
+                AnimationSet unitCombatAnimation = baseUnit.getTags();
                 if ((this.tag == null || (unitCombatAnimation != null && AnimationTag.a(this.tag, unitCombatAnimation))) && Utility.distanceSq(orderableUnit.posX, orderableUnit.posY, baseUnit.posX, baseUnit.posY) < this.withinRangeSq) {
-                    if (baseUnit.deceleration < 1.0f && !this.incompleteBuildings) {
+                    if (baseUnit.buildProgress < 1.0f && !this.incompleteBuildings) {
                         return;
                     }
                     this.count++;
@@ -1957,7 +1957,7 @@ public class LogicBooleanGameFunctions {
             if (baseUnitDr != null) {
                 z = true;
                 if (this._withTag != null) {
-                    if (!AnimationTag.a(this._withTag, baseUnitDr.getUnitCombatAnimation())) {
+                    if (!AnimationTag.a(this._withTag, baseUnitDr.getTags())) {
                         z = false;
                     }
                 }
@@ -2038,7 +2038,7 @@ public class LogicBooleanGameFunctions {
                 OrderableUnit orderableUnit2 = (OrderableUnit) objArrA[i2];
                 if (orderableUnit2 != null && (this.attachmentId == -1 || i2 == this.attachmentId)) {
                     if (this._withTag != null) {
-                        if (AnimationTag.a(this._withTag, orderableUnit2.getUnitCombatAnimation())) {
+                        if (AnimationTag.a(this._withTag, orderableUnit2.getTags())) {
                             i++;
                         }
                     }

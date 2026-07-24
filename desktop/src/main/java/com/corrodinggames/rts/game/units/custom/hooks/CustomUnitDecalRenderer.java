@@ -176,7 +176,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                 DecalImageSlice decalImageSlice = new DecalImageSlice();
                 decalImageSlice.a = textureA;
                 if (decalImageSlice.a != null && zBooleanValue) {
-                    decalImageSlice.b = customUnitConfig.a(textureA, customUnitConfig.baseDamage);
+                    decalImageSlice.b = customUnitConfig.a(textureA, customUnitConfig.teamColoringMode);
                 }
                 decalImageSlice.a(decalDefinition);
                 decalDefinition.v = decalImageSlice;
@@ -227,12 +227,12 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                         }
                     }
                     DecalImageSlice decalImageSlice2 = new DecalImageSlice();
-                    decalImageSlice2.a = customUnitConfig.a(customUnitConfig.generation_free_in_sandbox, str4, customUnitConfig.imageSmoothing, str2, "imageStack");
+                    decalImageSlice2.a = customUnitConfig.a(customUnitConfig.resourceLoadPath, str4, customUnitConfig.imageSmoothing, str2, "imageStack");
                     if (decalImageSlice2.a == null) {
                         throw new ConfigParseException("[" + str2 + "]failed to load image " + str4);
                     }
                     if (z2) {
-                        decalImageSlice2.b = customUnitConfig.a(decalImageSlice2.a, customUnitConfig.baseDamage);
+                        decalImageSlice2.b = customUnitConfig.a(decalImageSlice2.a, customUnitConfig.teamColoringMode);
                     }
                     decalImageSlice2.a(decalDefinition);
                     for (int i4 = 0; i4 < i3; i4++) {
@@ -297,7 +297,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                 if (turretConfigFindProjectileConfigByName == null) {
                     throw new ConfigParseException("[" + str2 + "]basePositionFromTurret failed to find: " + string3);
                 }
-                decalDefinition.ag = turretConfigFindProjectileConfigByName.rotationSpeed;
+                decalDefinition.ag = turretConfigFindProjectileConfigByName.turretIndex;
             }
             if (decalDefinition.ae != -1 && decalDefinition.ag != -1) {
                 throw new ConfigParseException("[" + str2 + "]basePositionFromTurret and basePositionFromLeg cannot be used at the same time");
@@ -538,7 +538,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                             if (var14.af) {
                                 float var24 = jx.rotationSpeed;
                                 if (jx.unitConfig.lockLegRotationWithMainTurret) {
-                                    var24 = jx.movementLevels[jx.unitConfig.defaultTurretRotationSpeed].targetX;
+                                    var24 = jx.movementLevels[jx.unitConfig.mainTurretIndex].targetX;
                                 }
 
                                 float var25 = Utility.fastCos(var24);
@@ -585,7 +585,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                             var18 = ((BaseUnit)var50).rotationSpeed + 90.0F;
                             var19 = ((BaseUnit)var50).rotationSpeed;
                             if (var14.ac == null && jx.unitConfig.lockBodyRotationWithMainTurret) {
-                                float var56 = jx.movementLevels[jx.unitConfig.defaultTurretRotationSpeed].targetX;
+                                float var56 = jx.movementLevels[jx.unitConfig.mainTurretIndex].targetX;
                                 var18 = var56 + 90.0F;
                                 var19 = var56;
                             }

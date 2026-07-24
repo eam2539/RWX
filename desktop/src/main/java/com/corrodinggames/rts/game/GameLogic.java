@@ -735,13 +735,13 @@ public class GameLogic extends GameEngine {
                     this.maxUnitCap = this.networkEngine.maxUnitCap;
                 }
                 GameEngine.log("Unit cap is now: " + this.maxUnitCap);
-                if (this.networkEngine.roomSettings.fodMode == 0) {
+                if (this.networkEngine.roomSettings.fogMode == 0) {
                     this.tileMap.fogEnabled = false;
                     this.tileMap.fogPeriodicMaintenanceEnabled = false;
-                } else if (this.networkEngine.roomSettings.fodMode == 1) {
+                } else if (this.networkEngine.roomSettings.fogMode == 1) {
                     this.tileMap.fogEnabled = true;
                     this.tileMap.fogPeriodicMaintenanceEnabled = false;
-                } else if (this.networkEngine.roomSettings.fodMode == 2) {
+                } else if (this.networkEngine.roomSettings.fogMode == 2) {
                     this.tileMap.fogEnabled = true;
                     this.tileMap.fogPeriodicMaintenanceEnabled = true;
                 }
@@ -811,7 +811,7 @@ public class GameLogic extends GameEngine {
                                         fValueOf = Float.valueOf(baseUnit.posX);
                                         fValueOf2 = Float.valueOf(baseUnit.posY);
                                         if (!z5) {
-                                            baseUnit.getUnitAICondition();
+                                            baseUnit.removeFromGame();
                                         }
                                     }
                                     if (baseUnit.isTargetable && !z4) {
@@ -819,7 +819,7 @@ public class GameLogic extends GameEngine {
                                         fValueOf3 = Float.valueOf(baseUnit.posX);
                                         fValueOf4 = Float.valueOf(baseUnit.posY);
                                         if (!z6) {
-                                            baseUnit.getUnitAICondition();
+                                            baseUnit.removeFromGame();
                                         }
                                     }
                                 }
@@ -874,7 +874,7 @@ public class GameLogic extends GameEngine {
                                         baseUnitA4.posY = fFloatValue2;
                                         baseUnitA4.rotationSpeed = 90.0f;
                                         baseUnitA4.posZ = 2.0f;
-                                        baseUnitA4.getUnitAICombatState();
+                                        baseUnitA4.startFalling();
                                         PlayerTeam.c(baseUnitA4);
                                     }
                                 } else if (iIntValue != 9 && iIntValue > 10) {
@@ -890,7 +890,7 @@ public class GameLogic extends GameEngine {
                                             baseUnitA5.rotationSpeed = 90.0f;
                                         }
                                         if (customUnitConfigC.startFallingWhenStartingUnit) {
-                                            baseUnitA5.getUnitAICombatState();
+                                            baseUnitA5.startFalling();
                                             if (baseUnitA5 instanceof CustomUnit) {
                                                 ((CustomUnit) baseUnitA5).dB();
                                             }
@@ -1013,7 +1013,7 @@ public class GameLogic extends GameEngine {
     private void selectAnyOnScreenBuilder() {
         this.gameUI.clearSelection();
         for (BaseUnit baseUnit : BaseUnit.bE) {
-            if (baseUnit.team == this.playerTeam && (baseUnit instanceof OrderableUnit) && baseUnit.canMove() && baseUnit.isBuilding() && baseUnit.isAlive() && !baseUnit.u() && !baseUnit.t()) {
+            if (baseUnit.team == this.playerTeam && (baseUnit instanceof OrderableUnit) && baseUnit.canMove() && baseUnit.isVisibleOnScreen() && baseUnit.isAlive() && !baseUnit.u() && !baseUnit.t()) {
                 GameEngine.log("selectAnyOnScreenBuilder: found builder");
                 this.gameUI.selectUnit(baseUnit);
                 return;
@@ -1105,7 +1105,7 @@ public class GameLogic extends GameEngine {
         }
 
         if (isGameThreadActive && !this.hasLoggedHighNativeHeapUsage && isAndroidPlatform() && Debug.getNativeHeapAllocatedSize() > 209715200L) {
-            GameEngine.log("getNativeHeapAllocatedSize: " + Utility.formatMilliseconds((int) Debug.getNativeHeapAllocatedSize()));
+            GameEngine.log("getNativeHeapAllocatedSize: " + Utility.formatByteSize((int) Debug.getNativeHeapAllocatedSize()));
             this.hasLoggedHighNativeHeapUsage = true;
         }
 
@@ -1826,9 +1826,9 @@ public class GameLogic extends GameEngine {
 
             for (int var6 = 0; var6 < var5; var6++) {
                 GameObject var7 = var4[var6];
-                boolean var8 = var7.flag3;
+                boolean var8 = var7.shouldDraw;
                 boolean var9 = var7.a(this);
-                var7.flag3 = var9;
+                var7.shouldDraw = var9;
                 if (var8 != var9) {
                     var3 = true;
                 }
@@ -1924,7 +1924,7 @@ public class GameLogic extends GameEngine {
             if (!var13) {
                 for (int var16 = 0; var16 < var15; var16++) {
                     GameObject var10 = var14[var16];
-                    if (var10.syncType == 0) {
+                    if (var10.drawLayer == 0) {
                         var10.c(float2);
                     }
                 }
@@ -1965,26 +1965,26 @@ public class GameLogic extends GameEngine {
 
                 for (int var20 = 0; var20 < var5; var20++) {
                     GameObject var27 = var4[var20];
-                    if (!var27.flag3) {
+                    if (!var27.shouldDraw) {
                         if (!(var27 instanceof BaseUnit)) {
                             continue;
                         }
 
                         BaseUnit var11 = (BaseUnit)var27;
-                        if (!var11.isSelected || var11.team != this.playerTeam && !var11.getWeight()) {
+                        if (!var11.isSelected || var11.team != this.playerTeam && !var11.isVisibleToLocalPlayer()) {
                             continue;
                         }
                     }
 
                     var27.e(float2);
-                    if (!var27.flag3) {
+                    if (!var27.shouldDraw) {
                         var27.p(float2);
                     }
                 }
 
                 for (int var21 = 0; var21 < var15; var21++) {
                     GameObject var28 = var14[var21];
-                    if (var28.syncType != 0 && var28.syncType != 10) {
+                    if (var28.drawLayer != 0 && var28.drawLayer != 10) {
                         var28.c(float2);
                     }
                 }
@@ -2007,7 +2007,7 @@ public class GameLogic extends GameEngine {
 
             for (int var23 = 0; var23 < var15; var23++) {
                 GameObject var30 = var14[var23];
-                if (var30.syncType == 10) {
+                if (var30.drawLayer == 10) {
                     var30.c(float2);
                 }
             }

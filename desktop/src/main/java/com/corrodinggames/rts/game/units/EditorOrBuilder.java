@@ -76,7 +76,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction editorSelectionTexture3 = new AbstractUnitAction("reloadUnits") { // from class: com.corrodinggames.rts.game.units.h.1
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             if (EditorOrBuilder.w()) {
                 return false;
             }
@@ -85,25 +85,25 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Reload all unit data from disk (for modding)";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Reload units";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 0;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z2) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
             return -1;
         }
 
@@ -114,13 +114,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public ActionType e() {
+        public ActionType getActionType() {
             return ActionType.none;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.action;
         }
 
@@ -141,7 +141,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction editorIconTexture = new AbstractUnitAction("reloadOnlyActiveUnits") { // from class: com.corrodinggames.rts.game.units.h.12
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             if (EditorOrBuilder.w()) {
                 return false;
             }
@@ -150,25 +150,25 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Reload data only for active units on map (for modding). This is a faster than reload but will be incomplete.";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Quick reload";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 0;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z2) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
             return -1;
         }
 
@@ -179,13 +179,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public ActionType e() {
+        public ActionType getActionType() {
             return ActionType.none;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.action;
         }
 
@@ -206,25 +206,25 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction editorIconTexture2 = new AbstractUnitAction("unitClone") { // from class: com.corrodinggames.rts.game.units.h.17
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Clones units at point x50";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Unit Clone";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 0;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z2) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
             return -1;
         }
 
@@ -235,13 +235,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public ActionType e() {
+        public ActionType getActionType() {
             return ActionType.targetGround;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.action;
         }
 
@@ -253,7 +253,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             return true;
         }
 
@@ -268,13 +268,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction editorIconTexture3 = new AbstractUnitAction("removeUnits") { // from class: com.corrodinggames.rts.game.units.h.18
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Delete all units at a point";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Delete units at";
         }
 
@@ -286,13 +286,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 0;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z2) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
             return -1;
         }
 
@@ -303,13 +303,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public ActionType e() {
+        public ActionType getActionType() {
             return ActionType.targetGround;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.action;
         }
 
@@ -321,7 +321,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             return true;
         }
 
@@ -336,13 +336,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction editorIconTexture4 = new AbstractUnitAction("killUnits") { // from class: com.corrodinggames.rts.game.units.h.19
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Kill units at a point";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Kill units at";
         }
 
@@ -354,13 +354,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 0;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z2) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
             return -1;
         }
 
@@ -371,13 +371,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public ActionType e() {
+        public ActionType getActionType() {
             return ActionType.targetGround;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.action;
         }
 
@@ -389,7 +389,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             return true;
         }
 
@@ -404,13 +404,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction editorIconTexture5 = new AbstractUnitAction("finishQueue") { // from class: com.corrodinggames.rts.game.units.h.20
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Finish all unit queues at";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Finish queue at";
         }
 
@@ -422,13 +422,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 0;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z2) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
             return -1;
         }
 
@@ -439,13 +439,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public ActionType e() {
+        public ActionType getActionType() {
             return ActionType.targetGround;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.action;
         }
 
@@ -457,7 +457,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             return true;
         }
 
@@ -472,13 +472,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction editorIconTexture6 = new AbstractUnitAction("nukeAt") { // from class: com.corrodinggames.rts.game.units.h.21
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Create a nuke at a point";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Nuke at";
         }
 
@@ -490,13 +490,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return 0;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z2) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z2) {
             return -1;
         }
 
@@ -507,13 +507,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public ActionType e() {
+        public ActionType getActionType() {
             return ActionType.targetGround;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.action;
         }
 
@@ -525,7 +525,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             return true;
         }
 
@@ -540,13 +540,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction editorIconTexture7 = new NoneAction("freezeAI") { // from class: com.corrodinggames.rts.game.units.h.22
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Freeze high level AI logic (120secs)";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Freeze AI";
         }
 
@@ -569,7 +569,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             return baseUnit.team instanceof AIController;
         }
     };
@@ -578,13 +578,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction editorIconTexture8 = new NoneAction("changeAlliance") { // from class: com.corrodinggames.rts.game.units.h.23
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Change selected player's alliance (players with the same letter are allied)";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Ally:";
         }
 
@@ -600,7 +600,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             return true;
         }
     };
@@ -609,13 +609,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction editorIconTexture9 = new NoneAction("startRecording") { // from class: com.corrodinggames.rts.game.units.h.2
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Start recording a replay to file";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Start Recording";
         }
 
@@ -632,7 +632,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             if (GameEngine.getInstance().replayEngine.j()) {
                 return false;
             }
@@ -664,9 +664,9 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                         if (!gameEngine2.networkEngine.networkGameActive) {
                             long j = gameEngine2.networkEngine.nextUnitId;
                             gameEngine2.networkEngine.requireActiveMods = true;
-                            int i = gameEngine2.networkEngine.roomSettings.fodMode;
+                            int i = gameEngine2.networkEngine.roomSettings.fogMode;
                             gameEngine2.networkEngine.startSandboxServer();
-                            gameEngine2.networkEngine.roomSettings.fodMode = i;
+                            gameEngine2.networkEngine.roomSettings.fogMode = i;
                             gameEngine2.networkEngine.nextUnitId = j;
                             gameEngine2.networkEngine.gameHasBeenStarted = true;
                             gameEngine2.currentTick = 0;
@@ -696,13 +696,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction s = new NoneAction("startReplayPlayback") { // from class: com.corrodinggames.rts.game.units.h.3
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Start playback of last a replay";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Start Playback";
         }
 
@@ -719,7 +719,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             boolean zK = GameEngine.getInstance().replayEngine.k();
             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
             return (editorOrBuilderL == null || editorOrBuilderL.editorIconTexture10 == null || zK) ? false : true;
@@ -816,7 +816,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction t = new NoneAction("hideInterface") { // from class: com.corrodinggames.rts.game.units.h.4
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             String str = "Hide interface till the screen is clicked/pressed";
             if (GameEngine.isPC()) {
                 str = str + "\n-Enable mouse capture to also hide the mouse";
@@ -826,7 +826,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Hide interface";
         }
 
@@ -840,13 +840,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction u = new NoneAction("freezeAllAI") { // from class: com.corrodinggames.rts.game.units.h.5
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Freeze full high level logic for all AI forever";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Freeze AI";
         }
 
@@ -862,20 +862,20 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z2) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             return true;
         }
     };
     static AbstractUnitAction v = new NoneAction("pauseGame") { // from class: com.corrodinggames.rts.game.units.h.6
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Pause Game";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             if (GameEngine.getInstance().gameSpeed != 0.0f) {
                 return "Pause: Off";
             }
@@ -899,13 +899,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction w = new NoneAction("slowGame") { // from class: com.corrodinggames.rts.game.units.h.7
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Slow motion";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             if (GameEngine.getInstance().gameSpeed != 0.1f) {
                 return "Slow motion: Off";
             }
@@ -929,13 +929,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction x = new NoneAction("fastForward") { // from class: com.corrodinggames.rts.game.units.h.8
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Fast Forward 1-5x";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return "Fast Forward: " + GameEngine.getInstance().gameSpeed;
         }
 
@@ -972,19 +972,19 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction y = new NoneAction("search") { // from class: com.corrodinggames.rts.game.units.h.9
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: j */
-        public Texture getIconColor() {
+        public Texture getIconTexture() {
             return EditorOrBuilder.editorSelectionTexture2;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Search for units";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             GameEngine.getInstance();
             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
             if (editorOrBuilderL != null && editorOrBuilderL.G == EditorTab.search) {
@@ -1048,13 +1048,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction z = new NoneAction("enableDebug") { // from class: com.corrodinggames.rts.game.units.h.10
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Show hidden unit information in tooltips including flags, ammo, tags and resources";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             if (!GameEngine.getInstance().isDebugTempMode) {
                 return "Debug: Off";
             }
@@ -1064,13 +1064,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction A = new NoneAction("enableAIDebug") { // from class: com.corrodinggames.rts.game.units.h.11
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "AI debug view";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             GameEngine.getInstance();
             if (!AIController.unitCountsUpdated) {
                 return "AI Debug: Off";
@@ -1081,13 +1081,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction B = new NoneAction("enableTriggerDebug") { // from class: com.corrodinggames.rts.game.units.h.13
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "For debugging autoTriggers. When enabled will log a message when any auto triggers fire on any selected units";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             if (!GameEngine.getInstance().isTriggerDebugMode) {
                 return "Trigger Debug: Off";
             }
@@ -1102,13 +1102,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static AbstractUnitAction C = new NoneAction("clearSaveHistory") { // from class: com.corrodinggames.rts.game.units.h.14
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "Clear save history";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             GameEngine.getInstance();
             return "Clear history";
         }
@@ -1678,7 +1678,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                 if ((baseUnit2 instanceof BaseUnit) && Utility.distanceSq(baseUnit2.posX, baseUnit2.posY, pointF.x, pointF.y) < 2500.0f) {
                     if (abstractUnitAction == editorIconTexture3) {
                         if (baseUnit2.unitTransportTarget == null && baseUnit2.parentEntity == null) {
-                            baseUnit2.getUnitAICondition();
+                            baseUnit2.removeFromGame();
                             if ((baseUnit2 instanceof OrderableUnit) && baseUnit2.bI()) {
                                 gameEngine.pathfindingEngine.a((OrderableUnit) baseUnit2);
                             }
@@ -1970,7 +1970,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: J */
-    public boolean mo193J() {
+    public boolean isDamageImmune() {
         return true;
     }
 

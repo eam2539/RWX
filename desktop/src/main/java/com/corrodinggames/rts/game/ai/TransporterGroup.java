@@ -158,7 +158,7 @@ public class TransporterGroup extends AIUnitGroupBase {
                     if (getDistanceSqToUnit(orderableUnit) > 28900.0f && !orderableUnit.isAttackCommandActive()) {
                         commandNewCommandForTeam.setTargetUnit(orderableUnit);
                     } else if (((TransportUnitInterface) orderableUnit).getTransportedUnitCount() != 0) {
-                        ActionId actionIdCp = orderableUnit.getUnitAIPathfindPath();
+                        ActionId actionIdCp = orderableUnit.getUnloadActionId();
                         Command commandNewCommandForTeam2 = gameEngine.commandController.newCommandForTeam(this.aiController);
                         commandNewCommandForTeam2.setTargetUnit(orderableUnit);
                         commandNewCommandForTeam2.setActionId(actionIdCp);
@@ -302,7 +302,7 @@ public class TransporterGroup extends AIUnitGroupBase {
                 for (OrderableUnit orderableUnit6 : this.F) {
                     if (Utility.distanceSq(orderableUnit6.posX, orderableUnit6.posY, this.r, this.s) < 6400.0f) {
                         this.p = true;
-                        ActionId actionIdCp2 = orderableUnit6.getUnitAIPathfindPath();
+                        ActionId actionIdCp2 = orderableUnit6.getUnloadActionId();
                         Command commandNewCommandForTeam7 = gameEngine.commandController.newCommandForTeam(this.aiController);
                         commandNewCommandForTeam7.setTargetUnit(orderableUnit6);
                         commandNewCommandForTeam7.setActionId(actionIdCp2);

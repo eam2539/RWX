@@ -105,7 +105,7 @@ public class MammothTank extends LandUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (this.isInitialized) {
+        if (this.isMoving) {
             this.g += f;
             if (this.g > 3.0f) {
                 this.g = 0.0f;

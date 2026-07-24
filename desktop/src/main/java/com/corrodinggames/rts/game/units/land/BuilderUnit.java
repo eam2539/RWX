@@ -305,7 +305,7 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: z */
     public float getMoveSpeed() {
-        if (isMoving()) {
+        if (isOverLiquid()) {
             return 0.6f;
         }
         return 0.8f;
@@ -314,7 +314,7 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: A */
     public float getMaxTurnSpeed() {
-        if (isMoving()) {
+        if (isOverLiquid()) {
             return 1.7f;
         }
         return 3.8f;

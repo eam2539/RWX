@@ -409,7 +409,7 @@ public final class Effect {
         boolean z2 = this.ar == 4;
         float fFromHexString = 1.0f;
         if (this.G != 1.0f || this.F != 1.0f || this.H) {
-            fFromHexString = Utility.fromHexString(this.G, this.F, 1.0f - (this.V / this.W));
+            fFromHexString = Utility.lerp(this.G, this.F, 1.0f - (this.V / this.W));
             boolean z3 = this.ar != 4;
             if (this.H && z3) {
                 fFromHexString = fFromHexString * (1.0f / gameEngine.zoom) * gameEngine.screenScale;
@@ -429,7 +429,7 @@ public final class Effect {
                 rectF.a(this.b.posX, this.b.posY);
             }
         }
-        if ((!z2 || this.L) && !Utility.readFileToString(gameEngine.bufferedVisibleWorldRect, rectF)) {
+        if ((!z2 || this.L) && !Utility.rectanglesOverlap(gameEngine.bufferedVisibleWorldRect, rectF)) {
             return false;
         }
         if (!this.e && !z2 && !this.f) {
@@ -520,7 +520,7 @@ public final class Effect {
             z4 = true;
         }
         if (z4 && GameEngine.isAndroidPlatform() && !z && this.B == null) {
-            int iLongToIntArray = Utility.longToIntArray(255, (int) (f2 * 255.0f), (int) (f3 * 255.0f), (int) (f4 * 255.0f));
+            int iLongToIntArray = Utility.packArgb(255, (int) (f2 * 255.0f), (int) (f3 * 255.0f), (int) (f4 * 255.0f));
             if (C != null && D == iLongToIntArray) {
                 this.B = C;
             } else {
@@ -563,12 +563,12 @@ public final class Effect {
             texture = getTexture(fClampTo255);
         } else {
             texture = this.at;
-            int iLongToIntArray2 = Utility.longToIntArray(255, (int) (f2 * 255.0f), (int) (f3 * 255.0f), (int) (f4 * 255.0f));
+            int iLongToIntArray2 = Utility.packArgb(255, (int) (f2 * 255.0f), (int) (f3 * 255.0f), (int) (f4 * 255.0f));
             float f7 = this.au - fClampTo255;
             if (f7 < -0.01f || f7 > 0.01f || this.av != iLongToIntArray2) {
                 this.au = fClampTo255;
                 this.av = iLongToIntArray2;
-                this.at.b(Utility.longToIntArray((int) (fClampTo255 * 255.0f), (int) (f2 * 255.0f), (int) (f3 * 255.0f), (int) (f4 * 255.0f)));
+                this.at.b(Utility.packArgb((int) (fClampTo255 * 255.0f), (int) (f2 * 255.0f), (int) (f3 * 255.0f), (int) (f4 * 255.0f)));
             }
         }
         if (this.aa != null) {

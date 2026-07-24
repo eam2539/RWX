@@ -295,7 +295,7 @@ public final class PathEngine {
 
     public PathEngine() {
         this.H.add(new PathSolver(this));
-        int iDoubleToString = Utility.doubleToString();
+        int iDoubleToString = Utility.getCpuCoreCount();
         if (iDoubleToString > 1) {
             GameEngine.log("PathEngine", "We have " + iDoubleToString + " cores, creating extra solvers");
             this.H.add(new PathSolver(this));

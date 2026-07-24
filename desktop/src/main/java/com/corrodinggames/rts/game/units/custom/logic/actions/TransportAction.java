@@ -65,7 +65,7 @@ public class TransportAction extends LogicAction {
             transportAction.forceUnloadTransportNow = zBooleanValue2;
             transportAction.forceUnloadTransportNow_onlyOnSlot = iIntValue2;
             transportAction.transportTargetNow = logicBoolean;
-            customActionDef.ac.add(transportAction);
+            customActionDef.logicActions.add(transportAction);
         }
     }
 
@@ -80,11 +80,11 @@ public class TransportAction extends LogicAction {
                         BaseUnit baseUnit2 = (BaseUnit) customUnit.transportedUnits.get(size);
                         if (baseUnit2 == null) {
                             GameEngine.logColored("deleteNumUnitsFromTransport unit==null");
-                        } else if (this.deleteNumUnitsFromTransport_onlyWithTags == null || AnimationTag.a(this.deleteNumUnitsFromTransport_onlyWithTags, baseUnit2.getUnitCombatAnimation())) {
+                        } else if (this.deleteNumUnitsFromTransport_onlyWithTags == null || AnimationTag.a(this.deleteNumUnitsFromTransport_onlyWithTags, baseUnit2.getTags())) {
                             customUnit.transportedUnits.remove(size);
                             customUnit.unloadTransportedUnit(baseUnit2);
                             if (baseUnit2 != null) {
-                                baseUnit2.getUnitAICondition();
+                                baseUnit2.removeFromGame();
                             }
                         }
                     }

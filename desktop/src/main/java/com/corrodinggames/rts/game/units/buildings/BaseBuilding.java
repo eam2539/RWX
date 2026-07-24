@@ -117,7 +117,7 @@ public abstract class BaseBuilding extends OrderableUnit {
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean e() {
         GameEngine.getInstance().pathfindingEngine.a(this);
-        if (this.deceleration < 1.0f) {
+        if (this.buildProgress < 1.0f) {
             a(UnitSize.verysmall);
             return false;
         }
@@ -292,8 +292,8 @@ public abstract class BaseBuilding extends OrderableUnit {
         int iA;
         GameEngine gameEngine = GameEngine.getInstance();
         PorterDuffColorFilter porterDuffColorFilter = null;
-        if (this.deceleration < 1.0f) {
-            iA = Color.a((int) (40.0f + (this.deceleration * 200.0f)), 140, 255, 140);
+        if (this.buildProgress < 1.0f) {
+            iA = Color.a((int) (40.0f + (this.buildProgress * 200.0f)), 140, 255, 140);
             porterDuffColorFilter = overlayFilterLightGreen;
         } else {
             iA = Color.a(255, 255, 255, 255);

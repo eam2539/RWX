@@ -138,7 +138,7 @@ public class ModInfo implements Comparable<ModInfo> {
     public boolean addToNormalPlaylist;
 
     /* JADX INFO: renamed from: P */
-    public int hasImages;
+    public int musicErrorCount;
     /* JADX INFO: renamed from: V */
     public ArrayList<String> errors;
 
@@ -200,12 +200,12 @@ public class ModInfo implements Comparable<ModInfo> {
 
     /* JADX INFO: renamed from: b */
     public String getPaddedTitle() {
-        return Utility.padLeft(getDisplayTitle(), 25);
+        return Utility.truncateToLength(getDisplayTitle(), 25);
     }
 
     /* JADX INFO: renamed from: c */
     public String getPaddedTitle40() {
-        return Utility.padLeft(getDisplayTitle(), 40);
+        return Utility.truncateToLength(getDisplayTitle(), 40);
     }
 
     /* JADX INFO: renamed from: d */
@@ -441,7 +441,7 @@ public class ModInfo implements Comparable<ModInfo> {
     }
 
     /* JADX INFO: renamed from: q */
-    public ArrayList<String> getUnitBlueprints() {
+    public ArrayList<String> getMusicTrackPaths() {
         return this.unitBlueprints;
     }
 
@@ -481,7 +481,7 @@ public class ModInfo implements Comparable<ModInfo> {
             this.addToNormalPlaylist = modInfoFile.getBoolean("music", "addToNormalPlaylist", (Boolean) false).booleanValue();
             if (this.musicFolder != null && isEnabled()) {
                 GameEngine.log("Loading music for: " + getDisplayTitle());
-                String randomUUID = Utility.getRandomUUID(this.sourceFolder, this.musicFolder);
+                String randomUUID = Utility.joinPath(this.sourceFolder, this.musicFolder);
                 String[] strArrListDirCached = CacheManager.listDirCached("mods-dir-music", randomUUID);
                 if (strArrListDirCached == null) {
                     addWarning("Could not read target music folder: " + FileHelper.convertAbstractPath(randomUUID));
@@ -489,7 +489,7 @@ public class ModInfo implements Comparable<ModInfo> {
                     ArrayList arrayList = new ArrayList();
                     for (String str : strArrListDirCached) {
                         if (str.toLowerCase().endsWith(".ogg")) {
-                            String randomUUID2 = Utility.getRandomUUID(randomUUID, str);
+                            String randomUUID2 = Utility.joinPath(randomUUID, str);
                             if (!this.unitBlueprints.contains(randomUUID2)) {
                                 GameEngine.log("Found music track: " + str);
                             }

@@ -19,38 +19,38 @@ import com.corrodinggames.rts.gameFramework.ui.LagHidingManager;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.custom.a.g */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/custom/a/g.class */
 public class CustomAction extends PopupQueueAction {
-    public CustomActionDef a;
-    public UnitTypeReference b;
-    public ActionType c;
+    public CustomActionDef actionDef;
+    public UnitTypeReference unitTypeReference;
+    public ActionType actionTypeForUnit;
 
     public CustomAction(CustomActionDef customActionDef, UnitTypeReference unitTypeReference) {
         super((String) null);
-        this.c = ActionType.disabled;
+        this.actionTypeForUnit = ActionType.disabled;
         String str = VariableScope.nullOrMissingString;
-        canAfford(customActionDef.name != null ? customActionDef.name : (customActionDef.stringId != null ? str + customActionDef.stringId : str) + "_" + customActionDef.id);
-        this.a = customActionDef;
-        this.b = unitTypeReference;
-        if (customActionDef.iconUnitType3 != null) {
-            this.b = customActionDef.iconUnitType3;
+        setActionId(customActionDef.name != null ? customActionDef.name : (customActionDef.stringId != null ? str + customActionDef.stringId : str) + "_" + customActionDef.id);
+        this.actionDef = customActionDef;
+        this.unitTypeReference = unitTypeReference;
+        if (customActionDef.guiBuildUnit != null) {
+            this.unitTypeReference = customActionDef.guiBuildUnit;
         }
-        this.c = customActionDef.aN;
-        if (this.c == ActionType.auto) {
+        this.actionTypeForUnit = customActionDef.aiUse;
+        if (this.actionTypeForUnit == ActionType.auto) {
             boolean z = false;
             boolean z2 = false;
-            if (customActionDef.energyCost3 != null && customActionDef.offset == null) {
+            if (customActionDef.fireTurretAtGroundIndex != null && customActionDef.fireTurretAtGroundOffset == null) {
                 z2 = true;
             }
-            if (customActionDef.buildCost.d()) {
+            if (customActionDef.price.d()) {
                 z = true;
-                this.c = ActionType.upgrade;
+                this.actionTypeForUnit = ActionType.upgrade;
             }
             if (z && !z2) {
-                this.c = ActionType.upgrade;
+                this.actionTypeForUnit = ActionType.upgrade;
             } else {
-                this.c = ActionType.movementChange;
+                this.actionTypeForUnit = ActionType.movementChange;
             }
-            if (customActionDef.iconUnitType2 != null) {
-                this.c = ActionType.sameAsBuilding;
+            if (customActionDef.aiConsiderSameAsBuilding != null) {
+                this.actionTypeForUnit = ActionType.sameAsBuilding;
             }
         }
     }
@@ -58,7 +58,7 @@ public class CustomAction extends PopupQueueAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: P */
     public AnimationSet getAnimationSet() {
-        return this.a.animationSet;
+        return this.actionDef.tags;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -69,20 +69,20 @@ public class CustomAction extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: d */
-    public boolean getDisplayTextWithQueueCount(BaseUnit baseUnit, boolean z) {
-        return this.a.isDefaultBuildCommand2;
+    public boolean canPlayerCancel(BaseUnit baseUnit, boolean z) {
+        return this.actionDef.canPlayerCancel;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: k */
-    public boolean isSingleUse(BaseUnit baseUnit) {
-        return this.a.isDefaultBuildCommand3;
+    public boolean isAlwaysSinglePress(BaseUnit baseUnit) {
+        return this.actionDef.alwaysSinglePress;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: l */
-    public boolean isTargetingAction(BaseUnit baseUnit) {
-        return this.a.isDefaultBuildCommand4;
+    public boolean shouldHideQueueInterface(BaseUnit baseUnit) {
+        return this.actionDef.hideQueueInterface;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.PopupQueueAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -93,21 +93,21 @@ public class CustomAction extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+    public boolean canAfford(BaseUnit baseUnit, boolean z) {
         CustomUnit customUnit = (CustomUnit) baseUnit;
-        if (!this.a.isQueueUnitCommand && customUnit.a(getActionId(), z) > 0) {
+        if (!this.actionDef.allowMultipleInQueue && customUnit.a(getActionId(), z) > 0) {
             return false;
         }
-        if (this.a.availableCondition != null) {
-            if (z && getOptions()) {
-                if (!LagHidingManager.a(this.a.availableCondition, customUnit)) {
+        if (this.actionDef.isActive != null) {
+            if (z && usesExtraLagHidingInUI()) {
+                if (!LagHidingManager.a(this.actionDef.isActive, customUnit)) {
                     return false;
                 }
-            } else if (!this.a.availableCondition.read(customUnit)) {
+            } else if (!this.actionDef.isActive.read(customUnit)) {
                 return false;
             }
         }
-        return super.drawTooltip(baseUnit, z);
+        return super.canAfford(baseUnit, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -120,25 +120,25 @@ public class CustomAction extends PopupQueueAction {
     }
 
     public boolean a(BaseUnit baseUnit, int i) {
-        if (this.a.highlightCondition != null && (i == -1 || i == 1)) {
+        if (this.actionDef.isLocked != null && (i == -1 || i == 1)) {
             if (!(baseUnit instanceof CustomUnit)) {
                 GameEngine.reportProblem("CustomActionConfig lockedInGame:" + baseUnit.r().getUnitTypeDescriptionShort() + " is not a custom unit");
                 return false;
             }
-            if (this.a.highlightCondition.read((CustomUnit) baseUnit)) {
+            if (this.actionDef.isLocked.read((CustomUnit) baseUnit)) {
                 return true;
             }
         }
-        if (this.a.highlightColorCondition != null && (i == -1 || i == 2)) {
+        if (this.actionDef.isLockedAlt != null && (i == -1 || i == 2)) {
             if (!(baseUnit instanceof CustomUnit)) {
                 GameEngine.reportProblem("CustomActionConfig lockedInGame:" + baseUnit.r().getUnitTypeDescriptionShort() + " is not a custom unit");
                 return false;
             }
-            if (this.a.highlightColorCondition.read((CustomUnit) baseUnit)) {
+            if (this.actionDef.isLockedAlt.read((CustomUnit) baseUnit)) {
                 return true;
             }
         }
-        if (this.a.iconCondition == null) {
+        if (this.actionDef.isLockedAlt2 == null) {
             return false;
         }
         if (i == -1 || i == 3) {
@@ -146,7 +146,7 @@ public class CustomAction extends PopupQueueAction {
                 GameEngine.reportProblem("CustomActionConfig lockedInGame:" + baseUnit.r().getUnitTypeDescriptionShort() + " is not a custom unit");
                 return false;
             }
-            if (this.a.iconCondition.read((CustomUnit) baseUnit)) {
+            if (this.actionDef.isLockedAlt2.read((CustomUnit) baseUnit)) {
                 return true;
             }
             return false;
@@ -157,14 +157,14 @@ public class CustomAction extends PopupQueueAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: j */
     public String getIcon(BaseUnit baseUnit) {
-        if (a(baseUnit, 1) && this.a.highlightText != null) {
-            return this.a.highlightText.b(baseUnit);
+        if (a(baseUnit, 1) && this.actionDef.isLockedMessage != null) {
+            return this.actionDef.isLockedMessage.b(baseUnit);
         }
-        if (a(baseUnit, 2) && this.a.highlightColor != null) {
-            return this.a.highlightColor.b(baseUnit);
+        if (a(baseUnit, 2) && this.actionDef.isLockedAltMessage != null) {
+            return this.actionDef.isLockedAltMessage.b(baseUnit);
         }
-        if (a(baseUnit, 3) && this.a.icon != null) {
-            return this.a.icon.b(baseUnit);
+        if (a(baseUnit, 3) && this.actionDef.isLockedAlt2Message != null) {
+            return this.actionDef.isLockedAlt2Message.b(baseUnit);
         }
         return super.getIcon(baseUnit);
     }
@@ -173,11 +173,11 @@ public class CustomAction extends PopupQueueAction {
     /* JADX INFO: renamed from: r */
     public boolean isAvailable(BaseUnit baseUnit) {
         CustomUnit customUnit = (CustomUnit) baseUnit;
-        if (this.a.enabledCondition != null) {
-            if (getOptions()) {
-                return LagHidingManager.a(this.a.enabledCondition, customUnit);
+        if (this.actionDef.isVisible != null) {
+            if (usesExtraLagHidingInUI()) {
+                return LagHidingManager.a(this.actionDef.isVisible, customUnit);
             }
-            return this.a.enabledCondition.read(customUnit);
+            return this.actionDef.isVisible.read(customUnit);
         }
         return super.b(baseUnit);
     }
@@ -185,8 +185,8 @@ public class CustomAction extends PopupQueueAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public boolean b(BaseUnit baseUnit) {
         CustomUnit customUnit = (CustomUnit) baseUnit;
-        if (this.a.enabledCondition != null) {
-            return this.a.enabledCondition.read(customUnit);
+        if (this.actionDef.isVisible != null) {
+            return this.actionDef.isVisible.read(customUnit);
         }
         return super.b(baseUnit);
     }
@@ -194,13 +194,13 @@ public class CustomAction extends PopupQueueAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public boolean appendTooltip(BaseUnit baseUnit, PlayerTeam playerTeam) {
-        if (!this.a.showInBuildMenu && !this.a.disableInBuildMenu) {
+        if (!this.actionDef.isAlsoViewableByAllies && !this.actionDef.isAlsoViewableByEnemies) {
             return false;
         }
         if (baseUnit.team.d(playerTeam)) {
-            return this.a.showInBuildMenu;
+            return this.actionDef.isAlsoViewableByAllies;
         }
-        return this.a.disableInBuildMenu;
+        return this.actionDef.isAlsoViewableByEnemies;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -210,16 +210,16 @@ public class CustomAction extends PopupQueueAction {
         if (unitPriceB != null) {
             return unitPriceB;
         }
-        return this.a.resourceCost;
+        return this.actionDef.streamingCost;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.PopupQueueAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public int isActive(BaseUnit baseUnit, boolean z) {
-        if (this.a.isCondition) {
-            return this.a.buildCost.a(baseUnit, true);
+    public int getActiveCount(BaseUnit baseUnit, boolean z) {
+        if (this.actionDef.displayRemainingStockpile) {
+            return this.actionDef.price.a(baseUnit, true);
         }
-        return super.isActive(baseUnit, z);
+        return super.getActiveCount(baseUnit, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -229,23 +229,23 @@ public class CustomAction extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public String getCostForUnit() {
+    public String getDisplayName() {
         String strB = null;
-        if (this.a.description != null) {
-            strB = this.a.description.b();
+        if (this.actionDef.text != null) {
+            strB = this.actionDef.text.b();
         }
         return strB;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: d */
-    public String isVisible(BaseUnit baseUnit) {
+    public String getDisplayName(BaseUnit baseUnit) {
         UnitType typeOrNull;
         String strB = null;
-        if (this.a.description != null) {
-            strB = this.a.description.b(baseUnit);
+        if (this.actionDef.text != null) {
+            strB = this.actionDef.text.b(baseUnit);
         }
-        if (this.a.targetUnitType != null && (typeOrNull = this.a.targetUnitType.getTypeOrNull(baseUnit)) != null) {
+        if (this.actionDef.textAddUnitName != null && (typeOrNull = this.actionDef.textAddUnitName.getTypeOrNull(baseUnit)) != null) {
             if (strB == null) {
                 strB = VariableScope.nullOrMissingString;
             } else if (!strB.equals(VariableScope.nullOrMissingString)) {
@@ -253,36 +253,36 @@ public class CustomAction extends PopupQueueAction {
             }
             strB = strB + typeOrNull.getUnitName();
         }
-        if (this.a.message != null) {
+        if (this.actionDef.textPostFix != null) {
             if (strB == null) {
                 strB = VariableScope.nullOrMissingString;
             } else if (!strB.equals(VariableScope.nullOrMissingString)) {
                 strB = strB + " ";
             }
-            strB = strB + this.a.message.resolveText();
+            strB = strB + this.actionDef.textPostFix.resolveText();
         }
         return strB;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public String isLocked() {
+    public String getDescription() {
         String strB = null;
-        if (this.a.requiredUnitType != null) {
-            strB = this.a.requiredUnitType.b();
+        if (this.actionDef.description != null) {
+            strB = this.actionDef.description.b();
         }
         return strB;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: e */
-    public String getProducedUnitType(BaseUnit baseUnit) {
+    public String getDescriptionForUnit(BaseUnit baseUnit) {
         UnitType typeOrNull;
         String strB = null;
-        if (this.a.requiredUnitType != null) {
-            strB = this.a.requiredUnitType.b(baseUnit);
+        if (this.actionDef.description != null) {
+            strB = this.actionDef.description.b(baseUnit);
         }
-        if (this.a.sourceUnitType != null && (typeOrNull = this.a.sourceUnitType.getTypeOrNull(baseUnit)) != null) {
+        if (this.actionDef.descriptionAddFromUnit != null && (typeOrNull = this.actionDef.descriptionAddFromUnit.getTypeOrNull(baseUnit)) != null) {
             if (strB == null) {
                 strB = VariableScope.nullOrMissingString;
             } else if (!strB.equals(VariableScope.nullOrMissingString)) {
@@ -290,8 +290,8 @@ public class CustomAction extends PopupQueueAction {
             }
             strB = strB + typeOrNull.f();
         }
-        if (this.a.relatedUnitType != null) {
-            BaseUnit unitReferenceOrNull = this.a.relatedUnitType.getUnitReferenceOrNull(baseUnit);
+        if (this.actionDef.descriptionAddUnitStats != null) {
+            BaseUnit unitReferenceOrNull = this.actionDef.descriptionAddUnitStats.getUnitReferenceOrNull(baseUnit);
             if (unitReferenceOrNull != null) {
                 if (strB == null) {
                     strB = VariableScope.nullOrMissingString;
@@ -300,7 +300,7 @@ public class CustomAction extends PopupQueueAction {
                 }
                 strB = strB + GameInterfaceRenderer.a(unitReferenceOrNull, false, false, false);
             } else {
-                BaseUnit unitOrSharedUnit = this.a.relatedUnitType.getUnitOrSharedUnit(baseUnit);
+                BaseUnit unitOrSharedUnit = this.actionDef.descriptionAddUnitStats.getUnitOrSharedUnit(baseUnit);
                 if (unitOrSharedUnit != null) {
                     if (strB == null) {
                         strB = VariableScope.nullOrMissingString;
@@ -315,20 +315,20 @@ public class CustomAction extends PopupQueueAction {
     }
 
     public boolean L() {
-        return this.a.autoRepeat2;
+        return this.actionDef.whenBuildingCannotMove;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.PopupQueueAction
     public float K() {
-        if (this.a.cooldownTime >= 1.0f) {
+        if (this.actionDef.buildSpeed >= 1.0f) {
             return 1000.0f;
         }
-        return this.a.cooldownTime;
+        return this.actionDef.buildSpeed;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.PopupQueueAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-    public com.corrodinggames.rts.game.units.actions.ActionType e() {
-        return this.a.queueType;
+    public com.corrodinggames.rts.game.units.actions.ActionType getActionType() {
+        return this.actionDef.queueType;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -338,52 +338,52 @@ public class CustomAction extends PopupQueueAction {
         if (unitPriceA != null) {
             return unitPriceA;
         }
-        return this.a.buildCost;
+        return this.actionDef.price;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
-    public int isConfirmed() {
+    public int getCostAmount() {
         return getDisplayText().a();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: i */
     public UnitType getUnitType() {
-        if (this.b == null) {
+        if (this.unitTypeReference == null) {
             return null;
         }
-        return this.b.c();
+        return this.unitTypeReference.c();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: y */
     public UnitType getAttachedUnitType() {
-        if (this.a.iconUnitType3 != null) {
-            return this.a.iconUnitType3.c();
+        if (this.actionDef.guiBuildUnit != null) {
+            return this.actionDef.guiBuildUnit.c();
         }
         return null;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: E */
-    public UnitType getActionType() {
-        if (this.a.iconUnitType2 != null) {
-            return this.a.iconUnitType2.c();
+    public UnitType getAiConsiderSameAsBuildingUnitType() {
+        if (this.actionDef.aiConsiderSameAsBuilding != null) {
+            return this.actionDef.aiConsiderSameAsBuilding.c();
         }
         return null;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: A */
-    public boolean getDescription() {
+    public boolean usesActionTarget() {
         return true;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: g */
     public boolean isHighPriority() {
-        if (this.a.iconUnitType3 != null) {
+        if (this.actionDef.guiBuildUnit != null) {
             return true;
         }
         return false;
@@ -391,108 +391,108 @@ public class CustomAction extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
-        return this.a.aG;
+    public ActionDisplayType getActionDisplayType() {
+        return this.actionDef.displayType;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: m */
-    public boolean getEnergyCost(BaseUnit baseUnit) {
-        return this.a.iconColor.read((CustomUnit) baseUnit);
+    public boolean isAiDisabled(BaseUnit baseUnit) {
+        return this.actionDef.aiDisabledCondition.read((CustomUnit) baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: n */
-    public boolean isSecondary(BaseUnit baseUnit) {
-        if (this.a.iconColorCondition == null) {
+    public boolean isAiHighPriority(BaseUnit baseUnit) {
+        if (this.actionDef.aiHighPriorityCondition == null) {
             return false;
         }
         if (!(baseUnit instanceof CustomUnit)) {
             GameEngine.logColored("ai_isHighPriority non customUnit:" + baseUnit.r().getUnitTypeDescriptionShort());
             return false;
         }
-        return this.a.iconColorCondition.read((CustomUnit) baseUnit);
+        return this.actionDef.aiHighPriorityCondition.read((CustomUnit) baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: v */
     public ActionType getActionTypeForUnit(BaseUnit baseUnit) {
-        return this.c;
+        return this.actionTypeForUnit;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: H */
-    public boolean isAttack() {
-        return this.a.isDefaultAction;
+    public boolean isHighPriorityQueue() {
+        return this.actionDef.highPriorityQueue;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: I */
-    public boolean getTargetUnit() {
-        return this.a.isDefaultBuildCommand;
+    public boolean isOnlyOneUnitAtATime() {
+        return this.actionDef.onlyOneUnitAtATime;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: j */
-    public Texture getIconColor() {
-        return this.a.texture;
+    public Texture getIconTexture() {
+        return this.actionDef.iconImage;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: h */
-    public Texture isShowingNotEnoughEnergy(BaseUnit baseUnit) {
-        if (this.a.condition9 != null && (baseUnit instanceof CustomUnit) && !LagHidingManager.a(this.a.condition9, (CustomUnit) baseUnit)) {
+    public Texture getExtraIconTexture(BaseUnit baseUnit) {
+        if (this.actionDef.iconExtraIsVisible != null && (baseUnit instanceof CustomUnit) && !LagHidingManager.a(this.actionDef.iconExtraIsVisible, (CustomUnit) baseUnit)) {
             return null;
         }
-        return this.a.texture2;
+        return this.actionDef.iconExtraImage;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: J */
-    public int getNotAvailableReason() {
-        return this.a.texture3;
+    public int getExtraIconColor() {
+        return this.actionDef.iconExtraColor;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: i */
-    public BaseUnit isShowingNotEnoughResources(BaseUnit baseUnit) {
-        if (this.a.unitType != null) {
-            return this.a.unitType.getUnitOrSharedUnit(baseUnit);
+    public BaseUnit getUnitShownInUI(BaseUnit baseUnit) {
+        if (this.actionDef.unitShownInUI != null) {
+            return this.actionDef.unitShownInUI.getUnitOrSharedUnit(baseUnit);
         }
         return null;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: s */
-    public boolean shouldShowProgress(BaseUnit baseUnit) {
-        return this.a.isUnitType;
+    public boolean shouldShowUnitHealthBar(BaseUnit baseUnit) {
+        return this.actionDef.unitShownInUIWithHpBar;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: t */
-    public boolean shouldShowCount(BaseUnit baseUnit) {
-        return this.a.isUnitType2;
+    public boolean shouldShowUnitProgressBar(BaseUnit baseUnit) {
+        return this.actionDef.unitShownInUIWithProgressBar;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public boolean isTargetingGround(BaseUnit baseUnit) {
-        if (this.a.condition10 != null) {
-            return LagHidingManager.a(this.a.condition10, (CustomUnit) baseUnit);
+        if (this.actionDef.isGuiBlinking != null) {
+            return LagHidingManager.a(this.actionDef.isGuiBlinking, (CustomUnit) baseUnit);
         }
         return false;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: Q */
-    public boolean getOptions() {
-        return this.a.isBuildAction;
+    public boolean usesExtraLagHidingInUI() {
+        return this.actionDef.extraLagHidingInUI;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public void a(OrderableUnit orderableUnit) {
-        if (this.a.energyCost != null) {
-            LagHidingManager.b(orderableUnit, this.a.energyCost);
+        if (this.actionDef.addResources != null) {
+            LagHidingManager.b(orderableUnit, this.actionDef.addResources);
         }
     }
 }

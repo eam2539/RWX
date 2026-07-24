@@ -173,7 +173,7 @@ public class ExpressionEvaluator {
         matcher.appendTail(stringBuffer);
         String string = stringBuffer.toString();
         if (zB) {
-            string = Utility.truncateString(a(string));
+            string = Utility.formatNumber(a(string));
         }
         return string;
     }

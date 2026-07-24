@@ -15,7 +15,7 @@ public abstract class Sound {
     public abstract int a();
 
     public Sound(String str, SoundFactory soundFactory) {
-        this.e = Utility.getFileNameFromPath(str);
+        this.e = Utility.getFileNameWithoutExtension(str);
         if (soundFactory != null) {
             soundFactory.h.put(this.e, this);
         }

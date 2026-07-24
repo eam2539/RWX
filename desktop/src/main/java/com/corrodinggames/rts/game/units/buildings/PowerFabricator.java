@@ -64,19 +64,19 @@ public class PowerFabricator extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return Locale.get("units.fabricator.upgrade.description", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("units.fabricator.upgrade.name", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return UnitTypeEnum.fabricator.getUpgradeCost(2);
         }
 
@@ -87,12 +87,12 @@ public class PowerFabricator extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             PowerFabricator powerFabricator = (PowerFabricator) baseUnit;
             if (powerFabricator.buildingAnimationState != 1 || powerFabricator.a(getActionId(), z) > 0) {
                 return false;
             }
-            return super.drawTooltip(baseUnit, z);
+            return super.canAfford(baseUnit, z);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -111,7 +111,7 @@ public class PowerFabricator extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.upgrade;
         }
     };
@@ -126,19 +126,19 @@ public class PowerFabricator extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return Locale.get("units.fabricator.upgrade.descriptionT3", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("units.fabricator.upgrade.nameT3", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: c */
-        public int isConfirmed() {
+        public int getCostAmount() {
             return UnitTypeEnum.fabricator.getUpgradeCost(3);
         }
 
@@ -149,12 +149,12 @@ public class PowerFabricator extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             PowerFabricator powerFabricator = (PowerFabricator) baseUnit;
             if (powerFabricator.buildingAnimationState != 2 || powerFabricator.a(getActionId(), z) > 0) {
                 return false;
             }
-            return super.drawTooltip(baseUnit, z);
+            return super.canAfford(baseUnit, z);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -173,7 +173,7 @@ public class PowerFabricator extends FactoryWithQueue {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: f */
-        public ActionDisplayType isAlsoSelected() {
+        public ActionDisplayType getActionDisplayType() {
             return ActionDisplayType.upgrade;
         }
     };
@@ -314,12 +314,12 @@ public class PowerFabricator extends FactoryWithQueue {
         this.powerGenerationTimer += f;
         if (this.powerGenerationTimer > PlayerTeam.resourceIncomeUpdateInterval - 0.1f) {
             this.powerGenerationTimer -= PlayerTeam.resourceIncomeUpdateInterval;
-            this.team.b(cy() * (PlayerTeam.resourceIncomeUpdateInterval / PlayerTeam.resourceIncomeRatePeriod));
+            this.team.b(getCreditIncomeRate() * (PlayerTeam.resourceIncomeUpdateInterval / PlayerTeam.resourceIncomeRatePeriod));
         }
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
-    public float cy() {
+    public float getCreditIncomeRate() {
         if (this.buildingAnimationState == 1) {
             return 2.0f;
         }

@@ -318,7 +318,7 @@ public class Resource {
         if (this.t) {
             baseUnit.team.getCustomResources().a(this, d);
         } else {
-            baseUnit.getUnitAICombatRange().a(this, d);
+            baseUnit.getCustomResources().a(this, d);
         }
     }
 
@@ -326,7 +326,7 @@ public class Resource {
         if (this.t) {
             baseUnit.team.getCustomResources().b(this, d);
         } else {
-            baseUnit.getUnitAICombatRange().b(this, d);
+            baseUnit.getCustomResources().b(this, d);
         }
     }
 }

@@ -132,7 +132,7 @@ public abstract class BaseUnit extends SizedObject {
     public float worldY;
 
     /* JADX INFO: renamed from: cb */
-    public boolean isMoving;
+    public boolean collisionActive;
 
     /* JADX INFO: renamed from: cc */
     public float velocityX;
@@ -165,10 +165,10 @@ public abstract class BaseUnit extends SizedObject {
     public float spawnExitLockTimer;
 
     /* JADX INFO: renamed from: cm */
-    public float deceleration;
+    public float buildProgress;
 
     /* JADX INFO: renamed from: cn */
-    public float movementAngle;
+    public float paidBuildProgress;
 
     /* JADX INFO: renamed from: co */
     public boolean isUnitStunned;
@@ -229,13 +229,13 @@ public abstract class BaseUnit extends SizedObject {
     public int lastSelectedTick;
 
     /* JADX INFO: renamed from: cI */
-    public boolean isUnitBuilt;
+    public boolean wasSelectedBeforeDrag;
 
     /* JADX INFO: renamed from: cJ */
-    public float unitBuildProgress;
+    public float selectionFlashTimer;
 
     /* JADX INFO: renamed from: cK */
-    public boolean isInitialized;
+    public boolean isMoving;
 
     /* JADX INFO: renamed from: cL */
     public UnitMovementData[] movementLevels;
@@ -345,7 +345,7 @@ public abstract class BaseUnit extends SizedObject {
     public abstract boolean canMove();
 
     /* JADX INFO: renamed from: s_ */
-    public abstract boolean isBuilding();
+    public abstract boolean isVisibleOnScreen();
 
     public abstract UnitType r();
 
@@ -372,13 +372,13 @@ public abstract class BaseUnit extends SizedObject {
         this.unitCreationTime = 0L;
         this.worldX = 0.0f;
         this.worldY = 0.0f;
-        this.isMoving = false;
+        this.collisionActive = false;
         this.velocityX = 0.0f;
         this.velocityY = 0.0f;
         this.direction = 0.0f;
         this.rotation = 0.0f;
-        this.deceleration = 1.0f;
-        this.movementAngle = 1.0f;
+        this.buildProgress = 1.0f;
+        this.paidBuildProgress = 1.0f;
         this.isUnitStunned = false;
         this.isUnitParalyzed = false;
         this.isUnitInvulnerable = false;
@@ -386,8 +386,8 @@ public abstract class BaseUnit extends SizedObject {
         this.isUnitDisabled = false;
         this.isUnitCapturable = false;
         this.lastSelectedTick = -9999;
-        this.unitBuildProgress = 0.0f;
-        this.isInitialized = true;
+        this.selectionFlashTimer = 0.0f;
+        this.isMoving = true;
         this.unitTransportTarget = null;
         this.parentEntity = null;
         this.attachmentData = null;
@@ -636,7 +636,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: d */
-    public static BaseUnit findCollisionSize(UnitType unitType) {
+    public static BaseUnit getBuildingBlockoutUnit(UnitType unitType) {
         BaseUnit baseUnit = (BaseUnit) bH.get(unitType);
         if (baseUnit == null) {
             baseUnit = (BaseUnit) bH.get(CustomUnitConfig.instance);
@@ -663,12 +663,12 @@ public abstract class BaseUnit extends SizedObject {
         gameOutputStream.writeFloat(this.radius);
         gameOutputStream.writeFloat(this.displayRadius);
         gameOutputStream.writeFloat(this.spawnExitLockTimer);
-        gameOutputStream.writeFloat(this.deceleration);
+        gameOutputStream.writeFloat(this.buildProgress);
         gameOutputStream.writeBoolean(this.isUnitParalyzed);
         gameOutputStream.writeBoolean(this.isUnitDisabled);
         gameOutputStream.writeFloat(this.currentHealth);
         gameOutputStream.writeFloat(this.maxHealth);
-        gameOutputStream.writeBoolean(this.isInitialized);
+        gameOutputStream.writeBoolean(this.isMoving);
         gameOutputStream.writeFloat(this.movementLevels[0].targetX);
         gameOutputStream.writeFloat(this.movementLevels[0].velocityY);
         gameOutputStream.writeUnitIdOrNullBaseUnit(this.unitTransportTarget);
@@ -739,7 +739,7 @@ public abstract class BaseUnit extends SizedObject {
         VariableScope.writeOut(gameOutputStream, this.unitVariables);
         UnitPrice.a(gameOutputStream, this.unitData1);
         UnitPrice.a(gameOutputStream, this.unitData2);
-        gameOutputStream.writeFloat(this.movementAngle);
+        gameOutputStream.writeFloat(this.paidBuildProgress);
         super.a(gameOutputStream);
     }
 
@@ -763,12 +763,12 @@ public abstract class BaseUnit extends SizedObject {
         gameInputStream.readFloat();
         gameInputStream.readFloat();
         this.spawnExitLockTimer = gameInputStream.readFloat();
-        this.deceleration = gameInputStream.readFloat();
+        this.buildProgress = gameInputStream.readFloat();
         this.isUnitParalyzed = gameInputStream.readBoolean();
         this.isUnitDisabled = gameInputStream.readBoolean();
         o(gameInputStream.readFloat());
         this.maxHealth = gameInputStream.readFloat();
-        this.isInitialized = gameInputStream.readBoolean();
+        this.isMoving = gameInputStream.readBoolean();
         this.movementLevels[0].targetX = gameInputStream.readFloat();
         this.movementLevels[0].velocityY = gameInputStream.readFloat();
         this.unitTransportTarget = gameInputStream.readBaseUnit();
@@ -868,7 +868,7 @@ public abstract class BaseUnit extends SizedObject {
                     z = true;
                 }
                 if (!z) {
-                    getUnitAIConditionTime();
+                    markForDeath();
                 }
             }
         }
@@ -890,7 +890,7 @@ public abstract class BaseUnit extends SizedObject {
             this.unitData2 = UnitPrice.a(gameInputStream);
         }
         if (b >= 26) {
-            this.movementAngle = gameInputStream.readFloat();
+            this.paidBuildProgress = gameInputStream.readFloat();
         }
         if (this.isDead) {
             GameEngine gameEngine = GameEngine.getInstance();
@@ -998,7 +998,7 @@ public abstract class BaseUnit extends SizedObject {
 
     /* JADX INFO: renamed from: bT */
     public final boolean isAlive() {
-        return this.unitTransportTarget == null && this.deceleration >= 1.0f;
+        return this.unitTransportTarget == null && this.buildProgress >= 1.0f;
     }
 
     public float x() {
@@ -1013,9 +1013,9 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     public float bV() {
-        if (this.deceleration < 1.0f) {
-            if (this.parentEntity == null || this.parentEntity.deceleration >= 1.0f) {
-                return this.deceleration;
+        if (this.buildProgress < 1.0f) {
+            if (this.parentEntity == null || this.parentEntity.buildProgress >= 1.0f) {
+                return this.buildProgress;
             }
             return -1.0f;
         }
@@ -1105,11 +1105,11 @@ public abstract class BaseUnit extends SizedObject {
                 }
                 if (!z4) {
                     if (gameEngine.playerTeam.c(this.team)) {
-                        iLongToIntArray = Utility.longToIntArray(200, 183, 44, 44);
-                        iLongToIntArray2 = Utility.longToIntArray(120, 255, 60, 60);
+                        iLongToIntArray = Utility.packArgb(200, 183, 44, 44);
+                        iLongToIntArray2 = Utility.packArgb(120, 255, 60, 60);
                     } else {
-                        iLongToIntArray = Utility.longToIntArray(200, 0, 150, 0);
-                        iLongToIntArray2 = Utility.longToIntArray(120, 0, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 0);
+                        iLongToIntArray = Utility.packArgb(200, 0, 150, 0);
+                        iLongToIntArray2 = Utility.packArgb(120, 0, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 0);
                     }
                     Paint paintA = GameViewUtils.a(iLongToIntArray, Paint.Style.FILL);
                     Paint paintA2 = GameViewUtils.a(iLongToIntArray2, Paint.Style.STROKE);
@@ -1130,7 +1130,7 @@ public abstract class BaseUnit extends SizedObject {
                         if (f9 >= 1.0f) {
                             f9 = 1.0f;
                         }
-                        Paint paintA3 = GameViewUtils.a(Utility.longToIntArray(100, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_RADIO_SERVICE, 208, 26), Paint.Style.FILL);
+                        Paint paintA3 = GameViewUtils.a(Utility.packArgb(100, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_RADIO_SERVICE, 208, 26), Paint.Style.FILL);
                         dr.a((f4 - f3) + (f7 * fX), f5 + f6, (f4 - f3) + (f7 * f9), f5 + f6 + i2);
                         gameEngine.renderGraphicsEngine.a(dr, paintA3);
                     }
@@ -1161,16 +1161,16 @@ public abstract class BaseUnit extends SizedObject {
             boolean zIsUnitAtPositionX = isUnitAtPositionX();
             dr.a(f4 - f3, f5 + f6 + i4 + f8, (f4 - f3) + (f7 * getUnitTeamData()), f5 + f6 + i4 + 2 + f8);
             if (zIsUnitAtPositionX) {
-                iLongToIntArray3 = Utility.longToIntArray(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PROG_YELLOW, 103, 117, 119);
+                iLongToIntArray3 = Utility.packArgb(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PROG_YELLOW, 103, 117, 119);
             } else {
-                iLongToIntArray3 = Utility.longToIntArray(200, 23, 179, 207);
+                iLongToIntArray3 = Utility.packArgb(200, 23, 179, 207);
             }
             gameEngine.renderGraphicsEngine.a(dr, GameViewUtils.a(iLongToIntArray3, Paint.Style.FILL));
             dr.a(f4 - f3, f5 + f6 + i4 + f8, (f4 - f3) + f7, f5 + f6 + i4 + 2 + f8);
             if (zIsUnitAtPositionX) {
-                iLongToIntArray4 = Utility.longToIntArray(105, 123, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_AVR_INPUT, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_BUTTON_6);
+                iLongToIntArray4 = Utility.packArgb(105, 123, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_AVR_INPUT, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_BUTTON_6);
             } else {
-                iLongToIntArray4 = Utility.longToIntArray(120, 45, 211, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_NETWORK);
+                iLongToIntArray4 = Utility.packArgb(120, 45, 211, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_NETWORK);
             }
             gameEngine.renderGraphicsEngine.a(dr, GameViewUtils.a(iLongToIntArray4, Paint.Style.STROKE));
             f8 += 2;
@@ -1202,7 +1202,7 @@ public abstract class BaseUnit extends SizedObject {
                     gameEngine.selectedWaypointDrawCount++;
                     O();
                 }
-                getUnitAISettings();
+                drawRallyPoint();
             }
             if (GameViewUtils.a(this)) {
                 cb();
@@ -1211,7 +1211,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: ca */
-    public void getUnitAISettings() {
+    public void drawRallyPoint() {
     }
 
     public void O() {
@@ -1291,9 +1291,9 @@ public abstract class BaseUnit extends SizedObject {
     public void e(float f) {
         Paint paint;
         boolean z = false;
-        if (this.unitBuildProgress != 0.0f) {
-            this.unitBuildProgress = Utility.moveTowardsZero(this.unitBuildProgress, f);
-            if (this.unitBuildProgress % 15.0f < 7.0f) {
+        if (this.selectionFlashTimer != 0.0f) {
+            this.selectionFlashTimer = Utility.moveTowardsZero(this.selectionFlashTimer, f);
+            if (this.selectionFlashTimer % 15.0f < 7.0f) {
                 z = true;
             }
         }
@@ -1324,7 +1324,7 @@ public abstract class BaseUnit extends SizedObject {
                     if (paint == cY) {
                         paint = cZ;
                     }
-                    Rect unitAIUpdateTime = getUnitAIUpdateTime();
+                    Rect unitAIUpdateTime = getDisplayFootprint();
                     if (unitAIUpdateTime != null) {
                         dr.a(unitAIUpdateTime);
                         dr.b *= gameEngine.tileMap.tileWorldSizeY;
@@ -1365,7 +1365,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: ce */
-    public Rect getUnitAIUpdateTime() {
+    public Rect getDisplayFootprint() {
         return cc();
     }
 
@@ -1416,7 +1416,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cf */
-    public final boolean getWeight() {
+    public final boolean isVisibleToLocalPlayer() {
         return d(GameEngine.getInstance().playerTeam);
     }
 
@@ -1435,7 +1435,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cg */
-    public boolean getUnitAIPriority() {
+    public boolean isVisibleToEnemies() {
         return true;
     }
 
@@ -1467,7 +1467,7 @@ public abstract class BaseUnit extends SizedObject {
             this.unitAnimationRotation += f;
             if (this.unitAnimationOffset > 10.0f && this.unitAnimationScale < 300.0f && !dl()) {
                 this.unitAnimationOffset = 0.0f;
-                if (this.flag3 && gameEngine.shouldDrawMediumDetailEffects && (effectCreateEffectInternal = gameEngine.effectManager.createEffectInternal(this.posX, this.posY, this.posZ, EffectType.custom, false, EffectQuality.verylow)) != null) {
+                if (this.shouldDraw && gameEngine.shouldDrawMediumDetailEffects && (effectCreateEffectInternal = gameEngine.effectManager.createEffectInternal(this.posX, this.posY, this.posZ, EffectType.custom, false, EffectQuality.verylow)) != null) {
                     EffectEmitter.b(effectCreateEffectInternal, true);
                     effectCreateEffectInternal.I = this.posX;
                     effectCreateEffectInternal.J = this.posY;
@@ -1504,7 +1504,7 @@ public abstract class BaseUnit extends SizedObject {
             }
         }
         if (this.currentHealth <= 0.0f) {
-            updateUnitAI();
+            checkDeathOnZeroHp();
         }
     }
 
@@ -1544,14 +1544,14 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: J */
-    public boolean mo193J() {
+    public boolean isDamageImmune() {
         return false;
     }
 
     /* JADX INFO: renamed from: a */
     public float setTarget(BaseUnit baseUnit, float f, Projectile projectile) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (this.deceleration < 1.0f) {
+        if (this.buildProgress < 1.0f) {
             f *= 1.75f;
         }
         float f2 = 1.0f;
@@ -1598,7 +1598,7 @@ public abstract class BaseUnit extends SizedObject {
         } else {
             this.unitTarget1 = null;
         }
-        updateUnitAI();
+        checkDeathOnZeroHp();
         return f5;
     }
 
@@ -1610,7 +1610,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: ch */
-    public void updateUnitAI() {
+    public void checkDeathOnZeroHp() {
         if (!this.isDead && this.currentHealth <= 0.0f) {
             bv();
         }
@@ -1648,14 +1648,14 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: ci */
-    public void getUnitAICondition() {
+    public void removeFromGame() {
         bu();
         remove();
         bt();
     }
 
     /* JADX INFO: renamed from: cj */
-    public void getUnitAIConditionTime() {
+    public void markForDeath() {
         this.currentHealth = -1.0f;
     }
 
@@ -1771,7 +1771,7 @@ public abstract class BaseUnit extends SizedObject {
         int size = availableActions.size();
         for (int i = 0; i < size; i++) {
             AbstractUnitAction abstractUnitAction = (AbstractUnitAction) availableActions.get(i);
-            if (abstractUnitAction.isAvailableForUnit(actionId)) {
+            if (abstractUnitAction.matchesActionId(actionId)) {
                 return abstractUnitAction;
             }
         }
@@ -1779,9 +1779,9 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: ck */
-    public boolean isUnitEnergyCost() {
+    public boolean isUpgradeable() {
         if (bI()) {
-            return AbstractUnitAction.isMove(cm());
+            return AbstractUnitAction.isActionIdSpecified(cm());
         }
         return false;
     }
@@ -1796,7 +1796,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cn */
-    public float getUnitAIPathfindState() {
+    public float getAiUpgradePriority() {
         return -1.0f;
     }
 
@@ -1811,7 +1811,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cp */
-    public ActionId getUnitAIPathfindPath() {
+    public ActionId getUnloadActionId() {
         return AbstractUnitAction.NONE_ACTION_ID;
     }
 
@@ -1821,7 +1821,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cq */
-    public final int getUnitAIPathfindDistance() {
+    public final int getAvailableActionCount() {
         int i = 0;
         for (AbstractUnitAction abstractUnitAction : getAvailableActions()) {
             if (abstractUnitAction.b(this) || abstractUnitAction.isWaitingForTarget()) {
@@ -1862,17 +1862,17 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: ct */
-    public boolean getUnitAIPathfindMaxDepth() {
+    public boolean isAirborne() {
         return i();
     }
 
     /* JADX INFO: renamed from: cu */
-    public boolean getUnitAIPathfindMaxNodes() {
+    public boolean isNotPassivelyTargetedByOtherUnits() {
         return false;
     }
 
     /* JADX INFO: renamed from: cv */
-    public boolean getUnitAIPathfindTimeout() {
+    public boolean isWaterUnit() {
         return false;
     }
 
@@ -1881,7 +1881,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cw */
-    public int getUnitAIPathfindIterations() {
+    public int getTransportSlotsNeeded() {
         return 1;
     }
 
@@ -1921,7 +1921,7 @@ public abstract class BaseUnit extends SizedObject {
 
     public boolean y(BaseUnit baseUnit) {
         boolean z = false;
-        if (baseUnit.getUnitHealthPercent() > 0.0f) {
+        if (baseUnit.getResourceRate() > 0.0f) {
             z = true;
         }
         return z;
@@ -1930,24 +1930,24 @@ public abstract class BaseUnit extends SizedObject {
     /* JADX INFO: renamed from: z */
     public float calculateUnitSpeed(BaseUnit baseUnit) {
         float fC = c(baseUnit) * 5.1f;
-        if (baseUnit.getUnitHealthPercent() > 0.0f) {
-            fC = baseUnit.getUnitHealthPercent();
+        if (baseUnit.getResourceRate() > 0.0f) {
+            fC = baseUnit.getResourceRate();
         }
         return fC;
     }
 
     /* JADX INFO: renamed from: cx */
-    public float getUnitAIPathfindMemory() {
+    public float getNanoFactorySpeed() {
         return 1.0f;
     }
 
-    public float cy() {
+    public float getCreditIncomeRate() {
         return 0.0f;
     }
 
     /* JADX INFO: renamed from: cz */
-    public StoredResources getUnitAIPathfindResult() {
-        float fCy = cy();
+    public StoredResources getResourceGenerationRates() {
+        float fCy = getCreditIncomeRate();
         if (fCy == 0.0f) {
             return StoredResources.a;
         }
@@ -1957,12 +1957,12 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cA */
-    public StoredResources getUnitRotationData() {
+    public StoredResources getGlobalCustomResourceGenerationRates() {
         return StoredResources.a;
     }
 
     /* JADX INFO: renamed from: cB */
-    public String getVelocityX() {
+    public String getUnitDebugName() {
         return r().getUnitTypeDescriptionShort() + "(id:" + this.objectId + ")";
     }
 
@@ -1997,8 +1997,8 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cC */
-    public String getVelocityY() {
-        String str = (r().getUnitTypeDescriptionShort() + "(pos:" + ((int) this.posX) + "," + ((int) this.posY) + " id:" + this.objectId + VariableScope.nullOrMissingString) + ", hp:" + this.currentHealth + ", dead:" + this.isDead + ", deleted:" + this.isDead + " tags:" + getUnitCombatAnimation();
+    public String getUnitDebugDetails() {
+        String str = (r().getUnitTypeDescriptionShort() + "(pos:" + ((int) this.posX) + "," + ((int) this.posY) + " id:" + this.objectId + VariableScope.nullOrMissingString) + ", hp:" + this.currentHealth + ", dead:" + this.isDead + ", deleted:" + this.isDead + " tags:" + getTags();
         if (this.team != null) {
             str = str + " t:" + this.team.teamId;
         }
@@ -2006,14 +2006,14 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cD */
-    public float getMaxHealth() {
+    public float getRenderScale() {
         return 1.0f;
     }
 
     /* JADX INFO: renamed from: cE */
-    public RectF getUnitMassBounds() {
+    public RectF getVisibilityBounds() {
         GameEngine gameEngine = GameEngine.getInstance();
-        float maxHealth = getMaxHealth();
+        float maxHealth = getRenderScale();
         dA.a((this.posX - (this.eu * maxHealth)) - gameEngine.viewpointXSnapped, (this.posY - (this.ev * maxHealth)) - gameEngine.viewpointYSnapped, (this.posX + (this.eu * maxHealth)) - gameEngine.viewpointXSnapped, (this.posY + (this.ev * maxHealth)) - gameEngine.viewpointYSnapped);
         return dA;
     }
@@ -2034,7 +2034,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cG */
-    public boolean isUnitTransportWeight() {
+    public boolean hasShadowFrames() {
         return false;
     }
 
@@ -2072,25 +2072,25 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cH */
-    public final boolean checkTransportSlots() {
-        if (!m147cJ() || this.posZ > 2.0f) {
+    public final boolean isTouchingWater() {
+        if (!isOverWater() || this.posZ > 2.0f) {
             return false;
         }
         return true;
     }
 
     /* JADX INFO: renamed from: cI */
-    public boolean isUnitTransportCategory() {
+    public boolean isOverCliff() {
         return GameViewUtils.b(this.posX, this.posY);
     }
 
     /* JADX INFO: renamed from: cJ */
-    public boolean m147cJ() {
+    public boolean isOverWater() {
         return GameViewUtils.c(this.posX, this.posY);
     }
 
     /* JADX INFO: renamed from: cK */
-    public boolean isMoving() {
+    public boolean isOverLiquid() {
         return GameViewUtils.d(this.posX, this.posY);
     }
 
@@ -2103,18 +2103,18 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cM */
-    public UnitPrice getUnitDescription() {
+    public UnitPrice getBuildPrice() {
         return r().d(getUpgradeLevel());
     }
 
     /* JADX INFO: renamed from: cN */
-    public UnitPrice getUnitDisplayName() {
+    public UnitPrice getReclaimPrice() {
         return null;
     }
 
     public PointF a(float f, float f2, float f3, float f4, float f5) {
         float fDistance = 0.0f;
-        if (f3 > 0.1d && this.isInitialized) {
+        if (f3 > 0.1d && this.isMoving) {
             float f6 = 1.0f / f3;
             for (int i = 0; i < 3; i++) {
                 PointF pointFCalculateMaxAttackRange = calculateMaxAttackRange(fDistance);
@@ -2150,7 +2150,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cO */
-    public boolean isUnitIcon() {
+    public boolean canBeCapturedByAI() {
         return false;
     }
 
@@ -2175,17 +2175,17 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: g */
-    public float getUnitHealthPercent() {
+    public float getResourceRate() {
         return 0.0f;
     }
 
     /* JADX INFO: renamed from: cQ */
-    public int getUnitTypeName() {
+    public int getMaxConcurrentReclaimers() {
         return Integer.MAX_VALUE;
     }
 
     /* JADX INFO: renamed from: cR */
-    public AnimationSet getUnitTypeId() {
+    public AnimationSet getSimilarResourcesTag() {
         return null;
     }
 
@@ -2198,12 +2198,12 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cS */
-    public int getUnitType() {
+    public int getReclaimSearchRange() {
         return 500;
     }
 
     public boolean c(OrderableUnit orderableUnit) {
-        int unitTypeName = getUnitTypeName();
+        int unitTypeName = getMaxConcurrentReclaimers();
         if (unitTypeName < Integer.MAX_VALUE && d(orderableUnit) >= unitTypeName) {
             return true;
         }
@@ -2250,12 +2250,12 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cT */
-    public boolean getUnitVersion() {
-        return u() || this.deceleration < 1.0f || this.team == PlayerTeam.TEAM_UNKNOWN;
+    public boolean isExcludedFromDefeatCheck() {
+        return u() || this.buildProgress < 1.0f || this.team == PlayerTeam.TEAM_UNKNOWN;
     }
 
     /* JADX INFO: renamed from: cU */
-    public boolean getUnitFlags() {
+    public boolean isIncludedInUnitValue() {
         return !u();
     }
 
@@ -2264,12 +2264,12 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cV */
-    public boolean getUnitState() {
+    public boolean isUnselectableAsTarget() {
         return t();
     }
 
     /* JADX INFO: renamed from: cW */
-    public boolean getUnitStatus() {
+    public boolean canNotBeGivenOrdersByPlayer() {
         return false;
     }
 
@@ -2299,7 +2299,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cX */
-    public void getUnitAIType() {
+    public void updateFogOfWarPreview() {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.playerTeam != null && this.team != gameEngine.playerTeam && gameEngine.playerTeam.teamId >= 0 && gameEngine.playerTeam.teamId < PlayerTeam.TEAM_NEUTRAL) {
             UnitEffectData unitEffectData = this.unitEffects[gameEngine.playerTeam.teamId];
@@ -2323,7 +2323,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cY */
-    public PointF getUnitAIPosition() {
+    public PointF getRenderOffset() {
         dG.a(0.0f, 0.0f);
         return dG;
     }
@@ -2360,11 +2360,11 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: dc */
-    public void getUnitAICombatState() {
+    public void startFalling() {
     }
 
     /* JADX INFO: renamed from: dd */
-    public boolean getUnitAICombatTarget() {
+    public boolean isExperimental() {
         return false;
     }
 
@@ -2373,12 +2373,12 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: de */
-    public AnimationSet getUnitCombatAnimation() {
+    public AnimationSet getTags() {
         return null;
     }
 
     /* JADX INFO: renamed from: df */
-    public StoredResources getUnitAICombatRange() {
+    public StoredResources getCustomResources() {
         return this.unitCustomEffects;
     }
 
@@ -2387,12 +2387,12 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: dg */
-    public AnimationTrackingManager getUnitCombatCooldown() {
+    public AnimationTrackingManager getTrackingManager() {
         return this.unitCustomComponents;
     }
 
     /* JADX INFO: renamed from: dh */
-    public AnimationSet getUnitAICombatTimer() {
+    public AnimationSet getTrackingTags() {
         return null;
     }
 
@@ -2401,11 +2401,11 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: di */
-    public void updateUnitCombatTimer() {
+    public void applyBorrowedResources() {
     }
 
     /* JADX INFO: renamed from: dj */
-    public void getUnitAICombatStateTime() {
+    public void restoreBorrowedResources() {
     }
 
     public boolean dk() {
@@ -2430,21 +2430,21 @@ public abstract class BaseUnit extends SizedObject {
 
     public void r(float f) {
         if (f >= 1.0f) {
-            if (!(this.deceleration >= 1.0f)) {
+            if (!(this.buildProgress >= 1.0f)) {
                 PlayerTeam.b(this);
-                this.deceleration = 1.0f;
+                this.buildProgress = 1.0f;
                 PlayerTeam.c(this);
                 return;
             }
             return;
         }
-        if (this.deceleration >= 1.0f) {
+        if (this.buildProgress >= 1.0f) {
             PlayerTeam.b(this);
-            this.deceleration = f;
+            this.buildProgress = f;
             PlayerTeam.c(this);
             return;
         }
-        this.deceleration = f;
+        this.buildProgress = f;
     }
 
     public final void a(UnitEventType unitEventType) {

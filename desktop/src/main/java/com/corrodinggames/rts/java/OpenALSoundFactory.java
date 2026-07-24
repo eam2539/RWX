@@ -44,8 +44,8 @@ public class OpenALSoundFactory extends SoundFactory {
 
     @Override // com.corrodinggames.rts.gameFramework.audio.SoundFactory
     public Sound a(int i) {
-        OpenALSound openALSound = new OpenALSound(this, Utility.formatNumber(i), this);
-        String number = Utility.formatNumber(i);
+        OpenALSound openALSound = new OpenALSound(this, Utility.getResourcePath(i), this);
+        String number = Utility.getResourcePath(i);
         if (number == null) {
             throw new RuntimeException("Failed to find sound for res id:" + i);
         }

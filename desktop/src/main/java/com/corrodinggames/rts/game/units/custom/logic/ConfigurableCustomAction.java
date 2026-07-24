@@ -15,28 +15,28 @@ import com.corrodinggames.rts.gameFramework.ui.LagHidingManager;
 public class ConfigurableCustomAction extends UnitAction {
 
     /* JADX INFO: renamed from: b */
-    public LogicBoolean availableCondition;
+    public LogicBoolean enabledCondition;
 
     /* JADX INFO: renamed from: c */
-    public LogicBoolean condition1;
+    public LogicBoolean highlightCondition;
 
     /* JADX INFO: renamed from: d */
-    public LocalizedText action1;
+    public LocalizedText highlightText;
 
     /* JADX INFO: renamed from: e */
-    public LogicBoolean condition2;
+    public LogicBoolean highlightColorCondition;
 
     /* JADX INFO: renamed from: f */
-    public LocalizedText action2;
+    public LocalizedText highlightColor;
 
     /* JADX INFO: renamed from: g */
-    public LogicBoolean condition3;
+    public LogicBoolean iconCondition;
 
     /* JADX INFO: renamed from: h */
-    public LocalizedText action3;
+    public LocalizedText icon;
 
     /* JADX INFO: renamed from: i */
-    public boolean alwaysShow;
+    public boolean hideInBuildMenu;
 
     /* JADX INFO: renamed from: j */
     public LogicBoolean guiBlinkingCondition;
@@ -45,50 +45,50 @@ public class ConfigurableCustomAction extends UnitAction {
     public UnitPrice buildCost;
 
     /* JADX INFO: renamed from: l */
-    public UnitPrice resourceCost;
+    public UnitPrice energyCost;
 
     /* JADX INFO: renamed from: m */
-    public UnitPrice upgradeCost;
+    public UnitPrice resourceCost;
 
     public static UnitAction a(CustomActionDef customActionDef) {
         boolean z = false;
-        if (customActionDef.highlightCondition != null && customActionDef.highlightCondition != LogicBoolean.falseBoolean) {
+        if (customActionDef.isLocked != null && customActionDef.isLocked != LogicBoolean.falseBoolean) {
             z = true;
         }
-        if (customActionDef.highlightColorCondition != null && customActionDef.highlightColorCondition != LogicBoolean.falseBoolean) {
+        if (customActionDef.isLockedAlt != null && customActionDef.isLockedAlt != LogicBoolean.falseBoolean) {
             z = true;
         }
-        if (customActionDef.iconCondition != null && customActionDef.iconCondition != LogicBoolean.falseBoolean) {
+        if (customActionDef.isLockedAlt2 != null && customActionDef.isLockedAlt2 != LogicBoolean.falseBoolean) {
             z = true;
         }
-        if (customActionDef.enabledCondition != null && customActionDef.enabledCondition != LogicBoolean.trueBoolean) {
+        if (customActionDef.isVisible != null && customActionDef.isVisible != LogicBoolean.trueBoolean) {
             z = true;
         }
-        if (customActionDef.condition10 != null && customActionDef.condition10 != LogicBoolean.falseBoolean) {
+        if (customActionDef.isGuiBlinking != null && customActionDef.isGuiBlinking != LogicBoolean.falseBoolean) {
             z = true;
         }
-        if (customActionDef.energyCost != null) {
+        if (customActionDef.addResources != null) {
             z = true;
         }
-        if (customActionDef.buildCost != null) {
+        if (customActionDef.price != null) {
             z = true;
         }
         if (!z) {
             return UnitAction.a;
         }
         ConfigurableCustomAction configurableCustomAction = new ConfigurableCustomAction();
-        configurableCustomAction.condition1 = customActionDef.highlightCondition;
-        configurableCustomAction.action1 = customActionDef.highlightText;
-        configurableCustomAction.condition2 = customActionDef.highlightColorCondition;
-        configurableCustomAction.action2 = customActionDef.highlightColor;
-        configurableCustomAction.condition3 = customActionDef.iconCondition;
-        configurableCustomAction.action3 = customActionDef.icon;
-        configurableCustomAction.availableCondition = customActionDef.enabledCondition;
-        configurableCustomAction.guiBlinkingCondition = customActionDef.condition10;
-        configurableCustomAction.resourceCost = customActionDef.energyCost;
-        configurableCustomAction.buildCost = customActionDef.buildCost;
-        configurableCustomAction.upgradeCost = customActionDef.resourceCost;
-        configurableCustomAction.alwaysShow = customActionDef.hideInBuildMenu;
+        configurableCustomAction.highlightCondition = customActionDef.isLocked;
+        configurableCustomAction.highlightText = customActionDef.isLockedMessage;
+        configurableCustomAction.highlightColorCondition = customActionDef.isLockedAlt;
+        configurableCustomAction.highlightColor = customActionDef.isLockedAltMessage;
+        configurableCustomAction.iconCondition = customActionDef.isLockedAlt2;
+        configurableCustomAction.icon = customActionDef.isLockedAlt2Message;
+        configurableCustomAction.enabledCondition = customActionDef.isVisible;
+        configurableCustomAction.guiBlinkingCondition = customActionDef.isGuiBlinking;
+        configurableCustomAction.energyCost = customActionDef.addResources;
+        configurableCustomAction.buildCost = customActionDef.price;
+        configurableCustomAction.resourceCost = customActionDef.streamingCost;
+        configurableCustomAction.hideInBuildMenu = customActionDef.hideInBuildMenu;
         return configurableCustomAction;
     }
 
@@ -101,14 +101,14 @@ public class ConfigurableCustomAction extends UnitAction {
             return UnitAction.a;
         }
         ConfigurableCustomAction configurableCustomAction = new ConfigurableCustomAction();
-        configurableCustomAction.condition1 = customUnitTrigger.logicCondition;
-        configurableCustomAction.action1 = LocalizedText.a(customUnitTrigger.action);
+        configurableCustomAction.highlightCondition = customUnitTrigger.logicCondition;
+        configurableCustomAction.highlightText = LocalizedText.a(customUnitTrigger.action);
         return configurableCustomAction;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitAction
     public boolean a(BaseUnit baseUnit) {
-        return this.alwaysShow;
+        return this.hideInBuildMenu;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitAction
@@ -117,25 +117,25 @@ public class ConfigurableCustomAction extends UnitAction {
     }
 
     public boolean a(BaseUnit baseUnit, int i) {
-        if (this.condition1 != null && (i == -1 || i == 1)) {
+        if (this.highlightCondition != null && (i == -1 || i == 1)) {
             if (!(baseUnit instanceof OrderableUnit)) {
                 GameEngine.reportProblem("CustomActionConfig lockedInGame:" + baseUnit.r().getUnitTypeDescriptionShort() + " is not a OrderableUnit unit");
                 return false;
             }
-            if (this.condition1.read((OrderableUnit) baseUnit)) {
+            if (this.highlightCondition.read((OrderableUnit) baseUnit)) {
                 return true;
             }
         }
-        if (this.condition2 != null && (i == -1 || i == 2)) {
+        if (this.highlightColorCondition != null && (i == -1 || i == 2)) {
             if (!(baseUnit instanceof OrderableUnit)) {
                 GameEngine.reportProblem("CustomActionConfig lockedInGame:" + baseUnit.r().getUnitTypeDescriptionShort() + " is not a OrderableUnit unit");
                 return false;
             }
-            if (this.condition2.read((OrderableUnit) baseUnit)) {
+            if (this.highlightColorCondition.read((OrderableUnit) baseUnit)) {
                 return true;
             }
         }
-        if (this.condition3 == null) {
+        if (this.iconCondition == null) {
             return false;
         }
         if (i == -1 || i == 3) {
@@ -143,7 +143,7 @@ public class ConfigurableCustomAction extends UnitAction {
                 GameEngine.reportProblem("CustomActionConfig lockedInGame:" + baseUnit.r().getUnitTypeDescriptionShort() + " is not a OrderableUnit unit");
                 return false;
             }
-            if (this.condition3.read((OrderableUnit) baseUnit)) {
+            if (this.iconCondition.read((OrderableUnit) baseUnit)) {
                 return true;
             }
             return false;
@@ -153,29 +153,29 @@ public class ConfigurableCustomAction extends UnitAction {
 
     @Override // com.corrodinggames.rts.game.units.UnitAction
     public String c(BaseUnit baseUnit) {
-        if (a(baseUnit, 1) && this.action1 != null) {
-            return this.action1.b(baseUnit);
+        if (a(baseUnit, 1) && this.highlightText != null) {
+            return this.highlightText.b(baseUnit);
         }
-        if (a(baseUnit, 2) && this.action2 != null) {
-            return this.action2.b(baseUnit);
+        if (a(baseUnit, 2) && this.highlightColor != null) {
+            return this.highlightColor.b(baseUnit);
         }
-        if (a(baseUnit, 3) && this.action3 != null) {
-            return this.action3.b(baseUnit);
+        if (a(baseUnit, 3) && this.icon != null) {
+            return this.icon.b(baseUnit);
         }
         return null;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitAction
     public boolean a(BaseUnit baseUnit, boolean z) {
-        if (this.availableCondition != null) {
+        if (this.enabledCondition != null) {
             if (!(baseUnit instanceof OrderableUnit)) {
                 GameEngine.reportProblem("CustomActionConfig isAvailable:" + baseUnit.r().getUnitTypeDescriptionShort() + " is not a OrderableUnit unit");
                 return true;
             }
             if (z) {
-                return LagHidingManager.a(this.availableCondition, (OrderableUnit) baseUnit);
+                return LagHidingManager.a(this.enabledCondition, (OrderableUnit) baseUnit);
             }
-            return this.availableCondition.read((OrderableUnit) baseUnit);
+            return this.enabledCondition.read((OrderableUnit) baseUnit);
         }
         return true;
     }
@@ -194,8 +194,8 @@ public class ConfigurableCustomAction extends UnitAction {
 
     @Override // com.corrodinggames.rts.game.units.UnitAction
     public void a(BaseUnit baseUnit, BaseUnit baseUnit2) {
-        if (this.resourceCost != null) {
-            this.resourceCost.h(baseUnit);
+        if (this.energyCost != null) {
+            this.energyCost.h(baseUnit);
         }
     }
 
@@ -206,6 +206,6 @@ public class ConfigurableCustomAction extends UnitAction {
 
     @Override // com.corrodinggames.rts.game.units.UnitAction
     public UnitPrice b() {
-        return this.upgradeCost;
+        return this.resourceCost;
     }
 }

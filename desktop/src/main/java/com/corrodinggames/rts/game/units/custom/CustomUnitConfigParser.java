@@ -352,11 +352,11 @@ public class CustomUnitConfigParser {
                         } else {
                             str2 = customUnitConfig.modInfo.sourceFolder + "/common.ini";
                         }
-                        strTrackImageMemory = trackImageMemory(Utility.getRealPath(str2), strSubstring);
+                        strTrackImageMemory = trackImageMemory(Utility.getParentPath(str2), strSubstring);
                     } else if (strTrim.startsWith("CORE:")) {
-                        strTrackImageMemory = trackImageMemory(Utility.getRealPath("units/common.ini"), strTrim.substring("CORE:".length()));
+                        strTrackImageMemory = trackImageMemory(Utility.getParentPath("units/common.ini"), strTrim.substring("CORE:".length()));
                     } else {
-                        strTrackImageMemory = trackImageMemory(Utility.getRealPath(str), strTrim);
+                        strTrackImageMemory = trackImageMemory(Utility.getParentPath(str), strTrim);
                     }
                     IniFile editableCustomUnits = getEditableCustomUnits(strTrackImageMemory);
                     if (editableCustomUnits == null) {
@@ -444,7 +444,7 @@ public class CustomUnitConfigParser {
             describeModsForUnits((UnitType) customUnitConfig, unitReference, true);
             if (CustomUnitConfig.activeConfigs.remove(customUnitConfig)) {
                 CustomUnitConfig.activeConfigs.add(unitReference);
-                if (customUnitConfig.generation_unit != unitReference.generation_unit) {
+                if (customUnitConfig.configHash != unitReference.configHash) {
                     unitsRegeneratedCount++;
                 }
             } else {
@@ -465,8 +465,8 @@ public class CustomUnitConfigParser {
                     PlayerTeam.b((BaseUnit) customUnit);
                     customUnit.a(customUnitConfig, false, z);
                     customUnit.S();
-                    if (customUnit.getUnitCombatCooldown() != null) {
-                        customUnit.getUnitCombatCooldown().a(customUnitConfig);
+                    if (customUnit.getTrackingManager() != null) {
+                        customUnit.getTrackingManager().a(customUnitConfig);
                     }
                     PlayerTeam.c(customUnit);
                 }
@@ -680,8 +680,8 @@ public class CustomUnitConfigParser {
                         for (int i2 = 1; i2 <= 3; i2++) {
                             ArrayList arrayListA2 = unitType.a(i2);
                             SetRallyAction setRallyAction = new SetRallyAction();
-                            if (customActionDef.buildTime != -999.0f) {
-                                setRallyAction.sortOrder = customActionDef.buildTime;
+                            if (customActionDef.pos != -999.0f) {
+                                setRallyAction.sortOrder = customActionDef.pos;
                             }
                             arrayListA2.add(setRallyAction);
                             customUnitConfig4.hasSetRallyAction = true;
@@ -691,8 +691,8 @@ public class CustomUnitConfigParser {
                         for (int i3 = 1; i3 <= 3; i3++) {
                             ArrayList arrayListA3 = unitType.a(i3);
                             ReclaimTargetAction reclaimTargetAction = new ReclaimTargetAction(true);
-                            if (customActionDef.buildTime != -999.0f) {
-                                reclaimTargetAction.sortOrder = customActionDef.buildTime;
+                            if (customActionDef.pos != -999.0f) {
+                                reclaimTargetAction.sortOrder = customActionDef.pos;
                             }
                             arrayListA3.add(reclaimTargetAction);
                             loadSoundInternal(arrayListA3);
@@ -701,8 +701,8 @@ public class CustomUnitConfigParser {
                         for (int i4 = 1; i4 <= 3; i4++) {
                             ArrayList arrayListA4 = unitType.a(i4);
                             RepairTargetAction repairTargetAction = new RepairTargetAction();
-                            if (customActionDef.buildTime != -999.0f) {
-                                repairTargetAction.sortOrder = customActionDef.buildTime;
+                            if (customActionDef.pos != -999.0f) {
+                                repairTargetAction.sortOrder = customActionDef.pos;
                             }
                             arrayListA4.add(repairTargetAction);
                             loadSoundInternal(arrayListA4);
@@ -714,26 +714,26 @@ public class CustomUnitConfigParser {
                             if (unitTypeByName2 == null) {
                                 throw new ConfigParseException("Could not find canBuild target:" + customActionDef.stringId);
                             }
-                        } else if (customActionDef.aM != BuildType.convert) {
+                        } else if (customActionDef.actionType != BuildType.convert) {
                             throw new ConfigParseException("'Target' required for action:" + customActionDef.a());
                         }
                         for (int i5 = 1; i5 <= 3; i5++) {
                             ArrayList arrayListA5 = unitType.a(i5);
-                            if (customActionDef.aM == BuildType.build) {
-                                if (unitTypeByName2.j() || customActionDef.isCondition2) {
-                                    customAction = new PlaceBuildingAction(unitTypeByName2, customActionDef.condition12, null);
+                            if (customActionDef.actionType == BuildType.build) {
+                                if (unitTypeByName2.j() || customActionDef.forceNano) {
+                                    customAction = new PlaceBuildingAction(unitTypeByName2, customActionDef.techLevel, null);
                                     customAction.unitAction = ConfigurableCustomAction.a(customActionDef);
                                 } else {
                                     customAction = new QueueUnitAction(unitTypeByName2);
                                     customAction.unitAction = ConfigurableCustomAction.a(customActionDef);
                                 }
-                            } else if (customActionDef.aM == BuildType.convert) {
+                            } else if (customActionDef.actionType == BuildType.convert) {
                                 customAction = new CustomAction(customActionDef, CustomUnitConfig.a(unitTypeByName2));
                             } else {
-                                throw new ConfigParseException("Could not find actionType:" + customActionDef.aM);
+                                throw new ConfigParseException("Could not find actionType:" + customActionDef.actionType);
                             }
-                            if (customActionDef.buildTime != -999.0f) {
-                                customAction.sortOrder = customActionDef.buildTime;
+                            if (customActionDef.pos != -999.0f) {
+                                customAction.sortOrder = customActionDef.pos;
                             }
                             boolean z4 = false;
                             Iterator it3 = arrayListA5.iterator();
@@ -769,7 +769,7 @@ public class CustomUnitConfigParser {
             for (int i7 = 1; i7 <= 3; i7++) {
                 for (AbstractUnitAction abstractUnitAction2 : unitType.a(i7)) {
                     if (abstractUnitAction2.unitAction instanceof ActionWithCost) {
-                        GameEngine.logErrorColored("=== ChainedActionConfig already on: " + unitType.getUnitTypeDescriptionShort() + " action:" + abstractUnitAction2.getCostForUnit());
+                        GameEngine.logErrorColored("=== ChainedActionConfig already on: " + unitType.getUnitTypeDescriptionShort() + " action:" + abstractUnitAction2.getDisplayName());
                         abstractUnitAction2.unitAction = ((ActionWithCost) abstractUnitAction2.unitAction).wrappedAction;
                     }
                     if (z5) {
@@ -1187,8 +1187,8 @@ public class CustomUnitConfigParser {
                     return null;
                 }
                 customUnitConfig.configPath = str;
-                customUnitConfig.generation_delay = assetInputStream.getPath();
-                customUnitConfig.generation_free_in_sandbox = customUnitConfig.configPath;
+                customUnitConfig.sourceFilePath = assetInputStream.getPath();
+                customUnitConfig.resourceLoadPath = customUnitConfig.configPath;
                 customUnitConfig.modInfo = modInfo;
                 customUnitConfig.onNewMapSpawn_ifUnitIsMissing = str2;
                 customUnitConfig.onNewMapSpawn_ifUnitIsPresent = str3;
@@ -1222,11 +1222,11 @@ public class CustomUnitConfigParser {
                 VariableSubstitutionParser.a(customUnitConfig, iniFile);
                 String string = iniFile.getString("core", "overrideResourceLoadPath", (String) null);
                 if (string != null) {
-                    customUnitConfig.generation_free_in_sandbox = loadOrGetTexture(customUnitConfig, str, string);
+                    customUnitConfig.resourceLoadPath = loadOrGetTexture(customUnitConfig, str, string);
                 }
                 getLocaleString(jA2, LoadPhase.iniSetup);
                 customUnitConfig.name = iniFile.getValueStrict("core", "name");
-                customUnitConfig.generation_unit = iniFile.getHash();
+                customUnitConfig.configHash = iniFile.getHash();
                 if (customUnitConfig.name.equals("self")) {
                     throw new ConfigParseException("Unit name: " + customUnitConfig.name + " is reserved");
                 }
@@ -1239,9 +1239,9 @@ public class CustomUnitConfigParser {
                         customUnitConfig.autoTriggerAction.add(str5.trim());
                     }
                 }
-                customUnitConfig.image_shield = AnimationTag.a(iniFile.getString("core", "tags", (String) null));
-                if (customUnitConfig.strictLevel >= 1 && customUnitConfig.image_shield != null) {
-                    for (AnimationTag animationTag : customUnitConfig.image_shield.a) {
+                customUnitConfig.tags = AnimationTag.a(iniFile.getString("core", "tags", (String) null));
+                if (customUnitConfig.strictLevel >= 1 && customUnitConfig.tags != null) {
+                    for (AnimationTag animationTag : customUnitConfig.tags.a) {
                         if (animationTag.tagName.contains(" ")) {
                             throw new ConfigParseException("(strictLevel 1) [core]tags: space in tag: '" + animationTag.tagName + "'");
                         }
@@ -1274,7 +1274,7 @@ public class CustomUnitConfigParser {
                 }
                 customUnitConfig.onNewMapSpawn = (SpawnPointType) iniFile.getEnum("core", "onNewMapSpawn", (Enum) null, SpawnPointType.class);
                 customUnitConfig.globalScale = iniFile.getFloat("core", "globalScale", Float.valueOf(1.0f)).floatValue();
-                customUnitConfig.registerConfigWatcher(customUnitConfig.generation_delay);
+                customUnitConfig.registerConfigWatcher(customUnitConfig.sourceFilePath);
                 if (customUnitConfig.name.equals("missing")) {
                     if (modInfo == null) {
                         GameEngine.log("Setting missingPlaceHolder");
@@ -1317,9 +1317,9 @@ public class CustomUnitConfigParser {
                 if (customUnitConfig.image_offsetX != 0 || customUnitConfig.image_offsetY != 0 || customUnitConfig.image_offsetH != 0.0f) {
                     customUnitConfig.hasImageOffset = true;
                 }
-                customUnitConfig.baseDamage = ColorMode.pureGreen;
+                customUnitConfig.teamColoringMode = ColorMode.pureGreen;
                 if (iniFile.getBoolean("graphics", "teamColorsUseHue", (Boolean) false).booleanValue()) {
-                    customUnitConfig.baseDamage = ColorMode.hueAdd;
+                    customUnitConfig.teamColoringMode = ColorMode.hueAdd;
                 }
                 String string5 = iniFile.getString("graphics", "teamColoringMode", (String) null);
                 if (string5 != null) {
@@ -1327,13 +1327,13 @@ public class CustomUnitConfigParser {
                         throw new ConfigParseException("Cannot use teamColoringMode and teamColorsUseHue at the same time");
                     }
                     if (string5.equalsIgnoreCase("pureGreen")) {
-                        customUnitConfig.baseDamage = ColorMode.pureGreen;
+                        customUnitConfig.teamColoringMode = ColorMode.pureGreen;
                     } else if (string5.equalsIgnoreCase("hueAdd")) {
-                        customUnitConfig.baseDamage = ColorMode.hueAdd;
+                        customUnitConfig.teamColoringMode = ColorMode.hueAdd;
                     } else if (string5.equalsIgnoreCase("hueShift")) {
-                        customUnitConfig.baseDamage = ColorMode.hueShift;
+                        customUnitConfig.teamColoringMode = ColorMode.hueShift;
                     } else if (string5.equalsIgnoreCase("disabled")) {
-                        customUnitConfig.baseDamage = ColorMode.disabled;
+                        customUnitConfig.teamColoringMode = ColorMode.disabled;
                     } else {
                         throw new ConfigParseException("Unknown teamColoringMode:" + string5);
                     }
@@ -1345,23 +1345,23 @@ public class CustomUnitConfigParser {
                     customUnitConfig.isVisible = null;
                 }
                 customUnitConfig.unitStats.isVisibleToEnemies = iniFile.getBoolean("graphics", "isVisibleToEnemies", (Boolean) true).booleanValue();
-                customUnitConfig.baseTexture = customUnitConfig.a(customUnitConfig.generation_free_in_sandbox, iniFile.getValueStrict("graphics", "image"), customUnitConfig.imageSmoothing, "graphics", "image");
+                customUnitConfig.baseTexture = customUnitConfig.a(customUnitConfig.resourceLoadPath, iniFile.getValueStrict("graphics", "image"), customUnitConfig.imageSmoothing, "graphics", "image");
                 if (customUnitConfig.baseTexture == null) {
                     throw new ConfigParseException("Main unit image must be set on custom unit");
                 }
                 customUnitConfig.imageFloatingPointSize = iniFile.getBoolean("graphics", "image_floatingPointSize", (Boolean) false).booleanValue();
-                customUnitConfig.maxHp = customUnitConfig.baseTexture.m() / customUnitConfig.total_frames;
-                customUnitConfig.mass = customUnitConfig.baseTexture.l();
-                if (customUnitConfig.maxHp < 1) {
-                    customUnitConfig.maxHp = 1;
+                customUnitConfig.frameWidth = customUnitConfig.baseTexture.m() / customUnitConfig.total_frames;
+                customUnitConfig.frameHeight = customUnitConfig.baseTexture.l();
+                if (customUnitConfig.frameWidth < 1) {
+                    customUnitConfig.frameWidth = 1;
                 }
                 if (customUnitConfig.frame_width > 0) {
-                    customUnitConfig.maxHp = customUnitConfig.frame_width;
+                    customUnitConfig.frameWidth = customUnitConfig.frame_width;
                 }
                 if (customUnitConfig.frame_height > 0) {
-                    customUnitConfig.mass = customUnitConfig.frame_height;
-                    if (customUnitConfig.mass < customUnitConfig.baseTexture.l()) {
-                        customUnitConfig.frameColumns = customUnitConfig.baseTexture.m() / customUnitConfig.maxHp;
+                    customUnitConfig.frameHeight = customUnitConfig.frame_height;
+                    if (customUnitConfig.frameHeight < customUnitConfig.baseTexture.l()) {
+                        customUnitConfig.frameColumns = customUnitConfig.baseTexture.m() / customUnitConfig.frameWidth;
                         if (customUnitConfig.frameColumns < 1) {
                             customUnitConfig.frameColumns = 1;
                         }
@@ -1371,51 +1371,51 @@ public class CustomUnitConfigParser {
                 customUnitConfig.image_back_always_use_full_image = iniFile.getBoolean("graphics", "image_back_always_use_full_image", (Boolean) false).booleanValue();
                 customUnitConfig.image_wreak = customUnitConfig.a(iniFile, "graphics", "image_wreak");
                 customUnitConfig.image_turret = customUnitConfig.a(iniFile, "graphics", "image_turret");
-                customUnitConfig.energy = LandUnit.landUnitIconTextures;
+                customUnitConfig.teamColoredIconTextures = LandUnit.landUnitIconTextures;
                 String string6 = iniFile.getString("graphics", "image_shadow", "NONE");
                 if (string6.equalsIgnoreCase("AUTO")) {
-                    String str7 = "[autoShadow:" + customUnitConfig.maxHp + "," + customUnitConfig.mass + "]" + customUnitConfig.baseTexture.d + "-" + customUnitConfig.baseTexture.e;
+                    String str7 = "[autoShadow:" + customUnitConfig.frameWidth + "," + customUnitConfig.frameHeight + "]" + customUnitConfig.baseTexture.d + "-" + customUnitConfig.baseTexture.e;
                     Texture textureFromCache = getTextureFromCache(str7);
                     if (textureFromCache != null) {
-                        customUnitConfig.shieldRegenMoving = textureFromCache;
+                        customUnitConfig.shadowTexture = textureFromCache;
                     } else {
-                        customUnitConfig.shieldRegenMoving = BaseUnit.attackUnit(customUnitConfig.baseTexture, customUnitConfig.maxHp, customUnitConfig.mass);
-                        a_texture(customUnitConfig.shieldRegenMoving);
-                        if (customUnitConfig.shieldRegenMoving != null) {
-                            parseCustomActionDef(str7, customUnitConfig.shieldRegenMoving);
+                        customUnitConfig.shadowTexture = BaseUnit.attackUnit(customUnitConfig.baseTexture, customUnitConfig.frameWidth, customUnitConfig.frameHeight);
+                        a_texture(customUnitConfig.shadowTexture);
+                        if (customUnitConfig.shadowTexture != null) {
+                            parseCustomActionDef(str7, customUnitConfig.shadowTexture);
                         }
                     }
                 } else if (string6.equalsIgnoreCase("AUTO_ANIMATED")) {
-                    String str8 = "[autoShadowAnimated:" + customUnitConfig.maxHp + "," + customUnitConfig.mass + "]" + customUnitConfig.baseTexture.d + "-" + customUnitConfig.baseTexture.e;
+                    String str8 = "[autoShadowAnimated:" + customUnitConfig.frameWidth + "," + customUnitConfig.frameHeight + "]" + customUnitConfig.baseTexture.d + "-" + customUnitConfig.baseTexture.e;
                     Texture textureFromCache2 = getTextureFromCache(str8);
                     if (textureFromCache2 != null) {
-                        customUnitConfig.shieldRegenMoving = textureFromCache2;
+                        customUnitConfig.shadowTexture = textureFromCache2;
                     } else {
-                        customUnitConfig.shieldRegenMoving = BaseUnit.attackUnit(customUnitConfig.baseTexture, customUnitConfig.baseTexture.m(), customUnitConfig.baseTexture.l());
-                        a_texture(customUnitConfig.shieldRegenMoving);
-                        if (customUnitConfig.shieldRegenMoving != null) {
-                            parseCustomActionDef(str8, customUnitConfig.shieldRegenMoving);
+                        customUnitConfig.shadowTexture = BaseUnit.attackUnit(customUnitConfig.baseTexture, customUnitConfig.baseTexture.m(), customUnitConfig.baseTexture.l());
+                        a_texture(customUnitConfig.shadowTexture);
+                        if (customUnitConfig.shadowTexture != null) {
+                            parseCustomActionDef(str8, customUnitConfig.shadowTexture);
                         }
                     }
                     customUnitConfig.hasShadowFrames = true;
                 } else {
-                    customUnitConfig.shieldRegenMoving = customUnitConfig.a(customUnitConfig.generation_free_in_sandbox, string6, customUnitConfig.imageSmoothing, "graphics", "image_shadow");
+                    customUnitConfig.shadowTexture = customUnitConfig.a(customUnitConfig.resourceLoadPath, string6, customUnitConfig.imageSmoothing, "graphics", "image_shadow");
                 }
                 if (iniFile.getBoolean("graphics", "image_shadow_frames", (Boolean) false).booleanValue()) {
                     customUnitConfig.hasShadowFrames = true;
                 }
-                customUnitConfig.textures = customUnitConfig.a(customUnitConfig.baseTexture, customUnitConfig.baseDamage);
+                customUnitConfig.teamColoredBaseTextures = customUnitConfig.a(customUnitConfig.baseTexture, customUnitConfig.teamColoringMode);
                 customUnitConfig.teamColorsOnTurret = iniFile.getBoolean("graphics", "teamColorsOnTurret", (Boolean) false).booleanValue();
                 if (customUnitConfig.teamColorsOnTurret && customUnitConfig.image_turret != null) {
-                    customUnitConfig.maxEnergy = customUnitConfig.a(customUnitConfig.image_turret, customUnitConfig.baseDamage);
+                    customUnitConfig.teamColoredTurretTextures = customUnitConfig.a(customUnitConfig.image_turret, customUnitConfig.teamColoringMode);
                 }
                 float fFloatValue = iniFile.getFloat("graphics", "scaleImagesTo", Float.valueOf(-1.0f)).floatValue();
                 if (fFloatValue > 0.0f) {
-                    customUnitConfig.targetOwnTeam = (fFloatValue * customUnitConfig.globalScale) / customUnitConfig.maxHp;
+                    customUnitConfig.imageScale = (fFloatValue * customUnitConfig.globalScale) / customUnitConfig.frameWidth;
                 }
                 float fFloatValue2 = iniFile.getFloat("graphics", "imageScale", Float.valueOf(1.0f)).floatValue();
                 if (fFloatValue2 != 1.0f) {
-                    customUnitConfig.targetOwnTeam *= fFloatValue2;
+                    customUnitConfig.imageScale *= fFloatValue2;
                 }
                 float fFloatValue3 = iniFile.getFloat("graphics", "scaleTurretImagesTo", Float.valueOf(-1.0f)).floatValue();
                 if (fFloatValue3 > 0.0f) {
@@ -1423,21 +1423,21 @@ public class CustomUnitConfigParser {
                     if (customUnitConfig.image_turret == null) {
                         throw new RuntimeException("scaleTurretImagesTo needs image_turret set");
                     }
-                    customUnitConfig.targetNeutralTeam = f / customUnitConfig.image_turret.p;
+                    customUnitConfig.turretImageScale = f / customUnitConfig.image_turret.p;
                 }
                 float fFloatValue4 = iniFile.getFloat("graphics", "turretImageScale", Float.valueOf(1.0f)).floatValue();
                 if (fFloatValue4 != 1.0f) {
-                    customUnitConfig.targetNeutralTeam *= fFloatValue4;
+                    customUnitConfig.turretImageScale *= fFloatValue4;
                 }
-                customUnitConfig.texture = ExperimentalHoverTank.e;
+                customUnitConfig.shieldTexture = ExperimentalHoverTank.e;
                 Texture textureA = customUnitConfig.a(iniFile, "graphics", "image_shield");
                 if (textureA != null) {
-                    customUnitConfig.texture = textureA;
+                    customUnitConfig.shieldTexture = textureA;
                     customUnitConfig.hasCustomShieldImage = true;
                 }
                 customUnitConfig.icon_build = customUnitConfig.a(iniFile, "graphics", "icon_build", false);
-                float fM = customUnitConfig.baseTexture.m() * customUnitConfig.targetOwnTeam;
-                float fL = customUnitConfig.baseTexture.l() * customUnitConfig.targetOwnTeam;
+                float fM = customUnitConfig.baseTexture.m() * customUnitConfig.imageScale;
+                float fL = customUnitConfig.baseTexture.l() * customUnitConfig.imageScale;
                 if (fM / 2.0f > 90.0f || fL / 2.0f > 90.0f) {
                     customUnitConfig.largeImageBounds = new Rect();
                     customUnitConfig.largeImageBounds.a = (int) ((-fM) / 2.0f);
@@ -1713,7 +1713,7 @@ public class CustomUnitConfigParser {
                 customUnitConfig.radius = (int) (customUnitConfig.radius * customUnitConfig.globalScale);
                 customUnitConfig.displayRadius = (int) (customUnitConfig.displayRadius * customUnitConfig.globalScale);
                 customUnitConfig.unitStats.fogOfWarSightRange = iniFile.getLogicBooleanUnit("core", "fogOfWarSightRange", (Integer) 15).intValue();
-                customUnitConfig.fogOfWarSightRangeWhileNotBuilt2 = iniFile.getLogicBooleanUnit("core", "fogOfWarSightRangeWhileNotBuilt", (Integer) (-1)).intValue();
+                customUnitConfig.fogOfWarSightRangeWhileNotBuilt = iniFile.getLogicBooleanUnit("core", "fogOfWarSightRangeWhileNotBuilt", (Integer) (-1)).intValue();
                 customUnitConfig.exit_x = iniFile.getFloat("core", "exit_x", Float.valueOf(0.0f)).floatValue();
                 customUnitConfig.exit_y = iniFile.getFloat("core", "exit_y", Float.valueOf(9.0f)).floatValue();
                 customUnitConfig.exit_dirOffset = iniFile.getFloat("core", "exit_dirOffset", (Float) null);
@@ -1721,8 +1721,8 @@ public class CustomUnitConfigParser {
                 customUnitConfig.exitHeightIgnoreParent = iniFile.getBoolean("core", "exitHeightIgnoreParent", (Boolean) false).booleanValue();
                 customUnitConfig.exit_moveAwayAmount = iniFile.getFloat("core", "exit_moveAwayAmount", Float.valueOf(70.0f));
                 customUnitConfig.softCollisionOnAll = iniFile.getLogicBooleanUnit("core", "softCollisionOnAll", (Integer) 0).intValue();
-                customUnitConfig.disableAllUnitCollisions2 = iniFile.getBoolean("core", "disableAllUnitCollisions", (Boolean) false).booleanValue();
-                if (customUnitConfig.disableAllUnitCollisions2) {
+                customUnitConfig.disableAllUnitCollisions = iniFile.getBoolean("core", "disableAllUnitCollisions", (Boolean) false).booleanValue();
+                if (customUnitConfig.disableAllUnitCollisions) {
                     customUnitConfig.footprint.a(0, 0, -1, -1);
                 }
                 customUnitConfig.hideScorchMark = iniFile.getBoolean("core", "hideScorchMark", (Boolean) false).booleanValue();
@@ -1921,32 +1921,32 @@ public class CustomUnitConfigParser {
                 }
                 customUnitConfig.useAsTransport = boolValueOf.booleanValue();
                 if (customUnitConfig.isBuildingUnit) {
-                    customUnitConfig.energy = BaseBuilding.teamColoredIconTextures;
+                    customUnitConfig.teamColoredIconTextures = BaseBuilding.teamColoredIconTextures;
                 } else if (customUnitConfig.movementType == UnitMovementType.AIR) {
-                    customUnitConfig.energy = AirUnit.n;
+                    customUnitConfig.teamColoredIconTextures = AirUnit.n;
                 } else if (customUnitConfig.movementType == UnitMovementType.WATER) {
-                    customUnitConfig.energy = WaterUnit.waterUnitIconTextures;
+                    customUnitConfig.teamColoredIconTextures = WaterUnit.waterUnitIconTextures;
                 } else if (customUnitConfig.movementType == UnitMovementType.HOVER) {
                     if (customUnitConfig.experimental) {
-                        customUnitConfig.energy = LandUnit.landUnitIconTexturesExp;
+                        customUnitConfig.teamColoredIconTextures = LandUnit.landUnitIconTexturesExp;
                     } else if (customUnitConfig.l()) {
-                        customUnitConfig.energy = BuilderUnit.builderIconTexture_teamColors;
+                        customUnitConfig.teamColoredIconTextures = BuilderUnit.builderIconTexture_teamColors;
                     } else {
-                        customUnitConfig.energy = HoverLandUnit.n;
+                        customUnitConfig.teamColoredIconTextures = HoverLandUnit.n;
                     }
                 } else if (customUnitConfig.experimental) {
-                    customUnitConfig.energy = LandUnit.landUnitIconTexturesExp;
+                    customUnitConfig.teamColoredIconTextures = LandUnit.landUnitIconTexturesExp;
                 } else if (customUnitConfig.l()) {
-                    customUnitConfig.energy = BuilderUnit.builderIconTexture_teamColors;
+                    customUnitConfig.teamColoredIconTextures = BuilderUnit.builderIconTexture_teamColors;
                 } else {
-                    customUnitConfig.energy = LandUnit.landUnitIconTextures;
+                    customUnitConfig.teamColoredIconTextures = LandUnit.landUnitIconTextures;
                 }
                 Texture textureA2 = customUnitConfig.a(iniFile, "graphics", "icon_zoomed_out", false);
                 if (textureA2 != null) {
-                    customUnitConfig.energy = customUnitConfig.a(textureA2, customUnitConfig.baseDamage);
+                    customUnitConfig.teamColoredIconTextures = customUnitConfig.a(textureA2, customUnitConfig.teamColoringMode);
                 }
                 if (iniFile.getBoolean("graphics", "icon_zoomed_out_neverShow", (Boolean) false).booleanValue()) {
-                    customUnitConfig.energy = null;
+                    customUnitConfig.teamColoredIconTextures = null;
                 }
                 customUnitConfig.showHealthBar = iniFile.getBoolean("graphics", "showHealthBar", (Boolean) true).booleanValue();
                 customUnitConfig.showHealthBarChanges = iniFile.getBoolean("graphics", "showHealthBarChanges", (Boolean) true).booleanValue();
@@ -2029,7 +2029,7 @@ public class CustomUnitConfigParser {
                 }
                 customUnitConfig.disablePassiveTargeting = iniFile.getBoolean("attack", "disablePassiveTargeting", (Boolean) false).booleanValue();
                 customUnitConfig.stopTargetingAfterFiring = iniFile.getBoolean("attack", "stopTargetingAfterFiring", (Boolean) false).booleanValue();
-                customUnitConfig.turretMultiTargeting2 = iniFile.getBoolean("attack", "turretMultiTargeting", (Boolean) false).booleanValue();
+                customUnitConfig.turretMultiTargeting = iniFile.getBoolean("attack", "turretMultiTargeting", (Boolean) false).booleanValue();
                 customUnitConfig.attackMovementSpeed = iniFile.getFloat("attack", "attackMovementSpeed", Float.valueOf(1.0f)).floatValue();
                 customUnitConfig.attackMovementSpread = iniFile.getFloat("attack", "attackMovementSpread", Float.valueOf(1.0f)).floatValue();
                 Float f5 = iniFile.getFloat("attack", "maxAttackRange", (Float) null);
@@ -2081,8 +2081,8 @@ public class CustomUnitConfigParser {
                     CustomProjectileTemplate customProjectileTemplate3 = customUnitConfig.projectileTemplatesById[i5];
                     if (customProjectileTemplate3 != null) {
                         customProjectileTemplate3.w *= customUnitConfig.globalScale;
-                        customProjectileTemplate3.au *= customUnitConfig.globalScale;
-                        customProjectileTemplate3.aF *= customUnitConfig.globalScale;
+                        customProjectileTemplate3.targetSpeed *= customUnitConfig.globalScale;
+                        customProjectileTemplate3.drawSize *= customUnitConfig.globalScale;
                     }
                 }
                 if (customUnitConfig.projectileTemplatesById[0] == null) {
@@ -2109,31 +2109,31 @@ public class CustomUnitConfigParser {
                 }
                 if (arrayList.isEmpty()) {
                     TurretConfig turretConfig3 = new TurretConfig();
-                    turretConfig3.range = 0.0f;
-                    turretConfig3.minRange = 0.0f;
+                    turretConfig3.offsetX = 0.0f;
+                    turretConfig3.offsetY = 0.0f;
                     turretConfig3.name = "1";
                     turretConfig3.m = customUnitConfig.shootDelay;
                     arrayList.add(turretConfig3);
                 }
                 for (int size2 = arrayList.size() - 1; size2 >= 0; size2--) {
                     if (arrayList.get(size2) != null) {
-                        arrayList.get(size2).rotationSpeed = size2;
+                        arrayList.get(size2).turretIndex = size2;
                     }
                 }
                 for (int size3 = arrayList.size() - 1; size3 >= 0; size3--) {
                     if (arrayList.get(size3) != null) {
                         TurretConfig turretConfig4 = arrayList.get(size3);
                         if (turretConfig4.parentTurret != null) {
-                            turretConfig4.w = turretConfig4.parentTurret.rotationSpeed;
+                            turretConfig4.linkedTurretIndex = turretConfig4.parentTurret.turretIndex;
                             if (turretConfig4.parentTurret.parentTurret != null) {
                                 throw new RuntimeException(turretConfig4.name + ": Turret can not be attached to turret that is also attached to a turret");
                             }
                         }
                         if (turretConfig4.childTurret != null) {
-                            turretConfig4.x = turretConfig4.childTurret.rotationSpeed;
+                            turretConfig4.x = turretConfig4.childTurret.turretIndex;
                         }
-                        if (turretConfig4.W < 0.0f) {
-                            turretConfig4.W = turretConfig4.V;
+                        if (turretConfig4.turnSpeedDeceleration < 0.0f) {
+                            turretConfig4.turnSpeedDeceleration = turretConfig4.turnSpeedAcceleration;
                         }
                     }
                 }
@@ -2146,28 +2146,28 @@ public class CustomUnitConfigParser {
                 boolean z3 = true;
                 boolean z4 = false;
                 for (TurretConfig turretConfig5 : arrayList) {
-                    turretConfig5.shootSpeed2 *= customUnitConfig.globalScale;
-                    turretConfig5.range *= customUnitConfig.globalScale;
-                    turretConfig5.minRange *= customUnitConfig.globalScale;
-                    turretConfig5.shootAccuracy2 *= customUnitConfig.globalScale;
-                    turretConfig5.Z *= customUnitConfig.globalScale;
+                    turretConfig5.barrelY *= customUnitConfig.globalScale;
+                    turretConfig5.offsetX *= customUnitConfig.globalScale;
+                    turretConfig5.offsetY *= customUnitConfig.globalScale;
+                    turretConfig5.barrelX *= customUnitConfig.globalScale;
+                    turretConfig5.barrelOffsetXOnOddShots *= customUnitConfig.globalScale;
                     boolean zBooleanValue2 = false;
-                    if (turretConfig5.B) {
-                        if (turretConfig5.ab >= 99999.0f) {
+                    if (turretConfig5.canShoot) {
+                        if (turretConfig5.limitingRange >= 99999.0f) {
                             z3 = false;
                         } else {
                             z4 = true;
-                            if (customUnitConfig.maxAttackRange > turretConfig5.ab) {
-                                customUnitConfig.maxAttackRange = turretConfig5.ab;
+                            if (customUnitConfig.maxAttackRange > turretConfig5.limitingRange) {
+                                customUnitConfig.maxAttackRange = turretConfig5.limitingRange;
                             }
-                            if (f7 < turretConfig5.ab) {
-                                f7 = turretConfig5.ab;
+                            if (f7 < turretConfig5.limitingRange) {
+                                f7 = turretConfig5.limitingRange;
                             }
-                            if (Utility.abs(turretConfig5.ab - customUnitConfig.unitStats.maxAttackRange) > 5.0f) {
+                            if (Utility.abs(turretConfig5.limitingRange - customUnitConfig.unitStats.maxAttackRange) > 5.0f) {
                                 boolean z5 = false;
                                 Iterator it4 = customUnitConfig.customArms.iterator();
                                 while (it4.hasNext()) {
-                                    if (Utility.abs(turretConfig5.ab - ((CustomLimitedRange) it4.next()).value) < 5.0f) {
+                                    if (Utility.abs(turretConfig5.limitingRange - ((CustomLimitedRange) it4.next()).value) < 5.0f) {
                                         z5 = true;
                                     }
                                 }
@@ -2177,12 +2177,12 @@ public class CustomUnitConfigParser {
                             }
                         }
                     }
-                    if (turretConfig5.canTargetAir2 != null) {
-                        zBooleanValue2 = turretConfig5.canTargetAir2.booleanValue();
+                    if (turretConfig5.showRangeUIGuide != null) {
+                        zBooleanValue2 = turretConfig5.showRangeUIGuide.booleanValue();
                     }
                     if (zBooleanValue2) {
                         CustomLimitedRange customLimitedRange = new CustomLimitedRange();
-                        customLimitedRange.value = turretConfig5.ab;
+                        customLimitedRange.value = turretConfig5.limitingRange;
                         customUnitConfig.customArms.add(customLimitedRange);
                     }
                 }
@@ -2205,7 +2205,7 @@ public class CustomUnitConfigParser {
                         customUnitConfig.defaultTurret2 = customUnitConfig.turrets[0];
                     }
                 }
-                customUnitConfig.defaultTurretRotationSpeed = customUnitConfig.defaultTurret2.rotationSpeed;
+                customUnitConfig.mainTurretIndex = customUnitConfig.defaultTurret2.turretIndex;
                 getLocaleString(jA, LoadPhase.unitParsePartB);
                 long jA3 = PerformanceProfiler.a();
                 if (iniFile.hasKeyStartingWith("core", "action_")) {
@@ -2275,7 +2275,7 @@ public class CustomUnitConfigParser {
                     if (turretConfigFindProjectileConfigByName == null) {
                         throw new RuntimeException("Cannot find turret:" + string20 + " for [core]fireTurretXAtSelfOnDeath");
                     }
-                    customUnitConfig.canAttackUnderwater = turretConfigFindProjectileConfigByName.rotationSpeed;
+                    customUnitConfig.fireTurretAtSelfOnDeathIndex = turretConfigFindProjectileConfigByName.turretIndex;
                 }
                 CustomUnitDecalRenderer.a(customUnitConfig, iniFile);
                 customUnitConfig.dieOnAttack = iniFile.getBoolean("attack", "dieOnAttack", (Boolean) false).booleanValue();
@@ -2302,14 +2302,14 @@ public class CustomUnitConfigParser {
                 boolean z7 = false;
                 boolean z8 = false;
                 for (TurretConfig turretConfig6 : arrayList) {
-                    if (turretConfig6.animationSet != null && turretConfig6.animationSet.a(customUnitConfig.canOnlyAttackUnitsWithTags)) {
-                        turretConfig6.animationSet = null;
+                    if (turretConfig6.canOnlyAttackUnitsWithTags != null && turretConfig6.canOnlyAttackUnitsWithTags.a(customUnitConfig.canOnlyAttackUnitsWithTags)) {
+                        turretConfig6.canOnlyAttackUnitsWithTags = null;
                     }
-                    if (turretConfig6.animationSet2 != null && turretConfig6.animationSet2.a(customUnitConfig.canOnlyAttackUnitsWithoutTags)) {
-                        turretConfig6.animationSet2 = null;
+                    if (turretConfig6.canOnlyAttackUnitsWithoutTags != null && turretConfig6.canOnlyAttackUnitsWithoutTags.a(customUnitConfig.canOnlyAttackUnitsWithoutTags)) {
+                        turretConfig6.canOnlyAttackUnitsWithoutTags = null;
                     }
-                    if (turretConfig6.B) {
-                        if (turretConfig6.animationSet != null || turretConfig6.animationSet2 != null) {
+                    if (turretConfig6.canShoot) {
+                        if (turretConfig6.canOnlyAttackUnitsWithTags != null || turretConfig6.canOnlyAttackUnitsWithoutTags != null) {
                             z7 = true;
                         } else {
                             z8 = true;
@@ -2364,11 +2364,11 @@ public class CustomUnitConfigParser {
                 if (customUnitConfig.canAttack) {
                     for (int i9 = 0; i9 < customUnitConfig.turrets.length; i9++) {
                         TurretConfig turretConfig7 = customUnitConfig.turrets[i9];
-                        if (turretConfig7.B && turretConfig7.linkedTurret == null && customUnitConfig.showShotDelayBar) {
+                        if (turretConfig7.canShoot && turretConfig7.linkedTurret == null && customUnitConfig.showShotDelayBar) {
                             if (turretConfig7.m > 140.0f && (customUnitConfig.currentTurretIndex == -1 || customUnitConfig.turrets[customUnitConfig.currentTurretIndex].m < turretConfig7.m)) {
                                 customUnitConfig.currentTurretIndex = i9;
                             }
-                            if (turretConfig7.n > 80.0f) {
+                            if (turretConfig7.warmup > 80.0f) {
                                 customUnitConfig.warmupBarTurretIndex = i9;
                             }
                         }
@@ -2564,43 +2564,43 @@ public class CustomUnitConfigParser {
             String strTrim = str3.trim();
             CustomActionDef customActionDef = new CustomActionDef();
             customActionDef.stringId = strTrim;
-            customActionDef.isBuildAction = iniFile.getBoolean(str, str2 + "extraLagHidingInUI", (Boolean) false).booleanValue();
-            customActionDef.buildTime = iniFile.getFloat(str, str2 + "pos", Float.valueOf(999.0f)).floatValue();
-            customActionDef.condition12 = iniFile.getLogicBooleanUnit(str, str2 + "tech", (Integer) 1).intValue();
-            customActionDef.isCondition2 = iniFile.getBoolean(str, str2 + "forceNano", (Boolean) false).booleanValue();
-            customActionDef.condition13 = iniFile.getString(str, str2 + "type", (String) null);
-            customActionDef.buildCost = UnitPrice.a(customUnitConfig, iniFile, str, str2 + "price", (UnitPrice) null);
-            customActionDef.condition10 = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isGuiBlinking", (LogicBoolean) null);
-            customActionDef.enabledCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isVisible", (LogicBoolean) null);
-            customActionDef.highlightCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLocked", (LogicBoolean) null);
-            customActionDef.highlightText = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedMessage", (String) null);
-            if (customActionDef.highlightCondition != null) {
+            customActionDef.extraLagHidingInUI = iniFile.getBoolean(str, str2 + "extraLagHidingInUI", (Boolean) false).booleanValue();
+            customActionDef.pos = iniFile.getFloat(str, str2 + "pos", Float.valueOf(999.0f)).floatValue();
+            customActionDef.techLevel = iniFile.getLogicBooleanUnit(str, str2 + "tech", (Integer) 1).intValue();
+            customActionDef.forceNano = iniFile.getBoolean(str, str2 + "forceNano", (Boolean) false).booleanValue();
+            customActionDef.buildType = iniFile.getString(str, str2 + "type", (String) null);
+            customActionDef.price = UnitPrice.a(customUnitConfig, iniFile, str, str2 + "price", (UnitPrice) null);
+            customActionDef.isGuiBlinking = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isGuiBlinking", (LogicBoolean) null);
+            customActionDef.isVisible = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isVisible", (LogicBoolean) null);
+            customActionDef.isLocked = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLocked", (LogicBoolean) null);
+            customActionDef.isLockedMessage = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedMessage", (String) null);
+            if (customActionDef.isLocked != null) {
                 customActionDef.hideInBuildMenu = true;
             }
-            if (customActionDef.highlightCondition == LogicBoolean.falseBoolean) {
-                customActionDef.highlightCondition = null;
+            if (customActionDef.isLocked == LogicBoolean.falseBoolean) {
+                customActionDef.isLocked = null;
             }
-            customActionDef.highlightColorCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLockedAlt", (LogicBoolean) null);
-            customActionDef.highlightColor = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedAltMessage", (String) null);
-            if (customActionDef.highlightColorCondition != null) {
+            customActionDef.isLockedAlt = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLockedAlt", (LogicBoolean) null);
+            customActionDef.isLockedAltMessage = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedAltMessage", (String) null);
+            if (customActionDef.isLockedAlt != null) {
                 customActionDef.hideInBuildMenu = true;
             }
-            if (customActionDef.highlightColorCondition == LogicBoolean.falseBoolean) {
-                customActionDef.highlightColorCondition = null;
+            if (customActionDef.isLockedAlt == LogicBoolean.falseBoolean) {
+                customActionDef.isLockedAlt = null;
             }
-            customActionDef.iconCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLockedAlt2", (LogicBoolean) null);
-            customActionDef.icon = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedAlt2Message", (String) null);
-            if (customActionDef.iconCondition != null) {
+            customActionDef.isLockedAlt2 = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLockedAlt2", (LogicBoolean) null);
+            customActionDef.isLockedAlt2Message = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedAlt2Message", (String) null);
+            if (customActionDef.isLockedAlt2 != null) {
                 customActionDef.hideInBuildMenu = true;
             }
-            if (customActionDef.iconCondition == LogicBoolean.falseBoolean) {
-                customActionDef.iconCondition = null;
+            if (customActionDef.isLockedAlt2 == LogicBoolean.falseBoolean) {
+                customActionDef.isLockedAlt2 = null;
             }
             UnitPrice unitPriceA = UnitPrice.a(customUnitConfig, iniFile, str, str2 + "addResources", true);
             if (unitPriceA != null && unitPriceA.d()) {
-                customActionDef.energyCost = unitPriceA;
+                customActionDef.addResources = unitPriceA;
             }
-            customActionDef.aM = BuildType.build;
+            customActionDef.actionType = BuildType.build;
             if (!"NONE".equalsIgnoreCase(strTrim)) {
                 customUnitConfig.customActionDefs.add(customActionDef);
             }
@@ -2661,7 +2661,7 @@ public class CustomUnitConfigParser {
             if (string8 != null || string9 != null || string10 != null || string11 != null) {
                 z3 = true;
             }
-            if (customActionDef.ac.size() > 0) {
+            if (customActionDef.logicActions.size() > 0) {
                 z3 = true;
             }
         }
@@ -2705,247 +2705,247 @@ public class CustomUnitConfigParser {
                 }
             }
             customActionDef.displayName = str3;
-            customActionDef.isBuildAction = iniFile.getBoolean(str, str2 + "extraLagHidingInUI", (Boolean) false).booleanValue();
-            customActionDef.animationSet = AnimationTag.a(iniFile.getString(str, str2 + "tags", (String) null));
-            customActionDef.buildTime = iniFile.getFloat(str, str2 + "pos", Float.valueOf(999.0f)).floatValue();
-            customActionDef.buildCost = UnitPrice.a(customUnitConfig, iniFile, str, str2 + "price", true);
-            customActionDef.resourceCost = UnitPrice.b(customUnitConfig, iniFile, str, str2 + "streamingCost", null);
+            customActionDef.extraLagHidingInUI = iniFile.getBoolean(str, str2 + "extraLagHidingInUI", (Boolean) false).booleanValue();
+            customActionDef.tags = AnimationTag.a(iniFile.getString(str, str2 + "tags", (String) null));
+            customActionDef.pos = iniFile.getFloat(str, str2 + "pos", Float.valueOf(999.0f)).floatValue();
+            customActionDef.price = UnitPrice.a(customUnitConfig, iniFile, str, str2 + "price", true);
+            customActionDef.streamingCost = UnitPrice.b(customUnitConfig, iniFile, str, str2 + "streamingCost", null);
             if (iniFile.getBoolean(str, str2 + "switchPriceWithStreamingCost", (Boolean) false).booleanValue()) {
-                if (customActionDef.resourceCost != null) {
+                if (customActionDef.streamingCost != null) {
                     throw new RuntimeException("[" + str + "]streamingCost and switchPriceWithStreamingCost=true cannot be used at the same time");
                 }
-                customActionDef.resourceCost = UnitPrice.b(customUnitConfig, iniFile, str, str2 + "price", null);
-                customActionDef.buildCost = UnitPrice.a;
+                customActionDef.streamingCost = UnitPrice.b(customUnitConfig, iniFile, str, str2 + "price", null);
+                customActionDef.price = UnitPrice.a;
             }
-            customUnitConfig.a(customActionDef.buildCost);
-            if (customActionDef.resourceCost != null) {
-                customUnitConfig.a(customActionDef.resourceCost);
+            customUnitConfig.a(customActionDef.price);
+            if (customActionDef.streamingCost != null) {
+                customUnitConfig.a(customActionDef.streamingCost);
             }
-            customActionDef.isDefaultAction = iniFile.getBoolean(str, str2 + "highPriorityQueue", (Boolean) false).booleanValue();
-            customActionDef.isDefaultBuildCommand = iniFile.getBoolean(str, str2 + "onlyOneUnitAtATime", (Boolean) false).booleanValue();
-            customActionDef.isDefaultBuildCommand2 = iniFile.getBoolean(str, str2 + "canPlayerCancel", (Boolean) true).booleanValue();
-            customActionDef.isDefaultBuildCommand3 = iniFile.getBoolean(str, str2 + "alwaysSinglePress", (Boolean) false).booleanValue();
-            customActionDef.isQueueUnitCommand = iniFile.getBoolean(str, str2 + "allowMultipleInQueue", (Boolean) true).booleanValue();
-            if (!customActionDef.isDefaultBuildCommand2 && !customActionDef.isQueueUnitCommand && customActionDef.isDefaultBuildCommand3) {
-                customActionDef.isDefaultBuildCommand4 = true;
+            customActionDef.highPriorityQueue = iniFile.getBoolean(str, str2 + "highPriorityQueue", (Boolean) false).booleanValue();
+            customActionDef.onlyOneUnitAtATime = iniFile.getBoolean(str, str2 + "onlyOneUnitAtATime", (Boolean) false).booleanValue();
+            customActionDef.canPlayerCancel = iniFile.getBoolean(str, str2 + "canPlayerCancel", (Boolean) true).booleanValue();
+            customActionDef.alwaysSinglePress = iniFile.getBoolean(str, str2 + "alwaysSinglePress", (Boolean) false).booleanValue();
+            customActionDef.allowMultipleInQueue = iniFile.getBoolean(str, str2 + "allowMultipleInQueue", (Boolean) true).booleanValue();
+            if (!customActionDef.canPlayerCancel && !customActionDef.allowMultipleInQueue && customActionDef.alwaysSinglePress) {
+                customActionDef.hideQueueInterface = true;
             }
-            if (!customActionDef.isDefaultBuildCommand2) {
+            if (!customActionDef.canPlayerCancel) {
                 customActionDef.queueType = ActionType.none;
             } else {
                 customActionDef.queueType = ActionType.popupQueue;
             }
-            customActionDef.displayCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "requireConditional", (LogicBoolean) null);
-            customActionDef.availableCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isActive", (LogicBoolean) null);
-            customActionDef.enabledCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isVisible", (LogicBoolean) null);
-            customActionDef.disableInBuildMenu = iniFile.getBoolean(str, str2 + "isAlsoViewableByEnemies", (Boolean) false).booleanValue();
-            customActionDef.showInBuildMenu = iniFile.getBoolean(str, str2 + "isAlsoViewableByAllies", Boolean.valueOf(customActionDef.disableInBuildMenu)).booleanValue();
+            customActionDef.requireConditional = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "requireConditional", (LogicBoolean) null);
+            customActionDef.isActive = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isActive", (LogicBoolean) null);
+            customActionDef.isVisible = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isVisible", (LogicBoolean) null);
+            customActionDef.isAlsoViewableByEnemies = iniFile.getBoolean(str, str2 + "isAlsoViewableByEnemies", (Boolean) false).booleanValue();
+            customActionDef.isAlsoViewableByAllies = iniFile.getBoolean(str, str2 + "isAlsoViewableByAllies", Boolean.valueOf(customActionDef.isAlsoViewableByEnemies)).booleanValue();
             if (z2) {
-                if (customActionDef.enabledCondition != null && !LogicBoolean.isStaticFalse(customActionDef.enabledCondition)) {
+                if (customActionDef.isVisible != null && !LogicBoolean.isStaticFalse(customActionDef.isVisible)) {
                     throw new RuntimeException("[" + str + "]isVisible doesn't make sense to use in hidden actions");
                 }
-                customActionDef.enabledCondition = LogicBoolean.falseBoolean;
+                customActionDef.isVisible = LogicBoolean.falseBoolean;
             }
-            customActionDef.highlightCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLocked", (LogicBoolean) null);
-            customActionDef.highlightText = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedMessage", (String) null);
-            if (customActionDef.highlightCondition != null) {
+            customActionDef.isLocked = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLocked", (LogicBoolean) null);
+            customActionDef.isLockedMessage = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedMessage", (String) null);
+            if (customActionDef.isLocked != null) {
                 customActionDef.hideInBuildMenu = true;
             }
-            if (customActionDef.highlightCondition == LogicBoolean.falseBoolean) {
-                customActionDef.highlightCondition = null;
+            if (customActionDef.isLocked == LogicBoolean.falseBoolean) {
+                customActionDef.isLocked = null;
             }
-            customActionDef.highlightColorCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLockedAlt", (LogicBoolean) null);
-            customActionDef.highlightColor = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedAltMessage", (String) null);
-            if (customActionDef.highlightColorCondition != null) {
+            customActionDef.isLockedAlt = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLockedAlt", (LogicBoolean) null);
+            customActionDef.isLockedAltMessage = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedAltMessage", (String) null);
+            if (customActionDef.isLockedAlt != null) {
                 customActionDef.hideInBuildMenu = true;
             }
-            if (customActionDef.highlightColorCondition == LogicBoolean.falseBoolean) {
-                customActionDef.highlightColorCondition = null;
+            if (customActionDef.isLockedAlt == LogicBoolean.falseBoolean) {
+                customActionDef.isLockedAlt = null;
             }
-            customActionDef.iconCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLockedAlt2", (LogicBoolean) null);
-            customActionDef.icon = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedAlt2Message", (String) null);
-            if (customActionDef.iconCondition != null) {
+            customActionDef.isLockedAlt2 = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isLockedAlt2", (LogicBoolean) null);
+            customActionDef.isLockedAlt2Message = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "isLockedAlt2Message", (String) null);
+            if (customActionDef.isLockedAlt2 != null) {
                 customActionDef.hideInBuildMenu = true;
             }
-            if (customActionDef.iconCondition == LogicBoolean.falseBoolean) {
-                customActionDef.iconCondition = null;
+            if (customActionDef.isLockedAlt2 == LogicBoolean.falseBoolean) {
+                customActionDef.isLockedAlt2 = null;
             }
-            customActionDef.iconColorCondition = LogicBoolean.create(customUnitConfig, iniFile.getString(str, str2 + "ai_isHighPriority", (String) null), null);
-            if (customActionDef.iconColorCondition == LogicBoolean.falseBoolean) {
-                customActionDef.iconColorCondition = null;
+            customActionDef.aiHighPriorityCondition = LogicBoolean.create(customUnitConfig, iniFile.getString(str, str2 + "ai_isHighPriority", (String) null), null);
+            if (customActionDef.aiHighPriorityCondition == LogicBoolean.falseBoolean) {
+                customActionDef.aiHighPriorityCondition = null;
             }
-            if (customActionDef.iconColorCondition != null) {
+            if (customActionDef.aiHighPriorityCondition != null) {
                 customUnitConfig.hasAiHighPriorityAction = true;
             }
-            customActionDef.iconColor = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "ai_isDisabled", LogicBoolean.falseBoolean);
-            customActionDef.aN = (com.corrodinggames.rts.game.units.custom.logic.ActionType) iniFile.getEnum(str, str2 + "aiUse", customActionDef.aN, com.corrodinggames.rts.game.units.custom.logic.ActionType.class);
-            customActionDef.iconUnitType3 = customUnitConfig.reloadAllCustomUnits(iniFile.getString(str, str2 + "guiBuildUnit", (String) null), str2 + "guiBuildUnit", str);
-            if (customActionDef.iconUnitType3 != null) {
+            customActionDef.aiDisabledCondition = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "ai_isDisabled", LogicBoolean.falseBoolean);
+            customActionDef.aiUse = (com.corrodinggames.rts.game.units.custom.logic.ActionType) iniFile.getEnum(str, str2 + "aiUse", customActionDef.aiUse, com.corrodinggames.rts.game.units.custom.logic.ActionType.class);
+            customActionDef.guiBuildUnit = customUnitConfig.reloadAllCustomUnits(iniFile.getString(str, str2 + "guiBuildUnit", (String) null), str2 + "guiBuildUnit", str);
+            if (customActionDef.guiBuildUnit != null) {
                 customActionDef.queueType = ActionType.placeBuilding;
                 if (string != null) {
                     throw new RuntimeException("[" + str + "]guiBuildUnit and convertTo cannot currently be used the same action");
                 }
             }
-            customActionDef.iconUnitType2 = customUnitConfig.reloadAllCustomUnits(iniFile.getString(str, str2 + "ai_considerSameAsBuilding", (String) null), str2 + "ai_considerSameAsBuilding", str);
-            customActionDef.condition10 = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isGuiBlinking", (LogicBoolean) null);
-            customActionDef.texture = cacheTexture(customUnitConfig.generation_free_in_sandbox, iniFile.getString(str, str2 + "iconImage", "NONE"), customUnitConfig.imageSmoothing, customUnitConfig, str, str2 + "iconImage");
-            customActionDef.condition9 = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "iconExtraIsVisible", (LogicBoolean) null);
-            if (customActionDef.condition9 == LogicBoolean.trueBoolean) {
-                customActionDef.condition9 = null;
+            customActionDef.aiConsiderSameAsBuilding = customUnitConfig.reloadAllCustomUnits(iniFile.getString(str, str2 + "ai_considerSameAsBuilding", (String) null), str2 + "ai_considerSameAsBuilding", str);
+            customActionDef.isGuiBlinking = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "isGuiBlinking", (LogicBoolean) null);
+            customActionDef.iconImage = cacheTexture(customUnitConfig.resourceLoadPath, iniFile.getString(str, str2 + "iconImage", "NONE"), customUnitConfig.imageSmoothing, customUnitConfig, str, str2 + "iconImage");
+            customActionDef.iconExtraIsVisible = iniFile.getLogicBoolean(customUnitConfig, str, str2 + "iconExtraIsVisible", (LogicBoolean) null);
+            if (customActionDef.iconExtraIsVisible == LogicBoolean.trueBoolean) {
+                customActionDef.iconExtraIsVisible = null;
             }
-            customActionDef.texture2 = customUnitConfig.a(iniFile, str, str2 + "iconExtraImage");
-            customActionDef.texture3 = iniFile.getColorAsInt(str, str2 + "iconExtraColor", Integer.valueOf(Color.a(100, 255, 255, 255))).intValue();
-            customActionDef.unitType = UnitReference.parseUnitTypeOrReferenceFromConf(customUnitConfig, iniFile, str, str2 + "unitShownInUI", null);
-            if (customActionDef.unitType != null && customActionDef.texture != null) {
+            customActionDef.iconExtraImage = customUnitConfig.a(iniFile, str, str2 + "iconExtraImage");
+            customActionDef.iconExtraColor = iniFile.getColorAsInt(str, str2 + "iconExtraColor", Integer.valueOf(Color.a(100, 255, 255, 255))).intValue();
+            customActionDef.unitShownInUI = UnitReference.parseUnitTypeOrReferenceFromConf(customUnitConfig, iniFile, str, str2 + "unitShownInUI", null);
+            if (customActionDef.unitShownInUI != null && customActionDef.iconImage != null) {
                 throw new RuntimeException("[" + str + "]unitShownInUI and iconImage: doesn't make sense to use both at the same time");
             }
-            customActionDef.isUnitType = iniFile.getBoolean(str, str2 + "unitShownInUIWithHpBar", (Boolean) true).booleanValue();
-            customActionDef.isUnitType2 = iniFile.getBoolean(str, str2 + "unitShownInUIWithProgressBar", (Boolean) true).booleanValue();
-            customActionDef.aG = (ActionDisplayType) iniFile.getEnum(str, str2 + "displayType", customActionDef.aG, ActionDisplayType.class);
-            customActionDef.isCondition = iniFile.getBoolean(str, str2 + "displayRemainingStockpile", (Boolean) false).booleanValue();
-            customActionDef.description = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "text", VariableScope.nullOrMissingString);
-            customActionDef.targetUnitType = UnitReference.parseUnitTypeOrReferenceFromConf(customUnitConfig, iniFile, str, str2 + "textAddUnitName", null);
-            customActionDef.message = handleUnitLoadError(iniFile, str, str2 + "textPostFix", (String) null);
-            customActionDef.sourceUnitType = UnitReference.parseUnitTypeOrReferenceFromConf(customUnitConfig, iniFile, str, str2 + "descriptionAddFromUnit", null);
-            customActionDef.relatedUnitType = UnitReference.parseUnitTypeOrReferenceFromConf(customUnitConfig, iniFile, str, str2 + "descriptionAddUnitStats", null);
-            customActionDef.requiredUnitType = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "description", VariableScope.nullOrMissingString);
-            customActionDef.cooldownTime = iniFile.getInvertedTime(str, str2 + "buildSpeed", Float.valueOf(customActionDef.cooldownTime)).floatValue();
-            if (customActionDef.cooldownTime == 0.0f) {
-                customActionDef.cooldownTime = 50.0f;
+            customActionDef.unitShownInUIWithHpBar = iniFile.getBoolean(str, str2 + "unitShownInUIWithHpBar", (Boolean) true).booleanValue();
+            customActionDef.unitShownInUIWithProgressBar = iniFile.getBoolean(str, str2 + "unitShownInUIWithProgressBar", (Boolean) true).booleanValue();
+            customActionDef.displayType = (ActionDisplayType) iniFile.getEnum(str, str2 + "displayType", customActionDef.displayType, ActionDisplayType.class);
+            customActionDef.displayRemainingStockpile = iniFile.getBoolean(str, str2 + "displayRemainingStockpile", (Boolean) false).booleanValue();
+            customActionDef.text = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "text", VariableScope.nullOrMissingString);
+            customActionDef.textAddUnitName = UnitReference.parseUnitTypeOrReferenceFromConf(customUnitConfig, iniFile, str, str2 + "textAddUnitName", null);
+            customActionDef.textPostFix = handleUnitLoadError(iniFile, str, str2 + "textPostFix", (String) null);
+            customActionDef.descriptionAddFromUnit = UnitReference.parseUnitTypeOrReferenceFromConf(customUnitConfig, iniFile, str, str2 + "descriptionAddFromUnit", null);
+            customActionDef.descriptionAddUnitStats = UnitReference.parseUnitTypeOrReferenceFromConf(customUnitConfig, iniFile, str, str2 + "descriptionAddUnitStats", null);
+            customActionDef.description = loadUnitConfigFile(customUnitConfig, iniFile, str, str2 + "description", VariableScope.nullOrMissingString);
+            customActionDef.buildSpeed = iniFile.getInvertedTime(str, str2 + "buildSpeed", Float.valueOf(customActionDef.buildSpeed)).floatValue();
+            if (customActionDef.buildSpeed == 0.0f) {
+                customActionDef.buildSpeed = 50.0f;
             }
-            customActionDef.autoRepeat = iniFile.getBoolean(str, str2 + "buildSpeed_ignoreFactorySpeedModifiers", Boolean.valueOf(customActionDef.autoRepeat)).booleanValue();
+            customActionDef.buildSpeedIgnoreFactorySpeedModifiers = iniFile.getBoolean(str, str2 + "buildSpeed_ignoreFactorySpeedModifiers", Boolean.valueOf(customActionDef.buildSpeedIgnoreFactorySpeedModifiers)).booleanValue();
             boolean z4 = false;
-            customActionDef.autoRepeat2 = iniFile.getBoolean(str, str2 + "whenBuilding_cannotMove", Boolean.valueOf(customActionDef.autoRepeat2)).booleanValue();
-            customActionDef.animationReference = customUnitConfig.loadCore(iniFile.getString(str, str2 + "whenBuilding_playAnimation", (String) null), customActionDef.animationReference);
-            customActionDef.animationSpeed = iniFile.getFloat(str, str2 + "whenBuilding_rotateTo", customActionDef.animationSpeed);
-            customActionDef.isAnimation = iniFile.getBoolean(str, str2 + "whenBuilding_rotateTo_orBackwards", Boolean.valueOf(customActionDef.isAnimation)).booleanValue();
-            customActionDef.isAnimation2 = iniFile.getBoolean(str, str2 + "whenBuilding_rotateTo_waitTillRotated", Boolean.valueOf(customActionDef.isAnimation2)).booleanValue();
-            customActionDef.isAnimation3 = iniFile.getBoolean(str, str2 + "whenBuilding_rotateTo_aimAtActionTarget", Boolean.valueOf(customActionDef.isAnimation3)).booleanValue();
+            customActionDef.whenBuildingCannotMove = iniFile.getBoolean(str, str2 + "whenBuilding_cannotMove", Boolean.valueOf(customActionDef.whenBuildingCannotMove)).booleanValue();
+            customActionDef.whenBuildingPlayAnimation = customUnitConfig.loadCore(iniFile.getString(str, str2 + "whenBuilding_playAnimation", (String) null), customActionDef.whenBuildingPlayAnimation);
+            customActionDef.whenBuildingRotateTo = iniFile.getFloat(str, str2 + "whenBuilding_rotateTo", customActionDef.whenBuildingRotateTo);
+            customActionDef.whenBuildingRotateToOrBackwards = iniFile.getBoolean(str, str2 + "whenBuilding_rotateTo_orBackwards", Boolean.valueOf(customActionDef.whenBuildingRotateToOrBackwards)).booleanValue();
+            customActionDef.whenBuildingRotateToWaitTillRotated = iniFile.getBoolean(str, str2 + "whenBuilding_rotateTo_waitTillRotated", Boolean.valueOf(customActionDef.whenBuildingRotateToWaitTillRotated)).booleanValue();
+            customActionDef.whenBuildingRotateToAimAtActionTarget = iniFile.getBoolean(str, str2 + "whenBuilding_rotateTo_aimAtActionTarget", Boolean.valueOf(customActionDef.whenBuildingRotateToAimAtActionTarget)).booleanValue();
             String string13 = iniFile.getString(str, str2 + "whenBuilding_rotateTo_rotateTurretX", (String) null);
             if (string13 != null) {
-                customActionDef.animation = customUnitConfig.findProjectileConfigByName(string13);
-                if (customActionDef.animation == null) {
+                customActionDef.whenBuildingRotateToRotateTurretX = customUnitConfig.findProjectileConfigByName(string13);
+                if (customActionDef.whenBuildingRotateToRotateTurretX == null) {
                     throw new RuntimeException("Cannot find turret:" + string13 + " for [" + str + "]" + str2 + "whenBuilding_rotateTo_rotateTurretX");
                 }
-                if (customActionDef.isAnimation) {
+                if (customActionDef.whenBuildingRotateToOrBackwards) {
                     throw new RuntimeException("whenBuilding_rotateTo_orBackwards:true not supported with [" + str + "]" + str2 + "whenBuilding_rotateTo_rotateTurretX");
                 }
             }
-            if (customActionDef.isAnimation3 && customActionDef.animationSpeed == null) {
-                customActionDef.animationSpeed = Float.valueOf(0.0f);
+            if (customActionDef.whenBuildingRotateToAimAtActionTarget && customActionDef.whenBuildingRotateTo == null) {
+                customActionDef.whenBuildingRotateTo = Float.valueOf(0.0f);
             }
-            customActionDef.actionHandler = iniFile.getCustomUnitAction(customUnitConfig, str, str2 + "whenBuilding_triggerAction", (CustomUnitActionHandler) null);
-            customActionDef.isDefaultBuildCommand5 = iniFile.getBoolean(str, str2 + "convertTo_keepCurrentTags", Boolean.valueOf(customActionDef.isDefaultBuildCommand5)).booleanValue();
-            customActionDef.setUnitData2 = UnitStats.a(iniFile, str, str2 + "convertTo_keepCurrentFields", (CustomUnitDataField[]) null);
+            customActionDef.whenBuildingTriggerAction = iniFile.getCustomUnitAction(customUnitConfig, str, str2 + "whenBuilding_triggerAction", (CustomUnitActionHandler) null);
+            customActionDef.convertToKeepCurrentTags = iniFile.getBoolean(str, str2 + "convertTo_keepCurrentTags", Boolean.valueOf(customActionDef.convertToKeepCurrentTags)).booleanValue();
+            customActionDef.convertToKeepCurrentFields = UnitStats.a(iniFile, str, str2 + "convertTo_keepCurrentFields", (CustomUnitDataField[]) null);
             if (string2 != null && !"NONE".equalsIgnoreCase(string2)) {
-                customActionDef.spawnUnitType = customUnitConfig.reloadAllCustomUnits(string2, str2 + "whenBuilding_temporarilyConvertTo", str);
-                customActionDef.setUnitData = customUnitDataFieldArrA;
+                customActionDef.whenBuildingTemporarilyConvertTo = customUnitConfig.reloadAllCustomUnits(string2, str2 + "whenBuilding_temporarilyConvertTo", str);
+                customActionDef.whenBuildingTemporarilyConvertToKeepFields = customUnitDataFieldArrA;
                 z4 = true;
             }
-            if (customActionDef.autoRepeat2 || customActionDef.animationReference != null || customActionDef.animationSpeed != null || customActionDef.spawnUnitType != null || customActionDef.actionHandler != null) {
+            if (customActionDef.whenBuildingCannotMove || customActionDef.whenBuildingPlayAnimation != null || customActionDef.whenBuildingRotateTo != null || customActionDef.whenBuildingTemporarilyConvertTo != null || customActionDef.whenBuildingTriggerAction != null) {
                 customUnitConfig.isFactory = true;
             }
-            customActionDef.aM = BuildType.convert;
+            customActionDef.actionType = BuildType.convert;
             if (string != null && !"NONE".equalsIgnoreCase(string)) {
-                customActionDef.iconUnitType = customUnitConfig.reloadAllCustomUnits(string, str2 + "convertTo", str);
+                customActionDef.convertTo = customUnitConfig.reloadAllCustomUnits(string, str2 + "convertTo", str);
                 customActionDef.stringId = string;
-                customActionDef.isQueueUnitCommand = false;
+                customActionDef.allowMultipleInQueue = false;
                 z4 = true;
             }
             if (f != null) {
-                customActionDef.delay = f;
+                customActionDef.addEnergy = f;
                 z4 = true;
             }
             if (unitPriceA != null && unitPriceA.d()) {
-                customActionDef.energyCost = unitPriceA;
+                customActionDef.addResources = unitPriceA;
                 z4 = true;
             }
             if (unitPriceA2 != null && unitPriceA2.d()) {
-                customActionDef.energyCost2 = unitPriceA2;
+                customActionDef.addResourcesScaledByAIHandicaps = unitPriceA2;
                 z4 = true;
             }
-            customActionDef.offset = iniFile.getPointF(str, str2 + "fireTurretXAtGround_withOffset", (PointF) null);
-            customActionDef.condition = iniFile.getInt(customUnitConfig, str, str2 + "fireTurretXAtGround_withTarget", null);
-            customActionDef.condition3 = iniFile.getLogicBooleanUnit(str, str2 + "fireTurretXAtGround_count", (Integer) 1).intValue();
-            customActionDef.condition5 = CustomUnitDecalRenderer.a(customUnitConfig, iniFile.getString(str, "fireTurretXAtGround_showGuideDecals", (String) null));
-            if (customActionDef.condition != null && customActionDef.offset == null) {
-                customActionDef.offset = new PointF(0.0f, 0.0f);
+            customActionDef.fireTurretAtGroundOffset = iniFile.getPointF(str, str2 + "fireTurretXAtGround_withOffset", (PointF) null);
+            customActionDef.fireTurretAtGroundTarget = iniFile.getInt(customUnitConfig, str, str2 + "fireTurretXAtGround_withTarget", null);
+            customActionDef.fireTurretAtGroundCount = iniFile.getLogicBooleanUnit(str, str2 + "fireTurretXAtGround_count", (Integer) 1).intValue();
+            customActionDef.fireTurretAtGroundGuideDecals = CustomUnitDecalRenderer.a(customUnitConfig, iniFile.getString(str, "fireTurretXAtGround_showGuideDecals", (String) null));
+            if (customActionDef.fireTurretAtGroundTarget != null && customActionDef.fireTurretAtGroundOffset == null) {
+                customActionDef.fireTurretAtGroundOffset = new PointF(0.0f, 0.0f);
             }
             String string14 = iniFile.getString(str, str2 + "fireTurretXAtGround_withProjectile", (String) null);
             if (string14 != null) {
-                customActionDef.condition2 = customUnitConfig.findProjectileTemplateByName(string14);
-                if (customActionDef.condition2 == null) {
+                customActionDef.fireTurretAtGroundProjectile = customUnitConfig.findProjectileTemplateByName(string14);
+                if (customActionDef.fireTurretAtGroundProjectile == null) {
                     throw new RuntimeException("Cannot find projectile:" + string14 + " for [" + str + "]" + str2 + "fireTurretXAtGround_withProjectile");
                 }
             }
             String string15 = iniFile.getString(str, str2 + "fireTurretXAtGround_onlyOverPassableTileOf", (String) null);
             if (string15 != null) {
-                customActionDef.condition4 = UnitMovementType.a(string15, str2 + "fireTurretXAtGround_overPassableTileOf");
+                customActionDef.fireTurretAtGroundTerrainFilter = UnitMovementType.a(string15, str2 + "fireTurretXAtGround_overPassableTileOf");
             }
             if (string3 != null) {
                 TurretConfig turretConfigFindProjectileConfigByName = customUnitConfig.findProjectileConfigByName(string3);
                 if (turretConfigFindProjectileConfigByName == null) {
                     throw new RuntimeException("Cannot find turret:" + string3 + " for [" + str + "]" + str2 + "fireTurretXAtGround");
                 }
-                customActionDef.energyCost3 = Integer.valueOf(turretConfigFindProjectileConfigByName.rotationSpeed);
-                if (customActionDef.offset == null) {
+                customActionDef.fireTurretAtGroundIndex = Integer.valueOf(turretConfigFindProjectileConfigByName.turretIndex);
+                if (customActionDef.fireTurretAtGroundOffset == null) {
                     customActionDef.queueType = ActionType.targetGround;
-                    if (customActionDef.iconUnitType3 != null) {
+                    if (customActionDef.guiBuildUnit != null) {
                         throw new RuntimeException("[" + str + "]guiBuildUnit and fireTurretXAtGround (without withOffset) cannot be used in the same action");
                     }
                 }
                 z4 = true;
             }
-            customActionDef.condition6 = logicBoolean;
-            customActionDef.condition7 = logicBoolean2;
+            customActionDef.alsoTriggerOrQueueActionTarget = logicBoolean;
+            customActionDef.alsoTriggerOrQueueActionCondition = logicBoolean2;
             if (string4 != null && !"NONE".equalsIgnoreCase(string4)) {
-                customActionDef.actionHandler2 = customUnitConfig.addActionHandler(string4, "alsoTriggerAction", str);
+                customActionDef.alsoTriggerAction = customUnitConfig.addActionHandler(string4, "alsoTriggerAction", str);
                 if (logicBooleanNumber != null) {
                     if (LogicBoolean.isStaticNumber(logicBooleanNumber)) {
                         float knownStaticNumber = LogicBoolean.getKnownStaticNumber(logicBooleanNumber);
                         if (knownStaticNumber == 0.0f) {
-                            customActionDef.actionHandler2 = null;
+                            customActionDef.alsoTriggerAction = null;
                         } else if (knownStaticNumber != 1.0f) {
-                            customActionDef.condition8 = logicBooleanNumber;
+                            customActionDef.alsoTriggerActionRepeat = logicBooleanNumber;
                         }
                     } else {
-                        customActionDef.condition8 = logicBooleanNumber;
+                        customActionDef.alsoTriggerActionRepeat = logicBooleanNumber;
                     }
                 }
                 z4 = true;
             }
             if (string5 != null && !"NONE".equalsIgnoreCase(string5)) {
-                customActionDef.actionHandler3 = customUnitConfig.addActionHandler(string5, "alsoQueueAction", str);
+                customActionDef.alsoQueueAction = customUnitConfig.addActionHandler(string5, "alsoQueueAction", str);
                 z4 = true;
             }
             if (string6 != null) {
-                customActionDef.spawnList = customUnitConfig.addConfigExtension(string6, (CustomUnitSpawnList) null);
+                customActionDef.spawnEffects = customUnitConfig.addConfigExtension(string6, (CustomUnitSpawnList) null);
                 z4 = true;
             }
             if (string7 != null) {
-                customActionDef.spawnList2 = customUnitConfig.addConfigExtension(string7, (CustomUnitSpawnList) null);
+                customActionDef.spawnEffectsOnQueue = customUnitConfig.addConfigExtension(string7, (CustomUnitSpawnList) null);
                 z4 = true;
             }
             if (string8 != null) {
-                customActionDef.spawnList3 = SoundList.a(customUnitConfig, string8);
+                customActionDef.playSoundAtUnit = SoundList.a(customUnitConfig, string8);
                 z4 = true;
             }
             if (string9 != null) {
-                customActionDef.spawnList4 = SoundList.a(customUnitConfig, string9);
+                customActionDef.playSoundGlobally = SoundList.a(customUnitConfig, string9);
                 z4 = true;
             }
             if (string10 != null) {
-                customActionDef.spawnList5 = SoundList.a(customUnitConfig, string10);
+                customActionDef.playSoundToPlayer = SoundList.a(customUnitConfig, string10);
                 z4 = true;
             }
             if (string11 != null) {
-                customActionDef.spawnList6 = SoundList.a(customUnitConfig, string11);
+                customActionDef.playSoundToPlayerOnQueue = SoundList.a(customUnitConfig, string11);
                 z4 = true;
             }
             if (logicBoolean3 != null) {
-                customActionDef.condition11 = logicBoolean3;
+                customActionDef.resetCustomTimer = logicBoolean3;
                 z4 = true;
             }
-            if (customActionDef.ac.size() > 0) {
+            if (customActionDef.logicActions.size() > 0) {
                 z4 = true;
             }
             ArrayList<CustomEventBinding> arrayList = null;
@@ -3022,7 +3022,7 @@ public class CustomUnitConfigParser {
             String string17 = iniFile.getString(str, str2 + "autoTrigger", (String) null);
             UpdateFrequency updateFrequency = (UpdateFrequency) iniFile.getEnum(str, str2 + "autoTriggerCheckRate", customUnitConfig.autoTriggerCheckRate, UpdateFrequency.class);
             customActionDef.addToBuildQueue = z4;
-            if (z4 || customActionDef.enabledCondition != null) {
+            if (z4 || customActionDef.isVisible != null) {
                 if (logicBoolean4 != null && z4) {
                     CustomUnitCondition customUnitCondition = new CustomUnitCondition();
                     customUnitCondition.logicBoolean = logicBoolean4;
@@ -3039,7 +3039,7 @@ public class CustomUnitConfigParser {
                         customUnitConfig.eventBindings.add(customEventBinding2);
                     }
                 }
-                if (customActionDef.stringId != null && customActionDef.buildCost != null && customActionDef.buildCost.b > 0) {
+                if (customActionDef.stringId != null && customActionDef.price != null && customActionDef.price.b > 0) {
                     customUnitConfig.hasBuildCostActions = true;
                 }
                 customUnitConfig.customActionDefs.add(customActionDef);
@@ -3065,7 +3065,7 @@ public class CustomUnitConfigParser {
                 str = customUnitConfig.modInfo.sourceFolder + "/common.ini";
             }
         }
-        String str3 = Utility.getRealPath(str) + "/";
+        String str3 = Utility.getParentPath(str) + "/";
         while (true) {
             if (str2.startsWith("/") || str2.startsWith("\\")) {
                 str2 = str2.substring(1);
@@ -3145,7 +3145,7 @@ public class CustomUnitConfigParser {
             z2 = true;
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        String str3 = Utility.getRealPath(str) + "/";
+        String str3 = Utility.getParentPath(str) + "/";
         String str4 = "[" + z + "," + z2 + "]" + str3 + str2;
         Texture textureFromCache = getTextureFromCache(str4);
         if (textureFromCache != null) {
@@ -3250,7 +3250,7 @@ public class CustomUnitConfigParser {
             str2 = str2.substring("SHARED:".length());
             str = "units/shared/common.ini";
         }
-        String str3 = Utility.getRealPath(str) + "/";
+        String str3 = Utility.getParentPath(str) + "/";
         String str4 = str3 + str2;
         Sound sound = (Sound) soundCache.get(str4);
         if (sound != null) {

@@ -30,13 +30,13 @@ public class SelectUnitTypeAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public int isActive(BaseUnit baseUnit, boolean z) {
+    public int getActiveCount(BaseUnit baseUnit, boolean z) {
         return -1;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
-    public int isConfirmed() {
+    public int getCostAmount() {
         return 0;
     }
 
@@ -47,13 +47,13 @@ public class SelectUnitTypeAction extends AbstractUnitAction {
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-    public ActionType e() {
+    public ActionType getActionType() {
         return ActionType.infoOnly;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
+    public ActionDisplayType getActionDisplayType() {
         if (GameEngine.isAndroidPlatform() && !GameUI.bO) {
             return ActionDisplayType.infoOnlyNoBox;
         }
@@ -105,7 +105,7 @@ public class SelectUnitTypeAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public String getCostForUnit() {
+    public String getDisplayName() {
         return "UnitInfo";
     }
 
@@ -144,7 +144,7 @@ public class SelectUnitTypeAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public String isLocked() {
+    public String getDescription() {
         String str = VariableScope.nullOrMissingString;
         if (this.e instanceof EditorOrBuilder) {
             return VariableScope.nullOrMissingString;

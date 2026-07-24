@@ -13,7 +13,7 @@ public class ChatLog {
     private ConcurrentLinkedQueue<ChatMessage> a = new ConcurrentLinkedQueue();
 
     public String a(String str) {
-        return Utility.endsWithSlash(str);
+        return Utility.escapeHtml(str);
     }
 
     public void a(int i, String str, String str2, NetworkConnection networkConnection) {
@@ -33,13 +33,13 @@ public class ChatLog {
             if (chatMessage.d == i2 && Utility.getStackTrace(chatMessage.e, System.nanoTime()) < i && !chatMessage.c.startsWith("-i ") && !chatMessage.c.startsWith("-qc ")) {
                 i3++;
                 if (chatMessage.c != null) {
-                    if (Utility.concat(chatMessage.c, '\n') >= 3) {
+                    if (Utility.countOccurrences(chatMessage.c, '\n') >= 3) {
                         i3 += 2;
                     }
-                    if (Utility.concat(chatMessage.c, '\n') >= 6) {
+                    if (Utility.countOccurrences(chatMessage.c, '\n') >= 6) {
                         i3 += 2;
                     }
-                    if (Utility.concat(chatMessage.c, '\n') >= 9) {
+                    if (Utility.countOccurrences(chatMessage.c, '\n') >= 9) {
                         i3 += 2;
                     }
                 }

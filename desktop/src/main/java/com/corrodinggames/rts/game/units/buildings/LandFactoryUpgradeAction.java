@@ -21,19 +21,19 @@ class LandFactoryUpgradeAction extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public String isLocked() {
+    public String getDescription() {
         return Locale.get("units.landFactory.upgrade.description", new Object[0]);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public String getCostForUnit() {
+    public String getDisplayName() {
         return Locale.get("units.landFactory.upgrade.name", new Object[0]);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
-    public int isConfirmed() {
+    public int getCostAmount() {
         return UnitTypeEnum.landFactory.getUpgradeCost(2);
     }
 
@@ -44,12 +44,12 @@ class LandFactoryUpgradeAction extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+    public boolean canAfford(BaseUnit baseUnit, boolean z) {
         LandFactory landFactory = (LandFactory) baseUnit;
         if (landFactory.isUpgraded || landFactory.a(getActionId(), z) > 0) {
             return false;
         }
-        return super.drawTooltip(baseUnit, z);
+        return super.canAfford(baseUnit, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -60,7 +60,7 @@ class LandFactoryUpgradeAction extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
+    public ActionDisplayType getActionDisplayType() {
         return ActionDisplayType.upgrade;
     }
 }

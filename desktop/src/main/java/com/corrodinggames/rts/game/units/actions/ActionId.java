@@ -14,13 +14,13 @@ public class ActionId {
     private static final HashMap internMap = new HashMap();
 
     /* JADX INFO: renamed from: a */
-    public static final ActionId NONE = isSameInstance("-1");
+    public static final ActionId NONE = intern("-1");
 
     /* JADX INFO: renamed from: b */
     String id;
 
     /* JADX INFO: renamed from: a */
-    public static ActionId isSameInstance(String str) {
+    public static ActionId intern(String str) {
         ActionId actionId = (ActionId) internMap.get(str);
         if (actionId != null) {
             return actionId;
@@ -52,7 +52,7 @@ public class ActionId {
     public static ActionId deserialize(GameInputStream gameInputStream) throws IOException {
         String nullableString = gameInputStream.readNullableString();
         if (nullableString != null) {
-            return isSameInstance(nullableString);
+            return intern(nullableString);
         }
         return null;
     }

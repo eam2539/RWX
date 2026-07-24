@@ -222,7 +222,7 @@ public class JavaSteamEngine extends DisabledSteamEngine {
                         String strPadLeft = gameEngine.settingsEngine.lastNetworkPlayerName;
                         String strC = DisabledSteamEngine.a().c();
                         if (strC != null && strPadLeft == null) {
-                            strPadLeft = Utility.padLeft(strC.replace(" ", "_"), 20);
+                            strPadLeft = Utility.truncateToLength(strC.replace(" ", "_"), 20);
                         }
                         gameEngine.networkEngine.playerName = strPadLeft;
                         SteamSocket steamSocket2 = new SteamSocket(JavaSteamEngine.this, JavaSteamEngine.this.p);

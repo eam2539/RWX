@@ -19,13 +19,13 @@ public class AttackModeAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public int isActive(BaseUnit baseUnit, boolean z) {
+    public int getActiveCount(BaseUnit baseUnit, boolean z) {
         return -1;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
-    public int isConfirmed() {
+    public int getCostAmount() {
         return 0;
     }
 
@@ -36,13 +36,13 @@ public class AttackModeAction extends AbstractUnitAction {
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-    public ActionType e() {
+    public ActionType getActionType() {
         return ActionType.directToAction;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
+    public ActionDisplayType getActionDisplayType() {
         return ActionDisplayType.none;
     }
 
@@ -54,13 +54,13 @@ public class AttackModeAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public String isLocked() {
+    public String getDescription() {
         return "Attack Mode";
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public String getCostForUnit() {
+    public String getDisplayName() {
         AttackMode attackModeQ = q();
         if (attackModeQ != null) {
             return attackModeQ.name();
@@ -137,7 +137,7 @@ public class AttackModeAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public String d() {
-        return getCostForUnit();
+        return getDisplayName();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction

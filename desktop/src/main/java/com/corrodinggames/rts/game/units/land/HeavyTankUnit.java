@@ -74,7 +74,7 @@ public class HeavyTankUnit extends LandUnit {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: F */
     public boolean canDrawShadow() {
-        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDead && this.deceleration >= 1.0f && !this.isUnitInvulnerable;
+        return GameEngine.getInstance().settingsEngine.renderExtraShadows && !this.isDead && this.buildProgress >= 1.0f && !this.isUnitInvulnerable;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -122,7 +122,7 @@ public class HeavyTankUnit extends LandUnit {
                     this.turretFrameIndex = 0;
                 }
             }
-            if (this.flag3) {
+            if (this.shouldDraw) {
                 this.smokeTimer += f;
                 if (this.smokeTimer > 9.0f) {
                     this.smokeTimer = 0.0f;

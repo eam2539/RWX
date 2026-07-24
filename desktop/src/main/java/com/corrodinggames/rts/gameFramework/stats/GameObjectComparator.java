@@ -18,7 +18,7 @@ public abstract class GameObjectComparator implements Comparable<GameObjectCompa
     public abstract int a(StatType statType);
 
     /* JADX INFO: renamed from: b */
-    public void getName(StatType statType) {
+    public void updateCachedStat(StatType statType) {
         this.cachedStat = a(statType);
     }
 

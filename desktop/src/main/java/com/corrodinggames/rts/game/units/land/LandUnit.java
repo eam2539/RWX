@@ -36,7 +36,7 @@ public abstract class LandUnit extends MovableUnit {
         if (this.team.teamId == -1) {
             return null;
         }
-        if (getUnitAICombatTarget()) {
+        if (isExperimental()) {
             return landUnitIconTexturesExp[this.team.getTeamColorIndex()];
         }
         return landUnitIconTextures[this.team.getTeamColorIndex()];
@@ -63,7 +63,7 @@ public abstract class LandUnit extends MovableUnit {
         super.update(f);
         if (this.isDead) {
             float f2 = 0.0f;
-            if (isMoving()) {
+            if (isOverLiquid()) {
                 f2 = -10.0f;
             }
             if (this.posZ > f2) {

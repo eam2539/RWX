@@ -82,7 +82,7 @@ public enum UnitTypeEnum implements UnitType {
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
         public int a(BaseUnit baseUnit) {
-            if (baseUnit.m147cJ()) {
+            if (baseUnit.isOverWater()) {
                 return 110;
             }
             return 0;
@@ -1475,7 +1475,7 @@ public enum UnitTypeEnum implements UnitType {
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
         public int c() {
-            return UnitTypeEnum.turret.c() + TurretFactory.upgradeToArtilleryAction.isConfirmed();
+            return UnitTypeEnum.turret.c() + TurretFactory.upgradeToArtilleryAction.getCostAmount();
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1509,7 +1509,7 @@ public enum UnitTypeEnum implements UnitType {
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
         public int c() {
-            return UnitTypeEnum.turret.c() + TurretFactory.upgradeToFlamethrowerAction.isConfirmed();
+            return UnitTypeEnum.turret.c() + TurretFactory.upgradeToFlamethrowerAction.getCostAmount();
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1599,7 +1599,7 @@ public enum UnitTypeEnum implements UnitType {
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
         public int c() {
-            return UnitTypeEnum.turret.c() + AntiAirTurret.upgradeToLevel2Action.isConfirmed();
+            return UnitTypeEnum.turret.c() + AntiAirTurret.upgradeToLevel2Action.getCostAmount();
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1633,7 +1633,7 @@ public enum UnitTypeEnum implements UnitType {
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
         public int c() {
-            return UnitTypeEnum.turret.c() + TurretFactory.upgradeToT2Action.isConfirmed();
+            return UnitTypeEnum.turret.c() + TurretFactory.upgradeToT2Action.getCostAmount();
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1667,7 +1667,7 @@ public enum UnitTypeEnum implements UnitType {
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
         public int c() {
-            return UnitTypeEnum.turret.c() + TurretFactory.upgradeToT2Action.isConfirmed() + TurretFactory.upgradeToT3Action.isConfirmed();
+            return UnitTypeEnum.turret.c() + TurretFactory.upgradeToT2Action.getCostAmount() + TurretFactory.upgradeToT3Action.getCostAmount();
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
@@ -2041,7 +2041,7 @@ public enum UnitTypeEnum implements UnitType {
         AbstractUnitAction abstractUnitActionA;
         ActionId actionIdCm = orderableUnit.cm();
         if (actionIdCm != null && (abstractUnitActionA = orderableUnit.validateActionId(actionIdCm)) != null) {
-            return abstractUnitActionA.isConfirmed();
+            return abstractUnitActionA.getCostAmount();
         }
         return 0;
     }
@@ -2254,7 +2254,7 @@ public enum UnitTypeEnum implements UnitType {
         if (baseUnitCanAttack instanceof OrderableUnit) {
             OrderableUnit orderableUnit = (OrderableUnit) baseUnitCanAttack;
             if (orderableUnit.baseTexture != null) {
-                float fCD = orderableUnit.et * orderableUnit.getMaxHealth();
+                float fCD = orderableUnit.et * orderableUnit.getRenderScale();
                 if (fCD > f7) {
                     f7 = fCD;
                 }

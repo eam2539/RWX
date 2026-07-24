@@ -53,7 +53,7 @@ public class ConvertResourceAction extends LogicAction {
                 throw new ConfigParseException("[" + str + "] convertResource_maxAmount cannot be < convertResource_minAmount");
             }
             convertResourceAction.convertResourceMultiplyAmountBy = iniFile.getFloat(str, "convertResource_multiplyAmountBy", Float.valueOf(1.0f)).floatValue();
-            customActionDef.ac.add(convertResourceAction);
+            customActionDef.logicActions.add(convertResourceAction);
         }
     }
 

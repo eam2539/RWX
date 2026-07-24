@@ -98,7 +98,7 @@ public class Debug extends ScriptContext {
         try {
             baseUnitA.setTeam(i);
             PlayerTeam.c(baseUnitA);
-            baseUnitA.isInitialized = true;
+            baseUnitA.isMoving = true;
             if (z) {
                 gameEngine.centerViewpoint(f, f2);
             }
@@ -120,7 +120,7 @@ public class Debug extends ScriptContext {
         try {
             baseUnitA.setTeam(i2);
             PlayerTeam.c(baseUnitA);
-            baseUnitA.isInitialized = true;
+            baseUnitA.isMoving = true;
             if (z) {
                 gameEngine.centerViewpoint(f, f2);
             }

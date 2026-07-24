@@ -61,7 +61,7 @@ public class TextRenderQueue {
             RenderElement renderElement = (RenderElement) this.i.get(size);
             if (renderElement instanceof TextRenderer) {
                 TextRenderer textRenderer = (TextRenderer) renderElement;
-                String strBooleanToString = Utility.booleanToString(textRenderer.d, str);
+                String strBooleanToString = Utility.removeSuffix(textRenderer.d, str);
                 if (!textRenderer.d.equals(strBooleanToString)) {
                     this.i.set(size, textRenderer.b(strBooleanToString));
                 }
@@ -174,7 +174,7 @@ public class TextRenderQueue {
                             }
                         }
                         String strSubstring = str.substring(i3, i3 + iA);
-                        if (Utility.getRandomBoolean(strSubstring, "\\n")) {
+                        if (Utility.containsSubstring(strSubstring, "\\n")) {
                             strSubstring = strSubstring.replaceAll("(\\n)", VariableScope.nullOrMissingString);
                         }
                         TextRenderer textRendererB = textRenderer.b(strSubstring);

@@ -18,7 +18,6 @@ import com.corrodinggames.rts.gameFramework.utility.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/librocket/scripts/Multiplayer.class */
 public class Multiplayer extends ScriptContext {
@@ -707,7 +706,7 @@ public class Multiplayer extends ScriptContext {
                 mapDropdown2.setValue(VariableScope.nullOrMissingString + gameEngine.networkEngine.roomSettings.mapPath);
             }
             currentPopup.getElementById("typeSelector");
-            elementById.setValue(VariableScope.nullOrMissingString + gameEngine.networkEngine.roomSettings.fodMode);
+            elementById.setValue(VariableScope.nullOrMissingString + gameEngine.networkEngine.roomSettings.fogMode);
             elementById2.setValue(VariableScope.nullOrMissingString + gameEngine.networkEngine.roomSettings.startingCredits);
             elementById7.setValue(VariableScope.nullOrMissingString + gameEngine.networkEngine.roomSettings.startingUnits);
             gameEngine.networkEngine.roomSettings.revealedMap = true;
@@ -735,7 +734,7 @@ public class Multiplayer extends ScriptContext {
             } else if (gameModeType != gameRoomSettingsE.gameModeType) {
                 gameRoomSettingsE.mapPath = null;
             }
-            gameRoomSettingsE.fodMode = elementById.getValueAsInt(null).intValue();
+            gameRoomSettingsE.fogMode = elementById.getValueAsInt(null).intValue();
             gameRoomSettingsE.startingCredits = elementById2.getValueAsInt(null).intValue();
             float f = 1.0f;
             try {
@@ -780,7 +779,7 @@ public class Multiplayer extends ScriptContext {
         if (gameRoomSettingsE != null) {
             String fileNameWithoutExtension = str;
             if (!fileNameWithoutExtension.contains("MOD|")) {
-                fileNameWithoutExtension = Utility.getFileNameWithoutExtension(fileNameWithoutExtension);
+                fileNameWithoutExtension = Utility.getFileName(fileNameWithoutExtension);
             }
             gameRoomSettingsE.mapPath = fileNameWithoutExtension;
             gameEngine.networkEngine.a(gameRoomSettingsE);

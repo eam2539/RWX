@@ -371,7 +371,7 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
                 OrderableUnit orderableUnit2 = (OrderableUnit) objArrA[i];
                 if (orderableUnit2 != null && (this.attachmentId == -1 || i == this.attachmentId)) {
                     if (this._withTag != null) {
-                        if (!AnimationTag.a(this._withTag, orderableUnit2.getUnitCombatAnimation())) {
+                        if (!AnimationTag.a(this._withTag, orderableUnit2.getTags())) {
                         }
                     }
                     return orderableUnit2;
@@ -637,11 +637,11 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
                 if ((this.relation != TeamRelation.any && !orderableUnit.team.a(this.relation, baseUnit.team)) || orderableUnit == baseUnit) {
                     return;
                 }
-                AnimationSet unitCombatAnimation = baseUnit.getUnitCombatAnimation();
+                AnimationSet unitCombatAnimation = baseUnit.getTags();
                 if (this.tag == null || (unitCombatAnimation != null && AnimationTag.a(this.tag, unitCombatAnimation))) {
                     float fDistanceSq = Utility.distanceSq(orderableUnit.posX, orderableUnit.posY, baseUnit.posX, baseUnit.posY);
                     if (fDistanceSq < this.withinRangeSq) {
-                        if (baseUnit.deceleration < 1.0f && !this.incompleteBuildings) {
+                        if (baseUnit.buildProgress < 1.0f && !this.incompleteBuildings) {
                             return;
                         }
                         if (this.withoutTag != null && unitCombatAnimation != null && AnimationTag.a(this.withoutTag, unitCombatAnimation)) {
@@ -699,8 +699,8 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
             for (int i = 0; i < size; i++) {
                 BaseUnit baseUnit = baseUnitArrA[i];
                 if ((this.relation == TeamRelation.any || orderableUnit.team.a(this.relation, baseUnit.team)) && orderableUnit != baseUnit) {
-                    AnimationSet unitCombatAnimation = baseUnit.getUnitCombatAnimation();
-                    if ((this._withTag == null || (unitCombatAnimation != null && AnimationTag.a(this._withTag, unitCombatAnimation))) && (baseUnit.deceleration >= 1.0f || this.incompleteBuildings)) {
+                    AnimationSet unitCombatAnimation = baseUnit.getTags();
+                    if ((this._withTag == null || (unitCombatAnimation != null && AnimationTag.a(this._withTag, unitCombatAnimation))) && (baseUnit.buildProgress >= 1.0f || this.incompleteBuildings)) {
                         return baseUnit;
                     }
                 }

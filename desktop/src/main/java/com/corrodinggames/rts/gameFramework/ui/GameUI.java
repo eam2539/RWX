@@ -8,7 +8,6 @@ import com.corrodinggames.rts.game.ai.AIController;
 import com.corrodinggames.rts.game.units.*;
 import com.corrodinggames.rts.game.units.actions.*;
 import com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface;
-import com.corrodinggames.rts.game.units.custom.ConfigParseException;
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfigParser;
 import com.corrodinggames.rts.game.units.custom.LocaleString;
@@ -1266,7 +1265,7 @@ public final class GameUI extends Serializable {
     public void clearEditorOrBuilder() {
         if (this.editorOrBuilder != null) {
             deselectUnit(this.editorOrBuilder);
-            this.editorOrBuilder.getUnitAICondition();
+            this.editorOrBuilder.removeFromGame();
             this.editorOrBuilder = null;
         }
     }
@@ -1592,7 +1591,7 @@ public final class GameUI extends Serializable {
     public boolean clearCurrentAction() {
         GameEngine.getInstance();
         if (this.currentAction != null) {
-            if (this.currentAction.e() == ActionType.placeBuilding) {
+            if (this.currentAction.getActionType() == ActionType.placeBuilding) {
                 this.currentAction = null;
                 this.isBuildingMode = false;
                 this.isQueuedBuild = false;
@@ -1795,7 +1794,7 @@ public final class GameUI extends Serializable {
                     baseUnitF = wrapperUnitAction.b;
                 }
             }
-            if (this.currentAction.e() == ActionType.reclaimTarget) {
+            if (this.currentAction.getActionType() == ActionType.reclaimTarget) {
                 drawActionTooltip(this.currentAction, false, baseUnitF, false, true);
                 if (removeFromSelection(false) || isMouseSelectionActive()) {
                     clearCurrentAction();
@@ -1817,7 +1816,7 @@ public final class GameUI extends Serializable {
                 }
                 return;
             }
-            if (this.currentAction.e() == ActionType.repairTarget) {
+            if (this.currentAction.getActionType() == ActionType.repairTarget) {
                 drawActionTooltip(this.currentAction, false, baseUnitF, false, true);
                 if (removeFromSelection(false) || isMouseSelectionActive()) {
                     clearCurrentAction();
@@ -1839,7 +1838,7 @@ public final class GameUI extends Serializable {
                 }
                 return;
             }
-            if (this.currentAction.e() == ActionType.setRally) {
+            if (this.currentAction.getActionType() == ActionType.setRally) {
                 drawActionTooltip(this.currentAction, false, baseUnitF, false, true);
                 if (removeFromSelection(false) || isMouseSelectionActive()) {
                     clearCurrentAction();
@@ -1855,7 +1854,7 @@ public final class GameUI extends Serializable {
                     return;
                 }
             }
-            if (this.currentAction.e() == ActionType.targetGround) {
+            if (this.currentAction.getActionType() == ActionType.targetGround) {
                 drawActionTooltip(this.currentAction, false, baseUnitF, false, true);
                 BaseUnit baseUnitF2 = this.interfaceRenderer.f();
                 AbstractUnitAction abstractUnitAction = this.currentAction;
@@ -1918,7 +1917,7 @@ public final class GameUI extends Serializable {
                 }
                 return;
             }
-            if (this.currentAction.e() == ActionType.attackMove) {
+            if (this.currentAction.getActionType() == ActionType.attackMove) {
                 drawActionTooltip(this.currentAction, false, baseUnitF, false, true);
                 if (removeFromSelection(false) || isMouseSelectionActive()) {
                     clearCurrentAction();
@@ -1937,7 +1936,7 @@ public final class GameUI extends Serializable {
                     return;
                 }
             }
-            if (this.currentAction.e() == ActionType.guardUnit) {
+            if (this.currentAction.getActionType() == ActionType.guardUnit) {
                 drawActionTooltip(this.currentAction, false, baseUnitF, false, true);
                 if (removeFromSelection(false) || isMouseSelectionActive()) {
                     clearCurrentAction();
@@ -1957,7 +1956,7 @@ public final class GameUI extends Serializable {
                 }
                 return;
             }
-            if (this.currentAction.e() == ActionType.patrol) {
+            if (this.currentAction.getActionType() == ActionType.patrol) {
                 drawActionTooltip(this.currentAction, false, baseUnitF, false, true);
                 if (drawInteractiveLabel(ConfirmationResult.yes, true) || isMouseSelectionActive()) {
                     clearCurrentAction();
@@ -1972,7 +1971,7 @@ public final class GameUI extends Serializable {
                     return;
                 }
             }
-            if (this.currentAction.e() == ActionType.pingMap) {
+            if (this.currentAction.getActionType() == ActionType.pingMap) {
                 drawActionTooltip(this.currentAction, false, baseUnitF, false, true);
                 if (cancelCurrentAction() || isMouseSelectionActive()) {
                     clearCurrentAction();
@@ -1992,7 +1991,7 @@ public final class GameUI extends Serializable {
                     return;
                 }
             }
-            if (this.currentAction.getUnitType() != null && this.currentAction.e() == ActionType.placeBuilding) {
+            if (this.currentAction.getUnitType() != null && this.currentAction.getActionType() == ActionType.placeBuilding) {
                 handleBuildingPlacement(f2, f3, point);
             }
         }
@@ -2004,7 +2003,7 @@ public final class GameUI extends Serializable {
         final BaseUnit f = this.interfaceRenderer.f();
         boolean b = false;
         if (f != null && f.validateActionId(this.currentAction.getActionId()) != null) {
-            b = (this.currentAction.drawTooltip(f, true) && !GameInterfaceRenderer.a(this.currentAction));
+            b = (this.currentAction.canAfford(f, true) && !GameInterfaceRenderer.a(this.currentAction));
             if (!this.currentAction.b(f)) {
                 b = false;
             }
@@ -2258,7 +2257,7 @@ public final class GameUI extends Serializable {
                     int n4 = 0;
                     int n5 = 1;
                     for (final PointF pointF : arrayList) {
-                        if (this.currentAction.getDescription()) {
+                        if (this.currentAction.usesActionTarget()) {
                             final Command commandForSelectedUnits = this.createCommandForSelectedUnits();
                             this.setTargetForCommand(commandForSelectedUnits);
                             commandForSelectedUnits.setActionTarget(this.currentAction.getActionId(), pointF, null);
@@ -2525,7 +2524,7 @@ public final class GameUI extends Serializable {
             showAttackFeedback(baseUnit);
             return true;
         }
-        if (selectedUnitsTeam.d(baseUnit.team) && ((baseUnit.currentHealth < baseUnit.maxHealth || baseUnit.deceleration < 1.0f) && getSelectedUnitCount() != 0)) {
+        if (selectedUnitsTeam.d(baseUnit.team) && ((baseUnit.currentHealth < baseUnit.maxHealth || baseUnit.buildProgress < 1.0f) && getSelectedUnitCount() != 0)) {
             boolean z2 = true;
             boolean z3 = false;
             boolean z4 = false;
@@ -2571,7 +2570,7 @@ public final class GameUI extends Serializable {
                 return true;
             }
         }
-        if (baseUnit.getUnitHealthPercent() > 0.0f && getSelectedUnitCount() != 0) {
+        if (baseUnit.getResourceRate() > 0.0f && getSelectedUnitCount() != 0) {
             boolean z6 = true;
             Iterator it2 = GameObject.fastGameObjectList.iterator();
             while (true) {
@@ -2707,7 +2706,7 @@ public final class GameUI extends Serializable {
                     continue;
                 }
                 final AbstractUnitAction validateActionId = am.validateActionId(actionId);
-                if (validateActionId == null || !validateActionId.b(am) || (!validateActionId.drawTooltip(am, true) && !boolean3)) {
+                if (validateActionId == null || !validateActionId.b(am) || (!validateActionId.canAfford(am, true) && !boolean3)) {
                     continue;
                 }
                 int a = 0;
@@ -2741,7 +2740,7 @@ public final class GameUI extends Serializable {
             OrderableUnit orderableUnit = wrapperUnitAction.b;
             AbstractUnitAction abstractUnitActionP_ = wrapperUnitAction.p_();
             boolean z = false;
-            if (abstractUnitActionP_.b(orderableUnit) && abstractUnitActionP_.drawTooltip((BaseUnit) orderableUnit, true) && !orderableUnit.a(abstractUnitActionP_, f, f2)) {
+            if (abstractUnitActionP_.b(orderableUnit) && abstractUnitActionP_.canAfford((BaseUnit) orderableUnit, true) && !orderableUnit.a(abstractUnitActionP_, f, f2)) {
                 z = true;
             }
             return z;
@@ -2750,7 +2749,7 @@ public final class GameUI extends Serializable {
         for (GameObject gameObject : GameObject.fastGameObjectList) {
             if (gameObject instanceof OrderableUnit) {
                 OrderableUnit orderableUnit2 = (OrderableUnit) gameObject;
-                if (orderableUnit2.isSelected && canControlUnit(orderableUnit2) && (abstractUnitActionA = orderableUnit2.validateActionId(abstractUnitAction.getActionId())) != null && abstractUnitActionA.b(orderableUnit2) && abstractUnitActionA.drawTooltip((BaseUnit) orderableUnit2, true)) {
+                if (orderableUnit2.isSelected && canControlUnit(orderableUnit2) && (abstractUnitActionA = orderableUnit2.validateActionId(abstractUnitAction.getActionId())) != null && abstractUnitActionA.b(orderableUnit2) && abstractUnitActionA.canAfford((BaseUnit) orderableUnit2, true)) {
                     if (!orderableUnit2.a(abstractUnitActionA, f, f2)) {
                         z2 = true;
                     } else {
@@ -2788,13 +2787,13 @@ public final class GameUI extends Serializable {
         AbstractUnitAction abstractUnitActionA;
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
-            return wrapperUnitAction.drawTooltip((BaseUnit) wrapperUnitAction.b, true);
+            return wrapperUnitAction.canAfford((BaseUnit) wrapperUnitAction.b, true);
         }
         ActionId actionId = abstractUnitAction.getActionId();
         for (BaseUnit baseUnit : this.selectedUnitsList) {
             if (baseUnit instanceof OrderableUnit) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
-                if (orderableUnit.isSelected && canControlUnit(orderableUnit) && (abstractUnitActionA = orderableUnit.validateActionId(actionId)) != null && abstractUnitActionA.drawTooltip(orderableUnit, z)) {
+                if (orderableUnit.isSelected && canControlUnit(orderableUnit) && (abstractUnitActionA = orderableUnit.validateActionId(actionId)) != null && abstractUnitActionA.canAfford(orderableUnit, z)) {
                     return true;
                 }
             }
@@ -2949,7 +2948,7 @@ public final class GameUI extends Serializable {
                     if (arrayListN != null) {
                         Iterator it = arrayListN.iterator();
                         while (it.hasNext()) {
-                            if (((AbstractUnitAction) it.next()).e() == ActionType.setRally) {
+                            if (((AbstractUnitAction) it.next()).getActionType() == ActionType.setRally) {
                                 z = true;
                             }
                         }
@@ -3120,7 +3119,7 @@ public final class GameUI extends Serializable {
         GameEngine gameEngine = GameEngine.getInstance();
         PointF pointF = new PointF(f, f2);
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
-        if (!abstractUnitAction.getTargetUnit()) {
+        if (!abstractUnitAction.isOnlyOneUnitAtATime()) {
             drawActionPreviewWithTarget(commandCreateCommandForSelectedUnits, abstractUnitAction);
         } else {
             drawButtonAndHandleEventAdvanced(commandCreateCommandForSelectedUnits, abstractUnitAction, false);
@@ -3511,7 +3510,7 @@ public final class GameUI extends Serializable {
         PlayerTeam var10 = this.getSelectedUnitsTeam();
 
         for (BaseUnit var12 : BaseUnit.bE) {
-            if ((boolean3 ? !var12.t() : !var12.getUnitState()) && !var12.isDead && var12.unitTransportTarget == null) {
+            if ((boolean3 ? !var12.t() : !var12.isUnselectableAsTarget()) && !var12.isDead && var12.unitTransportTarget == null) {
                 float var13 = Utility.distanceSq(float1, float2, var12.posX, var12.posY - var12.posZ);
                 float var14 = var12.radius;
                 if (!var12.isSelected) {
@@ -3525,14 +3524,14 @@ public final class GameUI extends Serializable {
                     var14 += var9;
                 }
 
-                if (var13 < var14 * var14 && (!var15 || var12.getUnitAIPriority()) && (var5 == null || var13 < var6)) {
+                if (var13 < var14 * var14 && (!var15 || var12.isVisibleToEnemies()) && (var5 == null || var13 < var6)) {
                     var5 = var12;
                     var6 = var13;
                 }
             }
         }
 
-        return var5 != null && var5.team != var4.playerTeam && !var5.getWeight() ? null : var5;
+        return var5 != null && var5.team != var4.playerTeam && !var5.isVisibleToLocalPlayer() ? null : var5;
     }
 
     /* JADX INFO: renamed from: b */
@@ -3555,7 +3554,7 @@ public final class GameUI extends Serializable {
         for (GameObject gameObject : GameObject.fastGameObjectList) {
             if (gameObject instanceof BaseUnit) {
                 BaseUnit baseUnit2 = (BaseUnit) gameObject;
-                if (!baseUnit2.isDead && baseUnit2.unitTransportTarget == null && baseUnit2.team == baseUnit.team && baseUnit2.isBuilding() && GameInterfaceRenderer.a(baseUnit2, baseUnit) && (baseUnit2.team == gameEngine.playerTeam || baseUnit2.getWeight())) {
+                if (!baseUnit2.isDead && baseUnit2.unitTransportTarget == null && baseUnit2.team == baseUnit.team && baseUnit2.isVisibleOnScreen() && GameInterfaceRenderer.a(baseUnit2, baseUnit) && (baseUnit2.team == gameEngine.playerTeam || baseUnit2.isVisibleToLocalPlayer())) {
                     selectUnit(baseUnit2);
                 }
             }
@@ -3582,7 +3581,7 @@ public final class GameUI extends Serializable {
             return false;
         }
         PlayerTeam playerTeam = GameEngine.getInstance().playerTeam;
-        if (playerTeam != null && playerTeam.c(baseUnit.team) && !baseUnit.getUnitAIPriority()) {
+        if (playerTeam != null && playerTeam.c(baseUnit.team) && !baseUnit.isVisibleToEnemies()) {
             return false;
         }
         return true;
@@ -3716,7 +3715,7 @@ public final class GameUI extends Serializable {
     /* JADX INFO: renamed from: m */
     public boolean canControlUnit(BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (baseUnit.getUnitStatus()) {
+        if (baseUnit.canNotBeGivenOrdersByPlayer()) {
             return false;
         }
         if (baseUnit.team == gameEngine.playerTeam) {
@@ -3820,11 +3819,11 @@ public final class GameUI extends Serializable {
         float f5 = orderableUnit.posX;
         float f6 = orderableUnit.posY;
         OrderableUnit orderableUnit2 = null;
-        BaseUnit baseUnitFindCollisionSize = BaseUnit.findCollisionSize(orderableUnit.r());
-        if (!(baseUnitFindCollisionSize instanceof OrderableUnit)) {
-            GameEngine.log("buildingBlockoutUnit not OrderableUnit is: " + baseUnitFindCollisionSize.getClass().getName());
+        BaseUnit buildingBlockoutUnit = BaseUnit.getBuildingBlockoutUnit(orderableUnit.r());
+        if (!(buildingBlockoutUnit instanceof OrderableUnit)) {
+            GameEngine.log("buildingBlockoutUnit not OrderableUnit is: " + buildingBlockoutUnit.getClass().getName());
         } else {
-            orderableUnit2 = (OrderableUnit) baseUnitFindCollisionSize;
+            orderableUnit2 = (OrderableUnit) buildingBlockoutUnit;
         }
         boolean z2 = false;
         gameEngine.tileMap.exportTmxToFile(f, f2);
@@ -3990,7 +3989,7 @@ public final class GameUI extends Serializable {
         if (GameEngine.isDesktopMouseInput()) {
             b2 = false;
         }
-        if (am != null && s.isTargetingAction(am)) {
+        if (am != null && s.shouldHideQueueInterface(am)) {
             b2 = false;
         }
         if (boolean7) {
@@ -4019,7 +4018,7 @@ public final class GameUI extends Serializable {
         if (s2 == null) {
             final float b5 = this.interfaceRenderer.b(s);
             if (b5 > 0.0f) {
-                s2 = Utility.toString(b5 / 1000.0f);
+                s2 = Utility.formatSeconds(b5 / 1000.0f);
             }
         }
         final String actionDisplayText = this.getActionDisplayText(s);
@@ -4114,7 +4113,7 @@ public final class GameUI extends Serializable {
         bw2.d += 15;
         int active = -1;
         if (am != null) {
-            active = s.isActive(am, true);
+            active = s.getActiveCount(am, true);
         }
         if (am != null && b2 && active != -1) {
             final Rect bw3 = this.bw;
@@ -4126,7 +4125,7 @@ public final class GameUI extends Serializable {
             this.bw.a(0, n3);
         }
         UnitType unitType = s.getUnitType();
-        if (!s.getDisplayTextForUnit()) {
+        if (!s.shouldShowUnitPreview()) {
             unitType = null;
         }
         if (unitType != null && am != null) {
@@ -4193,7 +4192,7 @@ public final class GameUI extends Serializable {
             boolean b10 = false;
             boolean b11 = false;
             final boolean b12 = !b3 && this.drawActionPreviewWithFlag(s, true);
-            final boolean b13 = active > 0 && s.getDisplayTextWithQueueCount(am, true);
+            final boolean b13 = active > 0 && s.canPlayerCancel(am, true);
             int n6 = (int)(this.bw.d() + 60.0f * float7);
             int i = (int)(this.bw.d - 65.0f * float7);
             this.by.a(n6, i, n6 + n5, i + n5);

@@ -988,7 +988,7 @@ public class OpenGLRenderer implements IGraphicsEngine {
         }
         if (iK % 2 != 0) {
         }
-        boolean zRemoveBadChars = Utility.removeBadChars(str);
+        boolean zRemoveBadChars = Utility.containsNonAscii(str);
         if (zRemoveBadChars) {
             iK = 24;
         }

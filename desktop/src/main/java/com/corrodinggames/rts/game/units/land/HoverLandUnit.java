@@ -26,7 +26,7 @@ public abstract class HoverLandUnit extends LandUnit {
         if (this.team.teamId == -1) {
             return null;
         }
-        if (getUnitAICombatTarget()) {
+        if (isExperimental()) {
             return LandUnit.landUnitIconTexturesExp[this.team.getTeamColorIndex()];
         }
         return n[this.team.getTeamColorIndex()];
@@ -46,13 +46,13 @@ public abstract class HoverLandUnit extends LandUnit {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         super.update(f);
-        if (isAlive() && !this.isDead && isMoving()) {
+        if (isAlive() && !this.isDead && isOverLiquid()) {
             if (this.rotation > 0.0f) {
                 this.l += f;
             }
             if (this.l > 10.0f) {
                 this.l = 0.0f;
-                if (isBuilding()) {
+                if (isVisibleOnScreen()) {
                     Effect effectCreateEffectInternal = GameEngine.getInstance().effectManager.createEffectInternal(this.posX + (Utility.fastCos(this.rotationSpeed) * 4.0f), this.posY + (Utility.fastSin(this.rotationSpeed) * 4.0f), 0.0f, EffectType.custom, false, EffectQuality.low);
                     if (effectCreateEffectInternal != null) {
                         effectCreateEffectInternal.aq = 0;

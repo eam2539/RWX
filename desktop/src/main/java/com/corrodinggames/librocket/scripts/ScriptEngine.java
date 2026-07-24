@@ -119,7 +119,7 @@ public class ScriptEngine {
             } catch (Exception e) {
                 if (this.tryToCatchCrash) {
                     GameEngine.log("caught script crash", (Throwable) e);
-                    this.caughtCrash = Utility.formatLong(e);
+                    this.caughtCrash = Utility.stackTraceToString(e);
                     return;
                 }
                 throw new RuntimeException(e);
@@ -163,7 +163,7 @@ public class ScriptEngine {
             } catch (Exception e) {
                 if (this.tryToCatchCrash) {
                     GameEngine.log("caught script crash", (Throwable) e);
-                    this.caughtCrash = Utility.formatLong(e);
+                    this.caughtCrash = Utility.stackTraceToString(e);
                     return;
                 }
                 throw new RuntimeException(e);
@@ -279,7 +279,7 @@ public class ScriptEngine {
         }
         Matcher matcherMatch = match("'(.*)'", strTrim);
         if (matcherMatch != null) {
-            return Utility.urlDecode(matcherMatch.group(1));
+            return Utility.unescapeHtml(matcherMatch.group(1));
         }
         Matcher matcherMatch2 = match("(-?\\d*)", strTrim);
         if (matcherMatch2 != null) {

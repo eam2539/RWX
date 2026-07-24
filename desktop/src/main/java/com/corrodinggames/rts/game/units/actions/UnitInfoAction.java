@@ -23,13 +23,13 @@ public class UnitInfoAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public int isActive(BaseUnit baseUnit, boolean z) {
+    public int getActiveCount(BaseUnit baseUnit, boolean z) {
         return -1;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
-    public int isConfirmed() {
+    public int getCostAmount() {
         return 0;
     }
 
@@ -40,13 +40,13 @@ public class UnitInfoAction extends AbstractUnitAction {
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-    public ActionType e() {
+    public ActionType getActionType() {
         return ActionType.infoOnly;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
+    public ActionDisplayType getActionDisplayType() {
         return ActionDisplayType.infoOnly;
     }
 
@@ -107,13 +107,13 @@ public class UnitInfoAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public String getCostForUnit() {
+    public String getDisplayName() {
         return "UnitInfo";
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: d */
-    public String isVisible(BaseUnit baseUnit) {
+    public String getDisplayName(BaseUnit baseUnit) {
         if (this.a) {
             return VariableScope.nullOrMissingString;
         }
@@ -149,7 +149,7 @@ public class UnitInfoAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public String isLocked() {
+    public String getDescription() {
         OrderableUnit orderableUnitK;
         if (!this.a && (orderableUnitK = K()) != null) {
             String strA = GameInterfaceRenderer.a(orderableUnitK, false, true, false);

@@ -36,7 +36,7 @@ public class SeaFactory extends FactoryWithQueue {
     static Texture deadFactoryTexture = null;
 
     /* JADX INFO: renamed from: g */
-    static final ActionId upgradeActionId = ActionId.isSameInstance(String.valueOf(110));
+    static final ActionId upgradeActionId = ActionId.intern(String.valueOf(110));
 
     /* JADX INFO: renamed from: b */
     public static void loadTextures() {

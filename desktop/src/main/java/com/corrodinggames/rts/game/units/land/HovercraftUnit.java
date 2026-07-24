@@ -41,27 +41,27 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
     public static final AbstractUnitAction i = new NoneAction(109) { // from class: com.corrodinggames.rts.game.units.e.i.1
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "-Will unload all units when stopped";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("gui.actions.unload", new Object[0]);
         }
 
         /* JADX WARN: Multi-variable type inference failed */
         @Override // com.corrodinggames.rts.game.units.actions.NoneAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z) {
             return ((TransportUnitInterface) baseUnit).getTransportedUnitCount();
         }
 
         /* JADX WARN: Multi-variable type inference failed */
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             return !((TransportUnitInterface) baseUnit).isTransportUnloadingActive() && ((TransportUnitInterface) baseUnit).f() && ((TransportUnitInterface) baseUnit).getTransportedUnitCount() > 0;
         }
 
@@ -74,26 +74,26 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
     public static final AbstractUnitAction j = new NoneAction(110) { // from class: com.corrodinggames.rts.game.units.e.i.2
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "-Stop unloading";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("gui.actions.cancel", new Object[0]);
         }
 
         /* JADX WARN: Multi-variable type inference failed */
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             return ((TransportUnitInterface) baseUnit).isTransportUnloadingActive();
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean b(BaseUnit baseUnit) {
-            return drawTooltip(baseUnit, false);
+            return canAfford(baseUnit, false);
         }
     };
     static ArrayList k = new ArrayList();
@@ -192,7 +192,7 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
             baseUnit.posX = this.posX + (Utility.fastCos(this.rotationSpeed) * (-9.0f));
             baseUnit.posY = this.posY + (Utility.fastSin(this.rotationSpeed) * (-9.0f));
             if (z) {
-                baseUnit.getUnitAIConditionTime();
+                baseUnit.markForDeath();
             }
         }
         this.transportedUnits.clear();
@@ -212,13 +212,13 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
         int unitAIPathfindIterations = 0;
         Iterator it = fastArrayList.iterator();
         while (it.hasNext()) {
-            unitAIPathfindIterations += ((BaseUnit) it.next()).getUnitAIPathfindIterations();
+            unitAIPathfindIterations += ((BaseUnit) it.next()).getTransportSlotsNeeded();
         }
         return unitAIPathfindIterations;
     }
 
     public static boolean a(FastArrayList fastArrayList, int i2, BaseUnit baseUnit) {
-        if (a(fastArrayList) + baseUnit.getUnitAIPathfindIterations() <= i2) {
+        if (a(fastArrayList) + baseUnit.getTransportSlotsNeeded() <= i2) {
             return true;
         }
         return false;
@@ -286,10 +286,10 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
         if (this.isDead || !isAlive()) {
             return;
         }
-        if (this.spawnExitLockTimer == 0.0f && this.syncType != 3) {
+        if (this.spawnExitLockTimer == 0.0f && this.drawLayer != 3) {
             S(3);
         }
-        if (this.isUnloading && !isMoving() && !this.isInitialized) {
+        if (this.isUnloading && !isOverLiquid() && !this.isMoving) {
             this.unloadTimer = Utility.moveTowardsZero(this.unloadTimer, f);
             if (this.unloadTimer == 0.0f) {
                 this.unloadTimer = 30.0f;
@@ -335,7 +335,7 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: z */
     public float getMoveSpeed() {
-        if (isMoving()) {
+        if (isOverLiquid()) {
             return 1.2f;
         }
         return 0.9f;
@@ -344,7 +344,7 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: A */
     public float getMaxTurnSpeed() {
-        if (isMoving()) {
+        if (isOverLiquid()) {
             return 1.8f;
         }
         return 1.4f;
@@ -461,7 +461,7 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cp */
-    public ActionId getUnitAIPathfindPath() {
+    public ActionId getUnloadActionId() {
         return i.getActionId();
     }
 
@@ -473,7 +473,7 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
 
     @Override // com.corrodinggames.rts.game.units.TransportUnitInterface
     public boolean f() {
-        return !isMoving();
+        return !isOverLiquid();
     }
 
     @Override // com.corrodinggames.rts.game.units.TransportUnitInterface

@@ -30,7 +30,7 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
         CustomUnitConfig customUnitConfig = customUnit.unitConfig;
         float f2 = customUnit.rotationSpeed;
         if (customUnitConfig.lockLegRotationWithMainTurret) {
-            f2 = customUnit.movementLevels[customUnitConfig.defaultTurretRotationSpeed].targetX;
+            f2 = customUnit.movementLevels[customUnitConfig.mainTurretIndex].targetX;
         }
         GameEngine gameEngine = GameEngine.getInstance();
         if (customUnit.isUnitInvulnerable || customUnit.isUnitParalyzed) {
@@ -39,7 +39,7 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
             }
             customUnit.dv();
         }
-        float maxHealth = customUnit.getMaxHealth();
+        float maxHealth = customUnit.getRenderScale();
         Paint renderPaint = null;
         boolean z3 = gameEngine.shouldDrawUnitLegDetails || customUnit.isUnitParalyzed;
         for (int i2 = 0; i2 < legInstanceArr.length; i2++) {
@@ -148,7 +148,7 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
         GameEngine gameEngine = GameEngine.getInstance();
         float f2 = customUnit.rotationSpeed;
         if (customUnitConfig.lockLegRotationWithMainTurret) {
-            f2 = customUnit.movementLevels[customUnitConfig.defaultTurretRotationSpeed].targetX;
+            f2 = customUnit.movementLevels[customUnitConfig.mainTurretIndex].targetX;
         }
         float f3 = customUnit.posX - customUnit.dP;
         float f4 = customUnit.posY - customUnit.dQ;
@@ -295,10 +295,10 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
                             if (legConfig2.I && !legInstance3.j) {
                                 legInstance3.j = true;
                                 if (legInstance3.l) {
-                                    if (gameEngine.shouldDrawMediumDetailEffects && customUnit.flag3) {
+                                    if (gameEngine.shouldDrawMediumDetailEffects && customUnit.shouldDraw) {
                                         gameEngine.effectManager.createRedLaserEffect(f14, f15, legInstance3.d, 0, 0.0f, 0.0f);
                                     }
-                                } else if (gameEngine.shouldDrawHighDetailEffects && customUnit.flag3 && (effectCreateMuzzleFlash = gameEngine.effectManager.createMuzzleFlash(f14, f15, legInstance3.d, legInstance3.i, 0)) != null) {
+                                } else if (gameEngine.shouldDrawHighDetailEffects && customUnit.shouldDraw && (effectCreateMuzzleFlash = gameEngine.effectManager.createMuzzleFlash(f14, f15, legInstance3.d, legInstance3.i, 0)) != null) {
                                     effectCreateMuzzleFlash.P = 0.0f;
                                     effectCreateMuzzleFlash.Q = 0.0f;
                                     effectCreateMuzzleFlash.G = 1.6f;

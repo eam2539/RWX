@@ -52,15 +52,15 @@ public class NearestUnitFinder extends FilteredUnitCallback {
 
     @Override // com.corrodinggames.rts.game.units.spatial.UnitSpatialCallback
     public void callback(OrderableUnit orderableUnit, float f, BaseUnit baseUnit) {
-        if (this.checkLineOfSight && baseUnit.getUnitHealthPercent() <= 0.0f) {
+        if (this.checkLineOfSight && baseUnit.getResourceRate() <= 0.0f) {
             return;
         }
         float fDistanceSq = Utility.distanceSq(this.searchPosX, this.searchPosY, baseUnit.posX, baseUnit.posY);
         if (fDistanceSq < this.closestDistanceSq) {
-            if (baseUnit.deceleration < 1.0f && !this.includeNonGroundUnits) {
+            if (baseUnit.buildProgress < 1.0f && !this.includeNonGroundUnits) {
                 return;
             }
-            if (this.animationSetFilter != null && !AnimationTag.a(this.animationSetFilter, baseUnit.getUnitCombatAnimation())) {
+            if (this.animationSetFilter != null && !AnimationTag.a(this.animationSetFilter, baseUnit.getTags())) {
                 return;
             }
             if ((this.checkLineOfSight && !orderableUnit.g(baseUnit, true)) || baseUnit.unitTransportTarget != null) {

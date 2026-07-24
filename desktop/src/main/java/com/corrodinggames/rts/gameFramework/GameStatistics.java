@@ -123,7 +123,7 @@ public class GameStatistics {
                 if (baseUnit2.bI()) {
                     statisticsDataA.d++;
                     statisticsDataA2.g++;
-                } else if (baseUnit2.getUnitAICombatTarget()) {
+                } else if (baseUnit2.isExperimental()) {
                     statisticsDataA.e++;
                     statisticsDataA2.h++;
                 } else {

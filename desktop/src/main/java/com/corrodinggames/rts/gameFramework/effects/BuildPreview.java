@@ -221,7 +221,7 @@ public class BuildPreview {
             }
             return true;
         }
-        if (this.attachedUnit == null || this.attachedUnit.getWeight()) {
+        if (this.attachedUnit == null || this.attachedUnit.isVisibleToLocalPlayer()) {
             return false;
         }
         return true;

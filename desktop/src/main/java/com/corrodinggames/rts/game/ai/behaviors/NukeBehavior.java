@@ -34,7 +34,7 @@ public class NukeBehavior extends UnitAIBehavior {
     public void e(AIController aIController, OrderableUnit orderableUnit) {
         AbstractUnitAction abstractUnitActionA = AIUnitActionUtils.a(aIController, orderableUnit, ActionType.launch);
         if (abstractUnitActionA != null) {
-            if (abstractUnitActionA.b(orderableUnit) && abstractUnitActionA.drawTooltip((BaseUnit) orderableUnit, false)) {
+            if (abstractUnitActionA.b(orderableUnit) && abstractUnitActionA.canAfford((BaseUnit) orderableUnit, false)) {
                 PointF pointFD = d(aIController, orderableUnit);
                 if (pointFD != null) {
                     aIController.c("nuke: launching at:" + pointFD.x + ", " + pointFD.y);

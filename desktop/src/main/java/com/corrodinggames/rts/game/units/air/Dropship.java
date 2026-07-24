@@ -43,50 +43,50 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
     public static final AbstractUnitAction q = new NoneAction(109) { // from class: com.corrodinggames.rts.game.units.b.d.1
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "-Will unload all units when stopped";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("gui.actions.unload", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.NoneAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public int isActive(BaseUnit baseUnit, boolean z) {
+        public int getActiveCount(BaseUnit baseUnit, boolean z) {
             return ((Dropship) baseUnit).o.size();
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
-            return (((Dropship) baseUnit).g || ((OrderableUnit) baseUnit).isMoving() || ((Dropship) baseUnit).o.size() <= 0) ? false : true;
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
+            return (((Dropship) baseUnit).g || ((OrderableUnit) baseUnit).isOverLiquid() || ((Dropship) baseUnit).o.size() <= 0) ? false : true;
         }
     };
     public static final AbstractUnitAction r = new NoneAction(110) { // from class: com.corrodinggames.rts.game.units.b.d.2
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public String isLocked() {
+        public String getDescription() {
             return "-Stop unloading";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
-        public String getCostForUnit() {
+        public String getDisplayName() {
             return Locale.get("gui.actions.cancel", new Object[0]);
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
-        public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+        public boolean canAfford(BaseUnit baseUnit, boolean z) {
             return ((Dropship) baseUnit).g;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean b(BaseUnit baseUnit) {
-            return drawTooltip(baseUnit, false);
+            return canAfford(baseUnit, false);
         }
     };
     static ArrayList s = new ArrayList();
@@ -207,7 +207,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: ct */
-    public boolean getUnitAIPathfindMaxDepth() {
+    public boolean isAirborne() {
         return true;
     }
 
@@ -218,8 +218,8 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
         if (this.isDead) {
             return;
         }
-        boolean zCK = isMoving();
-        if (this.g && !zCK && !this.isInitialized && this.posZ < 4.0f) {
+        boolean zCK = isOverLiquid();
+        if (this.g && !zCK && !this.isMoving && this.posZ < 4.0f) {
             this.f = Utility.moveTowardsZero(this.f, f);
             if (this.f == 0.0f) {
                 this.f = 30.0f;
@@ -379,7 +379,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
             baseUnit.posX = this.posX + (Utility.fastCos(this.rotationSpeed) * (-9.0f));
             baseUnit.posY = this.posY + (Utility.fastSin(this.rotationSpeed) * (-9.0f));
             if (z) {
-                baseUnit.getUnitAIConditionTime();
+                baseUnit.markForDeath();
             }
         }
         this.o.clear();
@@ -467,7 +467,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cp */
-    public ActionId getUnitAIPathfindPath() {
+    public ActionId getUnloadActionId() {
         return q.getActionId();
     }
 
@@ -479,7 +479,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
 
     @Override // com.corrodinggames.rts.game.units.TransportUnitInterface
     public boolean f() {
-        return !isMoving();
+        return !isOverLiquid();
     }
 
     @Override // com.corrodinggames.rts.game.units.TransportUnitInterface

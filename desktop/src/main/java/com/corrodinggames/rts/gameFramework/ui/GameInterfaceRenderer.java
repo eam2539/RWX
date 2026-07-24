@@ -631,7 +631,7 @@ public class GameInterfaceRenderer extends Serializable {
                 for (GameObject gameObject : GameObject.fastGameObjectList) {
                     if (gameObject instanceof UnitBase) {
                         UnitBase unitBase = (UnitBase) gameObject;
-                        unitBase.isUnitBuilt = unitBase.isSelected;
+                        unitBase.wasSelectedBeforeDrag = unitBase.isSelected;
                     }
                 }
             }
@@ -659,7 +659,7 @@ public class GameInterfaceRenderer extends Serializable {
                     for (GameObject gameObject2 : GameObject.fastGameObjectList) {
                         if (gameObject2 instanceof OrderableUnit) {
                             OrderableUnit orderableUnit = (OrderableUnit) gameObject2;
-                            if (a(orderableUnit) && (!zDrawRectWithBorder || !orderableUnit.isUnitBuilt)) {
+                            if (a(orderableUnit) && (!zDrawRectWithBorder || !orderableUnit.wasSelectedBeforeDrag)) {
                                 if (!orderableUnit.bI()) {
                                     z6 = false;
                                 }
@@ -688,16 +688,16 @@ public class GameInterfaceRenderer extends Serializable {
                         }
                         if (zDrawSelectionBox) {
                             if (z9) {
-                                z9 = !unitBase2.isUnitBuilt;
-                            } else if (unitBase2.isUnitBuilt) {
+                                z9 = !unitBase2.wasSelectedBeforeDrag;
+                            } else if (unitBase2.wasSelectedBeforeDrag) {
                                 z9 = true;
                             }
-                        } else if (zDrawRectWithBorder && unitBase2.isUnitBuilt) {
+                        } else if (zDrawRectWithBorder && unitBase2.wasSelectedBeforeDrag) {
                             z9 = true;
                         }
                         if (z9) {
                             this.gameUI.selectUnit(unitBase2);
-                            if (z4 && unitBase2.lastSelectedTick + 900 < this.gameEngine.renderTimeMillis && ((!zDrawRectWithBorder && !zDrawSelectionBox) || !unitBase2.isUnitBuilt)) {
+                            if (z4 && unitBase2.lastSelectedTick + 900 < this.gameEngine.renderTimeMillis && ((!zDrawRectWithBorder && !zDrawSelectionBox) || !unitBase2.wasSelectedBeforeDrag)) {
                                 z8 = true;
                             }
                         } else {
@@ -779,24 +779,24 @@ public class GameInterfaceRenderer extends Serializable {
         if ((abstractUnitAction instanceof RepairTargetAction) || (abstractUnitAction instanceof AttackModeAction)) {
             return null;
         }
-        if (abstractUnitAction.isAlsoSelected() == ActionDisplayType.rally) {
+        if (abstractUnitAction.getActionDisplayType() == ActionDisplayType.rally) {
             return gameEngine.inputController.T;
         }
-        if (abstractUnitAction.e() == ActionType.patrol) {
+        if (abstractUnitAction.getActionType() == ActionType.patrol) {
             return gameEngine.inputController.Q;
         }
-        if (abstractUnitAction.e() == ActionType.guardUnit) {
+        if (abstractUnitAction.getActionType() == ActionType.guardUnit) {
             return gameEngine.inputController.P;
         }
-        if (abstractUnitAction.e() == ActionType.reclaimTarget) {
+        if (abstractUnitAction.getActionType() == ActionType.reclaimTarget) {
             return gameEngine.inputController.R;
         }
-        if (abstractUnitAction.isAlsoSelected() == ActionDisplayType.upgrade) {
+        if (abstractUnitAction.getActionDisplayType() == ActionDisplayType.upgrade) {
             int i2 = 0;
             Iterator it = arrayList.iterator();
             while (it.hasNext()) {
                 AbstractUnitAction abstractUnitAction2 = (AbstractUnitAction) it.next();
-                if (abstractUnitAction2 != abstractUnitAction && abstractUnitAction2.isAlsoSelected() == ActionDisplayType.upgrade && this.gameUI.canUpgradeActionForSelectedUnits(abstractUnitAction2)) {
+                if (abstractUnitAction2 != abstractUnitAction && abstractUnitAction2.getActionDisplayType() == ActionDisplayType.upgrade && this.gameUI.canUpgradeActionForSelectedUnits(abstractUnitAction2)) {
                     i2++;
                 }
             }
@@ -804,7 +804,7 @@ public class GameInterfaceRenderer extends Serializable {
                 return gameEngine.inputController.S;
             }
         }
-        ActionDisplayType actionDisplayTypeIsAlsoSelected = abstractUnitAction.isAlsoSelected();
+        ActionDisplayType actionDisplayTypeIsAlsoSelected = abstractUnitAction.getActionDisplayType();
         if (actionDisplayTypeIsAlsoSelected == ActionDisplayType.infoOnly || actionDisplayTypeIsAlsoSelected == ActionDisplayType.infoOnlyNoBox || actionDisplayTypeIsAlsoSelected == ActionDisplayType.infoOnlyStockpile) {
             return null;
         }
@@ -1089,7 +1089,7 @@ public class GameInterfaceRenderer extends Serializable {
         }
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
-            if (wrapperUnitAction.drawTooltip((BaseUnit) wrapperUnitAction.b, true)) {
+            if (wrapperUnitAction.canAfford((BaseUnit) wrapperUnitAction.b, true)) {
                 return true;
             }
         }
@@ -1097,7 +1097,7 @@ public class GameInterfaceRenderer extends Serializable {
         while (it.hasNext()) {
             BaseUnit baseUnit = (OrderableUnit) it.next();
             AbstractUnitAction abstractUnitActionA = baseUnit.validateActionId(abstractUnitAction.getActionId());
-            if (abstractUnitActionA != null && abstractUnitActionA.drawTooltip(baseUnit, true)) {
+            if (abstractUnitActionA != null && abstractUnitActionA.canAfford(baseUnit, true)) {
                 return true;
             }
         }
@@ -1448,7 +1448,7 @@ public class GameInterfaceRenderer extends Serializable {
                     b5 = false;
                 }
                 n9 += n23;
-                final ActionDisplayType alsoSelected = unitCommand.isAlsoSelected();
+                final ActionDisplayType alsoSelected = unitCommand.getActionDisplayType();
                 boolean b6 = false;
                 if (alsoSelected == ActionDisplayType.infoOnly || alsoSelected == ActionDisplayType.infoOnlyNoBox || alsoSelected == ActionDisplayType.infoOnlyStockpile) {
                     b6 = true;
@@ -1496,7 +1496,7 @@ public class GameInterfaceRenderer extends Serializable {
                 float timerValue = 0.0f;
                 if (b5) {
                     timerValue = UnitActionTimer.getTimerValue(baseUnit, unitCommand, false);
-                    if (unitCommand.isAlsoSelected() != ActionDisplayType.infoOnlyNoBox) {
+                    if (unitCommand.getActionDisplayType() != ActionDisplayType.infoOnlyNoBox) {
                         final boolean setMenuDialog = this.gameUI.setMenuDialog(unitCommand);
                         float abs = 0.0f;
                         if (setMenuDialog) {
@@ -1563,8 +1563,8 @@ public class GameInterfaceRenderer extends Serializable {
                 }
                 boolean b11 = false;
                 UnitType as = unitCommand.getUnitType();
-                Texture e2 = unitCommand.getIconColor();
-                final BaseUnit showingNotEnoughResources = unitCommand.isShowingNotEnoughResources(baseUnit);
+                Texture e2 = unitCommand.getIconTexture();
+                final BaseUnit showingNotEnoughResources = unitCommand.getUnitShownInUI(baseUnit);
                 if (showingNotEnoughResources != null) {
                     as = showingNotEnoughResources.r();
                 }
@@ -1609,10 +1609,10 @@ public class GameInterfaceRenderer extends Serializable {
                         if (showingNotEnoughResources != null) {
                             final float n28 = showingNotEnoughResources.x();
                             final float bv = showingNotEnoughResources.bV();
-                            if (bv != -1.0f && unitCommand.shouldShowCount(baseUnit)) {
+                            if (bv != -1.0f && unitCommand.shouldShowUnitProgressBar(baseUnit)) {
                                 final int n29 = 120;
-                                final int n30 = Utility.longToIntArray(200, 0, 0, 150);
-                                final int j = Utility.longToIntArray(120, 0, 0, 230);
+                                final int n30 = Utility.packArgb(200, 0, 0, 150);
+                                final int j = Utility.packArgb(120, 0, 0, 230);
                                 final Paint a5 = GameViewUtils.a(n30, Paint.Style.FILL);
                                 final Paint a6 = GameViewUtils.a(j, Paint.Style.STROKE);
                                 final int n31 = 3;
@@ -1624,10 +1624,10 @@ public class GameInterfaceRenderer extends Serializable {
                                 this.minimapRectF.a(float3 - n32, float2 + n33, float3 - n32 + n34, float2 + n33 + n31);
                                 this.gameEngine.renderGraphicsEngine.a(this.minimapRectF, a6);
                             }
-                            else if (n28 != -1.0f && unitCommand.shouldShowProgress(baseUnit)) {
+                            else if (n28 != -1.0f && unitCommand.shouldShowUnitHealthBar(baseUnit)) {
                                 final int n29 = 120;
-                                final int n30 = Utility.longToIntArray(200, 0, 150, 0);
-                                final int j = Utility.longToIntArray(120, 0, 230, 0);
+                                final int n30 = Utility.packArgb(200, 0, 150, 0);
+                                final int j = Utility.packArgb(120, 0, 230, 0);
                                 final Paint a7 = GameViewUtils.a(n30, Paint.Style.FILL);
                                 final Paint a8 = GameViewUtils.a(j, Paint.Style.STROKE);
                                 final int n31 = 3;
@@ -1644,7 +1644,7 @@ public class GameInterfaceRenderer extends Serializable {
                     }
                     b11 = true;
                 }
-                final Texture showingNotEnoughEnergy = unitCommand.isShowingNotEnoughEnergy(baseUnit);
+                final Texture showingNotEnoughEnergy = unitCommand.getExtraIconTexture(baseUnit);
                 if (showingNotEnoughEnergy != null) {
                     Rect rect2 = unitCommand.getIconRect();
                     if (rect2 == null) {
@@ -1654,7 +1654,7 @@ public class GameInterfaceRenderer extends Serializable {
                     final float float4 = this.zoomButtonRect.c() * 0.7f / rect2.c();
                     final int a4 = (int)(this.zoomButtonRect.d() - rect2.b() * 0.5f * float4);
                     final int n35 = (int)(this.zoomButtonRect.e() - rect2.c() * 0.5f * float4);
-                    this.paintMinimap.b(unitCommand.getNotAvailableReason());
+                    this.paintMinimap.b(unitCommand.getExtraIconColor());
                     final RectF minimapRectF2 = this.minimapRectF;
                     minimapRectF2.a((float)a4, (float)n35, a4 + rect2.b() * float4, n35 + rect2.c() * float4);
                     this.gameEngine.renderGraphicsEngine.a(showingNotEnoughEnergy, rect2, minimapRectF2, this.paintMinimap);
@@ -1754,7 +1754,7 @@ public class GameInterfaceRenderer extends Serializable {
                         this.unitCommand = unitCommand;
                         this.commandTimer = n19 + y;
                     }
-                    else if (AbstractUnitAction.onTargetSelected(this.unitCommand, unitCommand)) {
+                    else if (AbstractUnitAction.isSameActionInstance(this.unitCommand, unitCommand)) {
                         this.selectedUnit = null;
                         this.unitCommand = null;
                     }
@@ -1776,7 +1776,7 @@ public class GameInterfaceRenderer extends Serializable {
                     }
                 }
                 if (n36 != 0) {
-                    if (unitCommand.e() == ActionType.none || unitCommand.e() == ActionType.popupQueue) {
+                    if (unitCommand.getActionType() == ActionType.none || unitCommand.getActionType() == ActionType.popupQueue) {
                         this.gameUI.currentAction = null;
                         boolean boolean5 = false;
                         if (b13) {
@@ -1786,10 +1786,10 @@ public class GameInterfaceRenderer extends Serializable {
                             boolean5 = true;
                         }
                         else {
-                            if (unitCommand.isSingleUse(baseUnit)) {
+                            if (unitCommand.isAlwaysSinglePress(baseUnit)) {
                                 boolean5 = true;
                             }
-                            else if (this.selectedUnit == baseUnit && AbstractUnitAction.onTargetSelected(this.unitCommand, unitCommand)) {
+                            else if (this.selectedUnit == baseUnit && AbstractUnitAction.isSameActionInstance(this.unitCommand, unitCommand)) {
                                 boolean5 = true;
                             }
                             this.selectedUnit = baseUnit;
@@ -1809,7 +1809,7 @@ public class GameInterfaceRenderer extends Serializable {
                             boolean b14 = false;
                             if (!b13) {
                                 boolean highPriority = false;
-                                if (baseUnit != null && unitCommand.isActive(baseUnit, false) != -1) {
+                                if (baseUnit != null && unitCommand.getActiveCount(baseUnit, false) != -1) {
                                     highPriority = true;
                                 }
                                 if (boolean4 && highPriority) {
@@ -1841,7 +1841,7 @@ public class GameInterfaceRenderer extends Serializable {
                                 UnitActionTimer.startTimer(baseUnit, unitCommand, b14, false);
                                 for (int j = 0; j < n29; ++j) {
                                     final Command commandForSelectedUnits = this.gameUI.createCommandForSelectedUnits();
-                                    if (!unitCommand.getTargetUnit()) {
+                                    if (!unitCommand.isOnlyOneUnitAtATime()) {
                                         this.gameUI.drawActionPreviewWithTarget(commandForSelectedUnits, unitCommand);
                                     }
                                     else {
@@ -1858,7 +1858,7 @@ public class GameInterfaceRenderer extends Serializable {
                             }
                         }
                     }
-                    else if (unitCommand.e() == ActionType.patrol || unitCommand.e() == ActionType.guardUnit || unitCommand.e() == ActionType.pingMap) {
+                    else if (unitCommand.getActionType() == ActionType.patrol || unitCommand.getActionType() == ActionType.guardUnit || unitCommand.getActionType() == ActionType.pingMap) {
                         if (boolean4) {
                             if (unitCommand != null && unitCommand.equals(this.gameUI.currentAction)) {
                                 this.gameUI.clearCurrentAction();
@@ -1874,10 +1874,10 @@ public class GameInterfaceRenderer extends Serializable {
                             this.gameUI.currentAction = unitCommand;
                         }
                     }
-                    else if (unitCommand.e() == ActionType.setRally || unitCommand.e() == ActionType.reclaimTarget || unitCommand.e() == ActionType.repairTarget || unitCommand.e() == ActionType.targetGround) {
+                    else if (unitCommand.getActionType() == ActionType.setRally || unitCommand.getActionType() == ActionType.reclaimTarget || unitCommand.getActionType() == ActionType.repairTarget || unitCommand.getActionType() == ActionType.targetGround) {
                         boolean boolean5 = false;
                         boolean b15 = false;
-                        if (unitCommand.e() == ActionType.targetGround) {
+                        if (unitCommand.getActionType() == ActionType.targetGround) {
                             b15 = true;
                         }
                         if (boolean4 && b15) {
@@ -1885,7 +1885,7 @@ public class GameInterfaceRenderer extends Serializable {
                         }
                         if (boolean5) {
                             final Command commandForSelectedUnits2 = this.gameUI.createCommandForSelectedUnits();
-                            if (!unitCommand.getTargetUnit()) {
+                            if (!unitCommand.isOnlyOneUnitAtATime()) {
                                 this.gameUI.drawActionPreviewWithTarget(commandForSelectedUnits2, unitCommand);
                             }
                             else {
@@ -1907,7 +1907,7 @@ public class GameInterfaceRenderer extends Serializable {
                             }
                         }
                     }
-                    else if (unitCommand.e() == ActionType.placeBuilding) {
+                    else if (unitCommand.getActionType() == ActionType.placeBuilding) {
                         if (a(unitCommand)) {
                             this.gameEngine.soundEngine.playInterfaceSound(SoundEngine.interfaceErrorSound, 0.8f);
                         }
@@ -1935,13 +1935,13 @@ public class GameInterfaceRenderer extends Serializable {
                         this.gameUI.isBuildingMode = true;
                         this.gameEngine.tileMap.noop();
                     }
-                    else if (unitCommand.e() == ActionType.directToAction) {
+                    else if (unitCommand.getActionType() == ActionType.directToAction) {
                         UnitActionTimer.startTimer(baseUnit, unitCommand, false, false);
                         unitCommand.c(baseUnit);
                     }
                     else {
-                        if (unitCommand.e() != ActionType.infoOnly) {
-                            throw new RuntimeException("unknown gui action:" + unitCommand.e());
+                        if (unitCommand.getActionType() != ActionType.infoOnly) {
+                            throw new RuntimeException("unknown gui action:" + unitCommand.getActionType());
                         }
                         if (unitCommand.getCost()) {
                             this.selectedUnit = baseUnit;
@@ -2068,7 +2068,7 @@ public class GameInterfaceRenderer extends Serializable {
                     z4 = true;
                 }
                 if (this.gameUI.getSelectedUnitCount() == 1 && baseUnit != null) {
-                    if (baseUnit.getUnitAIPathfindDistance() <= 3 || (playerTeam != null && !z3)) {
+                    if (baseUnit.getAvailableActionCount() <= 3 || (playerTeam != null && !z3)) {
                         String strA = a(baseUnit, false);
                         if (z4) {
                             strA = "\n" + ("\n" + ("\n" + strA));
@@ -2118,8 +2118,8 @@ public class GameInterfaceRenderer extends Serializable {
         if (z) {
             str2 = str2 + baseUnit.r().getUnitName() + "\n";
         }
-        if (baseUnit.getUnitHealthPercent() > 0.0f) {
-            str = str2 + UnitPrice.a(baseUnit.getUnitDescription(), baseUnit.currentHealth / baseUnit.maxHealth).a(true, true, 3, false);
+        if (baseUnit.getResourceRate() > 0.0f) {
+            str = str2 + UnitPrice.a(baseUnit.getBuildPrice(), baseUnit.currentHealth / baseUnit.maxHealth).a(true, true, 3, false);
         } else {
             str = str2 + ((int) Math.ceil(baseUnit.currentHealth)) + "/" + ((int) baseUnit.maxHealth) + "\n";
         }
@@ -2127,7 +2127,7 @@ public class GameInterfaceRenderer extends Serializable {
             str = str + "(" + ((int) baseUnit.shield) + "/" + ((int) baseUnit.unitEnergyMax) + ")\n";
         }
         UnitPrice unitPriceDq = baseUnit.dq();
-        StoredResources unitAIPathfindResult = baseUnit.getUnitAIPathfindResult();
+        StoredResources unitAIPathfindResult = baseUnit.getResourceGenerationRates();
         if (unitPriceDq != null) {
             unitAIPathfindResult = StoredResources.d(unitAIPathfindResult);
             unitAIPathfindResult.a(unitPriceDq);
@@ -2139,7 +2139,7 @@ public class GameInterfaceRenderer extends Serializable {
                 }
             }
         }
-        return Utility.getFileName(str);
+        return Utility.removeTrailingNewline(str);
     }
 
     public static String a(AbstractUnitAction abstractUnitAction, boolean z) {
@@ -2158,7 +2158,7 @@ public class GameInterfaceRenderer extends Serializable {
                 BaseUnit[] baseUnitArrA = gameEngine.gameUI.selectedUnitsList.a();
                 int size = gameEngine.gameUI.selectedUnitsList.size();
                 for (int i = 0; i < size; i++) {
-                    float unitAIPathfindMemory = baseUnitArrA[i].getUnitAIPathfindMemory();
+                    float unitAIPathfindMemory = baseUnitArrA[i].getNanoFactorySpeed();
                     if (f == -1.0f || unitAIPathfindMemory < f) {
                         f = unitAIPathfindMemory;
                     }
@@ -2166,10 +2166,10 @@ public class GameInterfaceRenderer extends Serializable {
                 if (f == -1.0f) {
                     f = 1.0f;
                 }
-                str2 = str2 + Utility.toString((1.0f / ((popupQueueAction.K() * f) * 60.0f)) + 1.0E-4f) + str;
+                str2 = str2 + Utility.formatSeconds((1.0f / ((popupQueueAction.K() * f) * 60.0f)) + 1.0E-4f) + str;
             }
         }
-        return Utility.booleanToString(str2, str);
+        return Utility.removeSuffix(str2, str);
     }
 
     public static String a(BaseUnit baseUnit, boolean z, boolean z2, boolean z3) {
@@ -2211,7 +2211,7 @@ public class GameInterfaceRenderer extends Serializable {
             }
         }
         UnitPrice unitPriceDq = baseUnit.dq();
-        float fCy = baseUnit.cy();
+        float fCy = baseUnit.getCreditIncomeRate();
         if (unitPriceDq != null) {
             fCy += unitPriceDq.a();
         }
@@ -2260,7 +2260,7 @@ public class GameInterfaceRenderer extends Serializable {
             if (fM != 0.0f) {
                 str2 = str2 + "Range: " + Utility.min(fM) + str;
             }
-            if (z3 && orderableUnit.isUnitEnergyCost()) {
+            if (z3 && orderableUnit.isUpgradeable()) {
                 str2 = str2 + "Upgradable" + str;
             }
         }
@@ -2272,7 +2272,7 @@ public class GameInterfaceRenderer extends Serializable {
             UnitType unitTypeR = baseUnit.r();
             str2 = ((str2 + "\n") + "--Debug--" + str) + "name: " + unitTypeR.getUnitTypeDescriptionShort() + str;
             if ((unitTypeR instanceof CustomUnitConfig) && (modInfo = ((CustomUnitConfig) unitTypeR).modInfo) != null) {
-                str2 = str2 + "(mod: " + Utility.padLeft(modInfo.getDisplayTitle(), 30) + ")" + str;
+                str2 = str2 + "(mod: " + Utility.truncateToLength(modInfo.getDisplayTitle(), 30) + ")" + str;
             }
             if (baseUnit.objectId != 0) {
                 str2 = str2 + "id: " + baseUnit.objectId + str;
@@ -2301,26 +2301,26 @@ public class GameInterfaceRenderer extends Serializable {
             if (!baseUnit.isUnitParalyzed) {
                 str2 = (str2 + "height: " + Utility.min(baseUnit.posZ) + str) + "dir: " + Utility.min(baseUnit.rotationSpeed) + str;
             }
-            if (baseUnit.deceleration < 1.0f) {
-                str2 = str2 + "built: " + Utility.min(baseUnit.deceleration) + str;
+            if (baseUnit.buildProgress < 1.0f) {
+                str2 = str2 + "built: " + Utility.min(baseUnit.buildProgress) + str;
             }
             if (baseUnit instanceof CustomUnit) {
                 CustomUnit customUnit2 = (CustomUnit) baseUnit;
-                str2 = (str2 + "frame: " + customUnit2.animationFrameIndex + str) + "drawLayer: " + customUnit2.syncType + str;
-                if (customUnit2.getUnitCombatAnimation() != null) {
-                    str2 = str2 + "tags: " + customUnit2.getUnitCombatAnimation() + str;
+                str2 = (str2 + "frame: " + customUnit2.animationFrameIndex + str) + "drawLayer: " + customUnit2.drawLayer + str;
+                if (customUnit2.getTags() != null) {
+                    str2 = str2 + "tags: " + customUnit2.getTags() + str;
                 }
                 if (customUnit2.parentEntity != null) {
-                    str2 = str2 + "attachedTo: " + customUnit2.parentEntity.getVelocityX() + str;
+                    str2 = str2 + "attachedTo: " + customUnit2.parentEntity.getUnitDebugName() + str;
                 }
                 if (customUnit2.unitTarget2 != null && !customUnit2.unitTarget2.isDead) {
-                    str2 = str2 + "customTarget1: " + customUnit2.unitTarget2.getVelocityX() + str;
+                    str2 = str2 + "customTarget1: " + customUnit2.unitTarget2.getUnitDebugName() + str;
                 }
                 if (customUnit2.unitTarget3 != null && !customUnit2.unitTarget3.isDead) {
-                    str2 = str2 + "customTarget2: " + customUnit2.unitTarget3.getVelocityX() + str;
+                    str2 = str2 + "customTarget2: " + customUnit2.unitTarget3.getUnitDebugName() + str;
                 }
                 if (customUnit2.unitFlags2 != -9999) {
-                    str2 = str2 + "customTimer: " + Utility.toString(customUnit2.unitFlags2 / 1000.0f) + str;
+                    str2 = str2 + "customTimer: " + Utility.formatSeconds(customUnit2.unitFlags2 / 1000.0f) + str;
                 }
                 if (customUnit2.unitVariables != null && !customUnit2.unitVariables.isEmpty()) {
                     str2 = str2 + "-- memory --: " + str + customUnit2.unitVariables.debugMemory(true, true) + str;
@@ -2328,14 +2328,14 @@ public class GameInterfaceRenderer extends Serializable {
             }
             z5 = true;
         }
-        StoredResources unitAICombatRange = baseUnit.getUnitAICombatRange();
+        StoredResources unitAICombatRange = baseUnit.getCustomResources();
         if (unitAICombatRange != null && !unitAICombatRange.c()) {
             String strA = unitAICombatRange.a(z2, true, 10, z5, false);
             if (!strA.equals(VariableScope.nullOrMissingString)) {
                 str2 = str2 + strA + str;
             }
         }
-        return Utility.booleanToString(str2, str);
+        return Utility.removeSuffix(str2, str);
     }
 
     void j() {

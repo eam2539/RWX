@@ -768,7 +768,7 @@ public class BaseZone extends AIStrategyNode {
         } else {
             GameEngine.logColored("buildBuilding: could not find getBuildUnitAction for builder this shouldn't happen:" + unitType.getUnitTypeDescriptionShort());
         }
-        if (!abstractUnitActionFindActionForUnitType.b(orderableUnitA) || !abstractUnitActionFindActionForUnitType.drawTooltip((BaseUnit) orderableUnitA, false)) {
+        if (!abstractUnitActionFindActionForUnitType.b(orderableUnitA) || !abstractUnitActionFindActionForUnitType.canAfford((BaseUnit) orderableUnitA, false)) {
             if (!this.aiController.isPathPossibleBetweenPoints(abstractUnitActionFindActionForUnitType.getDisplayText(), orderableUnitA)) {
                 this.lastBuiltCustomUnit = abstractUnitActionFindActionForUnitType.getDisplayText();
                 this.lastBuiltCustomUnit2 = this.lastBuiltCustomUnit.i(orderableUnitA);
@@ -776,7 +776,7 @@ public class BaseZone extends AIStrategyNode {
             }
             return true;
         }
-        if (abstractUnitActionFindActionForUnitType.getDescription()) {
+        if (abstractUnitActionFindActionForUnitType.usesActionTarget()) {
             Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this.aiController);
             commandNewCommandForTeam.setTargetUnit(orderableUnitA);
             commandNewCommandForTeam.setActionTarget(abstractUnitActionFindActionForUnitType.getActionId(), pointFE, (BaseUnit) null);
@@ -806,7 +806,7 @@ public class BaseZone extends AIStrategyNode {
         int size = this.unitsInZone.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit.team == this.aiController && baseUnit.isAlive() && (unitCombatAnimation = baseUnit.getUnitCombatAnimation()) != null && AnimationTag.a(animationSet, unitCombatAnimation)) {
+            if (baseUnit.team == this.aiController && baseUnit.isAlive() && (unitCombatAnimation = baseUnit.getTags()) != null && AnimationTag.a(animationSet, unitCombatAnimation)) {
                 return true;
             }
         }
@@ -833,7 +833,7 @@ public class BaseZone extends AIStrategyNode {
                 OrderableUnit orderableUnit = (OrderableUnit) fireUnit;
                 FactoryQueueInterface factoryQueueInterface = (FactoryQueueInterface) fireUnit;
                 AbstractUnitAction unitAction = fireUnit.getUnitAction(unitType);
-                if (unitAction != null && ((factoryQueueInterface.dy() || !z) && !unitAction.getEnergyCost(fireUnit) && unitAction.b(orderableUnit) && unitAction.drawTooltip((BaseUnit) orderableUnit, false) && ((!(fireUnit instanceof CommandCenter) || unitType.m() || u() <= 2 || this.isUnderAttack || !z) && (!z2 || orderableUnit.aD)))) {
+                if (unitAction != null && ((factoryQueueInterface.dy() || !z) && !unitAction.isAiDisabled(fireUnit) && unitAction.b(orderableUnit) && unitAction.canAfford((BaseUnit) orderableUnit, false) && ((!(fireUnit instanceof CommandCenter) || unitType.m() || u() <= 2 || this.isUnderAttack || !z) && (!z2 || orderableUnit.aD)))) {
                     return orderableUnit;
                 }
             }
@@ -876,7 +876,7 @@ public class BaseZone extends AIStrategyNode {
             GameEngine.log("AI", "buildUnit: isAvailable==false");
             return false;
         }
-        if (!abstractUnitActionE.drawTooltip((BaseUnit) orderableUnitA, false)) {
+        if (!abstractUnitActionE.canAfford((BaseUnit) orderableUnitA, false)) {
             GameEngine.log("AI", "buildUnit: isActive==false");
             return false;
         }
@@ -959,7 +959,7 @@ public class BaseZone extends AIStrategyNode {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit.team == this.aiController && a(baseUnit, true) && baseUnit.bI() && (baseUnit.currentHealth < baseUnit.maxHealth - 1.0f || baseUnit.deceleration < 1.0f)) {
+            if (baseUnit.team == this.aiController && a(baseUnit, true) && baseUnit.bI() && (baseUnit.currentHealth < baseUnit.maxHealth - 1.0f || baseUnit.buildProgress < 1.0f)) {
                 return baseUnit;
             }
         }
@@ -1036,7 +1036,7 @@ public class BaseZone extends AIStrategyNode {
             int size = this.unitsInZone.size();
             for (int i = 0; i < size; i++) {
                 BaseUnit baseUnit = baseUnitArrA[i];
-                if (baseUnit.team == this.aiController && countUnitsForStrategy(baseUnit) && baseUnit.unitTransportTarget == null && baseUnit.r().n() && (baseUnit instanceof OrderableUnit) && this.aiController.isEligibleUnitForRandomSelection(baseUnit) && Utility.randomFloatInRange(0.0f, 1.0f) <= 0.3d && (currentWaypoint = (orderableUnit = (OrderableUnit) baseUnit).getCurrentWaypoint()) != null && currentWaypoint.getCommandType() == UnitCommandType.reclaim && (targetUnit = currentWaypoint.getTargetUnit()) != null && targetUnit.getUnitHealthPercent() > 0.0f && !this.lastBuiltCustomUnit2.c(targetUnit.getUnitDescription())) {
+                if (baseUnit.team == this.aiController && countUnitsForStrategy(baseUnit) && baseUnit.unitTransportTarget == null && baseUnit.r().n() && (baseUnit instanceof OrderableUnit) && this.aiController.isEligibleUnitForRandomSelection(baseUnit) && Utility.randomFloatInRange(0.0f, 1.0f) <= 0.3d && (currentWaypoint = (orderableUnit = (OrderableUnit) baseUnit).getCurrentWaypoint()) != null && currentWaypoint.getCommandType() == UnitCommandType.reclaim && (targetUnit = currentWaypoint.getTargetUnit()) != null && targetUnit.getResourceRate() > 0.0f && !this.lastBuiltCustomUnit2.c(targetUnit.getBuildPrice())) {
                     a(orderableUnit, r());
                     return;
                 }
@@ -1048,7 +1048,7 @@ public class BaseZone extends AIStrategyNode {
         BaseUnit baseUnit = null;
         for (int i = 0; i < 20; i++) {
             baseUnit = this.buildingsInZone.get(Utility.getRandomIntInRange(0, this.buildingsInZone.size() - 1));
-            if (baseUnit == null || this.lastBuiltCustomUnit2 == null || this.lastBuiltCustomUnit2.c(baseUnit.getUnitDescription())) {
+            if (baseUnit == null || this.lastBuiltCustomUnit2 == null || this.lastBuiltCustomUnit2.c(baseUnit.getBuildPrice())) {
                 break;
             }
         }
@@ -1191,7 +1191,7 @@ public class BaseZone extends AIStrategyNode {
         this.buildingsInZone.clear();
         for (Object o : k()) {
             BaseUnit baseUnit=(BaseUnit) o;
-            if (baseUnit.getUnitHealthPercent() > 0.0f && isUnitInside(baseUnit)) {
+            if (baseUnit.getResourceRate() > 0.0f && isUnitInside(baseUnit)) {
                 this.isPrimary = true;
                 this.buildingsInZone.add(baseUnit);
             }

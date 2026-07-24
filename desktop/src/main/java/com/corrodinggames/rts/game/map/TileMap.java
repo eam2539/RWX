@@ -1605,7 +1605,7 @@ public final class TileMap {
                         if (gameObject3 instanceof OrderableUnit) {
                             OrderableUnit orderableUnit3 = (OrderableUnit) gameObject3;
                             if (orderableUnit3.bI()) {
-                                orderableUnit3.getUnitAIType();
+                                orderableUnit3.updateFogOfWarPreview();
                             }
                         }
                     }

@@ -39,7 +39,7 @@ public class SendMessageAction extends LogicAction {
             sendMessageAction.sendMessageTo = logicBoolean;
             sendMessageAction.sendMessageWithData = memoryWriterCreateGenericKeyValueWriter;
             sendMessageAction.sendMessageWithTags = animationSet;
-            customActionDef.ac.add(sendMessageAction);
+            customActionDef.logicActions.add(sendMessageAction);
         }
     }
 

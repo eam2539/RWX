@@ -18,13 +18,13 @@ public abstract class CustomUnitToolAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public int isActive(BaseUnit baseUnit, boolean z) {
+    public int getActiveCount(BaseUnit baseUnit, boolean z) {
         return -1;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
-    public int isConfirmed() {
+    public int getCostAmount() {
         return 0;
     }
 
@@ -35,13 +35,13 @@ public abstract class CustomUnitToolAction extends AbstractUnitAction {
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-    public ActionType e() {
+    public ActionType getActionType() {
         return ActionType.infoOnly;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
+    public ActionDisplayType getActionDisplayType() {
         return ActionDisplayType.infoOnly;
     }
 
@@ -75,7 +75,7 @@ public abstract class CustomUnitToolAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public String d() {
-        return getCostForUnit();
+        return getDisplayName();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction

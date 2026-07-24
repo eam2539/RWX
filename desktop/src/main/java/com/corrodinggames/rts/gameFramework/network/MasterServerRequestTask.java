@@ -47,7 +47,7 @@ class MasterServerRequestTask implements Runnable {
             this.responseHandler.handleServerListResponse(bufferedReader, this.requestIndex, this.baseUrl);
         } catch (Exception e) {
             e.printStackTrace();
-            String strAreEqual = Utility.areEqual(e, true);
+            String strAreEqual = Utility.formatExceptionMessage(e, true);
             if (e instanceof UnknownHostException) {
                 strAreEqual = "DNS lookup failed, check your internet connection";
             }

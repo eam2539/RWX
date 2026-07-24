@@ -227,7 +227,7 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: ca */
-    public void getUnitAISettings() {
+    public void drawRallyPoint() {
         if (this.z.b != null) {
             final GameEngine instance = GameEngine.getInstance();
             instance.renderGraphicsEngine.a((float)(int)(this.posX - instance.viewpointXSnapped), (float)(int)(this.posY - instance.viewpointYSnapped), (float)(int)(this.z.b.x - instance.viewpointXSnapped), (float)(int)(this.z.b.y - instance.viewpointYSnapped), FactoryWithQueue.y);

@@ -39,16 +39,16 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     private UnitPrice cost;
 
     /* JADX INFO: renamed from: b */
-    public abstract String getCostForUnit();
+    public abstract String getDisplayName();
 
     /* JADX INFO: renamed from: a */
-    public abstract String isLocked();
+    public abstract String getDescription();
 
     /* JADX INFO: renamed from: c */
-    public abstract int isConfirmed();
+    public abstract int getCostAmount();
 
     /* JADX INFO: renamed from: b */
-    public abstract int isActive(BaseUnit baseUnit, boolean z);
+    public abstract int getActiveCount(BaseUnit baseUnit, boolean z);
 
     /* JADX INFO: renamed from: i */
     public abstract UnitType getUnitType();
@@ -56,10 +56,10 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     /* JADX INFO: renamed from: g */
     public abstract boolean isHighPriority();
 
-    public abstract ActionType e();
+    public abstract ActionType getActionType();
 
     /* JADX INFO: renamed from: f */
-    public abstract ActionDisplayType isAlsoSelected();
+    public abstract ActionDisplayType getActionDisplayType();
 
     /* JADX INFO: renamed from: m_ */
     public float getSortOrder() {
@@ -100,7 +100,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: b */
-    public static final boolean getBuildQueueCount(ActionId actionId) {
+    public static final boolean isNullOrNoneActionId(ActionId actionId) {
         if (actionId == null || actionId == NONE_ACTION_ID) {
             return true;
         }
@@ -108,39 +108,39 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: c */
-    public static final boolean isMove(ActionId actionId) {
-        return !getBuildQueueCount(actionId);
+    public static final boolean isActionIdSpecified(ActionId actionId) {
+        return !isNullOrNoneActionId(actionId);
     }
 
     /* JADX INFO: renamed from: a */
-    public static boolean onTargetSelected(AbstractUnitAction abstractUnitAction, AbstractUnitAction abstractUnitAction2) {
+    public static boolean isSameActionInstance(AbstractUnitAction abstractUnitAction, AbstractUnitAction abstractUnitAction2) {
         return abstractUnitAction == abstractUnitAction2;
     }
 
     /* JADX INFO: renamed from: d */
-    public final boolean isAvailableForUnit(ActionId actionId) {
+    public final boolean matchesActionId(ActionId actionId) {
         return this.actionId == actionId;
     }
 
     public AbstractUnitAction(int i) {
-        canAfford(String.valueOf(i));
+        setActionId(String.valueOf(i));
     }
 
     public AbstractUnitAction(String str) {
-        canAfford(str);
+        setActionId(str);
     }
 
     public AbstractUnitAction(ActionId actionId) {
-        getDescriptionForUnit(actionId);
+        setActionId(actionId);
     }
 
     /* JADX INFO: renamed from: a */
-    public final void canAfford(String str) {
-        this.actionId = ActionId.isSameInstance(str);
+    public final void setActionId(String str) {
+        this.actionId = ActionId.intern(str);
     }
 
     /* JADX INFO: renamed from: e */
-    public final void getDescriptionForUnit(ActionId actionId) {
+    public final void setActionId(ActionId actionId) {
         this.actionId = actionId;
     }
 
@@ -168,13 +168,13 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: d */
-    public String isVisible(BaseUnit baseUnit) {
-        return getCostForUnit();
+    public String getDisplayName(BaseUnit baseUnit) {
+        return getDisplayName();
     }
 
     /* JADX INFO: renamed from: e */
-    public String getProducedUnitType(BaseUnit baseUnit) {
-        return isLocked();
+    public String getDescriptionForUnit(BaseUnit baseUnit) {
+        return getDescription();
     }
 
     /* JADX INFO: renamed from: B */
@@ -183,7 +183,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
         if (unitPriceA != null) {
             return unitPriceA;
         }
-        int iIsConfirmed = isConfirmed();
+        int iIsConfirmed = getCostAmount();
         if (iIsConfirmed == 0) {
             return UnitPrice.a;
         }
@@ -217,32 +217,32 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: a */
-    public void isPickAction(BaseUnit baseUnit, BaseUnit baseUnit2) {
+    public void onTargetSelected(BaseUnit baseUnit, BaseUnit baseUnit2) {
         this.unitAction.a(baseUnit, baseUnit2);
     }
 
     /* JADX INFO: renamed from: d */
-    public boolean getDisplayTextWithQueueCount(BaseUnit baseUnit, boolean z) {
+    public boolean canPlayerCancel(BaseUnit baseUnit, boolean z) {
         return true;
     }
 
     /* JADX INFO: renamed from: k */
-    public boolean isSingleUse(BaseUnit baseUnit) {
+    public boolean isAlwaysSinglePress(BaseUnit baseUnit) {
         return false;
     }
 
     /* JADX INFO: renamed from: l */
-    public boolean isTargetingAction(BaseUnit baseUnit) {
+    public boolean shouldHideQueueInterface(BaseUnit baseUnit) {
         return false;
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+    public boolean canAfford(BaseUnit baseUnit, boolean z) {
         if (isNotAvailable(baseUnit) || SpecialActionBlockEffect.a(baseUnit, getActionId()) > 0) {
             return false;
         }
         if (z) {
-            return getDisplayText().c(baseUnit, getOptions());
+            return getDisplayText().c(baseUnit, usesExtraLagHidingInUI());
         }
         return getDisplayText().b(baseUnit);
     }
@@ -282,12 +282,12 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: D */
-    public boolean getDisplayTextForUnit() {
+    public boolean shouldShowUnitPreview() {
         return true;
     }
 
     /* JADX INFO: renamed from: A */
-    public boolean getDescription() {
+    public boolean usesActionTarget() {
         return false;
     }
 
@@ -297,7 +297,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: E */
-    public UnitType getActionType() {
+    public UnitType getAiConsiderSameAsBuildingUnitType() {
         return null;
     }
 
@@ -317,12 +317,12 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: m */
-    public boolean getEnergyCost(BaseUnit baseUnit) {
+    public boolean isAiDisabled(BaseUnit baseUnit) {
         return false;
     }
 
     /* JADX INFO: renamed from: n */
-    public boolean isSecondary(BaseUnit baseUnit) {
+    public boolean isAiHighPriority(BaseUnit baseUnit) {
         return false;
     }
 
@@ -342,16 +342,16 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
             if (baseUnit instanceof OrderableUnit) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
                 if (costForUnit == null) {
-                    costForUnit = isVisible(orderableUnit);
+                    costForUnit = getDisplayName(orderableUnit);
                 }
-                int iIsActive = isActive(orderableUnit, true);
+                int iIsActive = getActiveCount(orderableUnit, true);
                 if (iIsActive != -1 && iIsActive != 0) {
                     i += iIsActive;
                 }
             }
         }
         if (costForUnit == null) {
-            costForUnit = getCostForUnit();
+            costForUnit = getDisplayName();
         }
         if (i != -1 && i != 0) {
             costForUnit = costForUnit + " (" + i + ")";
@@ -366,7 +366,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
 
     /* JADX INFO: renamed from: w */
     public String getDisplayTextForUnitWithQueueCount(BaseUnit baseUnit) {
-        return isVisible(baseUnit);
+        return getDisplayName(baseUnit);
     }
 
     /* JADX INFO: renamed from: a */
@@ -382,7 +382,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
         if (paint != null) {
             textRenderQueue.a(paint3);
         }
-        ActionDisplayType actionDisplayTypeIsAlsoSelected = isAlsoSelected();
+        ActionDisplayType actionDisplayTypeIsAlsoSelected = getActionDisplayType();
         UnitPrice displayText = getDisplayText();
         if (!displayText.c() && actionDisplayTypeIsAlsoSelected != ActionDisplayType.infoOnlyStockpile) {
             textRenderQueue.b(" (");
@@ -409,7 +409,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
         if (strA != null && !VariableScope.nullOrMissingString.equals(strA)) {
             textRenderQueue.b("\n" + strA.trim());
         }
-        String producedUnitType = getProducedUnitType(baseUnit);
+        String producedUnitType = getDescriptionForUnit(baseUnit);
         if (producedUnitType != null && !VariableScope.nullOrMissingString.equals(producedUnitType)) {
             textRenderQueue.b("\n" + producedUnitType.trim());
         }
@@ -425,20 +425,20 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: j */
-    public Texture getIconColor() {
-        if (isAlsoSelected() == ActionDisplayType.upgrade) {
+    public Texture getIconTexture() {
+        if (getActionDisplayType() == ActionDisplayType.upgrade) {
             return GameEngine.getInstance().gameUI.bk;
         }
         return null;
     }
 
     /* JADX INFO: renamed from: h */
-    public Texture isShowingNotEnoughEnergy(BaseUnit baseUnit) {
+    public Texture getExtraIconTexture(BaseUnit baseUnit) {
         return null;
     }
 
     /* JADX INFO: renamed from: J */
-    public int getNotAvailableReason() {
+    public int getExtraIconColor() {
         return Color.a(100, 255, 255, 255);
     }
 
@@ -448,17 +448,17 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: i */
-    public BaseUnit isShowingNotEnoughResources(BaseUnit baseUnit) {
+    public BaseUnit getUnitShownInUI(BaseUnit baseUnit) {
         return null;
     }
 
     /* JADX INFO: renamed from: s */
-    public boolean shouldShowProgress(BaseUnit baseUnit) {
+    public boolean shouldShowUnitHealthBar(BaseUnit baseUnit) {
         return true;
     }
 
     /* JADX INFO: renamed from: t */
-    public boolean shouldShowCount(BaseUnit baseUnit) {
+    public boolean shouldShowUnitProgressBar(BaseUnit baseUnit) {
         return true;
     }
 
@@ -496,12 +496,12 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: H */
-    public boolean isAttack() {
+    public boolean isHighPriorityQueue() {
         return false;
     }
 
     /* JADX INFO: renamed from: I */
-    public boolean getTargetUnit() {
+    public boolean isOnlyOneUnitAtATime() {
         return false;
     }
 
@@ -531,7 +531,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: Q */
-    public boolean getOptions() {
+    public boolean usesExtraLagHidingInUI() {
         return false;
     }
 

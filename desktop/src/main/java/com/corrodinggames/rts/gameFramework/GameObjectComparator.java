@@ -12,16 +12,16 @@ public class GameObjectComparator implements Comparator<GameObject> {
     @Override // java.util.Comparator
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
     public int compare(GameObject gameObject, GameObject gameObject2) {
-        if (gameObject.syncType > gameObject2.syncType) {
+        if (gameObject.drawLayer > gameObject2.drawLayer) {
             return 1;
         }
-        if (gameObject.syncType < gameObject2.syncType) {
+        if (gameObject.drawLayer < gameObject2.drawLayer) {
             return -1;
         }
-        if (gameObject.value2 > gameObject2.value2) {
+        if (gameObject.drawOrder > gameObject2.drawOrder) {
             return 1;
         }
-        if (gameObject.value2 < gameObject2.value2) {
+        if (gameObject.drawOrder < gameObject2.drawOrder) {
             return -1;
         }
         if (gameObject.posY > gameObject2.posY) {

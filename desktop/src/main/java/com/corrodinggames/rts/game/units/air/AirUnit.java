@@ -73,10 +73,10 @@ public abstract class AirUnit extends MovableUnit {
                 return;
             }
             if (this.k == null) {
-                this.k = Boolean.valueOf(isMoving());
+                this.k = Boolean.valueOf(isOverLiquid());
             }
             if (this.l == null) {
-                this.l = Boolean.valueOf(m147cJ());
+                this.l = Boolean.valueOf(isOverWater());
             }
             if (!this.i) {
                 this.i = true;
@@ -102,7 +102,7 @@ public abstract class AirUnit extends MovableUnit {
                     this.j += f;
                     if (this.j > 30.0f) {
                         this.j = 0.0f;
-                        if (isBuilding() && (effectCreateSmokeEffect = GameEngine.getInstance().effectManager.createSmokeEffect(this.posX, this.posY, this.posZ, this.rotationSpeed)) != null) {
+                        if (isVisibleOnScreen() && (effectCreateSmokeEffect = GameEngine.getInstance().effectManager.createSmokeEffect(this.posX, this.posY, this.posZ, this.rotationSpeed)) != null) {
                             effectCreateSmokeEffect.P = 0.0f;
                             effectCreateSmokeEffect.Q = -0.1f;
                         }

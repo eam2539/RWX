@@ -1649,7 +1649,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             for (int i = 0; i < size; i++) {
                 BaseUnit baseUnit = baseUnitArrA[i];
                 if (baseUnit.team == this) {
-                    if (!baseUnit.getUnitVersion()) {
+                    if (!baseUnit.isExcludedFromDefeatCheck()) {
                         z = true;
                         if (!this.isTeamDefeatedTech && (baseUnit.bJ() || baseUnit.canMove())) {
                             z2 = true;
@@ -1658,7 +1658,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                     } else {
                         z5 = true;
                     }
-                } else if (z4 && baseUnit.team != null && baseUnit.team.d(this) && !baseUnit.getUnitVersion()) {
+                } else if (z4 && baseUnit.team != null && baseUnit.team.d(this) && !baseUnit.isExcludedFromDefeatCheck()) {
                     z3 = true;
                 }
             }
@@ -1671,7 +1671,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 resetFogOfWar();
                 for (BaseUnit baseUnit2 : BaseUnit.bE) {
                     if (baseUnit2.team == this && !baseUnit2.u()) {
-                        if (z6 && !baseUnit2.isDead && baseUnit2.getUnitVersion()) {
+                        if (z6 && !baseUnit2.isDead && baseUnit2.isExcludedFromDefeatCheck()) {
                             UnitType unitTypeR = baseUnit2.r();
                             String str = baseUnit2.getUnitShortName() + " Warning: This unit got ignored in defeated check and now being removed";
                             if ((unitTypeR instanceof CustomUnitConfig) && ((CustomUnitConfig) unitTypeR).canNotBeDirectlyAttacked) {
@@ -1679,7 +1679,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                             }
                             NetworkEngine.a((String) null, str);
                         }
-                        baseUnit2.getUnitAIConditionTime();
+                        baseUnit2.markForDeath();
                     }
                 }
                 gameEngine.networkEngine.i(this);
@@ -1708,7 +1708,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             PlayerTeam playerTeam = baseUnit.team;
             baseUnit.isHidden = false;
             playerTeam.teamStatistics.b(baseUnit);
-            baseUnit.getUnitAICombatStateTime();
+            baseUnit.restoreBorrowedResources();
         }
     }
 
@@ -1721,7 +1721,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             baseUnit.isHidden = true;
             PlayerTeam playerTeam = baseUnit.team;
             playerTeam.teamStatistics.a(baseUnit);
-            baseUnit.updateUnitCombatTimer();
+            baseUnit.applyBorrowedResources();
             if (!playerTeam.isTeamControlledByAI && playerTeam.teamStatistics.m) {
                 playerTeam.isTeamControlledByAI = true;
             }

@@ -105,7 +105,7 @@ public class TakeResourcesAction extends LogicAction {
             return;
         }
         TakeResourcesAction takeResourcesAction = new TakeResourcesAction();
-        customActionDef.ac.add(takeResourcesAction);
+        customActionDef.logicActions.add(takeResourcesAction);
         takeResourcesAction.takeResources_includeUnitsInTransport = zBooleanValue;
         takeResourcesAction.takeResources_includeUnitsWithinRange = fFloatValue;
         takeResourcesAction.takeResources_includeParent = zBooleanValue2;
@@ -184,7 +184,7 @@ public class TakeResourcesAction extends LogicAction {
         }
         if (this.takeResources_excludeUnitsWithoutTags != null) {
             for (int size = fastArrayList.size() - 1; size >= 0; size--) {
-                if (!AnimationTag.a(this.takeResources_excludeUnitsWithoutTags, ((BaseUnit) fastArrayList.get(size)).getUnitCombatAnimation())) {
+                if (!AnimationTag.a(this.takeResources_excludeUnitsWithoutTags, ((BaseUnit) fastArrayList.get(size)).getTags())) {
                     fastArrayList.remove(size);
                 }
             }

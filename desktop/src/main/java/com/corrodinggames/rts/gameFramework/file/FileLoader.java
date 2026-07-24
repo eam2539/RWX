@@ -118,7 +118,7 @@ public class FileLoader {
                         if (modByUuid == null) {
                             GameEngine.log(this.TAG + "Failed to find mod with hash:" + strSubstring);
                         } else {
-                            randomUUID = Utility.getRandomUUID(modByUuid.getSourceFolder(), randomUUID);
+                            randomUUID = Utility.joinPath(modByUuid.getSourceFolder(), randomUUID);
                             GameEngine.log(this.TAG + "Path changed to mod path:" + randomUUID);
                             z = true;
                             break;
@@ -238,7 +238,7 @@ public class FileLoader {
                 GameEngine.log(this.TAG + "isDirectory: asset file doesn't exist:" + strConvertAbstractPath);
                 return false;
             }
-            if (Utility.getFileNameWithoutExtension(str).contains(".")) {
+            if (Utility.getFileName(str).contains(".")) {
                 return false;
             }
             return true;

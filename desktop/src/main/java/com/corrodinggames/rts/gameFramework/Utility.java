@@ -334,7 +334,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final float countOccurrences(float f2, boolean z) {
+    public static final float normalizeAngle(float f2, boolean z) {
         if (!z) {
             while (true) {
                 if (f2 <= 180.0f && f2 >= -180.0f) {
@@ -465,12 +465,12 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: e */
-    public static final float createAndOpenFile(float f2, float f3) {
+    public static final float pow(float f2, float f3) {
         return (float) StrictMath.pow(f2, f3);
     }
 
     /* JADX INFO: renamed from: a */
-    public static final double md5FromString(double d2) {
+    public static final double abs(double d2) {
         return d2 < 0.0d ? -d2 : d2;
     }
 
@@ -587,7 +587,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: b */
-    public static String truncateString(double d2) {
+    public static String formatNumber(double d2) {
         if (d2 == ((int) d2)) {
             return VariableScope.nullOrMissingString + ((int) d2);
         }
@@ -624,7 +624,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: h */
-    public static String toString(float f2) {
+    public static String formatSeconds(float f2) {
         if (((int) (f2 * 10.0f)) == ((int) f2) * 10) {
             return VariableScope.nullOrMissingString + ((int) f2) + "s";
         }
@@ -649,7 +649,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String padLeft(String str, int i2) {
+    public static String truncateToLength(String str, int i2) {
         if (str == null) {
             return null;
         }
@@ -675,7 +675,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: b */
-    public static String getParentDir(String str) {
+    public static String md5Hex(String str) {
         try {
             byte[] bArrDigest = MessageDigest.getInstance("MD5").digest(str.getBytes("UTF-8"));
             StringBuilder sb = new StringBuilder(bArrDigest.length * 2);
@@ -696,30 +696,30 @@ public final class Utility {
 
     /* JADX INFO: renamed from: c */
     public static String md5(String str) {
-        return padLeft(toHexString(removeStart(str)), 14);
+        return truncateToLength(toHexString(sha256Bytes(str)), 14);
     }
 
     /* JADX INFO: renamed from: d */
     public static String abs(String str) {
-        return padLeft(toHexString(removeStart(str)), 4);
+        return truncateToLength(toHexString(sha256Bytes(str)), 4);
     }
 
     /* JADX INFO: renamed from: c */
     public static String split(String str, int i2) {
-        String hexString = toHexString(removeStart(str));
+        String hexString = toHexString(sha256Bytes(str));
         for (int i3 = 0; i3 < i2; i3++) {
-            hexString = toHexString(removeStart(hexString));
+            hexString = toHexString(sha256Bytes(hexString));
         }
         return hexString;
     }
 
     /* JADX INFO: renamed from: e */
     public static String truncate(String str) {
-        return toHexString(removeStart(str));
+        return toHexString(sha256Bytes(str));
     }
 
     /* JADX INFO: renamed from: f */
-    static byte[] removeStart(String str) {
+    static byte[] sha256Bytes(String str) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             messageDigest.reset();
@@ -736,11 +736,11 @@ public final class Utility {
 
     /* JADX INFO: renamed from: b */
     public static String formatDouble(byte[] bArr) {
-        return toHexString(isSame(bArr));
+        return toHexString(sha256Bytes(bArr));
     }
 
     /* JADX INFO: renamed from: c */
-    static byte[] isSame(byte[] bArr) {
+    static byte[] sha256Bytes(byte[] bArr) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             messageDigest.reset();
@@ -751,7 +751,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: c */
-    public static int doubleToString() {
+    public static int getCpuCoreCount() {
         int iAvailableProcessors;
         int length = 1;
         try {
@@ -785,17 +785,17 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static void compareByteArrays(byte[] bArr, byte[] bArr2) {
+    public static void copyByteArray(byte[] bArr, byte[] bArr2) {
         System.arraycopy(bArr, 0, bArr2, 0, bArr.length);
     }
 
     /* JADX INFO: renamed from: f */
-    public static float fromHexString(float f2, float f3, float f4) {
+    public static float lerp(float f2, float f3, float f4) {
         return f2 + ((f3 - f2) * f4);
     }
 
     /* JADX INFO: renamed from: i */
-    public static float getRealAssetPath(float f2) {
+    public static float easeInOutQuad(float f2) {
         float f3 = f2 - 1.0f;
         float f4 = f2 * 2.0f;
         return f4 < 1.0f ? f2 * f4 : 1.0f - ((f3 * f3) * 2.0f);
@@ -803,7 +803,7 @@ public final class Utility {
 
     /* JADX INFO: renamed from: a */
     public static int getRandomIntInRange(int i2, int i3, float f2) {
-        return Color.a((int) fromHexString(Color.a(i2), Color.a(i3), f2), (int) fromHexString(Color.b(i2), Color.b(i3), f2), (int) fromHexString(Color.c(i2), Color.c(i3), f2), (int) fromHexString(Color.d(i2), Color.d(i3), f2));
+        return Color.a((int) lerp(Color.a(i2), Color.a(i3), f2), (int) lerp(Color.b(i2), Color.b(i3), f2), (int) lerp(Color.c(i2), Color.c(i3), f2), (int) lerp(Color.d(i2), Color.d(i3), f2));
     }
 
     /* JADX INFO: renamed from: d */
@@ -832,7 +832,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: f */
-    public static String formatSize(String str, int i2) {
+    public static String padRight(String str, int i2) {
         return String.format("%1$-" + i2 + "s", str);
     }
 
@@ -853,7 +853,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: f */
-    public static String formatNumber(int i2) {
+    public static String getResourcePath(int i2) {
         String strCountChars = countChars(R.drawable.class, i2);
         if (strCountChars != null) {
             return FileHelper.findFileWithExtension("res/drawable", strCountChars);
@@ -866,7 +866,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: g */
-    public static final String formatMilliseconds(int i2) {
+    public static final String formatByteSize(int i2) {
         if (-1000 < i2 && i2 < 1000) {
             return i2 + " B";
         }
@@ -884,7 +884,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: g */
-    public static final String getFileNameFromPath(String str) {
+    public static final String getFileNameWithoutExtension(String str) {
         if (str == null) {
             return null;
         }
@@ -892,7 +892,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: h */
-    public static final String getRealPath(String str) {
+    public static final String getParentPath(String str) {
         if (str.contains("\\")) {
             str = str.replace('\\', '/');
         }
@@ -900,7 +900,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final boolean readFileToString(Rect rect, RectF rectF) {
+    public static final boolean rectanglesOverlap(Rect rect, RectF rectF) {
         return ((float) rect.a) < rectF.c && rectF.a < ((float) rect.c) && ((float) rect.b) < rectF.d && rectF.b < ((float) rect.d);
     }
 
@@ -910,7 +910,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: b */
-    public static final int longToIntArray(int i2, int i3, int i4, int i5) {
+    public static final int packArgb(int i2, int i3, int i4, int i5) {
         return (i2 << 24) | (i3 << 16) | (i4 << 8) | i5;
     }
 
@@ -920,7 +920,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final int concat(String str, char c2) {
+    public static final int countOccurrences(String str, char c2) {
         int i2 = 0;
         for (int i3 = 0; i3 < str.length(); i3++) {
             if (str.charAt(i3) == c2) {
@@ -931,12 +931,12 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: i */
-    public static final String endsWithSlash(String str) {
+    public static final String escapeHtml(String str) {
         return str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("${", "$ {");
     }
 
     /* JADX INFO: renamed from: a */
-    public static String join(File file) {
+    public static String readFileToString(File file) {
         int i2;
         try {
             FileInputStream fileInputStream = new FileInputStream(file);
@@ -987,7 +987,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final String formatLong(Exception exc) {
+    public static final String stackTraceToString(Exception exc) {
         StringWriter stringWriter = new StringWriter();
         exc.printStackTrace(new PrintWriter(stringWriter));
         return stringWriter.toString();
@@ -995,11 +995,11 @@ public final class Utility {
 
     /* JADX INFO: renamed from: b */
     public static final String isGreaterThan(Exception exc) {
-        return areEqual(exc, false);
+        return formatExceptionMessage(exc, false);
     }
 
     /* JADX INFO: renamed from: a */
-    public static final String areEqual(Exception exc, boolean z) {
+    public static final String formatExceptionMessage(Exception exc, boolean z) {
         Throwable th;
         String message = exc.getMessage();
         if (message == null) {
@@ -1051,7 +1051,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: j */
-    public static String getFileName(String str) {
+    public static String removeTrailingNewline(String str) {
         if (str.endsWith("\n")) {
             return str.substring(0, str.length() - 1);
         }
@@ -1059,7 +1059,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String booleanToString(String str, String str2) {
+    public static String removeSuffix(String str, String str2) {
         if (str.endsWith(str2)) {
             return str.substring(0, str.length() - str2.length());
         }
@@ -1067,12 +1067,12 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: k */
-    public static String getFileNameWithoutExtension(String str) {
+    public static String getFileName(String str) {
         return new File(str).getName();
     }
 
     /* JADX INFO: renamed from: b */
-    public static String getRandomUUID(String str, String str2) {
+    public static String joinPath(String str, String str2) {
         if (str2.startsWith("/") || str2.startsWith("\\")) {
             str2 = str2.substring(1);
         }
@@ -1123,7 +1123,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: n */
-    public static boolean removeBadChars(String str) {
+    public static boolean containsNonAscii(String str) {
         int length = str.length();
         int iCharCount = 0;
         while (true) {
@@ -1205,7 +1205,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: o */
-    public static String urlDecode(String str) {
+    public static String unescapeHtml(String str) {
         if (str.contains("&")) {
             str = str.replace("&lt;", "<").replace("&gt;", ">").replace("&apos;", "'").replace("&quot;", "\"").replace("&amp;", "&");
         }
@@ -1244,7 +1244,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: q */
-    public static String isAlphanumeric(String str) {
+    public static String removeEscapeCharacters(String str) {
         boolean z = false;
         StringBuilder sb = new StringBuilder();
         for (char c2 : str.toCharArray()) {
@@ -1261,19 +1261,19 @@ public final class Utility {
 
     /* JADX INFO: renamed from: a */
     public static final String readStreamToString(String str, String str2, String str3) {
-        if (!getRandomBoolean(str, str2)) {
+        if (!containsSubstring(str, str2)) {
             return str;
         }
         return str.replace(str2, str3);
     }
 
     /* JADX INFO: renamed from: c */
-    public static final boolean getRandomBoolean(String str, String str2) {
+    public static final boolean containsSubstring(String str, String str2) {
         return str.indexOf(str2) > -1;
     }
 
     /* JADX INFO: renamed from: b */
-    public static final boolean endsWithChar(String str, char c2) {
+    public static final boolean containsChar(String str, char c2) {
         return str.indexOf(c2) > -1;
     }
 
@@ -1331,7 +1331,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: s */
-    public static boolean isInteger(String str) {
+    public static boolean isValidNumber(String str) {
         boolean z = false;
         for (int i2 = 0; i2 < str.length(); i2++) {
             char cCharAt = str.charAt(i2);
@@ -1352,12 +1352,12 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: k */
-    public static final boolean isLessThan(float f2, float f3) {
+    public static final boolean approximatelyEqualStrict(float f2, float f3) {
         return abs(f2 - f3) < 1.0E-7f;
     }
 
     public static boolean b(double d2, double d3) {
-        return md5FromString(d2 - d3) < 1.0000000116860974E-7d;
+        return abs(d2 - d3) < 1.0000000116860974E-7d;
     }
 
     /* JADX INFO: renamed from: d */

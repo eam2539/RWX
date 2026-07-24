@@ -24,13 +24,13 @@ public abstract class GameObject extends Serializable {
     public boolean isStatic;
 
     /* JADX INFO: renamed from: el */
-    public boolean flag3;
+    public boolean shouldDraw;
 
     /* JADX INFO: renamed from: em */
-    public int syncType;
+    public int drawLayer;
 
     /* JADX INFO: renamed from: en */
-    public int value2;
+    public int drawOrder;
 
     /* JADX INFO: renamed from: eo */
     public float posX;
@@ -60,20 +60,20 @@ public abstract class GameObject extends Serializable {
     public abstract boolean f(float f);
 
     public void S(int i) {
-        this.syncType = i;
+        this.drawLayer = i;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
         gameOutputStream.writeBoolean(this.isDestroyed);
         gameOutputStream.writeBoolean(this.isStatic);
-        gameOutputStream.writeInt(this.syncType);
+        gameOutputStream.writeInt(this.drawLayer);
     }
 
     public void a(GameInputStream gameInputStream) throws IOException {
         this.isDestroyed = gameInputStream.readBoolean();
         this.isStatic = gameInputStream.readBoolean();
-        this.syncType = gameInputStream.readInt();
+        this.drawLayer = gameInputStream.readInt();
     }
 
     public GameObject() {
@@ -83,8 +83,8 @@ public abstract class GameObject extends Serializable {
     public GameObject(boolean z) {
         this.isDestroyed = false;
         this.isStatic = false;
-        this.syncType = 2;
-        this.value2 = 0;
+        this.drawLayer = 2;
+        this.drawOrder = 0;
         this.posZ = 0.0f;
         if (!z) {
             GameEngine gameEngine = GameEngine.getInstance();

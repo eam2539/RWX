@@ -24,7 +24,7 @@ public class GameRoomSettings implements Cloneable {
     public int startingCredits = 0;
 
     /* JADX INFO: renamed from: d */
-    public int fodMode = 2;
+    public int fogMode = 2;
 
     /* JADX INFO: renamed from: e */
     public boolean revealedMap = true;
@@ -67,7 +67,7 @@ public class GameRoomSettings implements Cloneable {
 
     /* JADX INFO: renamed from: b */
     public String getSettingsSummary() {
-        return ((((((((((VariableScope.nullOrMissingString + "startingCredits: " + this.startingCredits + "\n") + "fogMode: " + this.fodMode + "\n") + "revealedMap: " + this.revealedMap + "\n") + "aiDifficulty: " + this.aiDifficulty + "\n") + "startingUnits: " + this.startingUnits + "\n") + "incomeMultiplier: " + this.incomeMultiplier + "\n") + "noNukes: " + this.noNukes + "\n") + "sharedControl: " + this.sharedControl + "\n") + "allowSpectators: " + this.allowSpectators + "\n") + "lockedRoom: " + this.roomLock + "\n") + "randomSeed: " + this.randomSeed + "\n";
+        return ((((((((((VariableScope.nullOrMissingString + "startingCredits: " + this.startingCredits + "\n") + "fogMode: " + this.fogMode + "\n") + "revealedMap: " + this.revealedMap + "\n") + "aiDifficulty: " + this.aiDifficulty + "\n") + "startingUnits: " + this.startingUnits + "\n") + "incomeMultiplier: " + this.incomeMultiplier + "\n") + "noNukes: " + this.noNukes + "\n") + "sharedControl: " + this.sharedControl + "\n") + "allowSpectators: " + this.allowSpectators + "\n") + "lockedRoom: " + this.roomLock + "\n") + "randomSeed: " + this.randomSeed + "\n";
     }
 
     /* JADX INFO: renamed from: c, reason: merged with bridge method [inline-methods] */
@@ -82,7 +82,7 @@ public class GameRoomSettings implements Cloneable {
     /* JADX INFO: renamed from: a */
     public void writeToStream(GameOutputStream gos) throws IOException {
         gos.writeByte(4);
-        gos.writeInt(this.fodMode);
+        gos.writeInt(this.fogMode);
         gos.writeInt(this.startingCredits);
         gos.writeBoolean(this.revealedMap);
         gos.writeInt(this.aiDifficulty);
@@ -101,7 +101,7 @@ public class GameRoomSettings implements Cloneable {
     /* JADX INFO: renamed from: a */
     public void readFromStream(GameInputStream gis) throws IOException {
         byte b = gis.readByte();
-        this.fodMode = gis.readInt();
+        this.fogMode = gis.readInt();
         this.startingCredits = gis.readInt();
         this.revealedMap = gis.readBoolean();
         this.aiDifficulty = gis.readInt();

@@ -160,7 +160,7 @@ public class TriggerExecutor {
                     }
                     if (list.size() > 0) {
                         for (final BaseUnit baseUnit : list) {
-                            baseUnit.getUnitAICondition();
+                            baseUnit.removeFromGame();
                             if (baseUnit instanceof OrderableUnit && baseUnit.bI()) {
                                 instance.pathfindingEngine.a((OrderableUnit)baseUnit);
                             }
@@ -207,7 +207,7 @@ public class TriggerExecutor {
                         final Command commandForTeam2 = instance.commandController.createCommandForTeam(a7);
                         commandForTeam2.isQueued = true;
                         commandForTeam2.setTargetUnit(targetUnit);
-                        commandForTeam2.setActionId(targetUnit.getUnitAIPathfindPath());
+                        commandForTeam2.setActionId(targetUnit.getUnloadActionId());
                     }
                 }
             }

@@ -53,7 +53,7 @@ class ErrorReportSender implements Runnable {
                     MasterServerClient.addParam(arrayList, "dedicated_server", Utility.padString(GameEngine.isNonAndroidVersion));
                     String str2 = gameEngine.networkEngine != null ? gameEngine.networkEngine.sessionToken : "NA";
                     MasterServerClient.addParam(arrayList, "private_token", str2);
-                    MasterServerClient.addParam(arrayList, "private_token_2", Utility.getParentDir(Utility.getParentDir(str2)));
+                    MasterServerClient.addParam(arrayList, "private_token_2", Utility.md5Hex(Utility.md5Hex(str2)));
                     MasterServerClient.addParam(arrayList, "message", this.message);
                     MasterServerClient.addParam(arrayList, "stacktrace", this.stacktrace);
                     GameEngine.log("SendErrorReport", "making request");

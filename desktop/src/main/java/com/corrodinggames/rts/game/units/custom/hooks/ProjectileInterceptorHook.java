@@ -24,12 +24,12 @@ public class ProjectileInterceptorHook extends CustomUnitRenderHook {
         int techLevel = customUnit.getTechLevel();
         for (int i = 0; i < techLevel; i++) {
             TurretConfig turretConfig = customUnitConfig.turrets[i];
-            if (turretConfig.shootSpeed3 != null && customUnit.currentEnergy > 0.0f && !customUnit.v) {
-                float fFloatValue = turretConfig.shootSpeed3.floatValue();
+            if (turretConfig.laserDefenceEnergyUse != null && customUnit.currentEnergy > 0.0f && !customUnit.v) {
+                float fFloatValue = turretConfig.laserDefenceEnergyUse.floatValue();
                 b.a(customUnit.E(i));
                 float fM = customUnit.m();
-                if (turretConfig.ab < 99999.0f) {
-                    fM = turretConfig.ab;
+                if (turretConfig.limitingRange < 99999.0f) {
+                    fM = turretConfig.limitingRange;
                 }
                 if (LaserDefense.attackTarget(customUnit, b.x, b.y, customUnit.posZ, fM, fFloatValue)) {
                 }
@@ -38,7 +38,7 @@ public class ProjectileInterceptorHook extends CustomUnitRenderHook {
                     customUnit.v = true;
                 }
             }
-            if (turretConfig.animationSet3 != null) {
+            if (turretConfig.interceptProjectilesWithTags != null) {
                 a(customUnit, turretConfig);
             }
         }
@@ -48,11 +48,11 @@ public class ProjectileInterceptorHook extends CustomUnitRenderHook {
         if (!customUnit.a(turretConfig)) {
             return;
         }
-        float f = turretConfig.al;
-        float f2 = turretConfig.am;
-        float f3 = turretConfig.an;
+        float f = turretConfig.interceptProjectilesAndTargetingGroundUnderDistance;
+        float f2 = turretConfig.interceptProjectilesAndUnderDistance;
+        float f3 = turretConfig.interceptProjectilesAndOverHeight;
         Projectile projectile = null;
-        AnimationSet animationSet = turretConfig.animationSet3;
+        AnimationSet animationSet = turretConfig.interceptProjectilesWithTags;
         Object[] objArrA = Projectile.a.a();
         int i = Projectile.a.size;
         for (int i2 = 0; i2 < i; i2++) {
@@ -63,7 +63,7 @@ public class ProjectileInterceptorHook extends CustomUnitRenderHook {
         }
         if (projectile != null) {
             customUnit.b(turretConfig);
-            Projectile projectileA = customUnit.a((BaseUnit) null, projectile.posX, projectile.posY, turretConfig.rotationSpeed, (CustomProjectileTemplate) null, 0);
+            Projectile projectileA = customUnit.a((BaseUnit) null, projectile.posX, projectile.posY, turretConfig.turretIndex, (CustomProjectileTemplate) null, 0);
             projectileA.aC = true;
             projectileA.q = projectile;
         }

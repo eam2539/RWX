@@ -261,7 +261,7 @@ public class UnitSpawner {
                 if (var10) {
                     String var34 = "";
                     if (var17 != null) {
-                        var34 = var34 + "source:" + var17.getVelocityX();
+                        var34 = var34 + "source:" + var17.getUnitDebugName();
                     }
 
                     GameEngine.logColored("spawnUnitsAt: Skipping, too many units already on team:" + var16.teamId + " count:" + var16.getNonBuildingUnitCountIncludingQueued() + " " + var34);
@@ -271,7 +271,7 @@ public class UnitSpawner {
                 } else if (var16.getTotalUnitCountIncludingQueued() > var16.getUnitCap() + 25000) {
                     String var33 = "";
                     if (var17 != null) {
-                        var33 = var33 + "source:" + var17.getVelocityX();
+                        var33 = var33 + "source:" + var17.getUnitDebugName();
                     }
 
                     GameEngine.logColored(
@@ -366,10 +366,10 @@ public class UnitSpawner {
                                 var35.posY = var35.posY + var15.offsetY;
                                 var12++;
                                 if (var15.skipIfOverlapping && var35 instanceof OrderableUnit && !((OrderableUnit)var35).canPlaceAtCurrentPosition(null)) {
-                                    var35.getUnitAICondition();
+                                    var35.removeFromGame();
                                 } else {
                                     if (var15.falling && var35 instanceof OrderableUnit) {
-                                        var35.getUnitAICombatState();
+                                        var35.startFalling();
                                     }
 
                                     if (var15.addResources != null) {
@@ -407,8 +407,8 @@ public class UnitSpawner {
                                                 }
 
                                                 if (!var35.e(var37, true)) {
-                                                    GameEngine.logColored("transportedUnitsToTransfer failed for: " + var37.getVelocityX() + " to: " + var35.getVelocityX());
-                                                    var37.getUnitAICondition();
+                                                    GameEngine.logColored("transportedUnitsToTransfer failed for: " + var37.getUnitDebugName() + " to: " + var35.getUnitDebugName());
+                                                    var37.removeFromGame();
                                                 }
                                             }
                                         }

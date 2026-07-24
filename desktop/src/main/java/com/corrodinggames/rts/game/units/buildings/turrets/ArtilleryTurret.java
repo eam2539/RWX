@@ -31,7 +31,7 @@ class ArtilleryTurret extends TurretImplementation {
 
     @Override // com.corrodinggames.rts.game.units.buildings.turrets.TurretImplementation
     public int d() {
-        return UnitTypeEnum.turret.c() + TurretFactory.upgradeToArtilleryAction.isConfirmed();
+        return UnitTypeEnum.turret.c() + TurretFactory.upgradeToArtilleryAction.getCostAmount();
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.turrets.TurretImplementation

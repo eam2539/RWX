@@ -72,7 +72,7 @@ public class LagHidingManager {
             b.team = baseUnit.team;
             b.unitLevel = unitSnapshotA.b;
             b.unitExperience = unitSnapshotA.c;
-            StoredResources unitAICombatRange = b.getUnitAICombatRange();
+            StoredResources unitAICombatRange = b.getCustomResources();
             b.a(unitSnapshotA.e);
             boolean zB = unitPrice.b(b);
             b.a(unitAICombatRange);

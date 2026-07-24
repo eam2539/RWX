@@ -267,7 +267,7 @@ public class FireUnit extends NaturalUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: s_ */
-    public boolean isBuilding() {
+    public boolean isVisibleOnScreen() {
         return true;
     }
 

@@ -67,7 +67,7 @@ public abstract class LibRocketManager extends LibRocket {
     /* JADX INFO: renamed from: a */
     public static String convertTexturePath(String str) {
         GameEngine.log("convertTexturePath for: " + str);
-        String strUrlDecode = Utility.urlDecode(str);
+        String strUrlDecode = Utility.unescapeHtml(str);
         if (strUrlDecode.startsWith("base:")) {
             return basePath + strUrlDecode.substring("base:".length());
         }
@@ -404,7 +404,7 @@ public abstract class LibRocketManager extends LibRocket {
         ScriptEngine.checkThreadAccess();
         ElementDocument elementDocumentCreatePopup = createPopup("messagebox.rml", obj);
         elementDocumentCreatePopup.setMetadata("sourceDocumentId", str);
-        String strJoin = Utility.join(new File(convertTexturePath(str)));
+        String strJoin = Utility.readFileToString(new File(convertTexturePath(str)));
         elementDocumentCreatePopup.getElementById("mainButtons").hide();
         Element elementById = elementDocumentCreatePopup.getElementById("message");
         elementById.setInnerRML(strJoin);
@@ -570,11 +570,11 @@ public abstract class LibRocketManager extends LibRocket {
             }
             if (string != null) {
                 ElementDocument activeDocument = getActiveDocument();
-                if (activeDocument != null && !activeDocument.translatedToUnicode && Utility.removeBadChars(string)) {
+                if (activeDocument != null && !activeDocument.translatedToUnicode && Utility.containsNonAscii(string)) {
                     activeDocument.translatedToUnicode = true;
                 }
                 ElementDocument topmostDocument = getTopmostDocument();
-                if (topmostDocument != null && !topmostDocument.translatedToUnicode && Utility.removeBadChars(string)) {
+                if (topmostDocument != null && !topmostDocument.translatedToUnicode && Utility.containsNonAscii(string)) {
                     topmostDocument.translatedToUnicode = true;
                 }
             }

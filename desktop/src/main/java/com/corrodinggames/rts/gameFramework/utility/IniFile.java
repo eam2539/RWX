@@ -174,7 +174,7 @@ public class IniFile {
                 String var9 = var3.trim();
                 boolean var10 = false;
                 if (var5 || !var9.startsWith("#")) {
-                    if (Utility.getRandomBoolean(var3, "\"\"\"")) {
+                    if (Utility.containsSubstring(var3, "\"\"\"")) {
                         int var11 = 0;
                         if (!var5 && var3.trim().startsWith("\"\"\"")) {
                             var8 = true;
@@ -211,7 +211,7 @@ public class IniFile {
                     }
 
                     if (var9.length() != 0) {
-                        if (Utility.getRandomBoolean(var3, "[")) {
+                        if (Utility.containsSubstring(var3, "[")) {
                             Matcher var19 = sectionPattern.matcher(var3);
                             if (var19.matches()) {
                                 var4 = var19.group(1).trim();

@@ -65,7 +65,7 @@ public class MemoryAction extends LogicAction {
             memoryAction.setCustomTarget1 = logicBoolean;
             memoryAction.setCustomTarget2 = logicBoolean2;
             memoryAction.shrinkArrays = memoryNamesCreateMemoryNameList;
-            customActionDef.ac.add(memoryAction);
+            customActionDef.logicActions.add(memoryAction);
         }
     }
 

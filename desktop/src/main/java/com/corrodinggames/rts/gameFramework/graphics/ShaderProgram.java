@@ -72,7 +72,7 @@ public class ShaderProgram {
     }
 
     public void a(String str, String str2) throws IOException {
-        this.c = Utility.getFileNameFromPath(str2);
+        this.c = Utility.getFileNameWithoutExtension(str2);
         this.i = str;
         this.j = str2;
         d();

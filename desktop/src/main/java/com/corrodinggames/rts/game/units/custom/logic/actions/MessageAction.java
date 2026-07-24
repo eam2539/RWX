@@ -49,7 +49,7 @@ public class MessageAction extends LogicAction {
             messageAction.showQuickWarLogToPlayer = localizedTextLoadUnitConfigFile4;
             messageAction.showQuickWarLogToAllPlayers = localizedTextLoadUnitConfigFile5;
             messageAction.debugMessage = localizedTextLoadUnitConfigFile6;
-            customActionDef.ac.add(messageAction);
+            customActionDef.logicActions.add(messageAction);
         }
     }
 

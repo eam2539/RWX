@@ -27,13 +27,13 @@ public class SpawnUnitAction extends LogicAction {
         if (!unitSpawnerA.b()) {
             SpawnUnitAction spawnUnitAction = new SpawnUnitAction();
             spawnUnitAction.produceUnits = unitSpawnerA;
-            customActionDef.ac.add(spawnUnitAction);
+            customActionDef.logicActions.add(spawnUnitAction);
         }
         UnitSpawner unitSpawnerA2 = UnitSpawner.a(customUnitConfig, iniFile, str, str2 + "spawnUnits");
         if (!unitSpawnerA2.b()) {
             SpawnUnitAction spawnUnitAction2 = new SpawnUnitAction();
             spawnUnitAction2.spawnUnits = unitSpawnerA2;
-            customActionDef.ac.add(spawnUnitAction2);
+            customActionDef.logicActions.add(spawnUnitAction2);
         }
     }
 

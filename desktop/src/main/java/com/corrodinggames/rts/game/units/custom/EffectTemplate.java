@@ -457,7 +457,7 @@ public class EffectTemplate {
             this.imageStrip.g = this.imageStrip.c;
             String string4 = iniFile.getString(str, "imageShadow", (String) null);
             if (string4 != null) {
-                this.imageStrip.j = CustomUnitConfigParser.cacheTexture(customUnitConfig.generation_free_in_sandbox, string4, customUnitConfig.imageSmoothing, customUnitConfig, str, "imageShadow");
+                this.imageStrip.j = CustomUnitConfigParser.cacheTexture(customUnitConfig.resourceLoadPath, string4, customUnitConfig.imageSmoothing, customUnitConfig, str, "imageShadow");
                 this.shadow = true;
             }
             if (this.shadow && this.imageStrip.j == null) {

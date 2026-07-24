@@ -214,12 +214,12 @@ public class CommandCenter extends FactoryWithQueue {
         this.resourceGenerationTimer += f;
         if (this.resourceGenerationTimer > PlayerTeam.resourceIncomeUpdateInterval - 0.1f) {
             this.resourceGenerationTimer -= PlayerTeam.resourceIncomeUpdateInterval;
-            this.team.b(cy() * (PlayerTeam.resourceIncomeUpdateInterval / PlayerTeam.resourceIncomeRatePeriod));
+            this.team.b(getCreditIncomeRate() * (PlayerTeam.resourceIncomeUpdateInterval / PlayerTeam.resourceIncomeRatePeriod));
         }
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
-    public float cy() {
+    public float getCreditIncomeRate() {
         return 18.0f;
     }
 

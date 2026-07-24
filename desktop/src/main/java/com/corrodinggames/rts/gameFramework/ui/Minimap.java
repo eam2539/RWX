@@ -668,7 +668,7 @@ public class Minimap {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (!baseUnit.isDead && baseUnit.unitTransportTarget == null && baseUnit.getWeight() && baseUnit.c_() && !baseUnit.u()) {
+            if (!baseUnit.isDead && baseUnit.unitTransportTarget == null && baseUnit.isVisibleToLocalPlayer() && baseUnit.c_() && !baseUnit.u()) {
                 Point pointWorldToScreen = worldToScreen(baseUnit.posX, baseUnit.posY);
                 baseUnit.unitCargoCount = pointWorldToScreen.worldX;
                 baseUnit.unitCargoMax = pointWorldToScreen.worldY;

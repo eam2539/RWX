@@ -1399,7 +1399,7 @@ public final class AIController extends PlayerTeam {
                     boolean z = false;
                     BaseUnit commandOrAttackTarget = orderableUnit.getCommandOrAttackTarget();
                     if (commandOrAttackTarget != null && orderableUnit.isWithinEngagementRange(commandOrAttackTarget)) {
-                        z = !commandOrAttackTarget.checkTransportSlots();
+                        z = !commandOrAttackTarget.isTouchingWater();
                     }
                     boolean z2 = !orderableUnit.Q();
                     if (z && z != z2) {
@@ -1524,7 +1524,7 @@ public final class AIController extends PlayerTeam {
                     commandNewCommandForTeam.setTargetUnit(orderableUnit2);
                     commandNewCommandForTeam.setAttackMode(attackModeForUnit);
                 }
-                if (orderableUnit2.canUnitAttack() && orderableUnit2.getUnitAICombatTarget() && orderableUnit2.aB == null && isEligibleUnitForRandomSelection(orderableUnit2)) {
+                if (orderableUnit2.canUnitAttack() && orderableUnit2.isExperimental() && orderableUnit2.aB == null && isEligibleUnitForRandomSelection(orderableUnit2)) {
                     UnitGroup.a(this, orderableUnit2);
                 }
             }
@@ -1626,7 +1626,7 @@ public final class AIController extends PlayerTeam {
                     }
                     if (baseUnit4.r().p()) {
                         i8++;
-                        if (AbstractUnitAction.isMove(baseUnit4.cm())) {
+                        if (AbstractUnitAction.isActionIdSpecified(baseUnit4.cm())) {
                             i9++;
                         }
                     }
@@ -1640,7 +1640,7 @@ public final class AIController extends PlayerTeam {
                             ArrayList<AbstractUnitAction> arrayListN = orderableUnit4.getAvailableActions();
                             ArrayList reusableList = getReusableList();
                             for (AbstractUnitAction abstractUnitAction : arrayListN) {
-                                if (abstractUnitAction.isSecondary(orderableUnit4)) {
+                                if (abstractUnitAction.isAiHighPriority(orderableUnit4)) {
                                     reusableList.add(abstractUnitAction);
                                 }
                             }
@@ -1658,8 +1658,8 @@ public final class AIController extends PlayerTeam {
                     if (baseUnit6.team == this && (baseUnit6 instanceof OrderableUnit)) {
                         OrderableUnit orderableUnit5 = (OrderableUnit) baseUnit6;
                         ActionId actionIdCm = orderableUnit5.cm();
-                        if (AbstractUnitAction.isMove(actionIdCm)) {
-                            float fCn = orderableUnit5.getUnitAIPathfindState();
+                        if (AbstractUnitAction.isActionIdSpecified(actionIdCm)) {
+                            float fCn = orderableUnit5.getAiUpgradePriority();
                             if (fCn < 0.0f) {
                                 fCn = 6.0f;
                                 z = false;
@@ -1700,16 +1700,16 @@ public final class AIController extends PlayerTeam {
                                     boolean z4 = false;
                                     AbstractUnitAction abstractUnitActionA = orderableUnit5.validateActionId(actionIdCm);
                                     if (abstractUnitActionA != null) {
-                                        if (abstractUnitActionA.getEnergyCost(orderableUnit5)) {
+                                        if (abstractUnitActionA.isAiDisabled(orderableUnit5)) {
                                             z4 = true;
                                         }
-                                        if (abstractUnitActionA.e() == ActionType.targetGround) {
+                                        if (abstractUnitActionA.getActionType() == ActionType.targetGround) {
                                             z4 = true;
                                         }
                                         if (!abstractUnitActionA.b(orderableUnit5)) {
                                             z4 = true;
                                         }
-                                        if (!abstractUnitActionA.drawTooltip((BaseUnit) orderableUnit5, false)) {
+                                        if (!abstractUnitActionA.canAfford((BaseUnit) orderableUnit5, false)) {
                                             z4 = true;
                                         }
                                     } else {
@@ -1754,7 +1754,7 @@ public final class AIController extends PlayerTeam {
     /* JADX INFO: renamed from: a */
     public boolean issueUnitAction(OrderableUnit orderableUnit, AbstractUnitAction abstractUnitAction) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (abstractUnitAction.b(orderableUnit) && abstractUnitAction.drawTooltip((BaseUnit) orderableUnit, false)) {
+        if (abstractUnitAction.b(orderableUnit) && abstractUnitAction.canAfford((BaseUnit) orderableUnit, false)) {
             Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this);
             commandNewCommandForTeam.setTargetUnit(orderableUnit);
             commandNewCommandForTeam.setActionId(abstractUnitAction.getQueueId());
@@ -1766,7 +1766,7 @@ public final class AIController extends PlayerTeam {
     /* JADX INFO: renamed from: a */
     public boolean pathCheck(OrderableUnit orderableUnit, AbstractUnitAction abstractUnitAction, PointF pointF, BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (abstractUnitAction.b(orderableUnit) && abstractUnitAction.drawTooltip((BaseUnit) orderableUnit, false)) {
+        if (abstractUnitAction.b(orderableUnit) && abstractUnitAction.canAfford((BaseUnit) orderableUnit, false)) {
             Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this);
             commandNewCommandForTeam.setTargetUnit(orderableUnit);
             commandNewCommandForTeam.setActionTarget(abstractUnitAction.getQueueId(), pointF, baseUnit);
@@ -2109,7 +2109,7 @@ public final class AIController extends PlayerTeam {
 
     /* JADX INFO: renamed from: i */
     public boolean isEligibleUnitForRandomSelection(BaseUnit baseUnit) {
-        if (baseUnit.u() || baseUnit.t() || baseUnit.getUnitStatus() || baseUnit.isAIUnit) {
+        if (baseUnit.u() || baseUnit.t() || baseUnit.canNotBeGivenOrdersByPlayer() || baseUnit.isAIUnit) {
             return false;
         }
         return true;
@@ -2326,7 +2326,7 @@ public final class AIController extends PlayerTeam {
 
     /* JADX INFO: renamed from: j */
     public boolean isUnitAllowedForSelection(BaseUnit baseUnit) {
-        if (!baseUnit.getUnitAIPriority() && c(baseUnit.team)) {
+        if (!baseUnit.isVisibleToEnemies() && c(baseUnit.team)) {
             return false;
         }
         return true;

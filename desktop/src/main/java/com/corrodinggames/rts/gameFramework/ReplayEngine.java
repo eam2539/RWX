@@ -537,7 +537,7 @@ public class ReplayEngine {
                         a("updateGameFrame: Build Type: " + commandCreateCommand.unitCommand.getBuildUnitType().getUnitTypeDescriptionShort());
                     }
                 }
-                if (AbstractUnitAction.isMove(commandCreateCommand.actionId)) {
+                if (AbstractUnitAction.isActionIdSpecified(commandCreateCommand.actionId)) {
                     a("updateGameFrame: SpecialAction: " + commandCreateCommand.actionId.getId());
                 }
                 if (commandCreateCommand.attackMode != null) {

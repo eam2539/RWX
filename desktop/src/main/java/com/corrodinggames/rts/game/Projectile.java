@@ -567,8 +567,8 @@ public class Projectile extends PositionedObject {
         projectile.posX = f2;
         projectile.posY = f3;
         projectile.ar = Color.a(255, 100, 30, 30);
-        projectile.value2 = baseUnit.value2 + 1;
-        projectile.syncType = 4;
+        projectile.drawOrder = baseUnit.drawOrder + 1;
+        projectile.drawLayer = 4;
         return projectile;
     }
 
@@ -602,7 +602,7 @@ public class Projectile extends PositionedObject {
             f2 = 0.0f;
         }
         if (baseUnit2 != null && !baseUnit2.isDead) {
-            if (projectile != null && projectile.g.bc && baseUnit != null) {
+            if (projectile != null && projectile.g.convertHitToSourceTeam && baseUnit != null) {
                 baseUnit2.isSelectable(baseUnit.team);
             }
             if (projectile != null) {
@@ -619,7 +619,7 @@ public class Projectile extends PositionedObject {
                 boolean z2 = !baseUnit2.isDead && baseUnit2.currentHealth > 0.0f;
                 baseUnit2.setTarget(baseUnit, f2, projectile);
                 float f3 = f2;
-                if (baseUnit2.mo193J()) {
+                if (baseUnit2.isDamageImmune()) {
                     f3 = 0.0f;
                 }
                 if (f3 > 0.0f) {
@@ -685,8 +685,8 @@ public class Projectile extends PositionedObject {
         ProjectileTemplate projectileTemplate = this.g;
         if (this.i == 0.0f) {
             this.i = -1.0f;
-            if (projectileTemplate.al != null) {
-                projectileTemplate.al.a(this.posX, this.posY, this.posZ, this.az, this.j, null, false, this.aD + 1, this, null);
+            if (projectileTemplate.spawnProjectilesOnCreate != null) {
+                projectileTemplate.spawnProjectilesOnCreate.a(this.posX, this.posY, this.posZ, this.az, this.j, null, false, this.aD + 1, this, null);
             }
         }
         this.h = Utility.moveTowardsZero(this.h, f2);
@@ -695,13 +695,13 @@ public class Projectile extends PositionedObject {
             z = true;
         }
         if (z) {
-            a(projectileTemplate.ax, projectileTemplate.ay, (AnimationSet) null);
+            a(projectileTemplate.autoTargetingOnDeadTargetRange, projectileTemplate.autoTargetingOnDeadTargetLead, (AnimationSet) null);
         }
-        if (projectileTemplate.az) {
+        if (projectileTemplate.retargetingInFlight) {
             this.aF = Utility.moveTowardsZero(this.aF, f2);
             if (this.aF == 0.0f) {
-                this.aF = projectileTemplate.aA;
-                a(projectileTemplate.aB, projectileTemplate.aC, projectileTemplate.aD);
+                this.aF = projectileTemplate.retargetingInFlightSearchDelay;
+                a(projectileTemplate.retargetingInFlightSearchRange, projectileTemplate.retargetingInFlightSearchLead, projectileTemplate.retargetingInFlightSearchOnlyTags);
             }
         }
         if (projectileTemplate.R != 0.0f || projectileTemplate.S != 0.0f) {
@@ -717,7 +717,7 @@ public class Projectile extends PositionedObject {
             this.L = Utility.fastSin((this.J * 1.5f) % 360.0f) * this.l.radius * 0.4f;
             float f10 = this.l.posX + this.K;
             float f11 = this.l.posY + this.L;
-            if (this.flag3) {
+            if (this.shouldDraw) {
                 this.aN += f2;
                 this.aO += f2;
                 if (this.aN > 11.0f) {
@@ -898,12 +898,12 @@ public class Projectile extends PositionedObject {
         if (z4 && this.r > 0.0f) {
             this.t = Utility.distanceSq(this.t, this.r, this.s * f2);
         }
-        if (projectileTemplate.am != 0.0f) {
-            float fFastSin = Utility.fastSin((((this.J * 360.0f) / projectileTemplate.an) + (360.0f * this.I)) % 360.0f) * projectileTemplate.am * f2;
+        if (projectileTemplate.wobbleAmplitude != 0.0f) {
+            float fFastSin = Utility.fastSin((((this.J * 360.0f) / projectileTemplate.wobbleFrequency) + (360.0f * this.I)) % 360.0f) * projectileTemplate.wobbleAmplitude * f2;
             this.posX += Utility.fastCos(angleBetweenPoints + 90.0f) * fFastSin;
             this.posY += Utility.fastSin(angleBetweenPoints + 90.0f) * fFastSin;
         }
-        if (this.flag3 && ((this.aM || projectileTemplate.ah != null) && !this.bn)) {
+        if (this.shouldDraw && ((this.aM || projectileTemplate.trailEffect != null) && !this.bn)) {
             this.aN += f2;
             if (this.aN > projectileTemplate.ag) {
                 this.aN = 0.0f;
@@ -911,8 +911,8 @@ public class Projectile extends PositionedObject {
                 if (this.D) {
                     z6 = true;
                 }
-                if (projectileTemplate.ah != null) {
-                    projectileTemplate.ah.a(this.posX, this.posY, this.posZ, this.aT, this);
+                if (projectileTemplate.trailEffect != null) {
+                    projectileTemplate.trailEffect.a(this.posX, this.posY, this.posZ, this.aT, this);
                 }
                 if (this.aM && (effectCreateEffectInternal = gameEngine.effectManager.createEffectInternal(this.posX, this.posY, this.posZ, EffectType.custom, z6, EffectQuality.low)) != null) {
                     if (this.posZ >= 0.0f) {
@@ -1038,9 +1038,9 @@ public class Projectile extends PositionedObject {
                 if (this.l != null) {
                     z9 = this.l.shield > 10.0f;
                 }
-                CustomUnitSpawnList customUnitSpawnList = projectileTemplate.aX;
+                CustomUnitSpawnList customUnitSpawnList = projectileTemplate.explodeEffect;
                 if (z9) {
-                    customUnitSpawnList = projectileTemplate.aY;
+                    customUnitSpawnList = projectileTemplate.explodeEffectOnShield;
                 }
                 if (this.l != null && (customUnitSpawnListA = projectileTemplate.a(this.l)) != null) {
                     customUnitSpawnList = customUnitSpawnListA;
@@ -1048,15 +1048,15 @@ public class Projectile extends PositionedObject {
                 if (customUnitSpawnList != null) {
                     customUnitSpawnList.a(this.aV, this.aW, this.aX, this.aT, this.l);
                 }
-                if (projectileTemplate.aj != null) {
-                    projectileTemplate.aj.a(this.posX, this.posY, this.posZ, this.az, this.j, null, false, this.aD + 1, this, this.l);
+                if (projectileTemplate.spawnProjectilesOnExplode != null) {
+                    projectileTemplate.spawnProjectilesOnExplode.a(this.posX, this.posY, this.posZ, this.az, this.j, null, false, this.aD + 1, this, this.l);
                 }
-                if (projectileTemplate.aZ != null && this.j != null) {
-                    projectileTemplate.aZ.a(this.aV, this.aW, 0.0f, this.az, this.j.team, false, this.j);
+                if (projectileTemplate.spawnUnit != null && this.j != null) {
+                    projectileTemplate.spawnUnit.a(this.aV, this.aW, 0.0f, this.az, this.j.team, false, this.j);
                 }
-                if (projectileTemplate.ba > 0 && this.j != null && (this.j instanceof CustomUnit)) {
+                if (projectileTemplate.unloadUpToXUnitsFromSource > 0 && this.j != null && (this.j instanceof CustomUnit)) {
                     CustomUnit customUnit = (CustomUnit) this.j;
-                    for (int i2 = 0; i2 < projectileTemplate.ba; i2++) {
+                    for (int i2 = 0; i2 < projectileTemplate.unloadUpToXUnitsFromSource; i2++) {
                         if (customUnit.transportedUnits != null && customUnit.transportedUnits.size() > 0) {
                             BaseUnit baseUnit3 = (BaseUnit) customUnit.transportedUnits.remove(customUnit.transportedUnits.size() - 1);
                             GameViewUtils.a(baseUnit3, customUnit);
@@ -1079,7 +1079,7 @@ public class Projectile extends PositionedObject {
                         }
                     }
                 }
-                if (projectileTemplate.bb && this.j != null) {
+                if (projectileTemplate.teleportSource && this.j != null) {
                     this.j.f(this.aV, this.aW);
                 }
                 if (!z8 && baseUnit != null) {
@@ -1109,7 +1109,7 @@ public class Projectile extends PositionedObject {
                     boolean z10 = true;
                     if (this.l != null && this.l.shield > 10.0f) {
                         z10 = false;
-                        if (projectileTemplate.aY == null && (effectCreateSmallExplosionInternal2 = gameEngine.effectManager.createSmallExplosionInternal(this.aV, this.aW, this.aX, -1127220)) != null) {
+                        if (projectileTemplate.explodeEffectOnShield == null && (effectCreateSmallExplosionInternal2 = gameEngine.effectManager.createSmallExplosionInternal(this.aV, this.aW, this.aX, -1127220)) != null) {
                             effectCreateSmallExplosionInternal2.V = 10.0f;
                             effectCreateSmallExplosionInternal2.F = 0.5f;
                             if (this.aQ) {
@@ -1126,10 +1126,10 @@ public class Projectile extends PositionedObject {
                     }
                     if (z10) {
                         if (!this.aQ) {
-                            if (projectileTemplate.aX == null) {
+                            if (projectileTemplate.explodeEffect == null) {
                                 gameEngine.effectManager.createLargeExplosion(this.aV, this.aW, this.aX);
                             }
-                        } else if (projectileTemplate.aX == null) {
+                        } else if (projectileTemplate.explodeEffect == null) {
                             if (this.Z > 10.0f && (effectCreateSmallExplosionInternal = gameEngine.effectManager.createSmallExplosionInternal(this.aV, this.aW, this.aX, 0)) != null) {
                                 effectCreateSmallExplosionInternal.F = this.Z / 25.0f;
                                 effectCreateSmallExplosionInternal.E = 0.7f;
@@ -1142,7 +1142,7 @@ public class Projectile extends PositionedObject {
                                 gameEngine.soundEngine.playSoundAt(SoundEngine.missileHitSound, 0.5f, 1.0f + Utility.randomFloatInRange(-0.06f, 0.06f), this.aV, this.aW);
                             }
                         }
-                        if (this.D && projectileTemplate.aX == null) {
+                        if (this.D && projectileTemplate.explodeEffect == null) {
                             gameEngine.soundEngine.playSoundAt(SoundEngine.nukeExplodeSound, 1.6f, 0.7f, this.aV, this.aW);
                             gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
                             Effect effectCreateLightEffect = gameEngine.effectManager.createLightEffect(this.aV, this.aW, this.posZ, Color.a(255, 255, 255, 255));
@@ -1368,8 +1368,8 @@ public class Projectile extends PositionedObject {
         }
         this.J += f2;
         if (this.h == 0.0f && (!this.bn || this.V)) {
-            if (projectileTemplate.ak != null) {
-                projectileTemplate.ak.a(this.posX, this.posY, this.posZ, this.az, this.j, null, false, this.aD + 1, this, null);
+            if (projectileTemplate.spawnProjectilesOnEndOfLife != null) {
+                projectileTemplate.spawnProjectilesOnEndOfLife.a(this.posX, this.posY, this.posZ, this.az, this.j, null, false, this.aD + 1, this, null);
             }
             remove();
         }
@@ -1534,8 +1534,8 @@ public class Projectile extends PositionedObject {
             if (projectileTemplate.Y != null) {
                 Paint paintF = f();
                 float f8 = 0.0f;
-                if (projectileTemplate.ad != 0.0f) {
-                    f8 = 0.0f + (projectileTemplate.ad * this.J);
+                if (projectileTemplate.beamImageOffsetRate != 0.0f) {
+                    f8 = 0.0f + (projectileTemplate.beamImageOffsetRate * this.J);
                 }
                 float f9 = this.posX - gameEngine.viewpointXSnapped;
                 float f10 = (this.posY - gameEngine.viewpointYSnapped) - this.posZ;
@@ -1751,7 +1751,7 @@ public class Projectile extends PositionedObject {
                 if (zB && this.k >= 0 && orderableUnit != null && this.k < orderableUnit.getTechLevel() && !orderableUnit.a((int) this.k, baseUnit, true, false)) {
                     zB = false;
                 }
-                if (animationSet != null && !AnimationTag.a(animationSet, baseUnit.getUnitCombatAnimation())) {
+                if (animationSet != null && !AnimationTag.a(animationSet, baseUnit.getTags())) {
                     zB = false;
                 }
                 if (zB) {

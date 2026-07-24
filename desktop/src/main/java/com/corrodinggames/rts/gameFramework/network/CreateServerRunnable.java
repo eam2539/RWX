@@ -39,8 +39,8 @@ class CreateServerRunnable implements Runnable {
                     MasterServerClient.addParam(arrayList, "game_mods", requiredModsSummary);
                 }
                 MasterServerClient.addParam(arrayList, "private_token", gameEngine.networkEngine.sessionToken);
-                MasterServerClient.addParam(arrayList, "private_token_2", Utility.getParentDir(Utility.getParentDir(gameEngine.networkEngine.sessionToken)));
-                MasterServerClient.addParam(arrayList, "confirm", Utility.getParentDir("a" + Utility.getParentDir(gameEngine.networkEngine.sessionToken)));
+                MasterServerClient.addParam(arrayList, "private_token_2", Utility.md5Hex(Utility.md5Hex(gameEngine.networkEngine.sessionToken)));
+                MasterServerClient.addParam(arrayList, "confirm", Utility.md5Hex("a" + Utility.md5Hex(gameEngine.networkEngine.sessionToken)));
                 MasterServerClient.addServerStatusParams(arrayList);
                 BufferedReader bufferedReaderRequestMasterServerResponseWithTimeout = MasterServerClient.requestMasterServerResponseWithTimeout(arrayList, 15);
                 String line = bufferedReaderRequestMasterServerResponseWithTimeout.readLine();

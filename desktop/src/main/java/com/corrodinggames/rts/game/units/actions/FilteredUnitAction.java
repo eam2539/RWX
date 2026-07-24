@@ -34,38 +34,38 @@ public class FilteredUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public String getCostForUnit() {
-        return this.a.getCostForUnit();
+    public String getDisplayName() {
+        return this.a.getDisplayName();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: d */
-    public String isVisible(BaseUnit baseUnit) {
-        return this.a.isVisible(baseUnit);
+    public String getDisplayName(BaseUnit baseUnit) {
+        return this.a.getDisplayName(baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public String isLocked() {
-        return this.a.isLocked();
+    public String getDescription() {
+        return this.a.getDescription();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: e */
-    public String getProducedUnitType(BaseUnit baseUnit) {
-        return this.a.getProducedUnitType(baseUnit);
+    public String getDescriptionForUnit(BaseUnit baseUnit) {
+        return this.a.getDescriptionForUnit(baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
-    public int isConfirmed() {
+    public int getCostAmount() {
         return 0;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
-    public int isActive(BaseUnit baseUnit, boolean z) {
-        return this.a.isActive(baseUnit, z);
+    public int getActiveCount(BaseUnit baseUnit, boolean z) {
+        return this.a.getActiveCount(baseUnit, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -76,9 +76,9 @@ public class FilteredUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public boolean drawTooltip(BaseUnit baseUnit, boolean z) {
+    public boolean canAfford(BaseUnit baseUnit, boolean z) {
         if (this.c) {
-            return this.a.drawTooltip(baseUnit, z);
+            return this.a.canAfford(baseUnit, z);
         }
         return true;
     }
@@ -142,14 +142,14 @@ public class FilteredUnitAction extends AbstractUnitAction {
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-    public ActionType e() {
-        return this.a.e();
+    public ActionType getActionType() {
+        return this.a.getActionType();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
-    public ActionDisplayType isAlsoSelected() {
-        return this.a.isAlsoSelected();
+    public ActionDisplayType getActionDisplayType() {
+        return this.a.getActionDisplayType();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -177,21 +177,21 @@ public class FilteredUnitAction extends AbstractUnitAction {
         if (unitType != null && (unitType instanceof CustomUnitConfig)) {
             CustomUnitConfig customUnitConfig = (CustomUnitConfig) unitType;
             if (customUnitConfig.modInfo != null) {
-                textRenderQueue.a("\n(mod: " + Utility.padLeft(customUnitConfig.modInfo.getDisplayTitle(), 30) + ")", this.f, true);
+                textRenderQueue.a("\n(mod: " + Utility.truncateToLength(customUnitConfig.modInfo.getDisplayTitle(), 30) + ")", this.f, true);
             }
         }
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: j */
-    public Texture getIconColor() {
-        return this.a.getIconColor();
+    public Texture getIconTexture() {
+        return this.a.getIconTexture();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: h */
-    public Texture isShowingNotEnoughEnergy(BaseUnit baseUnit) {
-        return this.a.isShowingNotEnoughEnergy(baseUnit);
+    public Texture getExtraIconTexture(BaseUnit baseUnit) {
+        return this.a.getExtraIconTexture(baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -202,8 +202,8 @@ public class FilteredUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: i */
-    public BaseUnit isShowingNotEnoughResources(BaseUnit baseUnit) {
-        return this.a.isShowingNotEnoughResources(baseUnit);
+    public BaseUnit getUnitShownInUI(BaseUnit baseUnit) {
+        return this.a.getUnitShownInUI(baseUnit);
     }
 
     public int hashCode() {
@@ -225,7 +225,7 @@ public class FilteredUnitAction extends AbstractUnitAction {
         this.f = Color.a(255, 50, 50, 50);
         this.a = abstractUnitAction;
         this.b = actionFilter;
-        getDescriptionForUnit(this.a.getActionId());
+        setActionId(this.a.getActionId());
         this.sortOrder = this.a.sortOrder;
         this.c = z;
     }

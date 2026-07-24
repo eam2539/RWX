@@ -1309,14 +1309,14 @@ public class Root extends ScriptContext {
             }
             elementM29clone.compareAndSetClassNames(str10);
             elementM29clone.findByClassName("rState").compareAndSetText(strReplace);
-            elementM29clone.findByClassName("rHost").compareAndSetText(Utility.padLeft(serverInfo.createdBy, 15));
+            elementM29clone.findByClassName("rHost").compareAndSetText(Utility.truncateToLength(serverInfo.createdBy, 15));
             if (serverInfo.currentPlayersText == "?") {
                 str4 = "?";
             } else {
                 str4 = serverInfo.currentPlayersText + "\\" + serverInfo.maxPlayersText;
             }
-            elementM29clone.findByClassName("rPlayers").compareAndSetText(Utility.padLeft(str4, 15));
-            String strPadLeft = Utility.padLeft(LevelSelectActivity.getMapName(serverInfo.mapPath), 40);
+            elementM29clone.findByClassName("rPlayers").compareAndSetText(Utility.truncateToLength(str4, 15));
+            String strPadLeft = Utility.truncateToLength(LevelSelectActivity.getMapName(serverInfo.mapPath), 40);
             if (strPadLeft == null) {
                 strPadLeft = VariableScope.nullOrMissingString;
             }
@@ -1324,7 +1324,7 @@ public class Root extends ScriptContext {
             if ("ANY".equalsIgnoreCase(serverInfo.gameVersionString)) {
                 str5 = serverInfo.gameVersionString;
             } else {
-                str5 = "v" + Utility.padLeft(serverInfo.gameVersionString, 8);
+                str5 = "v" + Utility.truncateToLength(serverInfo.gameVersionString, 8);
             }
             Element elementFindByClassName = elementM29clone.findByClassName("rVersion");
             elementFindByClassName.compareAndSetText(str5);

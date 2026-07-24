@@ -131,7 +131,7 @@ public class TankUnit extends LandUnit {
                     this.animationFrame = 0;
                 }
             }
-            if (this.rotation > 0.0f && this.flag3) {
+            if (this.rotation > 0.0f && this.shouldDraw) {
                 this.dustEffectTimer += f;
                 if (this.dustEffectTimer > 9.0f) {
                     this.dustEffectTimer = 0.0f;

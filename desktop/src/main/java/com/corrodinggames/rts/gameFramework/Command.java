@@ -169,7 +169,7 @@ public class Command {
 
     /* JADX INFO: renamed from: e */
     public boolean isSystemCommand() {
-        if (!AbstractUnitAction.isMove(this.actionId) && getAffectedUnitCount() == 0) {
+        if (!AbstractUnitAction.isActionIdSpecified(this.actionId) && getAffectedUnitCount() == 0) {
             return true;
         }
         return false;
@@ -270,7 +270,7 @@ public class Command {
         }
         this.isQueued = gameInputStream.readBoolean();
         this.stopCurrentAction = gameInputStream.readBoolean();
-        this.actionId = ActionId.isSameInstance(String.valueOf(gameInputStream.readInt()));
+        this.actionId = ActionId.intern(String.valueOf(gameInputStream.readInt()));
         this.attackMode = (AttackMode) gameInputStream.readEnumOrdinalOrNull(AttackMode.class);
         if (gameInputStream.readBoolean()) {
             this.rallyPoint = new PointF();
@@ -297,7 +297,7 @@ public class Command {
             this.targetUnit = gameInputStream.readBaseUnit();
         }
         if (gameInputStream.getProtocolVersion() >= 33) {
-            this.actionId = ActionId.isSameInstance(gameInputStream.readUTF());
+            this.actionId = ActionId.intern(gameInputStream.readUTF());
         }
         if (gameInputStream.getProtocolVersion() >= 37) {
             this.isInstantCommand = gameInputStream.readBoolean();
@@ -347,7 +347,7 @@ public class Command {
                 GameEngine.log("CommandController", "Warning AI: " + this.team.teamId + " gave an order to unit with team:" + orderableUnit.team.teamId + " type:" + orderableUnit.r().getUnitTypeDescriptionShort());
                 GameEngine.logWarningAndStack(VariableScope.nullOrMissingString);
             }
-            if (orderableUnit.getUnitStatus()) {
+            if (orderableUnit.canNotBeGivenOrdersByPlayer()) {
                 GameEngine.log("CommandController", "Warning AI: " + this.team.teamId + " gave an order to unit with canNotBeGivenOrdersByPlayer: " + orderableUnit.r().getUnitTypeDescriptionShort());
             }
         }
@@ -475,7 +475,7 @@ public class Command {
 
     /* JADX INFO: renamed from: j */
     public void debugPrintCommand() {
-        if (AbstractUnitAction.isMove(this.actionId)) {
+        if (AbstractUnitAction.isActionIdSpecified(this.actionId)) {
             for (OrderableUnit orderableUnit : this.selectedUnits) {
                 orderableUnit.stopMoving(orderableUnit.validateActionId(this.actionId), this.stopCurrentAction);
             }
@@ -601,7 +601,7 @@ public class Command {
                     }
                     str2 = str + orderableUnit3.objectId;
                     it.remove();
-                } else if (orderableUnit3.getUnitStatus()) {
+                } else if (orderableUnit3.canNotBeGivenOrdersByPlayer()) {
                     CommandController.logWithRateLimit("Warning unit: " + orderableUnit3.objectId + " has canNotBeGivenOrdersByPlayer set");
                     it.remove();
                 }
@@ -661,7 +661,7 @@ public class Command {
             formationGroupB.b();
             return;
         }
-        if (AbstractUnitAction.isMove(this.actionId)) {
+        if (AbstractUnitAction.isActionIdSpecified(this.actionId)) {
             for (OrderableUnit orderableUnit7 : this.selectedUnits) {
                 AbstractUnitAction abstractUnitActionA = orderableUnit7.validateActionId(this.actionId);
                 if (abstractUnitActionA == null) {

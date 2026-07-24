@@ -72,10 +72,10 @@ public class AutoRepairCallback extends FilteredUnitCallback {
         if (orderableUnit == baseUnit) {
             return;
         }
-        if ((baseUnit.currentHealth < baseUnit.maxHealth || baseUnit.deceleration < 1.0f) && !baseUnit.isDead && baseUnit.unitTransportTarget == null && this.searcherTeam.d(baseUnit.team) && orderableUnit.canRepairTarget(baseUnit)) {
+        if ((baseUnit.currentHealth < baseUnit.maxHealth || baseUnit.buildProgress < 1.0f) && !baseUnit.isDead && baseUnit.unitTransportTarget == null && this.searcherTeam.d(baseUnit.team) && orderableUnit.canRepairTarget(baseUnit)) {
             float fDistanceSq = Utility.distanceSq(orderableUnit.posX, orderableUnit.posY, baseUnit.posX, baseUnit.posY);
             if (fDistanceSq < this.searchRangeSquared) {
-                if (baseUnit.deceleration < 1.0f && orderableUnit.getRepairOrReclaimPrice(baseUnit) != null) {
+                if (baseUnit.buildProgress < 1.0f && orderableUnit.getRepairOrReclaimPrice(baseUnit) != null) {
                     return;
                 }
                 boolean z = false;
@@ -86,7 +86,7 @@ public class AutoRepairCallback extends FilteredUnitCallback {
                 } else if (this.bestTargetHealth == -1.0f || this.bestTargetHealth > baseUnit.currentHealth) {
                     z = true;
                 }
-                if (z && baseUnit.getUnitHealthPercent() == 0.0f) {
+                if (z && baseUnit.getResourceRate() == 0.0f) {
                     this.bestTargetHealth = baseUnit.currentHealth;
                     this.bestTargetDistance = fDistanceSq;
                     this.bestTarget = baseUnit;
