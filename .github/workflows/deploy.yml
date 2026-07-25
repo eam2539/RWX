@@ -167,8 +167,8 @@ jobs:
           fi
           echo "RWX_VERSION=$version" >> "$GITHUB_ENV"
 
-      - name: Validate tag signing configuration
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Validate Android signing configuration
+        if: env.SIGNING_KEYSTORE_BASE64 != '' || env.SIGNING_KEYSTORE_PASSWORD != '' || env.SIGNING_KEY_ALIAS != '' || env.SIGNING_KEY_PASSWORD != ''
         shell: bash
         run: |
           test -n "$SIGNING_KEYSTORE_BASE64"
