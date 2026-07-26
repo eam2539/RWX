@@ -145,11 +145,6 @@ jobs:
           pattern: RWX-*-desktop
           merge-multiple: true
 
-      - name: Generate checksums
-        run: |
-          cd release-artifacts
-          sha256sum *.zip > SHA256SUMS.txt
-
       - name: Create or update GitHub Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
