@@ -748,7 +748,9 @@ CLASS com/corrodinggames/rts/game/a/a com/corrodinggames/rts/game/ai/AIControlle
 	METHOD a canUnitReachUnit (Lcom/corrodinggames/rts/game/units/am;Lcom/corrodinggames/rts/game/units/am;)Z
 	METHOD a checkUnitVariableCondition (Lcom/corrodinggames/rts/game/units/ao;FFZ)Lcom/corrodinggames/rts/game/a/i;
 	METHOD a shouldIssueActionForUnitType (Lcom/corrodinggames/rts/game/units/as;)Z
-	METHOD a shouldIssueActionForUnitType (Lcom/corrodinggames/rts/game/units/as;FFI)I
+		COMMENT VERIFIED
+	METHOD a countUnitsOfTypeInRange (Lcom/corrodinggames/rts/game/units/as;FFI)I
+		COMMENT VERIFIED
 	METHOD a assignTaskToUnitTypeOnCommand (Lcom/corrodinggames/rts/game/units/as;Lcom/corrodinggames/rts/game/a/b;)I
 	METHOD a applyAIBuilder (Lcom/corrodinggames/rts/game/units/as;ZLcom/corrodinggames/rts/game/a/b;)I
 	METHOD a isPathPossibleBetweenPoints (Lcom/corrodinggames/rts/game/units/custom/d/b;Lcom/corrodinggames/rts/game/units/am;)Z
@@ -779,8 +781,10 @@ CLASS com/corrodinggames/rts/game/a/a com/corrodinggames/rts/game/ai/AIControlle
 	METHOD av initializeController ()V
 	METHOD b findZoneContainingPoint (FF)Lcom/corrodinggames/rts/game/a/i;
 	METHOD b isSafePointForOutpost (Landroid/graphics/PointF;)Z
-	METHOD b pathCheckOffsets (Lcom/corrodinggames/rts/game/n;FFF)I
-	METHOD b pathCheckOffsets (Lcom/corrodinggames/rts/game/units/am;FF)Z
+	METHOD b countEnemyUnitsInRange (Lcom/corrodinggames/rts/game/n;FFF)I
+		COMMENT VERIFIED
+	METHOD b canUnitReachPointWithOffsets (Lcom/corrodinggames/rts/game/units/am;FF)Z
+		COMMENT VERIFIED
 	METHOD b canUnitEngageTarget (Lcom/corrodinggames/rts/game/units/am;Lcom/corrodinggames/rts/game/units/am;)Z
 	METHOD c readExtendedTeamState (Lcom/corrodinggames/rts/gameFramework/j/k;)V
 	METHOD c findNearestZone (FF)Lcom/corrodinggames/rts/game/a/i;
@@ -886,23 +890,34 @@ CLASS com/corrodinggames/rts/game/a/i com/corrodinggames/rts/game/ai/BaseZone
 	FIELD z lastBuiltUnitType Lcom/corrodinggames/rts/game/units/as;
 	METHOD a findClosestResource ()Landroid/graphics/PointF;
 	METHOD a countEnemyUnitsInRange (F)I
-	METHOD a countEnemyUnitsInRange (Lcom/corrodinggames/rts/game/a/d;)I
+		COMMENT VERIFIED
+	METHOD a countUnitsForBuildStrategy (Lcom/corrodinggames/rts/game/a/d;)I
+		COMMENT VERIFIED
 	METHOD a countUnitsForStrategy (Lcom/corrodinggames/rts/game/units/am;)Z
 	METHOD a hasBuilderFor (Lcom/corrodinggames/rts/game/units/as;)Z
 	METHOD a removeUnit (Lcom/corrodinggames/rts/game/units/y;)V
-	METHOD A m112A ()Lcom/corrodinggames/rts/game/units/am;
+	METHOD A findRepairTarget ()Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
 	METHOD b updateUnitsInZone ()V
 	METHOD b canBuild (Lcom/corrodinggames/rts/game/units/as;)Z
 	METHOD c getBestBuildingToBuild ()Lcom/corrodinggames/rts/game/units/as;
-	METHOD c countUnitsOfType (F)V
+	METHOD c refreshUnitCounts (F)V
+		COMMENT VERIFIED
 	METHOD c countUnitsOfType (Lcom/corrodinggames/rts/game/units/as;)I
+		COMMENT VERIFIED
 	METHOD d countIdleCombatUnits ()I
-	METHOD d countIdleCombatUnits (Lcom/corrodinggames/rts/game/units/as;)Z
+		COMMENT VERIFIED
+	METHOD d tryBuildRecommendedHarvester (Lcom/corrodinggames/rts/game/units/as;)Z
+		COMMENT VERIFIED
 	METHOD e getNumberOfCombatUnits ()I
 	METHOD f hasEnemyUnits ()Z
-	METHOD f hasEnemyUnits (Lcom/corrodinggames/rts/game/units/as;)Lcom/corrodinggames/rts/game/units/y;
+		COMMENT VERIFIED
+	METHOD f findAvailableBuilderForUnitType (Lcom/corrodinggames/rts/game/units/as;)Lcom/corrodinggames/rts/game/units/y;
+		COMMENT VERIFIED
 	METHOD g getClosestEnemyUnit ()Lcom/corrodinggames/rts/game/units/am;
-	METHOD g getClosestEnemyUnit (Lcom/corrodinggames/rts/game/units/as;)Z
+		COMMENT VERIFIED
+	METHOD g tryBuildUnit (Lcom/corrodinggames/rts/game/units/as;)Z
+		COMMENT VERIFIED
 	METHOD h countEnemyUnits ()I
 CLASS com/corrodinggames/rts/game/a/j com/corrodinggames/rts/game/ai/BaseZoneStage
 CLASS com/corrodinggames/rts/game/a/k com/corrodinggames/rts/game/ai/BaseZoneType
@@ -1030,34 +1045,47 @@ CLASS com/corrodinggames/rts/game/b/b com/corrodinggames/rts/game/map/TileMap
 	METHOD a blitFogTiles ([I[IZLcom/corrodinggames/rts/gameFramework/m/e;Lcom/corrodinggames/rts/gameFramework/m/y;Lcom/corrodinggames/rts/gameFramework/m/e;)V
 	METHOD a composeFogPattern ([IIIZLcom/corrodinggames/rts/gameFramework/m/e;Lcom/corrodinggames/rts/gameFramework/m/y;Lcom/corrodinggames/rts/gameFramework/m/e;)V
 	METHOD a clampWorldX (F)F
+		COMMENT VERIFIED
 	METHOD a setCursorTileIndexFromWorldPoint (FF)V
 	METHOD a updateFogVisibilityForTeamsAtWorldPoint (FFILcom/corrodinggames/rts/game/n;Z)V
 	METHOD a isWorldPointVisibleForTeam (FFLcom/corrodinggames/rts/game/n;)Z
-	METHOD a isWorldPointVisibleForTeam (I)Lcom/corrodinggames/rts/game/b/j;
+		COMMENT VERIFIED
+	METHOD a findTilesetByGlobalTileId (I)Lcom/corrodinggames/rts/game/b/j;
+		COMMENT VERIFIED
 	METHOD a enumerateMaskCombinations (I[I)[I
 	METHOD a setCursorTileIndexFromTileIndex (II)V
-	METHOD a clampWorldX (II[[BB)B
+	METHOD a calculateFogNeighborMask (II[[BB)B
+		COMMENT VERIFIED
 	METHOD a isTileVisibleForTeam (IILcom/corrodinggames/rts/game/n;)Z
+		COMMENT VERIFIED
 	METHOD a computeFogAtlasTileRect (ILandroid/graphics/Rect;)V
 	METHOD a renderFogAtlasTile (ILcom/corrodinggames/rts/gameFramework/m/e;)V
-	METHOD a openAssetStreamFromSuffixSegments (Landroid/graphics/Point;)Landroid/graphics/PointF;
+	METHOD a tileToWorldPoint (Landroid/graphics/Point;)Landroid/graphics/PointF;
+		COMMENT VERIFIED
 	METHOD a convertWorldRectToTileRect (Landroid/graphics/RectF;)V
 	METHOD a registerUniqueTile (Lcom/corrodinggames/rts/game/b/g;)S
 	METHOD a getTileVariant (Lcom/corrodinggames/rts/game/b/g;II)Lcom/corrodinggames/rts/game/b/g;
 	METHOD a enqueueScorchMark (Lcom/corrodinggames/rts/game/l;)V
-	METHOD a clampWorldX (Lcom/corrodinggames/rts/game/n;II)Z
-	METHOD a isTileVisibleForTeam (Lcom/corrodinggames/rts/game/units/as;)Ljava/lang/Integer;
+	METHOD a isTileVisibleForTeam (Lcom/corrodinggames/rts/game/n;II)Z
+		COMMENT VERIFIED
+	METHOD a findTileIdForUnitType (Lcom/corrodinggames/rts/game/units/as;)Ljava/lang/Integer;
+		COMMENT VERIFIED
 	METHOD a renderBuildPlacementOverlay (Lcom/corrodinggames/rts/game/units/y;IIIIIILcom/corrodinggames/rts/gameFramework/m/y;ZI)V
 	METHOD a writeCursorSelectionPresenceFlag (Lcom/corrodinggames/rts/gameFramework/j/as;)V
 	METHOD a readCursorSelectionBlockFromStream (Lcom/corrodinggames/rts/gameFramework/j/k;)V
 	METHOD a rewriteTmxWithUnitObjects (Ljava/io/InputStream;Ljava/io/OutputStream;)V
-	METHOD a isWorldPointVisibleForTeam (Ljava/io/InputStream;Z)V
-	METHOD a isWorldPointVisibleForTeam (Ljava/lang/String;)J
+	METHOD a loadMapFromStream (Ljava/io/InputStream;Z)V
+		COMMENT VERIFIED
+	METHOD a getMapFileSize (Ljava/lang/String;)J
+		COMMENT VERIFIED
 	METHOD a getOrCreateTileFromTilesetIndex (Ljava/lang/String;II)Lcom/corrodinggames/rts/game/b/g;
 	METHOD a writeMapStreamToOutput (Ljava/lang/String;Lcom/corrodinggames/rts/gameFramework/j/as;)V
-	METHOD a isWorldPointVisibleForTeam (Ljava/lang/String;Ljava/lang/String;)Z
-	METHOD a tileToWorldPoint (Ljava/lang/String;Ljava/lang/String;I)Ljava/io/InputStream;
-	METHOD a clampWorldX (Ljava/lang/String;Z)V
+	METHOD a exportMap (Ljava/lang/String;Ljava/lang/String;)Z
+		COMMENT VERIFIED
+	METHOD a openAssetStreamFromSuffixSegments (Ljava/lang/String;Ljava/lang/String;I)Ljava/io/InputStream;
+		COMMENT VERIFIED
+	METHOD a loadMap (Ljava/lang/String;Z)V
+		COMMENT VERIFIED
 	METHOD a writeTmxDocumentToOutput (Lorg/w3c/dom/Document;Ljava/io/OutputStream;)V
 	METHOD a getUniqueTile (S)Lcom/corrodinggames/rts/game/b/g;
 	METHOD b releaseFogAtlasLock ()V
@@ -1766,6 +1794,8 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	FIELD bB unitFlags3 I
 	FIELD bC unitFlags4 I
 	FIELD bD isVisible Z
+	FIELD bK selectedUnitColorFilter Landroid/graphics/LightingColorFilter;
+		COMMENT VERIFIED
 	FIELD bL isHighlighted Z
 	FIELD bM isActive Z
 	FIELD bN isAIUnit Z
@@ -1873,12 +1903,17 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	METHOD bC updateUnitMovement ()V
 	METHOD bF getGlobalUnitList ()Lcom/corrodinggames/rts/gameFramework/utility/o;
 	METHOD bH loadAllUnits ()V
+	METHOD bK createUnitTypePrototypeCache ()Ljava/util/HashMap;
+		COMMENT VERIFIED
 	METHOD bl getTechLevel ()I
-	METHOD bL getAttachmentCount ()V
+	METHOD bL rebuildUnitTypePrototypeCaches ()V
+		COMMENT VERIFIED
 	METHOD bN getPushMass ()F
 	METHOD bT isAlive ()Z
-	METHOD bW getUnitTeamData ()F
-	METHOD bX isUnitAtPositionX ()Z
+	METHOD bW getSecondaryBarProgress ()F
+		COMMENT VERIFIED
+	METHOD bX isSecondaryBarRecharging ()Z
+		COMMENT VERIFIED
 	METHOD bY getTransportedUnitsWeight ()I
 	METHOD bZ getMaxTransportWeight ()I
 	METHOD c getUnitShortName ()Ljava/lang/String;
@@ -1942,7 +1977,8 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	METHOD cr canTransportUnits ()Z
 	METHOD cR getSimilarResourcesTag ()Lcom/corrodinggames/rts/game/units/custom/h;
 		COMMENT VERIFIED
-	METHOD cs getUnitAIPathfindHeuristic ()F
+	METHOD cs getTransportInteractionRange ()F
+		COMMENT VERIFIED
 	METHOD cS getReclaimSearchRange ()I
 		COMMENT VERIFIED
 	METHOD ct isAirborne ()Z
@@ -1972,11 +2008,15 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	METHOD cz getResourceGenerationRates ()Lcom/corrodinggames/rts/game/units/custom/e/f;
 		COMMENT VERIFIED
 	METHOD cZ getTileOffsetX ()F
+		COMMENT VERIFIED
 	METHOD d getBuildingBlockoutUnit (Lcom/corrodinggames/rts/game/units/as;)Lcom/corrodinggames/rts/game/units/am;
 		COMMENT VERIFIED
-	METHOD d getUnitArmorRating (Z)F
+	METHOD d getRenderRotation (Z)F
+		COMMENT VERIFIED
 	METHOD da getTileOffsetY ()F
+		COMMENT VERIFIED
 	METHOD db getSelectionRadius ()F
+		COMMENT VERIFIED
 	METHOD dc startFalling ()V
 		COMMENT VERIFIED
 	METHOD dd isExperimental ()Z
@@ -2118,6 +2158,7 @@ CLASS com/corrodinggames/rts/game/units/au com/corrodinggames/rts/game/units/Uni
 	FIELD n isForceMove Z
 	METHOD a getBuildUnitType ()Lcom/corrodinggames/rts/game/units/as;
 	METHOD a setMoveTarget (FF)V
+		COMMENT VERIFIED
 	METHOD a setBuildCommand (FFLcom/corrodinggames/rts/game/units/as;I)V
 	METHOD a setAttackTarget (Lcom/corrodinggames/rts/game/units/am;)V
 	METHOD a isApproximatelySameTarget (Lcom/corrodinggames/rts/game/units/au;)Z
@@ -2486,13 +2527,19 @@ CLASS com/corrodinggames/rts/game/units/custom/ag com/corrodinggames/rts/game/un
 	FIELD q maxBuildingRadius F
 	FIELD r lastModUsedForInit Lcom/corrodinggames/rts/gameFramework/i/b;
 	FIELD s lastErrorMessage Ljava/lang/String;
-	METHOD a init ()V
-	METHOD a a_texture_array ([Lcom/corrodinggames/rts/gameFramework/m/e;)V
-	METHOD a parse (I)V
-	METHOD a getLocaleString (JLcom/corrodinggames/rts/game/units/custom/ah;)V
+	METHOD a logAndResetTimingStats ()V
+		COMMENT VERIFIED
+	METHOD a trackImageMemoryForTextures ([Lcom/corrodinggames/rts/gameFramework/m/e;)V
+		COMMENT VERIFIED
+	METHOD a addImageMemory (I)V
+		COMMENT VERIFIED
+	METHOD a recordLoadPhaseTime (JLcom/corrodinggames/rts/game/units/custom/ah;)V
+		COMMENT VERIFIED
 	METHOD a applyCopyFromChain (Lcom/corrodinggames/rts/game/units/as;)V
-	METHOD a describeModsForUnits (Lcom/corrodinggames/rts/game/units/as;Lcom/corrodinggames/rts/game/units/custom/l;Z)V
-	METHOD a formatPathForModError (Lcom/corrodinggames/rts/game/units/custom/l;)Lcom/corrodinggames/rts/game/units/custom/l;
+	METHOD a refreshCustomUnitsForConfig (Lcom/corrodinggames/rts/game/units/as;Lcom/corrodinggames/rts/game/units/custom/l;Z)V
+		COMMENT VERIFIED
+	METHOD a reloadUnitConfigForModChange (Lcom/corrodinggames/rts/game/units/custom/l;)Lcom/corrodinggames/rts/game/units/custom/l;
+		COMMENT VERIFIED
 	METHOD a reloadSingleUnitConfig (Lcom/corrodinggames/rts/game/units/custom/l;Lcom/corrodinggames/rts/gameFramework/utility/ab;Lcom/corrodinggames/rts/gameFramework/utility/ab;Ljava/lang/String;I)V
 	METHOD a readAllCustomUnitConfigs (Lcom/corrodinggames/rts/game/units/custom/l;Lcom/corrodinggames/rts/gameFramework/utility/ab;Ljava/lang/String;Ljava/lang/String;I)V
 	METHOD a loadUnitConfigFile (Lcom/corrodinggames/rts/game/units/custom/l;Lcom/corrodinggames/rts/gameFramework/utility/ab;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/corrodinggames/rts/game/units/custom/aj;
@@ -2500,8 +2547,10 @@ CLASS com/corrodinggames/rts/game/units/custom/ag com/corrodinggames/rts/game/un
 	METHOD a mergeAndApplyUnitChanges (Lcom/corrodinggames/rts/game/units/custom/l;Lcom/corrodinggames/rts/gameFramework/utility/ab;Ljava/lang/String;Ljava/lang/String;Z)V
 	METHOD a loadOrGetTexture (Lcom/corrodinggames/rts/game/units/custom/l;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 	METHOD a trackSoundMemory (Lcom/corrodinggames/rts/gameFramework/a/i;)V
+		COMMENT VERIFIED
 	METHOD a applyCopyFromSectionChain (Lcom/corrodinggames/rts/gameFramework/i/b;Ljava/lang/String;Z)Ljava/lang/String;
-	METHOD a a_texture (Lcom/corrodinggames/rts/gameFramework/m/e;)V
+	METHOD a trackImageMemory (Lcom/corrodinggames/rts/gameFramework/m/e;)V
+		COMMENT VERIFIED
 	METHOD a handleUnitLoadError (Lcom/corrodinggames/rts/gameFramework/utility/ab;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/corrodinggames/rts/game/units/custom/bb;
 	METHOD a reloadCustomUnitList (Lcom/corrodinggames/rts/gameFramework/utility/m;)Z
 	METHOD a getEditableCustomUnits (Ljava/lang/String;)Lcom/corrodinggames/rts/gameFramework/utility/ab;
@@ -2511,7 +2560,8 @@ CLASS com/corrodinggames/rts/game/units/custom/ag com/corrodinggames/rts/game/un
 	METHOD a parse (Ljava/lang/String;Ljava/io/InputStream;JLcom/corrodinggames/rts/gameFramework/i/b;Lcom/corrodinggames/rts/gameFramework/utility/j;Ljava/lang/String;Ljava/lang/String;)Lcom/corrodinggames/rts/game/units/custom/l;
 	METHOD a validateModFilePath (Ljava/lang/String;Ljava/lang/Exception;Lcom/corrodinggames/rts/game/units/as;)V
 	METHOD a addTimingSample (Ljava/lang/String;Ljava/lang/Exception;Lcom/corrodinggames/rts/gameFramework/i/b;)V
-	METHOD a trackImageMemory (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+	METHOD a joinAssetPath (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD a describeModsForUnitList (Ljava/lang/String;Ljava/lang/String;Lcom/corrodinggames/rts/game/units/custom/l;)Lcom/corrodinggames/rts/gameFramework/a/i;
 	METHOD a createLocalizedString (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/util/ArrayList;
 	METHOD a parseCustomEventList (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/corrodinggames/rts/gameFramework/i/b;)Z
@@ -2521,10 +2571,12 @@ CLASS com/corrodinggames/rts/game/units/custom/ag com/corrodinggames/rts/game/un
 	METHOD a getActiveCustomUnits (Z)Ljava/util/ArrayList;
 	METHOD b reloadAllActiveCustomUnits ()V
 	METHOD b parseCanBuildEntry (Lcom/corrodinggames/rts/game/units/custom/l;Lcom/corrodinggames/rts/gameFramework/utility/ab;Ljava/lang/String;Ljava/lang/String;Z)V
-	METHOD b loadTextureInternal (Ljava/lang/String;)Lcom/corrodinggames/rts/gameFramework/utility/j;
+	METHOD b openUnitConfigFile (Ljava/lang/String;)Lcom/corrodinggames/rts/gameFramework/utility/j;
+		COMMENT VERIFIED
 	METHOD b computeLegAdjacency (Ljava/lang/String;Ljava/lang/String;Lcom/corrodinggames/rts/game/units/custom/l;)Lcom/corrodinggames/rts/gameFramework/a/i;
 	METHOD b openUnitConfigStream (Ljava/lang/String;Ljava/lang/String;ZLcom/corrodinggames/rts/game/units/custom/l;)Lcom/corrodinggames/rts/gameFramework/m/e;
-	METHOD b loadSoundInternal (Ljava/util/ArrayList;)V
+	METHOD b sortUnitActions (Ljava/util/ArrayList;)V
+		COMMENT VERIFIED
 	METHOD b enableAllCustomUnits (Z)Ljava/lang/String;
 	METHOD c reloadChangedUnitConfigs ()V
 	METHOD c getTextureFromCache (Ljava/lang/String;)Lcom/corrodinggames/rts/gameFramework/m/e;
@@ -2918,11 +2970,15 @@ CLASS com/corrodinggames/rts/game/units/custom/l com/corrodinggames/rts/game/uni
 	FIELD bd resourceReclaimMultiplier F
 	FIELD bD unitsSpawnedOnDeath_setToTeamOfLastAttacker Z
 	FIELD be nanoUnbuildSpeed F
-	FIELD bE targetAir Z
+		COMMENT VERIFIED
+	FIELD bE hasLaserDefenceTurret Z
+		COMMENT VERIFIED
 	FIELD bf nanoBuildSpeed F
-	FIELD bF targetBuildings Z
+	FIELD bF hasProjectileInterceptorTurret Z
+		COMMENT VERIFIED
 	FIELD bg isFactory Z
-	FIELD bG targetProjectiles Z
+	FIELD bG hasTurretWithLimitingAngle Z
+		COMMENT VERIFIED
 	FIELD bh selfBuildRate F
 	FIELD bH imageScale F
 		COMMENT VERIFIED
@@ -2931,11 +2987,15 @@ CLASS com/corrodinggames/rts/game/units/custom/l com/corrodinggames/rts/game/uni
 		COMMENT VERIFIED
 	FIELD bj dieOnAttack Z
 	FIELD bJ splashEffect Z
+		COMMENT VERIFIED
 	FIELD bk dieOnZeroEnergy Z
 	FIELD bK splashEffectReverse Z
+		COMMENT VERIFIED
 	FIELD bl removeOnAttack Z
-	FIELD bL internalEffect Z
+	FIELD bL hasMovementEffects Z
+		COMMENT VERIFIED
 	FIELD bm fireOnDeath I
+		COMMENT VERIFIED
 	FIELD bM dustEffect Z
 	FIELD bn nukeOnDeath Z
 	FIELD bN dustEffectReverse Z
@@ -3030,7 +3090,8 @@ CLASS com/corrodinggames/rts/game/units/custom/l com/corrodinggames/rts/game/uni
 	FIELD de uiTargetRadius F
 	FIELD dE lockLegRotationWithMainTurret Z
 	FIELD df shieldRenderRadius I
-	FIELD dF defaultTurret2 Lcom/corrodinggames/rts/game/units/custom/bn;
+	FIELD dF mainTurret Lcom/corrodinggames/rts/game/units/custom/bn;
+		COMMENT VERIFIED
 	FIELD dg buildingSelectionOffset I
 	FIELD dG mainTurretIndex I
 	FIELD dh fogOfWarSightRangeWhileNotBuilt I
@@ -3048,6 +3109,8 @@ CLASS com/corrodinggames/rts/game/units/custom/l com/corrodinggames/rts/game/uni
 	FIELD dM shootDelay F
 	FIELD dn exit_moveAwayAmount Ljava/lang/Float;
 	FIELD dN moveAccelerationSpeed F
+	FIELD do soundOnAttackOrder Lcom/corrodinggames/rts/game/units/custom/bl;
+		COMMENT VERIFIED
 	FIELD dO moveDecelerationSpeed F
 	FIELD dp soundOnMoveOrder Lcom/corrodinggames/rts/game/units/custom/bl;
 	FIELD dP ignoreMoveOrders Z
@@ -3174,7 +3237,8 @@ CLASS com/corrodinggames/rts/game/units/custom/l com/corrodinggames/rts/game/uni
 	FIELD fu canBuildUnits Z
 	FIELD fU hasAttachedTurrets Z
 	FIELD fv aiTags Lcom/corrodinggames/rts/game/units/custom/h;
-	FIELD fV defaultTurret Lcom/corrodinggames/rts/game/units/custom/bn;
+	FIELD fV mainNanoTurret Lcom/corrodinggames/rts/game/units/custom/bn;
+		COMMENT VERIFIED
 	FIELD fw disableUse Z
 	FIELD fW autoTriggerConditions Lcom/corrodinggames/rts/gameFramework/utility/m;
 	FIELD fx maxGlobal I
@@ -3248,11 +3312,13 @@ CLASS com/corrodinggames/rts/game/units/custom/l com/corrodinggames/rts/game/uni
 	METHOD a validateUnitCompatibility (Lcom/corrodinggames/rts/game/units/custom/ab;Ljava/util/HashMap;)V
 		ARG 0 report
 	METHOD a findAnimationForAction (Lcom/corrodinggames/rts/game/units/custom/n;)Lcom/corrodinggames/rts/game/units/custom/f;
-	METHOD a loadData (Lcom/corrodinggames/rts/game/units/custom/n;Lcom/corrodinggames/rts/game/units/custom/f;Z)Lcom/corrodinggames/rts/game/units/custom/f;
+	METHOD a resolveAnimationForAction (Lcom/corrodinggames/rts/game/units/custom/n;Lcom/corrodinggames/rts/game/units/custom/f;Z)Lcom/corrodinggames/rts/game/units/custom/f;
+		COMMENT VERIFIED
 	METHOD a registerConfigProcessor (Lcom/corrodinggames/rts/game/units/custom/t;)V
 	METHOD a loadAndValidateCustomUnits (Lcom/corrodinggames/rts/gameFramework/j/k;)V
 		ARG 0 inputStream
-	METHOD a loadData (Ljava/lang/String;)Ljava/lang/String;
+	METHOD a normalizeLimbName (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD a loadCore (Ljava/lang/String;Lcom/corrodinggames/rts/game/units/custom/o;)Lcom/corrodinggames/rts/game/units/custom/o;
 	METHOD a addConfigExtension (Ljava/lang/String;Lcom/corrodinggames/rts/game/units/custom/z;)Lcom/corrodinggames/rts/game/units/custom/z;
 	METHOD a reloadAllCustomUnits (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/corrodinggames/rts/game/units/custom/v;
@@ -3260,8 +3326,11 @@ CLASS com/corrodinggames/rts/game/units/custom/l com/corrodinggames/rts/game/uni
 	METHOD a createCustomUnit (Z)Lcom/corrodinggames/rts/game/units/am;
 	METHOD A load ()V
 	METHOD b getConfigDisplayPath ()Ljava/lang/String;
-	METHOD b getConfigDisplayPath (Ljava/lang/String;)I
-	METHOD b getConfigDisplayPath (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/corrodinggames/rts/game/units/custom/x;
+		COMMENT VERIFIED
+	METHOD b findLegConfigIndex (Ljava/lang/String;)I
+		COMMENT VERIFIED
+	METHOD b createProjectileReference (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/corrodinggames/rts/game/units/custom/x;
+		COMMENT VERIFIED
 	METHOD c createSpawnList (Ljava/lang/String;)Lcom/corrodinggames/rts/game/units/custom/z;
 	METHOD c addActionHandler (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/corrodinggames/rts/game/units/custom/u;
 	METHOD d resolveEffect (Ljava/lang/String;)Lcom/corrodinggames/rts/game/units/custom/ay;
@@ -3808,6 +3877,7 @@ CLASS com/corrodinggames/rts/game/units/y com/corrodinggames/rts/game/units/Orde
 	FIELD f waypointCount I
 	FIELD g waypoints [Lcom/corrodinggames/rts/game/units/au;
 	FIELD h isActing Z
+		COMMENT VERIFIED
 	FIELD i lastReclaimSearchTick I
 	FIELD j canAttack Z
 	FIELD k isPathingActive Z
@@ -4061,12 +4131,19 @@ CLASS com/corrodinggames/rts/gameFramework/ao com/corrodinggames/rts/gameFramewo
 CLASS com/corrodinggames/rts/gameFramework/ap com/corrodinggames/rts/gameFramework/AndroidMusicTrack
 CLASS com/corrodinggames/rts/gameFramework/aq com/corrodinggames/rts/gameFramework/MusicFactory
 	FIELD e musicManager Lcom/corrodinggames/rts/gameFramework/am;
-	METHOD a createMusicTrack (F)V
-	METHOD a createMusic (I)V
+		COMMENT VERIFIED
+	METHOD a update (F)V
+		COMMENT VERIFIED
+	METHOD a poll (I)V
+		COMMENT VERIFIED
 	METHOD b release ()V
-	METHOD c isMusicPlaying ()Z
+		COMMENT VERIFIED
+	METHOD c requiresSequentialFade ()Z
+		COMMENT VERIFIED
 	METHOD d isThreaded ()Z
-	METHOD e isMusicSupported ()I
+		COMMENT VERIFIED
+	METHOD e getUpdateThreadWaitTimeoutMillis ()I
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/ar com/corrodinggames/rts/gameFramework/Music
 	FIELD b path Ljava/lang/String;
 CLASS com/corrodinggames/rts/gameFramework/as com/corrodinggames/rts/gameFramework/MusicTrack
@@ -4136,7 +4213,9 @@ CLASS com/corrodinggames/rts/gameFramework/b/y com/corrodinggames/rts/gameFramew
 CLASS com/corrodinggames/rts/gameFramework/b/z com/corrodinggames/rts/gameFramework/gl/ShaderLocations
 CLASS com/corrodinggames/rts/gameFramework/ba com/corrodinggames/rts/gameFramework/ReplayEngine
 	METHOD a update (F)V
+		COMMENT VERIFIED
 	METHOD c loadReplay (Ljava/lang/String;)Z
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/bb com/corrodinggames/rts/gameFramework/ReplayWriter
 CLASS com/corrodinggames/rts/gameFramework/bc com/corrodinggames/rts/gameFramework/ChatMessage
 CLASS com/corrodinggames/rts/gameFramework/bd com/corrodinggames/rts/gameFramework/ReplayCommand
@@ -4285,7 +4364,8 @@ CLASS com/corrodinggames/rts/gameFramework/d/c com/corrodinggames/rts/gameFramew
 	METHOD a getNewEffect (Lcom/corrodinggames/rts/gameFramework/d/h;)Lcom/corrodinggames/rts/gameFramework/d/e;
 	METHOD a createLightEffect (Lcom/corrodinggames/rts/gameFramework/w;I)Lcom/corrodinggames/rts/gameFramework/d/e;
 	METHOD a createLightEffect (Lcom/corrodinggames/rts/gameFramework/w;IF)Lcom/corrodinggames/rts/gameFramework/d/e;
-	METHOD a a_string_method (Ljava/lang/String;)I
+	METHOD a findEffectTemplateIndex (Ljava/lang/String;)I
+		COMMENT VERIFIED
 	METHOD a setBitmapQuality (Z)V
 	METHOD a findFreeEffect (ZLcom/corrodinggames/rts/gameFramework/d/h;)Lcom/corrodinggames/rts/gameFramework/d/e;
 	METHOD b setForceHighQuality ()V
@@ -4351,32 +4431,52 @@ CLASS com/corrodinggames/rts/gameFramework/e com/corrodinggames/rts/gameFramewor
 	METHOD a hasValidCommandTargetPaths ()Z
 	METHOD a setMoveTarget (FF)V
 	METHOD a setBuildTarget (FFLcom/corrodinggames/rts/game/units/as;I)V
+		COMMENT VERIFIED
 	METHOD a setAttackMoveTarget (FFZ)V
+		COMMENT VERIFIED
 	METHOD a setRallyPoint (Landroid/graphics/PointF;)V
+		COMMENT VERIFIED
 	METHOD a canIssueOrdersToTeam (Lcom/corrodinggames/rts/game/n;Lcom/corrodinggames/rts/game/n;)Z
 	METHOD a setAttackMode (Lcom/corrodinggames/rts/game/units/a;)V
+		COMMENT VERIFIED
 	METHOD a setActionId (Lcom/corrodinggames/rts/game/units/a/c;)V
+		COMMENT VERIFIED
 	METHOD a setActionTarget (Lcom/corrodinggames/rts/game/units/a/c;Landroid/graphics/PointF;Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD a setAttackTarget (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD a setAttackTarget (Lcom/corrodinggames/rts/game/units/am;Z)V
-	METHOD a setTargetUnit (Lcom/corrodinggames/rts/game/units/y;)V
+		COMMENT VERIFIED
+	METHOD a addUnitToCommand (Lcom/corrodinggames/rts/game/units/y;)V
+		COMMENT VERIFIED
 	METHOD a serializeCommand (Lcom/corrodinggames/rts/gameFramework/j/as;)V
+		COMMENT VERIFIED
 	METHOD a deserializeCommand (Lcom/corrodinggames/rts/gameFramework/j/k;)V
+		COMMENT VERIFIED
 	METHOD a addUnitsToCommand (Ljava/util/AbstractList;)V
+		COMMENT VERIFIED
 	METHOD b precomputeCommandTargets ()V
 	METHOD b setAttackMoveTarget (FF)V
+		COMMENT VERIFIED
 	METHOD b setRepairTarget (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD c getTeam ()Lcom/corrodinggames/rts/game/n;
 	METHOD c setPatrolTarget (FF)V
+		COMMENT VERIFIED
 	METHOD c setGuardTarget (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD d getAffectedUnitCount ()I
 	METHOD d setReclaimTarget (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD e isSystemCommand ()Z
 	METHOD e setLoadIntoTarget (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD f cloneCommand ()Lcom/corrodinggames/rts/gameFramework/e;
 	METHOD f setLoadUpTarget (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD g prepareForNetworkTransfer ()V
 	METHOD h setClearExistingOrders ()V
+		COMMENT VERIFIED
 	METHOD i resolvePendingUnitIds ()V
 	METHOD j debugPrintCommand ()V
 	METHOD k executeCommand ()V
@@ -4496,7 +4596,8 @@ CLASS com/corrodinggames/rts/gameFramework/f com/corrodinggames/rts/gameFramewor
 	METHOD a abs (D)D
 	METHOD a min (DD)D
 	METHOD a toHexString (DI)Ljava/lang/String;
-	METHOD a sortRect (F)F
+	METHOD a squareRoot (F)F
+		COMMENT VERIFIED
 	METHOD a moveTowardsZero (FF)F
 	METHOD a distanceSq (FFF)F
 	METHOD a distanceSq (FFFF)F
@@ -4504,37 +4605,54 @@ CLASS com/corrodinggames/rts/gameFramework/f com/corrodinggames/rts/gameFramewor
 	METHOD a getRandomIntInRange (FFI)F
 	METHOD a padString (FI)Ljava/lang/String;
 	METHOD a normalizeAngle (FZ)F
-	METHOD a sqrt (I)I
+	METHOD a fastSquareRootInt (I)I
+		COMMENT VERIFIED
 	METHOD a getRandomIntInRange (II)I
 	METHOD a getRandomIntInRange (IIF)I
 	METHOD a getDeterministicRandomIntInRange (III)I
-	METHOD a countChars (IIII)I
-	METHOD a copyStream (J)Ljava/lang/String;
-	METHOD a getStackTrace (JJ)J
-	METHOD a replace (Landroid/graphics/PointF;Landroid/graphics/PointF;Landroid/graphics/PointF;Landroid/graphics/PointF;)Z
-	METHOD a sqrt (Landroid/graphics/Rect;)V
+	METHOD a chebyshevDistance (IIII)I
+		COMMENT VERIFIED
+	METHOD a formatDuration (J)Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD a elapsedMilliseconds (JJ)J
+		COMMENT VERIFIED
+	METHOD a lineSegmentsIntersect (Landroid/graphics/PointF;Landroid/graphics/PointF;Landroid/graphics/PointF;Landroid/graphics/PointF;)Z
+		COMMENT VERIFIED
+	METHOD a normalizeRect (Landroid/graphics/Rect;)V
+		COMMENT VERIFIED
 	METHOD a grow (Landroid/graphics/Rect;F)V
 	METHOD a rectanglesOverlap (Landroid/graphics/Rect;Landroid/graphics/RectF;)Z
-	METHOD a sortRect (Landroid/graphics/RectF;)V
+	METHOD a normalizeRect (Landroid/graphics/RectF;)V
+		COMMENT VERIFIED
 	METHOD a grow (Landroid/graphics/RectF;F)V
-	METHOD a getStackTrace (Landroid/graphics/RectF;Landroid/graphics/RectF;)Z
-	METHOD a copyStream (Lcom/corrodinggames/rts/game/units/am;FFI)F
-	METHOD a readStreamToString (Lcom/corrodinggames/rts/game/units/am;II)I
+	METHOD a rectanglesOverlap (Landroid/graphics/RectF;Landroid/graphics/RectF;)Z
+		COMMENT VERIFIED
+	METHOD a getDeterministicRandomFloat (Lcom/corrodinggames/rts/game/units/am;FFI)F
+		COMMENT VERIFIED
+	METHOD a getDeterministicRandomInt (Lcom/corrodinggames/rts/game/units/am;II)I
+		COMMENT VERIFIED
 	METHOD a getDeterministicRandomInt (Lcom/corrodinggames/rts/gameFramework/w;III)I
 	METHOD a readFileToString (Ljava/io/File;)Ljava/lang/String;
 	METHOD a readStreamToString (Ljava/io/InputStream;)Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD a copyStream (Ljava/io/InputStream;Ljava/io/OutputStream;)V
-	METHOD a formatDate (Ljava/lang/CharSequence;Ljava/lang/Iterable;)Ljava/lang/String;
-	METHOD a countChars (Ljava/lang/Class;I)Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD a joinStrings (Ljava/lang/CharSequence;Ljava/lang/Iterable;)Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD a getFieldNameByValue (Ljava/lang/Class;I)Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD a stackTraceToString (Ljava/lang/Exception;)Ljava/lang/String;
 	METHOD a formatExceptionMessage (Ljava/lang/Exception;Z)Ljava/lang/String;
-	METHOD a sqrt (Ljava/lang/Integer;Ljava/lang/Integer;)Z
-	METHOD a formatDate (Ljava/lang/String;)Ljava/lang/String;
+	METHOD a nullableIntegersEqual (Ljava/lang/Integer;Ljava/lang/Integer;)Z
+		COMMENT VERIFIED
+	METHOD a formatCurrentDate (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD a countOccurrences (Ljava/lang/String;C)I
 	METHOD a truncateToLength (Ljava/lang/String;I)Ljava/lang/String;
 	METHOD a replace (Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
 	METHOD a removeSuffix (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-	METHOD a readStreamToString (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+	METHOD a replaceSubstring (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD a padString (Z)Ljava/lang/String;
 	METHOD b randomUUID ()Ljava/lang/String;
 	METHOD b formatDouble ([B)Ljava/lang/String;
@@ -4549,11 +4667,14 @@ CLASS com/corrodinggames/rts/gameFramework/f com/corrodinggames/rts/gameFramewor
 	METHOD b max (II)I
 	METHOD b distance (III)I
 	METHOD b packArgb (IIII)I
-	METHOD b isGreaterThan (J)[I
-	METHOD b grow2 (Landroid/graphics/Rect;F)V
+	METHOD b secondsToTimeParts (J)[I
+		COMMENT VERIFIED
+	METHOD b expandRectForTouchTarget (Landroid/graphics/Rect;F)V
+		COMMENT VERIFIED
 	METHOD b clamp (Lcom/corrodinggames/rts/game/units/am;FFI)F
 	METHOD b endsWith (Ljava/io/InputStream;)Ljava/lang/String;
-	METHOD b isGreaterThan (Ljava/lang/Exception;)Ljava/lang/String;
+	METHOD b formatExceptionMessage (Ljava/lang/Exception;)Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD b md5Hex (Ljava/lang/String;)Ljava/lang/String;
 	METHOD b containsChar (Ljava/lang/String;C)Z
 	METHOD b truncateWithEllipsis (Ljava/lang/String;I)Ljava/lang/String;
@@ -4572,7 +4693,8 @@ CLASS com/corrodinggames/rts/gameFramework/f com/corrodinggames/rts/gameFramewor
 	METHOD c split (Ljava/lang/String;I)Ljava/lang/String;
 	METHOD c containsSubstring (Ljava/lang/String;Ljava/lang/String;)Z
 	METHOD d round (F)F
-	METHOD d m287d (FF)F
+	METHOD d randomRepairTargetOffset (FF)F
+		COMMENT VERIFIED
 	METHOD d createPointWithOffset (FFF)Landroid/graphics/PointF;
 	METHOD d getAngleBetweenPoints (FFFF)F
 	METHOD d abs (I)I
@@ -4603,7 +4725,8 @@ CLASS com/corrodinggames/rts/gameFramework/f com/corrodinggames/rts/gameFramewor
 	METHOD i fastAtan2 (FF)F
 	METHOD i escapeHtml (Ljava/lang/String;)Ljava/lang/String;
 	METHOD j fastSin (F)F
-	METHOD j isGreaterThan (FF)Z
+	METHOD j approximatelyEqual (FF)Z
+		COMMENT VERIFIED
 	METHOD j removeTrailingNewline (Ljava/lang/String;)Ljava/lang/String;
 	METHOD k fastCos (F)F
 	METHOD k approximatelyEqualStrict (FF)Z
@@ -4941,84 +5064,122 @@ CLASS com/corrodinggames/rts/gameFramework/f/g com/corrodinggames/rts/gameFramew
 	FIELD z selectionBoxMinWidth F
 	FIELD Z selectionBoxStartTime F
 	METHOD a shouldUseCircleSelect ()Z
+		COMMENT VERIFIED
 	METHOD a updateInput (F)V
 	METHOD a isWorldClickAllowedAt (FF)Z
+		COMMENT VERIFIED
 	METHOD a showCommandFeedback (FFF)V
 	METHOD a drawActionPreview (FFFLandroid/graphics/Point;)V
+		COMMENT VERIFIED
 	METHOD a handleBuildingPlacement (FFLandroid/graphics/Point;)V
-	METHOD a applyActionToCommand (FFLandroid/graphics/Point;Lcom/corrodinggames/rts/game/units/a/j;)V
+	METHOD a issueMapPingCommand (FFLandroid/graphics/Point;Lcom/corrodinggames/rts/game/units/a/j;)V
+		COMMENT VERIFIED
 	METHOD a executeUnitAction (FFLandroid/graphics/Point;Z)V
 	METHOD a sendMapPing (FFLcom/corrodinggames/rts/game/n;Lcom/corrodinggames/rts/game/units/a/j;)V
+		COMMENT VERIFIED
 	METHOD a findUnitAtPosition (FFZ)Lcom/corrodinggames/rts/game/units/am;
 	METHOD a initializeUIResources (Landroid/content/Context;)V
-	METHOD a setMenuDialog (Lcom/corrodinggames/rts/game/units/a/s;)Z
-	METHOD a drawRectCoords (Lcom/corrodinggames/rts/game/units/a/s;FF)Z
+		COMMENT VERIFIED
+	METHOD a isActionTargetingGround (Lcom/corrodinggames/rts/game/units/a/s;)Z
+		COMMENT VERIFIED
+	METHOD a hasInvalidActionTarget (Lcom/corrodinggames/rts/game/units/a/s;FF)Z
+		COMMENT VERIFIED
 	METHOD a prepareUnitActionCommand (Lcom/corrodinggames/rts/game/units/a/s;Landroid/graphics/PointF;Lcom/corrodinggames/rts/game/units/am;Lcom/corrodinggames/rts/gameFramework/e;)V
-	METHOD a drawActionPreviewWithFlag (Lcom/corrodinggames/rts/game/units/a/s;Z)Z
+	METHOD a canAffordActionForSelectedUnits (Lcom/corrodinggames/rts/game/units/a/s;Z)Z
+		COMMENT VERIFIED
 	METHOD a drawActionTooltip (Lcom/corrodinggames/rts/game/units/a/s;ZLcom/corrodinggames/rts/game/units/am;ZZ)Z
-	METHOD a drawActionTooltip2 (Lcom/corrodinggames/rts/game/units/a/s;ZLcom/corrodinggames/rts/game/units/am;ZZFZ)Z
-	METHOD a addUnitToSelection (Lcom/corrodinggames/rts/game/units/ag;)Z
-	METHOD a applyActionToCommandWithFlag (Lcom/corrodinggames/rts/game/units/ag;Lcom/corrodinggames/rts/game/units/am;)Z
-	METHOD a drawButtonAndHandleEvent (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
+	METHOD a drawActionTooltipAndHandleInput (Lcom/corrodinggames/rts/game/units/a/s;ZLcom/corrodinggames/rts/game/units/am;ZZFZ)Z
+		COMMENT VERIFIED
+	METHOD a playCommandSoundForSelectedUnits (Lcom/corrodinggames/rts/game/units/ag;)Z
+		COMMENT VERIFIED
+	METHOD a playCommandSoundForUnit (Lcom/corrodinggames/rts/game/units/ag;Lcom/corrodinggames/rts/game/units/am;)Z
+		COMMENT VERIFIED
+	METHOD a handleUnitSelectionClick (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD a drawTeamResources (Lcom/corrodinggames/rts/game/units/am;Z)V
-	METHOD a drawButtonAndHandleEventWithStyle (Lcom/corrodinggames/rts/game/units/am;ZFFLandroid/graphics/Point;)Z
-	METHOD a drawTextInRect (Lcom/corrodinggames/rts/game/units/h;)V
+	METHOD a handleUnitTargetClick (Lcom/corrodinggames/rts/game/units/am;ZFFLandroid/graphics/Point;)Z
+		COMMENT VERIFIED
+	METHOD a setEditorOrBuilder (Lcom/corrodinggames/rts/game/units/h;)V
+		COMMENT VERIFIED
 	METHOD a validateBuildingPlacement (Lcom/corrodinggames/rts/game/units/y;FFZZLcom/corrodinggames/rts/game/units/am;)Z
-	METHOD a setTargetForCommand (Lcom/corrodinggames/rts/gameFramework/e;)V
-	METHOD a drawActionPreviewWithTarget (Lcom/corrodinggames/rts/gameFramework/e;Lcom/corrodinggames/rts/game/units/a/s;)V
-	METHOD a drawButtonAndHandleEventAdvanced (Lcom/corrodinggames/rts/gameFramework/e;Lcom/corrodinggames/rts/game/units/a/s;Z)V
+	METHOD a addSelectedUnitsToCommand (Lcom/corrodinggames/rts/gameFramework/e;)V
+		COMMENT VERIFIED
+	METHOD a setActionCommandTargets (Lcom/corrodinggames/rts/gameFramework/e;Lcom/corrodinggames/rts/game/units/a/s;)V
+		COMMENT VERIFIED
+	METHOD a setActionCommandTarget (Lcom/corrodinggames/rts/gameFramework/e;Lcom/corrodinggames/rts/game/units/a/s;Z)V
+		COMMENT VERIFIED
 	METHOD a drawLabelInBox (Lcom/corrodinggames/rts/gameFramework/f/h;)Z
 	METHOD a drawInteractiveLabel (Lcom/corrodinggames/rts/gameFramework/f/h;Z)Z
-	METHOD a drawRectWithBorder (Lcom/corrodinggames/rts/gameFramework/l;)Z
+	METHOD a isShiftKeyPressed (Lcom/corrodinggames/rts/gameFramework/l;)Z
+		COMMENT VERIFIED
 	METHOD a highlightRect (Lcom/corrodinggames/rts/gameFramework/l;Lcom/corrodinggames/rts/game/n;ZLcom/corrodinggames/rts/game/units/custom/e/a;DLcom/corrodinggames/rts/game/units/custom/e/f;ILcom/corrodinggames/rts/game/units/custom/e/a;)Z
 	METHOD a drawRect (Lcom/corrodinggames/rts/gameFramework/l;Lcom/corrodinggames/rts/game/n;ZLcom/corrodinggames/rts/game/units/custom/e/f;)V
 	METHOD a drawTeamResources (Lcom/corrodinggames/rts/gameFramework/l;Lcom/corrodinggames/rts/game/n;ZZ)V
 		ARG 3 isAily
 		ARG 4 showDetails
 	METHOD a showInfoMessage (Ljava/lang/String;)V
+		COMMENT VERIFIED
 	METHOD a showInfoMessageWithPriority (Ljava/lang/String;I)V
+		COMMENT VERIFIED
 	METHOD a toggleGameAndUIState (Z)V
 	METHOD A hasUpgradedUnitsSelected ()Z
 	METHOD b calculateUIWidth ()F
 	METHOD b processTouchInput (F)V
 	METHOD b issueRallyPointCommand (FF)V
+		COMMENT VERIFIED
 	METHOD b selectUnitsInArea (FFF)V
 		ARG 1 x
 		ARG 2 y
 		ARG 3 radius
 	METHOD b issueMoveCommand (FFLandroid/graphics/Point;)V
+		COMMENT VERIFIED
 		ARG 1 worldX
 		ARG 2 worldY
 		ARG 3 ScreenPoint
 	METHOD b canUpgradeActionForSelectedUnits (Lcom/corrodinggames/rts/game/units/a/s;)Z
 	METHOD b executeUnitAction (Lcom/corrodinggames/rts/game/units/a/s;FF)V
 	METHOD b issueReclaimCommand (Lcom/corrodinggames/rts/game/units/am;)V
-	METHOD b drawSelectionBox (Lcom/corrodinggames/rts/gameFramework/l;)Z
+		COMMENT VERIFIED
+	METHOD b isControlKeyPressed (Lcom/corrodinggames/rts/gameFramework/l;)Z
+		COMMENT VERIFIED
 	METHOD b showMediumPriorityMessage (Ljava/lang/String;)V
+		COMMENT VERIFIED
 	METHOD b showMessageWithPriority (Ljava/lang/String;I)V
+		COMMENT VERIFIED
 	METHOD b removeFromSelection (Z)Z
 	METHOD B hasCombatUnitsSelected ()Z
+		COMMENT VERIFIED
 	METHOD c calculateCameraOpacity ()F
 	METHOD c handleTouchGestures (F)V
 	METHOD c issueMarchOrMoveCommand (FFLandroid/graphics/Point;)V
 		ARG 1 worldX
 		ARG 2 worldY
 		ARG 3 screennPoint
-	METHOD c isActionAvailableForSelectedUnits (Lcom/corrodinggames/rts/game/units/a/s;)Z
-	METHOD c showAttackFeedback (Lcom/corrodinggames/rts/game/units/am;)V
+	METHOD c isActionUnavailableForSelectedUnits (Lcom/corrodinggames/rts/game/units/a/s;)Z
+		COMMENT VERIFIED
+	METHOD c issueAttackTargetCommand (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD c isKeyboardSupportAndGraphicsEnabled (Lcom/corrodinggames/rts/gameFramework/l;)Z
 	METHOD c showHighPriorityMessage (Ljava/lang/String;)V
+		COMMENT VERIFIED
 	METHOD C hasMovableUnitsSelected ()Z
+		COMMENT VERIFIED
 	METHOD d resetMouseState ()V
 	METHOD d issueAttackCommand (FFLandroid/graphics/Point;)V
 		ARG 1 worldX
 		ARG 2 worldY
 		ARG 3 screenPoint
 	METHOD d getActionIcon (Lcom/corrodinggames/rts/game/units/a/s;)Ljava/lang/String;
-	METHOD d showRepairFeedback (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
+	METHOD d issueRepairCommand (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD d showDebugMessage (Ljava/lang/String;)V
-	METHOD D canSelectBuildings ()Z
+		COMMENT VERIFIED
+	METHOD D areAllSelectedUnitsAirborne ()Z
+		COMMENT VERIFIED
 	METHOD e initializeLocalizedStrings ()V
+		COMMENT VERIFIED
 	METHOD e getUnitsForAction (Lcom/corrodinggames/rts/game/units/a/s;)Lcom/corrodinggames/rts/gameFramework/utility/u;
 	METHOD e issueGuardCommand (Lcom/corrodinggames/rts/game/units/am;)V
 	METHOD E emptyMethod ()V
@@ -5030,7 +5191,8 @@ CLASS com/corrodinggames/rts/gameFramework/f/g com/corrodinggames/rts/gameFramew
 	METHOD g issueAttackCommand (Lcom/corrodinggames/rts/game/units/am;)V
 	METHOD G startGameEndSequence ()V
 	METHOD h clearEditorOrBuilder ()V
-	METHOD h selectAllSimilarBuildings (Lcom/corrodinggames/rts/game/units/am;)V
+	METHOD h selectAllSimilarUnits (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD H endGameSequence ()V
 	METHOD i getEditorOrBuilder ()Lcom/corrodinggames/rts/game/units/h;
 	METHOD i canUnitBeSelected (Lcom/corrodinggames/rts/game/units/am;)Z
@@ -5045,23 +5207,35 @@ CLASS com/corrodinggames/rts/gameFramework/f/g com/corrodinggames/rts/gameFramew
 	METHOD l deselectUnit (Lcom/corrodinggames/rts/game/units/am;)V
 	METHOD m shouldShowMouseCursor ()Z
 	METHOD m canControlUnit (Lcom/corrodinggames/rts/game/units/am;)Z
+		COMMENT VERIFIED
 	METHOD n isMouseSelectionActive ()Z
-	METHOD n canSelectedUnitsReachUnit (Lcom/corrodinggames/rts/game/units/am;)Z
+	METHOD n canSelectedUnitsLoadInto (Lcom/corrodinggames/rts/game/units/am;)Z
+		COMMENT VERIFIED
 	METHOD o isMouseInputActive ()Z
-	METHOD o canSelectedUnitsReachTarget (Lcom/corrodinggames/rts/game/units/am;)Z
+	METHOD o canSelectedUnitsLoadUp (Lcom/corrodinggames/rts/game/units/am;)Z
+		COMMENT VERIFIED
 	METHOD p canUseMouseSelection ()Z
-	METHOD p canSelectedUnitsReclaim (Lcom/corrodinggames/rts/game/units/am;)Z
+	METHOD p canSelectedUnitsRepair (Lcom/corrodinggames/rts/game/units/am;)Z
+		COMMENT VERIFIED
 	METHOD q getSelectedUnitCount ()I
-	METHOD q m303q (Lcom/corrodinggames/rts/game/units/am;)Z
+		COMMENT VERIFIED
+	METHOD q canSelectedUnitsReachTargetByPathfinding (Lcom/corrodinggames/rts/game/units/am;)Z
+		COMMENT VERIFIED
 	METHOD r getSelectedUnitsTeam ()Lcom/corrodinggames/rts/game/n;
+		COMMENT VERIFIED
 	METHOD r getUnitSelectionFadeEffect (Lcom/corrodinggames/rts/game/units/am;)F
 	METHOD s getFirstSelectedUnit ()Lcom/corrodinggames/rts/game/units/y;
+		COMMENT VERIFIED
 	METHOD t getFirstControllableSelectedUnit ()Lcom/corrodinggames/rts/game/units/y;
+		COMMENT VERIFIED
 	METHOD u canSetRallyPoint ()Z
+		COMMENT VERIFIED
 	METHOD v stopSelectedUnits ()V
+		COMMENT VERIFIED
 	METHOD w createBaseCommand ()Lcom/corrodinggames/rts/gameFramework/e;
 	METHOD x createCommandForSelectedUnits ()Lcom/corrodinggames/rts/gameFramework/e;
 	METHOD y clearSelection ()V
+		COMMENT VERIFIED
 	METHOD z getLastSelectedUnitModInfo ()Lcom/corrodinggames/rts/gameFramework/i/b;
 CLASS com/corrodinggames/rts/gameFramework/f/h com/corrodinggames/rts/gameFramework/ui/ConfirmationResult
 CLASS com/corrodinggames/rts/gameFramework/f/i com/corrodinggames/rts/gameFramework/ui/IconGroup
@@ -5520,16 +5694,19 @@ CLASS com/corrodinggames/rts/gameFramework/j/ad com/corrodinggames/rts/gameFrame
 	FIELD z localPlayerTeam Lcom/corrodinggames/rts/game/n;
 	METHOD a clearBans ()V
 	METHOD a applyChangedSetup (FLjava/lang/String;)V
-	METHOD a getFogModeString (Lcom/corrodinggames/rts/gameFramework/j/as;)V
+	METHOD a writeGameSetup (Lcom/corrodinggames/rts/gameFramework/j/as;)V
+		COMMENT VERIFIED
 	METHOD a processGamePacket (Lcom/corrodinggames/rts/gameFramework/j/au;)V
 		ARG 1 packet
 	METHOD a getActiveBanForConnection (Lcom/corrodinggames/rts/gameFramework/j/c;)Lcom/corrodinggames/rts/gameFramework/j/aj;
 	METHOD a banConnection (Lcom/corrodinggames/rts/gameFramework/j/c;Ljava/lang/String;I)Z
-	METHOD a applyAIDifficultyOverride (Ljava/lang/String;)Ljava/lang/String;
+	METHOD a setPlayerNameFromInput (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD a setPublicIpInfoResult (ZLjava/lang/String;Ljava/lang/Boolean;)V
 	METHOD aa regenerateOwnServerId ()V
 	METHOD ab getOwnServerId ()Ljava/lang/String;
-	METHOD A setPlayerName ()V
+	METHOD A resetConnectionStatusFlags ()V
+		COMMENT VERIFIED
 	METHOD ac getCurrentServerId ()Ljava/lang/String;
 	METHOD ad sendClientStatusPacket ()V
 	METHOD aC queueReturnToBattleroom ()V
@@ -5557,7 +5734,8 @@ CLASS com/corrodinggames/rts/gameFramework/j/ad com/corrodinggames/rts/gameFrame
 	METHOD ay removeDisconnectingConnections ()V
 	METHOD az resetResyncTracking ()V
 	METHOD b pruneExpiredBans ()V
-	METHOD b getAIDifficultyString (Lcom/corrodinggames/rts/game/n;)Z
+	METHOD b updateAiTeamName (Lcom/corrodinggames/rts/game/n;)Z
+		COMMENT VERIFIED
 	METHOD g reportDesync (Ljava/lang/String;)V
 	METHOD R startSandboxServer ()Z
 	METHOD S startSingleplayerServer ()Z
@@ -5568,24 +5746,30 @@ CLASS com/corrodinggames/rts/gameFramework/j/ad com/corrodinggames/rts/gameFrame
 		ARG 1 packet
 	METHOD b disconnectNetworking (Ljava/lang/String;)V
 	METHOD b startServerHosting (Z)Z
-	METHOD B updatePlayerTeamNameForAI ()I
-	METHOD c getDifficultyString ()F
+	METHOD B getPlayerConnectionCount ()I
+		COMMENT VERIFIED
+	METHOD c getCurrentStepRate ()F
+		COMMENT VERIFIED
 	METHOD c update (F)V
 		ARG 1 delta
 	METHOD c handlePreregisterInfo (Lcom/corrodinggames/rts/gameFramework/j/au;)V
 		ARG 1 packet
 	METHOD c ensureKeepAliveTimerStarted (Z)V
-	METHOD C getCurrentStepRate ()I
+	METHOD C getConnectedPlayerCount ()I
+		COMMENT VERIFIED
 	METHOD d resetSyncChecksumState ()V
 	METHOD d scheduleReturnToBattleroom (F)V
-	METHOD D resetSyncState ()I
+	METHOD D getRegisteredNonRelayConnectionCount ()I
+		COMMENT VERIFIED
 	METHOD e updateDesyncResyncTimer (F)V
 	METHOD e setGamePaused (Z)V
 	METHOD e getEditableRoomSettings ()Lcom/corrodinggames/rts/gameFramework/j/ah;
-	METHOD E getChangeableRoomSettings ()I
+	METHOD E getPlayerCount ()I
+		COMMENT VERIFIED
 	METHOD f refreshAIDifficultyForTeams ()V
 	METHOD F updateAIDifficulty ()V
-	METHOD G getFogDescription ()V
+	METHOD G checkConnectionPings ()V
+		COMMENT VERIFIED
 	METHOD H showPlayerListPopup ()V
 	METHOD I shouldGameBePausedForPathfinding ()Z
 	METHOD K closeBattleroom ()V
@@ -5729,89 +5913,163 @@ CLASS com/corrodinggames/rts/gameFramework/j/aq com/corrodinggames/rts/gameFrame
 CLASS com/corrodinggames/rts/gameFramework/j/ar com/corrodinggames/rts/gameFramework/network/PlatformHelper
 CLASS com/corrodinggames/rts/gameFramework/j/as com/corrodinggames/rts/gameFramework/network/GameOutputStream
 	FIELD a currentDataOutput Ljava/io/DataOutputStream;
+		COMMENT VERIFIED
 	FIELD b rootByteBuffer Ljava/io/ByteArrayOutputStream;
+		COMMENT VERIFIED
 	FIELD c rootDataOutput Ljava/io/DataOutputStream;
-	FIELD d maxBufferSize I
+		COMMENT VERIFIED
+	FIELD d streamVersion I
+		COMMENT VERIFIED
 	FIELD e outputBlockStack Ljava/util/LinkedList;
+		COMMENT VERIFIED
 	METHOD a flushAllBuffers ()V
+		COMMENT VERIFIED
 	METHOD a writeBytesWithLength ([B)V
+		COMMENT VERIFIED
 	METHOD a writeDouble (D)V
+		COMMENT VERIFIED
 	METHOD a writeFloat (F)V
+		COMMENT VERIFIED
 	METHOD a writeInt (I)V
+		COMMENT VERIFIED
 	METHOD a buildPacketData (II)Lcom/corrodinggames/rts/gameFramework/j/au;
+		COMMENT VERIFIED
 		ARG 1 packetType
 		ARG 2 delayMills
 	METHOD a writeLong (J)V
+		COMMENT VERIFIED
 	METHOD a writePointFNullable (Landroid/graphics/PointF;)V
+		COMMENT VERIFIED
 	METHOD a writeTeamIdByte (Lcom/corrodinggames/rts/game/n;)V
+		COMMENT VERIFIED
 	METHOD a writeUnitIdOrNullBaseUnit (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD a writeUnitTypeId (Lcom/corrodinggames/rts/game/units/as;)V
+		COMMENT VERIFIED
 	METHOD a writeAnimationTag (Lcom/corrodinggames/rts/game/units/custom/g;)V
-	METHOD a writeUnitIdOrNullUnitEntity (Lcom/corrodinggames/rts/game/units/y;)V
+		COMMENT VERIFIED
+	METHOD a writeOrderableUnit (Lcom/corrodinggames/rts/game/units/y;)V
+		COMMENT VERIFIED
 	METHOD a writeConnectionIdInt (Lcom/corrodinggames/rts/gameFramework/j/c;)V
+		COMMENT VERIFIED
 	METHOD a writeGameInputStreamWithLength (Lcom/corrodinggames/rts/gameFramework/j/k;)V
-	METHOD a startBlockInternal (Lcom/corrodinggames/rts/gameFramework/utility/m;)V
+		COMMENT VERIFIED
+	METHOD a writeGameObjectList (Lcom/corrodinggames/rts/gameFramework/utility/m;)V
+		COMMENT VERIFIED
 	METHOD a writeObjectId (Lcom/corrodinggames/rts/gameFramework/w;)V
+		COMMENT VERIFIED
 	METHOD a writeByteArrayWithLength (Ljava/io/ByteArrayOutputStream;)V
+		COMMENT VERIFIED
 	METHOD a writeStreamWithLength (Ljava/io/File;)V
+		COMMENT VERIFIED
 	METHOD a writeInputStreamWithLength (Ljava/io/InputStream;I)V
+		COMMENT VERIFIED
 	METHOD a writeEnumOrdinal (Ljava/lang/Enum;)V
+		COMMENT VERIFIED
 	METHOD a writeIntNullable (Ljava/lang/Integer;)V
+		COMMENT VERIFIED
 	METHOD a endBlock (Ljava/lang/String;)V
+		COMMENT VERIFIED
 		ARG 1 name
 	METHOD a beginBlockInternal (Ljava/lang/String;Z)V
+		COMMENT VERIFIED
 	METHOD a writeShort (S)V
+		COMMENT VERIFIED
 	METHOD a writeBoolean (Z)V
+		COMMENT VERIFIED
 	METHOD b useMainStream ()V
+		COMMENT VERIFIED
 	METHOD b writeBytesRaw ([B)V
+		COMMENT VERIFIED
 	METHOD b buildPacketData (I)Lcom/corrodinggames/rts/gameFramework/j/au;
+		COMMENT VERIFIED
 		ARG 1 packetType
 	METHOD b writeUnitIdIfAlive (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD b writeExistingObjectId (Lcom/corrodinggames/rts/gameFramework/w;)V
+		COMMENT VERIFIED
 	METHOD b writeStringNullable (Ljava/lang/String;)V
+		COMMENT VERIFIED
 	METHOD c getBufferAsString ()Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD c writeByte (I)V
+		COMMENT VERIFIED
 	METHOD c writeStringUTF (Ljava/lang/String;)V
+		COMMENT VERIFIED
 	METHOD d toByteArray ()[B
-	METHOD d debugPlaceholder (Ljava/lang/String;)V
+		COMMENT VERIFIED
+	METHOD d writeDebugMessage (Ljava/lang/String;)V
+		COMMENT VERIFIED
 	METHOD e writeMagicShort ()V
+		COMMENT VERIFIED
 	METHOD e startBlock (Ljava/lang/String;)V
-	METHOD f isCompressionEnabled ()Z
-	METHOD g getMaxSize ()I
+		COMMENT VERIFIED
+	METHOD f isDebugStream ()Z
+		COMMENT VERIFIED
+	METHOD g getStreamVersion ()I
+		COMMENT VERIFIED
 	METHOD h close ()V
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/j/at com/corrodinggames/rts/gameFramework/network/StreamBlock
 	FIELD a gzipOutput Ljava/util/zip/GZIPOutputStream;
+		COMMENT VERIFIED
 	FIELD b bufferedOutput Ljava/io/BufferedOutputStream;
+		COMMENT VERIFIED
 	FIELD c blockName Ljava/lang/String;
+		COMMENT VERIFIED
 	FIELD d byteBuffer Ljava/io/ByteArrayOutputStream;
+		COMMENT VERIFIED
 	FIELD e dataOutput Ljava/io/DataOutputStream;
+		COMMENT VERIFIED
 	FIELD f deferClose Z
+		COMMENT VERIFIED
 	METHOD a flush ()V
+		COMMENT VERIFIED
 	METHOD b close ()V
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/j/au com/corrodinggames/rts/gameFramework/network/PacketData
 	FIELD a connection Lcom/corrodinggames/rts/gameFramework/j/c;
+		COMMENT VERIFIED
 	FIELD b packetType I
+		COMMENT VERIFIED
 	FIELD c bytes [B
+		COMMENT VERIFIED
 	FIELD d delayMillis I
+		COMMENT VERIFIED
 	FIELD e isUrgent Z
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/j/av com/corrodinggames/rts/gameFramework/network/KeepAliveTimer
-	FIELD a isRunning Z
-	FIELD b lastPingTime J
+	FIELD a sendPingNext Z
+		COMMENT VERIFIED
+	FIELD b lastKeepAliveTime J
+		COMMENT VERIFIED
 	FIELD c networkEngine Lcom/corrodinggames/rts/gameFramework/j/ad;
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/j/aw com/corrodinggames/rts/gameFramework/network/DebugOutputStream
 	FIELD a buffer Ljava/io/ByteArrayOutputStream;
+		COMMENT VERIFIED
 	FIELD e mainPrintStream Ljava/io/PrintStream;
+		COMMENT VERIFIED
 	FIELD f activePrintStream Ljava/io/PrintStream;
+		COMMENT VERIFIED
 	FIELD g blockStack Ljava/util/LinkedList;
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/j/ax com/corrodinggames/rts/gameFramework/network/BlockOutputStream
 	FIELD a bufferedStream Ljava/io/BufferedOutputStream;
+		COMMENT VERIFIED
 	FIELD b blockName Ljava/lang/String;
+		COMMENT VERIFIED
 	FIELD c buffer Ljava/io/ByteArrayOutputStream;
+		COMMENT VERIFIED
 	FIELD d printStream Ljava/io/PrintStream;
+		COMMENT VERIFIED
 	FIELD e deferClose Z
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/j/ay com/corrodinggames/rts/gameFramework/network/SplitPacketData
 	FIELD f originalPacket Lcom/corrodinggames/rts/gameFramework/j/au;
+		COMMENT VERIFIED
 	FIELD g steamChannelId I
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/j/b com/corrodinggames/rts/gameFramework/network/ChatMessage
 CLASS com/corrodinggames/rts/gameFramework/j/c com/corrodinggames/rts/gameFramework/network/NetworkConnection
 	FIELD a isDisconnecting Z
@@ -5850,14 +6108,17 @@ CLASS com/corrodinggames/rts/gameFramework/j/c com/corrodinggames/rts/gameFramew
 	FIELD w isForwarded Z
 	FIELD W networkEngine Lcom/corrodinggames/rts/gameFramework/j/ad;
 	FIELD z player Lcom/corrodinggames/rts/game/e;
-	METHOD a disconnectWithMessage ()Z
+	METHOD a isCommandRateLimitExceeded ()Z
+		COMMENT VERIFIED
 	METHOD a enqueuePacket (Lcom/corrodinggames/rts/gameFramework/j/au;)V
 	METHOD a handleRemoteDisconnect (Ljava/lang/String;)V
 	METHOD a logErrorWithException (Ljava/lang/String;Ljava/lang/Throwable;)V
 	METHOD a handleTimeoutDisconnect (ZZ)V
 	METHOD a sendPacket (ZZLjava/lang/String;)V
-	METHOD b logDebug ()I
-	METHOD b getRecentPingMs (Ljava/lang/String;)V
+	METHOD b getRecentPingMs ()I
+		COMMENT VERIFIED
+	METHOD b logDebug (Ljava/lang/String;)V
+		COMMENT VERIFIED
 	METHOD c getPlayerTeamId ()I
 	METHOD c logInfo (Ljava/lang/String;)V
 	METHOD d startWorkers ()V
@@ -5937,52 +6198,94 @@ CLASS com/corrodinggames/rts/gameFramework/j/j com/corrodinggames/rts/gameFramew
 	FIELD b steamSocket Lcom/corrodinggames/rts/gameFramework/j/h;
 CLASS com/corrodinggames/rts/gameFramework/j/k com/corrodinggames/rts/gameFramework/network/GameInputStream
 	FIELD a byteArrayInput Ljava/io/ByteArrayInputStream;
+		COMMENT VERIFIED
 	FIELD b protocolVersion I
-	FIELD c maxBlockSize I
+		COMMENT VERIFIED
+	FIELD c streamVersion I
+		COMMENT VERIFIED
 	FIELD d bytesRead I
 	FIELD e rootDataInput Ljava/io/DataInputStream;
+		COMMENT VERIFIED
 	FIELD f currentDataInput Ljava/io/DataInputStream;
+		COMMENT VERIFIED
 	FIELD g inputBlockStack Ljava/util/LinkedList;
+		COMMENT VERIFIED
 	METHOD <init> (Lcom/corrodinggames/rts/gameFramework/j/au;)V
+		COMMENT VERIFIED
 		ARG 1 packet
 	METHOD a useMainStream ()V
+		COMMENT VERIFIED
 	METHOD a setProtocolVersion (I)V
-	METHOD a startBlockNamed (Lcom/corrodinggames/rts/gameFramework/j/m;)Lcom/corrodinggames/rts/game/units/am;
-	METHOD a assertMagicShort (Lcom/corrodinggames/rts/gameFramework/utility/m;Ljava/lang/Class;)V
-	METHOD a readBaseUnitWithStatus (Ljava/lang/Class;)Lcom/corrodinggames/rts/gameFramework/w;
+		COMMENT VERIFIED
+	METHOD a readBaseUnit (Lcom/corrodinggames/rts/gameFramework/j/m;)Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
+	METHOD a readGameObjectList (Lcom/corrodinggames/rts/gameFramework/utility/m;Ljava/lang/Class;)V
+		COMMENT VERIFIED
+	METHOD a readGameObject (Ljava/lang/Class;)Lcom/corrodinggames/rts/gameFramework/w;
+		COMMENT VERIFIED
 		ARG 1 clazz
 	METHOD b getProtocolVersion ()I
-	METHOD b setMaxBlockSize (I)V
+		COMMENT VERIFIED
+	METHOD b setStreamVersion (I)V
+		COMMENT VERIFIED
 	METHOD b readEnumOrdinalOrNull (Ljava/lang/Class;)Ljava/lang/Enum;
+		COMMENT VERIFIED
 	METHOD b startBlockNamed (Ljava/lang/String;)V
-	METHOD c getMaxBlockSize ()I
+		COMMENT VERIFIED
+	METHOD c getStreamVersion ()I
+		COMMENT VERIFIED
 	METHOD d readByte ()B
+		COMMENT VERIFIED
 	METHOD e readBoolean ()Z
+		COMMENT VERIFIED
 	METHOD f readInt ()I
+		COMMENT VERIFIED
 	METHOD g readFloat ()F
+		COMMENT VERIFIED
 	METHOD h readDouble ()D
+		COMMENT VERIFIED
 	METHOD i readLong ()J
+		COMMENT VERIFIED
 	METHOD j readNullableString ()Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD k readNullableInt ()Ljava/lang/Integer;
+		COMMENT VERIFIED
 	METHOD l readUTF ()Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD m readAnimationTag ()Lcom/corrodinggames/rts/game/units/custom/g;
-	METHOD n readLongOptional ()J
+		COMMENT VERIFIED
+	METHOD n readUnitId ()J
+		COMMENT VERIFIED
 	METHOD o readBaseUnit ()Lcom/corrodinggames/rts/game/units/am;
-	METHOD p readUnitEntity ()Lcom/corrodinggames/rts/game/units/y;
+		COMMENT VERIFIED
+	METHOD p readOrderableUnit ()Lcom/corrodinggames/rts/game/units/y;
+		COMMENT VERIFIED
 	METHOD r readRequiredPlayerTeam ()Lcom/corrodinggames/rts/game/n;
+		COMMENT VERIFIED
 	METHOD s readOptionalPlayerTeam ()Lcom/corrodinggames/rts/game/n;
+		COMMENT VERIFIED
 	METHOD t readBytesWithLength ()[B
+		COMMENT VERIFIED
 	METHOD u readNestedStream ()Lcom/corrodinggames/rts/gameFramework/j/k;
+		COMMENT VERIFIED
 	METHOD v readShortValue ()S
+		COMMENT VERIFIED
 	METHOD w getActiveInputStream ()Ljava/io/InputStream;
+		COMMENT VERIFIED
 	METHOD x startBlockAndGetName ()Ljava/lang/String;
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/j/l com/corrodinggames/rts/gameFramework/network/BlockInput
 	FIELD a blockName Ljava/lang/String;
+		COMMENT VERIFIED
 	FIELD b byteInput Ljava/io/ByteArrayInputStream;
+		COMMENT VERIFIED
 	FIELD c dataInput Ljava/io/DataInputStream;
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/j/m com/corrodinggames/rts/gameFramework/network/ConnectionStatus
 	FIELD a EXPECTED Lcom/corrodinggames/rts/gameFramework/j/m;
+		COMMENT VERIFIED
 	FIELD b WARN Lcom/corrodinggames/rts/gameFramework/j/m;
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/j/n com/corrodinggames/rts/gameFramework/network/MasterServerClient
 	FIELD a ENABLE_STATUS_LOGGING Z
 	FIELD b ENABLE_CONSOLE_LOGGING Z
@@ -6071,7 +6374,8 @@ CLASS com/corrodinggames/rts/gameFramework/k/j com/corrodinggames/rts/gameFramew
 CLASS com/corrodinggames/rts/gameFramework/k/k com/corrodinggames/rts/gameFramework/pathfinding/Path
 	FIELD r isLowPriority Z
 CLASS com/corrodinggames/rts/gameFramework/k/l com/corrodinggames/rts/gameFramework/path/PathEngine
-	METHOD a a (Lcom/corrodinggames/rts/game/units/ao;II)Z
+	METHOD a isTileBlockedForMovement (Lcom/corrodinggames/rts/game/units/ao;II)Z
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/k/m com/corrodinggames/rts/gameFramework/pathfinding/PathOpenListPool
 CLASS com/corrodinggames/rts/gameFramework/k/n com/corrodinggames/rts/gameFramework/pathfinding/PathOpenListNode
 CLASS com/corrodinggames/rts/gameFramework/k/o com/corrodinggames/rts/gameFramework/pathfinding/PathSolver
@@ -6748,19 +7052,47 @@ CLASS com/corrodinggames/rts/gameFramework/utility/ae com/corrodinggames/rts/gam
 	METHOD b getZipFileLoaderForPath (Ljava/lang/String;)Lcom/corrodinggames/rts/gameFramework/utility/af;
 	METHOD c closeModFile (Ljava/lang/String;)V
 CLASS com/corrodinggames/rts/gameFramework/utility/af com/corrodinggames/rts/gameFramework/utility/IFileLoader
-	METHOD a isDirect ()V
+	METHOD a closeAll ()V
+		COMMENT VERIFIED
 	METHOD a exists (Ljava/lang/String;)Z
-	METHOD a getRWFile (Ljava/lang/String;Ljava/lang/String;)Z
+		COMMENT VERIFIED
+	METHOD a rename (Ljava/lang/String;Ljava/lang/String;)Z
+		COMMENT VERIFIED
 	METHOD a getSize (Ljava/lang/String;Z)J
+		COMMENT VERIFIED
 	METHOD b listDir (Ljava/lang/String;)[Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD b openAssetInputStream (Ljava/lang/String;Z)Lcom/corrodinggames/rts/gameFramework/utility/j;
+		COMMENT VERIFIED
 	METHOD c delete (Ljava/lang/String;)Z
+		COMMENT VERIFIED
 	METHOD c openOutputStream (Ljava/lang/String;Z)Ljava/io/OutputStream;
-	METHOD d move (Ljava/lang/String;)Z
+		COMMENT VERIFIED
+	METHOD d isDirectory (Ljava/lang/String;)Z
+		COMMENT VERIFIED
 	METHOD e createDirectory (Ljava/lang/String;)Z
-	METHOD f getLastModified (Ljava/lang/String;)Ljava/lang/String;
-	METHOD g getFullPath (Ljava/lang/String;)J
+		COMMENT VERIFIED
+	METHOD f convertAbstractPathForDebug (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD g getLastModified (Ljava/lang/String;)J
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/utility/ag com/corrodinggames/rts/gameFramework/utility/RwmodFileLoader
+	FIELD a zipFileCache Ljava/util/HashMap;
+		COMMENT VERIFIED
+	METHOD d getOrOpenZipHelper (Ljava/lang/String;Z)Lcom/corrodinggames/rts/gameFramework/utility/ah;
+		COMMENT VERIFIED
+	METHOD e closeZipFile (Ljava/lang/String;Z)V
+		COMMENT VERIFIED
+	METHOD h logZipMessage (Ljava/lang/String;)V
+		COMMENT VERIFIED
+	METHOD i isRwmodPath (Ljava/lang/String;)Z
+		COMMENT VERIFIED
+	METHOD j getRwmodArchivePath (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD k closeModFile (Ljava/lang/String;)V
+		COMMENT VERIFIED
+	METHOD l getPathInZip (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/utility/ah com/corrodinggames/rts/gameFramework/utility/ZipHelper
 CLASS com/corrodinggames/rts/gameFramework/utility/ai com/corrodinggames/rts/gameFramework/utility/Vector3D
 CLASS com/corrodinggames/rts/gameFramework/utility/aj com/corrodinggames/rts/gameFramework/utility/RunnableQueue
@@ -6810,20 +7142,30 @@ CLASS com/corrodinggames/rts/gameFramework/utility/r com/corrodinggames/rts/game
 CLASS com/corrodinggames/rts/gameFramework/utility/s com/corrodinggames/rts/gameFramework/utility/GameObjectArrayList
 CLASS com/corrodinggames/rts/gameFramework/utility/SlickToAndroidKeycodes
 	FIELD a slickToAndroid Ljava/util/HashMap;
-	FIELD b androidToSlick Ljava/util/HashMap;
-	FIELD c androidToGdx Ljava/util/HashMap;
+	FIELD b gdxToAndroidMap Ljava/util/HashMap;
+		COMMENT VERIFIED
+	FIELD c gdxToSlickMap Ljava/util/HashMap;
+		COMMENT VERIFIED
 	FIELD d slickNameMap Ljava/util/HashMap;
 	FIELD e androidNameMap Ljava/util/HashMap;
 	FIELD f gdxNameMap Ljava/util/HashMap;
-	FIELD g gdxToAndroid Ljava/util/HashMap;
-	METHOD a getKeyCode ()V
+	FIELD g androidKeyCodeToNameMap Ljava/util/HashMap;
+		COMMENT VERIFIED
+	METHOD a initializeKeyCodeMaps ()V
+		COMMENT VERIFIED
 	METHOD a createKeyNameMap (Ljava/lang/Class;)Ljava/util/HashMap;
-	METHOD a initializeSlickToAndroidMapping (Ljava/lang/String;)I
-	METHOD a getKeyName (Ljava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;)Ljava/util/HashMap;
-	METHOD b convertAndroidToSlick ()V
-	METHOD b initializeGdxToAndroidMapping (I)I
-	METHOD c convertGdxToAndroid ()V
-	METHOD c initializeAndroidToGdxMapping (I)Ljava/lang/Integer;
+	METHOD a getAndroidKeyCode (Ljava/lang/String;)I
+		COMMENT VERIFIED
+	METHOD a buildKeyCodeConversionMap (Ljava/lang/String;Ljava/util/HashMap;Ljava/util/HashMap;)Ljava/util/HashMap;
+		COMMENT VERIFIED
+	METHOD b initializeGdxToAndroidMap ()V
+		COMMENT VERIFIED
+	METHOD b convertSlickToAndroidKeyCode (I)I
+		COMMENT VERIFIED
+	METHOD c initializeGdxToSlickMap ()V
+		COMMENT VERIFIED
+	METHOD c convertSlickToGdxKeyCode (I)Ljava/lang/Integer;
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/utility/t com/corrodinggames/rts/gameFramework/utility/GameObjectArrayListIterator
 CLASS com/corrodinggames/rts/gameFramework/utility/u com/corrodinggames/rts/gameFramework/utility/UnitList
 CLASS com/corrodinggames/rts/gameFramework/utility/v com/corrodinggames/rts/gameFramework/utility/UnitListIterator
@@ -6857,22 +7199,38 @@ CLASS com/corrodinggames/rts/gameFramework/w com/corrodinggames/rts/gameFramewor
 CLASS com/corrodinggames/rts/gameFramework/x com/corrodinggames/rts/gameFramework/GameObjectComparator
 CLASS com/corrodinggames/rts/gameFramework/y com/corrodinggames/rts/gameFramework/GameSaver
 	FIELD a debugPlainTextSave Z
+		COMMENT VERIFIED
 	FIELD b isProfilingEnabled Z
+		COMMENT VERIFIED
 	FIELD c firstTick I
 	FIELD d lastAutosaveTick I
-	METHOD a resetAutosaveTimers ()Z
-	METHOD a createTempFile (Lcom/corrodinggames/rts/gameFramework/j/as;)V
-	METHOD a writeSaveToStream (Lcom/corrodinggames/rts/gameFramework/j/k;ZZZ)Z
-	METHOD a writeSaveGame (Ljava/lang/String;)Ljava/lang/String;
-	METHOD a convertMapPath (Ljava/lang/String;Lcom/corrodinggames/rts/gameFramework/j/as;)V
+		COMMENT VERIFIED
+	METHOD a canAutosave ()Z
+		COMMENT VERIFIED
+	METHOD a writeSaveToStream (Lcom/corrodinggames/rts/gameFramework/j/as;)V
+		COMMENT VERIFIED
+	METHOD a readSaveFromStream (Lcom/corrodinggames/rts/gameFramework/j/k;ZZZ)Z
+		COMMENT VERIFIED
+	METHOD a normalizeDemoMapPath (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD a writeSaveFileToStream (Ljava/lang/String;Lcom/corrodinggames/rts/gameFramework/j/as;)V
+		COMMENT VERIFIED
 	METHOD a getSaveFile (Ljava/lang/String;Ljava/lang/String;Z)Ljava/io/File;
-	METHOD a isAutosaveEnabled (Ljava/lang/String;Z)Ljava/io/File;
-	METHOD a readSaveGame (Z)V
-	METHOD b deleteSave ()V
-	METHOD b saveGame (Ljava/lang/String;)Z
-	METHOD b updateAutosave (Ljava/lang/String;Z)V
-	METHOD c loadSave ()V
-	METHOD c performAutosave (Ljava/lang/String;Z)Z
+		COMMENT VERIFIED
+	METHOD a getSaveFilePath (Ljava/lang/String;Z)Ljava/io/File;
+		COMMENT VERIFIED
+	METHOD a resetAutosaveTimers (Z)V
+		COMMENT VERIFIED
+	METHOD b updateAutosaveTimer ()V
+		COMMENT VERIFIED
+	METHOD b deleteSaveGame (Ljava/lang/String;)Z
+		COMMENT VERIFIED
+	METHOD b saveGame (Ljava/lang/String;Z)V
+		COMMENT VERIFIED
+	METHOD c performAutosave ()V
+		COMMENT VERIFIED
+	METHOD c loadSaveFile (Ljava/lang/String;Z)Z
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/z com/corrodinggames/rts/gameFramework/GameThread
 CLASS com/corrodinggames/rts/java/a com/corrodinggames/rts/java/SlickTextureWrapper
 CLASS com/corrodinggames/rts/java/a/a com/corrodinggames/rts/java/image/SlickImageDataWrapper
