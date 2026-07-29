@@ -19,7 +19,7 @@ class MusicUpdateThread extends Thread {
                 this.musicManager.updateCoreRunning = true;
                 if (!this.musicManager.updateRunning) {
                     try {
-                        this.musicManager.updateLock.wait(MusicManager.musicFactory.isMusicSupported());
+                        this.musicManager.updateLock.wait(MusicManager.musicFactory.getUpdateThreadWaitTimeoutMillis());
                     } catch (InterruptedException e) {
                     }
                 }

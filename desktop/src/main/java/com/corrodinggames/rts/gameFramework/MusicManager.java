@@ -348,7 +348,7 @@ public class MusicManager {
         if (GameEngine.isDedicatedServer()) {
             return;
         }
-        musicFactory.createMusicTrack(f);
+        musicFactory.update(f);
         if (!isMusicEnabled()) {
             if (this.isPlaying && this.currentTrack.c()) {
                 pauseMusic();
@@ -517,8 +517,8 @@ public class MusicManager {
             }
         }
         if (this.fadingOut || this.volumeChanged) {
-            boolean zIsMusicPlaying = musicFactory.isMusicPlaying();
-            if (!zIsMusicPlaying) {
+            boolean requiresSequentialFade = musicFactory.requiresSequentialFade();
+            if (!requiresSequentialFade) {
                 if (this.quickFade) {
                     this.fadeLevel -= f * 0.1f;
                 } else {
@@ -531,7 +531,7 @@ public class MusicManager {
             } else {
                 this.fadeLevel -= f * 0.008f;
             }
-            if (!zIsMusicPlaying) {
+            if (!requiresSequentialFade) {
                 musicVolume = this.fadeLevel * getMusicVolume();
                 musicVolume2 = (1.0f - this.fadeLevel) * getMusicVolume();
             } else {

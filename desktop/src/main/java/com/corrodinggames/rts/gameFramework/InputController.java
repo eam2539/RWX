@@ -309,6 +309,6 @@ public class InputController {
         if (str.equalsIgnoreCase("CLEARED")) {
             return 0;
         }
-        return SlickToAndroidKeycodes.initializeSlickToAndroidMapping(str);
+        return SlickToAndroidKeycodes.getAndroidKeyCode(str);
     }
 }

@@ -200,7 +200,7 @@ public final class GameViewUtils {
         PathEngine pathEngine = GameEngine.getInstance().pathfindingEngine;
         TileMap tileMap = GameEngine.getInstance().tileMap;
         tileMap.setCursorTileIndexFromWorldPoint(f2, f3);
-        return pathEngine.a(unitMovementType, tileMap.cursorTileX, tileMap.cursorTileY);
+        return pathEngine.isTileBlockedForMovement(unitMovementType, tileMap.cursorTileX, tileMap.cursorTileY);
     }
 
     public static short b(float f2, float f3, UnitMovementType unitMovementType) {
@@ -403,7 +403,7 @@ public final class GameViewUtils {
         for (int i = 0; i <= 2; i++) {
             for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
                 if ((baseUnit instanceof BaseUnit) && !baseUnit.isDead && baseUnit.team == playerTeam) {
-                    if (i == 0 && baseUnit.isSelectable) {
+                    if (i == 0 && baseUnit.changeTeam) {
                         pointF.a(baseUnit.posX, baseUnit.posY);
                         return;
                     } else if (i == 1 && baseUnit.isTargetable) {

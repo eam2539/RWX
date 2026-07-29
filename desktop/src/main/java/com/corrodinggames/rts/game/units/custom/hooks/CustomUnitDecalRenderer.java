@@ -286,7 +286,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                 } else {
                     str = string2;
                 }
-                decalDefinition.ae = customUnitConfig.getConfigDisplayPath(str);
+                decalDefinition.ae = customUnitConfig.findLegConfigIndex(str);
                 if (decalDefinition.ae == -1) {
                     throw new ConfigParseException("[" + str2 + "]basePositionFromLeg* failed to find: " + str);
                 }

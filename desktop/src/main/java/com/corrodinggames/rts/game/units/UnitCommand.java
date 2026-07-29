@@ -108,7 +108,7 @@ public final class UnitCommand {
         this.buildUnitType = gameInputStream.q();
         this.targetX = gameInputStream.readFloat();
         this.targetY = gameInputStream.readFloat();
-        this.targetUnitId = gameInputStream.readLongOptional();
+        this.targetUnitId = gameInputStream.readUnitId();
         this.targetUnit = null;
         if (gameInputStream.getProtocolVersion() >= 40) {
             this.buildQueueSize = gameInputStream.readByte();

@@ -38,7 +38,7 @@ public class GameInputStream {
     int protocolVersion = 999999;
 
     /* JADX INFO: renamed from: c */
-    int maxBlockSize = 999999;
+    int streamVersion = 999999;
 
     /* JADX INFO: renamed from: d */
     int bytesRead = 0;
@@ -82,13 +82,13 @@ public class GameInputStream {
     }
 
     /* JADX INFO: renamed from: b */
-    public void setMaxBlockSize(int i) {
-        this.maxBlockSize = i;
+    public void setStreamVersion(int i) {
+        this.streamVersion = i;
     }
 
     /* JADX INFO: renamed from: c */
-    public int getMaxBlockSize() {
-        return this.maxBlockSize;
+    public int getStreamVersion() {
+        return this.streamVersion;
     }
 
     /* JADX INFO: renamed from: d */
@@ -152,38 +152,38 @@ public class GameInputStream {
     }
 
     /* JADX INFO: renamed from: n */
-    public long readLongOptional() throws IOException {
+    public long readUnitId() throws IOException {
         return this.currentDataInput.readLong();
     }
 
     /* JADX INFO: renamed from: a */
-    public GameObject readBaseUnitWithStatus(Class clazz) throws IOException {
+    public GameObject readGameObject(Class clazz) throws IOException {
         return GameObject.a(this.currentDataInput.readLong(), clazz, false);
     }
 
     /* JADX INFO: renamed from: a */
-    public void assertMagicShort(FastArrayList fastArrayList, Class cls) throws IOException {
+    public void readGameObjectList(FastArrayList fastArrayList, Class cls) throws IOException {
         int i = readInt();
         for (int i2 = 0; i2 < i; i2++) {
-            GameObject baseUnitWithStatus = readBaseUnitWithStatus(cls);
-            if (baseUnitWithStatus != null) {
-                fastArrayList.add(baseUnitWithStatus);
+            GameObject gameObject = readGameObject(cls);
+            if (gameObject != null) {
+                fastArrayList.add(gameObject);
             }
         }
     }
 
     /* JADX INFO: renamed from: o */
     public BaseUnit readBaseUnit() throws IOException {
-        return startBlockNamed(ConnectionStatus.warn);
+        return readBaseUnit(ConnectionStatus.WARN);
     }
 
     /* JADX INFO: renamed from: a */
-    public BaseUnit startBlockNamed(ConnectionStatus connectionStatus) throws IOException {
-        return GameObject.a(this.currentDataInput.readLong(), connectionStatus == ConnectionStatus.expected);
+    public BaseUnit readBaseUnit(ConnectionStatus connectionStatus) throws IOException {
+        return GameObject.a(this.currentDataInput.readLong(), connectionStatus == ConnectionStatus.EXPECTED);
     }
 
     /* JADX INFO: renamed from: p */
-    public OrderableUnit readUnitEntity() throws IOException {
+    public OrderableUnit readOrderableUnit() throws IOException {
         return GameObject.b(this.currentDataInput.readLong(), false);
     }
 

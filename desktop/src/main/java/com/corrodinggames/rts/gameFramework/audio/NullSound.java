@@ -14,7 +14,7 @@ public class NullSound extends SoundFactory {
 
     @Override // com.corrodinggames.rts.gameFramework.audio.SoundFactory
     public Sound a(int i) {
-        return new com.corrodinggames.rts.gameFramework.sound.NullSound(Utility.countChars(R.raw.class, i), this);
+        return new com.corrodinggames.rts.gameFramework.sound.NullSound(Utility.getFieldNameByValue(R.raw.class, i), this);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.audio.SoundFactory

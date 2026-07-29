@@ -30,7 +30,7 @@ public class ChatLog {
         int i2 = networkConnection.connectionId;
         int i3 = 0;
         for (ChatMessage chatMessage : this.a) {
-            if (chatMessage.d == i2 && Utility.getStackTrace(chatMessage.e, System.nanoTime()) < i && !chatMessage.c.startsWith("-i ") && !chatMessage.c.startsWith("-qc ")) {
+            if (chatMessage.d == i2 && Utility.elapsedMilliseconds(chatMessage.e, System.nanoTime()) < i && !chatMessage.c.startsWith("-i ") && !chatMessage.c.startsWith("-qc ")) {
                 i3++;
                 if (chatMessage.c != null) {
                     if (Utility.countOccurrences(chatMessage.c, '\n') >= 3) {

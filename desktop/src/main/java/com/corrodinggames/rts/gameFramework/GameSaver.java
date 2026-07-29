@@ -46,7 +46,7 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: a */
-    public File isAutosaveEnabled(String str, boolean z) {
+    public File getSaveFilePath(String str, boolean z) {
         return getSaveFile(str, "saves/", z);
     }
 
@@ -56,7 +56,7 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: b */
-    public void updateAutosave(String str, boolean z) throws IOException {
+    public void saveGame(String str, boolean z) throws IOException {
         File fileIsAutosaveEnabled = null;
         GameEngine gameEngine = GameEngine.getInstance();
         String str2 = str;
@@ -67,11 +67,11 @@ public class GameSaver {
         File fileIsAutosaveEnabled2 = null;
         boolean z2 = false;
         try {
-            fileIsAutosaveEnabled2 = isAutosaveEnabled(str2 + ".tmp", true);
+            fileIsAutosaveEnabled2 = getSaveFilePath(str2 + ".tmp", true);
             if (fileIsAutosaveEnabled2.exists()) {
-                fileIsAutosaveEnabled2 = isAutosaveEnabled(str2 + ".tmp2", true);
+                fileIsAutosaveEnabled2 = getSaveFilePath(str2 + ".tmp2", true);
             }
-            fileIsAutosaveEnabled = isAutosaveEnabled(str2, true);
+            fileIsAutosaveEnabled = getSaveFilePath(str2, true);
             absolutePath = fileIsAutosaveEnabled.getAbsolutePath();
             GameEngine.log("Saving game to: " + absolutePath);
             OutputStream outputStreamOpenOutputStream = FileHelper.openOutputStream(fileIsAutosaveEnabled2, false);
@@ -79,7 +79,7 @@ public class GameSaver {
             if (!debugPlainTextSave) {
                 DataOutputStream dataOutputStream = new DataOutputStream(bufferedOutputStream);
                 try {
-                    createTempFile(new GameOutputStream(dataOutputStream));
+                    writeSaveToStream(new GameOutputStream(dataOutputStream));
                     dataOutputStream.close();
                     bufferedOutputStream.close();
                     outputStreamOpenOutputStream.close();
@@ -92,7 +92,7 @@ public class GameSaver {
             } else {
                 PrintStream printStream = new PrintStream(bufferedOutputStream);
                 try {
-                    createTempFile(new DebugOutputStream(printStream));
+                    writeSaveToStream(new DebugOutputStream(printStream));
                     printStream.close();
                     bufferedOutputStream.close();
                     outputStreamOpenOutputStream.close();
@@ -117,7 +117,7 @@ public class GameSaver {
                 return;
             }
             e.printStackTrace();
-            gameEngine.alert("Error saving game, please check permissions, disk space, etc. (" + Utility.isGreaterThan(e) + ")", 1);
+            gameEngine.alert("Error saving game, please check permissions, disk space, etc. (" + Utility.formatExceptionMessage(e) + ")", 1);
             if (fileIsAutosaveEnabled2 != null && FileHelper.fileExists(fileIsAutosaveEnabled2.getAbsolutePath())) {
                 GameEngine.log("saveGame: Removing temp save file after crash");
                 FileHelper.deleteDirectory(fileIsAutosaveEnabled2);
@@ -146,7 +146,7 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: a */
-    public void createTempFile(GameOutputStream gameOutputStream) throws IOException {
+    public void writeSaveToStream(GameOutputStream gameOutputStream) throws IOException {
         GameEngine gameEngine = GameEngine.getInstance();
         GameEngine.log("GameSaver", "saveCurrentMap took:" + (System.currentTimeMillis() - System.currentTimeMillis()));
         long jCurrentTimeMillis = System.currentTimeMillis();
@@ -165,7 +165,7 @@ public class GameSaver {
             gameOutputStream.writeBoolean(gameEngine.networkEngine.singleplayerServer);
             gameOutputStream.writeBoolean(z);
             if (z) {
-                gameEngine.networkEngine.getFogModeString(gameOutputStream);
+                gameEngine.networkEngine.writeGameSetup(gameOutputStream);
             }
             gameOutputStream.endBlock("gameSetup");
             gameOutputStream.writeStringUTF(gameEngine.currentMapPath);
@@ -209,7 +209,7 @@ public class GameSaver {
             }
             if (!gameEngine.gameUI.e) {
             }
-            gameOutputStream.debugPlaceholder("Section: unit shells");
+            gameOutputStream.writeDebugMessage("Section: unit shells");
             gameOutputStream.writeInt(GameObject.fastGameObjectList.size());
             for (GameObject gameObject : GameObject.fastGameObjectList) {
                 if (gameObject == null) {
@@ -244,7 +244,7 @@ public class GameSaver {
                 }
                 gameOutputStream.writeLong(gameObject.objectId);
             }
-            gameOutputStream.debugPlaceholder("Section: CurrentUnitId");
+            gameOutputStream.writeDebugMessage("Section: CurrentUnitId");
             gameOutputStream.writeLong(gameEngine.networkEngine.z());
             gameEngine.formationEngine.a(gameOutputStream);
             gameEngine.gameUI.a(gameOutputStream);
@@ -257,12 +257,12 @@ public class GameSaver {
             }
             gameOutputStream.writeMagicShort();
             for (GameObject gameObject2 : GameObject.fastGameObjectList) {
-                if (gameOutputStream.isCompressionEnabled()) {
+                if (gameOutputStream.isDebugStream()) {
                     String simpleName = gameObject2.getClass().getSimpleName();
                     if (gameObject2 instanceof BaseUnit) {
                         simpleName = ((BaseUnit) gameObject2).r().getUnitTypeDescriptionShort();
                     }
-                    gameOutputStream.debugPlaceholder("Saving unit:" + simpleName + " (id" + gameObject2.objectId + ")");
+                    gameOutputStream.writeDebugMessage("Saving unit:" + simpleName + " (id" + gameObject2.objectId + ")");
                 }
                 gameObject2.a(gameOutputStream);
                 gameOutputStream.writeMagicShort();
@@ -278,7 +278,7 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: a */
-    public String writeSaveGame(String str) {
+    public String normalizeDemoMapPath(String str) {
         if (str == null) {
             return null;
         }
@@ -286,10 +286,10 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: c */
-    public boolean performAutosave(String str, boolean z) {
+    public boolean loadSaveFile(String str, boolean z) {
         GameEngine gameEngine = GameEngine.getInstance();
         try {
-            File fileIsAutosaveEnabled = isAutosaveEnabled(str, false);
+            File fileIsAutosaveEnabled = getSaveFilePath(str, false);
             if (fileIsAutosaveEnabled.isDirectory()) {
                 gameEngine.alert("Could not load, is a directory", 1);
                 return false;
@@ -302,7 +302,7 @@ public class GameSaver {
             BufferedInputStream bufferedInputStream = new BufferedInputStream(assetInputStreamOpenFileByPath);
             DataInputStream dataInputStream = new DataInputStream(bufferedInputStream);
             try {
-                boolean zWriteSaveToStream = writeSaveToStream(new GameInputStream(dataInputStream), z, false, false);
+                boolean zWriteSaveToStream = readSaveFromStream(new GameInputStream(dataInputStream), z, false, false);
                 dataInputStream.close();
                 bufferedInputStream.close();
                 assetInputStreamOpenFileByPath.close();
@@ -319,8 +319,8 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: a */
-    public void convertMapPath(String str, GameOutputStream gameOutputStream) throws IOException {
-        File fileIsAutosaveEnabled = isAutosaveEnabled(str, false);
+    public void writeSaveFileToStream(String str, GameOutputStream gameOutputStream) throws IOException {
+        File fileIsAutosaveEnabled = getSaveFilePath(str, false);
         if (fileIsAutosaveEnabled == null) {
             throw new IOException("Failed to get game save: " + str);
         }
@@ -328,7 +328,7 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: a */
-    public synchronized boolean writeSaveToStream(GameInputStream gameInputStream, boolean z, boolean z2, boolean z3) {
+    public synchronized boolean readSaveFromStream(GameInputStream gameInputStream, boolean z, boolean z2, boolean z3) {
         GameObject effectEmitter;
         PlayerTeam playerTeamK;
         GameEngine gameEngine = GameEngine.getInstance();
@@ -418,7 +418,7 @@ public class GameSaver {
                         gameInputStream.d("gameSetup");
                     }
                     gameEngine.remoteMapStream = null;
-                    gameEngine.currentMapPath = writeSaveGame(FileHelper.mapPath(gameInputStream.readUTF()));
+                    gameEngine.currentMapPath = normalizeDemoMapPath(FileHelper.mapPath(gameInputStream.readUTF()));
                     boolean z7 = false;
                     if (i >= 72) {
                         z7 = gameInputStream.readBoolean();
@@ -555,7 +555,7 @@ public class GameSaver {
                                         playerTeamK2.teamAIDifficultyOverride = num;
                                         playerTeamK2.c("networkLoad aiDifficultyOverride=" + num);
                                         gameEngine.networkEngine.a(playerTeamK2);
-                                        gameEngine.networkEngine.getAIDifficultyString(playerTeamK2);
+                                        gameEngine.networkEngine.updateAiTeamName(playerTeamK2);
                                     }
                                     if (playerTeamK2 != null && playerTeamK2 != playerTeamK2) {
                                         playerTeamK2.c("Transfering team stats");
@@ -623,7 +623,7 @@ public class GameSaver {
                                         EditorOrBuilder editorOrBuilder = gameEngine.gameUI.getEditorOrBuilder();
                                         if (editorOrBuilder == null || editorOrBuilder.isDestroyed) {
                                             GameEngine.log("Relinking editor");
-                                            gameEngine.gameUI.drawTextInRect((EditorOrBuilder) effectEmitter);
+                                            gameEngine.gameUI.setEditorOrBuilder((EditorOrBuilder) effectEmitter);
                                         }
                                     } else {
                                         GameEngine.log("Creating DebugEditorBuilder for load");
@@ -717,7 +717,7 @@ public class GameSaver {
                                             playerTeamK5.c("networkLoad2 aiDifficultyOverride=" + num2);
                                         }
                                         gameEngine.networkEngine.a(playerTeamK5);
-                                        gameEngine.networkEngine.getAIDifficultyString(playerTeamK5);
+                                        gameEngine.networkEngine.updateAiTeamName(playerTeamK5);
                                     }
                                 }
                             }
@@ -872,16 +872,16 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: b */
-    public boolean saveGame(String str) {
+    public boolean deleteSaveGame(String str) {
         GameEngine.log("Deleting: " + str);
         String strMapPath = FileHelper.mapPath(str);
         if (strMapPath.contains("\\") || strMapPath.contains("/")) {
             GameEngine.log("Cannot get save with path: " + str);
             return false;
         }
-        File fileIsAutosaveEnabled = isAutosaveEnabled(str, true);
+        File fileIsAutosaveEnabled = getSaveFilePath(str, true);
         boolean zDeleteDirectory = FileHelper.deleteDirectory(fileIsAutosaveEnabled);
-        FileHelper.deleteDirectory(isAutosaveEnabled(str + ".map", true));
+        FileHelper.deleteDirectory(getSaveFilePath(str + ".map", true));
         if (!zDeleteDirectory) {
             GameEngine.log("Failed to delete: " + fileIsAutosaveEnabled.getAbsolutePath());
             GameEngine.getInstance().alert("Failed to delete: " + fileIsAutosaveEnabled.getAbsolutePath());
@@ -891,7 +891,7 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: a */
-    public void readSaveGame(boolean z) {
+    public void resetAutosaveTimers(boolean z) {
         GameEngine.getInstance();
         if (!z) {
             this.firstTick = -9999;
@@ -900,7 +900,7 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean resetAutosaveTimers() {
+    public boolean canAutosave() {
         GameEngine gameEngine = GameEngine.getInstance();
         if (!gameEngine.settingsEngine.autosaving || GameEngine.isDedicatedServer() || !gameEngine.hasLoadedLevel || gameEngine.isMenuBackgroundMap || gameEngine.replayEngine.j() || gameEngine.isNetworkGameActive()) {
             return false;
@@ -909,9 +909,9 @@ public class GameSaver {
     }
 
     /* JADX INFO: renamed from: b */
-    public void deleteSave() throws IOException {
+    public void updateAutosaveTimer() throws IOException {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!resetAutosaveTimers()) {
+        if (!canAutosave()) {
             return;
         }
         if (this.lastAutosaveTick == -9999) {
@@ -921,13 +921,13 @@ public class GameSaver {
         if (this.lastAutosaveTick + 300000 < gameEngine.gameTimeMillis) {
             this.lastAutosaveTick = gameEngine.gameTimeMillis;
             long jA = PerformanceProfiler.a();
-            loadSave();
+            performAutosave();
             GameEngine.log("Autosaved (" + PerformanceProfiler.a(PerformanceProfiler.a(jA)) + ")");
         }
     }
 
     /* JADX INFO: renamed from: c */
-    public void loadSave() throws IOException {
-        updateAutosave("autosave", true);
+    public void performAutosave() throws IOException {
+        saveGame("autosave", true);
     }
 }

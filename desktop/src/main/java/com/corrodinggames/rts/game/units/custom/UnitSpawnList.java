@@ -59,7 +59,7 @@ public class UnitSpawnList {
                 if (strArrSplit2.length >= 2) {
                     i = Integer.parseInt(strArrSplit2[1]);
                 }
-                UnitSpawnEntry unitSpawnEntry = new UnitSpawnEntry(customUnitConfig.getConfigDisplayPath(str4, str3, str2));
+                UnitSpawnEntry unitSpawnEntry = new UnitSpawnEntry(customUnitConfig.createProjectileReference(str4, str3, str2));
                 if (unitSpawnList.a == null) {
                     unitSpawnList.a = new FastArrayList();
                 }
@@ -148,19 +148,19 @@ public class UnitSpawnList {
             } else {
                 for (int i4 = 0; i4 < unitSpawnEntry.b; i4++) {
                     i3++;
-                    if ((unitSpawnEntry.c >= 1.0f || Utility.copyStream(baseUnit, 0.0f, 1.0f, i3) <= unitSpawnEntry.c) && i2 < unitSpawnEntry.d && i <= unitSpawnEntry.n) {
+                    if ((unitSpawnEntry.c >= 1.0f || Utility.getDeterministicRandomFloat(baseUnit, 0.0f, 1.0f, i3) <= unitSpawnEntry.c) && i2 < unitSpawnEntry.d && i <= unitSpawnEntry.n) {
                         float fCopyStream = f + unitSpawnEntry.e;
                         float fCopyStream2 = f2 + unitSpawnEntry.f;
                         float f5 = f3 + unitSpawnEntry.g;
                         float fCopyStream3 = f4 + unitSpawnEntry.h;
                         if (unitSpawnEntry.m != 0.0f) {
-                            fCopyStream3 += Utility.copyStream(baseUnit, -unitSpawnEntry.m, unitSpawnEntry.m, (i3 * 4) + 3);
+                            fCopyStream3 += Utility.getDeterministicRandomFloat(baseUnit, -unitSpawnEntry.m, unitSpawnEntry.m, (i3 * 4) + 3);
                         }
                         if (unitSpawnEntry.k != 0.0f) {
-                            fCopyStream += Utility.copyStream(baseUnit, -unitSpawnEntry.k, unitSpawnEntry.k, (i3 * 2) + 1);
+                            fCopyStream += Utility.getDeterministicRandomFloat(baseUnit, -unitSpawnEntry.k, unitSpawnEntry.k, (i3 * 2) + 1);
                         }
                         if (unitSpawnEntry.l != 0.0f) {
-                            fCopyStream2 += Utility.copyStream(baseUnit, -unitSpawnEntry.l, unitSpawnEntry.l, (i3 * 3) + 2);
+                            fCopyStream2 += Utility.getDeterministicRandomFloat(baseUnit, -unitSpawnEntry.l, unitSpawnEntry.l, (i3 * 3) + 2);
                         }
                         if (unitSpawnEntry.i != 0.0f || unitSpawnEntry.j != 0.0f) {
                             float fFastCos = Utility.fastCos(f4);

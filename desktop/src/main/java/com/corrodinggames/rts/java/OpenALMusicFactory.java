@@ -21,7 +21,7 @@ public class OpenALMusicFactory extends MusicFactory {
 
     @Override // com.corrodinggames.rts.gameFramework.MusicFactory
     /* JADX INFO: renamed from: a */
-    public void createMusicTrack(float f) {
+    public void update(float f) {
         synchronized (f()) {
             if (this.a) {
                 return;
@@ -32,13 +32,13 @@ public class OpenALMusicFactory extends MusicFactory {
             if (dA > 16.0d) {
                 GameEngine.log("music poll took:" + PerformanceProfiler.a(dA));
             }
-            super.createMusicTrack(f);
+            super.update(f);
         }
     }
 
     @Override // com.corrodinggames.rts.gameFramework.MusicFactory
     /* JADX INFO: renamed from: a */
-    public void createMusic(int i) {
+    public void poll(int i) {
     }
 
     public OpenALMusicFactory(OpenALAudio openALAudio) {
@@ -70,7 +70,7 @@ public class OpenALMusicFactory extends MusicFactory {
 
     @Override // com.corrodinggames.rts.gameFramework.MusicFactory
     /* JADX INFO: renamed from: c */
-    public boolean isMusicPlaying() {
+    public boolean requiresSequentialFade() {
         return true;
     }
 
@@ -82,7 +82,7 @@ public class OpenALMusicFactory extends MusicFactory {
 
     @Override // com.corrodinggames.rts.gameFramework.MusicFactory
     /* JADX INFO: renamed from: e */
-    public int isMusicSupported() {
+    public int getUpdateThreadWaitTimeoutMillis() {
         return 100;
     }
 }

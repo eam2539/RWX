@@ -287,7 +287,7 @@ public class UnitSpawner {
                             var13++;
                             PlayerTeam var24 = var16;
                             if (var15.spawnChance < 1.0F) {
-                                float var25 = Utility.copyStream(var17, 0.0F, 1.0F, var13);
+                                float var25 = Utility.getDeterministicRandomFloat(var17, 0.0F, 1.0F, var13);
                                 if (var25 > var15.spawnChance) {
                                     continue;
                                 }
@@ -334,7 +334,7 @@ public class UnitSpawner {
 
                                 float var26 = var15.offsetDir;
                                 if (var15.offsetRandomDir != 0.0F) {
-                                    var26 += Utility.copyStream(var17, -var15.offsetRandomDir, var15.offsetRandomDir, var13 * 4 + 3);
+                                    var26 += Utility.getDeterministicRandomFloat(var17, -var15.offsetRandomDir, var15.offsetRandomDir, var13 * 4 + 3);
                                 }
 
                                 if (var26 != 0.0F) {
@@ -347,11 +347,11 @@ public class UnitSpawner {
 
                                 var35.posX += var23;
                                 if (var15.offsetRandomX != 0.0F) {
-                                    var35.posX = var35.posX + Utility.copyStream(var17, -var15.offsetRandomX, var15.offsetRandomX, var13 * 2 + 1);
+                                    var35.posX = var35.posX + Utility.getDeterministicRandomFloat(var17, -var15.offsetRandomX, var15.offsetRandomX, var13 * 2 + 1);
                                 }
 
                                 if (var15.offsetRandomY != 0.0F) {
-                                    var35.posY = var35.posY + Utility.copyStream(var17, -var15.offsetRandomY, var15.offsetRandomY, var13 * 3 + 2);
+                                    var35.posY = var35.posY + Utility.getDeterministicRandomFloat(var17, -var15.offsetRandomY, var15.offsetRandomY, var13 * 3 + 2);
                                 }
 
                                 if (var15.gridAlign) {

@@ -181,13 +181,13 @@ public class UnitStatsAction extends LogicAction {
             }
         }
         if (this.switchToNeutralTeam) {
-            customUnit.isSelectable(PlayerTeam.TEAM_ALL);
+            customUnit.changeTeam(PlayerTeam.TEAM_ALL);
         }
         if (this.switchToAggressiveTeam) {
-            customUnit.isSelectable(PlayerTeam.TEAM_UNKNOWN);
+            customUnit.changeTeam(PlayerTeam.TEAM_UNKNOWN);
         }
         if (this.switchToTeam != null && (playerTeamK = PlayerTeam.k((int) this.switchToTeam.readNumber(customUnit))) != null) {
-            customUnit.isSelectable(playerTeamK);
+            customUnit.changeTeam(playerTeamK);
         }
         if (this.setBodyRotation != null) {
             customUnit.h(this.setBodyRotation.readNumber(customUnit));

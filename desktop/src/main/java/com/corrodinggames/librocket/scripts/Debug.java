@@ -59,7 +59,7 @@ public class Debug extends ScriptContext {
     }
 
     public void setLocalPlayerName(String str) {
-        GameEngine.getInstance().networkEngine.applyAIDifficultyOverride(str);
+        GameEngine.getInstance().networkEngine.setPlayerNameFromInput(str);
     }
 
     public void setDdosProtection(boolean z) {
@@ -324,7 +324,7 @@ public class Debug extends ScriptContext {
             if (baseUnit instanceof OrderableUnit) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
                 if (orderableUnit.team == playerTeamK) {
-                    commandCreateCommandForTeam.setTargetUnit(orderableUnit);
+                    commandCreateCommandForTeam.addUnitToCommand(orderableUnit);
                 }
             }
         }
@@ -365,7 +365,7 @@ public class Debug extends ScriptContext {
     }
 
     public int numberOfPlayerConnections() {
-        return GameEngine.getInstance().networkEngine.updatePlayerTeamNameForAI();
+        return GameEngine.getInstance().networkEngine.getPlayerConnectionCount();
     }
 
     public boolean enableFastSync() {
@@ -549,7 +549,7 @@ public class Debug extends ScriptContext {
             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
             DataInputStream dataInputStream = new DataInputStream(bufferedInputStream);
             try {
-                boolean zWriteSaveToStream = gameEngine.gameSaver.writeSaveToStream(new GameInputStream(dataInputStream), false, false, false);
+                boolean zWriteSaveToStream = gameEngine.gameSaver.readSaveFromStream(new GameInputStream(dataInputStream), false, false, false);
                 dataInputStream.close();
                 bufferedInputStream.close();
                 fileInputStream.close();

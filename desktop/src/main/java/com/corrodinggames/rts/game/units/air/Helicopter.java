@@ -146,7 +146,7 @@ public class Helicopter extends AirUnit {
         this.q += 70.0f * this.o * f2;
         if (this.q >= 360.0f) {
             this.q -= 360.0f;
-            this.q += Utility.readStreamToString(this, 0, 4);
+            this.q += Utility.getDeterministicRandomInt(this, 0, 4);
         }
         if (this.o > 0.4f) {
             this.p += 2.0f * f2;

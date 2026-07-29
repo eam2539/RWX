@@ -142,7 +142,7 @@ public final class PathCostMap {
         for (int i5 = i; i5 <= i3; i5++) {
             for (int i6 = i2; i6 <= i4; i6++) {
                 byte b = bArr[(i5 * this.c) + i6];
-                if (b != 0 && (iCountChars = Utility.countChars((int) s, (int) s2, i5, i6)) < b) {
+                if (b != 0 && (iCountChars = Utility.chebyshevDistance((int) s, (int) s2, i5, i6)) < b) {
                     bArr[(i5 * this.c) + i6] = (byte) iCountChars;
                 }
             }
@@ -219,7 +219,7 @@ public final class PathCostMap {
                 } else {
                     z = true;
                 }
-                if (z && (iCountChars = Utility.countChars((int) s, (int) s2, i5, i6)) < i4) {
+                if (z && (iCountChars = Utility.chebyshevDistance((int) s, (int) s2, i5, i6)) < i4) {
                     i4 = iCountChars;
                 }
             }

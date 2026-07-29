@@ -410,7 +410,7 @@ public class ReplayEngine {
             this.O = false;
             this.N = true;
             a("Loading replay initial save");
-            gameEngine.gameSaver.writeSaveToStream(this.F, false, false, false);
+            gameEngine.gameSaver.readSaveFromStream(this.F, false, false, false);
             this.N = false;
             this.F.d("gamesave");
             if (!this.O) {
@@ -456,7 +456,7 @@ public class ReplayEngine {
         }
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.networkEngine.networkGameActive && !z && !this.N && gameEngine.settingsEngine.saveMultiplayerReplays) {
-            d(gameEngine.getCurrentMapName() + " [v" + gameEngine.getVersionString() + "] (" + Utility.formatDate("d MMM yyyy HH.mm.ss") + ").replay");
+            d(gameEngine.getCurrentMapName() + " [v" + gameEngine.getVersionString() + "] (" + Utility.formatCurrentDate("d MMM yyyy HH.mm.ss") + ").replay");
         }
     }
 
@@ -497,7 +497,7 @@ public class ReplayEngine {
             this.J.writeStringUTF(gameEngine.getVersionString());
             this.J.writeBoolean(gameEngine.isDemo);
             this.J.startBlock("gamesave");
-            gameEngine.gameSaver.createTempFile(this.J);
+            gameEngine.gameSaver.writeSaveToStream(this.J);
             this.J.endBlock("gamesave");
             this.I.flush();
             this.K = new ReplayWriter(this);
@@ -636,7 +636,7 @@ public class ReplayEngine {
             int i5 = this.F.readInt();
             float f2 = this.F.readFloat();
             float f3 = this.F.readFloat();
-            gameEngine.gameSaver.writeSaveToStream(new GameInputStream(this.F.readBytesWithLength()), true, true, true);
+            gameEngine.gameSaver.readSaveFromStream(new GameInputStream(this.F.readBytesWithLength()), true, true, true);
             l();
             gameEngine.currentTick = i4;
             gameEngine.gameTimeMillis = i5;

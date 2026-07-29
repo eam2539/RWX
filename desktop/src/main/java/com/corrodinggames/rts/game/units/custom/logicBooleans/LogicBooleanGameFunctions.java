@@ -1049,7 +1049,7 @@ public class LogicBooleanGameFunctions {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public boolean read(OrderableUnit orderableUnit) {
-            return orderableUnit.isUnitAtPositionX();
+            return orderableUnit.isSecondaryBarRecharging();
         }
     }
 

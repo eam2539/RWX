@@ -505,7 +505,7 @@ public class TurretFactory extends FactoryWithQueue {
         this.maxHealth = 700.0f;
         this.currentHealth = this.maxHealth;
         super.baseTexture = baseTexture;
-        this.movementLevels[0].targetX = Utility.readStreamToString(this, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT);
+        this.movementLevels[0].targetX = Utility.getDeterministicRandomInt(this, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT);
         this.buildingTargetRect.a(0, 0, 1, 1);
         this.buildingVelocityRect.a(0, 0, 1, 1);
     }
@@ -548,11 +548,11 @@ public class TurretFactory extends FactoryWithQueue {
             if (this.isAnimating) {
                 this.animationTargetAngle = this.movementLevels[0].targetX;
                 this.isAnimating = false;
-                this.animationTimer = Utility.readStreamToString(this, 0, 120);
+                this.animationTimer = Utility.getDeterministicRandomInt(this, 0, 120);
             }
             this.animationTimer += f;
             if (this.animationTimer > 450.0f) {
-                this.animationTimer = Utility.readStreamToString(this, 0, 30);
+                this.animationTimer = Utility.getDeterministicRandomInt(this, 0, 30);
                 this.animationDirection = !this.animationDirection;
             }
             if (this.animationTimer < 120.0f) {

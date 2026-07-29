@@ -192,7 +192,7 @@ public class TriggerExecutor {
             final Command commandForTeam = instance.commandController.createCommandForTeam(a7);
             for (final BaseUnit baseUnit2 : BaseUnit.bE) {
                 if (baseUnit2.team == a7 && baseUnit2 instanceof OrderableUnit && a.a(baseUnit2) && a.b(baseUnit2)) {
-                    commandForTeam.setTargetUnit((OrderableUnit)baseUnit2);
+                    commandForTeam.addUnitToCommand((OrderableUnit)baseUnit2);
                     ++n4;
                 }
             }
@@ -206,7 +206,7 @@ public class TriggerExecutor {
                         final OrderableUnit targetUnit = (OrderableUnit)baseUnit3;
                         final Command commandForTeam2 = instance.commandController.createCommandForTeam(a7);
                         commandForTeam2.isQueued = true;
-                        commandForTeam2.setTargetUnit(targetUnit);
+                        commandForTeam2.addUnitToCommand(targetUnit);
                         commandForTeam2.setActionId(targetUnit.getUnloadActionId());
                     }
                 }

@@ -128,7 +128,7 @@ public class MapObject {
         }
         if (element.hasAttribute("gid")) {
             this.globalTileId = Integer.parseInt(element.getAttribute("gid"));
-            this.tileset = tileMap.isWorldPointVisibleForTeam(this.globalTileId);
+            this.tileset = tileMap.findTilesetByGlobalTileId(this.globalTileId);
             if (this.tileset != null) {
                 this.tileset.usedInMap = true;
                 this.tileset.usedInNonGroundLayer = true;
@@ -210,9 +210,9 @@ public class MapObject {
                         baseUnitA.a_(properties.getProperty("type"));
                     }
                     if (properties.getProperty("randomRotate") != null && !baseUnitA.bI()) {
-                        baseUnitA.h(Utility.readStreamToString(baseUnitA, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT));
+                        baseUnitA.h(Utility.getDeterministicRandomInt(baseUnitA, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT));
                     }
-                    baseUnitA.isSelectable = "builder".equalsIgnoreCase(property) || "builder".equalsIgnoreCase(property2);
+                    baseUnitA.changeTeam = "builder".equalsIgnoreCase(property) || "builder".equalsIgnoreCase(property2);
                     baseUnitA.isTargetable = "commandCenter".equalsIgnoreCase(property) || "commandCenter".equalsIgnoreCase(property2);
                     baseUnitA.isActive = true;
                     baseUnitA.n();

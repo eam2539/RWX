@@ -136,9 +136,9 @@ public abstract class GameMainManager {
 
     /* JADX INFO: renamed from: a */
     public void onKeyDown(int i, char c) {
-        int iInitializeGdxToAndroidMapping = SlickToAndroidKeycodes.initializeGdxToAndroidMapping(i);
+        int iInitializeGdxToAndroidMapping = SlickToAndroidKeycodes.convertSlickToAndroidKeyCode(i);
         if (isUIReady()) {
-            Integer numInitializeAndroidToGdxMapping = SlickToAndroidKeycodes.initializeAndroidToGdxMapping(i);
+            Integer numInitializeAndroidToGdxMapping = SlickToAndroidKeycodes.convertSlickToGdxKeyCode(i);
             Object activeDocumentMetadata = this.libRocketManager.getActiveDocumentMetadata("event_onkeydown");
             if (activeDocumentMetadata != null) {
                 ScriptEngine.getInstance().addScriptToQueue(activeDocumentMetadata + "(" + iInitializeGdxToAndroidMapping + ");");

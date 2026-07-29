@@ -83,7 +83,7 @@ public abstract class BaseUnit extends SizedObject {
     public static HashMap bH = new HashMap();
     public static final Paint bI = new GamePaint();
     public static final Paint bJ;
-    static final LightingColorFilter bK;
+    static final LightingColorFilter selectedUnitColorFilter;
 
     /* JADX INFO: renamed from: bL */
     public boolean isHighlighted;
@@ -95,7 +95,7 @@ public abstract class BaseUnit extends SizedObject {
     public boolean isAIUnit;
 
     /* JADX INFO: renamed from: bO */
-    public boolean isSelectable;
+    public boolean changeTeam;
 
     /* JADX INFO: renamed from: bP */
     public boolean isTargetable;
@@ -363,7 +363,7 @@ public abstract class BaseUnit extends SizedObject {
         this.unitFlags3 = -9999;
         this.isActive = false;
         this.isAIUnit = false;
-        this.isSelectable = false;
+        this.changeTeam = false;
         this.isTargetable = false;
         this.targetUnit = null;
         this.isAlive = true;
@@ -461,9 +461,9 @@ public abstract class BaseUnit extends SizedObject {
         bI.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_BUTTON_8, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_BUTTON_8, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_BUTTON_8);
         bJ = new GamePaint();
         bJ.a(true);
-        bK = new LightingColorFilter(Color.a(255, 255, 255), Color.a(100, 100, 100));
+        selectedUnitColorFilter = new LightingColorFilter(Color.a(255, 255, 255), Color.a(100, 100, 100));
         bJ.a(255, 255, 255, 255);
-        bJ.a(bK);
+        bJ.a(selectedUnitColorFilter);
         cW = new Paint();
         cX = new GamePaint();
         cY = new GamePaint();
@@ -587,7 +587,7 @@ public abstract class BaseUnit extends SizedObject {
         return false;
     }
 
-    public static HashMap bK() {
+    public static HashMap createUnitTypePrototypeCache() {
         HashMap map = new HashMap();
         if (GameEngine.getInstance().usesCoreUnitTypes()) {
             for (UnitTypeEnum unitTypeEnum : EnumSet.allOf(UnitTypeEnum.class)) {
@@ -609,10 +609,10 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: bL */
-    public static void getAttachmentCount() {
-        bG = bK();
-        bH = bK();
-        bF = bK();
+    public static void rebuildUnitTypePrototypeCaches() {
+        bG = createUnitTypePrototypeCache();
+        bH = createUnitTypePrototypeCache();
+        bF = createUnitTypePrototypeCache();
     }
 
     /* JADX INFO: renamed from: a */
@@ -723,7 +723,7 @@ public abstract class BaseUnit extends SizedObject {
         gameOutputStream.writeInt(this.unitFlags2);
         gameOutputStream.writeInt(this.unitFlags3);
         gameOutputStream.writeInt(this.unitFlags4);
-        gameOutputStream.writeBoolean(this.isSelectable);
+        gameOutputStream.writeBoolean(this.changeTeam);
         gameOutputStream.writeBoolean(this.isTargetable);
         this.unitCustomEffects.a(gameOutputStream);
         this.unitCustomComponents.a(gameOutputStream);
@@ -852,7 +852,7 @@ public abstract class BaseUnit extends SizedObject {
             this.unitFlags4 = gameInputStream.readInt();
         }
         if (b >= 18) {
-            this.isSelectable = gameInputStream.readBoolean();
+            this.changeTeam = gameInputStream.readBoolean();
             this.isTargetable = gameInputStream.readBoolean();
         }
         if (b >= 19) {
@@ -860,7 +860,7 @@ public abstract class BaseUnit extends SizedObject {
             this.unitCustomComponents.a(this, gameInputStream);
         }
         if (b >= 20) {
-            OrderableUnit unitEntity = gameInputStream.readUnitEntity();
+            OrderableUnit unitEntity = gameInputStream.readOrderableUnit();
             short shortValue = gameInputStream.readShortValue();
             if (shortValue != -1) {
                 boolean z = false;
@@ -992,7 +992,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: d */
-    public float getUnitArmorRating(boolean z) {
+    public float getRenderRotation(boolean z) {
         return this.rotationSpeed + 90.0f;
     }
 
@@ -1023,12 +1023,12 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: bW */
-    public float getUnitTeamData() {
+    public float getSecondaryBarProgress() {
         return -1.0f;
     }
 
     /* JADX INFO: renamed from: bX */
-    public boolean isUnitAtPositionX() {
+    public boolean isSecondaryBarRecharging() {
         return false;
     }
 
@@ -1062,7 +1062,7 @@ public abstract class BaseUnit extends SizedObject {
         if (bV() >= 0.0f) {
             z2 = true;
         }
-        if (getUnitTeamData() >= 0.0f) {
+        if (getSecondaryBarProgress() >= 0.0f) {
             z2 = true;
         }
         if (this.isSelected || gameEngine.settingsEngine.showHp) {
@@ -1156,10 +1156,10 @@ public abstract class BaseUnit extends SizedObject {
                 f8 = 3.0f + 5.0f;
             }
         }
-        if (getUnitTeamData() >= 0.0f) {
+        if (getSecondaryBarProgress() >= 0.0f) {
             int i4 = 2 + 1;
-            boolean zIsUnitAtPositionX = isUnitAtPositionX();
-            dr.a(f4 - f3, f5 + f6 + i4 + f8, (f4 - f3) + (f7 * getUnitTeamData()), f5 + f6 + i4 + 2 + f8);
+            boolean zIsUnitAtPositionX = isSecondaryBarRecharging();
+            dr.a(f4 - f3, f5 + f6 + i4 + f8, (f4 - f3) + (f7 * getSecondaryBarProgress()), f5 + f6 + i4 + 2 + f8);
             if (zIsUnitAtPositionX) {
                 iLongToIntArray3 = Utility.packArgb(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PROG_YELLOW, 103, 117, 119);
             } else {
@@ -1701,11 +1701,11 @@ public abstract class BaseUnit extends SizedObject {
         if (playerTeamK == null) {
             throw new MapLoadException("Could not find team with id: " + i);
         }
-        isSelectable(playerTeamK);
+        changeTeam(playerTeamK);
     }
 
     /* JADX INFO: renamed from: e */
-    public void isSelectable(PlayerTeam playerTeam) {
+    public void changeTeam(PlayerTeam playerTeam) {
         if (this.team == playerTeam) {
             return;
         }
@@ -1857,7 +1857,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cs */
-    public float getUnitAIPathfindHeuristic() {
+    public float getTransportInteractionRange() {
         return 21.0f;
     }
 

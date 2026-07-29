@@ -659,7 +659,7 @@ public class Multiplayer extends ScriptContext {
         if (strTrim.equals(VariableScope.nullOrMissingString)) {
             strTrim = _getRandomDefaultPlayerName();
         }
-        gameEngine.networkEngine.applyAIDifficultyOverride(strTrim);
+        gameEngine.networkEngine.setPlayerNameFromInput(strTrim);
     }
 
     public void gameOptionsGet() {

@@ -16,7 +16,7 @@ public abstract class PositionedObject extends GameObject {
 
     @Override // com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
-        gameOutputStream.debugPlaceholder("xy is:");
+        gameOutputStream.writeDebugMessage("xy is:");
         gameOutputStream.writeFloat(this.posX);
         gameOutputStream.writeFloat(this.posY);
         gameOutputStream.writeFloat(this.posZ);

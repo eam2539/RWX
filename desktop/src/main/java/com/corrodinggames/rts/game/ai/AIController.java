@@ -345,14 +345,14 @@ public final class AIController extends PlayerTeam {
     }
 
     /* JADX INFO: renamed from: b */
-    public boolean pathCheckOffsets(BaseUnit baseUnit, float f, float f2) {
+    public boolean canUnitReachPointWithOffsets(BaseUnit baseUnit, float f, float f2) {
         UnitMovementType unitMovementTypeH = baseUnit.h();
         return isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f + 60.0f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f - 60.0f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2 + 60.0f, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2 - 60.0f, unitMovementTypeH);
     }
 
     /* JADX INFO: renamed from: a */
     public boolean canUnitReachUnit(BaseUnit baseUnit, BaseUnit baseUnit2) {
-        return pathCheckOffsets(baseUnit, baseUnit2.posX, baseUnit2.posY);
+        return canUnitReachPointWithOffsets(baseUnit, baseUnit2.posX, baseUnit2.posY);
     }
 
     @Override // com.corrodinggames.rts.game.PlayerTeam, com.corrodinggames.rts.gameFramework.Serializable
@@ -976,7 +976,7 @@ public final class AIController extends PlayerTeam {
                 }
             }
         }
-        if (pathCheckOffsets(this, pointF.x, pointF.y, 360.0f) >= 4 || canExecuteCustomUnitActionWithBoolean((PlayerTeam) this, pointF.x, pointF.y, 360.0f, true) >= 2) {
+        if (countEnemyUnitsInRange(this, pointF.x, pointF.y, 360.0f) >= 4 || canExecuteCustomUnitActionWithBoolean((PlayerTeam) this, pointF.x, pointF.y, 360.0f, true) >= 2) {
             return false;
         }
         return true;
@@ -1234,7 +1234,7 @@ public final class AIController extends PlayerTeam {
             }
         }
         for (BaseUnit baseUnit2 : BaseUnit.bE) {
-            if (baseUnit2.team == playerTeam && baseUnit2.isSelectable) {
+            if (baseUnit2.team == playerTeam && baseUnit2.changeTeam) {
                 return baseUnit2;
             }
         }
@@ -1299,11 +1299,11 @@ public final class AIController extends PlayerTeam {
                     }
                     Iterator it = gameEngine.tileMap.unitObjects.iterator();
                     while (it.hasNext()) {
-                        PointF pointFOpenAssetStreamFromSuffixSegments = gameEngine.tileMap.openAssetStreamFromSuffixSegments((Point) it.next());
-                        if (!isPathPossibleBetweenPoints(anySelectableUnitForTeam2.posX, anySelectableUnitForTeam2.posY, pointFOpenAssetStreamFromSuffixSegments.x, pointFOpenAssetStreamFromSuffixSegments.y + gameEngine.tileMap.tileWorldSizeY, UnitMovementType.LAND)) {
+                        PointF worldPoint = gameEngine.tileMap.tileToWorldPoint((Point) it.next());
+                        if (!isPathPossibleBetweenPoints(anySelectableUnitForTeam2.posX, anySelectableUnitForTeam2.posY, worldPoint.x, worldPoint.y + gameEngine.tileMap.tileWorldSizeY, UnitMovementType.LAND)) {
                             this.isWaitingForBetterAttackTiming = false;
                         }
-                        if (!isPathPossibleBetweenPoints(anySelectableUnitForTeam2.posX, anySelectableUnitForTeam2.posY, pointFOpenAssetStreamFromSuffixSegments.x, pointFOpenAssetStreamFromSuffixSegments.y + gameEngine.tileMap.tileWorldSizeY, UnitMovementType.HOVER)) {
+                        if (!isPathPossibleBetweenPoints(anySelectableUnitForTeam2.posX, anySelectableUnitForTeam2.posY, worldPoint.x, worldPoint.y + gameEngine.tileMap.tileWorldSizeY, UnitMovementType.HOVER)) {
                             this.isAttackAllowed = false;
                         }
                     }
@@ -1386,7 +1386,7 @@ public final class AIController extends PlayerTeam {
     /* JADX INFO: renamed from: a */
     public void getNodeId(OrderableUnit orderableUnit, ActionId actionId) {
         Command commandNewCommandForTeam = GameEngine.getInstance().commandController.newCommandForTeam(this);
-        commandNewCommandForTeam.setTargetUnit(orderableUnit);
+        commandNewCommandForTeam.addUnitToCommand(orderableUnit);
         commandNewCommandForTeam.setActionId(actionId);
     }
 
@@ -1425,7 +1425,7 @@ public final class AIController extends PlayerTeam {
                 }
                 if (orderableUnit.be() == UnitBehaviorType.bomber && orderableUnit.hasNoCurrentWaypoint() && orderableUnit.getCommandOrAttackTarget() != null) {
                     Command commandNewCommandForTeam = GameEngine.getInstance().commandController.newCommandForTeam(this);
-                    commandNewCommandForTeam.setTargetUnit(orderableUnit);
+                    commandNewCommandForTeam.addUnitToCommand(orderableUnit);
                     commandNewCommandForTeam.setAttackTarget(orderableUnit.getCommandOrAttackTarget());
                 }
             }
@@ -1521,7 +1521,7 @@ public final class AIController extends PlayerTeam {
                 AttackMode attackModeForUnit = getAttackModeForUnit(orderableUnit2);
                 if (orderableUnit2.attackMode != attackModeForUnit && isEligibleUnitForRandomSelection(orderableUnit2)) {
                     Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this);
-                    commandNewCommandForTeam.setTargetUnit(orderableUnit2);
+                    commandNewCommandForTeam.addUnitToCommand(orderableUnit2);
                     commandNewCommandForTeam.setAttackMode(attackModeForUnit);
                 }
                 if (orderableUnit2.canUnitAttack() && orderableUnit2.isExperimental() && orderableUnit2.aB == null && isEligibleUnitForRandomSelection(orderableUnit2)) {
@@ -1756,7 +1756,7 @@ public final class AIController extends PlayerTeam {
         GameEngine gameEngine = GameEngine.getInstance();
         if (abstractUnitAction.b(orderableUnit) && abstractUnitAction.canAfford((BaseUnit) orderableUnit, false)) {
             Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this);
-            commandNewCommandForTeam.setTargetUnit(orderableUnit);
+            commandNewCommandForTeam.addUnitToCommand(orderableUnit);
             commandNewCommandForTeam.setActionId(abstractUnitAction.getQueueId());
             return true;
         }
@@ -1768,7 +1768,7 @@ public final class AIController extends PlayerTeam {
         GameEngine gameEngine = GameEngine.getInstance();
         if (abstractUnitAction.b(orderableUnit) && abstractUnitAction.canAfford((BaseUnit) orderableUnit, false)) {
             Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this);
-            commandNewCommandForTeam.setTargetUnit(orderableUnit);
+            commandNewCommandForTeam.addUnitToCommand(orderableUnit);
             commandNewCommandForTeam.setActionTarget(abstractUnitAction.getQueueId(), pointF, baseUnit);
             return true;
         }
@@ -1978,7 +1978,7 @@ public final class AIController extends PlayerTeam {
                 } else if (orderableUnit2.hasNoCurrentWaypoint() && (baseZoneFindNearestZoneForUnit = findNearestZoneForUnit(orderableUnit2)) != null) {
                     PointF pointFW = baseZoneFindNearestZoneForUnit.getRandomPointInside();
                     Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this);
-                    commandNewCommandForTeam.setTargetUnit(orderableUnit2);
+                    commandNewCommandForTeam.addUnitToCommand(orderableUnit2);
                     commandNewCommandForTeam.setMoveTarget(pointFW.x, pointFW.y);
                 }
             }
@@ -1991,14 +1991,14 @@ public final class AIController extends PlayerTeam {
                 if (orderableUnit3.wayPointTimer > 2400.0f && isEligibleUnitForRandomSelection(orderableUnit3)) {
                     if (!orderableUnit3.aN || orderableUnit3.wayPointTimer >= 24000.0f) {
                         Command commandNewCommandForTeam2 = gameEngine.commandController.newCommandForTeam(this);
-                        commandNewCommandForTeam2.setTargetUnit(orderableUnit3);
+                        commandNewCommandForTeam2.addUnitToCommand(orderableUnit3);
                         commandNewCommandForTeam2.setClearExistingOrders();
                         if (!orderableUnit3.canUnitAttack()) {
                         }
                     }
                 } else if (!orderableUnit3.canUnitAttack() && isEligibleUnitForRandomSelection(orderableUnit3) && (currentWaypoint = orderableUnit3.getCurrentWaypoint()) != null && currentWaypoint.getCommandType() == UnitCommandType.build && orderableUnit3.wayPointTimer > 700.0f) {
                     Command commandNewCommandForTeam3 = gameEngine.commandController.newCommandForTeam(this);
-                    commandNewCommandForTeam3.setTargetUnit(orderableUnit3);
+                    commandNewCommandForTeam3.addUnitToCommand(orderableUnit3);
                     commandNewCommandForTeam3.setClearExistingOrders();
                 }
             }
@@ -2090,7 +2090,7 @@ public final class AIController extends PlayerTeam {
                                 OrderableUnit orderableUnit4 = (OrderableUnit) baseUnit7;
                                 if (!orderableUnit4.isActive && canUnitEngageTarget(orderableUnit4, randomEnemyUnit)) {
                                     if (i <= 0) {
-                                        commandNewCommandForTeam4.setTargetUnit(orderableUnit4);
+                                        commandNewCommandForTeam4.addUnitToCommand(orderableUnit4);
                                     } else {
                                         i--;
                                     }
@@ -2239,7 +2239,7 @@ public final class AIController extends PlayerTeam {
     }
 
     /* JADX INFO: renamed from: b */
-    public static int pathCheckOffsets(PlayerTeam playerTeam, float f, float f2, float f3) {
+    public static int countEnemyUnitsInRange(PlayerTeam playerTeam, float f, float f2, float f3) {
         int i = 0;
         BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
         int size = BaseUnit.bE.size();
@@ -2257,13 +2257,13 @@ public final class AIController extends PlayerTeam {
         int iShouldIssueActionForUnitType = 0;
         Iterator it = unitBuildStrategy.unitPriorities.iterator();
         while (it.hasNext()) {
-            iShouldIssueActionForUnitType += shouldIssueActionForUnitType(((UnitBuildPriority) it.next()).unitType, f, f2, i);
+            iShouldIssueActionForUnitType += countUnitsOfTypeInRange(((UnitBuildPriority) it.next()).unitType, f, f2, i);
         }
         return iShouldIssueActionForUnitType;
     }
 
     /* JADX INFO: renamed from: a */
-    public int shouldIssueActionForUnitType(UnitType unitType, float f, float f2, int i) {
+    public int countUnitsOfTypeInRange(UnitType unitType, float f, float f2, int i) {
         int i2 = 0;
         GameEngine gameEngine = GameEngine.getInstance();
         bI.clear();

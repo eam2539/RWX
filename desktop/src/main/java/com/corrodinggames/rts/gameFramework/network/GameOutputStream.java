@@ -38,7 +38,7 @@ public class GameOutputStream {
     private LinkedList outputBlockStack;
 
     /* JADX INFO: renamed from: d */
-    public int maxBufferSize;
+    public int streamVersion;
 
     /* JADX INFO: renamed from: a */
     public void flushAllBuffers() throws IOException {
@@ -59,12 +59,12 @@ public class GameOutputStream {
 
     public GameOutputStream(int i) {
         this();
-        this.maxBufferSize = i;
+        this.streamVersion = i;
     }
 
     public GameOutputStream() {
         this.outputBlockStack = new LinkedList();
-        this.maxBufferSize = 999999;
+        this.streamVersion = 999999;
         this.rootByteBuffer = new ByteArrayOutputStream();
         this.rootDataOutput = new DataOutputStream(this.rootByteBuffer);
         useMainStream();
@@ -72,7 +72,7 @@ public class GameOutputStream {
 
     public GameOutputStream(DataOutputStream dataOutputStream) {
         this.outputBlockStack = new LinkedList();
-        this.maxBufferSize = 999999;
+        this.streamVersion = 999999;
         this.rootDataOutput = dataOutputStream;
         useMainStream();
     }
@@ -193,7 +193,7 @@ public class GameOutputStream {
     }
 
     /* JADX INFO: renamed from: a */
-    public void startBlockInternal(FastArrayList fastArrayList) throws IOException {
+    public void writeGameObjectList(FastArrayList fastArrayList) throws IOException {
         if (fastArrayList == null) {
             writeInt(0);
             return;
@@ -224,7 +224,7 @@ public class GameOutputStream {
     }
 
     /* JADX INFO: renamed from: a */
-    public void writeUnitIdOrNullUnitEntity(OrderableUnit orderableUnit) throws IOException {
+    public void writeOrderableUnit(OrderableUnit orderableUnit) throws IOException {
         if (orderableUnit != null && !orderableUnit.isDestroyed) {
             writeObjectId((GameObject) orderableUnit);
         } else {
@@ -360,11 +360,11 @@ public class GameOutputStream {
     }
 
     /* JADX INFO: renamed from: d */
-    public void debugPlaceholder(String str) {
+    public void writeDebugMessage(String str) {
     }
 
     /* JADX INFO: renamed from: f */
-    public boolean isCompressionEnabled() {
+    public boolean isDebugStream() {
         return false;
     }
 
@@ -410,8 +410,8 @@ public class GameOutputStream {
     }
 
     /* JADX INFO: renamed from: g */
-    public int getMaxSize() {
-        return this.maxBufferSize;
+    public int getStreamVersion() {
+        return this.streamVersion;
     }
 
     /* JADX INFO: renamed from: h */

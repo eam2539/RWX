@@ -703,9 +703,9 @@ public class GameLogic extends GameEngine {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                this.tileMap.isWorldPointVisibleForTeam(activeInputStream, z2);
+                this.tileMap.loadMapFromStream(activeInputStream, z2);
             } else {
-                this.tileMap.clampWorldX(getCurrentMapPath(), z2);
+                this.tileMap.loadMap(getCurrentMapPath(), z2);
             }
             if (!this.tileMap.isCursorActive) {
                 log("map did not load, returning");
@@ -806,7 +806,7 @@ public class GameLogic extends GameEngine {
                             }
                             for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
                                 if ((baseUnit instanceof BaseUnit) && !baseUnit.isDead && baseUnit.team == playerTeamK3) {
-                                    if (baseUnit.isSelectable && !z3) {
+                                    if (baseUnit.changeTeam && !z3) {
                                         z3 = true;
                                         fValueOf = Float.valueOf(baseUnit.posX);
                                         fValueOf2 = Float.valueOf(baseUnit.posY);
@@ -936,7 +936,7 @@ public class GameLogic extends GameEngine {
             if (!z2) {
                 BuildPreview.clearAll();
             }
-            this.gameSaver.readSaveGame(z2);
+            this.gameSaver.resetAutosaveTimers(z2);
             this.gameUI.toggleGameAndUIState(z2);
             if (!z2) {
                 this.gameUI.clearSelection();
@@ -1165,7 +1165,7 @@ public class GameLogic extends GameEngine {
                     this.settingsEngine.save();
                 }
 
-                this.gameSaver.deleteSave();
+                this.gameSaver.updateAutosaveTimer();
                 float var26 = this.targetZoom * this.densityZoomScale;
                 if (var26 != this.zoom) {
                     float var4 = this.mouseX / this.zoom + this.viewpointX;
@@ -1279,19 +1279,19 @@ public class GameLogic extends GameEngine {
                     if (!this.shouldSkipUpdate(true) && !this.networkEngine.frameUpdateBlocked) {
                         this.accumulator += var29;
 
-                        while (this.accumulator > this.networkEngine.getDifficultyString()) {
+                        while (this.accumulator > this.networkEngine.getCurrentStepRate()) {
                             if (this.networkEngine.shouldGameBePausedForPathfinding()) {
                                 this.networkEngine.frameUpdateBlocked = true;
                                 break;
                             }
 
-                            this.accumulator = this.accumulator - this.networkEngine.getDifficultyString();
-                            this.networkEngine.a(this.networkEngine.getDifficultyString(), false);
+                            this.accumulator = this.accumulator - this.networkEngine.getCurrentStepRate();
+                            this.networkEngine.a(this.networkEngine.getCurrentStepRate(), false);
                             if (this.networkEngine.frameUpdateBlocked) {
                                 break;
                             }
 
-                            this.update(this.networkEngine.getDifficultyString());
+                            this.update(this.networkEngine.getCurrentStepRate());
                         }
 
                         if (!this.networkEngine.isServer) {
@@ -1320,40 +1320,40 @@ public class GameLogic extends GameEngine {
 
                             if (!this.networkEngine.catchupFastForwardActive && this.networkEngine.catchupSpeedupActive) {
                                 this.networkEngine.catchupSpeedupTimer += float1;
-                                if (this.networkEngine.catchupSpeedupTimer > this.networkEngine.getDifficultyString() * 3.0F) {
+                                if (this.networkEngine.catchupSpeedupTimer > this.networkEngine.getCurrentStepRate() * 3.0F) {
                                     this.networkEngine.catchupSpeedupTimer = 0.0F;
-                                    this.networkEngine.a(this.networkEngine.getDifficultyString(), true);
+                                    this.networkEngine.a(this.networkEngine.getCurrentStepRate(), true);
                                     if (!this.networkEngine.frameUpdateBlocked) {
-                                        this.update(this.networkEngine.getDifficultyString());
+                                        this.update(this.networkEngine.getCurrentStepRate());
                                     }
                                 }
                             }
 
                             if (this.networkEngine.catchupFastForwardActive) {
-                                this.networkEngine.a(this.networkEngine.getDifficultyString(), true);
+                                this.networkEngine.a(this.networkEngine.getCurrentStepRate(), true);
                                 if (!this.networkEngine.frameUpdateBlocked) {
-                                    this.update(this.networkEngine.getDifficultyString());
+                                    this.update(this.networkEngine.getCurrentStepRate());
                                 }
                             }
 
                             if (this.currentTick < this.networkEngine.nextBlockingFrame - 90) {
-                                this.networkEngine.a(this.networkEngine.getDifficultyString(), true);
+                                this.networkEngine.a(this.networkEngine.getCurrentStepRate(), true);
                                 if (!this.networkEngine.frameUpdateBlocked) {
-                                    this.update(this.networkEngine.getDifficultyString());
+                                    this.update(this.networkEngine.getCurrentStepRate());
                                 }
                             }
 
                             if (this.currentTick < this.networkEngine.nextBlockingFrame - 120) {
-                                this.networkEngine.a(this.networkEngine.getDifficultyString(), true);
+                                this.networkEngine.a(this.networkEngine.getCurrentStepRate(), true);
                                 if (!this.networkEngine.frameUpdateBlocked) {
-                                    this.update(this.networkEngine.getDifficultyString());
+                                    this.update(this.networkEngine.getCurrentStepRate());
                                 }
                             }
 
                             if (this.currentTick < this.networkEngine.nextBlockingFrame - 600) {
-                                this.networkEngine.a(this.networkEngine.getDifficultyString(), true);
+                                this.networkEngine.a(this.networkEngine.getCurrentStepRate(), true);
                                 if (!this.networkEngine.frameUpdateBlocked) {
-                                    this.update(this.networkEngine.getDifficultyString());
+                                    this.update(this.networkEngine.getCurrentStepRate());
                                 }
                             }
                         }
@@ -1371,13 +1371,13 @@ public class GameLogic extends GameEngine {
                     if (!this.shouldSkipUpdate(false)) {
                         this.accumulator += var30;
 
-                        while (this.accumulator > this.networkEngine.getDifficultyString()) {
-                            this.accumulator = this.accumulator - this.networkEngine.getDifficultyString();
+                        while (this.accumulator > this.networkEngine.getCurrentStepRate()) {
+                            this.accumulator = this.accumulator - this.networkEngine.getCurrentStepRate();
                             if (this.networkEngine.shouldGameBePausedForPathfinding()) {
                                 break;
                             }
 
-                            this.update(this.networkEngine.getDifficultyString());
+                            this.update(this.networkEngine.getCurrentStepRate());
                         }
                     }
 
@@ -1542,7 +1542,7 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: a */
     public void update(float deltaSpeed) throws IOException {
         if (isInNetworkOrReplay() && deltaSpeed < 0.1f) {
-            NetworkEngine.reportDesync("updateAllGame1: deltaSpeed:" + deltaSpeed + " frame:" + this.currentTick + " network.currentStepRate:" + this.networkEngine.getDifficultyString());
+            NetworkEngine.reportDesync("updateAllGame1: deltaSpeed:" + deltaSpeed + " frame:" + this.currentTick + " network.currentStepRate:" + this.networkEngine.getCurrentStepRate());
         }
         if (this.gameSpeed != 1.0f && !this.networkEngine.networkGameActive && !this.replayEngine.i()) {
             deltaSpeed *= this.gameSpeed;

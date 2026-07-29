@@ -555,7 +555,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: a */
-    public PointF openAssetStreamFromSuffixSegments(Point point) {
+    public PointF tileToWorldPoint(Point point) {
         this.tempWorldPoint.a(point.worldX * this.tileWorldSizeX, point.worldY * this.tileWorldSizeY);
         return this.tempWorldPoint;
     }
@@ -667,19 +667,19 @@ public final class TileMap {
         if (inputStreamOpenMapInputStreamWithMovedFallback == null) {
             throw new IOException("writeMapStream: Could not find map:" + str);
         }
-        int iIsWorldPointVisibleForTeam = (int) isWorldPointVisibleForTeam(str);
-        if (iIsWorldPointVisibleForTeam == -1) {
+        int mapFileSize = (int) getMapFileSize(str);
+        if (mapFileSize == -1) {
             new IOException("writeMapStream: Failed to get map size");
         }
-        if (iIsWorldPointVisibleForTeam == 0) {
+        if (mapFileSize == 0) {
             new IOException("writeMapStream: Got empty map size");
         }
-        GameEngine.log("Sending map stream of size: " + iIsWorldPointVisibleForTeam);
-        gameOutputStream.writeInputStreamWithLength(inputStreamOpenMapInputStreamWithMovedFallback, iIsWorldPointVisibleForTeam);
+        GameEngine.log("Sending map stream of size: " + mapFileSize);
+        gameOutputStream.writeInputStreamWithLength(inputStreamOpenMapInputStreamWithMovedFallback, mapFileSize);
     }
 
     /* JADX INFO: renamed from: a */
-    public static long isWorldPointVisibleForTeam(String str) {
+    public static long getMapFileSize(String str) {
         String str2 = VariableScope.nullOrMissingString + str;
         String strConvertAbstractPath = FileHelper.convertAbstractPath(str2);
         IFileLoader fileLoaderForPath = FileLoaderFactory.getFileLoaderForPath(strConvertAbstractPath);
@@ -794,7 +794,7 @@ public final class TileMap {
                             f = baseUnit.rotationSpeed + 90.0f;
                         }
                         elementCreateElement2.setAttribute("rotation", VariableScope.nullOrMissingString + f);
-                        Integer numIsTileVisibleForTeam = isTileVisibleForTeam(baseUnit.r());
+                        Integer numIsTileVisibleForTeam = findTileIdForUnitType(baseUnit.r());
                         if (numIsTileVisibleForTeam != null) {
                             elementCreateElement2.setAttribute("gid", VariableScope.nullOrMissingString + numIsTileVisibleForTeam);
                         }
@@ -818,7 +818,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean isWorldPointVisibleForTeam(String str, String str2) {
+    public boolean exportMap(String str, String str2) {
         GameEngine gameEngine = GameEngine.getInstance();
         try {
             exportMapToPath(str, str2);
@@ -883,14 +883,14 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: a */
-    public void clampWorldX(String str, boolean z) throws MapLoadException, IOException {
+    public void loadMap(String str, boolean z) throws MapLoadException, IOException {
         GameEngine.log(" --- Loading map ---");
         InputStream inputStreamOpenMapInputStreamWithMovedFallback = openMapInputStreamWithMovedFallback(str);
         if (inputStreamOpenMapInputStreamWithMovedFallback == null) {
             throw new MapLoadException("Could not find map: " + FileHelper.getFileName(resolveAbstractPathIfNotNull(str)));
         }
         BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStreamOpenMapInputStreamWithMovedFallback);
-        isWorldPointVisibleForTeam(bufferedInputStream, z);
+        loadMapFromStream(bufferedInputStream, z);
         try {
             bufferedInputStream.close();
             inputStreamOpenMapInputStreamWithMovedFallback.close();
@@ -941,7 +941,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: a */
-    public void isWorldPointVisibleForTeam(InputStream inputStream, boolean z) throws MapLoadException {
+    public void loadMapFromStream(InputStream inputStream, boolean z) throws MapLoadException {
         int iAllocateSlotForTile;
         NodeList elementsByTagName;
         this.unitObjects.clear();
@@ -1267,7 +1267,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: a */
-    public Tileset isWorldPointVisibleForTeam(int i) {
+    public Tileset findTilesetByGlobalTileId(int i) {
         for (int i2 = 0; i2 < this.tilesets.size(); i2++) {
             Tileset tileset = (Tileset) this.tilesets.get(i2);
             if (tileset.containsGid(i)) {
@@ -1278,7 +1278,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: a */
-    public Integer isTileVisibleForTeam(UnitType unitType) {
+    public Integer findTileIdForUnitType(UnitType unitType) {
         String unitTypeDescriptionShort = unitType.getUnitTypeDescriptionShort();
         Integer numC = c("unit", unitTypeDescriptionShort);
         if (numC == null) {
@@ -1348,7 +1348,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: a */
-    public byte clampWorldX(int i, int i2, byte[][] bArr, byte b2) {
+    public byte calculateFogNeighborMask(int i, int i2, byte[][] bArr, byte b2) {
         byte b3 = 0;
         int i3 = this.tileCountX;
         int i4 = this.tileCountY;
@@ -1633,7 +1633,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: a */
-    private InputStream tileToWorldPoint(String str, String str2, int i) {
+    private InputStream openAssetStreamFromSuffixSegments(String str, String str2, int i) {
         String[] strArrSplit = str2.split("/");
         if (strArrSplit.length >= i) {
             StringBuilder str3 = new StringBuilder(VariableScope.nullOrMissingString);
@@ -1654,13 +1654,13 @@ public final class TileMap {
     public InputStream openAssetStreamFromPair(String str, String str2) throws IOException {
         InputStream inputStreamOpenAsset = FileHelper.openAsset(str + str2);
         if (inputStreamOpenAsset == null) {
-            inputStreamOpenAsset = tileToWorldPoint(str, str2, 3);
+            inputStreamOpenAsset = openAssetStreamFromSuffixSegments(str, str2, 3);
         }
         if (inputStreamOpenAsset == null) {
-            inputStreamOpenAsset = tileToWorldPoint(str, str2, 2);
+            inputStreamOpenAsset = openAssetStreamFromSuffixSegments(str, str2, 2);
         }
         if (inputStreamOpenAsset == null) {
-            inputStreamOpenAsset = tileToWorldPoint(str, str2, 1);
+            inputStreamOpenAsset = openAssetStreamFromSuffixSegments(str, str2, 1);
         }
         if (inputStreamOpenAsset == null) {
             throw new IOException("File could not be found:" + str + str2);
@@ -1669,7 +1669,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean clampWorldX(PlayerTeam playerTeam, int i, int i2) {
+    public boolean isTileVisibleForTeam(PlayerTeam playerTeam, int i, int i2) {
         if (!this.fogRenderActive && this.fogEnabled && playerTeam.fogOfWarData != null && isInBounds(i, i2) && playerTeam.fogOfWarData[i][i2] == 10) {
             return false;
         }

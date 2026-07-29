@@ -396,14 +396,14 @@ public class SlickGameHandler extends BasicGame {
     public void keyReleased(int i, char c) {
         a(i, false);
         if (d()) {
-            Integer numInitializeAndroidToGdxMapping = SlickToAndroidKeycodes.initializeAndroidToGdxMapping(i);
+            Integer numInitializeAndroidToGdxMapping = SlickToAndroidKeycodes.convertSlickToGdxKeyCode(i);
             if (numInitializeAndroidToGdxMapping != null) {
                 this.b.p.processKeyUp(numInitializeAndroidToGdxMapping.intValue(), e());
             } else if (!Character.isISOControl(c)) {
             }
         }
         if (this.e != null) {
-            this.e.setKeyState(SlickToAndroidKeycodes.initializeGdxToAndroidMapping(i), false);
+            this.e.setKeyState(SlickToAndroidKeycodes.convertSlickToAndroidKeyCode(i), false);
         }
     }
 
@@ -767,7 +767,7 @@ public class SlickGameHandler extends BasicGame {
                 if (!file.exists()) {
                     file.mkdir();
                 }
-                final String str = "screenshot_" + Utility.formatDate("d MMM yyyy HH.mm.ss") + ".png";
+                final String str = "screenshot_" + Utility.formatCurrentDate("d MMM yyyy HH.mm.ss") + ".png";
                 final String str2 = "screenshots" + File.separator + str;
                 if (!z) {
                     Image image = new Image(this.c.getWidth(), this.c.getHeight());

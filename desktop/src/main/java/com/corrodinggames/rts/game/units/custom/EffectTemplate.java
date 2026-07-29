@@ -414,7 +414,7 @@ public class EffectTemplate {
         this.frameIndex = iniFile.getLogicBooleanUnit(str, "frameIndex", (Integer) 0).intValue();
         this.frameIndexRandom = iniFile.getLogicBooleanUnit(str, "frameIndexRandom", (Integer) 0).intValue();
         String string2 = iniFile.getString(str, "stripIndex", "0");
-        this.stripIndex = gameEngine.effectManager.a_string_method(string2);
+        this.stripIndex = gameEngine.effectManager.findEffectTemplateIndex(string2);
         if (this.stripIndex == -1) {
             throw new RuntimeException("Failed to find stripIndex with name:" + string2);
         }

@@ -146,7 +146,7 @@ public class NetworkConnection {
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean disconnectWithMessage() {
+    public boolean isCommandRateLimitExceeded() {
         if (this.commandWindowStartMs < System.currentTimeMillis() - 10000) {
             this.commandWindowStartMs = System.currentTimeMillis();
             this.commandCounter = 0;
@@ -164,7 +164,7 @@ public class NetworkConnection {
     }
 
     /* JADX INFO: renamed from: b */
-    public int logDebug() {
+    public int getRecentPingMs() {
         if (this.B == -1) {
             return -2;
         }
@@ -384,7 +384,7 @@ public class NetworkConnection {
     }
 
     /* JADX INFO: renamed from: b */
-    public void getRecentPingMs(String str) {
+    public void logDebug(String str) {
         GameEngine.logColored(formatLogPrefix(str));
     }
 

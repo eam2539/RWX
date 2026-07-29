@@ -199,7 +199,7 @@ public class DebugOutputStream extends GameOutputStream {
 
     @Override // com.corrodinggames.rts.gameFramework.network.GameOutputStream
     /* JADX INFO: renamed from: a */
-    public void writeUnitIdOrNullUnitEntity(OrderableUnit orderableUnit) {
+    public void writeOrderableUnit(OrderableUnit orderableUnit) {
         if (orderableUnit != null && !orderableUnit.isDestroyed) {
             writeObjectId((GameObject) orderableUnit);
         } else {
@@ -329,13 +329,13 @@ public class DebugOutputStream extends GameOutputStream {
 
     @Override // com.corrodinggames.rts.gameFramework.network.GameOutputStream
     /* JADX INFO: renamed from: d */
-    public void debugPlaceholder(String str) {
+    public void writeDebugMessage(String str) {
         this.activePrintStream.println("#writeIfDebugOnly: " + str);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.network.GameOutputStream
     /* JADX INFO: renamed from: f */
-    public boolean isCompressionEnabled() {
+    public boolean isDebugStream() {
         return true;
     }
 

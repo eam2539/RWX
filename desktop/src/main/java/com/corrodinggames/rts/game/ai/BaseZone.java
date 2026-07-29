@@ -323,7 +323,7 @@ public class BaseZone extends AIStrategyNode {
         if (this.aiController.isAggressive) {
             return null;
         }
-        int iCountEnemyUnitsInRange = countEnemyUnitsInRange(this.aiController.airFactoryUnitBuildStrategy);
+        int iCountEnemyUnitsInRange = countUnitsForBuildStrategy(this.aiController.airFactoryUnitBuildStrategy);
         UnitType unitType = null;
         float f = -1.0f;
         for (UnitType unitType2 : UnitTypeEnum.ae) {
@@ -466,7 +466,7 @@ public class BaseZone extends AIStrategyNode {
     }
 
     /* JADX INFO: renamed from: a */
-    public int countEnemyUnitsInRange(UnitBuildStrategy unitBuildStrategy) {
+    public int countUnitsForBuildStrategy(UnitBuildStrategy unitBuildStrategy) {
         int iCountUnitsOfType = 0;
         Iterator it = unitBuildStrategy.unitPriorities.iterator();
         while (it.hasNext()) {
@@ -566,10 +566,10 @@ public class BaseZone extends AIStrategyNode {
                     if (baseUnit.team == this.aiController && this.aiController.canUnitEngageTarget(baseUnit, closestEnemyUnit) && this.aiController.isEligibleUnitForRandomSelection(orderableUnit) && orderableUnit.hasNoCurrentWaypoint()) {
                         if (!baseUnit.isActive) {
                             if (AIController.isPathPossibleForUnit(baseUnit, this.posX, this.posY, 800.0f)) {
-                                commandNewCommandForTeam.setTargetUnit(orderableUnit);
+                                commandNewCommandForTeam.addUnitToCommand(orderableUnit);
                             }
                         } else if (AIController.isPathPossibleForUnit(baseUnit, this.posX, this.posY, 540.0f)) {
-                            commandNewCommandForTeam.setTargetUnit(orderableUnit);
+                            commandNewCommandForTeam.addUnitToCommand(orderableUnit);
                         }
                     }
                 }
@@ -623,11 +623,11 @@ public class BaseZone extends AIStrategyNode {
     }
 
     private OrderableUnit y() {
-        return hasEnemyUnits(null);
+        return findAvailableBuilderForUnitType(null);
     }
 
     /* JADX INFO: renamed from: f */
-    private OrderableUnit hasEnemyUnits(UnitType unitType) {
+    private OrderableUnit findAvailableBuilderForUnitType(UnitType unitType) {
         return a(unitType, (PointF) null, false);
     }
 
@@ -739,7 +739,7 @@ public class BaseZone extends AIStrategyNode {
     }
 
     /* JADX INFO: renamed from: g */
-    private boolean getClosestEnemyUnit(UnitType unitType) {
+    private boolean tryBuildUnit(UnitType unitType) {
         PointF pointFE;
         OrderableUnit orderableUnitA;
         this.lastBuiltUnitType = unitType;
@@ -778,12 +778,12 @@ public class BaseZone extends AIStrategyNode {
         }
         if (abstractUnitActionFindActionForUnitType.usesActionTarget()) {
             Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this.aiController);
-            commandNewCommandForTeam.setTargetUnit(orderableUnitA);
+            commandNewCommandForTeam.addUnitToCommand(orderableUnitA);
             commandNewCommandForTeam.setActionTarget(abstractUnitActionFindActionForUnitType.getActionId(), pointFE, (BaseUnit) null);
             return true;
         }
         Command commandNewCommandForTeam2 = gameEngine.commandController.newCommandForTeam(this.aiController);
-        commandNewCommandForTeam2.setTargetUnit(orderableUnitA);
+        commandNewCommandForTeam2.addUnitToCommand(orderableUnitA);
         commandNewCommandForTeam2.setBuildTarget(pointFE.x, pointFE.y, unitType, queueSize);
         return true;
     }
@@ -888,7 +888,7 @@ public class BaseZone extends AIStrategyNode {
         }
         for (int i2 = 0; i2 < i; i2++) {
             Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this.aiController);
-            commandNewCommandForTeam.setTargetUnit(orderableUnitA);
+            commandNewCommandForTeam.addUnitToCommand(orderableUnitA);
             commandNewCommandForTeam.setActionId(abstractUnitActionE.getQueueId());
         }
         return true;
@@ -920,7 +920,7 @@ public class BaseZone extends AIStrategyNode {
                 boolean zIsPathPossibleForUnit = this.aiController.isPathPossibleForUnit(orderableUnitX, pointFW.x, pointFW.y);
                 if (zIsPathPossibleForUnit || this.aiController.activeTransporterGroupCount != 0) {
                     Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this.aiController);
-                    commandNewCommandForTeam.setTargetUnit(orderableUnitX);
+                    commandNewCommandForTeam.addUnitToCommand(orderableUnitX);
                     commandNewCommandForTeam.setMoveTarget(pointFW.x, pointFW.y);
                     this.lastAttackedTimer++;
                     this.updateTimer = Utility.getRandomIntInRange(1800, 2500);
@@ -954,7 +954,7 @@ public class BaseZone extends AIStrategyNode {
     }
 
     /* JADX INFO: renamed from: A */
-    private BaseUnit m112A() {
+    private BaseUnit findRepairTarget() {
         BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
@@ -973,14 +973,14 @@ public class BaseZone extends AIStrategyNode {
         }
         for (int i = 0; i < 8; i++) {
             UnitType randomUnitType = this.aiController.extractorUnitBuildStrategy.getRandomUnitType();
-            if (randomUnitType != null && hasBuilderFor(randomUnitType) && countIdleCombatUnits(randomUnitType)) {
+            if (randomUnitType != null && hasBuilderFor(randomUnitType) && tryBuildRecommendedHarvester(randomUnitType)) {
                 return;
             }
         }
     }
 
 
-    public boolean countIdleCombatUnits(UnitType as) {
+    public boolean tryBuildRecommendedHarvester(UnitType as) {
         if (!(as instanceof CustomUnitConfig)) {
             return false;
         } else {
@@ -1059,27 +1059,27 @@ public class BaseZone extends AIStrategyNode {
         GameEngine gameEngine = GameEngine.getInstance();
         if (orderableUnit.g(baseUnit, true)) {
             Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this.aiController);
-            commandNewCommandForTeam.setTargetUnit(orderableUnit);
+            commandNewCommandForTeam.addUnitToCommand(orderableUnit);
             commandNewCommandForTeam.setReclaimTarget(baseUnit);
         }
     }
 
     public void s() {
         GameEngine gameEngine = GameEngine.getInstance();
-        BaseUnit baseUnitM112A = m112A();
+        BaseUnit baseUnitM112A = findRepairTarget();
         if (baseUnitM112A != null) {
             this.tempPoint2.a(baseUnitM112A.posX, baseUnitM112A.posY);
             OrderableUnit orderableUnitA = a((UnitType) null, this.tempPoint2, true);
             if (orderableUnitA != null && orderableUnitA.canRepairTarget(baseUnitM112A) && baseUnitM112A.e(orderableUnitA) < 2) {
                 Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this.aiController);
-                commandNewCommandForTeam.setTargetUnit(orderableUnitA);
+                commandNewCommandForTeam.addUnitToCommand(orderableUnitA);
                 commandNewCommandForTeam.setRepairTarget(baseUnitM112A);
             }
         }
     }
 
     public void b(float f) {
-        countUnitsOfType(f);
+        refreshUnitCounts(f);
         int i = this.numberOfFactories;
         int i2 = this.numberOfExtractors;
         updateUnitsInZone();
@@ -1182,7 +1182,7 @@ public class BaseZone extends AIStrategyNode {
     	at jadx.core.dex.visitors.typeinference.FixTypesVisitor.visit(FixTypesVisitor.java:94)
      */
     /* JADX INFO: renamed from: c */
-    public void countUnitsOfType(float f) {
+    public void refreshUnitCounts(float f) {
         this.numberOfExtractors = 0;
         this.numberOfFactories = 0;
         this.numberOfIdleCombatUnits = 0;
@@ -1261,7 +1261,7 @@ public class BaseZone extends AIStrategyNode {
             }
             if ((y() != null) && (bestBuildingToBuild = getBestBuildingToBuild()) != null && ((this.lastFoundBuildingPriority > 0.8d || this.aiController.hasCredits(1300.0d)) && ((this.lastFoundBuildingPriority > 0.4d || this.aiController.hasCredits(1700.0d)) && ((this.lastFoundBuildingPriority > 0.2d || this.aiController.hasCredits(2100.0d)) && ((this.lastFoundBuildingPriority > 0.1d || this.aiController.hasCredits(2800.0d)) && ((this.lastFoundBuildingPriority > 0.05d || this.aiController.hasCredits(3100.0d)) && (this.lastFoundBuildingPriority > 0.01d || this.aiController.hasCredits(4800.0d)))))))) {
                 this.numberOfLandUnits++;
-                if (!getClosestEnemyUnit(bestBuildingToBuild)) {
+                if (!tryBuildUnit(bestBuildingToBuild)) {
                     this.defensiveScore -= 120.0f;
                     this.numberOfAirUnits++;
                 }

@@ -69,7 +69,7 @@ public class AndroidSoundFactory extends SoundFactory {
 
     @Override // com.corrodinggames.rts.gameFramework.audio.SoundFactory
     public Sound a(int i) {
-        AndroidSound androidSound = new AndroidSound(this, Utility.countChars(R.raw.class, i), this);
+        AndroidSound androidSound = new AndroidSound(this, Utility.getFieldNameByValue(R.raw.class, i), this);
         androidSound.soundFactory = this;
         androidSound.soundId = this.soundPool.load(this.context, i, 1);
         return androidSound;

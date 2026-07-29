@@ -58,7 +58,7 @@ final class ReceiveWorker implements Runnable {
             int i = dataInputStream.readInt();
             int i2 = dataInputStream.readInt();
             if (i > 20000000) {
-                this.networkConnection.getRecentPingMs("readData(): new packet of type:" + i2 + " has size of:" + i);
+                this.networkConnection.logDebug("readData(): new packet of type:" + i2 + " has size of:" + i);
             }
             if (i > 10000) {
                 int i3 = 50000000;
@@ -69,12 +69,12 @@ final class ReceiveWorker implements Runnable {
                     i3 = 10000;
                 }
                 if (i > i3) {
-                    this.networkConnection.getRecentPingMs("Requested packet too large rejecting (max:" + i3 + ")");
+                    this.networkConnection.logDebug("Requested packet too large rejecting (max:" + i3 + ")");
                     return;
                 }
             }
             if (i < 0) {
-                this.networkConnection.getRecentPingMs("Requested packet negative size:" + i + " rejecting");
+                this.networkConnection.logDebug("Requested packet negative size:" + i + " rejecting");
                 return;
             }
             PacketData packetData = new PacketData(i2);
@@ -86,7 +86,7 @@ final class ReceiveWorker implements Runnable {
             while (i4 < i && !this.networkConnection.isDisconnecting) {
                 int i5 = dataInputStream.read(packetData.bytes, i4, i - i4);
                 if (i5 == -1) {
-                    this.networkConnection.getRecentPingMs("we got to the end of the stream?!?");
+                    this.networkConnection.logDebug("we got to the end of the stream?!?");
                     return;
                 }
                 i4 += i5;

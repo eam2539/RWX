@@ -334,7 +334,7 @@ public class Projectile extends PositionedObject {
         gameOutputStream.writeBoolean(this.aU);
         gameOutputStream.writeShort(this.R);
         gameOutputStream.writeBoolean(this.ao);
-        gameOutputStream.startBlockInternal(this.ap);
+        gameOutputStream.writeGameObjectList(this.ap);
         gameOutputStream.writeShort(this.Q);
         gameOutputStream.writeFloat(this.x);
         gameOutputStream.writeBoolean(this.aa);
@@ -387,7 +387,7 @@ public class Projectile extends PositionedObject {
     public void a(GameInputStream gameInputStream) throws IOException {
         this.h = gameInputStream.readFloat();
         this.j = gameInputStream.readBaseUnit();
-        this.l = gameInputStream.startBlockNamed(ConnectionStatus.expected);
+        this.l = gameInputStream.readBaseUnit(ConnectionStatus.EXPECTED);
         this.t = gameInputStream.readFloat();
         this.x = gameInputStream.readInt();
         this.A = gameInputStream.readBoolean();
@@ -445,7 +445,7 @@ public class Projectile extends PositionedObject {
             this.o = gameInputStream.readFloat();
             this.C = gameInputStream.readBoolean();
             this.D = gameInputStream.readBoolean();
-            this.q = (Projectile) gameInputStream.readBaseUnitWithStatus(Projectile.class);
+            this.q = (Projectile) gameInputStream.readGameObject(Projectile.class);
             this.aV = gameInputStream.readFloat();
             this.aW = gameInputStream.readFloat();
             this.aX = gameInputStream.readFloat();
@@ -456,7 +456,7 @@ public class Projectile extends PositionedObject {
             this.R = gameInputStream.readShortValue();
             this.ao = gameInputStream.readBoolean();
             FastArrayList fastArrayList = new FastArrayList();
-            gameInputStream.assertMagicShort(fastArrayList, BaseUnit.class);
+            gameInputStream.readGameObjectList(fastArrayList, BaseUnit.class);
             if (fastArrayList.size() > 0) {
                 this.ap = fastArrayList;
             }
@@ -531,7 +531,7 @@ public class Projectile extends PositionedObject {
             this.g = ProjectileTemplate.a(gameInputStream);
         }
         if (gameInputStream.getProtocolVersion() >= 81 && gameInputStream.readBoolean()) {
-            this.au = gameInputStream.readBaseUnitWithStatus(GameObject.class);
+            this.au = gameInputStream.readGameObject(GameObject.class);
             this.aw = gameInputStream.readFloat();
             this.ax = gameInputStream.readFloat();
             this.ay = gameInputStream.readFloat();
@@ -603,7 +603,7 @@ public class Projectile extends PositionedObject {
         }
         if (baseUnit2 != null && !baseUnit2.isDead) {
             if (projectile != null && projectile.g.convertHitToSourceTeam && baseUnit != null) {
-                baseUnit2.isSelectable(baseUnit.team);
+                baseUnit2.changeTeam(baseUnit.team);
             }
             if (projectile != null) {
                 if (projectile.ai != 1.0f && baseUnit2.bI()) {
@@ -854,7 +854,7 @@ public class Projectile extends PositionedObject {
                 float fSortRect = this.t * f2;
                 z4 = true;
                 if (fDistanceSq < fSortRect * fSortRect) {
-                    fSortRect = Utility.sortRect(fDistanceSq);
+                    fSortRect = Utility.squareRoot(fDistanceSq);
                     fDistanceSq = 0.0f;
                 }
                 this.posX += Utility.fastCos(angleBetweenPoints) * fSortRect;
@@ -888,7 +888,7 @@ public class Projectile extends PositionedObject {
                 z4 = true;
                 if (f33 != 0.0f) {
                     if (fDistanceSq > 0.1d) {
-                        fClamp = Utility.clamp((Utility.abs(f33) / Utility.sortRect(fDistanceSq)) * this.t * f2, this.t * f2);
+                        fClamp = Utility.clamp((Utility.abs(f33) / Utility.squareRoot(fDistanceSq)) * this.t * f2, this.t * f2);
                     }
                     this.posZ += Utility.clamp(f4, fClamp);
                     f4 = f3 - this.posZ;
@@ -997,7 +997,7 @@ public class Projectile extends PositionedObject {
             }
             if (this.at) {
                 gameEngine.tileMap.setCursorTileIndexFromWorldPoint(this.posX, this.posY);
-                if (gameEngine.pathfindingEngine.a(UnitMovementType.HOVER, gameEngine.tileMap.cursorTileX, gameEngine.tileMap.cursorTileY)) {
+                if (gameEngine.pathfindingEngine.isTileBlockedForMovement(UnitMovementType.HOVER, gameEngine.tileMap.cursorTileX, gameEngine.tileMap.cursorTileY)) {
                     z7 = true;
                     z8 = true;
                 }

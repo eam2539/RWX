@@ -673,7 +673,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                             gameEngine2.networkEngine.nextBlockingFrame = gameEngine2.currentTick + 1;
                             gameEngine2.networkEngine.w();
                         }
-                        String str = "[sandbox]" + gameEngine2.getCurrentMapName() + " [v" + gameEngine2.getVersionString() + "] (" + Utility.formatDate("d MMM yyyy HH.mm.ss") + ").replay";
+                        String str = "[sandbox]" + gameEngine2.getCurrentMapName() + " [v" + gameEngine2.getVersionString() + "] (" + Utility.formatCurrentDate("d MMM yyyy HH.mm.ss") + ").replay";
                         gameEngine2.replayEngine.d(str);
                         gameEngine2.gameUI.e = false;
                         GameEngine.addUIMessage(null, "Replay started as: " + str);
@@ -1276,10 +1276,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             pointF3.y += (pointF4.y - pointF3.y) * 0.04f * f;
             float f2 = currentRepairOrReclaimTarget.radius * 0.75f;
             if (Utility.abs(pointF3.x - pointF4.x) < 1.0f) {
-                pointF4.x = Utility.m287d(-f2, f2);
+                pointF4.x = Utility.randomRepairTargetOffset(-f2, f2);
             }
             if (Utility.abs(pointF3.y - pointF4.y) < 1.0f) {
-                pointF4.y = Utility.m287d(-f2, f2);
+                pointF4.y = Utility.randomRepairTargetOffset(-f2, f2);
             }
         }
     }
@@ -1310,7 +1310,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                     if (playerTeamK == null || playerTeamK.isSpectatorTeamColor()) {
                         i++;
                     } else {
-                        isSelectable(playerTeamK);
+                        changeTeam(playerTeamK);
                         break;
                     }
                 } else {
@@ -1487,7 +1487,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                     }
                 }
                 if (playerTeamK != null) {
-                    isSelectable(playerTeamK);
+                    changeTeam(playerTeamK);
                     if (!gameEngine.replayEngine.j()) {
                         gameEngine.playerTeam = playerTeamK;
                     }
@@ -1525,7 +1525,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                     }
                 }
                 if (playerTeam != null) {
-                    isSelectable(playerTeam);
+                    changeTeam(playerTeam);
                     if (!gameEngine.replayEngine.j()) {
                         gameEngine.playerTeam = playerTeam;
                     }

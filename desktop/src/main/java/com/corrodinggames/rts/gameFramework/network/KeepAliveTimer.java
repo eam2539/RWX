@@ -11,10 +11,10 @@ class KeepAliveTimer extends TimerTask {
     private final NetworkEngine networkEngine;
 
     /* JADX INFO: renamed from: a */
-    public boolean isRunning = true;
+    public boolean sendPingNext = true;
 
     /* JADX INFO: renamed from: b */
-    public long lastPingTime = 0;
+    public long lastKeepAliveTime = 0;
 
     KeepAliveTimer(NetworkEngine networkEngine) {
         this.networkEngine = networkEngine;
@@ -28,9 +28,9 @@ class KeepAliveTimer extends TimerTask {
                 this.networkEngine.playerUpdatePendingTimestamp = 0L;
                 this.networkEngine.sendPlayerUpdateNow();
             }
-            if (jCurrentTimeMillis > this.lastPingTime + 1000 || jCurrentTimeMillis < this.lastPingTime) {
-                this.lastPingTime = jCurrentTimeMillis;
-                if (this.isRunning) {
+            if (jCurrentTimeMillis > this.lastKeepAliveTime + 1000 || jCurrentTimeMillis < this.lastKeepAliveTime) {
+                this.lastKeepAliveTime = jCurrentTimeMillis;
+                if (this.sendPingNext) {
                     GameOutputStream gameOutputStream = new GameOutputStream();
                     gameOutputStream.writeLong(System.currentTimeMillis());
                     gameOutputStream.writeByte(0);
@@ -38,7 +38,7 @@ class KeepAliveTimer extends TimerTask {
                 } else {
                     this.networkEngine.markPlayerUpdatePending();
                 }
-                this.isRunning = !this.isRunning;
+                this.sendPingNext = !this.sendPingNext;
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -61,7 +61,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject
     public void a(GameInputStream gameInputStream) throws IOException {
-        this.i = (Projectile) gameInputStream.readBaseUnitWithStatus(Projectile.class);
+        this.i = (Projectile) gameInputStream.readGameObject(Projectile.class);
         super.a(gameInputStream);
     }
 
@@ -133,11 +133,11 @@ public class ExperimentalHoverTank extends HoverLandUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: bW */
-    public float getUnitTeamData() {
+    public float getSecondaryBarProgress() {
         if (this.unitEnergyMax > 0.0f && this.shield < this.unitEnergyMax) {
             return this.shield / this.unitEnergyMax;
         }
-        return super.getUnitTeamData();
+        return super.getSecondaryBarProgress();
     }
 
     @Override // com.corrodinggames.rts.game.units.land.HoverLandUnit, com.corrodinggames.rts.game.units.land.LandUnit, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
@@ -323,7 +323,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
         GameEngine gameEngine = GameEngine.getInstance();
         if (!this.isDead && this.shield > 0.0f && this.energy == 0.0f && (textureT = T()) != null) {
             this.k.a((int) ((0.09f + ((this.shield / this.unitEnergyMax) * 0.4f) + ((Utility.clamp(this.unitShieldMax, 50.0f) / 50.0f) * 0.5f)) * 255.0f), 255, 255, 255);
-            gameEngine.renderGraphicsEngine.a(textureT, this.posX - gameEngine.viewpointXSnapped, (this.posY - gameEngine.viewpointYSnapped) - this.posZ, getUnitArmorRating(false) - 90.0f, this.k);
+            gameEngine.renderGraphicsEngine.a(textureT, this.posX - gameEngine.viewpointXSnapped, (this.posY - gameEngine.viewpointYSnapped) - this.posZ, getRenderRotation(false) - 90.0f, this.k);
             return true;
         }
         return true;

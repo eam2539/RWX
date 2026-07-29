@@ -280,7 +280,7 @@ public class Command {
         this.clearExistingOrders = gameInputStream.readBoolean();
         int i = gameInputStream.readInt();
         for (int i2 = 0; i2 < i; i2++) {
-            this.pendingUnitIds.add(gameInputStream.readLongOptional());
+            this.pendingUnitIds.add(gameInputStream.readUnitId());
         }
         if (gameInputStream.getProtocolVersion() >= 16) {
             this.sourceTeam = null;
@@ -331,12 +331,12 @@ public class Command {
     public void addUnitsToCommand(AbstractList abstractList) {
         Iterator it = abstractList.iterator();
         while (it.hasNext()) {
-            setTargetUnit((OrderableUnit) it.next());
+            addUnitToCommand((OrderableUnit) it.next());
         }
     }
 
     /* JADX INFO: renamed from: a */
-    public void setTargetUnit(OrderableUnit orderableUnit) {
+    public void addUnitToCommand(OrderableUnit orderableUnit) {
         if (orderableUnit == null) {
             throw new RuntimeException("unit cannot be null");
         }

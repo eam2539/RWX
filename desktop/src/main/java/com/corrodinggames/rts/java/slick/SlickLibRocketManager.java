@@ -98,7 +98,7 @@ public class SlickLibRocketManager extends LibRocketManager {
             }
             RectF rectF2 = new RectF(rectF);
             rectF2.a(f, f2);
-            if (this.h && !Utility.getStackTrace(rectF2, this.scissorRectF)) {
+            if (this.h && !Utility.rectanglesOverlap(rectF2, this.scissorRectF)) {
                 boolean z = true;
                 if (slickUITextureHolder != null && slickUITextureHolder.h == null && slickUITextureHolder.lazyLoad && slickUITextureHolder.unitType == null) {
                     z = false;

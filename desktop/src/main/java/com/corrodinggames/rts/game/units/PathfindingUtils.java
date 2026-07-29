@@ -110,20 +110,20 @@ public final class PathfindingUtils {
         i.a(c.a, c.b);
         j.a(c.c, c.d);
         if (d.y < e.y) {
-            if ((z || !pathEngine.a(unitMovementType, i2, i3 - 1)) && Utility.replace(d, e, i, h)) {
+            if ((z || !pathEngine.isTileBlockedForMovement(unitMovementType, i2, i3 - 1)) && Utility.lineSegmentsIntersect(d, e, i, h)) {
                 b2 = 3;
             }
         } else {
-            if ((z || !pathEngine.a(unitMovementType, i2, i3 + 1)) && Utility.replace(d, e, g, j)) {
+            if ((z || !pathEngine.isTileBlockedForMovement(unitMovementType, i2, i3 + 1)) && Utility.lineSegmentsIntersect(d, e, g, j)) {
                 b2 = 1;
             }
         }
         if (d.x < e.x) {
-            if ((z || !pathEngine.a(unitMovementType, i2 - 1, i3)) && Utility.replace(d, e, i, g)) {
+            if ((z || !pathEngine.isTileBlockedForMovement(unitMovementType, i2 - 1, i3)) && Utility.lineSegmentsIntersect(d, e, i, g)) {
                 b2 = 2;
             }
         } else {
-            if ((z || !pathEngine.a(unitMovementType, i2 + 1, i3)) && Utility.replace(d, e, h, j)) {
+            if ((z || !pathEngine.isTileBlockedForMovement(unitMovementType, i2 + 1, i3)) && Utility.lineSegmentsIntersect(d, e, h, j)) {
                 b2 = 0;
             }
         }

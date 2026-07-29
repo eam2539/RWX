@@ -283,33 +283,33 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         gameOutputStream.writeInt(this.teamColorId);
         gameOutputStream.writeStringNullable(this.teamName);
         gameOutputStream.writeBoolean(this.isTeamObserver);
-        if (gameOutputStream.getMaxSize() > 26) {
+        if (gameOutputStream.getStreamVersion() > 26) {
             gameOutputStream.writeInt(getTeamId());
-            gameOutputStream.debugPlaceholder("lastPingTimeReceivedAt");
+            gameOutputStream.writeDebugMessage("lastPingTimeReceivedAt");
             gameOutputStream.writeLong(this.teamLastPingTime);
         }
-        if (gameOutputStream.getMaxSize() >= 55) {
+        if (gameOutputStream.getStreamVersion() >= 55) {
             gameOutputStream.writeBoolean(this.isTeamSpectator);
             gameOutputStream.writeInt(this.teamPingTime);
         }
-        if (gameOutputStream.getMaxSize() >= 91) {
+        if (gameOutputStream.getStreamVersion() >= 91) {
             gameOutputStream.writeInt(this.teamSortIndex);
             gameOutputStream.writeByte(0);
         }
-        if (gameOutputStream.getMaxSize() >= 97) {
+        if (gameOutputStream.getStreamVersion() >= 97) {
             gameOutputStream.writeBoolean(this.isTeamConnectionActive);
             gameOutputStream.writeBoolean(this.isTeamNetworkActive);
         }
-        if (gameOutputStream.getMaxSize() >= 125) {
+        if (gameOutputStream.getStreamVersion() >= 125) {
             gameOutputStream.writeBoolean(this.isTeamVictory);
             gameOutputStream.writeBoolean(this.teamSurrenderTriggered);
             gameOutputStream.writeInt(this.surrenderVoteTimeMillis);
         }
-        if (gameOutputStream.getMaxSize() >= 149) {
+        if (gameOutputStream.getStreamVersion() >= 149) {
             gameOutputStream.writeStringNullable(this.teamAIHint);
             gameOutputStream.writeInt(this.hostTeamFlag);
         }
-        if (gameOutputStream.getMaxSize() >= 156) {
+        if (gameOutputStream.getStreamVersion() >= 156) {
             gameOutputStream.writeIntNullable(this.teamAIDifficultyOverride);
             gameOutputStream.writeIntNullable(this.startingUnitsOverride);
             gameOutputStream.writeIntNullable(this.teamAILevelOverride);
@@ -362,7 +362,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             gameInputStream.readLong();
             this.teamLastPingTime = System.currentTimeMillis();
         }
-        if (gameInputStream.getProtocolVersion() >= 34 && gameInputStream.getMaxBlockSize() >= 55) {
+        if (gameInputStream.getProtocolVersion() >= 34 && gameInputStream.getStreamVersion() >= 55) {
             boolean z2 = gameInputStream.readBoolean();
             int i = gameInputStream.readInt();
             if (!z) {
@@ -370,17 +370,17 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 this.teamPingTime = i;
             }
         } else if (GameEngine.getInstance().networkEngine.networkGameActive) {
-            NetworkEngine.reportDesync("AI was skipping in networked game, steam version:" + gameInputStream.getMaxBlockSize());
+            NetworkEngine.reportDesync("AI was skipping in networked game, steam version:" + gameInputStream.getStreamVersion());
         }
-        if (gameInputStream.getProtocolVersion() >= 50 && gameInputStream.getMaxBlockSize() >= 91) {
+        if (gameInputStream.getProtocolVersion() >= 50 && gameInputStream.getStreamVersion() >= 91) {
             this.teamSortIndex = gameInputStream.readInt();
             gameInputStream.readByte();
         }
-        if (gameInputStream.getProtocolVersion() >= 52 && gameInputStream.getMaxBlockSize() >= 97) {
+        if (gameInputStream.getProtocolVersion() >= 52 && gameInputStream.getStreamVersion() >= 97) {
             this.isTeamConnectionActive = gameInputStream.readBoolean();
             this.isTeamNetworkActive = gameInputStream.readBoolean();
         }
-        if (gameInputStream.getProtocolVersion() >= 70 && gameInputStream.getMaxBlockSize() >= 125) {
+        if (gameInputStream.getProtocolVersion() >= 70 && gameInputStream.getStreamVersion() >= 125) {
             boolean z3 = gameInputStream.readBoolean();
             boolean z4 = gameInputStream.readBoolean();
             int i2 = gameInputStream.readInt();
@@ -390,7 +390,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 this.surrenderVoteTimeMillis = i2;
             }
         }
-        if (gameInputStream.getProtocolVersion() >= 90 && gameInputStream.getMaxBlockSize() >= 149) {
+        if (gameInputStream.getProtocolVersion() >= 90 && gameInputStream.getStreamVersion() >= 149) {
             String nullableString = gameInputStream.readNullableString();
             int i3 = gameInputStream.readInt();
             if (!z) {
@@ -398,7 +398,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 this.hostTeamFlag = i3;
             }
         }
-        if (gameInputStream.getProtocolVersion() >= 93 && gameInputStream.getMaxBlockSize() >= 156) {
+        if (gameInputStream.getProtocolVersion() >= 93 && gameInputStream.getStreamVersion() >= 156) {
             Integer nullableInt = gameInputStream.readNullableInt();
             Integer nullableInt2 = gameInputStream.readNullableInt();
             Integer nullableInt3 = gameInputStream.readNullableInt();
@@ -419,9 +419,9 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
 
     @Override // com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
-        gameOutputStream.debugPlaceholder("Writing team: " + this.teamName);
+        gameOutputStream.writeDebugMessage("Writing team: " + this.teamName);
         writeBasicTeamState(gameOutputStream);
-        if (gameOutputStream.getMaxSize() >= 44) {
+        if (gameOutputStream.getStreamVersion() >= 44) {
             gameOutputStream.writeByte(4);
             gameOutputStream.writeBoolean(this.isTeamWipedOut);
             gameOutputStream.writeBoolean(this.isTeamDefeatedTech);
@@ -460,7 +460,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     /* JADX INFO: renamed from: d */
     public void writeFogState(GameOutputStream gameOutputStream) throws IOException {
         GameEngine.getInstance();
-        gameOutputStream.debugPlaceholder("-- Saving fog --");
+        gameOutputStream.writeDebugMessage("-- Saving fog --");
         gameOutputStream.writeBoolean(this.fogOfWarData != null);
         if (this.fogOfWarData != null) {
             gameOutputStream.writeInt(this.fogOfWarWidth);
@@ -471,7 +471,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                 }
             }
         }
-        gameOutputStream.debugPlaceholder("--End fog--");
+        gameOutputStream.writeDebugMessage("--End fog--");
     }
 
     /* JADX INFO: renamed from: d */
@@ -1789,10 +1789,10 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                                     z = true;
                                     i3 = 50;
                                 } else if (GameViewUtils.a(playerTeam.teamVictoryCleanupStartTimeMillis, 6000)) {
-                                    z = Utility.readStreamToString(baseUnit, 0, 100) > 90;
+                                    z = Utility.getDeterministicRandomInt(baseUnit, 0, 100) > 90;
                                     i3 = 20;
                                 } else if (GameViewUtils.a(playerTeam.teamVictoryCleanupStartTimeMillis, 2000)) {
-                                    z = Utility.readStreamToString(baseUnit, 0, 100) > 98;
+                                    z = Utility.getDeterministicRandomInt(baseUnit, 0, 100) > 98;
                                     i3 = 2;
                                 }
                                 if (baseUnit instanceof CommandCenter) {

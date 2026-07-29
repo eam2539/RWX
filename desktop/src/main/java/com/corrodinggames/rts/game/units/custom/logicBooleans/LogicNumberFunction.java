@@ -151,7 +151,7 @@ public abstract class LogicNumberFunction extends LogicBoolean.LogicNumberOnly {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicNumberFunction.LogicNumberFunctionRawArgs
         public float doFunction(float f) {
-            return Utility.sortRect(f);
+            return Utility.squareRoot(f);
         }
     }
 

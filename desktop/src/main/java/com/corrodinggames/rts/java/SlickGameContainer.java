@@ -23,7 +23,7 @@ public class SlickGameContainer extends AppGameContainer {
         this.input.poll(this.width, this.height);
         Music.poll(1);
         if (MusicManager.musicFactory != null) {
-            MusicManager.musicFactory.createMusic(1);
+            MusicManager.musicFactory.poll(1);
         }
         GL.glClear(16640);
         GL.glLoadIdentity();
@@ -70,7 +70,7 @@ public class SlickGameContainer extends AppGameContainer {
         this.input.poll(this.width, this.height);
         Music.poll(i);
         if (MusicManager.musicFactory != null) {
-            MusicManager.musicFactory.createMusic(i);
+            MusicManager.musicFactory.poll(i);
         }
         if (this.paused) {
             this.game.update(this, 0);

@@ -168,7 +168,7 @@ public class BuildPreview {
         TileMap tileMap = GameEngine.getInstance().tileMap;
         y = orderableUnit.a(tileMap, y);
         tempRectF2 = orderableUnit2.a(tileMap, tempRectF2);
-        if (Utility.getStackTrace(y, tempRectF2)) {
+        if (Utility.rectanglesOverlap(y, tempRectF2)) {
             return true;
         }
         return false;
@@ -187,7 +187,7 @@ public class BuildPreview {
                     baseUnitFindTurretPosition.posX = buildPreview.worldX;
                     baseUnitFindTurretPosition.posY = buildPreview.worldY;
                     rectFA = baseUnitFindTurretPosition.a(tileMap, rectFA);
-                    if (Utility.getStackTrace(rectFA, rectF)) {
+                    if (Utility.rectanglesOverlap(rectFA, rectF)) {
                         return true;
                     }
                 }

@@ -379,7 +379,7 @@ public class MasterServerClient {
         } else {
             addParam(list, "game_status", "chat");
         }
-        addParam(list, "player_count", Integer.toString(gameEngine.networkEngine.getChangeableRoomSettings()));
+        addParam(list, "player_count", Integer.toString(gameEngine.networkEngine.getPlayerCount()));
         String string = Integer.toString(PlayerTeam.TEAM_NEUTRAL);
         if (gameEngine.networkEngine.chatOnlyMode) {
         }

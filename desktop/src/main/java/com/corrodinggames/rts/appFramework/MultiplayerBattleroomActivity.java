@@ -185,10 +185,10 @@ public class MultiplayerBattleroomActivity extends TaskQueueActivity {
         gameEngine.remoteMapStream = null;
         if (gameEngine.networkEngine.roomSettings.gameModeType == GameModeType.savedGame) {
             if (!gameEngine.networkEngine.isServer) {
-                gameEngine.gameSaver.writeSaveToStream(gameEngine.networkEngine.receivedSaveGameStream, true, false, false);
+                gameEngine.gameSaver.readSaveFromStream(gameEngine.networkEngine.receivedSaveGameStream, true, false, false);
                 gameEngine.gameUI.messageManager.addMessage((String) null, "Note: Game was started from a saved game.");
             } else {
-                gameEngine.gameSaver.performAutosave(gameEngine.networkEngine.roomSettings.mapPath, true);
+                gameEngine.gameSaver.loadSaveFile(gameEngine.networkEngine.roomSettings.mapPath, true);
             }
             showTeamStats();
             return;

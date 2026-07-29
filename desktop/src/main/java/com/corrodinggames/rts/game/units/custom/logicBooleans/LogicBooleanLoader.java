@@ -996,7 +996,7 @@ public class LogicBooleanLoader {
                 if (returnType == LogicBoolean.ReturnType.number) {
                     float number = logicBoolean2.readNumber(orderableUnit);
                     for (int i2 = 0; i2 < arraySize; i2++) {
-                        if (Utility.isGreaterThan(number, logicBoolean.readArrayElement(orderableUnit, i2).readNumber(orderableUnit))) {
+                        if (Utility.approximatelyEqual(number, logicBoolean.readArrayElement(orderableUnit, i2).readNumber(orderableUnit))) {
                             return i2;
                         }
                     }
@@ -1013,7 +1013,7 @@ public class LogicBooleanLoader {
                         int i3 = unit.team.teamId;
                         for (int i4 = 0; i4 < arraySize; i4++) {
                             BaseUnit unit2 = logicBoolean.readArrayElement(orderableUnit, i4).readUnit(orderableUnit);
-                            if (unit2 != null && Utility.isGreaterThan(f, unit2.posX) && Utility.isGreaterThan(f2, unit2.posY) && i3 == unit2.team.teamId) {
+                            if (unit2 != null && Utility.approximatelyEqual(f, unit2.posX) && Utility.approximatelyEqual(f2, unit2.posY) && i3 == unit2.team.teamId) {
                                 return i4;
                             }
                         }

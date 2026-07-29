@@ -200,7 +200,7 @@ public class HeavyHoverTank extends HoverLandUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: d */
-    public float getUnitArmorRating(boolean z) {
+    public float getRenderRotation(boolean z) {
         return this.movementLevels[0].targetX + 90.0f;
     }
 

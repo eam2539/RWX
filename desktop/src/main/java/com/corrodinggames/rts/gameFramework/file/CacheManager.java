@@ -23,7 +23,7 @@ public class CacheManager {
     /* JADX INFO: renamed from: a */
     public static String encodeChar(String str, char c) {
         if (Utility.containsChar(str, c)) {
-            str = Utility.readStreamToString(str, String.valueOf(c), "%" + getCharAsString(c));
+            str = Utility.replaceSubstring(str, String.valueOf(c), "%" + getCharAsString(c));
         }
         return str;
     }
@@ -33,7 +33,7 @@ public class CacheManager {
         if (str == null) {
             return "null";
         }
-        String strEncodeChar = encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(Utility.readStreamToString(str, "%", "%%"), '/'), '\\'), ':'), '\"'), '\''), '|'), '?'), '*'), '<'), '>'), (char) 0);
+        String strEncodeChar = encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(encodeChar(Utility.replaceSubstring(str, "%", "%%"), '/'), '\\'), ':'), '\"'), '\''), '|'), '?'), '*'), '<'), '>'), (char) 0);
         if (strEncodeChar.contains("/")) {
             throw new IllegalArgumentException();
         }
@@ -181,7 +181,7 @@ public class CacheManager {
     public static String[] listDirCached(String str, String str2) throws IOException {
         String str3;
         long fileSize;
-        if (!RwmodFileLoader.i(str2)) {
+        if (!RwmodFileLoader.isRwmodPath(str2)) {
             return FileHelper.listFiles(str2);
         }
         String str4 = str2 + ".data";

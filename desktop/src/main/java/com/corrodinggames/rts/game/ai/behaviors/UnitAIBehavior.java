@@ -23,7 +23,7 @@ public abstract class UnitAIBehavior extends AIBehavior {
         super.a(gameInputStream);
         int i = gameInputStream.readInt();
         for (int i2 = 0; i2 < i; i2++) {
-            OrderableUnit unitEntity = gameInputStream.readUnitEntity();
+            OrderableUnit unitEntity = gameInputStream.readOrderableUnit();
             if (unitEntity != null) {
                 this.managedUnits.add(unitEntity);
             }
@@ -36,7 +36,7 @@ public abstract class UnitAIBehavior extends AIBehavior {
         gameOutputStream.writeInt(this.managedUnits.size());
         Iterator it = this.managedUnits.iterator();
         while (it.hasNext()) {
-            gameOutputStream.writeUnitIdOrNullUnitEntity((OrderableUnit) it.next());
+            gameOutputStream.writeOrderableUnit((OrderableUnit) it.next());
         }
     }
 

@@ -98,7 +98,7 @@ public class AnimationTrackingManager {
                         float angleBetweenPoints = Utility.getAngleBetweenPoints(baseUnit.posX, baseUnit.posY - baseUnit.posZ, baseUnit2.posX, baseUnit2.posY - baseUnit2.posZ);
                         float fDistanceSq = Utility.distanceSq(baseUnit.posX, baseUnit.posY - baseUnit.posZ, baseUnit2.posX, baseUnit2.posY - baseUnit2.posZ);
                         if (fDistanceSq < (texture.q - 2) * (texture.q - 2)) {
-                            fSqrt = Utility.sqrt((int) fDistanceSq);
+                            fSqrt = Utility.fastSquareRootInt((int) fDistanceSq);
                         }
                         gameEngine.renderGraphicsEngine.k();
                         gameEngine.renderGraphicsEngine.a(angleBetweenPoints + 90.0f, f3, f4);
@@ -165,7 +165,7 @@ public class AnimationTrackingManager {
             short shortValue2 = gameInputStream.readShortValue();
             for (int i2 = 0; i2 < shortValue2; i2++) {
                 TrackingData trackingData = new TrackingData();
-                trackingData.a = gameInputStream.startBlockNamed(ConnectionStatus.expected);
+                trackingData.a = gameInputStream.readBaseUnit(ConnectionStatus.EXPECTED);
                 trackingData.b = gameInputStream.readBoolean();
                 trackingData.c = gameInputStream.readBoolean();
                 if (trackingData.a != null && trackingGroup != null) {

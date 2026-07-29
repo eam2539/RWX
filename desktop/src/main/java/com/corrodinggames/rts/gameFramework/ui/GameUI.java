@@ -1276,12 +1276,12 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: a */
-    public void drawTextInRect(EditorOrBuilder editorOrBuilder) {
+    public void setEditorOrBuilder(EditorOrBuilder editorOrBuilder) {
         this.editorOrBuilder = editorOrBuilder;
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean drawRectWithBorder(GameEngine gameEngine) {
+    public boolean isShiftKeyPressed(GameEngine gameEngine) {
         if (!gameEngine.settingsEngine.keyboardSupport) {
             return false;
         }
@@ -1289,7 +1289,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: b */
-    public boolean drawSelectionBox(GameEngine gameEngine) {
+    public boolean isControlKeyPressed(GameEngine gameEngine) {
         if (!gameEngine.settingsEngine.keyboardSupport) {
             return false;
         }
@@ -1703,14 +1703,14 @@ public final class GameUI extends Serializable {
                             if (pointScreenToWorld == null) {
                                 baseUnitFindUnitAtPosition = findUnitAtPosition(f4, f5, true);
                             }
-                            drawButtonAndHandleEvent(baseUnitFindUnitAtPosition);
+                            handleUnitSelectionClick(baseUnitFindUnitAtPosition);
                         } else if (z4) {
                             BaseUnit baseUnitFindUnitAtPosition2 = null;
                             if (pointScreenToWorld == null) {
                                 baseUnitFindUnitAtPosition2 = findUnitAtPosition(f4, f5, false);
                             }
                             boolean z6 = false;
-                            if (baseUnitFindUnitAtPosition2 == null || !drawButtonAndHandleEventWithStyle(baseUnitFindUnitAtPosition2, false, f4, f5, pointScreenToWorld)) {
+                            if (baseUnitFindUnitAtPosition2 == null || !handleUnitTargetClick(baseUnitFindUnitAtPosition2, false, f4, f5, pointScreenToWorld)) {
                                 z6 = true;
                             }
                             if (z6) {
@@ -1727,15 +1727,15 @@ public final class GameUI extends Serializable {
                         if (baseUnitFindUnitAtPosition3 == null && baseUnitFindUnitAtPosition4 == null) {
                             issueMarchOrMoveCommand(f4, f5, pointScreenToWorld);
                         } else if (baseUnitFindUnitAtPosition4 != null) {
-                            if (!drawButtonAndHandleEventWithStyle(baseUnitFindUnitAtPosition4, true, f4, f5, pointScreenToWorld)) {
+                            if (!handleUnitTargetClick(baseUnitFindUnitAtPosition4, true, f4, f5, pointScreenToWorld)) {
                                 if (!baseUnitFindUnitAtPosition4.t()) {
-                                    drawButtonAndHandleEvent(baseUnitFindUnitAtPosition4);
+                                    handleUnitSelectionClick(baseUnitFindUnitAtPosition4);
                                 } else if (baseUnitFindUnitAtPosition3 != null) {
-                                    drawButtonAndHandleEvent(baseUnitFindUnitAtPosition3);
+                                    handleUnitSelectionClick(baseUnitFindUnitAtPosition3);
                                 }
                             }
                         } else {
-                            drawButtonAndHandleEvent(baseUnitFindUnitAtPosition3);
+                            handleUnitSelectionClick(baseUnitFindUnitAtPosition3);
                         }
                     }
                 }
@@ -1805,7 +1805,7 @@ public final class GameUI extends Serializable {
                     BaseUnit baseUnitFindUnitAtPosition = findUnitAtPosition(f2, f3, false);
                     if (baseUnitFindUnitAtPosition != null && this.currentAction.isAvailableAndVisible(baseUnitFindUnitAtPosition)) {
                         issueReclaimCommand(baseUnitFindUnitAtPosition);
-                        if (!drawRectWithBorder(gameEngine)) {
+                        if (!isShiftKeyPressed(gameEngine)) {
                             clearCurrentAction();
                         }
                     } else {
@@ -1826,8 +1826,8 @@ public final class GameUI extends Serializable {
                 if (this.isSelectionBoxActive && !this.isInputDisabled && !shouldShowMouseCursor()) {
                     BaseUnit baseUnitFindUnitAtPosition2 = findUnitAtPosition(f2, f3, true);
                     if (baseUnitFindUnitAtPosition2 != null && this.currentAction.isAvailableAndVisible(baseUnitFindUnitAtPosition2)) {
-                        showRepairFeedback(baseUnitFindUnitAtPosition2);
-                        if (!drawRectWithBorder(gameEngine)) {
+                        issueRepairCommand(baseUnitFindUnitAtPosition2);
+                        if (!isShiftKeyPressed(gameEngine)) {
                             clearCurrentAction();
                         }
                     } else {
@@ -1901,12 +1901,12 @@ public final class GameUI extends Serializable {
                 }
                 if (z && point == null) {
                     boolean z3 = false;
-                    if (drawRectCoords(this.currentAction, f2, f3)) {
+                    if (hasInvalidActionTarget(this.currentAction, f2, f3)) {
                         z3 = true;
                     }
                     if (!z3) {
                         executeUnitAction(this.currentAction, f2, f3);
-                        if (!drawRectWithBorder(gameEngine) && !this.currentAction.isCancel()) {
+                        if (!isShiftKeyPressed(gameEngine) && !this.currentAction.isCancel()) {
                             clearCurrentAction();
                         }
                     } else {
@@ -1926,7 +1926,7 @@ public final class GameUI extends Serializable {
                 } else {
                     if (this.isSelectionBoxActive && !this.isInputDisabled && !shouldShowMouseCursor()) {
                         issueAttackCommand(f2, f3, point);
-                        if (!drawRectWithBorder(gameEngine)) {
+                        if (!isShiftKeyPressed(gameEngine)) {
                             clearCurrentAction();
                             this.isSelectionBoxActive = false;
                             return;
@@ -1980,7 +1980,7 @@ public final class GameUI extends Serializable {
                 } else {
                     if (this.isSelectionBoxActive && !this.isInputDisabled && !shouldShowMouseCursor() && point == null) {
                         if (this.currentAction instanceof PingMapAction) {
-                            applyActionToCommand(f2, f3, point, (PingMapAction) this.currentAction);
+                            issueMapPingCommand(f2, f3, point, (PingMapAction) this.currentAction);
                         } else {
                             GameEngine.logColored("orderBuildingSpecialAction is not a PingMapAction, it is: " + this.currentAction.getClass().getName());
                         }
@@ -2183,7 +2183,7 @@ public final class GameUI extends Serializable {
             y.a(1);
             if (b9 && this.canUseMouseSelection()) {
                 this.isSelectionBoxActive = false;
-                if (this.drawRectWithBorder(instance)) {
+                if (this.isShiftKeyPressed(instance)) {
                     b7 = true;
                     b8 = true;
                 }
@@ -2259,7 +2259,7 @@ public final class GameUI extends Serializable {
                     for (final PointF pointF : arrayList) {
                         if (this.currentAction.usesActionTarget()) {
                             final Command commandForSelectedUnits = this.createCommandForSelectedUnits();
-                            this.setTargetForCommand(commandForSelectedUnits);
+                            this.addSelectedUnitsToCommand(commandForSelectedUnits);
                             commandForSelectedUnits.setActionTarget(this.currentAction.getActionId(), pointF, null);
                         }
                         else {
@@ -2279,11 +2279,11 @@ public final class GameUI extends Serializable {
                             OrderableUnit firstControllableSelectedUnit = this.getFirstControllableSelectedUnit();
                             if (this.currentAction instanceof WrapperUnitAction) {
                                 final OrderableUnit b13 = ((WrapperUnitAction)this.currentAction).b;
-                                commandForSelectedUnits2.setTargetUnit(b13);
+                                commandForSelectedUnits2.addUnitToCommand(b13);
                                 firstControllableSelectedUnit = b13;
                             }
                             else {
-                                this.setTargetForCommand(commandForSelectedUnits2);
+                                this.addSelectedUnitsToCommand(commandForSelectedUnits2);
                             }
                             commandForSelectedUnits2.setBuildTarget(pointF.x, pointF.y, unitType, queueSize);
                             if (firstControllableSelectedUnit != null) {
@@ -2313,7 +2313,7 @@ public final class GameUI extends Serializable {
                     if (!b7) {
                         if (n4 > 0) {
                             boolean b14 = true;
-                            if (y != null && !this.canSelectedUnitsReclaim(y)) {
+                            if (y != null && !this.canSelectedUnitsRepair(y)) {
                                 b14 = false;
                             }
                             this.currentAction = null;
@@ -2498,30 +2498,30 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: a */
-    public void drawButtonAndHandleEvent(BaseUnit baseUnit) {
+    public void handleUnitSelectionClick(BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (baseUnit != null && this.lastSelectedUnit == baseUnit && this.lastSelectionTime < 40.0f && !drawSelectionBox(gameEngine)) {
-            if (!drawRectWithBorder(gameEngine)) {
+        if (baseUnit != null && this.lastSelectedUnit == baseUnit && this.lastSelectionTime < 40.0f && !isControlKeyPressed(gameEngine)) {
+            if (!isShiftKeyPressed(gameEngine)) {
                 clearSelection();
             }
-            selectAllSimilarBuildings(baseUnit);
+            selectAllSimilarUnits(baseUnit);
         } else if (baseUnit != null) {
-            if (!drawRectWithBorder(gameEngine) && !drawSelectionBox(gameEngine)) {
+            if (!isShiftKeyPressed(gameEngine) && !isControlKeyPressed(gameEngine)) {
                 clearSelection();
             }
-            drawTeamResources(baseUnit, drawSelectionBox(gameEngine));
+            drawTeamResources(baseUnit, isControlKeyPressed(gameEngine));
             this.lastSelectedUnit = baseUnit;
             this.lastSelectionTime = 0.0f;
         }
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean drawButtonAndHandleEventWithStyle(BaseUnit baseUnit, boolean z, float f, float f2, Point point) {
+    public boolean handleUnitTargetClick(BaseUnit baseUnit, boolean z, float f, float f2, Point point) {
         GameEngine.getInstance();
         PlayerTeam selectedUnitsTeam = getSelectedUnitsTeam();
         boolean zC = selectedUnitsTeam.c(baseUnit.team);
-        if (zC && hasCombatUnitsSelected() && m303q(baseUnit)) {
-            showAttackFeedback(baseUnit);
+        if (zC && hasCombatUnitsSelected() && canSelectedUnitsReachTargetByPathfinding(baseUnit)) {
+            issueAttackTargetCommand(baseUnit);
             return true;
         }
         if (selectedUnitsTeam.d(baseUnit.team) && ((baseUnit.currentHealth < baseUnit.maxHealth || baseUnit.buildProgress < 1.0f) && getSelectedUnitCount() != 0)) {
@@ -2529,7 +2529,7 @@ public final class GameUI extends Serializable {
             boolean z3 = false;
             boolean z4 = false;
             boolean z5 = false;
-            if (baseUnit.canTransportUnits() && canSelectedUnitsReachUnit(baseUnit)) {
+            if (baseUnit.canTransportUnits() && canSelectedUnitsLoadInto(baseUnit)) {
                 z3 = true;
             }
             Iterator it = this.selectedUnitsList.iterator();
@@ -2563,10 +2563,10 @@ public final class GameUI extends Serializable {
             }
             if (z2 && (!z4 || !z3)) {
                 if (z5) {
-                    showRepairFeedback(baseUnit);
+                    issueRepairCommand(baseUnit);
                     return true;
                 }
-                showRepairFeedback(baseUnit);
+                issueRepairCommand(baseUnit);
                 return true;
             }
         }
@@ -2599,11 +2599,11 @@ public final class GameUI extends Serializable {
                 return true;
             }
         }
-        if (baseUnit.canTransportUnits() && canSelectedUnitsReachUnit(baseUnit)) {
+        if (baseUnit.canTransportUnits() && canSelectedUnitsLoadInto(baseUnit)) {
             issueLoadIntoCommand(baseUnit);
             return true;
         }
-        if (GameEngine.isPC() && hasMovableUnitsSelected() && canSelectedUnitsReachTarget(baseUnit)) {
+        if (GameEngine.isPC() && hasMovableUnitsSelected() && canSelectedUnitsLoadUp(baseUnit)) {
             issueAttackCommand(baseUnit);
             return true;
         }
@@ -2616,7 +2616,7 @@ public final class GameUI extends Serializable {
             } else if (!baseUnit.isAlive) {
                 z7 = true;
             }
-            if (!z7 && !baseUnit.i() && canSelectBuildings()) {
+            if (!z7 && !baseUnit.i() && areAllSelectedUnitsAirborne()) {
                 z7 = true;
             }
         }
@@ -2633,12 +2633,12 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: a */
-    void setTargetForCommand(Command command) {
+    void addSelectedUnitsToCommand(Command command) {
         for (GameObject gameObject : GameObject.fastGameObjectList) {
             if (gameObject instanceof OrderableUnit) {
                 OrderableUnit orderableUnit = (OrderableUnit) gameObject;
                 if (orderableUnit.isSelected && canControlUnit(orderableUnit)) {
-                    command.setTargetUnit(orderableUnit);
+                    command.addUnitToCommand(orderableUnit);
                 }
             }
         }
@@ -2691,9 +2691,9 @@ public final class GameUI extends Serializable {
 
     /* JADX WARN: Multi-variable type inference failed */
     /* JADX INFO: renamed from: a */
-    void drawButtonAndHandleEventAdvanced(final Command e, final AbstractUnitAction s, final boolean boolean3) {
+    void setActionCommandTarget(final Command e, final AbstractUnitAction s, final boolean boolean3) {
         if (s instanceof WrapperUnitAction) {
-            e.setTargetUnit(((WrapperUnitAction)s).b);
+            e.addUnitToCommand(((WrapperUnitAction)s).b);
             return;
         }
         final ActionId actionId = s.getActionId();
@@ -2728,12 +2728,12 @@ public final class GameUI extends Serializable {
             }
         }
         if (targetUnit != null) {
-            e.setTargetUnit(targetUnit);
+            e.addUnitToCommand(targetUnit);
         }
     }
 
     /* JADX INFO: renamed from: a */
-    boolean drawRectCoords(AbstractUnitAction abstractUnitAction, float f, float f2) {
+    boolean hasInvalidActionTarget(AbstractUnitAction abstractUnitAction, float f, float f2) {
         AbstractUnitAction abstractUnitActionA;
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
@@ -2765,10 +2765,10 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: a */
-    void drawActionPreviewWithTarget(Command command, AbstractUnitAction abstractUnitAction) {
+    void setActionCommandTargets(Command command, AbstractUnitAction abstractUnitAction) {
         AbstractUnitAction abstractUnitActionA;
         if (abstractUnitAction instanceof WrapperUnitAction) {
-            command.setTargetUnit(((WrapperUnitAction) abstractUnitAction).b);
+            command.addUnitToCommand(((WrapperUnitAction) abstractUnitAction).b);
             return;
         }
         ActionId actionId = abstractUnitAction.getActionId();
@@ -2776,14 +2776,14 @@ public final class GameUI extends Serializable {
             if (gameObject instanceof OrderableUnit) {
                 OrderableUnit orderableUnit = (OrderableUnit) gameObject;
                 if (orderableUnit.isSelected && canControlUnit(orderableUnit) && (abstractUnitActionA = orderableUnit.validateActionId(actionId)) != null && abstractUnitActionA.b(orderableUnit)) {
-                    command.setTargetUnit(orderableUnit);
+                    command.addUnitToCommand(orderableUnit);
                 }
             }
         }
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean drawActionPreviewWithFlag(AbstractUnitAction abstractUnitAction, boolean z) {
+    public boolean canAffordActionForSelectedUnits(AbstractUnitAction abstractUnitAction, boolean z) {
         AbstractUnitAction abstractUnitActionA;
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
@@ -2802,7 +2802,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean setMenuDialog(AbstractUnitAction abstractUnitAction) {
+    public boolean isActionTargetingGround(AbstractUnitAction abstractUnitAction) {
         AbstractUnitAction abstractUnitActionA;
         ActionId actionId = abstractUnitAction.getActionId();
         if (abstractUnitAction.isLockedAndDisabled()) {
@@ -2843,7 +2843,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: c */
-    public boolean isActionAvailableForSelectedUnits(AbstractUnitAction abstractUnitAction) {
+    public boolean isActionUnavailableForSelectedUnits(AbstractUnitAction abstractUnitAction) {
         AbstractUnitAction abstractUnitActionA;
         boolean z = false;
         if (abstractUnitAction instanceof WrapperUnitAction) {
@@ -2963,11 +2963,11 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean addUnitToSelection(CommandType commandType) {
+    public boolean playCommandSoundForSelectedUnits(CommandType commandType) {
         for (BaseUnit baseUnit : this.selectedUnitsList) {
             if (baseUnit instanceof OrderableUnit) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
-                if (canControlUnit(orderableUnit) && applyActionToCommandWithFlag(commandType, orderableUnit)) {
+                if (canControlUnit(orderableUnit) && playCommandSoundForUnit(commandType, orderableUnit)) {
                     return true;
                 }
             }
@@ -2976,7 +2976,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean applyActionToCommandWithFlag(CommandType commandType, BaseUnit baseUnit) {
+    public boolean playCommandSoundForUnit(CommandType commandType, BaseUnit baseUnit) {
         if (baseUnit instanceof OrderableUnit) {
             OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
             if ((commandType == CommandType.attack || commandType == CommandType.move) && !GameEngine.hasTimeElapsed(this.lastActionConfirmTime, 1000L)) {
@@ -3018,8 +3018,8 @@ public final class GameUI extends Serializable {
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
         commandCreateCommandForSelectedUnits.isHighPriority = true;
         commandCreateCommandForSelectedUnits.setMoveTarget(worldX, worldY);
-        setTargetForCommand(commandCreateCommandForSelectedUnits);
-        if (!addUnitToSelection(CommandType.move)) {
+        addSelectedUnitsToCommand(commandCreateCommandForSelectedUnits);
+        if (!playCommandSoundForSelectedUnits(CommandType.move)) {
             gameEngine.soundEngine.playInterfaceSound(SoundEngine.moveSound, 0.2f);
         }
         Effect effectCreateEffect = gameEngine.effectManager.createEffect(worldX, worldY, 0.0f, EffectType.custom, true, EffectQuality.critical);
@@ -3065,8 +3065,8 @@ public final class GameUI extends Serializable {
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
         commandCreateCommandForSelectedUnits.isHighPriority = true;
         commandCreateCommandForSelectedUnits.setAttackMoveTarget(worldX, worldY);
-        setTargetForCommand(commandCreateCommandForSelectedUnits);
-        if (!addUnitToSelection(CommandType.move)) {
+        addSelectedUnitsToCommand(commandCreateCommandForSelectedUnits);
+        if (!playCommandSoundForSelectedUnits(CommandType.move)) {
             gameEngine.soundEngine.playInterfaceSound(SoundEngine.moveSound, 0.2f);
         }
         Effect effectCreateEffect = gameEngine.effectManager.createEffect(worldX, worldY, 0.0f, EffectType.custom, true, EffectQuality.critical);
@@ -3103,7 +3103,7 @@ public final class GameUI extends Serializable {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
         commandCreateCommandForSelectedUnits.setClearExistingOrders();
-        setTargetForCommand(commandCreateCommandForSelectedUnits);
+        addSelectedUnitsToCommand(commandCreateCommandForSelectedUnits);
         gameEngine.soundEngine.playInterfaceSound(SoundEngine.moveSound, 0.2f);
     }
 
@@ -3120,9 +3120,9 @@ public final class GameUI extends Serializable {
         PointF pointF = new PointF(f, f2);
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
         if (!abstractUnitAction.isOnlyOneUnitAtATime()) {
-            drawActionPreviewWithTarget(commandCreateCommandForSelectedUnits, abstractUnitAction);
+            setActionCommandTargets(commandCreateCommandForSelectedUnits, abstractUnitAction);
         } else {
-            drawButtonAndHandleEventAdvanced(commandCreateCommandForSelectedUnits, abstractUnitAction, false);
+            setActionCommandTarget(commandCreateCommandForSelectedUnits, abstractUnitAction, false);
         }
         commandCreateCommandForSelectedUnits.setActionTarget(abstractUnitAction.getActionId(), pointF, (BaseUnit) null);
         prepareUnitActionCommand(abstractUnitAction, pointF, (BaseUnit) null, commandCreateCommandForSelectedUnits);
@@ -3147,7 +3147,7 @@ public final class GameUI extends Serializable {
     public void issueReclaimCommand(BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
-        setTargetForCommand(commandCreateCommandForSelectedUnits);
+        addSelectedUnitsToCommand(commandCreateCommandForSelectedUnits);
         commandCreateCommandForSelectedUnits.setReclaimTarget(baseUnit);
         gameEngine.soundEngine.playInterfaceSound(SoundEngine.moveSound, 0.2f);
         Effect effectCreateEffect = gameEngine.effectManager.createEffect(baseUnit.posX, baseUnit.posY, baseUnit.posZ, EffectType.custom, true, EffectQuality.critical);
@@ -3167,7 +3167,7 @@ public final class GameUI extends Serializable {
     public void issueRallyPointCommand(float f, float f2) {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateBaseCommand = createBaseCommand();
-        setTargetForCommand(commandCreateBaseCommand);
+        addSelectedUnitsToCommand(commandCreateBaseCommand);
         commandCreateBaseCommand.setRallyPoint(new PointF(f, f2));
         gameEngine.soundEngine.playInterfaceSound(SoundEngine.moveSound, 0.2f);
         Effect effectCreateEffect = gameEngine.effectManager.createEffect(f, f2, 0.0f, EffectType.custom, true, EffectQuality.critical);
@@ -3185,7 +3185,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: a */
-    public void applyActionToCommand(float f, float f2, Point point, PingMapAction pingMapAction) {
+    public void issueMapPingCommand(float f, float f2, Point point, PingMapAction pingMapAction) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (!gameEngine.settingsEngine.showMapPingsOnBattlefield && !gameEngine.settingsEngine.showMapPingsOnMinimap) {
             showMediumPriorityMessage("Cannot send map ping, you have disabled both battlefield and minimap pings in your settings");
@@ -3309,19 +3309,19 @@ public final class GameUI extends Serializable {
     public Command createCommandForSelectedUnits() {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateBaseCommand = createBaseCommand();
-        if (drawRectWithBorder(gameEngine)) {
+        if (isShiftKeyPressed(gameEngine)) {
             commandCreateBaseCommand.isQueued = true;
         }
         return commandCreateBaseCommand;
     }
 
     /* JADX INFO: renamed from: c */
-    public void showAttackFeedback(BaseUnit baseUnit) {
+    public void issueAttackTargetCommand(BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
         commandCreateCommandForSelectedUnits.setAttackTarget(baseUnit);
-        setTargetForCommand(commandCreateCommandForSelectedUnits);
-        if (!addUnitToSelection(CommandType.attack)) {
+        addSelectedUnitsToCommand(commandCreateCommandForSelectedUnits);
+        if (!playCommandSoundForSelectedUnits(CommandType.attack)) {
             gameEngine.soundEngine.playInterfaceSound(SoundEngine.attack2Sound, 1.0f);
         }
         Effect effectCreateEffect = gameEngine.effectManager.createEffect(baseUnit.posX, baseUnit.posY, baseUnit.posZ, EffectType.custom, true, EffectQuality.critical);
@@ -3360,10 +3360,10 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: d */
-    public void showRepairFeedback(BaseUnit baseUnit) {
+    public void issueRepairCommand(BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
-        setTargetForCommand(commandCreateCommandForSelectedUnits);
+        addSelectedUnitsToCommand(commandCreateCommandForSelectedUnits);
         commandCreateCommandForSelectedUnits.setRepairTarget(baseUnit);
         gameEngine.soundEngine.playInterfaceSound(SoundEngine.attack2Sound, 1.0f);
         Effect effectCreateEffect = gameEngine.effectManager.createEffect(baseUnit.posX, baseUnit.posY, baseUnit.posZ, EffectType.custom, true, EffectQuality.critical);
@@ -3383,7 +3383,7 @@ public final class GameUI extends Serializable {
     public void issueGuardCommand(BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
-        setTargetForCommand(commandCreateCommandForSelectedUnits);
+        addSelectedUnitsToCommand(commandCreateCommandForSelectedUnits);
         commandCreateCommandForSelectedUnits.setGuardTarget(baseUnit);
         gameEngine.soundEngine.playInterfaceSound(SoundEngine.attack2Sound, 1.0f);
         Effect effectCreateEffect = gameEngine.effectManager.createEffect(baseUnit.posX, baseUnit.posY, baseUnit.posZ, EffectType.custom, true, EffectQuality.critical);
@@ -3424,7 +3424,7 @@ public final class GameUI extends Serializable {
     public void executeUnitAction(float f, float f2, Point point, boolean z) {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
-        setTargetForCommand(commandCreateCommandForSelectedUnits);
+        addSelectedUnitsToCommand(commandCreateCommandForSelectedUnits);
         commandCreateCommandForSelectedUnits.setPatrolTarget(f, f2);
         if (!z) {
             commandCreateCommandForSelectedUnits.isQueued = true;
@@ -3463,7 +3463,7 @@ public final class GameUI extends Serializable {
     public void issueLoadIntoCommand(BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
-        setTargetForCommand(commandCreateCommandForSelectedUnits);
+        addSelectedUnitsToCommand(commandCreateCommandForSelectedUnits);
         commandCreateCommandForSelectedUnits.setLoadIntoTarget(baseUnit);
         gameEngine.soundEngine.playInterfaceSound(SoundEngine.attack2Sound, 1.0f);
         Effect effectCreateEffect = gameEngine.effectManager.createEffect(baseUnit.posX, baseUnit.posY, baseUnit.posZ, EffectType.custom, true, EffectQuality.critical);
@@ -3483,7 +3483,7 @@ public final class GameUI extends Serializable {
     public void issueAttackCommand(BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
         Command commandCreateCommandForSelectedUnits = createCommandForSelectedUnits();
-        setTargetForCommand(commandCreateCommandForSelectedUnits);
+        addSelectedUnitsToCommand(commandCreateCommandForSelectedUnits);
         commandCreateCommandForSelectedUnits.setLoadUpTarget(baseUnit);
         gameEngine.soundEngine.playInterfaceSound(SoundEngine.attack2Sound, 1.0f);
         Effect effectCreateEffect = gameEngine.effectManager.createEffect(baseUnit.posX, baseUnit.posY, baseUnit.posZ, EffectType.custom, true, EffectQuality.critical);
@@ -3548,7 +3548,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: h */
-    public void selectAllSimilarBuildings(BaseUnit baseUnit) {
+    public void selectAllSimilarUnits(BaseUnit baseUnit) {
         this.lastSelectedUnit = null;
         GameEngine gameEngine = GameEngine.getInstance();
         for (GameObject gameObject : GameObject.fastGameObjectList) {
@@ -3596,7 +3596,7 @@ public final class GameUI extends Serializable {
             return false;
         }
         addToSelection(baseUnit);
-        applyActionToCommandWithFlag(CommandType.newSelection, baseUnit);
+        playCommandSoundForUnit(CommandType.newSelection, baseUnit);
         return true;
     }
 
@@ -3697,7 +3697,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: D */
-    public boolean canSelectBuildings() {
+    public boolean areAllSelectedUnitsAirborne() {
         if (getSelectedUnitCount() == 0) {
             return true;
         }
@@ -3728,7 +3728,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: n */
-    public boolean canSelectedUnitsReachUnit(BaseUnit baseUnit) {
+    public boolean canSelectedUnitsLoadInto(BaseUnit baseUnit) {
         if (getSelectedUnitCount() == 0) {
             return false;
         }
@@ -3744,7 +3744,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: o */
-    public boolean canSelectedUnitsReachTarget(BaseUnit baseUnit) {
+    public boolean canSelectedUnitsLoadUp(BaseUnit baseUnit) {
         if (getSelectedUnitCount() == 0) {
             return false;
         }
@@ -3760,7 +3760,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: p */
-    public boolean canSelectedUnitsReclaim(BaseUnit baseUnit) {
+    public boolean canSelectedUnitsRepair(BaseUnit baseUnit) {
         if (getSelectedUnitCount() == 0) {
             return false;
         }
@@ -3776,7 +3776,7 @@ public final class GameUI extends Serializable {
     }
 
     /* JADX INFO: renamed from: q */
-    public boolean m303q(BaseUnit baseUnit) {
+    public boolean canSelectedUnitsReachTargetByPathfinding(BaseUnit baseUnit) {
         if (getSelectedUnitCount() == 0) {
             return false;
         }
@@ -3977,11 +3977,11 @@ public final class GameUI extends Serializable {
 
     /* JADX INFO: renamed from: a */
     public boolean drawActionTooltip(AbstractUnitAction abstractUnitAction, boolean z, BaseUnit baseUnit, boolean z2, boolean z3) {
-        return drawActionTooltip2(abstractUnitAction, z, baseUnit, z2, false, -1.0f, z3);
+        return drawActionTooltipAndHandleInput(abstractUnitAction, z, baseUnit, z2, false, -1.0f, z3);
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean drawActionTooltip2(final AbstractUnitAction s, final boolean boolean2, final BaseUnit am, final boolean boolean4, final boolean boolean5, final float float6, final boolean boolean7) {
+    public boolean drawActionTooltipAndHandleInput(final AbstractUnitAction s, final boolean boolean2, final BaseUnit am, final boolean boolean4, final boolean boolean5, final float float6, final boolean boolean7) {
         final GameEngine instance = GameEngine.getInstance();
         String s2 = null;
         boolean b = false;
@@ -4001,7 +4001,7 @@ public final class GameUI extends Serializable {
             b3 = true;
             b4 = true;
         }
-        if (this.isActionAvailableForSelectedUnits(s)) {
+        if (this.isActionUnavailableForSelectedUnits(s)) {
             b3 = true;
             s2 = this.lockedText;
             final String actionIcon = this.getActionIcon(s);
@@ -4191,7 +4191,7 @@ public final class GameUI extends Serializable {
             }
             boolean b10 = false;
             boolean b11 = false;
-            final boolean b12 = !b3 && this.drawActionPreviewWithFlag(s, true);
+            final boolean b12 = !b3 && this.canAffordActionForSelectedUnits(s, true);
             final boolean b13 = active > 0 && s.canPlayerCancel(am, true);
             int n6 = (int)(this.bw.d() + 60.0f * float7);
             int i = (int)(this.bw.d - 65.0f * float7);
@@ -4261,10 +4261,10 @@ public final class GameUI extends Serializable {
             }
             n6 = 1;
             if ((b10 || b11) && s.isHighPriority()) {
-                if (this.drawRectWithBorder(instance)) {
+                if (this.isShiftKeyPressed(instance)) {
                     n6 = 5;
                 }
-                if (this.drawSelectionBox(instance)) {
+                if (this.isControlKeyPressed(instance)) {
                     n6 = 10;
                 }
             }
@@ -4278,10 +4278,10 @@ public final class GameUI extends Serializable {
                 }
                 for (i = 0; i < n6; ++i) {
                     final Command baseCommand = this.createBaseCommand();
-                    if (this.drawRectWithBorder(instance)) {
+                    if (this.isShiftKeyPressed(instance)) {
                         baseCommand.isQueued = true;
                     }
-                    this.drawActionPreviewWithTarget(baseCommand, s);
+                    this.setActionCommandTargets(baseCommand, s);
                     baseCommand.setActionId(s.getQueueId());
                     this.prepareUnitActionCommand(s, null, null, baseCommand);
                 }
@@ -4293,7 +4293,7 @@ public final class GameUI extends Serializable {
                 }
                 for (i = 0; i < n6; ++i) {
                     final Command baseCommand2 = this.createBaseCommand();
-                    this.drawActionPreviewWithTarget(baseCommand2, s);
+                    this.setActionCommandTargets(baseCommand2, s);
                     baseCommand2.stopCurrentAction = true;
                     baseCommand2.setActionId(s.getQueueId());
                 }

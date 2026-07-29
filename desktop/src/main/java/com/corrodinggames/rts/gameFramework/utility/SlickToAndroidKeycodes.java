@@ -15,10 +15,10 @@ public class SlickToAndroidKeycodes {
     static HashMap slickToAndroid;
 
     /* JADX INFO: renamed from: b */
-    static HashMap androidToSlick;
+    static HashMap gdxToAndroidMap;
 
     /* JADX INFO: renamed from: c */
-    static HashMap androidToGdx;
+    static HashMap gdxToSlickMap;
 
     /* JADX INFO: renamed from: d */
     static HashMap<String,Integer> slickNameMap = createKeyNameMap(SlickCodes.class);
@@ -30,7 +30,7 @@ public class SlickToAndroidKeycodes {
     static HashMap gdxNameMap = createKeyNameMap(GdxCodes.class);
 
     /* JADX INFO: renamed from: g */
-    static HashMap gdxToAndroid;
+    static HashMap androidKeyCodeToNameMap;
 
     /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/utility/SlickToAndroidKeycodes$AndroidCodes.class */
     public class AndroidCodes {
@@ -830,9 +830,9 @@ public class SlickToAndroidKeycodes {
     }
 
     /* JADX INFO: renamed from: a */
-    public static void getKeyCode() {
-        slickToAndroid = getKeyName("slickToAndroidCodes", slickNameMap, androidNameMap);
-        gdxToAndroid = new HashMap();
+    public static void initializeKeyCodeMaps() {
+        slickToAndroid = buildKeyCodeConversionMap("slickToAndroidCodes", slickNameMap, androidNameMap);
+        androidKeyCodeToNameMap = new HashMap();
         ArrayList arrayList = new ArrayList();
         for (String str : slickNameMap.keySet()) {
             int iIntValue = ((Integer) slickNameMap.get(str)).intValue();
@@ -844,24 +844,24 @@ public class SlickToAndroidKeycodes {
             }
             String lowerCase = str.toLowerCase(Locale.ENGLISH);
             if (num != null) {
-                gdxToAndroid.put(num, lowerCase);
+                androidKeyCodeToNameMap.put(num, lowerCase);
             }
         }
     }
 
     /* JADX INFO: renamed from: b */
-    public static void convertAndroidToSlick() {
-        androidToSlick = getKeyName("gdxToAndroidCodes", gdxNameMap, androidNameMap);
+    public static void initializeGdxToAndroidMap() {
+        gdxToAndroidMap = buildKeyCodeConversionMap("gdxToAndroidCodes", gdxNameMap, androidNameMap);
     }
 
     /* JADX INFO: renamed from: c */
-    public static void convertGdxToAndroid() {
-        androidToGdx = getKeyName("gdxToSlickCodes", gdxNameMap, slickNameMap);
+    public static void initializeGdxToSlickMap() {
+        gdxToSlickMap = buildKeyCodeConversionMap("gdxToSlickCodes", gdxNameMap, slickNameMap);
     }
 
     /* JADX INFO: renamed from: a */
 
-    public static HashMap getKeyName(String string, HashMap<String,Integer> hashMap2, HashMap hashMap3) {
+    public static HashMap buildKeyCodeConversionMap(String string, HashMap<String,Integer> hashMap2, HashMap hashMap3) {
         HashMap var3 = new HashMap();
         ArrayList<String> var4 = new ArrayList();
 
@@ -898,9 +898,9 @@ public class SlickToAndroidKeycodes {
     }
 
     static {
-        getKeyCode();
-        convertAndroidToSlick();
-        convertGdxToAndroid();
+        initializeKeyCodeMaps();
+        initializeGdxToAndroidMap();
+        initializeGdxToSlickMap();
     }
 
     /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/utility/SlickToAndroidKeycodes$MissingKey.class */
@@ -913,7 +913,7 @@ public class SlickToAndroidKeycodes {
     }
 
     /* JADX INFO: renamed from: a */
-    public static int initializeSlickToAndroidMapping(String str) throws MissingKey {
+    public static int getAndroidKeyCode(String str) throws MissingKey {
         String upperCase = str.toUpperCase();
         Integer num = (Integer) androidNameMap.get(upperCase);
         if (num == null) {
@@ -923,7 +923,7 @@ public class SlickToAndroidKeycodes {
     }
 
     public static String a(int i) {
-        String str = (String) gdxToAndroid.get(Integer.valueOf(i));
+        String str = (String) androidKeyCodeToNameMap.get(Integer.valueOf(i));
         if (str == null) {
             return "unknown";
         }
@@ -931,7 +931,7 @@ public class SlickToAndroidKeycodes {
     }
 
     /* JADX INFO: renamed from: b */
-    public static int initializeGdxToAndroidMapping(int i) {
+    public static int convertSlickToAndroidKeyCode(int i) {
         Integer num = (Integer) slickToAndroid.get(Integer.valueOf(i));
         if (num == null) {
             return 0;
@@ -940,7 +940,7 @@ public class SlickToAndroidKeycodes {
     }
 
     /* JADX INFO: renamed from: c */
-    public static Integer initializeAndroidToGdxMapping(int i) {
+    public static Integer convertSlickToGdxKeyCode(int i) {
         if (i == 14) {
             return 69;
         }

@@ -1097,7 +1097,7 @@ public class MissionEngine extends Serializable {
                             && !var9.i()
                             && var9.isAlive()
                             && Utility.distanceSq(var9.posX, var9.posY, var6.posX, var6.posY) < 28900.0F) {
-                        var6.isSelectable(var9.team);
+                        var6.changeTeam(var9.team);
                         var6.selectionFlashTimer = 60.0F;
                         var1 = true;
                         break;

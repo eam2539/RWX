@@ -26,7 +26,7 @@ public class FileLoaderFactory {
 
     /* JADX INFO: renamed from: a */
     public static IFileLoader getFileLoaderForPath(String str) {
-        if (RwmodFileLoader.i(str)) {
+        if (RwmodFileLoader.isRwmodPath(str)) {
             return modFileLoader;
         }
         if (isZipFSEnabled() && SafFileLoader.l(str)) {
@@ -59,18 +59,18 @@ public class FileLoaderFactory {
 
     /* JADX INFO: renamed from: c */
     public static void closeModFile(String str) {
-        if (modFileLoader != null && RwmodFileLoader.i(str)) {
-            modFileLoader.k(str);
+        if (modFileLoader != null && RwmodFileLoader.isRwmodPath(str)) {
+            modFileLoader.closeModFile(str);
         }
     }
 
     /* JADX INFO: renamed from: b */
     public static void closeAll() {
         if (modFileLoader != null) {
-            modFileLoader.isDirect();
+            modFileLoader.closeAll();
         }
         if (zipFileLoader != null) {
-            zipFileLoader.isDirect();
+            zipFileLoader.closeAll();
         }
     }
 }

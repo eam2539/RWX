@@ -66,7 +66,7 @@ public class MathTest extends Test {
         GameEngine.log("diff sin(360):" + String.format("%.12f", Float.valueOf(Utility.fastSin(360.0f) - ((float) StrictMath.sin(6.283185307179586d)))));
         GameEngine.log("Testing squareroot");
         for (int i = 0; i < 1005; i++) {
-            Assert.assertEquals(Utility.sqrt(i), Utility.round(Utility.sortRect(i)));
+            Assert.assertEquals(Utility.fastSquareRootInt(i), Utility.round(Utility.squareRoot(i)));
         }
         int i2 = 0;
         GameEngine.log("=== cos/sin tests (runs:5)");

@@ -50,7 +50,7 @@ class GameStartupRunnable implements Runnable {
         }
         GameEngine.log("Game stopped running shutting down");
         try {
-            GameEngine.getInstance().gameSaver.updateAutosave("lastgame", false);
+            GameEngine.getInstance().gameSaver.saveGame("lastgame", false);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

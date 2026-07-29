@@ -352,7 +352,7 @@ public class MapLayer {
                             } else {
                                 byte bClampWorldX = bArr3[i6][i7];
                                 if (bClampWorldX == 127) {
-                                    bClampWorldX = tileMap.clampWorldX(i6, i7, bArr, (byte) 5);
+                                    bClampWorldX = tileMap.calculateFogNeighborMask(i6, i7, bArr, (byte) 5);
                                     bArr3[i6][i7] = bClampWorldX;
                                 }
                                 if (bClampWorldX != 0) {
@@ -370,7 +370,7 @@ public class MapLayer {
                             if (b2 != 10) {
                                 byte bClampWorldX2 = bArr2[i6][i7];
                                 if (bClampWorldX2 == 127) {
-                                    bClampWorldX2 = tileMap.clampWorldX(i6, i7, bArr, (byte) 10);
+                                    bClampWorldX2 = tileMap.calculateFogNeighborMask(i6, i7, bArr, (byte) 10);
                                     bArr2[i6][i7] = bClampWorldX2;
                                 }
                                 if (bClampWorldX2 != 0) {
@@ -491,7 +491,7 @@ public class MapLayer {
                     this.setTileAt(s3, s2, g2, true);
                     continue;
                 }
-                Tileset j2 = b2.isWorldPointVisibleForTeam(n3);
+                Tileset j2 = b2.findTilesetByGlobalTileId(n3);
                 if (j2 != null) {
                     g2 = MapTile.createTile(b2, this, j2, n3 - j2.firstGid, s3, s2, bl);
                     if (g2 != null) {

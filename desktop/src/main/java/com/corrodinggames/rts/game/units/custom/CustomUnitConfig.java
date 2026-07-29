@@ -315,13 +315,13 @@ public final class CustomUnitConfig implements UnitType {
     public boolean unitsSpawnedOnDeath_setToTeamOfLastAttacker;
 
     /* JADX INFO: renamed from: bE */
-    public boolean targetAir;
+    public boolean hasLaserDefenceTurret;
 
     /* JADX INFO: renamed from: bF */
-    public boolean targetBuildings;
+    public boolean hasProjectileInterceptorTurret;
 
     /* JADX INFO: renamed from: bG */
-    public boolean targetProjectiles;
+    public boolean hasTurretWithLimitingAngle;
     /* JADX INFO: renamed from: cd */
     public boolean autoTriggerCheckWhileNotBuilt;
     /* JADX INFO: renamed from: ce */
@@ -450,7 +450,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: dE */
     public boolean lockLegRotationWithMainTurret;
     /* JADX INFO: renamed from: dF */
-    public TurretConfig defaultTurret2;
+    public TurretConfig mainTurret;
     /* JADX INFO: renamed from: dG */
     public int mainTurretIndex;
     /* JADX INFO: renamed from: dH */
@@ -467,7 +467,7 @@ public final class CustomUnitConfig implements UnitType {
     public float moveAccelerationSpeed;
 
     /* JADX INFO: renamed from: do, reason: not valid java name */
-    public SoundList f0do;
+    public SoundList soundOnAttackOrder;
     /* JADX INFO: renamed from: dO */
     public float moveDecelerationSpeed;
     /* JADX INFO: renamed from: dP */
@@ -892,7 +892,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: cu */
     public float updateUnitMemoryRate = 1.0f;
     /* JADX INFO: renamed from: bL */
-    boolean internalEffect;
+    boolean hasMovementEffects;
     /* JADX INFO: renamed from: bM */
     boolean dustEffect;
     /* JADX INFO: renamed from: bN */
@@ -960,7 +960,7 @@ public final class CustomUnitConfig implements UnitType {
     boolean hasAttachedTurrets = false;
 
     /* JADX INFO: renamed from: fV */
-    TurretConfig defaultTurret = null;
+    TurretConfig mainNanoTurret = null;
 
     /* JADX INFO: renamed from: fW */
     FastArrayList<CustomUnitCondition> autoTriggerConditions = new FastArrayList();
@@ -1032,7 +1032,7 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     /* JADX INFO: renamed from: a */
-    AnimationConfig loadData(CustomUnitAction customUnitAction, AnimationConfig animationConfig, boolean z) throws ConfigParseException {
+    AnimationConfig resolveAnimationForAction(CustomUnitAction customUnitAction, AnimationConfig animationConfig, boolean z) throws ConfigParseException {
         AnimationConfig animationConfigFindAnimationForAction = findAnimationForAction(customUnitAction);
         if (animationConfigFindAnimationForAction != null) {
             if (z && animationConfig != null && animationConfig.a()) {
@@ -1044,7 +1044,7 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String loadData(String str) {
+    public static String normalizeLimbName(String str) {
         String strTrim = str.toLowerCase(Locale.ROOT).trim();
         if (strTrim.startsWith("arm_")) {
             strTrim = "arm" + strTrim.substring("arm_".length());
@@ -1604,7 +1604,7 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     /* JADX INFO: renamed from: b */
-    public CustomUnitProjectileReference getConfigDisplayPath(String str, String str2, String str3) {
+    public CustomUnitProjectileReference createProjectileReference(String str, String str2, String str3) {
         CustomUnitProjectileReference customUnitProjectileReference = new CustomUnitProjectileReference();
         customUnitProjectileReference.configKey = str2;
         customUnitProjectileReference.sectionName = str3;
@@ -1805,8 +1805,8 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     /* JADX INFO: renamed from: b */
-    public int getConfigDisplayPath(String str) {
-        String strLoadData = loadData(str);
+    public int findLegConfigIndex(String str) {
+        String strLoadData = normalizeLimbName(str);
         GameEngine.log("name:" + strLoadData);
         for (int i = 0; i < this.legConfig.length; i++) {
             GameEngine.log("checking:" + this.legConfig[i].b);
@@ -1941,7 +1941,7 @@ public final class CustomUnitConfig implements UnitType {
                 teamColorTextures[i].w();
             }
         }
-        CustomUnitConfigParser.a_texture_array(teamColorTextures);
+        CustomUnitConfigParser.trackImageMemoryForTextures(teamColorTextures);
         return teamColorTextures;
     }
 
@@ -1951,7 +1951,7 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: o */
     public void registerConfigWatcher(String str) {
-        if (RwmodFileLoader.i(str)) {
+        if (RwmodFileLoader.isRwmodPath(str)) {
             return;
         }
         this.fileWatchers.add(new FileWatcher(str));

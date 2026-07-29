@@ -17,15 +17,15 @@ public abstract class MusicFactory {
     public abstract void release();
 
     /* JADX INFO: renamed from: a */
-    public void createMusic(int i) {
+    public void poll(int i) {
     }
 
     /* JADX INFO: renamed from: a */
-    public void createMusicTrack(float f) {
+    public void update(float f) {
     }
 
     /* JADX INFO: renamed from: c */
-    public boolean isMusicPlaying() {
+    public boolean requiresSequentialFade() {
         return false;
     }
 
@@ -35,7 +35,7 @@ public abstract class MusicFactory {
     }
 
     /* JADX INFO: renamed from: e */
-    public int isMusicSupported() {
+    public int getUpdateThreadWaitTimeoutMillis() {
         return 0;
     }
 }

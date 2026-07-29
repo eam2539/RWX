@@ -604,7 +604,7 @@ public class GameInterfaceRenderer extends Serializable {
                     this.selectionRect.b = (int) this.selectionRectF2.b;
                     this.selectionRect.a = (int) this.selectionRectF2.a;
                     this.selectionRect.c = (int) this.selectionRectF2.c;
-                    Utility.sqrt(this.selectionRect);
+                    Utility.normalizeRect(this.selectionRect);
                     this.paintSelectionBox.b(Color.a(255, 0, 255, 0));
                     this.paintSelectionBox.a(Paint.Style.STROKE);
                     this.paintSelectionBox.a(1.0f);
@@ -640,7 +640,7 @@ public class GameInterfaceRenderer extends Serializable {
                 this.isDragging = false;
             }
             this.selectionRectF3.a(this.selectionRectF2);
-            Utility.sortRect(this.selectionRectF3);
+            Utility.normalizeRect(this.selectionRectF3);
             if (Math.abs(this.selectionRectF3.a - this.selectionRectF3.c) > i || Math.abs(this.selectionRectF3.b - this.selectionRectF3.d) > i) {
                 this.selectionRectF3.d /= this.gameEngine.zoom;
                 this.selectionRectF3.b /= this.gameEngine.zoom;
@@ -650,8 +650,8 @@ public class GameInterfaceRenderer extends Serializable {
                 this.gameUI.tooltipX = 4.0f;
                 this.gameUI.tooltipY = 40.0f;
                 this.gameUI.isSelectionBoxActive = false;
-                boolean zDrawRectWithBorder = this.gameUI.drawRectWithBorder(this.gameEngine);
-                boolean zDrawSelectionBox = this.gameUI.drawSelectionBox(this.gameEngine);
+                boolean zDrawRectWithBorder = this.gameUI.isShiftKeyPressed(this.gameEngine);
+                boolean zDrawSelectionBox = this.gameUI.isControlKeyPressed(this.gameEngine);
                 boolean z6 = true;
                 boolean z7 = true;
                 boolean z8 = false;
@@ -1497,7 +1497,7 @@ public class GameInterfaceRenderer extends Serializable {
                 if (b5) {
                     timerValue = UnitActionTimer.getTimerValue(baseUnit, unitCommand, false);
                     if (unitCommand.getActionDisplayType() != ActionDisplayType.infoOnlyNoBox) {
-                        final boolean setMenuDialog = this.gameUI.setMenuDialog(unitCommand);
+                        final boolean setMenuDialog = this.gameUI.isActionTargetingGround(unitCommand);
                         float abs = 0.0f;
                         if (setMenuDialog) {
                             final float n25 = GameEngine.getCurrentTimeMillis() % 1000L / 1000.0f;
@@ -1735,7 +1735,7 @@ public class GameInterfaceRenderer extends Serializable {
                 }
                 this.unitRect.a(this.zoomButtonRect);
                 if (GameEngine.isNonPCPlatform()) {
-                    Utility.grow2(this.unitRect, 2.0f);
+                    Utility.expandRectForTouchTarget(this.unitRect, 2.0f);
                 }
                 this.gameUI.a((float)this.unitRect.a, (float)this.unitRect.b, (float)this.unitRect.b(), (float)this.unitRect.c());
                 if (!this.isDraggingSelectionBox && this.unitRect.b((int)this.gameUI.selectionBoxMinWidth, (int)this.gameUI.selectionBoxMinHeight) && this.rectF.b((float)(int)this.gameUI.selectionBoxMinWidth, (float)(int)this.gameUI.selectionBoxMinHeight)) {
@@ -1799,10 +1799,10 @@ public class GameInterfaceRenderer extends Serializable {
                         if (boolean5) {
                             int n29 = 1;
                             if (unitCommand.isHighPriority()) {
-                                if (this.gameUI.drawRectWithBorder(this.gameEngine)) {
+                                if (this.gameUI.isShiftKeyPressed(this.gameEngine)) {
                                     n29 = 5;
                                 }
-                                if (this.gameUI.drawSelectionBox(this.gameEngine)) {
+                                if (this.gameUI.isControlKeyPressed(this.gameEngine)) {
                                     n29 = 10;
                                 }
                             }
@@ -1842,10 +1842,10 @@ public class GameInterfaceRenderer extends Serializable {
                                 for (int j = 0; j < n29; ++j) {
                                     final Command commandForSelectedUnits = this.gameUI.createCommandForSelectedUnits();
                                     if (!unitCommand.isOnlyOneUnitAtATime()) {
-                                        this.gameUI.drawActionPreviewWithTarget(commandForSelectedUnits, unitCommand);
+                                        this.gameUI.setActionCommandTargets(commandForSelectedUnits, unitCommand);
                                     }
                                     else {
-                                        this.gameUI.drawButtonAndHandleEventAdvanced(commandForSelectedUnits, unitCommand, b14);
+                                        this.gameUI.setActionCommandTarget(commandForSelectedUnits, unitCommand, b14);
                                     }
                                     if (b14) {
                                         commandForSelectedUnits.stopCurrentAction = true;
@@ -1886,10 +1886,10 @@ public class GameInterfaceRenderer extends Serializable {
                         if (boolean5) {
                             final Command commandForSelectedUnits2 = this.gameUI.createCommandForSelectedUnits();
                             if (!unitCommand.isOnlyOneUnitAtATime()) {
-                                this.gameUI.drawActionPreviewWithTarget(commandForSelectedUnits2, unitCommand);
+                                this.gameUI.setActionCommandTargets(commandForSelectedUnits2, unitCommand);
                             }
                             else {
-                                this.gameUI.drawButtonAndHandleEventAdvanced(commandForSelectedUnits2, unitCommand, boolean5);
+                                this.gameUI.setActionCommandTarget(commandForSelectedUnits2, unitCommand, boolean5);
                             }
                             commandForSelectedUnits2.stopCurrentAction = true;
                             commandForSelectedUnits2.setActionId(unitCommand.getQueueId());
@@ -1977,7 +1977,7 @@ public class GameInterfaceRenderer extends Serializable {
                     if (n3 == 0) {
                         b17 = false;
                     }
-                    if (this.gameUI.drawActionTooltip2(this.unitCommand, boolean6, this.selectedUnit, !b17, true, this.commandTimer, false)) {
+                    if (this.gameUI.drawActionTooltipAndHandleInput(this.unitCommand, boolean6, this.selectedUnit, !b17, true, this.commandTimer, false)) {
                         this.selectedUnit = null;
                     }
                 }
@@ -2425,7 +2425,7 @@ public class GameInterfaceRenderer extends Serializable {
             n2 = (int)(n * this.gameEngine.screenScale * 1.6f);
             n3 = (int)(this.gameEngine.currentScreenWidthPixels / 2.0f);
             n4 = 7 + (int)this.gameUI.unitRangePaint.k();
-            this.gameEngine.renderGraphicsEngine.a(Utility.copyStream(this.gameEngine.gameTimeMillis / 1000), (float)n3, (float)n4, this.gameUI.unitRangePaint);
+            this.gameEngine.renderGraphicsEngine.a(Utility.formatDuration(this.gameEngine.gameTimeMillis / 1000), (float)n3, (float)n4, this.gameUI.unitRangePaint);
             n4 += n2 / 2 + 10;
             n3 += n2 / 2 + 5;
             this.unitRect2.a(n3, n4, n3 + n2, n4 + n2);

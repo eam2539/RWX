@@ -171,7 +171,7 @@ public class FileLoader {
         String strConvertAbstractPath = convertAbstractPath(str);
         IFileLoader zipFileLoaderForPath = FileLoaderFactory.getZipFileLoaderForPath(strConvertAbstractPath);
         if (zipFileLoaderForPath != null) {
-            return zipFileLoaderForPath.getLastModified(strConvertAbstractPath);
+            return zipFileLoaderForPath.convertAbstractPathForDebug(strConvertAbstractPath);
         }
         return strConvertAbstractPath;
     }
@@ -228,7 +228,7 @@ public class FileLoader {
             fileLoaderForPath = FileLoaderFactory.getFileLoaderForPath(strConvertAbstractPath);
         }
         if (fileLoaderForPath != null) {
-            return fileLoaderForPath.move(strConvertAbstractPath);
+            return fileLoaderForPath.isDirectory(strConvertAbstractPath);
         }
         if (isAbstractPath(str)) {
             if (this.disableAssets) {
@@ -491,7 +491,7 @@ public class FileLoader {
         String strConvertAbstractPath = convertAbstractPath(str);
         IFileLoader fileLoaderForPath = FileLoaderFactory.getFileLoaderForPath(strConvertAbstractPath);
         if (fileLoaderForPath != null) {
-            return fileLoaderForPath.getFullPath(strConvertAbstractPath);
+            return fileLoaderForPath.getLastModified(strConvertAbstractPath);
         }
         File file = new File(strConvertAbstractPath);
         if (!file.exists()) {
@@ -581,7 +581,7 @@ public class FileLoader {
         IFileLoader zipFileLoaderForPath = FileLoaderFactory.getZipFileLoaderForPath(file.getAbsolutePath());
         if (zipFileLoaderForPath != null) {
             try {
-                boolean rWFile = zipFileLoaderForPath.getRWFile(file.getAbsolutePath(), file2.getAbsolutePath());
+                boolean rWFile = zipFileLoaderForPath.rename(file.getAbsolutePath(), file2.getAbsolutePath());
                 FileLoaderFactory.closeModFile(file2.getAbsolutePath());
                 return rWFile;
             } catch (Exception e) {

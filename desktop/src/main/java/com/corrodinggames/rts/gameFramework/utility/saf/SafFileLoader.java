@@ -71,7 +71,7 @@ public class SafFileLoader extends IFileLoader {
 
     @Override // com.corrodinggames.rts.gameFramework.utility.IFileLoader
     /* JADX INFO: renamed from: a */
-    public void isDirect() {
+    public void closeAll() {
         synchronized (b) {
             Iterator it = b.values().iterator();
             while (it.hasNext()) {
@@ -139,7 +139,7 @@ public class SafFileLoader extends IFileLoader {
             if (i != 0) {
                 j("getPathInZip: Backtracking attempt out of zip: " + strSubstring);
             }
-            strSubstring = Utility.formatDate("/", arrayList);
+            strSubstring = Utility.joinStrings("/", arrayList);
         }
         return strSubstring;
     }
@@ -165,7 +165,7 @@ public class SafFileLoader extends IFileLoader {
 
     @Override // com.corrodinggames.rts.gameFramework.utility.IFileLoader
     /* JADX INFO: renamed from: f */
-    public String getLastModified(String str) {
+    public String convertAbstractPathForDebug(String str) {
         if (str.endsWith(".[saflink]") || str.endsWith(".[saflink]/") || str.endsWith(".[saflink]\\")) {
             return str;
         }
@@ -179,7 +179,7 @@ public class SafFileLoader extends IFileLoader {
 
     @Override // com.corrodinggames.rts.gameFramework.utility.IFileLoader
     /* JADX INFO: renamed from: d */
-    public boolean move(String str) {
+    public boolean isDirectory(String str) {
         if (str.endsWith(".[saflink]") || str.endsWith(".[saflink]/") || str.endsWith(".[saflink]\\")) {
             return true;
         }
@@ -269,7 +269,7 @@ public class SafFileLoader extends IFileLoader {
 
     @Override // com.corrodinggames.rts.gameFramework.utility.IFileLoader
     /* JADX INFO: renamed from: g */
-    public long getFullPath(String str) {
+    public long getLastModified(String str) {
         SafFileSystem safFileSystemD = d(str, true);
         if (safFileSystemD == null) {
             h("saf==null: for '" + str + "'");
@@ -300,7 +300,7 @@ public class SafFileLoader extends IFileLoader {
 
     @Override // com.corrodinggames.rts.gameFramework.utility.IFileLoader
     /* JADX INFO: renamed from: a */
-    public boolean getRWFile(String str, String str2) {
+    public boolean rename(String str, String str2) {
         h("Rename: " + str + " to " + str2);
         SafFileSystem safFileSystemD = d(str, true);
         if (safFileSystemD == null) {

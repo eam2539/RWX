@@ -281,7 +281,7 @@ public class StatsHistoryChart {
         var12.d = rect.d - this.b.c() - 3;
         int var37 = Math.max(1, var7.b - var7.c);
         float var38 = (float)var12.c() / var37;
-        String var16 = Utility.copyStream(0L);
+        String var16 = Utility.formatDuration(0L);
         int var13 = y.b(var16, var10);
         y.a(var16, (float)(rect.a + var13 / 2), (float)rect.d, var10);
         var12.a = rect.a + var13 / 2;
@@ -310,7 +310,7 @@ public class StatsHistoryChart {
             var12.c = rect.c - var5.toScreenPixels(10);
         }
 
-        String var39 = Utility.copyStream((long)(var7.d / 1000));
+        String var39 = Utility.formatDuration((long)(var7.d / 1000));
         var13 = y.b(var39, var10);
         y.a(var39, (float)var12.c, (float)rect.d, var10);
         float var40 = (float)var12.b() / var7.d;
@@ -421,7 +421,7 @@ public class StatsHistoryChart {
                 this.u = var49;
                 this.s.clear();
                 this.t.clear();
-                this.s.add(Utility.copyStream((long)(this.u / 1000)));
+                this.s.add(Utility.formatDuration((long)(this.u / 1000)));
                 this.t.add(-1);
                 TeamHistoryChart var52 = null;
                 if (z == ValueDisplayMode.absolute) {

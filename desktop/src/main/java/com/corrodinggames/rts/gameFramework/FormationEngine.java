@@ -111,12 +111,12 @@ public class FormationEngine extends Serializable {
                 OrderableUnit orderableUnit4 = null;
                 float f = 0.0f;
                 OrderableUnit orderableUnit5 = orderableUnit2;
-                int iSqrt = Utility.sqrt((int) orderableUnit5.ao);
+                int iSqrt = Utility.fastSquareRootInt((int) orderableUnit5.ao);
                 Iterator it2 = fastArrayList.iterator();
                 while (it2.hasNext()) {
                     OrderableUnit orderableUnit6 = (OrderableUnit) it2.next();
                     if (orderableUnit6.transportedBy == orderableUnit && orderableUnit6.ao > 0.0f && orderableUnit6 != orderableUnit5) {
-                        float fDistanceInt = ((0 + Utility.distanceInt(orderableUnit5.posX, orderableUnit5.posY, orderableUnit.posX + orderableUnit6.transportOffsetX, orderableUnit.posY + orderableUnit6.transportOffsetY)) + Utility.distanceInt(orderableUnit6.posX, orderableUnit6.posY, orderableUnit.posX + orderableUnit5.transportOffsetX, orderableUnit.posY + orderableUnit5.transportOffsetY)) - (Utility.sqrt((int) orderableUnit6.ao) + iSqrt);
+                        float fDistanceInt = ((0 + Utility.distanceInt(orderableUnit5.posX, orderableUnit5.posY, orderableUnit.posX + orderableUnit6.transportOffsetX, orderableUnit.posY + orderableUnit6.transportOffsetY)) + Utility.distanceInt(orderableUnit6.posX, orderableUnit6.posY, orderableUnit.posX + orderableUnit5.transportOffsetX, orderableUnit.posY + orderableUnit5.transportOffsetY)) - (Utility.fastSquareRootInt((int) orderableUnit6.ao) + iSqrt);
                         if (fDistanceInt < f) {
                             f = fDistanceInt;
                             orderableUnit4 = orderableUnit6;

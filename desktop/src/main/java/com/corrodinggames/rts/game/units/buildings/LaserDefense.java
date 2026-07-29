@@ -368,16 +368,16 @@ public class LaserDefense extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: bW */
-    public float getUnitTeamData() {
+    public float getSecondaryBarProgress() {
         if (this.currentEnergy != 1.0f) {
             return this.currentEnergy;
         }
-        return super.getUnitTeamData();
+        return super.getSecondaryBarProgress();
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: bX */
-    public boolean isUnitAtPositionX() {
+    public boolean isSecondaryBarRecharging() {
         return this.isRecharging;
     }
 

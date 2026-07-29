@@ -50,7 +50,7 @@ public class ZipHelper {
         try {
             b();
         } catch (IllegalArgumentException e) {
-            RwmodFileLoader.h("Failed to open source zip with unicode encoding, attempting with ISO-8859-1");
+            RwmodFileLoader.logZipMessage("Failed to open source zip with unicode encoding, attempting with ISO-8859-1");
             Charset charsetForName = Charset.forName("ISO-8859-1");
             try {
                 if (zipFileLoaderForPath != null) {

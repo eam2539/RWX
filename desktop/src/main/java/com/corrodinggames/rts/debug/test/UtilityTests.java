@@ -51,7 +51,7 @@ public class UtilityTests extends Test {
             long jA = PerformanceProfiler.a();
             for (int i3 = 0; i3 < 1000; i3++) {
                 for (float f : fArr) {
-                    iSqrt += Utility.sqrt((int) f);
+                    iSqrt += Utility.fastSquareRootInt((int) f);
                 }
             }
             GameEngine.log("sum:" + iSqrt);
@@ -63,7 +63,7 @@ public class UtilityTests extends Test {
             int iSortRect = 0;
             for (int i5 = 0; i5 < 1000; i5++) {
                 for (float f2 : fArr) {
-                    iSortRect = (int) (iSortRect + Utility.sortRect((int) f2));
+                    iSortRect = (int) (iSortRect + Utility.squareRoot((int) f2));
                 }
             }
             GameEngine.log("sum:" + iSortRect);
@@ -102,8 +102,8 @@ public class UtilityTests extends Test {
                 Assert.assertEqualsFloat(expressionEvaluator.a(customUnitConfig, iniFile, "core", "cos(60)"), "0.5");
                 Assert.assertEqualsFloat(expressionEvaluator.a(customUnitConfig, iniFile, "core", "sin(b+20+(2-2)+(5*0))"), "0.5");
                 GameEngine.log("PassthroughZipReader");
-                Assert.assertEquals(RwmodFileLoader.l("/first/second/zip.rwmod/test1/test2"), "test1/test2");
-                Assert.assertEquals(RwmodFileLoader.l("\\first\\second\\zip.rwmod\\test1\\test2"), "test1/test2");
+                Assert.assertEquals(RwmodFileLoader.getPathInZip("/first/second/zip.rwmod/test1/test2"), "test1/test2");
+                Assert.assertEquals(RwmodFileLoader.getPathInZip("\\first\\second\\zip.rwmod\\test1\\test2"), "test1/test2");
                 assertKeyValueEquals("A", "B");
                 assertKeyValueEquals("AA=11", "BB=22");
                 assertKeyValueEquals("AA='11'", "BB='22'");

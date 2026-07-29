@@ -880,7 +880,7 @@ public final class EffectManager {
     }
 
     /* JADX INFO: renamed from: a */
-    public int a_string_method(String str) {
+    public int findEffectTemplateIndex(String str) {
         for (int i = 0; i < effectTemplates.length; i++) {
             if (effectTemplates[i] != null) {
                 if (effectTemplates[i].a != null && effectTemplates[i].a.equalsIgnoreCase(str)) {

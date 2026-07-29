@@ -85,7 +85,7 @@ public class UnitGroup extends AIUnitGroupBase {
         gameOutputStream.writeInt(this.F.size());
         Iterator it = this.F.iterator();
         while (it.hasNext()) {
-            gameOutputStream.writeUnitIdOrNullUnitEntity((OrderableUnit) it.next());
+            gameOutputStream.writeOrderableUnit((OrderableUnit) it.next());
         }
         gameOutputStream.writeByte(7);
         gameOutputStream.writeBoolean(false);
@@ -94,7 +94,7 @@ public class UnitGroup extends AIUnitGroupBase {
         gameOutputStream.writeInt(this.G.size());
         Iterator it2 = this.G.iterator();
         while (it2.hasNext()) {
-            gameOutputStream.writeUnitIdOrNullUnitEntity((OrderableUnit) it2.next());
+            gameOutputStream.writeOrderableUnit((OrderableUnit) it2.next());
         }
         gameOutputStream.writeBoolean(this.B);
         gameOutputStream.writeBoolean(this.a);
@@ -102,7 +102,7 @@ public class UnitGroup extends AIUnitGroupBase {
         gameOutputStream.writeBoolean(this.d);
         gameOutputStream.writeBoolean(this.e);
         gameOutputStream.writeBoolean(this.f);
-        gameOutputStream.writeUnitIdOrNullUnitEntity(this.g);
+        gameOutputStream.writeOrderableUnit(this.g);
         gameOutputStream.writeInt(this.A);
         super.a(gameOutputStream);
     }
@@ -116,7 +116,7 @@ public class UnitGroup extends AIUnitGroupBase {
         q();
         int i = gameInputStream.readInt();
         for (int i2 = 0; i2 < i; i2++) {
-            OrderableUnit unitEntity = gameInputStream.readUnitEntity();
+            OrderableUnit unitEntity = gameInputStream.readOrderableUnit();
             if (unitEntity != null) {
                 a(unitEntity);
             }
@@ -135,7 +135,7 @@ public class UnitGroup extends AIUnitGroupBase {
             this.G.clear();
             int i3 = gameInputStream.readInt();
             for (int i4 = 0; i4 < i3; i4++) {
-                OrderableUnit unitEntity2 = gameInputStream.readUnitEntity();
+                OrderableUnit unitEntity2 = gameInputStream.readOrderableUnit();
                 if (unitEntity2 != null) {
                     this.G.add(unitEntity2);
                 }
@@ -150,7 +150,7 @@ public class UnitGroup extends AIUnitGroupBase {
             this.d = gameInputStream.readBoolean();
             this.e = gameInputStream.readBoolean();
             this.f = gameInputStream.readBoolean();
-            this.g = gameInputStream.readUnitEntity();
+            this.g = gameInputStream.readOrderableUnit();
         }
         if (b >= 7) {
             this.A = gameInputStream.readInt();
@@ -260,7 +260,7 @@ public class UnitGroup extends AIUnitGroupBase {
         for (OrderableUnit orderableUnit : this.F) {
             if (!z || orderableUnit.hasNoCurrentWaypoint()) {
                 if (baseUnit == null || this.aiController.canUnitReachUnit(orderableUnit, baseUnit)) {
-                    command.setTargetUnit(orderableUnit);
+                    command.addUnitToCommand(orderableUnit);
                 }
             }
         }
@@ -368,7 +368,7 @@ public class UnitGroup extends AIUnitGroupBase {
                         z = false;
                     }
                     if (z) {
-                        commandNewCommandForTeam.setTargetUnit(orderableUnit2);
+                        commandNewCommandForTeam.addUnitToCommand(orderableUnit2);
                     }
                 }
                 if (this.f) {

@@ -221,7 +221,7 @@ public class Tree extends NaturalUnit {
             gameEngine.renderGraphicsEngine.a(textureD, dv, du, (Paint) null);
             dv.a(-this.es, 0);
         }
-        graphicsEngine.a(getUnitArmorRating(false), fD, fE);
+        graphicsEngine.a(getRenderRotation(false), fD, fE);
         graphicsEngine.a(textureD, dv, du, (Paint) null);
         graphicsEngine.l();
         return true;

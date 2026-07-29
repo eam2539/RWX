@@ -635,12 +635,12 @@ public abstract class OrderableUnit extends UnitBase {
         gameOutputStream.writeFloat(this.turretRotation);
         gameOutputStream.writeFloat(this.turretTurnSpeed);
         gameOutputStream.writeFloat(this.wayPointTimer);
-        gameOutputStream.debugPlaceholder("pathing_active:");
+        gameOutputStream.writeDebugMessage("pathing_active:");
         gameOutputStream.writeBoolean(this.isPathingActive);
         gameOutputStream.writeFloat(this.pathTargetX);
         gameOutputStream.writeFloat(this.pathTargetY);
         gameOutputStream.writeFloat(this.s);
-        gameOutputStream.writeUnitIdOrNullUnitEntity(this.transportedBy);
+        gameOutputStream.writeOrderableUnit(this.transportedBy);
         gameOutputStream.writeBoolean(this.ae);
         gameOutputStream.writeBoolean(this.af);
         gameOutputStream.writeBoolean(this.aj);
@@ -649,14 +649,14 @@ public abstract class OrderableUnit extends UnitBase {
         gameOutputStream.writeFloat(this.am);
         gameOutputStream.writeInt(this.lastTransportPathUpdateTick);
         gameOutputStream.writeInt(this.waypointSyncGroupId);
-        gameOutputStream.debugPlaceholder("activePathCount:");
+        gameOutputStream.writeDebugMessage("activePathCount:");
         gameOutputStream.writeInt(this.activePathCount);
         for (int i3 = 0; i3 < this.activePathCount; i3++) {
             this.pathPositions[i3].a(gameOutputStream);
         }
         gameOutputStream.writeInt(this.activePathCount);
         gameOutputStream.writeInt(this.v);
-        if (gameOutputStream.isCompressionEnabled()) {
+        if (gameOutputStream.isDebugStream()) {
         }
         gameOutputStream.writeByte(12);
         gameOutputStream.writeFloat(this.lastPathTargetX);
@@ -721,7 +721,7 @@ public abstract class OrderableUnit extends UnitBase {
                 this.attackMode = AttackMode.onlyInRange;
             }
         }
-        long longOptional = gameInputStream.readLongOptional();
+        long attackTargetUnitId = gameInputStream.readUnitId();
         this.turretRotation = gameInputStream.readFloat();
         this.turretTurnSpeed = gameInputStream.readFloat();
         this.wayPointTimer = gameInputStream.readFloat();
@@ -729,7 +729,7 @@ public abstract class OrderableUnit extends UnitBase {
         this.pathTargetX = gameInputStream.readFloat();
         this.pathTargetY = gameInputStream.readFloat();
         this.s = gameInputStream.readFloat();
-        setTransportParent(gameInputStream.readUnitEntity());
+        setTransportParent(gameInputStream.readOrderableUnit());
         this.ae = gameInputStream.readBoolean();
         this.af = gameInputStream.readBoolean();
         this.aj = gameInputStream.readBoolean();
@@ -805,7 +805,7 @@ public abstract class OrderableUnit extends UnitBase {
         }
         super.a(gameInputStream);
         if (!this.isDead) {
-            this.attackTarget = GameObject.a(longOptional, false);
+            this.attackTarget = GameObject.a(attackTargetUnitId, false);
             for (int i6 = 0; i6 < this.waypointCount; i6++) {
                 if (this.waypoints[i6] == null) {
                     GameEngine.log("readIn: convertUnitIds is null: " + i6 + " waypointsCount:" + this.waypointCount);
@@ -968,10 +968,10 @@ public abstract class OrderableUnit extends UnitBase {
         int iMax2 = Utility.max(f7);
         int iMax3 = Utility.max(f8);
         int iMax4 = Utility.max(f9);
-        if ((iMax != iMax3 || iMax2 != iMax4) && this.spawnExitLockTimer == 0.0f && gameEngine.pathfindingEngine.a(h(), iMax3, iMax4)) {
+        if ((iMax != iMax3 || iMax2 != iMax4) && this.spawnExitLockTimer == 0.0f && gameEngine.pathfindingEngine.isTileBlockedForMovement(h(), iMax3, iMax4)) {
             if (iMax != iMax3 && iMax2 != iMax4) {
-                boolean zA = gameEngine.pathfindingEngine.a(h(), iMax, iMax4);
-                boolean zA2 = gameEngine.pathfindingEngine.a(h(), iMax3, iMax2);
+                boolean zA = gameEngine.pathfindingEngine.isTileBlockedForMovement(h(), iMax, iMax4);
+                boolean zA2 = gameEngine.pathfindingEngine.isTileBlockedForMovement(h(), iMax3, iMax2);
                 if (zA && zA2) {
                     z = true;
                     aG.a(f6, f7);
@@ -996,7 +996,7 @@ public abstract class OrderableUnit extends UnitBase {
         boolean z2 = false;
         if (pointFA != null) {
             boolean z3 = false;
-            if (gameEngine.pathfindingEngine.a(h(), iMax, iMax2) && !gameEngine.pathfindingEngine.b(h(), iMax3, iMax4)) {
+            if (gameEngine.pathfindingEngine.isTileBlockedForMovement(h(), iMax, iMax2) && !gameEngine.pathfindingEngine.b(h(), iMax3, iMax4)) {
                 z3 = true;
             }
             if (!z3) {
@@ -1669,8 +1669,8 @@ public abstract class OrderableUnit extends UnitBase {
         }
         if (unitCommand != null) {
             this.targetUnit = unitCommand.targetUnit;
-            float fCs = getUnitAIPathfindHeuristic();
-            if (fDistanceSq > fCs * fCs) {
+            float transportInteractionRange = getTransportInteractionRange();
+            if (fDistanceSq > transportInteractionRange * transportInteractionRange) {
                 this.isPathingActive = true;
                 this.pathTargetX = targetX;
                 this.pathTargetY = targetY;
@@ -2058,8 +2058,8 @@ public abstract class OrderableUnit extends UnitBase {
             this.targetUnit = baseUnit;
             boolean z = false;
             if (baseUnit.bI()) {
-                float unitAIPathfindHeuristic = baseUnit.getUnitAIPathfindHeuristic() + 10.0f;
-                if (fDistanceSq < unitAIPathfindHeuristic * unitAIPathfindHeuristic) {
+                float transportInteractionRange = baseUnit.getTransportInteractionRange() + 10.0f;
+                if (fDistanceSq < transportInteractionRange * transportInteractionRange) {
                     this.waypointDwellTimer += f;
                 }
                 if (this.waypointDwellTimer > 240.0f) {
@@ -2076,8 +2076,8 @@ public abstract class OrderableUnit extends UnitBase {
                     z = true;
                 }
             } else {
-                float unitAIPathfindHeuristic2 = baseUnit.getUnitAIPathfindHeuristic();
-                if (fDistanceSq < unitAIPathfindHeuristic2 * unitAIPathfindHeuristic2) {
+                float transportInteractionRange = baseUnit.getTransportInteractionRange();
+                if (fDistanceSq < transportInteractionRange * transportInteractionRange) {
                     z = true;
                 }
             }
@@ -2257,7 +2257,7 @@ public abstract class OrderableUnit extends UnitBase {
                 }
                 boolean z6 = false;
                 if (unitCommand.attackMoveRange >= 0.0f) {
-                    if (unitCommand.attackMoveRange < Utility.sqrt((int) fDistanceSq) - f2) {
+                    if (unitCommand.attackMoveRange < Utility.fastSquareRootInt((int) fDistanceSq) - f2) {
                         z6 = true;
                     }
                 }
@@ -2561,7 +2561,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (this.aq < -900.0f) {
             this.aq = Utility.getAngleBetweenPoints(this.posX, this.posY, f2, f3);
         }
-        if (f < 10000.0f && isUnitAtPositionX()) {
+        if (f < 10000.0f && isSecondaryBarRecharging()) {
             this.ar = true;
         }
         if (this.ar) {
@@ -4030,7 +4030,7 @@ public abstract class OrderableUnit extends UnitBase {
         gameEngine.tileMap.setCursorTileIndexFromWorldPoint(this.posX, this.posY);
         int i = gameEngine.tileMap.cursorTileX;
         int i2 = gameEngine.tileMap.cursorTileY;
-        if (gameEngine.pathfindingEngine.a(h(), i, i2) && !gameEngine.pathfindingEngine.b(h(), i, i2)) {
+        if (gameEngine.pathfindingEngine.isTileBlockedForMovement(h(), i, i2) && !gameEngine.pathfindingEngine.b(h(), i, i2)) {
             z = true;
         }
         return z;
@@ -4050,7 +4050,7 @@ public abstract class OrderableUnit extends UnitBase {
         tileMap.setCursorTileIndexFromWorldPoint(this.posX, this.posY);
         int i2 = tileMap.cursorTileX;
         int i3 = tileMap.cursorTileY;
-        if (pathEngine.a(h(), i2, i3) && !pathEngine.b(h(), i2, i3)) {
+        if (pathEngine.isTileBlockedForMovement(h(), i2, i3) && !pathEngine.b(h(), i2, i3)) {
             z3 = true;
             z4 = true;
         }
@@ -4374,7 +4374,7 @@ public abstract class OrderableUnit extends UnitBase {
                 graphicsEngine.k();
                 graphicsEngine.a(fCD, fCD, f2, f3);
             }
-            graphicsEngine.a(this.baseTexture, f2, f3, getUnitArmorRating(false) - 90.0f, renderPaint);
+            graphicsEngine.a(this.baseTexture, f2, f3, getRenderRotation(false) - 90.0f, renderPaint);
             if (fCD != 1.0f) {
                 graphicsEngine.l();
                 return true;
@@ -4397,7 +4397,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (fCD != 1.0f) {
             graphicsEngine.a(fCD, fCD, f6, f7);
         }
-        graphicsEngine.a(getUnitArmorRating(false), f6, f7);
+        graphicsEngine.a(getRenderRotation(false), f6, f7);
         graphicsEngine.a(this.baseTexture, rectA_, rectFCF, renderPaint);
         graphicsEngine.l();
         return true;
@@ -4448,11 +4448,11 @@ public abstract class OrderableUnit extends UnitBase {
                 RectF rectF = dB;
                 rectF.a(f - this.eu, f2 - this.ev, f + this.eu, f2 + this.ev);
                 graphicsEngine.k();
-                graphicsEngine.a(getUnitArmorRating(true), f, f2);
+                graphicsEngine.a(getRenderRotation(true), f, f2);
                 graphicsEngine.a(this.shadowTexture, rectA_, rectF, getSelectionPaint());
                 graphicsEngine.l();
             } else {
-                graphicsEngine.a(this.shadowTexture, f, f2, getUnitArmorRating(true) - 90.0f, getSelectionPaint());
+                graphicsEngine.a(this.shadowTexture, f, f2, getRenderRotation(true) - 90.0f, getSelectionPaint());
             }
             if (fCD != 1.0f) {
                 graphicsEngine.l();

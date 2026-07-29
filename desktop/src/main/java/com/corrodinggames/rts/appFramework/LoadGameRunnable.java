@@ -21,7 +21,7 @@ class LoadGameRunnable implements Runnable {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.stopGameThread();
         try {
-            gameEngine.gameSaver.updateAutosave(this.saveName, false);
+            gameEngine.gameSaver.saveGame(this.saveName, false);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

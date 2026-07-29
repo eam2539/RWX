@@ -211,7 +211,7 @@ public class AmphibiousJet extends AirUnit {
             PointF pointFA = a(i, z2);
             float f3 = pointFA.x - gameEngine.viewpointXSnapped;
             float f4 = pointFA.y - gameEngine.viewpointYSnapped;
-            float unitArmorRating = getUnitArmorRating(false) - 90.0f;
+            float unitArmorRating = getRenderRotation(false) - 90.0f;
             if (!z2) {
                 f4 -= this.posZ;
             }
@@ -245,7 +245,7 @@ public class AmphibiousJet extends AirUnit {
         if (i == ds()) {
             return super.G(i);
         }
-        float unitArmorRating = getUnitArmorRating(false) - 90.0f;
+        float unitArmorRating = getRenderRotation(false) - 90.0f;
         PointF pointFA = a(i, false);
         float f2 = pointFA.x;
         float f3 = pointFA.y;
@@ -254,7 +254,7 @@ public class AmphibiousJet extends AirUnit {
     }
 
     public PointF a(int i, boolean z2) {
-        float unitArmorRating = getUnitArmorRating(false) - 90.0f;
+        float unitArmorRating = getRenderRotation(false) - 90.0f;
         if (i == ds()) {
             throw new RuntimeException("index==2 is for base");
         }
@@ -541,7 +541,7 @@ public class AmphibiousJet extends AirUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: d */
-    public float getUnitArmorRating(boolean z2) {
+    public float getRenderRotation(boolean z2) {
         return this.movementLevels[ds()].targetX + 90.0f;
     }
 

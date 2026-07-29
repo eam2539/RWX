@@ -21,23 +21,23 @@ public abstract class IFileLoader {
     public abstract OutputStream openOutputStream(String str, boolean z);
 
     /* JADX INFO: renamed from: a */
-    public abstract boolean getRWFile(String str, String str2);
+    public abstract boolean rename(String str, String str2);
 
     /* JADX INFO: renamed from: c */
     public abstract boolean delete(String str);
 
     /* JADX INFO: renamed from: d */
-    public abstract boolean move(String str);
+    public abstract boolean isDirectory(String str);
 
     /* JADX INFO: renamed from: e */
     public abstract boolean createDirectory(String str);
 
     /* JADX INFO: renamed from: a */
-    public abstract void isDirect();
+    public abstract void closeAll();
 
     /* JADX INFO: renamed from: f */
-    public abstract String getLastModified(String str);
+    public abstract String convertAbstractPathForDebug(String str);
 
     /* JADX INFO: renamed from: g */
-    public abstract long getFullPath(String str);
+    public abstract long getLastModified(String str);
 }

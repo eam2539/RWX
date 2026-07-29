@@ -469,7 +469,7 @@ public class TurretConfig {
         turretConfig.limitingMinRange = iniFile.getFloat(str, "limitingMinRange", Float.valueOf(turretConfig.limitingMinRange)).floatValue();
         turretConfig.aimOffsetSpread = iniFile.getFloat(str, "aimOffsetSpread", Float.valueOf(turretConfig.aimOffsetSpread)).floatValue();
         if (turretConfig.limitingAngle >= 0.0f) {
-            customUnitConfig.targetProjectiles = true;
+            customUnitConfig.hasTurretWithLimitingAngle = true;
         }
         if (turretConfig.limitingRange < 99999.0f) {
             turretConfig.effectiveRange = turretConfig.limitingRange;
@@ -485,12 +485,12 @@ public class TurretConfig {
         turretConfig.showRangeUIGuide = iniFile.getBoolean(str, "showRangeUIGuide", (Boolean) null);
         turretConfig.laserDefenceEnergyUse = iniFile.getFloat(str, "laserDefenceEnergyUse", turretConfig.laserDefenceEnergyUse);
         if (turretConfig.laserDefenceEnergyUse != null) {
-            customUnitConfig.targetAir = true;
+            customUnitConfig.hasLaserDefenceTurret = true;
             customUnitConfig.a(ProjectileInterceptorHook.a);
         }
         turretConfig.interceptProjectilesWithTags = AnimationTag.a(iniFile.getString(str, "interceptProjectiles_withTags", (String) null), turretConfig.interceptProjectilesWithTags);
         if (turretConfig.interceptProjectilesWithTags != null) {
-            customUnitConfig.targetBuildings = true;
+            customUnitConfig.hasProjectileInterceptorTurret = true;
             customUnitConfig.a(ProjectileInterceptorHook.a);
             turretConfig.interceptProjectilesAndTargetingGroundUnderDistance = iniFile.getFloat(str, "interceptProjectiles_andTargetingGroundUnderDistance", Float.valueOf(turretConfig.interceptProjectilesAndTargetingGroundUnderDistance)).floatValue();
             turretConfig.interceptProjectilesAndUnderDistance = iniFile.getFloat(str, "interceptProjectiles_andUnderDistance", Float.valueOf(turretConfig.interceptProjectilesAndUnderDistance)).floatValue();
@@ -525,7 +525,7 @@ public class TurretConfig {
         turretConfig.onShootFreezeBodyMovementFor = iniFile.getTime(str, "onShoot_freezeBodyMovementFor", Float.valueOf(turretConfig.onShootFreezeBodyMovementFor)).floatValue();
         turretConfig.onShootTriggerActions = iniFile.getCustomUnitAction(customUnitConfig, str, "onShoot_triggerActions", turretConfig.onShootTriggerActions);
         if (iniFile.getBoolean(str, "isMainNanoTurret", (Boolean) false).booleanValue()) {
-            customUnitConfig.defaultTurret = turretConfig;
+            customUnitConfig.mainNanoTurret = turretConfig;
         }
         Texture textureA = customUnitConfig.a(iniFile, str, "image");
         if (textureA != null) {

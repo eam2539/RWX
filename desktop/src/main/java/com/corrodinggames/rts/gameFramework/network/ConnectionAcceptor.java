@@ -261,7 +261,7 @@ public class ConnectionAcceptor implements Runnable {
                     }
                     try {
                         recreateServerSocket();
-                        if (i2 < 3 && gameEngine.networkEngine.resetSyncState() > 0) {
+                        if (i2 < 3 && gameEngine.networkEngine.getRegisteredNonRelayConnectionCount() > 0) {
                             String str2 = "Warning: server socket got closed and needed to be recreated, players were likely disconnected (but can rejoin).";
                             if (GameEngine.isIOSVersion) {
                                 str2 = str2 + "\n This likely due to iOS removing sockets of background apps. Avoid minimising the game when hosting.";

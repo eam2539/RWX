@@ -177,9 +177,9 @@ public final class MapTile {
                         missileShip.a_(embeddedPngBase64.getProperty("type"));
                     }
                     if (embeddedPngBase64.getProperty("randomRotate") != null) {
-                        missileShip.rotationSpeed = Utility.readStreamToString(missileShip, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT);
+                        missileShip.rotationSpeed = Utility.getDeterministicRandomInt(missileShip, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT);
                     }
-                    missileShip.isSelectable = "builder".equalsIgnoreCase(property2) || "builder".equalsIgnoreCase(property3);
+                    missileShip.changeTeam = "builder".equalsIgnoreCase(property2) || "builder".equalsIgnoreCase(property3);
                     missileShip.isTargetable = "commandCenter".equalsIgnoreCase(property2) || "commandCenter".equalsIgnoreCase(property3);
                     missileShip.isActive = true;
                     missileShip.n();

@@ -324,7 +324,7 @@ public class InGameActivity extends TaskQueueActivity {
         builder.setMessage("Enter a name to export the map as");
         final EditText editText = new EditText(this);
         if (str == null) {
-            editText.setText(("New " + gameEngine.getCurrentMapName() + " (" + Utility.formatDate("d MMM yyyy").replace(".", VariableScope.nullOrMissingString) + " " + Utility.formatDate("HH.mm.ss") + ")").replace("  ", " "));
+            editText.setText(("New " + gameEngine.getCurrentMapName() + " (" + Utility.formatCurrentDate("d MMM yyyy").replace(".", VariableScope.nullOrMissingString) + " " + Utility.formatCurrentDate("HH.mm.ss") + ")").replace("  ", " "));
         } else {
             editText.setText(str);
         }
@@ -346,7 +346,7 @@ public class InGameActivity extends TaskQueueActivity {
                     builder2.show();
                     return;
                 }
-                gameEngine.tileMap.isWorldPointVisibleForTeam(gameEngine.currentMapPath, "/SD/rustedWarfare/maps/" + string + ".tmx");
+                gameEngine.tileMap.exportMap(gameEngine.currentMapPath, "/SD/rustedWarfare/maps/" + string + ".tmx");
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() { // from class: com.corrodinggames.rts.appFramework.g.5
@@ -366,7 +366,7 @@ public class InGameActivity extends TaskQueueActivity {
         builder.setMessage("Enter a name to save the game under");
         final EditText editText = new EditText(this);
         if (str == null) {
-            editText.setText(gameEngine.getCurrentMapName() + " (" + Utility.formatDate("d MMM yyyy").replace(".", VariableScope.nullOrMissingString) + " " + Utility.formatDate("HH.mm.ss") + ")");
+            editText.setText(gameEngine.getCurrentMapName() + " (" + Utility.formatCurrentDate("d MMM yyyy").replace(".", VariableScope.nullOrMissingString) + " " + Utility.formatCurrentDate("HH.mm.ss") + ")");
         } else {
             editText.setText(str);
         }

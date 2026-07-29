@@ -107,36 +107,36 @@ public class CustomUnitConfigParser {
     static String lastErrorMessage = null;
 
     /* JADX INFO: renamed from: a */
-    public static void parse(int i) {
+    public static void addImageMemory(int i) {
         if (currentModInfo != null) {
             currentModInfo.totalImageMemory += (long) i;
         }
     }
 
     /* JADX INFO: renamed from: a */
-    public static void init() {
+    public static void logAndResetTimingStats() {
         logTimingStats();
         resetTimingStats();
     }
 
     /* JADX INFO: renamed from: a */
-    public static void a_texture(Texture texture) {
+    public static void trackImageMemory(Texture texture) {
         if (texture != null && !texture.v) {
             if (GameEngine.areShadersSupported() && (texture instanceof TeamColorTexture)) {
                 return;
             }
             texture.v = true;
-            parse(texture.u());
+            addImageMemory(texture.u());
         }
     }
 
     /* JADX INFO: renamed from: a */
-    public static void a_texture_array(Texture[] textureArr) {
+    public static void trackImageMemoryForTextures(Texture[] textureArr) {
         if (textureArr != null) {
             Texture texture = null;
             for (Texture texture2 : textureArr) {
                 if (texture2 != texture) {
-                    a_texture(texture2);
+                    trackImageMemory(texture2);
                 }
                 if (texture == null) {
                     texture = texture2;
@@ -168,7 +168,7 @@ public class CustomUnitConfigParser {
         Iterator it = fastArrayList.iterator();
         while (it.hasNext()) {
             CustomUnitConfig customUnitConfig = (CustomUnitConfig) it.next();
-            CustomUnitConfig pathForModError = formatPathForModError(customUnitConfig);
+            CustomUnitConfig pathForModError = reloadUnitConfigForModChange(customUnitConfig);
             if (pathForModError == null) {
                 GameEngine.log("Failed to apply changes to unit type: " + customUnitConfig.name);
                 z = true;
@@ -296,7 +296,7 @@ public class CustomUnitConfigParser {
             if (iniFile != null) {
                 return iniFile;
             }
-            AssetInputStream assetInputStreamLoadTextureInternal = loadTextureInternal(str);
+            AssetInputStream assetInputStreamLoadTextureInternal = openUnitConfigFile(str);
             if (assetInputStreamLoadTextureInternal == null) {
                 return null;
             }
@@ -352,11 +352,11 @@ public class CustomUnitConfigParser {
                         } else {
                             str2 = customUnitConfig.modInfo.sourceFolder + "/common.ini";
                         }
-                        strTrackImageMemory = trackImageMemory(Utility.getParentPath(str2), strSubstring);
+                        strTrackImageMemory = joinAssetPath(Utility.getParentPath(str2), strSubstring);
                     } else if (strTrim.startsWith("CORE:")) {
-                        strTrackImageMemory = trackImageMemory(Utility.getParentPath("units/common.ini"), strTrim.substring("CORE:".length()));
+                        strTrackImageMemory = joinAssetPath(Utility.getParentPath("units/common.ini"), strTrim.substring("CORE:".length()));
                     } else {
-                        strTrackImageMemory = trackImageMemory(Utility.getParentPath(str), strTrim);
+                        strTrackImageMemory = joinAssetPath(Utility.getParentPath(str), strTrim);
                     }
                     IniFile editableCustomUnits = getEditableCustomUnits(strTrackImageMemory);
                     if (editableCustomUnits == null) {
@@ -414,7 +414,7 @@ public class CustomUnitConfigParser {
     }
 
     /* JADX INFO: renamed from: a */
-    public static CustomUnitConfig formatPathForModError(CustomUnitConfig customUnitConfig) {
+    public static CustomUnitConfig reloadUnitConfigForModChange(CustomUnitConfig customUnitConfig) {
         String str = customUnitConfig.configPath;
         GameEngine gameEngine = GameEngine.getInstance();
         CustomUnitConfig unitReference = null;
@@ -441,7 +441,7 @@ public class CustomUnitConfigParser {
             synchronized (CustomUnitConfig.allConfigs) {
                 CustomUnitConfig.allConfigs.remove(customUnitConfig);
             }
-            describeModsForUnits((UnitType) customUnitConfig, unitReference, true);
+            refreshCustomUnitsForConfig((UnitType) customUnitConfig, unitReference, true);
             if (CustomUnitConfig.activeConfigs.remove(customUnitConfig)) {
                 CustomUnitConfig.activeConfigs.add(unitReference);
                 if (customUnitConfig.configHash != unitReference.configHash) {
@@ -457,7 +457,7 @@ public class CustomUnitConfigParser {
     }
 
     /* JADX INFO: renamed from: a */
-    public static void describeModsForUnits(UnitType unitType, CustomUnitConfig customUnitConfig, boolean z) {
+    public static void refreshCustomUnitsForConfig(UnitType unitType, CustomUnitConfig customUnitConfig, boolean z) {
         for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
             if (baseUnit instanceof CustomUnit) {
                 CustomUnit customUnit = (CustomUnit) baseUnit;
@@ -556,7 +556,7 @@ public class CustomUnitConfigParser {
             }
         }
         UnitTypeEnum.ae = arrayList;
-        BaseUnit.getAttachmentCount();
+        BaseUnit.rebuildUnitTypePrototypeCaches();
         rebuildOverridesAndTriggersAsync();
         f();
         Resource.e();
@@ -592,12 +592,12 @@ public class CustomUnitConfigParser {
     }
 
     /* JADX INFO: renamed from: b */
-    public static AssetInputStream loadTextureInternal(String str) {
+    public static AssetInputStream openUnitConfigFile(String str) {
         return FileHelper.openFileByPath(VariableScope.nullOrMissingString + str);
     }
 
     /* JADX INFO: renamed from: b */
-    public static void loadSoundInternal(ArrayList arrayList) {
+    public static void sortUnitActions(ArrayList arrayList) {
         Collections.sort(arrayList);
     }
 
@@ -668,7 +668,7 @@ public class CustomUnitConfigParser {
                             if (!z3) {
                                 arrayListA.add(placeBuildingAction);
                             }
-                            loadSoundInternal(arrayListA);
+                            sortUnitActions(arrayListA);
                         }
                     }
                 }
@@ -685,7 +685,7 @@ public class CustomUnitConfigParser {
                             }
                             arrayListA2.add(setRallyAction);
                             customUnitConfig4.hasSetRallyAction = true;
-                            loadSoundInternal(arrayListA2);
+                            sortUnitActions(arrayListA2);
                         }
                     } else if (customActionDef.stringId != null && customActionDef.stringId.equalsIgnoreCase("reclaim")) {
                         for (int i3 = 1; i3 <= 3; i3++) {
@@ -695,7 +695,7 @@ public class CustomUnitConfigParser {
                                 reclaimTargetAction.sortOrder = customActionDef.pos;
                             }
                             arrayListA3.add(reclaimTargetAction);
-                            loadSoundInternal(arrayListA3);
+                            sortUnitActions(arrayListA3);
                         }
                     } else if (customActionDef.stringId != null && customActionDef.stringId.equalsIgnoreCase("repair")) {
                         for (int i4 = 1; i4 <= 3; i4++) {
@@ -705,7 +705,7 @@ public class CustomUnitConfigParser {
                                 repairTargetAction.sortOrder = customActionDef.pos;
                             }
                             arrayListA4.add(repairTargetAction);
-                            loadSoundInternal(arrayListA4);
+                            sortUnitActions(arrayListA4);
                         }
                     } else {
                         UnitType unitTypeByName2 = null;
@@ -745,7 +745,7 @@ public class CustomUnitConfigParser {
                             if (!z4) {
                                 arrayListA5.add(customAction);
                             }
-                            loadSoundInternal(arrayListA5);
+                            sortUnitActions(arrayListA5);
                         }
                     }
                 }
@@ -886,12 +886,12 @@ public class CustomUnitConfigParser {
     public static CustomUnitConfig getUnitReference(String str, ModInfo modInfo, String str2, String str3) {
         try {
             long jA = PerformanceProfiler.a();
-            AssetInputStream assetInputStreamLoadTextureInternal = loadTextureInternal(str);
+            AssetInputStream assetInputStreamLoadTextureInternal = openUnitConfigFile(str);
             if (assetInputStreamLoadTextureInternal == null) {
                 throw new RuntimeException("Failed to open unit config file:" + str);
             }
             BufferedInputStream bufferedInputStream = new BufferedInputStream(assetInputStreamLoadTextureInternal);
-            getLocaleString(jA, LoadPhase.iniOpen);
+            recordLoadPhaseTime(jA, LoadPhase.iniOpen);
             totalUnitFilesLoaded++;
             if (modInfo != null) {
                 totalModUnitFilesLoaded++;
@@ -910,7 +910,7 @@ public class CustomUnitConfigParser {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            getLocaleString(jA2, LoadPhase.iniClose);
+            recordLoadPhaseTime(jA2, LoadPhase.iniClose);
             return customUnitConfig;
         } catch (RuntimeException e2) {
             addTimingSample(str, e2, modInfo);
@@ -1028,7 +1028,7 @@ public class CustomUnitConfigParser {
                 }
             }
         }
-        init();
+        logAndResetTimingStats();
         enableAllCustomUnits(true);
         GameEngine.log("Done loading custom units. image cacheHits:" + CustomUnitConfigParser.imageCacheHitCount + " image cacheMisses:" + CustomUnitConfigParser.imageCacheMissCount + " (in: " + PerformanceProfiler.a(a) + "ms)");
         GameEngine.log("========= Mods data loaded ===========");
@@ -1118,7 +1118,7 @@ public class CustomUnitConfigParser {
                     String str6 = str + "/" + str5;
                     if (lastModUsedForInit != modByShortName && modByShortName != null) {
                         lastModUsedForInit = modByShortName;
-                        init();
+                        logAndResetTimingStats();
                         GameEngine.log("Loading units from mod: " + modByShortName.dirName);
                     }
                     if (str5.equalsIgnoreCase("desktop.ini")) {
@@ -1126,7 +1126,7 @@ public class CustomUnitConfigParser {
                     } else {
                         long jA = PerformanceProfiler.a();
                         getUnitReference(str6, modByShortName, str2, str3);
-                        getLocaleString(jA, LoadPhase.unitParse);
+                        recordLoadPhaseTime(jA, LoadPhase.unitParse);
                     }
                 } else if (str5.toLowerCase(Locale.ENGLISH).endsWith(".tmx")) {
                     String str7 = str + "/" + str5;
@@ -1181,7 +1181,7 @@ public class CustomUnitConfigParser {
             long jA = PerformanceProfiler.a();
             try {
                 IniFile iniFile = new IniFile(inputStream, str);
-                getLocaleString(jA, LoadPhase.iniParse);
+                recordLoadPhaseTime(jA, LoadPhase.iniParse);
                 CustomUnitConfig customUnitConfig = new CustomUnitConfig();
                 if (iniFile.getBoolean("core", "dont_load", (Boolean) false).booleanValue()) {
                     return null;
@@ -1224,7 +1224,7 @@ public class CustomUnitConfigParser {
                 if (string != null) {
                     customUnitConfig.resourceLoadPath = loadOrGetTexture(customUnitConfig, str, string);
                 }
-                getLocaleString(jA2, LoadPhase.iniSetup);
+                recordLoadPhaseTime(jA2, LoadPhase.iniSetup);
                 customUnitConfig.name = iniFile.getValueStrict("core", "name");
                 customUnitConfig.configHash = iniFile.getHash();
                 if (customUnitConfig.name.equals("self")) {
@@ -1380,7 +1380,7 @@ public class CustomUnitConfigParser {
                         customUnitConfig.shadowTexture = textureFromCache;
                     } else {
                         customUnitConfig.shadowTexture = BaseUnit.attackUnit(customUnitConfig.baseTexture, customUnitConfig.frameWidth, customUnitConfig.frameHeight);
-                        a_texture(customUnitConfig.shadowTexture);
+                        trackImageMemory(customUnitConfig.shadowTexture);
                         if (customUnitConfig.shadowTexture != null) {
                             parseCustomActionDef(str7, customUnitConfig.shadowTexture);
                         }
@@ -1392,7 +1392,7 @@ public class CustomUnitConfigParser {
                         customUnitConfig.shadowTexture = textureFromCache2;
                     } else {
                         customUnitConfig.shadowTexture = BaseUnit.attackUnit(customUnitConfig.baseTexture, customUnitConfig.baseTexture.m(), customUnitConfig.baseTexture.l());
-                        a_texture(customUnitConfig.shadowTexture);
+                        trackImageMemory(customUnitConfig.shadowTexture);
                         if (customUnitConfig.shadowTexture != null) {
                             parseCustomActionDef(str8, customUnitConfig.shadowTexture);
                         }
@@ -1556,7 +1556,7 @@ public class CustomUnitConfigParser {
                 customUnitConfig.updateUnitMemoryRate = iniFile.getTime("core", "updateUnitMemoryRate", Float.valueOf(60.0f)).floatValue();
                 customUnitConfig.resourceMaxConcurrentReclaimingThis = iniFile.getLogicBooleanUnit("core", "resourceMaxConcurrentReclaimingThis", (Integer) Integer.MAX_VALUE).intValue();
                 customUnitConfig.similarResourcesHaveTag = iniFile.getAnimationSet(customUnitConfig, "core", "similarResourcesHaveTag", (AnimationSet) null);
-                customUnitConfig.f0do = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnAttackOrder", (String) null));
+                customUnitConfig.soundOnAttackOrder = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnAttackOrder", (String) null));
                 customUnitConfig.soundOnMoveOrder = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnMoveOrder", (String) null));
                 customUnitConfig.soundOnNewSelection = SoundList.a(customUnitConfig, iniFile.getString("core", "soundOnNewSelection", (String) null));
                 String string8 = iniFile.getString("graphics", "drawLayer", (String) null);
@@ -1610,19 +1610,19 @@ public class CustomUnitConfigParser {
                 customUnitConfig.dustEffect = iniFile.getBoolean("graphics", "dustEffect", (Boolean) false).booleanValue();
                 customUnitConfig.splashEffectReverse = iniFile.getBoolean("graphics", "splastEffectReverse", (Boolean) true).booleanValue();
                 customUnitConfig.dustEffectReverse = iniFile.getBoolean("graphics", "dustEffectReverse", (Boolean) true).booleanValue();
-                customUnitConfig.internalEffect = customUnitConfig.dustEffect || customUnitConfig.splashEffect;
+                customUnitConfig.hasMovementEffects = customUnitConfig.dustEffect || customUnitConfig.splashEffect;
                 String string9 = iniFile.getString("graphics", "movementEffect", (String) null);
                 if (string9 != null) {
                     customUnitConfig.movementEffect = customUnitConfig.addConfigExtension(string9, null);
                     if (customUnitConfig.movementEffect != null && customUnitConfig.movementEffect.a()) {
-                        customUnitConfig.internalEffect = true;
+                        customUnitConfig.hasMovementEffects = true;
                     }
                 }
                 String string10 = iniFile.getString("graphics", "movementEffectReverse", (String) null);
                 if (string10 != null) {
                     customUnitConfig.movementEffectReverse = customUnitConfig.addConfigExtension(string10, (CustomUnitSpawnList) null);
                     if (customUnitConfig.movementEffectReverse != null && customUnitConfig.movementEffectReverse.a()) {
-                        customUnitConfig.internalEffect = true;
+                        customUnitConfig.hasMovementEffects = true;
                     }
                 }
                 customUnitConfig.movementEffectRate = iniFile.getFloat("graphics", "movementEffectRate", Float.valueOf(11.0f)).floatValue();
@@ -1665,9 +1665,9 @@ public class CustomUnitConfigParser {
                     animationConfig.a(customUnitConfig, iniFile, str11, VariableScope.nullOrMissingString);
                     customUnitConfig.animations.add(animationConfig);
                 }
-                customUnitConfig.movingAnimation = customUnitConfig.loadData(CustomUnitAction.move, customUnitConfig.movingAnimation, true);
-                customUnitConfig.idleAnimation = customUnitConfig.loadData(CustomUnitAction.idle, customUnitConfig.idleAnimation, true);
-                customUnitConfig.attackAnimation = customUnitConfig.loadData(CustomUnitAction.attack, customUnitConfig.attackAnimation, true);
+                customUnitConfig.movingAnimation = customUnitConfig.resolveAnimationForAction(CustomUnitAction.move, customUnitConfig.movingAnimation, true);
+                customUnitConfig.idleAnimation = customUnitConfig.resolveAnimationForAction(CustomUnitAction.idle, customUnitConfig.idleAnimation, true);
+                customUnitConfig.attackAnimation = customUnitConfig.resolveAnimationForAction(CustomUnitAction.attack, customUnitConfig.attackAnimation, true);
                 customUnitConfig.underConstructionAnimation = customUnitConfig.findAnimationForAction(CustomUnitAction.underConstruction);
                 customUnitConfig.underConstructionWithLinkedBuiltTimeAnimation = customUnitConfig.findAnimationForAction(CustomUnitAction.underConstructionWithLinkedBuiltTime);
                 if (customUnitConfig.underConstructionAnimation != null && customUnitConfig.underConstructionWithLinkedBuiltTimeAnimation != null) {
@@ -2056,7 +2056,7 @@ public class CustomUnitConfigParser {
                 } else if (f6 != null) {
                     throw new RuntimeException("[attack]meleeEngangementDistance can only be used with isMelee:true");
                 }
-                getLocaleString(jA, LoadPhase.unitParsePartA);
+                recordLoadPhaseTime(jA, LoadPhase.unitParsePartA);
                 for (String str16 : iniFile.getSectionsStartingWith("projectile_")) {
                     String strSubstring2 = str16.substring("projectile_".length());
                     if (customUnitConfig.findProjectileTemplateByName(strSubstring2) != null) {
@@ -2195,18 +2195,18 @@ public class CustomUnitConfigParser {
                 }
                 String string19 = iniFile.getString("attack", "setMainTurretAs", (String) null);
                 if (string19 != null) {
-                    customUnitConfig.defaultTurret2 = customUnitConfig.findProjectileConfigByName(string19);
-                    if (customUnitConfig.defaultTurret2 == null) {
+                    customUnitConfig.mainTurret = customUnitConfig.findProjectileConfigByName(string19);
+                    if (customUnitConfig.mainTurret == null) {
                         throw new RuntimeException("[attack] Could not find setMainTurretAs with name: " + string19);
                     }
                 } else {
-                    customUnitConfig.defaultTurret2 = customUnitConfig.findProjectileConfigByName("1");
-                    if (customUnitConfig.defaultTurret2 == null) {
-                        customUnitConfig.defaultTurret2 = customUnitConfig.turrets[0];
+                    customUnitConfig.mainTurret = customUnitConfig.findProjectileConfigByName("1");
+                    if (customUnitConfig.mainTurret == null) {
+                        customUnitConfig.mainTurret = customUnitConfig.turrets[0];
                     }
                 }
-                customUnitConfig.mainTurretIndex = customUnitConfig.defaultTurret2.turretIndex;
-                getLocaleString(jA, LoadPhase.unitParsePartB);
+                customUnitConfig.mainTurretIndex = customUnitConfig.mainTurret.turretIndex;
+                recordLoadPhaseTime(jA, LoadPhase.unitParsePartB);
                 long jA3 = PerformanceProfiler.a();
                 if (iniFile.hasKeyStartingWith("core", "action_")) {
                     for (int i6 = 0; i6 <= 50; i6++) {
@@ -2227,7 +2227,7 @@ public class CustomUnitConfigParser {
                     }
                     joinPath(customUnitConfig, iniFile, str19, VariableScope.nullOrMissingString, strSubstring5, true, true);
                 }
-                getLocaleString(jA3, LoadPhase.actionParse);
+                recordLoadPhaseTime(jA3, LoadPhase.actionParse);
                 ArrayList<LegConfig> arrayList2 = new ArrayList();
                 ArrayList<LegConfig> arrayList3 = new ArrayList();
                 int i7 = 0;
@@ -2424,7 +2424,7 @@ public class CustomUnitConfigParser {
                     }
                     customUnitConfig.configProcessors.clear();
                 }
-                getLocaleString(jA, LoadPhase.unitParsePartC);
+                recordLoadPhaseTime(jA, LoadPhase.unitParsePartC);
                 iniFile.checkForUnusedKeys();
                 for (ConfigKeyValue configKeyValue : iniFile.duplicateKeys) {
                     if (configKeyValue.a() != null && (configKeyValue.a().startsWith("hiddenAction_") || configKeyValue.a().startsWith("canBuild_"))) {
@@ -2452,7 +2452,7 @@ public class CustomUnitConfigParser {
                 synchronized (CustomUnitConfig.allConfigs) {
                     CustomUnitConfig.allConfigs.add(customUnitConfig);
                 }
-                getLocaleString(jA, LoadPhase.unitParsePartD);
+                recordLoadPhaseTime(jA, LoadPhase.unitParsePartD);
                 return customUnitConfig;
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -2502,7 +2502,7 @@ public class CustomUnitConfigParser {
 
     /* JADX INFO: renamed from: a */
     public static void addTimingSample(String str, Exception exc, ModInfo modInfo) {
-        String strIsGreaterThan;
+        String errorMessage;
         String str2;
         GameEngine.logColored("Error while loading unit:" + str);
         GameEngine.printStackTrace(exc);
@@ -2510,23 +2510,23 @@ public class CustomUnitConfigParser {
             str = "<null>";
         }
         if (exc instanceof ConfigParseException) {
-            strIsGreaterThan = exc.getMessage();
+            errorMessage = exc.getMessage();
         } else {
-            strIsGreaterThan = Utility.isGreaterThan(exc);
+            errorMessage = Utility.formatExceptionMessage(exc);
         }
-        if (strIsGreaterThan == null) {
-            strIsGreaterThan = "<No error cause>";
+        if (errorMessage == null) {
+            errorMessage = "<No error cause>";
         }
-        if (!strIsGreaterThan.contains("unit config file")) {
-            strIsGreaterThan = strIsGreaterThan.replace(str + ": ", VariableScope.nullOrMissingString).replace(str, VariableScope.nullOrMissingString);
+        if (!errorMessage.contains("unit config file")) {
+            errorMessage = errorMessage.replace(str + ": ", VariableScope.nullOrMissingString).replace(str, VariableScope.nullOrMissingString);
         }
         String strApplyCopyFromSectionChain = applyCopyFromSectionChain(modInfo, str, true);
         if (modInfo != null) {
-            str2 = "Error loading unit: " + strApplyCopyFromSectionChain + ": \n" + strIsGreaterThan;
-        } else if (strIsGreaterThan.contains("Error loading core unit")) {
-            str2 = strIsGreaterThan;
+            str2 = "Error loading unit: " + strApplyCopyFromSectionChain + ": \n" + errorMessage;
+        } else if (errorMessage.contains("Error loading core unit")) {
+            str2 = errorMessage;
         } else {
-            str2 = "Error loading core unit: " + strApplyCopyFromSectionChain + ": \n" + strIsGreaterThan + " (This might be from placing a mod in 'assets/', they should go under 'mods/')";
+            str2 = "Error loading core unit: " + strApplyCopyFromSectionChain + ": \n" + errorMessage + " (This might be from placing a mod in 'assets/', they should go under 'mods/')";
         }
         if (exc instanceof ConfigParseException) {
             ConfigParseException configParseException = (ConfigParseException) exc;
@@ -3076,7 +3076,7 @@ public class CustomUnitConfigParser {
     }
 
     /* JADX INFO: renamed from: a */
-    public static void getLocaleString(long j, LoadPhase loadPhase) {
+    public static void recordLoadPhaseTime(long j, LoadPhase loadPhase) {
         loadPhase.o += (double) PerformanceProfiler.a(j);
     }
 
@@ -3109,7 +3109,7 @@ public class CustomUnitConfigParser {
     public static Texture getLocalizedDisplayString(String str, String str2, boolean z, CustomUnitConfig customUnitConfig) {
         long jA = PerformanceProfiler.a();
         Texture textureOpenUnitConfigStream = openUnitConfigStream(str, str2, z, customUnitConfig);
-        getLocaleString(jA, LoadPhase.imageLoadOrGet);
+        recordLoadPhaseTime(jA, LoadPhase.imageLoadOrGet);
         return textureOpenUnitConfigStream;
     }
 
@@ -3163,7 +3163,7 @@ public class CustomUnitConfigParser {
             long jA = PerformanceProfiler.a();
             try {
                 textureA = gameEngine.renderGraphicsEngine.a((InputStream) assetInputStreamOpenAssetStreamForUnit, true);
-                getLocaleString(jA, LoadPhase.imageLoad);
+                recordLoadPhaseTime(jA, LoadPhase.imageLoad);
                 if (textureA.A()) {
                     GameEngine.log("oomErrors:" + oomImageErrorCount);
                     oomImageErrorCount++;
@@ -3191,7 +3191,7 @@ public class CustomUnitConfigParser {
         if (z2) {
             textureA = BaseUnit.attackUnit(textureA, textureA.p, textureA.q);
         }
-        a_texture(textureA);
+        trackImageMemory(textureA);
         parseCustomActionDef(str4, textureA);
         return textureA;
     }
@@ -3206,7 +3206,7 @@ public class CustomUnitConfigParser {
         Texture texture = (Texture) imageCache.get(str);
         if (texture != null) {
             imageCacheHitCount++;
-            a_texture(texture);
+            trackImageMemory(texture);
             texture.t();
             return texture;
         }
@@ -3221,7 +3221,7 @@ public class CustomUnitConfigParser {
     public static Sound describeModsForUnitList(String str, String str2, CustomUnitConfig customUnitConfig) {
         long jA = PerformanceProfiler.a();
         Sound soundComputeLegAdjacency = computeLegAdjacency(str, str2, customUnitConfig);
-        getLocaleString(jA, LoadPhase.soundLoadOrGet);
+        recordLoadPhaseTime(jA, LoadPhase.soundLoadOrGet);
         return soundComputeLegAdjacency;
     }
 
@@ -3268,7 +3268,7 @@ public class CustomUnitConfigParser {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        getLocaleString(jA, LoadPhase.soundLoad);
+        recordLoadPhaseTime(jA, LoadPhase.soundLoad);
         if (soundLoadSound == null) {
             String str5 = "Sound file found but failed to load: " + str4;
             if (str2.toLowerCase(Locale.ROOT).endsWith(".ogg")) {
@@ -3300,7 +3300,7 @@ public class CustomUnitConfigParser {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String trackImageMemory(String str, String str2) {
+    public static String joinAssetPath(String str, String str2) {
         if (!str.endsWith("/")) {
             str = str + "/";
         }
@@ -3315,7 +3315,7 @@ public class CustomUnitConfigParser {
 
     /* JADX INFO: renamed from: c */
     public static AssetInputStream openAssetStreamForUnit(String str, String str2, CustomUnitConfig customUnitConfig) {
-        String strTrackImageMemory = trackImageMemory(str, str2);
+        String strTrackImageMemory = joinAssetPath(str, str2);
         ModInfo modInfo = null;
         if (customUnitConfig != null) {
             modInfo = customUnitConfig.modInfo;
@@ -3357,7 +3357,7 @@ public class CustomUnitConfigParser {
                     }
                 }
             }
-            float fSortRect = Utility.sortRect(f) + 2.0f;
+            float fSortRect = Utility.squareRoot(f) + 2.0f;
             float f3 = fSortRect * fSortRect;
             ArrayList arrayList = new ArrayList();
             for (LegConfig legConfig4 : legConfigArr) {

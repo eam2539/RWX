@@ -83,7 +83,7 @@ public class AttackModeAction extends AbstractUnitAction {
             if (baseUnit2 instanceof OrderableUnit) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit2;
                 if (orderableUnit.isSelected) {
-                    commandCreateCommandForTeam.setTargetUnit(orderableUnit);
+                    commandCreateCommandForTeam.addUnitToCommand(orderableUnit);
                 }
             }
         }

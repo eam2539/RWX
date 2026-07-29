@@ -428,7 +428,7 @@ public class IniFile {
         if (str == null) {
             return null;
         }
-        return Utility.readStreamToString(str, "\\n", "\n");
+        return Utility.replaceSubstring(str, "\\n", "\n");
     }
 
     /* JADX INFO: renamed from: a */

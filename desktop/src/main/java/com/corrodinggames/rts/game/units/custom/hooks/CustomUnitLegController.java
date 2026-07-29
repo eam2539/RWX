@@ -103,7 +103,7 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
                             float angleBetweenPoints = Utility.getAngleBetweenPoints(legInstance.b, legInstance.c, f7, f8);
                             float fDistanceSq = Utility.distanceSq(legInstance.b, legInstance.c, f7, f8);
                             if (fDistanceSq < (f6 - 2.0f) * (f6 - 2.0f)) {
-                                fSqrt = Utility.sqrt((int) fDistanceSq);
+                                fSqrt = Utility.fastSquareRootInt((int) fDistanceSq);
                             }
                             graphicsEngine.k();
                             graphicsEngine.a(angleBetweenPoints + 90.0f, f4, f5);

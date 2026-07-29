@@ -1422,7 +1422,7 @@ public class Root extends ScriptContext {
     public void saveGame(String str) throws IOException {
         closePopup();
         hideKeyboard();
-        GameEngine.getInstance().gameSaver.updateAutosave(str.replace(".", "_").replace("/", "_").replace("\\", "_"), false);
+        GameEngine.getInstance().gameSaver.saveGame(str.replace(".", "_").replace("/", "_").replace("\\", "_"), false);
     }
 
     public void exportMap(String str) {
@@ -1442,7 +1442,7 @@ public class Root extends ScriptContext {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.networkEngine.disconnectNetworking("loading new save");
         gameEngine.isGameStarted = false;
-        if (gameEngine.gameSaver.performAutosave(str, false)) {
+        if (gameEngine.gameSaver.loadSaveFile(str, false)) {
             resumeNonMenu();
         }
     }
@@ -1455,14 +1455,14 @@ public class Root extends ScriptContext {
                 @Override // java.lang.Runnable
                 public void run() {
                     Root.this.closePopup();
-                    PlatformExtension.a(gameEngine.gameSaver.isAutosaveEnabled(str, false));
+                    PlatformExtension.a(gameEngine.gameSaver.getSaveFilePath(str, false));
                 }
             });
         }
         showPopupWithButtons(null, str, true, buttonAction, new ButtonAction("Delete", new Runnable() { // from class: com.corrodinggames.librocket.scripts.Root.8
             @Override // java.lang.Runnable
             public void run() {
-                gameEngine.gameSaver.saveGame(str);
+                gameEngine.gameSaver.deleteSaveGame(str);
                 Root.this.closePopup();
                 Root.this.showMaps();
             }
@@ -1503,7 +1503,7 @@ public class Root extends ScriptContext {
         String strReplace;
         GameEngine gameEngine = GameEngine.getInstance();
         if (str == null) {
-            strReplace = (gameEngine.getCurrentMapName() + " (" + Utility.formatDate("d MMM yyyy HH-mm-ss") + ")").replace("  ", " ");
+            strReplace = (gameEngine.getCurrentMapName() + " (" + Utility.formatCurrentDate("d MMM yyyy HH-mm-ss") + ")").replace("  ", " ");
         } else {
             strReplace = str;
         }
@@ -1514,7 +1514,7 @@ public class Root extends ScriptContext {
         String strReplace;
         GameEngine gameEngine = GameEngine.getInstance();
         if (str == null) {
-            strReplace = ("New " + gameEngine.getCurrentMapName() + " - " + Utility.formatDate("d MMM yyyy")).replace("  ", " ");
+            strReplace = ("New " + gameEngine.getCurrentMapName() + " - " + Utility.formatCurrentDate("d MMM yyyy")).replace("  ", " ");
         } else {
             strReplace = str;
         }
@@ -1680,7 +1680,7 @@ public class Root extends ScriptContext {
         }
 
         public boolean same(TableCell tableCell, boolean z) {
-            if (!Utility.md5(this.classes, tableCell.classes) || !Utility.md5(this.librocketOnClick, tableCell.librocketOnClick) || !Utility.sqrt(this.color, tableCell.color)) {
+            if (!Utility.md5(this.classes, tableCell.classes) || !Utility.md5(this.librocketOnClick, tableCell.librocketOnClick) || !Utility.nullableIntegersEqual(this.color, tableCell.color)) {
                 return false;
             }
             if (!z && !Utility.md5(this.text, tableCell.text)) {
@@ -2112,7 +2112,7 @@ public class Root extends ScriptContext {
             return;
         }
         try {
-            File file = new File(FileHelper.convertAbstractPath("/SD/rustedWarfare/RustedWarfareLog-" + Utility.formatDate("d_MMM_yyyy_HH.mm.ss") + ".txt"));
+            File file = new File(FileHelper.convertAbstractPath("/SD/rustedWarfare/RustedWarfareLog-" + Utility.formatCurrentDate("d_MMM_yyyy_HH.mm.ss") + ".txt"));
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.append((CharSequence) stringBuffer.toString());
             fileWriter.flush();

@@ -231,7 +231,7 @@ public class FireUnit extends NaturalUnit {
         gameEngine.renderGraphicsEngine.k();
         float fD = du.d();
         float fE = du.e();
-        gameEngine.renderGraphicsEngine.a(getUnitArmorRating(false), fD, fE);
+        gameEngine.renderGraphicsEngine.a(getRenderRotation(false), fD, fE);
         gameEngine.renderGraphicsEngine.a(this.o * 2.7f, this.o * 2.7f, fD, fE);
         gameEngine.renderGraphicsEngine.a(textureD, dv, du, (Paint) null);
         gameEngine.renderGraphicsEngine.l();

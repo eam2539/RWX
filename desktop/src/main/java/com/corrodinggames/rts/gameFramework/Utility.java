@@ -58,7 +58,7 @@ public final class Utility {
 
     static {
         for (int i2 = 0; i2 < j.length; i2++) {
-            j[i2] = (byte) StrictMath.round(sortRect(i2));
+            j[i2] = (byte) StrictMath.round(squareRoot(i2));
         }
         d = new PointF();
         e = new PointF();
@@ -105,12 +105,12 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final int readStreamToString(BaseUnit baseUnit, int i2, int i3) {
+    public static final int getDeterministicRandomInt(BaseUnit baseUnit, int i2, int i3) {
         return getDeterministicRandomInt((GameObject) baseUnit, i2, i3, 0);
     }
 
     /* JADX INFO: renamed from: a */
-    public static final float copyStream(BaseUnit baseUnit, float f2, float f3, int i2) {
+    public static final float getDeterministicRandomFloat(BaseUnit baseUnit, float f2, float f3, int i2) {
         if (baseUnit == null) {
             return getDeterministicRandomIntInRange((int) (f2 * 1000.0f), (int) (f3 * 1000.0f), i2) * 0.001f;
         }
@@ -176,7 +176,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String formatDate(String str) {
+    public static String formatCurrentDate(String str) {
         return new SimpleDateFormat(str).format(Calendar.getInstance().getTime());
     }
 
@@ -215,14 +215,14 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final float sortRect(float f2) {
+    public static final float squareRoot(float f2) {
         return (float) StrictMath.sqrt(f2);
     }
 
     /* JADX INFO: renamed from: a */
-    public static final int sqrt(int i2) {
+    public static final int fastSquareRootInt(int i2) {
         if (i2 > 1000 || i2 < 0) {
-            return StrictMath.round(sortRect(i2));
+            return StrictMath.round(squareRoot(i2));
         }
         return j[i2];
     }
@@ -317,11 +317,11 @@ public final class Utility {
 
     /* JADX INFO: renamed from: c */
     public static final int distanceInt(float f2, float f3, float f4, float f5) {
-        return sqrt((int) (((f2 - f4) * (f2 - f4)) + ((f3 - f5) * (f3 - f5))));
+        return fastSquareRootInt((int) (((f2 - f4) * (f2 - f4)) + ((f3 - f5) * (f3 - f5))));
     }
 
     /* JADX INFO: renamed from: a */
-    public static final int countChars(int i2, int i3, int i4, int i5) {
+    public static final int chebyshevDistance(int i2, int i3, int i4, int i5) {
         int i6 = i2 - i4;
         int i7 = i3 - i5;
         if (i6 < 0) {
@@ -381,7 +381,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final boolean replace(PointF pointF, PointF pointF2, PointF pointF3, PointF pointF4) {
+    public static final boolean lineSegmentsIntersect(PointF pointF, PointF pointF2, PointF pointF3, PointF pointF4) {
         float f2 = ((pointF4.y - pointF3.y) * (pointF2.x - pointF.x)) - ((pointF4.x - pointF3.x) * (pointF2.y - pointF.y));
         float f3 = ((pointF4.x - pointF3.x) * (pointF.y - pointF3.y)) - ((pointF4.y - pointF3.y) * (pointF.x - pointF3.x));
         float f4 = ((pointF2.x - pointF.x) * (pointF.y - pointF3.y)) - ((pointF2.y - pointF.y) * (pointF.x - pointF3.x));
@@ -402,7 +402,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: d */
-    public static final float m287d(float f2, float f3) {
+    public static final float randomRepairTargetOffset(float f2, float f3) {
         return (a.nextFloat() * (f3 - f2)) + f2;
     }
 
@@ -426,7 +426,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final void sqrt(Rect rect) {
+    public static final void normalizeRect(Rect rect) {
         if (rect.c < rect.a) {
             int i2 = rect.c;
             rect.c = rect.a;
@@ -440,7 +440,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final void sortRect(RectF rectF) {
+    public static final void normalizeRect(RectF rectF) {
         if (rectF.c < rectF.a) {
             float f2 = rectF.c;
             rectF.c = rectF.a;
@@ -560,7 +560,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: b */
-    public static void grow2(Rect rect, float f2) {
+    public static void expandRectForTouchTarget(Rect rect, float f2) {
         rect.a = (int) (rect.a - f2);
         rect.b = (int) (rect.b - f2);
         rect.c = (int) (rect.c + (f2 * 2.0f));
@@ -837,7 +837,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String countChars(Class cls, int i2) {
+    public static String getFieldNameByValue(Class cls, int i2) {
         try {
             for (Field field : cls.getFields()) {
                 if (field.getInt(null) == i2) {
@@ -854,11 +854,11 @@ public final class Utility {
 
     /* JADX INFO: renamed from: f */
     public static String getResourcePath(int i2) {
-        String strCountChars = countChars(R.drawable.class, i2);
+        String strCountChars = getFieldNameByValue(R.drawable.class, i2);
         if (strCountChars != null) {
             return FileHelper.findFileWithExtension("res/drawable", strCountChars);
         }
-        String strCountChars2 = countChars(R.raw.class, i2);
+        String strCountChars2 = getFieldNameByValue(R.raw.class, i2);
         if (strCountChars2 != null) {
             return FileHelper.findFileWithExtension("res/raw", strCountChars2);
         }
@@ -905,7 +905,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final boolean getStackTrace(RectF rectF, RectF rectF2) {
+    public static final boolean rectanglesOverlap(RectF rectF, RectF rectF2) {
         return rectF.a < rectF2.c && rectF2.a < rectF.c && rectF.b < rectF2.d && rectF2.b < rectF.d;
     }
 
@@ -915,7 +915,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final long getStackTrace(long j2, long j3) {
+    public static final long elapsedMilliseconds(long j2, long j3) {
         return (j3 - j2) / 1000000;
     }
 
@@ -994,7 +994,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: b */
-    public static final String isGreaterThan(Exception exc) {
+    public static final String formatExceptionMessage(Exception exc) {
         return formatExceptionMessage(exc, false);
     }
 
@@ -1086,7 +1086,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String formatDate(CharSequence charSequence, Iterable iterable) {
+    public static String joinStrings(CharSequence charSequence, Iterable iterable) {
         StringBuilder sb = new StringBuilder();
         boolean z = true;
         Iterator it = iterable.iterator();
@@ -1141,19 +1141,19 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String copyStream(long j2) {
+    public static String formatDuration(long j2) {
         String str;
-        int[] iArrIsGreaterThan = isGreaterThan(j2);
-        if (iArrIsGreaterThan[0] == 0) {
-            str = replace(VariableScope.nullOrMissingString + iArrIsGreaterThan[1], 2, "0") + ":" + replace(VariableScope.nullOrMissingString + iArrIsGreaterThan[2], 2, "0");
+        int[] timeParts = secondsToTimeParts(j2);
+        if (timeParts[0] == 0) {
+            str = replace(VariableScope.nullOrMissingString + timeParts[1], 2, "0") + ":" + replace(VariableScope.nullOrMissingString + timeParts[2], 2, "0");
         } else {
-            str = replace(VariableScope.nullOrMissingString + iArrIsGreaterThan[0], 2, "0") + ":" + replace(VariableScope.nullOrMissingString + iArrIsGreaterThan[1], 2, "0") + ":" + replace(VariableScope.nullOrMissingString + iArrIsGreaterThan[2], 2, "0");
+            str = replace(VariableScope.nullOrMissingString + timeParts[0], 2, "0") + ":" + replace(VariableScope.nullOrMissingString + timeParts[1], 2, "0") + ":" + replace(VariableScope.nullOrMissingString + timeParts[2], 2, "0");
         }
         return str;
     }
 
     /* JADX INFO: renamed from: b */
-    public static int[] isGreaterThan(long j2) {
+    public static int[] secondsToTimeParts(long j2) {
         int i2 = ((int) j2) / 3600;
         int i3 = ((int) j2) - (i2 * 3600);
         int i4 = i3 / 60;
@@ -1260,7 +1260,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final String readStreamToString(String str, String str2, String str3) {
+    public static final String replaceSubstring(String str, String str2, String str3) {
         if (!containsSubstring(str, str2)) {
             return str;
         }
@@ -1347,7 +1347,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: j */
-    public static final boolean isGreaterThan(float f2, float f3) {
+    public static final boolean approximatelyEqual(float f2, float f3) {
         return abs(f2 - f3) < 1.0E-4f;
     }
 
@@ -1369,7 +1369,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final boolean sqrt(Integer num, Integer num2) {
+    public static final boolean nullableIntegersEqual(Integer num, Integer num2) {
         if (num == null) {
             return num2 == null;
         }

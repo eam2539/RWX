@@ -57,12 +57,12 @@ public class TransporterGroup extends AIUnitGroupBase {
         gameOutputStream.writeInt(this.F.size());
         Iterator it = this.F.iterator();
         while (it.hasNext()) {
-            gameOutputStream.writeUnitIdOrNullUnitEntity((OrderableUnit) it.next());
+            gameOutputStream.writeOrderableUnit((OrderableUnit) it.next());
         }
         gameOutputStream.writeByte(5);
         gameOutputStream.writeInt(this.aiController.filterUnitAndCommand(this.m));
         gameOutputStream.writeBoolean(this.q);
-        gameOutputStream.writeUnitIdOrNullUnitEntity(this.n);
+        gameOutputStream.writeOrderableUnit(this.n);
         gameOutputStream.writeFloat(this.o);
         gameOutputStream.writeBoolean(this.p);
         gameOutputStream.writeFloat(this.r);
@@ -79,7 +79,7 @@ public class TransporterGroup extends AIUnitGroupBase {
         q();
         int i = gameInputStream.readInt();
         for (int i2 = 0; i2 < i; i2++) {
-            OrderableUnit unitEntity = gameInputStream.readUnitEntity();
+            OrderableUnit unitEntity = gameInputStream.readOrderableUnit();
             if (unitEntity != null) {
                 if (!this.aiController.isNonCombatCustomUnit(unitEntity)) {
                     GameEngine.logColored("TransporterGroup:readIn: Unit is not transporterUnit");
@@ -96,7 +96,7 @@ public class TransporterGroup extends AIUnitGroupBase {
             this.q = gameInputStream.readBoolean();
         }
         if (b >= 3) {
-            this.n = gameInputStream.readUnitEntity();
+            this.n = gameInputStream.readOrderableUnit();
         }
         if (b >= 4) {
             this.o = gameInputStream.readFloat();
@@ -156,11 +156,11 @@ public class TransporterGroup extends AIUnitGroupBase {
                 Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this.aiController);
                 for (OrderableUnit orderableUnit : this.F) {
                     if (getDistanceSqToUnit(orderableUnit) > 28900.0f && !orderableUnit.isAttackCommandActive()) {
-                        commandNewCommandForTeam.setTargetUnit(orderableUnit);
+                        commandNewCommandForTeam.addUnitToCommand(orderableUnit);
                     } else if (((TransportUnitInterface) orderableUnit).getTransportedUnitCount() != 0) {
                         ActionId actionIdCp = orderableUnit.getUnloadActionId();
                         Command commandNewCommandForTeam2 = gameEngine.commandController.newCommandForTeam(this.aiController);
-                        commandNewCommandForTeam2.setTargetUnit(orderableUnit);
+                        commandNewCommandForTeam2.addUnitToCommand(orderableUnit);
                         commandNewCommandForTeam2.setActionId(actionIdCp);
                     }
                 }
@@ -219,7 +219,7 @@ public class TransporterGroup extends AIUnitGroupBase {
                         Command commandNewCommandForTeam3 = gameEngine.commandController.newCommandForTeam(this.aiController);
                         Iterator it2 = this.F.iterator();
                         while (it2.hasNext()) {
-                            commandNewCommandForTeam3.setTargetUnit((OrderableUnit) it2.next());
+                            commandNewCommandForTeam3.addUnitToCommand((OrderableUnit) it2.next());
                         }
                         commandNewCommandForTeam3.setMoveTarget(this.n.posX, this.n.posY);
                     }
@@ -232,7 +232,7 @@ public class TransporterGroup extends AIUnitGroupBase {
                                     OrderableUnit orderableUnit4 = it3.next();
                                     if (orderableUnit4.d(orderableUnit3, false) && Utility.distanceSq(orderableUnit4.posX, orderableUnit4.posY, orderableUnit3.posX, orderableUnit3.posY) < 14400.0f) {
                                         Command commandNewCommandForTeam4 = gameEngine.commandController.newCommandForTeam(this.aiController);
-                                        commandNewCommandForTeam4.setTargetUnit(orderableUnit3);
+                                        commandNewCommandForTeam4.addUnitToCommand(orderableUnit3);
                                         commandNewCommandForTeam4.setLoadIntoTarget(orderableUnit4);
                                         break;
                                     }
@@ -288,10 +288,10 @@ public class TransporterGroup extends AIUnitGroupBase {
                     for (OrderableUnit orderableUnit5 : this.F) {
                         if (((TransportUnitInterface) orderableUnit5).getTransportedUnitCount() == 0) {
                             Command commandNewCommandForTeam6 = gameEngine.commandController.newCommandForTeam(this.aiController);
-                            commandNewCommandForTeam6.setTargetUnit(orderableUnit5);
+                            commandNewCommandForTeam6.addUnitToCommand(orderableUnit5);
                             commandNewCommandForTeam6.setMoveTarget(this.posX, this.posY);
                         } else if (Utility.distanceSq(orderableUnit5.posX, orderableUnit5.posY, this.r, this.s) > 1600.0f) {
-                            commandNewCommandForTeam5.setTargetUnit(orderableUnit5);
+                            commandNewCommandForTeam5.addUnitToCommand(orderableUnit5);
                         }
                     }
                     commandNewCommandForTeam5.setMoveTarget(this.r, this.s);
@@ -304,7 +304,7 @@ public class TransporterGroup extends AIUnitGroupBase {
                         this.p = true;
                         ActionId actionIdCp2 = orderableUnit6.getUnloadActionId();
                         Command commandNewCommandForTeam7 = gameEngine.commandController.newCommandForTeam(this.aiController);
-                        commandNewCommandForTeam7.setTargetUnit(orderableUnit6);
+                        commandNewCommandForTeam7.addUnitToCommand(orderableUnit6);
                         commandNewCommandForTeam7.setActionId(actionIdCp2);
                     }
                 }

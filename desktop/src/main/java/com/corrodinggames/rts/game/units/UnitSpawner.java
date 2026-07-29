@@ -135,10 +135,10 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
             pointF3.y += (pointF4.y - pointF3.y) * 0.04f * f2;
             float f3 = currentRepairOrReclaimTarget.radius * 0.75f;
             if (Utility.abs(pointF3.x - pointF4.x) < 1.0f) {
-                pointF4.x = Utility.m287d(-f3, f3);
+                pointF4.x = Utility.randomRepairTargetOffset(-f3, f3);
             }
             if (Utility.abs(pointF3.y - pointF4.y) < 1.0f) {
-                pointF4.y = Utility.m287d(-f3, f3);
+                pointF4.y = Utility.randomRepairTargetOffset(-f3, f3);
             }
         }
     }

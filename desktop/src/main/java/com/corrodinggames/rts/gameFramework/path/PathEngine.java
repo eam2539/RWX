@@ -83,7 +83,7 @@ public final class PathEngine {
         return null;
     }
 
-    public boolean a(UnitMovementType unitMovementType, int i2, int i3) {
+    public boolean isTileBlockedForMovement(UnitMovementType unitMovementType, int i2, int i3) {
         return a(a(unitMovementType), i2, i3);
     }
 

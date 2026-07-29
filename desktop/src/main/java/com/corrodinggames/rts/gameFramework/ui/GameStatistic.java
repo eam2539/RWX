@@ -48,7 +48,7 @@ public class GameStatistic {
                     arrayList.add(new GameStatistic("Wave difficulty: " + gameEngine.networkEngine.c(gameEngine.missionEngine.y), VariableScope.nullOrMissingString));
                 }
             }
-            arrayList.add(new GameStatistic("Game Time", Utility.copyStream(gameEngine.gameTimeMillis / 1000)));
+            arrayList.add(new GameStatistic("Game Time", Utility.formatDuration(gameEngine.gameTimeMillis / 1000)));
             arrayList.add(new GameStatistic("=============================", VariableScope.nullOrMissingString));
             arrayList.add(new GameStatistic("Units Killed", statisticsDataA.c));
             arrayList.add(new GameStatistic("Buildings Killed", statisticsDataA.d));

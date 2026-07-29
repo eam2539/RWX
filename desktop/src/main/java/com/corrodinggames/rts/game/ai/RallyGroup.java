@@ -17,13 +17,13 @@ public class RallyGroup extends AIUnitGroupBase {
         gameOutputStream.writeInt(this.F.size());
         Iterator it = this.F.iterator();
         while (it.hasNext()) {
-            gameOutputStream.writeUnitIdOrNullUnitEntity((OrderableUnit) it.next());
+            gameOutputStream.writeOrderableUnit((OrderableUnit) it.next());
         }
         gameOutputStream.writeByte(1);
         gameOutputStream.writeInt(this.G.size());
         Iterator it2 = this.G.iterator();
         while (it2.hasNext()) {
-            gameOutputStream.writeUnitIdOrNullUnitEntity((OrderableUnit) it2.next());
+            gameOutputStream.writeOrderableUnit((OrderableUnit) it2.next());
         }
         gameOutputStream.writeFloat(this.a);
         super.a(gameOutputStream);
@@ -35,7 +35,7 @@ public class RallyGroup extends AIUnitGroupBase {
         q();
         int i = gameInputStream.readInt();
         for (int i2 = 0; i2 < i; i2++) {
-            OrderableUnit unitEntity = gameInputStream.readUnitEntity();
+            OrderableUnit unitEntity = gameInputStream.readOrderableUnit();
             if (unitEntity != null) {
                 a(unitEntity);
             }
@@ -44,7 +44,7 @@ public class RallyGroup extends AIUnitGroupBase {
             this.G.clear();
             int i3 = gameInputStream.readInt();
             for (int i4 = 0; i4 < i3; i4++) {
-                OrderableUnit unitEntity2 = gameInputStream.readUnitEntity();
+                OrderableUnit unitEntity2 = gameInputStream.readOrderableUnit();
                 if (unitEntity2 != null) {
                     this.G.add(unitEntity2);
                 }

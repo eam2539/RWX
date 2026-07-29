@@ -691,7 +691,7 @@ public class Minimap {
         PlayerTeam playerTeam = gameEngine.playerTeam;
         for (StrategicPoint strategicPoint : this.strategicPoints) {
             strategicPoint.isVisible = false;
-            if (gameEngine.tileMap.clampWorldX(playerTeam, strategicPoint.gridX, strategicPoint.gridY)) {
+            if (gameEngine.tileMap.isTileVisibleForTeam(playerTeam, strategicPoint.gridX, strategicPoint.gridY)) {
                 strategicPoint.isVisible = true;
                 Point pointWorldToScreen3 = worldToScreen(strategicPoint.gridX * gameEngine.tileMap.tileWorldSizeX, strategicPoint.gridY * gameEngine.tileMap.tileWorldSizeY);
                 strategicPoint.screenX = pointWorldToScreen3.worldX;

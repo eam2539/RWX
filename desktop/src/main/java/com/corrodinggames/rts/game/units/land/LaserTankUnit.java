@@ -130,19 +130,19 @@ public class LaserTankUnit extends LandUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: bW */
-    public float getUnitTeamData() {
+    public float getSecondaryBarProgress() {
         if (this.movementLevels[0].rotation > 0.0f) {
             return 1.0f - (this.movementLevels[0].rotation / b(0));
         }
         if (this.movementLevels[0].speed != 0.0f) {
             return this.movementLevels[0].speed / e(0);
         }
-        return super.getUnitTeamData();
+        return super.getSecondaryBarProgress();
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: bX */
-    public boolean isUnitAtPositionX() {
+    public boolean isSecondaryBarRecharging() {
         return this.movementLevels[0].rotation > 0.0f;
     }
 
