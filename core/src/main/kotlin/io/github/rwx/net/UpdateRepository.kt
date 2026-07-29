@@ -6,7 +6,6 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -15,23 +14,21 @@ import java.util.*
 class UpdateRepository(
     private val client: HttpClient = defaultUpdateHttpClient(),
 ) {
-    fun checkLatestReleaseBlocking(currentVersion: String): Result<UpdateCheckResponse> =
+    suspend fun checkLatestRelease(currentVersion: String): Result<UpdateCheckResponse> =
         runCatching {
-            runBlocking {
-                val response = client.get(GITHUB_RELEASES_API_URL) {
-                    header("Accept", "application/vnd.github+json")
-                    header("User-Agent", "RWX")
-                }
-                check(response.status.isSuccess()) {
-                    "GitHub returned HTTP ${response.status.value}"
-                }
-                val releases = updateJson.decodeFromString<List<GithubReleaseResponse>>(response.bodyAsText())
-                val latest = releases.firstOrNull { !it.draft }?.toUpdateRelease()
-                UpdateCheckResponse(
-                    latestRelease = latest,
-                    isUpdateAvailable = latest?.let { isNewerVersion(it.tagName, currentVersion) } == true,
-                )
+            val response = client.get(GITHUB_RELEASES_API_URL) {
+                header("Accept", "application/vnd.github+json")
+                header("User-Agent", "RWX")
             }
+            check(response.status.isSuccess()) {
+                "GitHub returned HTTP ${response.status.value}"
+            }
+            val releases = updateJson.decodeFromString<List<GithubReleaseResponse>>(response.bodyAsText())
+            val latest = releases.firstOrNull { !it.draft }?.toUpdateRelease()
+            UpdateCheckResponse(
+                latestRelease = latest,
+                isUpdateAvailable = latest?.let { isNewerVersion(it.tagName, currentVersion) } == true,
+            )
         }
 }
 

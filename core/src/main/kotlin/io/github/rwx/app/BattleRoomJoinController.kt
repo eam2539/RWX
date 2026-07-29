@@ -5,7 +5,9 @@ import io.github.rwx.logger
 import io.github.rwx.session.BattleRoomSnapshot
 import io.github.rwx.session.GameSession
 import io.github.rwx.ui.host.LoadingDialogSceneHost
+import kotlinx.coroutines.delay
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class BattleRoomJoinController(
     private val gameSession: GameSession,
@@ -43,19 +45,19 @@ internal class BattleRoomJoinController(
                 failurePrefix = failurePrefix,
                 startedAtNanos = System.nanoTime(),
             )
-            loadingDialogSceneHost.showCircular(
-                title = I18n.multiplayer.joiningRoom(),
-                message = I18n.multiplayer.connectingTo(roomLabel),
-            )
-            Thread({
+            val job = launchOnIO("battleroom-join") {
                 monitor(
                     token = joinToken,
                     requestJoin = requestJoin,
                     failurePrefix = failurePrefix,
                 )
-            }, "RWX-battleroom-join").apply {
-                isDaemon = true
-                start()
+            }
+            loadingDialogSceneHost.showCircular(
+                title = I18n.multiplayer.joiningRoom(),
+                message = I18n.multiplayer.connectingTo(roomLabel),
+            ) {
+                loadingDialogSceneHost.hide()
+                job.cancel()
             }
         }.onFailure { error ->
             clearPending()
@@ -103,7 +105,7 @@ internal class BattleRoomJoinController(
         loadingDialogSceneHost.hide()
     }
 
-    private fun monitor(
+    private suspend fun monitor(
         token: String,
         requestJoin: () -> Unit,
         failurePrefix: String,
@@ -119,13 +121,11 @@ internal class BattleRoomJoinController(
             return
         }
         while (this.token.get() == token) {
-            val snapshot = runCatching { gameSession.currentBattleRoom() }.getOrNull()
-            val isJoinInProgress = runCatching {
-                gameSession.isJoiningBattleRoom
-            }.getOrDefault(false)
+            val snapshot = gameSession.currentBattleRoom()
+            val isJoinInProgress = gameSession.isJoiningBattleRoom
             val hasJoinedSnapshot = snapshot != null &&
                     snapshot.isReadyForJoinedRoom()
-            val errorMessage = runCatching { gameSession.latestBattleRoomJoinError }.getOrNull()
+            val errorMessage = gameSession.latestBattleRoomJoinError
             probe.set(
                 PendingBattleRoomJoinProbe(
                     snapshot = snapshot,
@@ -137,7 +137,7 @@ internal class BattleRoomJoinController(
             if (!errorMessage.isNullOrBlank() || (hasJoinedSnapshot && !isJoinInProgress)) {
                 return
             }
-            Thread.sleep(BATTLE_ROOM_JOIN_POLL_INTERVAL_MS)
+            delay(BATTLE_ROOM_JOIN_POLL_INTERVAL_MS.milliseconds)
         }
     }
 

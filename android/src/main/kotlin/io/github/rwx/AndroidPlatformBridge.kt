@@ -19,10 +19,8 @@ class AndroidPlatformBridge(context: Context) : PlatformBridge {
     override val appMetadata: AppMetadata = createAppMetadata(this.appContext)
     override val displayDensity: Float = this.appContext.resources.displayMetrics.density
     override val audio: PlatformAudio = AndroidPlatformAudio(appContext)
-
-
+    override var filePickerHost: PlatformFilePickerHost?=null
     override val isMobilePlatform: Boolean = true
-
 
     override fun createModClassLoader(modFile: File, parent: ClassLoader): ClassLoader {
         val optimizedDir = File(this.appContext.codeCacheDir, "mod-dex")
@@ -84,6 +82,7 @@ class AndroidPlatformBridge(context: Context) : PlatformBridge {
             signature = signature,
         )
     }
+
 }
 
 private class AndroidPlatformAudio(context: Context) : PlatformAudio {

@@ -31,7 +31,8 @@ internal class ResourceBrowserController(
         val page = if (append) state.page + 1 else 1
         val nextRequestId = ++requestId
         sceneHost.setLoading(true, I18n.resourcebrowser.loading())
-        Thread({
+        launchOnIO("resource-browser-search")
+        {
             val result = repository.searchBlocking(
                 source = state.source,
                 type = state.type,
@@ -59,7 +60,7 @@ internal class ResourceBrowserController(
                 )
             )
             CoreUiEventQueue.requestResourceBrowserSearchCompleted()
-        }, "RWX resource browser search").apply { isDaemon = true }.start()
+        }
     }
 
     fun selectType(type: ResourceBrowserType) {
@@ -85,13 +86,9 @@ internal class ResourceBrowserController(
             showUnavailableDialog(I18n.resourcebrowser.missingDownloadUrl())
             return
         }
-        loadingDialogSceneHost.showProgress(
-            title = I18n.resourcebrowser.downloading(),
-            message = item.title,
-            progress = 0.01f,
-        )
-        Thread({
-            val result = repository.downloadBlocking(item) { progress ->
+
+        val job = launchOnIO("resource-browser-download") {
+            val result = repository.download(item) { progress ->
                 if (progress >= 0.0f) {
                     downloadProgress.set(progress)
                     CoreUiEventQueue.requestResourceBrowserDownloadProgress()
@@ -99,7 +96,15 @@ internal class ResourceBrowserController(
             }
             downloadResult.set(ResourceBrowserDownloadResult(item, result.exceptionOrNull()))
             CoreUiEventQueue.requestResourceBrowserDownloadCompleted()
-        }, "RWX resource browser download").apply { isDaemon = true }.start()
+        }
+        loadingDialogSceneHost.showProgress(
+            title = I18n.resourcebrowser.downloading(),
+            message = item.title,
+            progress = 0.01f,
+        ) {
+            loadingDialogSceneHost.hide()
+            job.cancel()
+        }
     }
 
     fun handleDownloadProgress() {

@@ -41,6 +41,9 @@ data class DialogInfoRow(
 data class DialogTextInput(
     val initialText: String = "",
     val hint: String = "",
+    val trailingIcon: Icon? = null,
+    val trailingIconTooltip: String? = null,
+    val onTrailingIconPress: ((setValue: (String) -> Unit) -> Unit)? = null,
 )
 
 data class DialogForm(

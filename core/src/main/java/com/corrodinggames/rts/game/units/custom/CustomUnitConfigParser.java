@@ -37,6 +37,7 @@ import com.corrodinggames.rts.gameFramework.ui.GameUI;
 import com.corrodinggames.rts.gameFramework.utility.*;
 import io.github.rwx.geometry.PointF;
 import io.github.rwx.geometry.Rect;
+import io.github.rwx.mod.JvmModAssetBridge;
 import io.github.rwx.render.canvas.KoolArgbColor;
 
 import java.io.BufferedInputStream;
@@ -3341,7 +3342,10 @@ public class CustomUnitConfigParser {
                 throw new RuntimeException(e);
             }
         }
-        AssetInputStream assetInputStreamOpenFileByPath = FileHelper.openFileByPath(strTrackImageMemory);
+        AssetInputStream assetInputStreamOpenFileByPath = JvmModAssetBridge.openAsset(modInfo, strTrackImageMemory);
+        if (assetInputStreamOpenFileByPath == null) {
+            assetInputStreamOpenFileByPath = FileHelper.openFileByPath(strTrackImageMemory);
+        }
         if (assetInputStreamOpenFileByPath == null) {
             GameEngine.log("Orginal path: " + strTrackImageMemory);
             throw new RuntimeException("IO Error: Failed to open: " + applyCopyFromSectionChain(modInfo, strTrackImageMemory, true));

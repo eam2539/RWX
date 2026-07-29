@@ -60,7 +60,7 @@ fun UiScope.Icon(
     icon: Icon,
     size: Dp,
     color: Color,
-): ImageScope = Image(RwxIconTextureCache.textureFor(icon)) {
+): ImageScope = Image(IconTextureCache.textureFor(icon)) {
     modifier
         .width(size)
         .height(size)
@@ -156,12 +156,12 @@ fun UiScope.TextIconButton(
     }
 }
 
-private object RwxIconTextureCache {
+private object IconTextureCache {
     private val iconTextureSize = Vec2i(256, 256)
     private val textures = mutableMapOf<Icon, Texture2d>()
 
     fun textureFor(icon: Icon): Texture2d = textures.getOrPut(icon) {
-        Texture2d(name = "rwx-icon:${icon.assetPath}") {
+        Texture2d(name = "icon:${icon.assetPath}") {
             Assets.defaultLoader.loadImage2d(icon.assetPath, resolveSize = iconTextureSize).getOrNull()
                 ?: AssetLoader.textureDataLoadFailed
         }
@@ -186,7 +186,7 @@ private object RwxIconTextureCache {
                     }.awaitAll()
                 }
                 loaded.forEach { (icon, imageData) ->
-                    val texture = Texture2d(name = "rwx-icon:${icon.assetPath}")
+                    val texture = Texture2d(name = "icon:${icon.assetPath}")
                     texture.upload(imageData)
                     textures[icon] = texture
                     completed++
@@ -202,7 +202,7 @@ private object RwxIconTextureCache {
 
 /** Decodes and uploads shared icon textures before interactive scenes become visible. */
 suspend fun preloadUiIconTextures(onProgress: (Int, Int) -> Unit = { _, _ -> }) {
-    RwxIconTextureCache.preload(onProgress)
+    IconTextureCache.preload(onProgress)
 }
 
 /** Draws one preloaded texture to compile the shared image pipeline on Loading. */
@@ -213,6 +213,61 @@ internal fun UiScope.UiIconWarmup(theme: ColorSchemeDefinition) {
     }
 }
 fun invalidateUiIconTextureCache() {
-    RwxIconTextureCache.invalidate()
+    IconTextureCache.invalidate()
 }
 private const val UI_TEXTURE_PRELOAD_CONCURRENCY: Int = 6
+fun UiScope.TextFieldWithTrailingIcon(
+    value: String,
+    hint: String,
+    theme: ColorSchemeDefinition,
+    contentWidth: Dimension = UiTheme.Layout.dialogMessageWidth,
+    compact: Boolean = false,
+    trailingIcon: Icon? = null,
+    trailingIconTooltip: String? = null,
+    onTrailingIconPress: (() -> Unit)? = null,
+    onChange: (String) -> Unit,
+) {
+    val inputHeight = if (compact) UiTheme.Layout.CompactMenuButtonHeight else UiTheme.Layout.menuButtonHeight
+    Box(width = contentWidth, height = inputHeight) {
+        modifier.margin(bottom = if (compact) Dp.ZERO else UiTheme.Spacing.lg)
+        RwxTextField(value) {
+            modifier
+                .width(Grow.Std)
+                .height(Grow.Std)
+                .padding(
+                    start = UiTheme.Spacing.sm,
+                    end = if (trailingIcon == null) Dp.ZERO else inputHeight,
+                )
+                .hint(hint)
+                .font(UiTheme.Fonts.bodySmall)
+                .colors(
+                    textColor = theme.palette.textPrimary,
+                    hintColor = theme.palette.textSecondary,
+                    lineColor = theme.palette.borderSubtle,
+                    lineColorFocused = theme.palette.primary,
+                    cursorColor = theme.palette.primary,
+                    selectionColor = theme.palette.primaryContainer,
+                )
+                .onChange(onChange)
+        }
+        trailingIcon?.let { icon ->
+            val iconSize = if (compact) Dp(18f) else UiTheme.Layout.textButtonGlyphSize
+            if (onTrailingIconPress != null) {
+                IconButton(
+                    icon = icon,
+                    theme = theme,
+                    size = inputHeight,
+                    iconSize = iconSize,
+                    tooltip = trailingIconTooltip,
+                    onPressed = onTrailingIconPress,
+                ).modifier.align(AlignmentX.End, AlignmentY.Center)
+            } else {
+                Box(width = inputHeight, height = Grow.Std) {
+                    modifier.align(AlignmentX.End, AlignmentY.Center)
+                    Icon(icon, iconSize, theme.palette.primary).modifier
+                        .align(AlignmentX.Center, AlignmentY.Center)
+                }
+            }
+        }
+    }
+}

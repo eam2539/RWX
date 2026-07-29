@@ -15,8 +15,10 @@ import de.fabmax.kool.modules.ui2.UiScope
 import io.github.rwx.PlatformBridge
 import io.github.rwx.logger
 import io.github.rwx.mod.api.*
+import io.github.rwx.mod.assets.AssetPrivateKey
 import io.github.rwx.render.ModRenderRegistry
 import java.io.File
+import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Locale
 import java.util.zip.ZipFile
@@ -27,7 +29,8 @@ class ApiImpl private constructor(
     private val jarFile: File,
     private val workDir: File,
     internal val platformBridge: PlatformBridge?,
-) : Api {
+    private val assetStore: JvmModAssetStore,
+) : Api, AutoCloseable {
     private val unitApi = UnitApiImpl()
     private val unitWorldApi = UnitWorldImpl()
     private val commandApi = UnitCommandsImpl(this)
@@ -39,7 +42,7 @@ class ApiImpl private constructor(
     private var engineModInfo: ModInfo? = null
 
     override val game: Game = GameImpl(this)
-    override val assets: Asset = AssetImpl(workDir)
+    override val assets: Asset = AssetImpl(workDir, assetStore)
     override val units: Units = unitApi
     override val unitWorld: UnitWorld = unitWorldApi
     override val commands: UnitCommands = commandApi
@@ -220,6 +223,7 @@ class ApiImpl private constructor(
         modInfo.found = true
         modInfo.storageDescription = "JVM Mod: ${jarFile.name}"
         modInfo.dataRefreshed = true
+        JvmModAssetBridge.mount(modInfo, workDir, assetStore)
     }
 
     private fun extractJarResources() {
@@ -232,8 +236,12 @@ class ApiImpl private constructor(
                 val entry = entries.nextElement()
                 if (entry.isDirectory) continue
                 val name = entry.name
-                if (!name.startsWith("assets/") && !name.startsWith("localization/") && !name.startsWith("units/")) continue
-                val outFile = workDir.resolve(name).normalize()
+                if (!name.startsWith("assets/")) continue
+                val normalized = runCatching {
+                    io.github.rwx.mod.assets.AssetVaultFormat.normalizeAssetPath(name)
+                }.getOrNull() ?: continue
+                if (!normalized.startsWith("assets/")) continue
+                val outFile = workDir.resolve(normalized).normalize()
                 if (!outFile.path.startsWith(workDir.path)) continue
                 outFile.parentFile?.mkdirs()
                 zip.getInputStream(entry).use { input -> outFile.outputStream().use { output -> input.copyTo(output) } }
@@ -307,10 +315,10 @@ class ApiImpl private constructor(
         require(ShaderTarget.UNIT in definition.targets) {
             "Shader ${definition.id} does not target units"
         }
-        val fragment = resolvePackagedResource(definition.fragment)
+        val fragment = resolvePackagedResourcePath(definition.fragment)
         val shader = definition.vertex?.let { vertex ->
             ShaderProgram().apply {
-                a(resolvePackagedResource(vertex).absolutePath, fragment.absolutePath)
+                a(resolvePackagedResourcePath(vertex).absolutePath, fragment.absolutePath)
             }
         } ?: ShaderProgram(fragment.absolutePath)
         definition.uniforms.forEach { uniform -> applyUniformDefault(shader, uniform) }
@@ -342,7 +350,7 @@ class ApiImpl private constructor(
                     is String -> ResourcePath(value)
                     else -> error("Texture uniform ${definition.name} must use ResourcePath or String")
                 }
-                val texture = resolvePackagedResource(resource).inputStream().use { input ->
+                val texture = openPackagedResource(resource).use { input ->
                     GameEngine.getInstance().renderGraphicsEngine.a(input, true)
                 }
                 shader.a(definition.name, texture)
@@ -369,34 +377,64 @@ class ApiImpl private constructor(
         textures += unit.teamColoredBaseTextures
         textures.forEach { it.a(shader) }
     }
+    internal fun openPackagedResource(path: ResourcePath): InputStream {
+        assetStore.open(path.value)?.let { return it }
+        val file = resolvePackagedResourcePath(path)
+        require(file.isFile) { "Missing packaged resource: ${path.value}" }
+        return file.inputStream()
+    }
 
-    internal fun resolvePackagedResource(path: ResourcePath): File {
+    private fun resolvePackagedResourcePath(path: ResourcePath): File {
         val root = workDir.canonicalFile
-        val relative = path.value.removePrefix("ROOT:").replace('\\', '/')
-        require(relative.isNotBlank() && !relative.startsWith('/')) {
-            "Shader resources must use a relative packaged path: ${path.value}"
-        }
+        val relative = normalizedPackagedPath(path)
         val file = root.resolve(relative).canonicalFile
         require(file.path == root.path || file.path.startsWith(root.path + File.separator)) {
-            "Shader resource escapes the mod directory: ${path.value}"
+            "Resource escapes the mod directory: ${path.value}"
         }
-        require(file.isFile) { "Missing packaged shader resource: ${path.value}" }
+        require(file.isFile || assetStore.exists(relative)) { "Missing packaged resource: ${path.value}" }
         return file
     }
 
     internal fun loadRenderTexture(path: ResourcePath, options: TextureOptions): Texture {
-        val texture = resolvePackagedResource(path).inputStream().use { input ->
+        val texture = openPackagedResource(path).use { input ->
             GameEngine.getInstance().renderGraphicsEngine.a(input, true)
         }
         texture.setPremultipliedAlpha(options.premultiplyAlpha)
         return texture
     }
 
+    private fun normalizedPackagedPath(path: ResourcePath): String =
+        io.github.rwx.mod.assets.AssetVaultFormat.normalizeAssetPath(path.value).also { normalized ->
+            require(normalized.startsWith("assets/")) {
+                "JVM mod packaged resources must be under assets/: ${path.value}"
+            }
+        }
+
+    override fun close() {
+        engineModInfo?.let(JvmModAssetBridge::unmount)
+        engineModInfo = null
+        assetStore.close()
+    }
+
     companion object {
         @JvmStatic
-        fun create(metadata: ModMetadata, jarFile: File, platformBridge: PlatformBridge? = null): ApiImpl {
+        fun create(
+            metadata: ModMetadata,
+            jarFile: File,
+            platformBridge: PlatformBridge? = null,
+            assetKeyResolver: ((String) -> AssetPrivateKey?)? = null,
+        ): ApiImpl {
             val root = File(FileHelper.getWorkingDirectory(), "jvm-mod-api/${sanitizePathSegment(metadata.id)}")
-            return ApiImpl(metadata, jarFile, root, platformBridge)
+            val keyStore = platformBridge?.storage?.let(::JvmModAssetKeyStore)
+            val resolver = assetKeyResolver ?: keyStore?.let { store -> store::find } ?: { null }
+            val assetStore = JvmModAssetStore(jarFile, metadata.id, resolver)
+            return try {
+                assetStore.requireAuthorized()
+                ApiImpl(metadata, jarFile, root, platformBridge, assetStore)
+            } catch (error: Throwable) {
+                assetStore.close()
+                throw error
+            }
         }
 
         private fun sanitizePathSegment(value: String): String = value
@@ -446,37 +484,74 @@ private class GameImpl(private val api: Api) : Game {
     }
 }
 
-private class AssetImpl(private val root: File) : Asset {
+private class AssetImpl(
+    private val root: File,
+    private val store: JvmModAssetStore,
+) : Asset {
     private val mounts = linkedMapOf<String, File>()
-    override fun mount(namespace: String, root: ResourceLocation) {
-        mounts[namespace] = File(root.uri.removePrefix("file:"))
+
+    override fun mount(namespace: String, root: ResourcePath) {
+        require(namespace.isNotBlank()) { "Asset mount namespace must not be blank" }
+        mounts[namespace] = File(root.value.removePrefix("file:")).canonicalFile
     }
 
     override fun open(path: ResourcePath): io.github.rwx.mod.api.ResourceStream {
-        val file = resolve(path)
-        return ResourceStream(file)
+        resolveMount(path)?.let { return ResourceStream(it.inputStream()) }
+        val normalized = requireNotNull(normalizedPackagedAssetPathOrNull(path)) {
+            "JVM mod packaged resources must be under assets/: ${path.value}"
+        }
+        store.open(normalized)?.let { return ResourceStream(it) }
+        return ResourceStream(resolveLocal(normalized).inputStream())
     }
 
-    override fun exists(path: ResourcePath): Boolean = resolve(path).exists()
-    override fun list(path: ResourcePath): List<ResourcePath> =
-        resolve(path).listFiles()?.map { ResourcePath(it.path) } ?: emptyList()
+    override fun exists(path: ResourcePath): Boolean {
+        resolveMount(path)?.let { return it.exists() }
+        val normalized = normalizedPackagedAssetPathOrNull(path) ?: return false
+        return store.exists(normalized) || resolveLocal(normalized).exists()
+    }
 
-    private fun resolve(path: ResourcePath): File {
+    override fun list(path: ResourcePath): List<ResourcePath> {
+        resolveMount(path)?.let { directory ->
+            return directory.listFiles()?.map { ResourcePath(it.path) } ?: emptyList()
+        }
+        val normalized = normalizedPackagedAssetPathOrNull(path) ?: return emptyList()
+        val packaged = store.list(normalized).map(::ResourcePath)
+        val local = resolveLocal(normalized).listFiles()?.map { ResourcePath(it.path) }.orEmpty()
+        return (packaged + local).distinctBy(ResourcePath::value)
+    }
+
+    private fun resolveMount(path: ResourcePath): File? {
         val value = path.value
         val namespaceIndex = value.indexOf(':')
         if (namespaceIndex > 0) {
             val namespace = value.substring(0, namespaceIndex)
             val localPath = value.substring(namespaceIndex + 1)
-            mounts[namespace]?.let { return it.resolve(localPath) }
+            mounts[namespace]?.let { return safeResolve(it, localPath) }
         }
-        return root.resolve(value)
+        return null
+    }
+
+    private fun normalizedPackagedAssetPathOrNull(path: ResourcePath): String? =
+        runCatching { io.github.rwx.mod.assets.AssetVaultFormat.normalizeAssetPath(path.value) }
+            .getOrNull()
+            ?.takeIf { it == "assets" || it.startsWith("assets/") }
+
+    private fun resolveLocal(normalizedPath: String): File = safeResolve(root, normalizedPath)
+
+    private fun safeResolve(base: File, relative: String): File {
+        val canonicalBase = base.canonicalFile
+        val file = canonicalBase.resolve(relative).canonicalFile
+        require(file.path == canonicalBase.path || file.path.startsWith(canonicalBase.path + File.separator)) {
+            "Resource escapes its mounted directory: $relative"
+        }
+        return file
     }
 }
 
-private class ResourceStream(private val file: File) : io.github.rwx.mod.api.ResourceStream {
-    override fun readBytes(): ByteArray = file.readBytes()
-    override fun readText(charset: String): String = file.readText(Charset.forName(charset))
-    override fun close() {}
+private class ResourceStream(private val input: InputStream) : io.github.rwx.mod.api.ResourceStream {
+    override fun readBytes(): ByteArray = input.readBytes()
+    override fun readText(charset: String): String = input.bufferedReader(Charset.forName(charset)).readText()
+    override fun close() = input.close()
 }
 
 private class Localization : io.github.rwx.mod.api.Localization {

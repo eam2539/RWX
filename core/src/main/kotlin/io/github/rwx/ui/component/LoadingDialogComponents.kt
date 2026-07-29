@@ -4,6 +4,7 @@ import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.scene.geometry.MeshBuilder
 import de.fabmax.kool.util.Color
 import de.fabmax.kool.util.Time
+import io.github.rwx.i18n.I18n
 import io.github.rwx.ui.ColorSchemeDefinition
 import io.github.rwx.ui.UiTheme
 import kotlin.math.*
@@ -14,6 +15,7 @@ fun UiScope.ProgressLoadingDialog(
     progress: Float,
     theme: ColorSchemeDefinition,
     contentWidth: Dp = UiTheme.Layout.dialogMessageWidth,
+    onCancel: () -> Unit
 ) {
     LoadingDialogTitle(title, theme, contentWidth)
     LoadingDialogMessage(message, theme, contentWidth)
@@ -22,6 +24,9 @@ fun UiScope.ProgressLoadingDialog(
         width = contentWidth,
         theme = theme,
     )
+    TextIconButton(I18n.common.cancel(), Icon.Close,  UiTheme.Layout.dialogButtonWidth, theme) {
+        onCancel()
+    }
 }
 
 fun UiScope.CircularLoadingDialog(
@@ -29,6 +34,7 @@ fun UiScope.CircularLoadingDialog(
     message: String,
     theme: ColorSchemeDefinition,
     contentWidth: Dp = UiTheme.Layout.dialogMessageWidth,
+    onCancel: () -> Unit,
 ) {
     LoadingDialogTitle(title, theme, contentWidth)
     CircularLoadingIndicator(
@@ -39,6 +45,9 @@ fun UiScope.CircularLoadingDialog(
         .alignX(AlignmentX.Center)
         .margin(bottom = UiTheme.Spacing.lg)
     LoadingDialogMessage(message, theme, contentWidth)
+    TextIconButton(I18n.common.cancel(), Icon.Close,  UiTheme.Layout.dialogButtonWidth, theme) {
+        onCancel()
+    }
 }
 
 fun UiScope.CircularLoadingIndicator(

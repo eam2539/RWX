@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.provider.DocumentsContract
+import android.provider.OpenableColumns
 import android.view.*
 import android.widget.FrameLayout
 import de.fabmax.kool.KoolConfigAndroid
@@ -22,7 +23,9 @@ import de.fabmax.kool.util.FrontendScope
 import de.fabmax.kool.util.MsdfFont
 import io.github.rwx.app.AppOptions
 import io.github.rwx.app.AppSession
+import io.github.rwx.app.asyncOnIO
 import io.github.rwx.app.installApp
+import io.github.rwx.app.launchOnIO
 import io.github.rwx.di.AndroidGameRenderBackend
 import io.github.rwx.di.selectedAndroidGameRenderBackend
 import io.github.rwx.p2p.P2PLobbyService
@@ -45,8 +48,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
+import org.koin.core.component.KoinComponent
+import java.io.File
+import java.util.UUID
 
-class MainActivity : Activity(), PlatformStoragePickerController {
+class MainActivity : Activity(),  PlatformFilePickerHost, KoinComponent {
 
     private var koolContext: KoolContextAndroid? = null
     private var appSession: AppSession? = null
@@ -54,11 +60,13 @@ class MainActivity : Activity(), PlatformStoragePickerController {
     private var rendererPreferenceListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
     private var textInputController: AndroidTextInputController? = null
     private var pendingStoragePickerResult: ((ExternalStorageSelection?) -> Unit)? = null
+    private var pendingFilePickerResult: ((PlatformFileSelection?) -> Unit)? = null
     private var applicationExitRequested: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        PlatformStoragePickerBridge.install(this)
+        val bridge=get<PlatformBridge>()
+        bridge.filePickerHost=this
         UiScale.uiScale.value = ANDROID_UI_SCALE
         val selectedGameSession = get<GameSession>()
         nativeGameSession = selectedGameSession as? AndroidGameSession
@@ -187,9 +195,12 @@ class MainActivity : Activity(), PlatformStoragePickerController {
 
     override fun onDestroy() {
         val terminateProcess = applicationExitRequested
-        PlatformStoragePickerBridge.uninstall(this)
+        val bridge=get<PlatformBridge>()
+        bridge.filePickerHost=null
         pendingStoragePickerResult?.invoke(null)
         pendingStoragePickerResult = null
+        pendingFilePickerResult?.invoke(null)
+        pendingFilePickerResult = null
         textInputController?.let {
             PlatformTextInputBridge.uninstall(it)
             it.dispose()
@@ -253,15 +264,51 @@ class MainActivity : Activity(), PlatformStoragePickerController {
         }
     }
 
+    override fun openFilePicker(
+        title: String,
+        allowedExtensions: Set<String>,
+        allowDirectories: Boolean,
+        onResult: (PlatformFileSelection?) -> Unit,
+    ) {
+        runOnUiThread {
+            pendingFilePickerResult?.invoke(null)
+            pendingFilePickerResult = onResult
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "*/*"
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivityForResult(Intent.createChooser(intent, title), FILE_PICKER_REQUEST_CODE)
+        }
+    }
+
     @Deprecated("Deprecated in Android API")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode != EXTERNAL_STORAGE_TREE_REQUEST_CODE) return
-        val callback = pendingStoragePickerResult ?: return
-        pendingStoragePickerResult = null
-        val uri = data?.data?.takeIf { resultCode == RESULT_OK }
-        val selection = uri?.let(::persistExternalStorageSelection)
-        FrontendScope.launch { callback(selection) }
+        when (requestCode) {
+            EXTERNAL_STORAGE_TREE_REQUEST_CODE -> {
+                val callback = pendingStoragePickerResult ?: return
+                pendingStoragePickerResult = null
+                val uri = data?.data?.takeIf { resultCode == RESULT_OK }
+                val selection = uri?.let(::persistExternalStorageSelection)
+                FrontendScope.launch { callback(selection) }
+            }
+
+            FILE_PICKER_REQUEST_CODE -> {
+                val callback = pendingFilePickerResult ?: return
+                pendingFilePickerResult = null
+                val uri = data?.data?.takeIf { resultCode == RESULT_OK }
+                FrontendScope.launch {
+                    val selection = uri?.let {
+                        asyncOnIO {
+                            stageSelectedFile(it)
+                        }
+                            .await()
+                    }
+                    callback(selection)
+                }
+            }
+        }
     }
 
     private fun persistExternalStorageSelection(uri: Uri): ExternalStorageSelection? = runCatching {
@@ -274,6 +321,41 @@ class MainActivity : Activity(), PlatformStoragePickerController {
             displayPath = DocumentsContract.getTreeDocumentId(uri),
         )
     }.getOrNull()
+
+    private fun stageSelectedFile(uri: Uri): PlatformFileSelection? {
+        var stagingDirectory: File? = null
+        return runCatching {
+            val displayPath = documentDisplayName(uri) ?: "selected-file"
+            val safeName = File(displayPath).name
+                .takeIf { it.isNotBlank() && it != "." && it != ".." }
+                ?: "selected-file"
+            val cacheRoot = File(cacheDir, FILE_PICKER_CACHE_DIRECTORY).apply {
+                check(isDirectory || mkdirs()) { "Unable to create file picker cache" }
+            }
+            val selectionDirectory = File(cacheRoot, UUID.randomUUID().toString()).apply {
+                check(mkdirs()) { "Unable to create selection cache" }
+            }
+            stagingDirectory = selectionDirectory
+            val selectedFile = File(selectionDirectory, safeName)
+            contentResolver.openInputStream(uri)?.buffered().use { input ->
+                checkNotNull(input) { "Unable to open selected file" }
+                selectedFile.outputStream().buffered().use { output -> input.copyTo(output) }
+            }
+           PlatformFileSelection(
+                path = selectedFile.absolutePath,
+                displayPath = displayPath,
+                release = { selectionDirectory.deleteRecursively() },
+            )
+        }.onFailure {
+            stagingDirectory?.deleteRecursively()
+        }.getOrNull()
+    }
+
+    private fun documentDisplayName(uri: Uri): String? =
+        contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+            val displayNameColumn = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (displayNameColumn >= 0 && cursor.moveToFirst()) cursor.getString(displayNameColumn) else null
+        }
 
     private suspend fun installMsdfFonts() {
         UiTheme.Fonts.installBaseFont(loadMsdfFont(UiTheme.Fonts.CJK_MSDF_FONT_PATH))
@@ -340,6 +422,8 @@ private const val UI_RENDERER_WARMUP_MILLIS: Long = 100L
 private const val STARTING_GAME_STATUS_FRAME_MILLIS: Long = 50L
 private const val PREWARM_MAP_PREVIEWS_PER_MODE: Int = 12
 private const val EXTERNAL_STORAGE_TREE_REQUEST_CODE: Int = 9124
+private const val FILE_PICKER_REQUEST_CODE: Int = 9125
+private const val FILE_PICKER_CACHE_DIRECTORY: String = "file-picker"
 
 private suspend fun initialMapPreviewPaths(
     viewModelFactory: LevelSelectViewModelFactory,

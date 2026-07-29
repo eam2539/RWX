@@ -95,13 +95,11 @@ interface ScheduledTask {
 }
 
 interface Asset {
-    fun mount(namespace: String, root: ResourceLocation)
+    fun mount(namespace: String, root: ResourcePath)
     fun open(path: ResourcePath): ResourceStream
     fun exists(path: ResourcePath): Boolean
     fun list(path: ResourcePath): List<ResourcePath>
 }
-
-data class ResourceLocation(val uri: String)
 
 data class ResourcePath(val value: String)
 

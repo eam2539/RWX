@@ -45,6 +45,7 @@ class DesktopPlatformBridge : PlatformBridge {
     )
     override val isMobilePlatform: Boolean = false
     override val audio: PlatformAudio = DesktopPlatformAudio(storage)
+    override var filePickerHost: PlatformFilePickerHost?=null
 
     override fun createModClassLoader(modFile: File, parent: ClassLoader): ClassLoader {
         return URLClassLoader(arrayOf(modFile.toURI().toURL()), parent)
@@ -58,6 +59,8 @@ class DesktopPlatformBridge : PlatformBridge {
             desktop.browse(URI(url))
             true
         }.getOrDefault(false)
+
+
 }
 
 private class DesktopPlatformAudio(

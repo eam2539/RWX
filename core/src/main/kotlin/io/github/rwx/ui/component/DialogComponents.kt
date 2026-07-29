@@ -43,9 +43,19 @@ fun UiScope.MessageDialog(
         DialogScrollableList(dialog.listItems, theme, contentWidth, compact)
     }
     dialog.textInput?.let { input ->
-        DialogTextInput(inputValue.use(), input.hint, theme, contentWidth, compact) {
-            inputValue.value = it
-        }
+        TextFieldWithTrailingIcon(
+            value = inputValue.use(),
+            hint = input.hint,
+            theme = theme,
+            contentWidth = contentWidth,
+            compact = compact,
+            trailingIcon = input.trailingIcon,
+            trailingIconTooltip = input.trailingIconTooltip,
+            onTrailingIconPress = input.onTrailingIconPress?.let { onPress ->
+                { onPress { selectedValue -> inputValue.value = selectedValue } }
+            },
+            onChange = { inputValue.value = it },
+        )
     }
     dialog.form?.let { form ->
         DialogForm(form, formValues.use(), theme, contentWidth, compact, dialog.usesScrollableForm()) { id, value ->
@@ -496,7 +506,7 @@ private fun UiScope.DialogChoiceField(
         RwxComboBox {
             modifier
                 .width(Grow.Std)
-                .height(if (compact) CompactDialogFormControlHeight else UiTheme.Layout.menuButtonHeight)
+                .height(if (compact) UiTheme.Layout.CompactMenuButtonHeight  else UiTheme.Layout.menuButtonHeight)
                 .font(UiTheme.Fonts.bodySmall)
                 .items(field.options)
                 .selectedIndex(selectedIndex)
@@ -535,7 +545,7 @@ private fun UiScope.DialogToggleField(
         Button(if (checked) "On" else "Off") {
             modifier
                 .width(Grow.Std)
-                .height(if (compact) CompactDialogFormControlHeight else UiTheme.Layout.menuButtonHeight)
+                .height(if (compact) UiTheme.Layout.CompactMenuButtonHeight else UiTheme.Layout.menuButtonHeight)
                 .font(UiTheme.Fonts.bodySmall)
                 .colors(
                     buttonColor = if (checked) theme.palette.primaryContainer else theme.palette.surfaceSunken,
@@ -557,7 +567,7 @@ private fun UiScope.DialogTextField(
     onChange: (String, String) -> Unit,
 ) {
     DialogFieldRow(field.label, theme, contentWidth, compact) {
-        DialogTextInput(value ?: field.initialText, field.hint, theme, Grow.Std, compact) {
+        TextFieldWithTrailingIcon(value ?: field.initialText, field.hint, theme, Grow.Std, compact) {
             onChange(field.id, it)
         }
     }
@@ -582,7 +592,7 @@ private fun UiScope.DialogFieldRow(
                     .clipToBounds(true)
                     .textColor(theme.palette.textPrimary)
             }
-            Box(width = contentWidth, height = CompactDialogFormControlHeight) {
+            Box(width = contentWidth, height = UiTheme.Layout.CompactMenuButtonHeight) {
                 content()
             }
         }
@@ -604,34 +614,6 @@ private fun UiScope.DialogFieldRow(
         Box(width = inputWidth, height = UiTheme.Layout.menuButtonHeight) {
             content()
         }
-    }
-}
-
-fun UiScope.DialogTextInput(
-    value: String,
-    hint: String,
-    theme: ColorSchemeDefinition,
-    contentWidth: Dimension = UiTheme.Layout.dialogMessageWidth,
-    compact: Boolean = false,
-    onChange: (String) -> Unit,
-) {
-    RwxTextField(value) {
-        modifier
-            .width(contentWidth)
-            .height(if (compact) CompactDialogFormControlHeight else UiTheme.Layout.menuButtonHeight)
-            .margin(bottom = if (compact) Dp.ZERO else UiTheme.Spacing.lg)
-            .padding(start = UiTheme.Spacing.sm)
-            .hint(hint)
-            .font(UiTheme.Fonts.bodySmall)
-            .colors(
-                textColor = theme.palette.textPrimary,
-                hintColor = theme.palette.textSecondary,
-                lineColor = theme.palette.borderSubtle,
-                lineColorFocused = theme.palette.primary,
-                cursorColor = theme.palette.primary,
-                selectionColor = theme.palette.primaryContainer,
-            )
-            .onChange(onChange)
     }
 }
 
@@ -663,7 +645,6 @@ private val CompactDialogScrollableMessageHeight: Dp = Dp(240f)
 private val CompactDialogScrollableFormHeight: Dp = Dp(250f)
 private val CompactDialogListHeight: Dp = Dp(230f)
 private val CompactDialogFormLabelHeight: Dp = Dp(20f)
-private val CompactDialogFormControlHeight: Dp = Dp(34f)
 private val CompactDialogFormFieldHeight: Dp = Dp(58f)
 private const val CompactDialogWideFormFieldThreshold: Int = 15
 private const val DialogAutomaticScrollFieldThreshold: Int = 6

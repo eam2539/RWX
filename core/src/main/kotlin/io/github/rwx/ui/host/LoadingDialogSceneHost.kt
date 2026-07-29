@@ -15,13 +15,13 @@ class LoadingDialogSceneHost(
 ) {
     private val dialogState = mutableStateOf<LoadingDialogState?>(null)
 
-    fun showProgress(title: String, message: String, progress: Float) {
-        dialogState.value = LoadingDialogState(title, message, progress.coerceIn(0.0f, 1.0f))
+    fun showProgress(title: String, message: String, progress: Float, onDismiss: () -> Unit = { hide() }) {
+        dialogState.value = LoadingDialogState(title, message, progress.coerceIn(0.0f, 1.0f), onDismiss)
         onVisibilityChanged(true)
     }
 
-    fun showCircular(title: String, message: String) {
-        dialogState.value = LoadingDialogState(title, message, progress = null)
+    fun showCircular(title: String, message: String, onDismiss: () -> Unit = { hide() }) {
+        dialogState.value = LoadingDialogState(title, message, progress = null, onDismiss)
         onVisibilityChanged(true)
     }
 
@@ -39,19 +39,20 @@ class LoadingDialogSceneHost(
     }
 
     fun createScene(): Scene = UiScene(LOADING_DIALOG_SCENE_NAME) {
-        addPanelSurface(PanelStyle.Dialog, "rwx-loading-dialog-panel", model) { theme ->
+        addPanelSurface(PanelStyle.Dialog, "loading-dialog-panel", model) { theme ->
             val dialog = dialogState.use() ?: return@addPanelSurface
             val progress = dialog.progress
             if (progress == null) {
-                CircularLoadingDialog(dialog.title, dialog.message, theme)
+                CircularLoadingDialog(dialog.title, dialog.message, theme, onCancel = dialog.onDismiss)
             } else {
-                ProgressLoadingDialog(dialog.title, dialog.message, progress, theme)
+                ProgressLoadingDialog(dialog.title, dialog.message, progress, theme, onCancel = dialog.onDismiss)
             }
         }
     }
 
     companion object {
-        const val LOADING_DIALOG_SCENE_NAME: String = "rwx-loading-dialog"
+
+        const val LOADING_DIALOG_SCENE_NAME: String = "loading-dialog"
     }
 }
 
@@ -59,4 +60,5 @@ private data class LoadingDialogState(
     val title: String,
     val message: String,
     val progress: Float?,
+    val onDismiss: () -> Unit
 )
