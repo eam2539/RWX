@@ -6,7 +6,10 @@ import de.fabmax.kool.platform.swing.KoolGlCanvas
 import de.fabmax.kool.platform.swing.SwingWindowSubsystem
 import io.github.rwx.slick.SlickAwtGLCanvas
 import io.github.rwx.slick.SlickCanvasHost
+import org.lwjgl.awt.AWT as LwjglAwt
 import org.lwjgl.opengl.awt.GLData
+import org.lwjgl.system.jawt.JAWTWin32DrawingSurfaceInfo
+import org.lwjgl.system.windows.User32
 import java.awt.*
 import java.awt.event.*
 import java.awt.font.TextHitInfo
@@ -75,13 +78,7 @@ class SwingKoolHost private constructor(
             }
         })
 
-        overlayPanel.background = TransparentCanvasColor
-        overlayPanel.isOpaque = false
-        overlayPanel.add(koolCanvas, BorderLayout.CENTER)
-        overlayWindow.background = TransparentCanvasColor
-        overlayWindow.contentPane = overlayPanel
-        overlayWindow.rootPane.isOpaque = false
-        overlayWindow.focusableWindowState = true
+        configureKoolOverlayWindow(overlayWindow, overlayPanel, koolCanvas)
 
         frame.defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE
         frame.isUndecorated = startupFullscreen
@@ -182,6 +179,7 @@ class SwingKoolHost private constructor(
         if (visible) {
             syncOverlayBounds(forceLocationRefresh = true)
             overlayWindow.isVisible = true
+            enableWindowsKoolOverlayInput(overlayWindow)
             overlayWindow.toFront()
         } else {
             overlayWindow.isVisible = false
@@ -305,7 +303,6 @@ class SwingKoolHost private constructor(
         val DEFAULT_WINDOW_SIZE = Vec2i(1280, 720)
         private const val KOOL_CARD = "kool"
         private const val GAME_CARD = "game"
-        private val TransparentCanvasColor = Color(0, 0, 0, 0)
 
         fun create(fullscreen: Boolean, useOpenGl: Boolean): SwingKoolHost {
             System.setProperty("org.lwjgl.opengl.contextAPI", "native")
@@ -376,6 +373,43 @@ class SwingKoolHost private constructor(
                 .defaultConfiguration
                 .bounds
 
+    }
+}
+
+internal fun configureKoolOverlayWindow(
+    overlayWindow: JWindow,
+    overlayPanel: JPanel,
+    koolCanvas: Canvas,
+) {
+    overlayPanel.background = TransparentCanvasColor
+    overlayPanel.isOpaque = false
+    overlayPanel.add(koolCanvas, BorderLayout.CENTER)
+    overlayWindow.background = TransparentCanvasColor
+    overlayWindow.contentPane = overlayPanel
+    overlayWindow.rootPane.isOpaque = false
+    overlayWindow.focusableWindowState = true
+}
+
+private val TransparentCanvasColor = Color(0, 0, 0, 0)
+
+internal fun enableWindowsKoolOverlayInput(
+    overlayWindow: JWindow,
+    osName: String = System.getProperty("os.name"),
+) {
+    if (!osName.startsWith("Windows", ignoreCase = true)) return
+
+    LwjglAwt(overlayWindow).use { awt ->
+        val windowHandle = JAWTWin32DrawingSurfaceInfo.create(awt.platformInfo).hwnd()
+        val extendedStyle = User32.GetWindowLongPtr(null, windowHandle, User32.GWL_EXSTYLE)
+        if (extendedStyle and User32.WS_EX_LAYERED.toLong() == 0L) return
+
+        // Java 的透明顶层窗口会带上 WS_EX_LAYERED，Windows 会让它整体穿透鼠标。
+        User32.SetWindowLongPtr(
+            null,
+            windowHandle,
+            User32.GWL_EXSTYLE,
+            extendedStyle and User32.WS_EX_LAYERED.toLong().inv(),
+        )
     }
 }
 
