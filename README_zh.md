@@ -1,4 +1,4 @@
-<div align="center">
+<div style="text-align: center;">
 
 ![Banner](logo.svg)
 
@@ -22,7 +22,7 @@
 ## 亮点
 
 - 支持 **Desktop + Android**
-- **P2P 联机**：WebRTC DataChannel 传输 + libp2p 发现/信令
+- **P2P 联机**：全新联机方式
 - **区域控制**模式：占领区域、持续计分、改写胜负条件
 - **地图联通**：用传送门连接多张地图，单位可跨图转移
 - **JVM 模组**，便于更深度地扩展玩法
@@ -38,7 +38,6 @@
 
 - [x] 基于 P2P 的联机系统
 - [ ] 中继 / 兜底连通性改进
-- [ ] 合作模式 *（暂未规划）*
 
 ### 玩法特性
 
@@ -62,7 +61,7 @@
 ./gradlew -PandroidAbiSplits=true :android:assembleRelease
 ```
 
-更多信息请参考 [CI/CD 配置](.github/workflows/deploy.yml) 以及
+更多信息请参考 [CI/CD 配置](.github/workflows/ci.yml) 以及
 [文档站快速开始](https://rwx-docs.netlify.app/zh/tutorial/getting-started)。
 
 ## 免责声明

@@ -175,7 +175,6 @@ jobs:
           echo "RWX_VERSION=$version" >> "$GITHUB_ENV"
 
       - name: Validate Android signing configuration
-        if: env.SIGNING_KEYSTORE_BASE64 != '' || env.SIGNING_KEYSTORE_PASSWORD != '' || env.SIGNING_KEY_ALIAS != '' || env.SIGNING_KEY_PASSWORD != ''
         shell: bash
         run: |
           test -n "$SIGNING_KEYSTORE_BASE64"
@@ -184,7 +183,6 @@ jobs:
           test -n "$SIGNING_KEY_PASSWORD"
 
       - name: Restore Android signing keystore
-        if: env.SIGNING_KEYSTORE_BASE64 != ''
         shell: bash
         run: |
           keystore="$RUNNER_TEMP/rwx-android-signing.p12"
@@ -241,7 +239,7 @@ jobs:
           retention-days: 14
 
       - name: Remove Android signing keystore
-        if: always() && env.KEYSTORE_FILE != ''
+        if: always()
         shell: bash
         run: rm -f "$KEYSTORE_FILE"
 
@@ -264,16 +262,33 @@ jobs:
           pattern: RWX-*
           merge-multiple: true
 
-      - name: Create or update GitHub Release
+      - name: Prepare release notes
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: bash
         run: |
-          mapfile -d '' assets < <(find release-artifacts -type f -print0 | sort -z)
-          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" "${assets[@]}" \
-              --repo "$GITHUB_REPOSITORY" --clobber
+          TAG_MESSAGE=$(git cat-file tag "$RWX_VERSION" 2>/dev/null | sed '1,/^$/d' || echo "")
+          if [ -z "$TAG_MESSAGE" ]; then
+            AUTO_NOTES=$(gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+              -f tag_name="$RWX_VERSION" \
+              --jq '.body')
+            echo "$AUTO_NOTES" > release_notes.md
           else
-            gh release create "$GITHUB_REF_NAME" "${assets[@]}" \
-              --repo "$GITHUB_REPOSITORY" --generate-notes --verify-tag
+#            printf "%s\n\n---\n\n%s" "$TAG_MESSAGE" "%s\n\n---\n\n%s" "$AUTO_NOTES" > release_notes.md
+            echo "$TAG_MESSAGE" > release_notes.md
           fi
+
+      - name: Create or update release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ env.RWX_VERSION }}
+          name: ${{ env.RWX_VERSION }}
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          replacesArtifacts: true
+          bodyFile: release_notes.md
+          artifacts: |
+            release-artifacts/**/*
+          token: ${{ secrets.GITHUB_TOKEN }}

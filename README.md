@@ -1,4 +1,4 @@
-<div align="center">
+<div style="text-align: center;">
 
 ![Banner](logo.svg)
 
@@ -21,7 +21,7 @@ English, [简体中文](README_zh.md)
 ## Highlights
 
 - **Desktop + Android** supported
-- **P2P multiplayer** with WebRTC DataChannel transport and libp2p discovery/signaling
+- **P2P multiplayer**: A brand-new way to play together
 - **Area Control** mode: capture zones, continuous scoring, new win conditions
 - **Linked Maps**: connect multiple maps with portals and transfer units between them
 - **JVM modding** for deeper gameplay extensions
@@ -37,7 +37,6 @@ English, [简体中文](README_zh.md)
 
 - [x] P2P-based multiplayer system
 - [ ] Dedicated relay / fallback path improvements
-- [ ] Co-op mode *(not planned right now)*
 
 ### Gameplay features
 
@@ -61,7 +60,7 @@ Java 25 is required. Common release tasks:
 ./gradlew -PandroidAbiSplits=true :android:assembleRelease
 ```
 
-See the [workflow](.github/workflows/deploy.yml) and the
+See the [workflow](.github/workflows/ci.yml) and the
 [getting started guide](https://rwx-docs.netlify.app/tutorial/getting-started) for more details.
 
 ## Disclaimer
