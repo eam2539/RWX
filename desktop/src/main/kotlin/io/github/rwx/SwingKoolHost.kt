@@ -10,10 +10,7 @@ import io.github.rwx.app.launchOnIO
 import io.github.rwx.slick.SlickAwtGLCanvas
 import io.github.rwx.slick.SlickCanvasHost
 import kotlinx.coroutines.launch
-import org.lwjgl.awt.AWT as LwjglAwt
 import org.lwjgl.opengl.awt.GLData
-import org.lwjgl.system.jawt.JAWTWin32DrawingSurfaceInfo
-import org.lwjgl.system.windows.User32
 import java.awt.*
 import java.awt.event.*
 import java.awt.font.TextHitInfo
@@ -220,7 +217,6 @@ class SwingKoolHost private constructor(
         if (visible) {
             syncOverlayBounds(forceLocationRefresh = true)
             overlayWindow.isVisible = true
-            enableWindowsKoolOverlayInput(overlayWindow)
             overlayWindow.toFront()
         } else {
             overlayWindow.isVisible = false
@@ -421,38 +417,23 @@ internal fun configureKoolOverlayWindow(
     overlayWindow: JWindow,
     overlayPanel: JPanel,
     koolCanvas: Canvas,
+    osName: String = System.getProperty("os.name"),
 ) {
     overlayPanel.background = TransparentCanvasColor
     overlayPanel.isOpaque = false
     overlayPanel.add(koolCanvas, BorderLayout.CENTER)
-    overlayWindow.background = TransparentCanvasColor
+    overlayWindow.background = if (osName.startsWith("Windows", ignoreCase = true)) {
+        WindowsOverlayBackgroundColor
+    } else {
+        TransparentCanvasColor
+    }
     overlayWindow.contentPane = overlayPanel
     overlayWindow.rootPane.isOpaque = false
     overlayWindow.focusableWindowState = true
 }
 
 private val TransparentCanvasColor = Color(0, 0, 0, 0)
-
-internal fun enableWindowsKoolOverlayInput(
-    overlayWindow: JWindow,
-    osName: String = System.getProperty("os.name"),
-) {
-    if (!osName.startsWith("Windows", ignoreCase = true)) return
-
-    LwjglAwt(overlayWindow).use { awt ->
-        val windowHandle = JAWTWin32DrawingSurfaceInfo.create(awt.platformInfo).hwnd()
-        val extendedStyle = User32.GetWindowLongPtr(null, windowHandle, User32.GWL_EXSTYLE)
-        if (extendedStyle and User32.WS_EX_LAYERED.toLong() == 0L) return
-
-        // Java 的透明顶层窗口会带上 WS_EX_LAYERED，Windows 会让它整体穿透鼠标。
-        User32.SetWindowLongPtr(
-            null,
-            windowHandle,
-            User32.GWL_EXSTYLE,
-            extendedStyle and User32.WS_EX_LAYERED.toLong().inv(),
-        )
-    }
-}
+private val WindowsOverlayBackgroundColor = Color(0, 0, 0, 1)
 
 internal fun dispatchCanvasVisibilityChange(
     gameCanvasShowing: Boolean,
