@@ -68,8 +68,17 @@ jobs:
           ./gradlew --no-daemon \
             -Pversion="$RWX_VERSION" \
             -PtargetPlatform=${{ matrix.platform_id }} \
+            :desktop:test \
             :desktop:platformFatJar \
             :desktop:packageDesktopDistribution
+
+      - name: Verify Windows launcher uses bundled runtime
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./.github/scripts/test-windows-bundled-runtime.ps1 `
+            -ImagePath desktop/build/jpackage/image/windows-x64/RWX `
+            -ExternalJavaHome $env:JAVA_HOME
 
       - name: Upload desktop artifacts
         uses: actions/upload-artifact@v6

@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import edu.sc.seis.launch4j.tasks.Launch4jLibraryTask
 import io.github.rwx.build.AssetListGenerationSupport
 import io.github.rwx.build.KoolVulkanOverlayPatchTask
 import java.util.*
@@ -8,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.shadow)
+    alias(libs.plugins.launch4j)
 }
 
 kotlin {
@@ -364,10 +366,51 @@ val createJpackageImage by tasks.registering(Exec::class) {
 val packagedAppName = if (targetPlatform.osName == "macos") "$appName.app" else appName
 
 if (targetPlatform.osName == "windows") {
+    val createWindowsLauncher = tasks.named<Launch4jLibraryTask>("createExe") {
+        group = "distribution"
+        description = "Creates a Windows launcher that always uses the bundled runtime."
+        setJarTask(platformFatJar.get())
+        outputDir.set("launch4j/windows")
+        outfile.set("$appName.exe")
+        mainClassName.set(application.mainClass)
+        dontWrapJar.set(true)
+        libraryDir.set("app")
+        bundledJrePath.set("runtime")
+        requires64Bit.set(true)
+        jreMinVersion.set("25")
+        icon.set(layout.projectDirectory.file("src/main/resources/icons/logo.ico").asFile.absolutePath)
+        jvmOptions.set(
+            listOf(
+                "-Djpackage.app-version=$jpackageVersion",
+                "-Dfile.encoding=UTF-8",
+                "-Dorg.lwjgl.opengl.contextAPI=native",
+            ),
+        )
+        productName.set(appName)
+        fileDescription.set("Cross-platform real-time strategy game")
+    }
+
+    val installWindowsLauncher by tasks.registering(Copy::class) {
+        group = "distribution"
+        description = "Replaces the jpackage launcher with the bundled-runtime Windows launcher."
+        dependsOn(createJpackageImage, createWindowsLauncher)
+        from(layout.buildDirectory.file("launch4j/windows/$appName.exe"))
+        from(File(System.getProperty("java.home"), "bin/javaw.exe")) {
+            into("runtime/bin")
+        }
+        into(jpackageImageDir.map { it.dir(packagedAppName) })
+        doFirst {
+            val launcher = jpackageImageDir.get().file("$packagedAppName/$appName.exe").asFile
+            if (launcher.exists() && !launcher.setWritable(true)) {
+                throw GradleException("Could not make the jpackage launcher writable: $launcher")
+            }
+        }
+    }
+
     tasks.register<Zip>("packageDesktopDistribution") {
         group = "distribution"
         description = "Creates the ${targetPlatform.id} jpackage distribution zip."
-        dependsOn(createJpackageImage)
+        dependsOn(installWindowsLauncher)
         destinationDirectory.set(layout.buildDirectory.dir("distributions"))
         archiveFileName.set("$appName-${project.version}-${targetPlatform.id}-desktop.zip")
         from(jpackageImageDir.map { it.dir(packagedAppName) }) {

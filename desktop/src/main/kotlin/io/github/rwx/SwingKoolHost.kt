@@ -81,13 +81,7 @@ class SwingKoolHost private constructor(
             }
         })
 
-        overlayPanel.background = TransparentCanvasColor
-        overlayPanel.isOpaque = false
-        overlayPanel.add(koolCanvas, BorderLayout.CENTER)
-        overlayWindow.background = TransparentCanvasColor
-        overlayWindow.contentPane = overlayPanel
-        overlayWindow.rootPane.isOpaque = false
-        overlayWindow.focusableWindowState = true
+        configureKoolOverlayWindow(overlayWindow, overlayPanel, koolCanvas)
 
         frame.defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE
         frame.isUndecorated = startupFullscreen
@@ -346,7 +340,6 @@ class SwingKoolHost private constructor(
         val DEFAULT_WINDOW_SIZE = Vec2i(1280, 720)
         private const val KOOL_CARD = "kool"
         private const val GAME_CARD = "game"
-        private val TransparentCanvasColor = Color(0, 0, 0, 0)
 
         fun create(fullscreen: Boolean, useOpenGl: Boolean): SwingKoolHost {
             System.setProperty("org.lwjgl.opengl.contextAPI", "native")
@@ -419,6 +412,28 @@ class SwingKoolHost private constructor(
 
     }
 }
+
+internal fun configureKoolOverlayWindow(
+    overlayWindow: JWindow,
+    overlayPanel: JPanel,
+    koolCanvas: Canvas,
+    osName: String = System.getProperty("os.name"),
+) {
+    overlayPanel.background = TransparentCanvasColor
+    overlayPanel.isOpaque = false
+    overlayPanel.add(koolCanvas, BorderLayout.CENTER)
+    overlayWindow.background = if (osName.startsWith("Windows", ignoreCase = true)) {
+        WindowsOverlayBackgroundColor
+    } else {
+        TransparentCanvasColor
+    }
+    overlayWindow.contentPane = overlayPanel
+    overlayWindow.rootPane.isOpaque = false
+    overlayWindow.focusableWindowState = true
+}
+
+private val TransparentCanvasColor = Color(0, 0, 0, 0)
+private val WindowsOverlayBackgroundColor = Color(0, 0, 0, 1)
 
 internal fun dispatchCanvasVisibilityChange(
     gameCanvasShowing: Boolean,

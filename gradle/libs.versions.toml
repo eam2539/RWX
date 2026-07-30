@@ -17,6 +17,7 @@ koinCoreVersion = "4.2.2"
 slf4jVersion = "2.0.18"
 logbackVersion = "1.5.37"
 shadowVersion = "9.4.3"
+launch4jVersion = "4.0.0"
 timberVersion = "5.0.1"
 [libraries]
 httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclientVersion" }
@@ -46,3 +47,4 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinVersion" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadowVersion" }
+launch4j = { id = "edu.sc.seis.launch4j", version.ref = "launch4jVersion" }
