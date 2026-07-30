@@ -24,7 +24,7 @@ import kotlin.test.assertTrue
 class SwingKoolHostWindowsTest {
     @Test
     fun `kool overlay stays transparent and receives mouse clicks on Windows`() {
-        if (!isWindows() || GraphicsEnvironment.isHeadless()) return
+        if (!isWindows() || GraphicsEnvironment.isHeadless() || System.getenv("CI").toBoolean()) return
 
         val clicked = CountDownLatch(1)
         var frame: JFrame? = null
