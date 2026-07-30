@@ -2,6 +2,7 @@ package io.github.rwx.mod
 
 import io.github.rwx.PlatformBridge
 import io.github.rwx.logger
+import io.github.rwx.mod.assets.AssetPrivateKey
 import net.peanuuutz.tomlkt.*
 import org.koin.mp.KoinPlatform.getKoin
 import java.io.Closeable
@@ -11,7 +12,8 @@ import java.util.zip.ZipFile
 class JvmModLoader @JvmOverloads constructor(
     private val platformClassLoader: ClassLoader = JvmModLoader::class.java.classLoader,
     private val createClassLoader: ((File, ClassLoader) -> ClassLoader)? = null,
-    private val platformBridge: PlatformBridge? = null
+    private val platformBridge: PlatformBridge? = null,
+    private val assetKeyResolver: ((String) -> AssetPrivateKey?)? = null,
 ) : AutoCloseable {
     val errors: MutableList<Throwable> = mutableListOf()
 
@@ -39,6 +41,7 @@ class JvmModLoader @JvmOverloads constructor(
                     currentBatch += mod
                 }
             }.onFailure { e ->
+                errors += e
                 logger.error(e) { "Failed to load JVM mod from ${file.path}" }
             }
         }
@@ -79,13 +82,17 @@ class JvmModLoader @JvmOverloads constructor(
             ?: requireNotNull(resolvedPlatformBridge) { "A PlatformBridge or classloader factory is required" }
                 .createModClassLoader(jarFile, platformClassLoader)
 
-        val mod = (instantiateMod(entryClassName, classLoader, jarFile.name)
-            ?: return null)
-            .apply {
+        val mod = instantiateMod(entryClassName, classLoader, jarFile.name) ?: return null
+        try {
+            mod.apply {
                 this.classLoader = classLoader
                 this.metadata = metadata
-                this.api = ApiImpl.create(metadata, jarFile, resolvedPlatformBridge)
+                this.api = ApiImpl.create(metadata, jarFile, resolvedPlatformBridge, assetKeyResolver)
             }
+        } catch (error: Throwable) {
+            if (classLoader is Closeable) runCatching(classLoader::close)
+            throw error
+        }
 
         discoveredMods += mod
         return mod
@@ -232,6 +239,11 @@ class JvmModLoader @JvmOverloads constructor(
             ModRegistry.unregister(mod)
         }
         discoveredMods.distinct().forEach { mod ->
+            runCatching {
+                (runCatching { mod.api }.getOrNull() as? ApiImpl)?.close()
+            }.onFailure { e ->
+                logger.error(e) { "Error closing assets for mod ${mod.metadata.id}" }
+            }
             runCatching {
                 val cl = mod.classLoader
                 if (cl is Closeable) cl.close()

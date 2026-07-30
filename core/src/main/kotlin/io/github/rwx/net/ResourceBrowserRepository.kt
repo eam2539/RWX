@@ -37,39 +37,36 @@ class ResourceBrowserRepository(
             }
         }
 
-    fun downloadBlocking(
+    suspend fun download(
         item: ResourceBrowserItem,
         progress: (Float) -> Unit,
     ): Result<File> =
         runCatching {
             val url = requireNotNull(item.downloadUrl) { "Missing download URL" }
-            val target = runBlocking {
-                val response = client.get(url) {
-                    timeout {
-                        requestTimeoutMillis = RESOURCE_BROWSER_DOWNLOAD_TIMEOUT_MS
-                        connectTimeoutMillis = RESOURCE_BROWSER_TIMEOUT_MS
-                        socketTimeoutMillis = RESOURCE_BROWSER_DOWNLOAD_SOCKET_TIMEOUT_MS
+            val response = client.get(url) {
+                timeout {
+                    requestTimeoutMillis = RESOURCE_BROWSER_DOWNLOAD_TIMEOUT_MS
+                    connectTimeoutMillis = RESOURCE_BROWSER_TIMEOUT_MS
+                    socketTimeoutMillis = RESOURCE_BROWSER_DOWNLOAD_SOCKET_TIMEOUT_MS
+                }
+            }
+            val target = item.downloadTargetFile(storage, response)
+            target.parentFile?.mkdirs()
+            val contentLength = response.contentLength() ?: -1L
+            val channel = response.bodyAsChannel()
+            var downloaded = 0L
+            val buffer = ByteArray(DOWNLOAD_BUFFER_SIZE)
+            target.outputStream().buffered().use { output ->
+                while (!channel.isClosedForRead) {
+                    val read = channel.readAvailable(buffer, 0, buffer.size)
+                    if (read == -1) break
+                    if (read == 0) continue
+                    output.write(buffer, 0, read)
+                    downloaded += read
+                    if (contentLength > 0L) {
+                        progress((downloaded.toFloat() / contentLength.toFloat()).coerceIn(0.0f, 1.0f))
                     }
                 }
-                val target = item.downloadTargetFile(storage, response)
-                target.parentFile?.mkdirs()
-                val contentLength = response.contentLength() ?: -1L
-                val channel = response.bodyAsChannel()
-                var downloaded = 0L
-                val buffer = ByteArray(DOWNLOAD_BUFFER_SIZE)
-                target.outputStream().buffered().use { output ->
-                    while (!channel.isClosedForRead) {
-                        val read = channel.readAvailable(buffer, 0, buffer.size)
-                        if (read == -1) break
-                        if (read == 0) continue
-                        output.write(buffer, 0, read)
-                        downloaded += read
-                        if (contentLength > 0L) {
-                            progress((downloaded.toFloat() / contentLength.toFloat()).coerceIn(0.0f, 1.0f))
-                        }
-                    }
-                }
-                target
             }
             progress(1.0f)
             target

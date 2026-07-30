@@ -1,6 +1,8 @@
 package io.github.rwx.app
 
 import de.fabmax.kool.KoolContext
+import de.fabmax.kool.util.ApplicationScope
+import io.github.rwx.logger
 import io.github.rwx.render.canvas.KoolCanvasFrame
 import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.ui.*
@@ -8,10 +10,39 @@ import io.github.rwx.ui.model.LevelSelectMode
 import io.github.rwx.ui.model.MainMenuConditions
 import io.github.rwx.ui.model.PauseMenuConditions
 import io.github.rwx.ui.model.ResourceBrowserType
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 const val RWX_KOOL_READY_MARKER: String = "RWX_SCREENSHOT_READY"
 const val RWX_KOOL_GAME_FRAME_READY_MARKER: String = "RWX_GAME_FRAME_READY"
+private val ioSupervisor = SupervisorJob(ApplicationScope.job)
 
+fun launchOnIO(name: String?=null,
+               start: CoroutineStart = CoroutineStart.DEFAULT,
+               exceptionHandler: (CoroutineContext, Throwable)->Unit={ _, t-> logger.error(t) },
+               block: suspend CoroutineScope.() -> Unit): Job {
+    val effectiveName = name ?: "IO-${System.identityHashCode(block)}"
+    val ctx=ioSupervisor+Dispatchers.IO+ CoroutineName(effectiveName)+CoroutineExceptionHandler(exceptionHandler)
+    return ApplicationScope.launch(ctx, start, block)
+}
+fun <T> asyncOnIO(
+    name: String? = null,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    block: suspend CoroutineScope.() -> T
+): Deferred<T> {
+    val effectiveName = name ?: "IO-${System.identityHashCode(block)}"
+    val ctx = ioSupervisor + Dispatchers.IO + CoroutineName(effectiveName)
+    return ApplicationScope.async(ctx, start, block)
+}
 class AppSession internal constructor(
     val navigator: ScreenNavigator,
     private val onQuit: () -> Unit,

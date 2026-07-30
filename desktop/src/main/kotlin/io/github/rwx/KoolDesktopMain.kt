@@ -55,9 +55,10 @@ object KoolDesktopMain : KoinComponent {
             fullscreen = SettingsEngine.getInstance().slick2dFullScreen,
             useOpenGl = renderBackend == RenderBackendGl.Companion,
         )
+        val bridge=get<PlatformBridge>()
+        bridge.filePickerHost=swingHost
         val context = createContext(createKoolConfig(swingHost, renderBackend))
         val app = KoolApplication(context)
-
         val loadingScene = LoadingSceneHost.createScene()
         app.ctx.addScene(loadingScene)
         FrontendScope.launch {

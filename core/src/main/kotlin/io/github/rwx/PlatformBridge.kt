@@ -16,6 +16,7 @@ interface PlatformBridge {
         get() = 1f
     val audio: PlatformAudio
         get() = NoopPlatformAudio
+    var filePickerHost:PlatformFilePickerHost?
 
     /**
      * Create an isolated ClassLoader for a mod JAR file.

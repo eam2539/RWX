@@ -35,11 +35,10 @@ data class ModImportResult(
 
 class FileSystemModRepository(
     private val storage: PlatformStorage,
-    preferenceStorage: PreferenceStorage,
+    private val preferenceStorage: PreferenceStorage,
 ) : ModRepository {
     private val preferences = preferenceStorage.preference(PREFERENCE_NAME)
     private val pendingEnabled = LinkedHashMap<String, Boolean>()
-    private val preferenceStorage = preferenceStorage
 
     override fun listMods(): List<ModEntry> {
         liveModManager()?.let { manager ->
@@ -62,6 +61,17 @@ class FileSystemModRepository(
         val source = File(path.trim().trim('"', '\'')).absoluteFile
         if (!source.exists()) {
             return ModImportResult(false, "Import failed: file does not exist")
+        }
+        if (source.isFile && source.extension.equals(PRIVATE_ASSET_KEY_EXTENSION, ignoreCase = true)) {
+            return runCatching {
+                val imported = JvmModAssetKeyStore(storage).importKey(source)
+                ModImportResult(
+                    true,
+                    "Imported JVM mod asset key ${imported.keyId.take(12)}… (${imported.kind.name.lowercase()})",
+                )
+            }.getOrElse { error ->
+                ModImportResult(false, "Key import failed: ${error.message ?: error.javaClass.simpleName}")
+            }
         }
         if (!source.isModSourceCandidate()) {
             return ModImportResult(false, "Import failed: unsupported mod source")
@@ -243,8 +253,7 @@ class FileSystemModRepository(
                                 name.equals(MOD_INFO_FILE, ignoreCase = true)
                     }
                     .filter { (_, name) -> name.count { it == '/' } <= MAX_MOD_INFO_DEPTH }
-                    .sortedBy { (_, name) -> name.count { it == '/' } }
-                    .firstOrNull()
+                    .minByOrNull { (_, name) -> name.count { it == '/' } }
                 if (modInfoEntry != null) {
                     val text = zip.getInputStream(modInfoEntry.first).bufferedReader().use { it.readText() }
                     return ModInfoReadResult(parseModInfo(text), null)
@@ -383,6 +392,7 @@ class FileSystemModRepository(
     companion object {
         private const val MOD_INFO_FILE = "mod-info.txt"
         private const val JVM_MOD_MANIFEST = "mod.toml"
+        private const val PRIVATE_ASSET_KEY_EXTENSION = "rwxkey"
         private const val MAX_MOD_INFO_DEPTH = 4
         private const val MAX_ORIGINAL_SELECTION_LABEL_LENGTH = 15
         private const val ORIGINAL_MOD_SETTINGS_KEY = "modSettings"
@@ -400,7 +410,7 @@ internal fun ModInfo.toModEntryModel(): ModEntry =
         name = displayTitle(),
         isEnabled = isSelectedInPreferences(),
         description = description.orEmpty(),
-        ramLabel = getMemoryUsageString(),
+        ramLabel = memoryUsageString,
         errorMessage = statusErrorMessage(),
     )
 

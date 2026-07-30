@@ -44,8 +44,8 @@ internal class UpdateController(
         if (inProgress) return
 
         inProgress = true
-        Thread({
-            val response = updateRepository.checkLatestReleaseBlocking(appMetadata.versionName)
+        launchOnIO("resource-browser-search"){
+            val response = updateRepository.checkLatestRelease(appMetadata.versionName)
             result.set(
                 UpdateCheckResult(
                     manual = manual || manualRequested.getAndSet(false),
@@ -53,9 +53,6 @@ internal class UpdateController(
                     error = response.exceptionOrNull(),
                 )
             )
-        }, "RWX-update-check").apply {
-            isDaemon = true
-            start()
         }
     }
 

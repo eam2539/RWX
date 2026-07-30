@@ -69,7 +69,8 @@ object ModAudioRegistry {
     private fun materialize(sound: RegisteredSound) {
         if (sound.loaded) return
         val audio = sound.owner.platformBridge?.audio ?: return
-        audio.registerSound(sound.backendId, sound.owner.resolvePackagedResource(sound.path))
+        val data = sound.owner.openPackagedResource(sound.path).use { it.readBytes() }
+        audio.registerSound(sound.backendId, data, sound.path.value)
         sound.loaded = true
     }
 

@@ -10,7 +10,7 @@ import de.fabmax.kool.input.KeyEvent
 import de.fabmax.kool.input.KeyboardInput
 import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.scene.Scene
-import io.github.rwx.PlatformStoragePickerBridge
+import io.github.rwx.PlatformBridge
 import io.github.rwx.input.KoolKeyCodeMapping
 import io.github.rwx.ui.model.AndroidStoragePreference
 import io.github.rwx.ui.component.BodyText
@@ -38,6 +38,7 @@ import io.github.rwx.ui.component.SettingsTabs
 import io.github.rwx.ui.component.SettingsToggleCard
 import io.github.rwx.ui.component.settingsIcon
 import io.github.rwx.ui.remainingAfter
+import org.koin.mp.KoinPlatform.getKoin
 import kotlin.collections.forEach
 import com.corrodinggames.rts.gameFramework.InputController as LegacyInputController
 
@@ -216,7 +217,8 @@ class SettingsSceneHost(
 
     private fun handleStorageLocationChange(preference: AndroidStoragePreference) {
         if (preference == AndroidStoragePreference.External) {
-            PlatformStoragePickerBridge.requestExternalStorage { selection ->
+            val host=getKoin().get<PlatformBridge>().filePickerHost?:return
+            host.requestExternalStorage { selection ->
                 if (selection == null) return@requestExternalStorage
                 val engine = GameEngine.getInstance() ?: return@requestExternalStorage
                 val settings = engine.settingsEngine ?: return@requestExternalStorage

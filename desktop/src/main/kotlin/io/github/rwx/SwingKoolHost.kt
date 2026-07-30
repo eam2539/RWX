@@ -4,8 +4,12 @@ import de.fabmax.kool.input.KeyboardInput
 import de.fabmax.kool.math.Vec2i
 import de.fabmax.kool.platform.swing.KoolGlCanvas
 import de.fabmax.kool.platform.swing.SwingWindowSubsystem
+import de.fabmax.kool.util.FrontendScope
+import io.github.rwx.KoolDesktopMain.getKoin
+import io.github.rwx.app.launchOnIO
 import io.github.rwx.slick.SlickAwtGLCanvas
 import io.github.rwx.slick.SlickCanvasHost
+import kotlinx.coroutines.launch
 import org.lwjgl.awt.AWT as LwjglAwt
 import org.lwjgl.opengl.awt.GLData
 import org.lwjgl.system.jawt.JAWTWin32DrawingSurfaceInfo
@@ -19,9 +23,11 @@ import java.text.AttributedString
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.imageio.ImageIO
 import javax.swing.JFrame
+import javax.swing.JFileChooser
 import javax.swing.JPanel
 import javax.swing.JWindow
 import javax.swing.SwingUtilities
+import javax.swing.filechooser.FileNameExtensionFilter
 import kotlin.system.exitProcess
 
 class SwingKoolHost private constructor(
@@ -29,7 +35,7 @@ class SwingKoolHost private constructor(
     val gameCanvas: Canvas,
     val windowSubsystem: SwingWindowSubsystem,
     private val startupFullscreen: Boolean,
-) {
+) : PlatformFilePickerHost {
     private val panel = JPanel(null)
     private val frame = JFrame(windowTitle())
     private val overlayPanel = JPanel(BorderLayout())
@@ -144,21 +150,56 @@ class SwingKoolHost private constructor(
     fun requestClose() {
         // Provided Swing canvases have a no-op KoolWindow.close(), so desktop exit closes the subsystem directly.
         if (!closeRequested.compareAndSet(false, true)) return
+        val bridge=getKoin().get<PlatformBridge>()
+        bridge.filePickerHost=null
         keyboardFocusManager.removeKeyEventDispatcher(koolTypedControlCharacterFilter)
         // Stop the embedded Slick render thread and wait for it to release the game canvas'
         // JAWT drawing surface before disposing the window. Disposing while that thread still
         // holds the surface races the EDT inside JAWT_FreeDrawingSurface and crashes the JVM.
         // Run off the EDT so joining the render thread cannot deadlock its invokeAndWait calls.
-        Thread({
+        launchOnIO("shutdown-slick") {
             runCatching { SlickCanvasHost.shutdownRenderer() }
             windowSubsystem.close {
                 overlayWindow.dispose()
                 frame.dispose()
                 exitProcess(0)
             }
-        }, "RWX-shutdown").apply {
-            isDaemon = true
-            start()
+        }
+    }
+
+    override fun openFilePicker(
+        title: String,
+        allowedExtensions: Set<String>,
+        allowDirectories: Boolean,
+        onResult: (PlatformFileSelection?) -> Unit,
+    ) {
+        runOnEdt {
+            val selection = runCatching {
+                val extensions = allowedExtensions
+                    .map { it.trim().removePrefix(".") }
+                    .filter { it.isNotEmpty() }
+                    .sorted()
+                    .toTypedArray()
+                val chooser = JFileChooser().apply {
+                    dialogTitle = title
+                    fileSelectionMode = if (allowDirectories) {
+                        JFileChooser.FILES_AND_DIRECTORIES
+                    } else {
+                        JFileChooser.FILES_ONLY
+                    }
+                    isMultiSelectionEnabled = false
+                    if (extensions.isNotEmpty()) {
+                        val extensionList = extensions.joinToString { ".$it" }
+                        fileFilter = FileNameExtensionFilter("Supported files ($extensionList)", *extensions)
+                        isAcceptAllFileFilterUsed = false
+                    }
+                }
+                chooser.takeIf { it.showOpenDialog(overlayWindow) == JFileChooser.APPROVE_OPTION }
+                    ?.selectedFile
+                    ?.absoluteFile
+                    ?.let { file -> PlatformFileSelection(path = file.path) }
+            }.getOrNull()
+            FrontendScope.launch { onResult(selection) }
         }
     }
 

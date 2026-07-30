@@ -5,6 +5,7 @@ import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.Utility;
 import com.corrodinggames.rts.gameFramework.file.FileHelper;
 import com.corrodinggames.rts.gameFramework.utility.AssetInputStream;
+import io.github.rwx.mod.JvmModAssetBridge;
 import io.github.rwx.render.canvas.KoolPaint;
 
 import java.io.ByteArrayOutputStream;
@@ -158,6 +159,9 @@ public class ShaderProgram {
         AssetInputStream assetInputStream = FileHelper.openFileByPath(str);
         if (assetInputStream == null && str.startsWith("assets/")) {
             assetInputStream = FileHelper.openFileByPath(str.substring("assets/".length()));
+        }
+        if (assetInputStream == null) {
+            assetInputStream = JvmModAssetBridge.openAsset(str);
         }
         if (assetInputStream == null) {
             throw new IOException("Cannot find: " + str);

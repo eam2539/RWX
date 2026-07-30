@@ -22,6 +22,7 @@ dependencyResolutionManagement {
 
 include(":core")
 include(":mod-api")
+include(":mod-tools")
 include(":slick2d-lwjgl3")
 include(":desktop")
 include(":android")

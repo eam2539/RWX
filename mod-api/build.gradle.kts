@@ -28,7 +28,7 @@ val generateIniSpecMetadata by tasks.registering {
             source.readLines().forEach { line ->
                 Regex("data class ([A-Za-z0-9_]+)").find(line)?.let { match ->
                     className = match.groupValues[1]
-                    classes.getOrPut(checkNotNull(className)) { linkedMapOf() }
+                    classes.getOrPut(className) { linkedMapOf() }
                 }
                 val trimmed = line.trim()
                 val marker = when {
