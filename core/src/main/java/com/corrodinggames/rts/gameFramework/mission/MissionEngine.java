@@ -218,6 +218,107 @@ public class MissionEngine extends Serializable {
         return this.o;
     }
 
+    private static boolean isMapModeAllowed(GameEngine gameEngine) {
+        if (!gameEngine.isNetworkGameActive()) {
+            return true;
+        }
+        return gameEngine.networkEngine != null && gameEngine.networkEngine.p2pSession;
+    }
+
+    public void c() {
+        for (MapTrigger mapTrigger : this.J) {
+            if (mapTrigger.g == TriggerType.objective) {
+                boolean z = false;
+                Iterator it = this.g.iterator();
+                while (it.hasNext()) {
+                    if (((TriggerWrapper) it.next()).a == mapTrigger) {
+                        z = true;
+                    }
+                }
+                if (!z) {
+                    TriggerWrapper triggerWrapper = new TriggerWrapper();
+                    triggerWrapper.a = mapTrigger;
+                    this.g.add(triggerWrapper);
+                    GameEngine.log("Found objective: " + triggerWrapper.a());
+                }
+            }
+        }
+    }
+
+    public static void c(String str) {
+        GameEngine.getInstance();
+        GameEngine.log("MissionEngine", str);
+        NetworkEngine.reportDesync(str);
+    }
+
+    public MapTrigger d(String str) {
+        String strTrim = str.trim();
+        for (MapTrigger mapTrigger : this.J) {
+            if (mapTrigger.b != null && mapTrigger.b.equalsIgnoreCase(strTrim)) {
+                return mapTrigger;
+            }
+        }
+        return null;
+    }
+
+    public MapTrigger e(String str) {
+        String strTrim = str.trim();
+        for (MapTrigger mapTrigger : this.J) {
+            if (mapTrigger.c.equalsIgnoreCase(strTrim)) {
+                return mapTrigger;
+            }
+        }
+        return null;
+    }
+
+    public PointF f(String str) {
+        MapObjectLayer mapObjectLayer = GameEngine.getInstance().tileMap.objectsLayer;
+        if (mapObjectLayer != null) {
+            for (MapObject mapObject : mapObjectLayer.mapObjects) {
+                if ("point".equalsIgnoreCase(mapObject.type) && mapObject.normalizedName != null && mapObject.normalizedName.equalsIgnoreCase(str)) {
+                    this.K.a(mapObject.x, mapObject.y);
+                    return this.K;
+                }
+            }
+            return null;
+        }
+        return null;
+    }
+
+    public AreaControlMode ensureAreaControlEditorMode() {
+        if (this.areaControlMode == null) {
+            this.areaControlMode = AreaControlMode.createForEditor();
+        }
+        return this.areaControlMode;
+    }
+
+    public MapPortalMode ensureMapPortalEditorMode() {
+        if (this.mapPortalMode == null) {
+            this.mapPortalMode = MapPortalMode.createForEditor();
+        }
+        return this.mapPortalMode;
+    }
+
+    public boolean requestMapPortalJumpAt(float x, float y) {
+        return this.mapPortalMode != null && this.mapPortalMode.requestJumpAt(x, y);
+    }
+
+    public boolean hasMapPortalMode() {
+        return this.mapPortalMode != null && this.mapPortalMode.getPortalCount() > 0;
+    }
+
+    public float[] getMapPortalCenter(String portalId) {
+        return this.mapPortalMode == null ? null : this.mapPortalMode.getPortalCenter(portalId);
+    }
+
+    public String[] getMapPortalTargetMapIds() {
+        return this.mapPortalMode == null ? new String[0] : this.mapPortalMode.getTargetMapIds();
+    }
+
+    public int addAreaControlEditorZone(float x, float y, boolean circle) throws MapLoadException {
+        return addAreaControlEditorZone(x, y, circle, circle ? 320.0f : 420.0f, circle ? 320.0f : 260.0f);
+    }
+
     public void a(final boolean boolean1) throws MapLoadException {
         final GameEngine instance = GameEngine.getInstance();
         this.areaControlMode = null;
@@ -264,13 +365,13 @@ public class MissionEngine extends Serializable {
             this.e = WaveSpawnMode.noConstructionOrTech;
             return;
         }
-        final String rwxMode = AreaControlMode.readMode(objectByName);
-        final boolean areaControlMap = AreaControlMode.isAreaControlMode(rwxMode);
-        if (rwxMode != null && !areaControlMap) {
-            throw new MapLoadException("Unsupported RWX map mode: " + rwxMode);
+        final String mapMode = AreaControlMode.readMode(objectByName);
+        final boolean areaControlMap = AreaControlMode.isAreaControlMode(mapMode);
+        if (mapMode != null && !areaControlMap) {
+            throw new MapLoadException("Unsupported map mode: " + mapMode);
         }
-        if (areaControlMap && !isRwxMapModeAllowed(instance)) {
-            throw new MapLoadException("RWX areaControl maps can FastArrayList used in single-player or RWX P2P multiplayer only");
+        if (areaControlMap && !isMapModeAllowed(instance)) {
+            throw new MapLoadException("Area control maps can be used in single-player or P2P multiplayer only");
         }
         this.k = "survival".equalsIgnoreCase(objectByName.getDescription("type"));
         if (this.k) {
@@ -460,11 +561,11 @@ public class MissionEngine extends Serializable {
         }
         if (areaControlMap) {
             this.areaControlMode = AreaControlMode.fromMap(objectByName, instance.tileMap.objectsLayer);
-            GameEngine.log("MissionEngine", "RWX areaControl mode enabled");
+            GameEngine.log("MissionEngine", "Area control mode enabled");
         }
         if (MapPortalMode.hasMapLinks(objectByName, instance.tileMap.objectsLayer)) {
             this.mapPortalMode = MapPortalMode.fromMap(objectByName, instance.tileMap.objectsLayer);
-            GameEngine.log("MissionEngine", "RWX map links enabled with " + this.mapPortalMode.getPortalCount() + " portals");
+            GameEngine.log("MissionEngine", "Map links enabled with " + this.mapPortalMode.getPortalCount() + " portals");
         }
         this.J.clear();
         for (final MapObject a : instance.tileMap.objectsLayer.mapObjects) {
@@ -542,118 +643,6 @@ public class MissionEngine extends Serializable {
         this.c();
     }
 
-    public void c() {
-        for (MapTrigger mapTrigger : this.J) {
-            if (mapTrigger.g == TriggerType.objective) {
-                boolean z = false;
-                Iterator it = this.g.iterator();
-                while (it.hasNext()) {
-                    if (((TriggerWrapper) it.next()).a == mapTrigger) {
-                        z = true;
-                    }
-                }
-                if (!z) {
-                    TriggerWrapper triggerWrapper = new TriggerWrapper();
-                    triggerWrapper.a = mapTrigger;
-                    this.g.add(triggerWrapper);
-                    GameEngine.log("Found objective: " + triggerWrapper.a());
-                }
-            }
-        }
-    }
-
-    public static void c(String str) {
-        GameEngine.getInstance();
-        GameEngine.log("MissionEngine", str);
-        NetworkEngine.reportDesync(str);
-    }
-
-    public MapTrigger d(String str) {
-        String strTrim = str.trim();
-        for (MapTrigger mapTrigger : this.J) {
-            if (mapTrigger.b != null && mapTrigger.b.equalsIgnoreCase(strTrim)) {
-                return mapTrigger;
-            }
-        }
-        return null;
-    }
-
-    public MapTrigger e(String str) {
-        String strTrim = str.trim();
-        for (MapTrigger mapTrigger : this.J) {
-            if (mapTrigger.c.equalsIgnoreCase(strTrim)) {
-                return mapTrigger;
-            }
-        }
-        return null;
-    }
-
-    public PointF f(String str) {
-        MapObjectLayer mapObjectLayer = GameEngine.getInstance().tileMap.objectsLayer;
-        if (mapObjectLayer != null) {
-            for (MapObject mapObject : mapObjectLayer.mapObjects) {
-                if ("point".equalsIgnoreCase(mapObject.type) && mapObject.normalizedName != null && mapObject.normalizedName.equalsIgnoreCase(str)) {
-                    this.K.a(mapObject.x, mapObject.y);
-                    return this.K;
-                }
-            }
-            return null;
-        }
-        return null;
-    }
-
-    public AreaControlMode ensureAreaControlEditorMode() {
-        if (this.areaControlMode == null) {
-            this.areaControlMode = AreaControlMode.createForEditor();
-        }
-        return this.areaControlMode;
-    }
-
-    public MapPortalMode ensureMapPortalEditorMode() {
-        if (this.mapPortalMode == null) {
-            this.mapPortalMode = MapPortalMode.createForEditor();
-        }
-        return this.mapPortalMode;
-    }
-
-    public boolean requestMapPortalJumpAt(float x, float y) {
-        return this.mapPortalMode != null && this.mapPortalMode.requestJumpAt(x, y);
-    }
-
-    public boolean hasMapPortalMode() {
-        return this.mapPortalMode != null && this.mapPortalMode.getPortalCount() > 0;
-    }
-
-    public float[] getMapPortalCenter(String portalId) {
-        return this.mapPortalMode == null ? null : this.mapPortalMode.getPortalCenter(portalId);
-    }
-
-    public String[] getMapPortalTargetMapIds() {
-        return this.mapPortalMode == null ? new String[0] : this.mapPortalMode.getTargetMapIds();
-    }
-
-    public int addAreaControlEditorZone(float x, float y, boolean circle) throws MapLoadException {
-        return addAreaControlEditorZone(x, y, circle, circle ? 320.0f : 420.0f, circle ? 320.0f : 260.0f);
-    }
-
-    public int addAreaControlEditorZone(float x, float y, boolean circle, float width, float height) throws MapLoadException {
-        GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine == null || gameEngine.tileMap == null) {
-            throw new MapLoadException("No map loaded");
-        }
-        if (width <= 0.0f || height <= 0.0f) {
-            throw new MapLoadException("RWX area zone size must FastArrayList greater than 0");
-        }
-        AreaControlMode mode = ensureAreaControlEditorMode();
-        MapObjectLayer layer = ensureAreaControlEditorObjectLayer(gameEngine);
-        int zoneIndex = mode.getZoneCount();
-        MapObject object = createAreaControlEditorObject(gameEngine, layer, zoneIndex, x, y, circle, width, height);
-        layer.mapObjects.add(object);
-        int count = mode.addEditorZone(object);
-        this.areaControlEditorModified = true;
-        return count;
-    }
-
     public int addAreaControlEditorZoneBounds(float left, float top, float right, float bottom, boolean circle) throws MapLoadException {
         float width = Math.abs(right - left);
         float height = Math.abs(bottom - top);
@@ -717,19 +706,29 @@ public class MissionEngine extends Serializable {
         return this.areaControlMode.getEditorZonePropertiesAt(x, y);
     }
 
-    public int getAreaControlEditorScoreLimit() throws MapLoadException {
-        if (this.areaControlMode == null || this.areaControlMode.getZoneCount() == 0) {
-            throw new MapLoadException("No RWX area control zones are active");
+    public int addAreaControlEditorZone(float x, float y, boolean circle, float width, float height) throws MapLoadException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new MapLoadException("No map loaded");
         }
-        return this.areaControlMode.getScoreLimit();
+        if (width <= 0.0f || height <= 0.0f) {
+            throw new MapLoadException("Area zone size must be greater than 0");
+        }
+        AreaControlMode mode = ensureAreaControlEditorMode();
+        MapObjectLayer layer = ensureAreaControlEditorObjectLayer(gameEngine);
+        int zoneIndex = mode.getZoneCount();
+        MapObject object = createAreaControlEditorObject(gameEngine, layer, zoneIndex, x, y, circle, width, height);
+        layer.mapObjects.add(object);
+        int count = mode.addEditorZone(object);
+        this.areaControlEditorModified = true;
+        return count;
     }
 
-    public void updateAreaControlEditorScoreLimit(int scoreLimit) throws MapLoadException {
+    public int getAreaControlEditorScoreLimit() throws MapLoadException {
         if (this.areaControlMode == null || this.areaControlMode.getZoneCount() == 0) {
-            throw new MapLoadException("No RWX area control zones are active");
+            throw new MapLoadException("No area control zones are active");
         }
-        this.areaControlMode.setEditorScoreLimit(scoreLimit);
-        this.areaControlEditorModified = true;
+        return this.areaControlMode.getScoreLimit();
     }
 
     public String updateAreaControlEditorZone(float x, float y, AreaControlMode.EditorZoneProperties properties) throws MapLoadException {
@@ -747,25 +746,12 @@ public class MissionEngine extends Serializable {
         return id;
     }
 
-    public int addMapPortalEditorPortal(float x, float y, boolean circle, float width, float height, String targetMapId, String targetPortalId) throws MapLoadException {
-        GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine == null || gameEngine.tileMap == null) {
-            throw new MapLoadException("No map loaded");
+    public void updateAreaControlEditorScoreLimit(int scoreLimit) throws MapLoadException {
+        if (this.areaControlMode == null || this.areaControlMode.getZoneCount() == 0) {
+            throw new MapLoadException("No area control zones are active");
         }
-        if (circle) {
-            float diameter = Math.min(width, height);
-            width = diameter;
-            height = diameter;
-        }
-        if (width <= 0.0f || height <= 0.0f) {
-            throw new MapLoadException("RWX map portal size must FastArrayList greater than 0");
-        }
-        MapPortalMode mode = ensureMapPortalEditorMode();
-        MapObjectLayer layer = ensureAreaControlEditorObjectLayer(gameEngine);
-        int portalIndex = mode.getPortalCount();
-        MapObject object = createMapPortalEditorObject(gameEngine, layer, portalIndex, x, y, circle, width, height, targetMapId, targetPortalId);
-        layer.mapObjects.add(object);
-        return mode.addEditorPortal(object);
+        this.areaControlMode.setEditorScoreLimit(scoreLimit);
+        this.areaControlEditorModified = true;
     }
 
     public int addMapPortalEditorPortalBounds(float left, float top, float right, float bottom, boolean circle, String targetMapId, String targetPortalId) throws MapLoadException {
@@ -832,7 +818,28 @@ public class MissionEngine extends Serializable {
         return this.mapPortalMode.updateEditorPortalAt(x, y, properties);
     }
 
-    public void exportRwxEditorMap(String targetPath) throws MapLoadException, IOException {
+    public int addMapPortalEditorPortal(float x, float y, boolean circle, float width, float height, String targetMapId, String targetPortalId) throws MapLoadException {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new MapLoadException("No map loaded");
+        }
+        if (circle) {
+            float diameter = Math.min(width, height);
+            width = diameter;
+            height = diameter;
+        }
+        if (width <= 0.0f || height <= 0.0f) {
+            throw new MapLoadException("Map portal size must be greater than 0");
+        }
+        MapPortalMode mode = ensureMapPortalEditorMode();
+        MapObjectLayer layer = ensureAreaControlEditorObjectLayer(gameEngine);
+        int portalIndex = mode.getPortalCount();
+        MapObject object = createMapPortalEditorObject(gameEngine, layer, portalIndex, x, y, circle, width, height, targetMapId, targetPortalId);
+        layer.mapObjects.add(object);
+        return mode.addEditorPortal(object);
+    }
+
+    public void exportEditorMap(String targetPath) throws MapLoadException, IOException {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine == null || gameEngine.tileMap == null || gameEngine.currentMapPath == null || gameEngine.currentMapPath.length() == 0) {
             throw new IOException("No source map loaded");
@@ -842,7 +849,7 @@ public class MissionEngine extends Serializable {
         boolean hasAreaZones = areaMode != null && areaMode.getZoneCount() > 0;
         boolean hasMapPortals = portalMode != null && portalMode.getPortalCount() > 0;
         if (!hasAreaZones && !hasMapPortals && !this.areaControlEditorModified) {
-            throw new MapLoadException("Add at least one RWX area zone or map portal before saving");
+            throw new MapLoadException("Add at least one area zone or map portal before saving");
         }
         gameEngine.tileMap.exportMapToPath(gameEngine.currentMapPath, targetPath);
         if (hasAreaZones) {
@@ -866,7 +873,7 @@ public class MissionEngine extends Serializable {
             gameEngine.tileMap.objectsLayer = new MapObjectLayer(group, gameEngine.tileMap);
             return gameEngine.tileMap.objectsLayer;
         } catch (Exception e) {
-            throw new MapLoadException("Failed to create RWX editor object layer", e);
+            throw new MapLoadException("Failed to create editor object layer", e);
         }
     }
 
@@ -898,35 +905,7 @@ public class MissionEngine extends Serializable {
         } catch (MapLoadException e) {
             throw e;
         } catch (Exception e) {
-            throw new MapLoadException("Failed to create RWX area control zone", e);
-        }
-    }
-
-    private MapObject createMapPortalEditorObject(GameEngine gameEngine, MapObjectLayer layer, int portalIndex, float centerX, float centerY, boolean circle, float width, float height, String targetMapId, String targetPortalId) throws MapLoadException {
-        try {
-            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Element object = document.createElement("object");
-            String id = "portal" + (portalIndex + 1);
-            object.setAttribute("id", String.valueOf(11000 + portalIndex));
-            object.setAttribute("name", id);
-            object.setAttribute("type", MapPortalMode.PORTAL_OBJECT_TYPE);
-            object.setAttribute("x", String.valueOf(centerX - (width * 0.5f)));
-            object.setAttribute("y", String.valueOf(centerY - (height * 0.5f)));
-            object.setAttribute("width", String.valueOf(width));
-            object.setAttribute("height", String.valueOf(height));
-            Element properties = document.createElement("properties");
-            addEditorProperty(document, properties, "id", id);
-            addEditorProperty(document, properties, "targetMapId", targetMapId == null ? "" : targetMapId.trim());
-            addEditorProperty(document, properties, "targetPortalId", targetPortalId == null ? "" : targetPortalId.trim());
-            if (circle) {
-                addEditorProperty(document, properties, "shape", "circle");
-            }
-            object.appendChild(properties);
-            return new MapObject(object, gameEngine.tileMap, layer);
-        } catch (MapLoadException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new MapLoadException("Failed to create RWX map portal", e);
+            throw new MapLoadException("Failed to create area control zone", e);
         }
     }
 
@@ -1439,11 +1418,32 @@ public class MissionEngine extends Serializable {
         return a && GameEngine.getInstance().isDebugTempMode;
     }
 
-    private static boolean isRwxMapModeAllowed(GameEngine gameEngine) {
-        if (!gameEngine.isNetworkGameActive()) {
-            return true;
+    private MapObject createMapPortalEditorObject(GameEngine gameEngine, MapObjectLayer layer, int portalIndex, float centerX, float centerY, boolean circle, float width, float height, String targetMapId, String targetPortalId) throws MapLoadException {
+        try {
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element object = document.createElement("object");
+            String id = "portal" + (portalIndex + 1);
+            object.setAttribute("id", String.valueOf(11000 + portalIndex));
+            object.setAttribute("name", id);
+            object.setAttribute("type", MapPortalMode.PORTAL_OBJECT_TYPE);
+            object.setAttribute("x", String.valueOf(centerX - (width * 0.5f)));
+            object.setAttribute("y", String.valueOf(centerY - (height * 0.5f)));
+            object.setAttribute("width", String.valueOf(width));
+            object.setAttribute("height", String.valueOf(height));
+            Element properties = document.createElement("properties");
+            addEditorProperty(document, properties, "id", id);
+            addEditorProperty(document, properties, "targetMapId", targetMapId == null ? "" : targetMapId.trim());
+            addEditorProperty(document, properties, "targetPortalId", targetPortalId == null ? "" : targetPortalId.trim());
+            if (circle) {
+                addEditorProperty(document, properties, "shape", "circle");
+            }
+            object.appendChild(properties);
+            return new MapObject(object, gameEngine.tileMap, layer);
+        } catch (MapLoadException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MapLoadException("Failed to create map portal", e);
         }
-        return gameEngine.networkEngine != null && gameEngine.networkEngine.rwxP2PSession;
     }
 
     public static void i(String str) {

@@ -6,17 +6,8 @@ import de.fabmax.kool.modules.ui2.mutableStateListOf
 import de.fabmax.kool.modules.ui2.mutableStateOf
 import de.fabmax.kool.scene.Scene
 import de.fabmax.kool.util.FrontendScope
-import io.github.rwx.ui.model.LevelSelectAction
-import io.github.rwx.ui.model.LevelSelectActionHandler
-import io.github.rwx.ui.component.LevelSelectList
-import io.github.rwx.ui.component.LevelSelectListActions
-import io.github.rwx.ui.component.LevelSelectListModel
-import io.github.rwx.ui.model.LevelSelectMode
-import io.github.rwx.ui.model.LevelSelectViewModelFactory
-import io.github.rwx.ui.model.MapEntry
-import io.github.rwx.ui.component.PanelStyle
-import io.github.rwx.ui.model.SettingsModel
-import io.github.rwx.ui.component.addPanelSurface
+import io.github.rwx.ui.component.*
+import io.github.rwx.ui.model.*
 import kotlinx.coroutines.*
 
 /**
@@ -68,7 +59,7 @@ class LevelSelectSceneHost(
     fun dispatch(action: LevelSelectAction) = onAction.onAction(action)
 
     fun createScene(): Scene = UiScene(LEVEL_SELECT_SCENE_NAME) {
-        addPanelSurface(PanelStyle.Menu, "rwx-level-select-panel", model) { theme ->
+        addPanelSurface(PanelStyle.Menu, "level-select-panel", model) { theme ->
             LevelSelectList(
                 model = LevelSelectListModel(
                     title = modeTitle.use(),
@@ -88,6 +79,6 @@ class LevelSelectSceneHost(
     }
 
     companion object {
-        const val LEVEL_SELECT_SCENE_NAME: String = "rwx-level-select"
+        const val LEVEL_SELECT_SCENE_NAME: String = "level-select"
     }
 }

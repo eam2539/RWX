@@ -151,7 +151,7 @@ class P2PLobbyService private constructor() {
     fun hostCurrentServer() {
         ensureStarted()
         val gameEngine = GameEngine.getInstance()
-        gameEngine.networkEngine.rwxP2PSession = true
+        gameEngine.networkEngine.p2pSession = true
         try {
             val room = P2PRoomAdvertisement().apply {
                 roomId = UUID.randomUUID().toString()
@@ -208,7 +208,7 @@ class P2PLobbyService private constructor() {
     fun prepareJoin(roomId: String): String {
         ensureStarted()
         val networkEngine = GameEngine.getInstance().networkEngine
-        networkEngine.rwxP2PSession = true
+        networkEngine.p2pSession = true
         try {
             val room = findRoom(roomId) ?: throw IOException("That P2P room is no longer available")
 
@@ -254,7 +254,7 @@ class P2PLobbyService private constructor() {
         libp2pProxy.stop()
         webRtcProxy.stop()
         featureChannel.stop()
-        networkEngine.rwxP2PSession = false
+        networkEngine.p2pSession = false
         lastDetectedMapFeaturePath = null
         lastDetectedRequiredRwxFeatures = emptyList()
         lastBroadcastMapFeaturePath = null
@@ -318,7 +318,7 @@ class P2PLobbyService private constructor() {
         libp2pProxy.stop()
         webRtcProxy.stop()
         featureChannel.stop()
-        GameEngine.getInstance().networkEngine.rwxP2PSession = false
+        GameEngine.getInstance().networkEngine.p2pSession = false
         lastDetectedMapFeaturePath = null
         lastDetectedRequiredRwxFeatures = emptyList()
         lastBroadcastMapFeaturePath = null

@@ -412,11 +412,11 @@ abstract class GameSession {
             networkEngine.requireActiveMods = config.useMods
             initBattleRoomMap(engine, config.mapPath, force = true, savedGame = config.savedGame)
             check(networkEngine.startServerHosting(false)) { "Unable to host battle room" }
-            networkEngine.rwxP2PSession = config.rwxP2PSession
+            networkEngine.p2pSession = config.rwxP2PSession
             true
         }
 
-    open fun joinBattleRoom(address: String, serverId: String?, rwxP2PSession: Boolean): Boolean {
+    open fun joinBattleRoom(address: String, serverId: String?, p2pSession: Boolean): Boolean {
         val trimmedAddress = address.trim()
         if (trimmedAddress.isBlank()) {
             latestBattleRoomJoinError = "Missing server address"
@@ -451,7 +451,7 @@ abstract class GameSession {
                     runCatching {
                         networkEngine.disconnectNetworking("starting new")
                         networkEngine.a(socket)
-                        networkEngine.rwxP2PSession = rwxP2PSession
+                        networkEngine.p2pSession = p2pSession
                         BattleRoomUiBridge.updateUI()
                     }.onFailure { error ->
                         latestBattleRoomJoinError = "Connection failed: ${error.message ?: error.javaClass.simpleName}"
@@ -1208,7 +1208,7 @@ abstract class GameSession {
             isHost = networkEngine.isServer || networkEngine.isProxyController,
             isNetworkMultiplayer = engine.isNetworkGameActive(),
             savedGame = settings.gameModeType == GameModeType.savedGame,
-            rwxP2PSession = networkEngine.rwxP2PSession,
+            rwxP2PSession = networkEngine.p2pSession,
             requiredModsSummary = if (refreshNetworkStatus || cachedBattleRoomRequiredModsSummary == null) {
                 runCatching { networkEngine.requiredModsSummary }.getOrNull()
                     .also { cachedBattleRoomRequiredModsSummary = it }

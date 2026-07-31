@@ -4,17 +4,9 @@ import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.pipeline.ClearColorFill
 import de.fabmax.kool.scene.Scene
 import io.github.rwx.session.GameLoadingStatus
-import io.github.rwx.ui.ColorSchemeDefinition
-import io.github.rwx.ui.ColorSchemeRegistry
-import io.github.rwx.ui.component.PanelStyle
-import io.github.rwx.ui.ResponsiveContentWidth
+import io.github.rwx.ui.*
+import io.github.rwx.ui.component.*
 import io.github.rwx.ui.model.SettingsModel
-import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.component.addPanelSurface
-import io.github.rwx.ui.component.CircularLoadingIndicator
-import io.github.rwx.ui.component.LoadingProgressBar
-import io.github.rwx.ui.component.UiIconWarmup
-import io.github.rwx.ui.fraction
 
 class LoadingSceneHost(
     private val model: SettingsModel = SettingsModel(),
@@ -46,8 +38,8 @@ class LoadingSceneHost(
         createLoadingScene(model, sceneName, label, progress, recentSteps, warmupUiTextures)
 
     companion object {
-        const val LOADING_SCENE_NAME: String = "rwx-loading-scene"
-        const val GAME_LOADING_SCENE_NAME: String = "rwx-game-loading-scene"
+        const val LOADING_SCENE_NAME: String = "loading-scene"
+        const val GAME_LOADING_SCENE_NAME: String = "game-loading-scene"
         const val LOADING_LABEL: String = "Loading..."
 
         fun createScene(
@@ -84,7 +76,7 @@ private fun createLoadingScene(
 ): Scene {
     val theme = ColorSchemeRegistry.schemeFor(model.selectedColorSchemeId.value)
     return UiScene(sceneName, clearColor = ClearColorFill(theme.palette.surfaceBase)) {
-        addPanelSurface(PanelStyle.Menu, "rwx-loading-panel", model) { activeTheme ->
+        addPanelSurface(PanelStyle.Menu, "loading-panel", model) { activeTheme ->
             val contentWidth = loadingContentWidth()
             MainMenuHeader(contentWidth, activeTheme)
             LoadingStatus(label.use(), progress.use(), recentSteps.use(), activeTheme, contentWidth)

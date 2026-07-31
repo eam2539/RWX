@@ -5,17 +5,11 @@ import de.fabmax.kool.modules.ui2.UiScene
 import de.fabmax.kool.modules.ui2.mutableStateListOf
 import de.fabmax.kool.modules.ui2.mutableStateOf
 import de.fabmax.kool.scene.Scene
-import io.github.rwx.ui.model.BattleRoomAction
-import io.github.rwx.ui.model.BattleRoomActions
-import io.github.rwx.ui.model.BattleRoomChatLine
-import io.github.rwx.ui.model.BattleRoomInfo
-import io.github.rwx.ui.model.BattleRoomModel
-import io.github.rwx.ui.model.BattleRoomPlayer
-import io.github.rwx.ui.component.PanelStyle
-import io.github.rwx.ui.model.SettingsModel
-import io.github.rwx.ui.component.addPanelSurface
 import io.github.rwx.ui.component.BattleRoom
+import io.github.rwx.ui.component.PanelStyle
+import io.github.rwx.ui.component.addPanelSurface
 import io.github.rwx.ui.component.replaceAllIncrementally
+import io.github.rwx.ui.model.*
 
 
 class BattleRoomSceneHost(
@@ -69,6 +63,6 @@ class BattleRoomSceneHost(
     }
 
     companion object {
-        const val BATTLE_ROOM_SCENE_NAME: String = "rwx-battleroom"
+        const val BATTLE_ROOM_SCENE_NAME: String = "battleroom"
     }
 }

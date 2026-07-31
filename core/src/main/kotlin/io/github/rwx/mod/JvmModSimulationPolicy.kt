@@ -7,5 +7,5 @@ internal fun isJvmModSimulationAllowed(engine: GameEngine? = GameEngine.getInsta
     if (engine.replayEngine?.j() == true) return false
     val networkEngine = engine.networkEngine ?: return true
     val multiplayerActive = networkEngine.networkGameActive && !networkEngine.singleplayerServer
-    return !multiplayerActive || networkEngine.rwxP2PSession
+    return !multiplayerActive || networkEngine.p2pSession
 }

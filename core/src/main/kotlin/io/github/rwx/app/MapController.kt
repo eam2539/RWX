@@ -14,7 +14,8 @@ import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.session.BattleRoomSnapshot
 import io.github.rwx.session.GameMemorySnapshot
 import io.github.rwx.session.GameSession
-import io.github.rwx.ui.*
+import io.github.rwx.ui.AppScreen
+import io.github.rwx.ui.CoreUiEvent
 import io.github.rwx.ui.component.Icon
 import io.github.rwx.ui.model.Dialog
 import io.github.rwx.ui.model.DialogButton
@@ -186,7 +187,7 @@ internal class MapController(
         if (!LinkedMapAvailability.ENABLED) return
         val engine = GameEngine.getInstance() ?: return
         val networkEngine = engine.networkEngine ?: return
-        if (!engine.isNetworkGameActive() || !networkEngine.rwxP2PSession) {
+        if (!engine.isNetworkGameActive() || !networkEngine.p2pSession) {
             return
         }
         val localPlayerId = currentLocalPlayerId() ?: return
@@ -288,7 +289,7 @@ internal class MapController(
     private fun shouldSimulateMapLocally(mapPath: String): Boolean {
         val engine = GameEngine.getInstance()
         val networkEngine = engine?.networkEngine
-        if (engine?.isNetworkGameActive() != true || networkEngine?.rwxP2PSession != true) {
+        if (engine?.isNetworkGameActive() != true || networkEngine?.p2pSession != true) {
             return true
         }
         val localPlayerId = currentLocalPlayerId() ?: return false

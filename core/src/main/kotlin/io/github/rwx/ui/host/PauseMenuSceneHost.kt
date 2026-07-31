@@ -4,17 +4,9 @@ import de.fabmax.kool.modules.ui2.Row
 import de.fabmax.kool.modules.ui2.UiScene
 import de.fabmax.kool.modules.ui2.mutableStateListOf
 import de.fabmax.kool.scene.Scene
-import io.github.rwx.ui.component.PanelStyle
-import io.github.rwx.ui.model.PauseMenuAction
-import io.github.rwx.ui.model.PauseMenuConditions
-import io.github.rwx.ui.model.PauseMenuItem
-import io.github.rwx.ui.model.PauseMenuViewModel
-import io.github.rwx.ui.model.SettingsModel
 import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.component.addPanelSurface
-import io.github.rwx.ui.component.Icon
-import io.github.rwx.ui.component.IconButton
-import io.github.rwx.ui.component.TextIconButton
+import io.github.rwx.ui.component.*
+import io.github.rwx.ui.model.*
 import io.github.rwx.ui.remainingAfter
 
 /**
@@ -45,7 +37,7 @@ class PauseMenuSceneHost(
     fun dispatch(action: PauseMenuAction) = onAction(action)
 
     fun createScene(): Scene = UiScene(PAUSE_SCENE_NAME) {
-        addPanelSurface(PanelStyle.Pause, "rwx-pause-panel", model) { theme ->
+        addPanelSurface(PanelStyle.Pause, "pause-panel", model) { theme ->
             val actions = menuItems.use().filterNot { it.action == PauseMenuAction.Resume }
             actions.firstOrNull()?.let { item ->
                 Row(width = UiTheme.Layout.menuButtonWidth, height = UiTheme.Layout.menuButtonHeight) {
@@ -71,7 +63,7 @@ class PauseMenuSceneHost(
     }
 
     companion object {
-        const val PAUSE_SCENE_NAME: String = "rwx-pause"
+        const val PAUSE_SCENE_NAME: String = "pause"
     }
 }
 

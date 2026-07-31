@@ -18,7 +18,7 @@ class KoolDisplacementShader(
     var viewportSize: Vec2f by uniform2f(VIEWPORT_SIZE_UNIFORM, Vec2f.ONES)
     var offsetBy: Float by uniform1f(OFFSET_BY_UNIFORM, 0f)
 
-    private class Model : KslProgram("RWX Displacement Shader") {
+    private class Model : KslProgram("Displacement Shader") {
         init {
             val texCoords = interStageFloat2()
             val vertexColor = interStageFloat4()

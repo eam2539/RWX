@@ -418,14 +418,14 @@ public final class GameUI extends Serializable {
     boolean isRightClickDrag = false;
     public final boolean ab = true;
     public final KoolPaint at = new KoolPaint();
-    boolean rwxAreaEditorDragActive;
-    float rwxAreaEditorDragStartX;
-    float rwxAreaEditorDragStartY;
-    float rwxAreaEditorDragEndX;
-    float rwxAreaEditorDragEndY;
-    final RectF rwxAreaEditorDragRect = new RectF();
-    final KoolPaint rwxAreaEditorDragFillPaint = new KoolPaint();
-    final KoolPaint rwxAreaEditorDragBorderPaint = new KoolPaint();
+    final RectF areaEditorDragRect = new RectF();
+    final KoolPaint areaEditorDragFillPaint = new KoolPaint();
+    final KoolPaint areaEditorDragBorderPaint = new KoolPaint();
+    boolean areaEditorDragActive;
+    float areaEditorDragStartX;
+    float areaEditorDragStartY;
+    float areaEditorDragEndX;
+    float areaEditorDragEndY;
 
     /* JADX INFO: renamed from: aU */
     public float tooltipX = 0.0f;
@@ -1610,76 +1610,76 @@ public final class GameUI extends Serializable {
             } else {
                 this.currentAction = null;
             }
-            this.rwxAreaEditorDragActive = false;
+            this.areaEditorDragActive = false;
             this.screenFlashBlue = 0;
             return true;
         }
         return false;
     }
 
-    private boolean handleRwxAreaEditorDragAction(GameEngine gameEngine, float worldX, float worldY, Point minimapPoint) {
-        if (!EditorOrBuilder.isRwxAreaEditorAddAction(this.currentAction)) {
+    private boolean handleAreaEditorDragAction(GameEngine gameEngine, float worldX, float worldY, Point minimapPoint) {
+        if (!EditorOrBuilder.isAreaEditorAddAction(this.currentAction)) {
             return false;
         }
-        boolean circle = EditorOrBuilder.isRwxAreaEditorCircleAddAction(this.currentAction);
+        boolean circle = EditorOrBuilder.isAreaEditorCircleAddAction(this.currentAction);
         if (GameEngine.isNonPCPlatform() && gameEngine.isTouchDown() && gameEngine.getTouchPointerCount() >= 2) {
-            this.rwxAreaEditorDragStartX = screenToWorldX(gameEngine, gameEngine.getTouchX(0));
-            this.rwxAreaEditorDragStartY = screenToWorldY(gameEngine, gameEngine.getTouchY(0));
-            this.rwxAreaEditorDragEndX = screenToWorldX(gameEngine, gameEngine.getTouchX(1));
-            this.rwxAreaEditorDragEndY = screenToWorldY(gameEngine, gameEngine.getTouchY(1));
-            this.rwxAreaEditorDragActive = true;
-            drawRwxAreaEditorDragPreview(
+            this.areaEditorDragStartX = screenToWorldX(gameEngine, gameEngine.getTouchX(0));
+            this.areaEditorDragStartY = screenToWorldY(gameEngine, gameEngine.getTouchY(0));
+            this.areaEditorDragEndX = screenToWorldX(gameEngine, gameEngine.getTouchX(1));
+            this.areaEditorDragEndY = screenToWorldY(gameEngine, gameEngine.getTouchY(1));
+            this.areaEditorDragActive = true;
+            drawAreaEditorDragPreview(
                     gameEngine,
-                    this.rwxAreaEditorDragStartX,
-                    this.rwxAreaEditorDragStartY,
-                    this.rwxAreaEditorDragEndX,
-                    this.rwxAreaEditorDragEndY,
+                    this.areaEditorDragStartX,
+                    this.areaEditorDragStartY,
+                    this.areaEditorDragEndX,
+                    this.areaEditorDragEndY,
                     circle
             );
             return true;
         }
-        if (GameEngine.isNonPCPlatform() && this.rwxAreaEditorDragActive && !gameEngine.isTouchDown()) {
-            EditorOrBuilder.addRwxEditorBounds(
+        if (GameEngine.isNonPCPlatform() && this.areaEditorDragActive && !gameEngine.isTouchDown()) {
+            EditorOrBuilder.addAreaEditorBounds(
                     this.currentAction,
-                    this.rwxAreaEditorDragStartX,
-                    this.rwxAreaEditorDragStartY,
-                    this.rwxAreaEditorDragEndX,
-                    this.rwxAreaEditorDragEndY,
+                    this.areaEditorDragStartX,
+                    this.areaEditorDragStartY,
+                    this.areaEditorDragEndX,
+                    this.areaEditorDragEndY,
                     circle
             );
-            this.rwxAreaEditorDragActive = false;
+            this.areaEditorDragActive = false;
             clearCurrentAction();
             this.isSelectionBoxActive = false;
             return true;
         }
         boolean cancel = cancelCurrentAction();
         if (cancel || isMouseSelectionActive()) {
-            this.rwxAreaEditorDragActive = false;
+            this.areaEditorDragActive = false;
             clearCurrentAction();
             this.isSelectionBoxActive = false;
             return true;
         }
-        if (!EditorOrBuilder.isRwxAreaEditorAvailable()) {
-            this.rwxAreaEditorDragActive = false;
+        if (!EditorOrBuilder.isAreaEditorAvailable()) {
+            this.areaEditorDragActive = false;
             clearCurrentAction();
             this.isSelectionBoxActive = false;
             return true;
         }
         boolean pointerInWorld = minimapPoint == null && !this.isInputDisabled && !this.isKeyboardCtrlPressed && !this.isMiddleMousePressed;
         if (this.isMousePressed && pointerInWorld) {
-            if (!this.rwxAreaEditorDragActive) {
-                this.rwxAreaEditorDragStartX = screenToWorldX(gameEngine, this.mouseWorldX);
-                this.rwxAreaEditorDragStartY = screenToWorldY(gameEngine, this.mouseWorldY);
-                this.rwxAreaEditorDragActive = true;
+            if (!this.areaEditorDragActive) {
+                this.areaEditorDragStartX = screenToWorldX(gameEngine, this.mouseWorldX);
+                this.areaEditorDragStartY = screenToWorldY(gameEngine, this.mouseWorldY);
+                this.areaEditorDragActive = true;
             }
-            drawRwxAreaEditorDragPreview(gameEngine, this.rwxAreaEditorDragStartX, this.rwxAreaEditorDragStartY, worldX, worldY, circle);
+            drawAreaEditorDragPreview(gameEngine, this.areaEditorDragStartX, this.areaEditorDragStartY, worldX, worldY, circle);
             return true;
         }
         if (this.isSelectionBoxActive && pointerInWorld && !shouldShowMouseCursor()) {
-            float startX = this.rwxAreaEditorDragActive ? this.rwxAreaEditorDragStartX : worldX;
-            float startY = this.rwxAreaEditorDragActive ? this.rwxAreaEditorDragStartY : worldY;
-            EditorOrBuilder.addRwxEditorBounds(this.currentAction, startX, startY, worldX, worldY, circle);
-            this.rwxAreaEditorDragActive = false;
+            float startX = this.areaEditorDragActive ? this.areaEditorDragStartX : worldX;
+            float startY = this.areaEditorDragActive ? this.areaEditorDragStartY : worldY;
+            EditorOrBuilder.addAreaEditorBounds(this.currentAction, startX, startY, worldX, worldY, circle);
+            this.areaEditorDragActive = false;
             clearCurrentAction();
             this.isSelectionBoxActive = false;
             return true;
@@ -1695,7 +1695,7 @@ public final class GameUI extends Serializable {
         return (screenY / gameEngine.zoom) + gameEngine.viewpointYSnapped;
     }
 
-    private void drawRwxAreaEditorDragPreview(GameEngine gameEngine, float startX, float startY, float endX, float endY, boolean circle) {
+    private void drawAreaEditorDragPreview(GameEngine gameEngine, float startX, float startY, float endX, float endY, boolean circle) {
         float left = Math.min(startX, endX);
         float right = Math.max(startX, endX);
         float top = Math.min(startY, endY);
@@ -1726,21 +1726,21 @@ public final class GameUI extends Serializable {
         float screenTop = (top - gameEngine.viewpointYSnapped) * zoom;
         float screenRight = (right - gameEngine.viewpointXSnapped) * zoom;
         float screenBottom = (bottom - gameEngine.viewpointYSnapped) * zoom;
-        this.rwxAreaEditorDragFillPaint.a(KoolPaint.Style.FILL);
-        this.rwxAreaEditorDragFillPaint.a(46, 94, 188, 108);
-        this.rwxAreaEditorDragBorderPaint.a(KoolPaint.Style.STROKE);
-        this.rwxAreaEditorDragBorderPaint.a(2.0f);
-        this.rwxAreaEditorDragBorderPaint.a(230, 176, 224, 126);
+        this.areaEditorDragFillPaint.a(KoolPaint.Style.FILL);
+        this.areaEditorDragFillPaint.a(46, 94, 188, 108);
+        this.areaEditorDragBorderPaint.a(KoolPaint.Style.STROKE);
+        this.areaEditorDragBorderPaint.a(2.0f);
+        this.areaEditorDragBorderPaint.a(230, 176, 224, 126);
         if (circle) {
             float centerX = (screenLeft + screenRight) * 0.5f;
             float centerY = (screenTop + screenBottom) * 0.5f;
             float radius = Math.min(screenRight - screenLeft, screenBottom - screenTop) * 0.5f;
-            gameEngine.renderGraphicsEngine.a(centerX, centerY, radius, this.rwxAreaEditorDragFillPaint);
-            gameEngine.renderGraphicsEngine.a(centerX, centerY, radius, this.rwxAreaEditorDragBorderPaint);
+            gameEngine.renderGraphicsEngine.a(centerX, centerY, radius, this.areaEditorDragFillPaint);
+            gameEngine.renderGraphicsEngine.a(centerX, centerY, radius, this.areaEditorDragBorderPaint);
         } else {
-            this.rwxAreaEditorDragRect.a(screenLeft, screenTop, screenRight, screenBottom);
-            gameEngine.renderGraphicsEngine.a(this.rwxAreaEditorDragRect, this.rwxAreaEditorDragFillPaint);
-            gameEngine.renderGraphicsEngine.a(this.rwxAreaEditorDragRect, this.rwxAreaEditorDragBorderPaint);
+            this.areaEditorDragRect.a(screenLeft, screenTop, screenRight, screenBottom);
+            gameEngine.renderGraphicsEngine.a(this.areaEditorDragRect, this.areaEditorDragFillPaint);
+            gameEngine.renderGraphicsEngine.a(this.areaEditorDragRect, this.areaEditorDragBorderPaint);
         }
     }
 
@@ -1993,7 +1993,7 @@ public final class GameUI extends Serializable {
             }
             if (this.currentAction.getActionType() == ActionType.targetGround) {
                 drawActionTooltip(this.currentAction, false, baseUnitF, false, true);
-                if (handleRwxAreaEditorDragAction(gameEngine, f2, f3, point)) {
+                if (handleAreaEditorDragAction(gameEngine, f2, f3, point)) {
                     return;
                 }
                 BaseUnit baseUnitF2 = this.interfaceRenderer.f();

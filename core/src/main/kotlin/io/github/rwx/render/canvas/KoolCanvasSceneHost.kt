@@ -31,7 +31,7 @@ class KoolCanvasSceneHost(
     }
 
     companion object {
-        const val DEFAULT_SCENE_NAME: String = "rwx-kool-canvas"
+        const val DEFAULT_SCENE_NAME: String = "kool-canvas"
         val EmptyFrame: KoolCanvasFrame = KoolCanvasFrame(KoolCanvasViewport(0, 0), emptyList())
     }
 }

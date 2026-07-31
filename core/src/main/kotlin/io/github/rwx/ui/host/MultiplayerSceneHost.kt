@@ -1,24 +1,12 @@
 package io.github.rwx.ui.host
 
-import de.fabmax.kool.modules.ui2.Dp
-import de.fabmax.kool.modules.ui2.UiScene
-import de.fabmax.kool.modules.ui2.UiScope
-import de.fabmax.kool.modules.ui2.mutableStateListOf
-import de.fabmax.kool.modules.ui2.mutableStateOf
+import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.scene.Scene
-import io.github.rwx.ui.model.MultiplayerAction
-import io.github.rwx.ui.model.MultiplayerLobbyKind
-import io.github.rwx.ui.model.MultiplayerRoomItem
-import io.github.rwx.ui.model.MultiplayerRoomListModel
-import io.github.rwx.ui.component.PanelStyle
 import io.github.rwx.ui.ResponsiveContentWidth
 import io.github.rwx.ui.ResponsiveViewportHeight
-import io.github.rwx.ui.model.SettingsModel
 import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.component.addPanelSurface
-import io.github.rwx.ui.component.MultiplayerRoomList
-import io.github.rwx.ui.component.MultiplayerRoomListActions
-import io.github.rwx.ui.component.replaceAllIncrementally
+import io.github.rwx.ui.component.*
+import io.github.rwx.ui.model.*
 
 class MultiplayerSceneHost(
     private val model: SettingsModel = SettingsModel(),
@@ -41,7 +29,7 @@ class MultiplayerSceneHost(
     fun dispatch(action: MultiplayerAction) = onAction(action)
 
     fun createScene(): Scene = UiScene(MULTIPLAYER_SCENE_NAME) {
-        addPanelSurface(PanelStyle.Menu, "rwx-multiplayer-panel", model) { theme ->
+        addPanelSurface(PanelStyle.Menu, "multiplayer-panel", model) { theme ->
             val metrics = multiplayerLayoutMetrics()
             MultiplayerRoomList(
                 model = MultiplayerRoomListModel(
@@ -67,7 +55,7 @@ class MultiplayerSceneHost(
     }
 
     companion object {
-        const val MULTIPLAYER_SCENE_NAME: String = "rwx-multiplayer"
+        const val MULTIPLAYER_SCENE_NAME: String = "multiplayer"
     }
 }
 

@@ -51,7 +51,7 @@ public final class OpenGLGraphicsRenderer implements GraphicsInterface {
 
     private DrawStyle b(Paint paint) {
         this.b.a((C0009fo) null);
-        applyRwxBlendMode(paint);
+        applyBlendMode(paint);
         if (paint == null) {
             return null;
         }
@@ -61,12 +61,12 @@ public final class OpenGLGraphicsRenderer implements GraphicsInterface {
         return this.d;
     }
 
-    private void applyRwxBlendMode(Paint paint) {
-        int blendMode = RwxBlendPaint.BLEND_NORMAL;
-        if (paint instanceof RwxBlendPaint) {
-            blendMode = ((RwxBlendPaint) paint).rwxBlendMode;
+    private void applyBlendMode(Paint paint) {
+        int blendMode = BlendPaint.BLEND_NORMAL;
+        if (paint instanceof BlendPaint) {
+            blendMode = ((BlendPaint) paint).blendMode;
         }
-        this.b.aRwxBlendMode(blendMode);
+        this.b.applyBlendMode(blendMode);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.android.graphics.GraphicsInterface
@@ -159,7 +159,7 @@ public final class OpenGLGraphicsRenderer implements GraphicsInterface {
             openGLRenderer.E = -1;
         } else {
             int color = paint.getColor();
-            if (color != -1 && paint.getColorFilter() == null && !(paint instanceof RwxBlendPaint)) {
+            if (color != -1 && paint.getColorFilter() == null && !(paint instanceof BlendPaint)) {
                 color = Color.argb(Color.alpha(color), 255, 255, 255);
             }
             openGLRenderer.E = color;
@@ -171,8 +171,8 @@ public final class OpenGLGraphicsRenderer implements GraphicsInterface {
         }
         openGLRenderer.a(imageBaseA, zIsAntiAlias ? 9729 : 9728);
         C0009fo c0009foN = paint instanceof UniquePaint ? ((UniquePaint) paint).c : null;
-        if (paint instanceof RwxBlendPaint && ((RwxBlendPaint) paint).rwxShader != null) {
-            c0009foN = ((RwxBlendPaint) paint).rwxShader;
+        if (paint instanceof BlendPaint && ((BlendPaint) paint).shaderProgram != null) {
+            c0009foN = ((BlendPaint) paint).shaderProgram;
         }
         if (unitTexture != null && c0009foN == null) {
             c0009foN = unitTexture.n();
@@ -187,7 +187,7 @@ public final class OpenGLGraphicsRenderer implements GraphicsInterface {
         } else {
             this.b.a((C0009fo) null);
         }
-        applyRwxBlendMode(paint);
+        applyBlendMode(paint);
         openGLRenderer.a(imageBaseA, this.m, rectF, this.j);
     }
 
@@ -280,7 +280,7 @@ public final class OpenGLGraphicsRenderer implements GraphicsInterface {
     @Override // com.corrodinggames.rts.gameFramework.android.graphics.GraphicsInterface
     public final void b(float[] fArr, int i, int i2, Paint paint) {
         if (debugPointCallCount < 16) {
-            Log.d("RWX_MINIMAP_GL", "drawPoints offset=" + i + " floats=" + i2
+            Log.d("MinimapGL", "drawPoints offset=" + i + " floats=" + i2
                     + " color=" + (paint == null ? "null" : paint.getColor())
                     + " strokeWidth=" + (paint == null ? "null" : paint.getStrokeWidth()));
             debugPointCallCount++;
@@ -363,7 +363,7 @@ public final class OpenGLGraphicsRenderer implements GraphicsInterface {
     @Override // com.corrodinggames.rts.gameFramework.android.graphics.GraphicsInterface
     public final void a(String str, float f2, float f3, Paint paint) {
         this.b.b((C0009fo) null);
-        applyRwxBlendMode(paint);
+        applyBlendMode(paint);
         OpenGLRenderer.O = this;
         this.f771a.a(str, f2, f3, paint);
     }

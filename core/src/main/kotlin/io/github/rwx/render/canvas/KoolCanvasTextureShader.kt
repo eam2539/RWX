@@ -24,7 +24,7 @@ class KoolCanvasTextureShader(
     private class Model(
         premultipliedAlpha: Boolean,
         multipliesRgbByAlpha: Boolean,
-    ) : KslProgram("RWX Canvas Texture Shader") {
+    ) : KslProgram("Canvas Texture Shader") {
         init {
             val texCoords = interStageFloat2()
             val vertexColor = interStageFloat4()

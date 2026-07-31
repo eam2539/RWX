@@ -440,7 +440,7 @@ fun installApp(
         battleRoomLaunchController = battleRoomLaunchController,
         resourceBrowserController = resourceBrowserController,
         inGameDialogController = inGameDialogController,
-        rwxMapController = mapController,
+        mapController = mapController,
         sessionActions = sessionActions,
         updateController = updateController,
         battleRoomJoinController = battleRoomJoinController,

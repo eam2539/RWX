@@ -14,7 +14,7 @@ internal class FrameDriver(
     private val updateController: UpdateController,
     private val battleRoomController: BattleRoomController,
     private val battleRoomLaunchController: BattleRoomLaunchController,
-    private val rwxMapController: MapController,
+    private val mapController: MapController,
     private val battleRoomJoinController: BattleRoomJoinController,
     private val pendingStartController: PendingStartController,
     private val externalGameController: ExternalGameController,
@@ -34,10 +34,10 @@ internal class FrameDriver(
         driveInGameMapTransfers()
         battleRoomJoinController.drive()
         pendingStartController.drive {
-            rwxMapController.applyPendingPortalTransfers()
+            mapController.applyPendingPortalTransfers()
         }
         if (currentScreen() == AppScreen.InGame) {
-            rwxMapController.applyPendingPortalTransfers()
+            mapController.applyPendingPortalTransfers()
         }
         externalGameController.drive(
             screen = currentScreen(),
@@ -86,8 +86,8 @@ internal class FrameDriver(
     private fun driveInGameMapTransfers() {
         if (currentScreen() != AppScreen.InGame) return
 
-        rwxMapController.ensureP2PAssignedMapLoaded()
-        rwxMapController.drainP2PPortalTransfers()
+        mapController.ensureP2PAssignedMapLoaded()
+        mapController.drainP2PPortalTransfers()
     }
 
     private fun driveMusicOutsideRwFrame(screen: AppScreen, deltaSeconds: Float) {

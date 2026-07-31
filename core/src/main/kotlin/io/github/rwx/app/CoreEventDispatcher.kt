@@ -11,7 +11,7 @@ internal class CoreEventDispatcher(
     private val battleRoomLaunchController: BattleRoomLaunchController,
     private val resourceBrowserController: ResourceBrowserController,
     private val inGameDialogController: InGameDialogController,
-    private val rwxMapController: MapController,
+    private val mapController: MapController,
     private val openInGameSettings: () -> Unit,
     private val requestInGameSurrender: () -> Unit,
     private val exitRwGameToMainMenu: () -> Unit,
@@ -49,12 +49,12 @@ internal class CoreEventDispatcher(
 
                 is CoreUiEvent.InGameChatRequested -> inGameDialogController.showInGameChatDialog(event.teamOnly)
                 CoreUiEvent.InGamePlayerListRequested -> inGameDialogController.showInGamePlayerListDialog()
-                is CoreUiEvent.InGameMapJumpRequested -> rwxMapController.jumpToLinkedMap(event)
-                CoreUiEvent.InGameMapListRequested -> rwxMapController.showMapSwitchDialog()
+                is CoreUiEvent.InGameMapJumpRequested -> mapController.jumpToLinkedMap(event)
+                CoreUiEvent.InGameMapListRequested -> mapController.showMapSwitchDialog()
                 CoreUiEvent.InGameModWindowRequested -> openInGameModWindow()
                 CoreUiEvent.InGameModWindowBackRequested -> closeInGameModWindow()
                 CoreUiEvent.InGameModWindowRefreshRequested -> refreshInGameModWindow()
-                is CoreUiEvent.InGameMapPortalTransferRequested -> rwxMapController.handlePortalTransfer(event.transfer)
+                is CoreUiEvent.InGameMapPortalTransferRequested -> mapController.handlePortalTransfer(event.transfer)
                 is CoreUiEvent.MessageDialogRequested -> inGameDialogController.showLegacyMessageDialog(event)
                 is CoreUiEvent.PasswordDialogRequested -> inGameDialogController.showLegacyPasswordDialog(event)
                 is CoreUiEvent.FormDialogRequested -> inGameDialogController.showLegacyFormDialog(event)

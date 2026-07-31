@@ -3,25 +3,11 @@ package io.github.rwx.ui.host
 import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.scene.Scene
 import io.github.rwx.i18n.I18n
-import io.github.rwx.ui.component.BodyText
-import io.github.rwx.ui.component.PanelStyle
 import io.github.rwx.ui.ResponsiveContentWidth
 import io.github.rwx.ui.ResponsiveViewportHeight
-import io.github.rwx.ui.component.ScrollableVerticalList
-import io.github.rwx.ui.model.SettingsModel
 import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.component.addPanelSurface
-import io.github.rwx.ui.component.ModCard
-import io.github.rwx.ui.component.ModsActionBar
-import io.github.rwx.ui.component.ModsActionCallbacks
-import io.github.rwx.ui.component.ModsActionLabels
-import io.github.rwx.ui.component.ModsFilterField
-import io.github.rwx.ui.component.ModsSectionHeader
-import io.github.rwx.ui.model.ModEntry
-import io.github.rwx.ui.model.ModsAction
-import io.github.rwx.ui.model.ModsListModel
-import io.github.rwx.ui.model.ModsScrollRow
-import io.github.rwx.ui.model.ModsScrollRows
+import io.github.rwx.ui.component.*
+import io.github.rwx.ui.model.*
 
 
 class ModsSceneHost(
@@ -66,7 +52,7 @@ class ModsSceneHost(
     }
 
     fun createScene(): Scene = UiScene(MODS_SCENE_NAME) {
-        addPanelSurface(PanelStyle.Menu, "rwx-mods-panel", model) { theme ->
+        addPanelSurface(PanelStyle.Menu, "mods-panel", model) { theme ->
             val metrics = modsLayoutMetrics()
 
             ModsFilterField(
@@ -132,7 +118,7 @@ class ModsSceneHost(
     }
 
     companion object {
-        const val MODS_SCENE_NAME: String = "rwx-mods"
+        const val MODS_SCENE_NAME: String = "mods"
     }
 }
 

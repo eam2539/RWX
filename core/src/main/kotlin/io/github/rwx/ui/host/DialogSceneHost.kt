@@ -3,11 +3,11 @@ package io.github.rwx.ui.host
 import de.fabmax.kool.modules.ui2.UiScene
 import de.fabmax.kool.modules.ui2.mutableStateOf
 import de.fabmax.kool.scene.Scene
-import io.github.rwx.ui.model.Dialog
-import io.github.rwx.ui.component.PanelStyle
-import io.github.rwx.ui.model.SettingsModel
-import io.github.rwx.ui.component.addPanelSurface
 import io.github.rwx.ui.component.MessageDialog
+import io.github.rwx.ui.component.PanelStyle
+import io.github.rwx.ui.component.addPanelSurface
+import io.github.rwx.ui.model.Dialog
+import io.github.rwx.ui.model.SettingsModel
 
 
 class DialogSceneHost(
@@ -27,13 +27,13 @@ class DialogSceneHost(
     }
 
     fun createScene(): Scene = UiScene(ERROR_DIALOG_SCENE_NAME) {
-        addPanelSurface(PanelStyle.Dialog, "rwx-dialog-panel", model) { theme ->
+        addPanelSurface(PanelStyle.Dialog, "dialog-panel", model) { theme ->
             val dialog = dialogState.use() ?: return@addPanelSurface
             MessageDialog(dialog, theme) { hide() }
         }
     }
 
     companion object {
-        const val ERROR_DIALOG_SCENE_NAME: String = "rwx-dialog"
+        const val ERROR_DIALOG_SCENE_NAME: String = "dialog"
     }
 }

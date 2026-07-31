@@ -12,34 +12,13 @@ import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.scene.Scene
 import io.github.rwx.PlatformBridge
 import io.github.rwx.input.KoolKeyCodeMapping
-import io.github.rwx.ui.model.AndroidStoragePreference
-import io.github.rwx.ui.component.BodyText
-import io.github.rwx.ui.component.PanelStyle
 import io.github.rwx.ui.ResponsiveContentWidth
 import io.github.rwx.ui.ResponsiveViewportHeight
-import io.github.rwx.ui.component.SectionTitle
-import io.github.rwx.ui.model.SettingKeyBindingRow
-import io.github.rwx.ui.model.SettingToggle
-import io.github.rwx.ui.model.SettingsAction
-import io.github.rwx.ui.model.SettingsModel
-import io.github.rwx.ui.model.SettingsPage
-import io.github.rwx.ui.model.SettingsPageContent
-import io.github.rwx.ui.model.SettingsPageItem
-import io.github.rwx.ui.model.SettingsScrollRow
-import io.github.rwx.ui.model.SettingsViewModel
 import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.component.addPanelSurface
-import io.github.rwx.ui.component.ScrollableVerticalList
-import io.github.rwx.ui.component.SettingsColorSchemeCard
-import io.github.rwx.ui.component.SettingsKeyBindingCard
-import io.github.rwx.ui.component.SettingsSliderCard
-import io.github.rwx.ui.component.SettingsStorageLocationCard
-import io.github.rwx.ui.component.SettingsTabs
-import io.github.rwx.ui.component.SettingsToggleCard
-import io.github.rwx.ui.component.settingsIcon
+import io.github.rwx.ui.component.*
+import io.github.rwx.ui.model.*
 import io.github.rwx.ui.remainingAfter
 import org.koin.mp.KoinPlatform.getKoin
-import kotlin.collections.forEach
 import com.corrodinggames.rts.gameFramework.InputController as LegacyInputController
 
 class SettingsSceneHost(
@@ -66,7 +45,7 @@ class SettingsSceneHost(
     }
 
     fun createScene(): Scene = UiScene(SETTINGS_SCENE_NAME) {
-        addPanelSurface(PanelStyle.Menu, "rwx-settings-panel", model) { theme ->
+        addPanelSurface(PanelStyle.Menu, "settings-panel", model) { theme ->
             val metrics = settingsLayoutMetrics()
 
             val pageIndex = currentPage.use()
@@ -328,7 +307,7 @@ class SettingsSceneHost(
     }
 
     companion object {
-        const val SETTINGS_SCENE_NAME: String = "rwx-settings"
+        const val SETTINGS_SCENE_NAME: String = "settings"
         const val DISPLAY_SECTION_TITLE: String = "Display & Input"
         const val AUDIO_SECTION_TITLE: String = "Audio"
         const val INTERFACE_SECTION_TITLE: String = "Interface"

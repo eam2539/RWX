@@ -97,7 +97,7 @@ public class AreaControlMode {
     public static AreaControlMode fromMap(MapObject mapInfo, MapObjectLayer objectLayer) throws MapLoadException {
         int scoreLimit = readIntProperty(mapInfo, "areaControlScoreLimit", readIntProperty(mapInfo, "scoreLimit", 500));
         if (scoreLimit <= 0) {
-            throw new MapLoadException("areaControl scoreLimit must FastArrayList greater than 0");
+            throw new MapLoadException("areaControl scoreLimit must be greater than 0");
         }
         float defaultScoreIntervalFrames = readSecondsProperty(mapInfo, "scoreInterval", 5.0f);
         if (readProperty(mapInfo, "areaControlScoreInterval") != null) {
@@ -125,11 +125,23 @@ public class AreaControlMode {
         return this.scoreLimit;
     }
 
-    public void setEditorScoreLimit(int scoreLimit) throws MapLoadException {
-        if (scoreLimit <= 0) {
-            throw new MapLoadException("RWX area control victory score must FastArrayList greater than 0");
+    private static MapObjectLayer ensureSnapshotObjectLayer(MapObjectLayer layer) throws IOException {
+        if (layer != null) {
+            return layer;
         }
-        this.scoreLimit = scoreLimit;
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new IOException("No map loaded for area snapshot");
+        }
+        try {
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element group = document.createElement("objectgroup");
+            group.setAttribute("name", "Triggers");
+            gameEngine.tileMap.objectsLayer = new MapObjectLayer(group, gameEngine.tileMap);
+            return gameEngine.tileMap.objectsLayer;
+        } catch (Exception e) {
+            throw new IOException("Failed to create area snapshot object layer", e);
+        }
     }
 
     public EditorZoneProperties getEditorZonePropertiesAt(float x, float y) {
@@ -149,59 +161,36 @@ public class AreaControlMode {
         return this.zones.length;
     }
 
-    public String updateEditorZoneAt(float x, float y, EditorZoneProperties properties) throws MapLoadException {
-        int index = findEditorZoneIndexAt(x, y);
-        if (index < 0) {
-            return null;
+    private static MapObject createSnapshotObject(MapObjectLayer layer, String id, String type, float x, float y, float width, float height, Map<String, String> properties) throws IOException {
+        try {
+            GameEngine gameEngine = GameEngine.getInstance();
+            if (gameEngine == null || gameEngine.tileMap == null) {
+                throw new IOException("No map loaded for snapshot object");
+            }
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element object = document.createElement("object");
+            object.setAttribute("id", String.valueOf(12000 + (layer.mapObjects == null ? 0 : layer.mapObjects.size())));
+            object.setAttribute("name", id);
+            object.setAttribute("type", type);
+            object.setAttribute("x", trimFloat(x));
+            object.setAttribute("y", trimFloat(y));
+            object.setAttribute("width", trimFloat(width));
+            object.setAttribute("height", trimFloat(height));
+            Element propertyRoot = document.createElement("properties");
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                appendProperty(document, propertyRoot, entry.getKey(), entry.getValue());
+            }
+            object.appendChild(propertyRoot);
+            MapObject mapObject = new MapObject(object, gameEngine.tileMap, layer);
+            if (layer.mapObjects != null) {
+                layer.mapObjects.add(mapObject);
+            }
+            return mapObject;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException("Failed to create area snapshot object", e);
         }
-        if (properties == null) {
-            throw new MapLoadException("RWX area zone properties are missing");
-        }
-        String id = properties.id == null ? "" : properties.id.trim();
-        if (id.length() == 0) {
-            throw new MapLoadException("RWX area zone id must not FastArrayList empty");
-        }
-        float width = properties.width;
-        float height = properties.height;
-        if (properties.circle) {
-            float diameter = Math.min(width, height);
-            width = diameter;
-            height = diameter;
-        }
-        if (width <= 0.0f || height <= 0.0f) {
-            throw new MapLoadException("RWX area zone size must FastArrayList greater than 0");
-        }
-
-        ControlZone existing = this.zones[index];
-        MapObject object = existing.object;
-        object.name = id;
-        object.normalizedName = id.trim().toLowerCase(java.util.Locale.ENGLISH);
-        object.type = CONTROL_ZONE_TYPE;
-        object.x = properties.x;
-        object.y = properties.y;
-        object.width = width;
-        object.height = height;
-        object.tileRect.a(properties.x, properties.y, properties.x + width, properties.y + height);
-        setObjectProperty(object, "id", id);
-        if (properties.circle) {
-            setObjectProperty(object, "shape", "circle");
-        } else {
-            removeObjectProperty(object, "shape");
-            removeObjectProperty(object, "circle");
-        }
-        setObjectProperty(object, "captureTime", trimFloat(properties.captureTimeSeconds));
-        setObjectProperty(object, "neutralizeTime", trimFloat(properties.neutralizeTimeSeconds));
-        setObjectProperty(object, "scoreRate", String.valueOf(properties.scoreRate));
-        setObjectProperty(object, "scoreInterval", trimFloat(properties.scoreIntervalSeconds));
-        setObjectProperty(object, "groundOnly", String.valueOf(properties.groundOnly));
-        setObjectProperty(object, "maxCaptureWeight", trimFloat(properties.maxCaptureWeight));
-        if (properties.startingOwner == -1) {
-            removeObjectProperty(object, "startingOwner");
-        } else {
-            setObjectProperty(object, "startingOwner", String.valueOf(properties.startingOwner));
-        }
-        this.zones[index] = ControlZone.fromMapObject(object, index, 180.0f);
-        return id;
     }
 
     public MapObject removeEditorZoneAt(float x, float y) {
@@ -685,22 +674,22 @@ public class AreaControlMode {
         }
     }
 
-    private static MapObjectLayer ensureSnapshotObjectLayer(MapObjectLayer layer) throws IOException {
-        if (layer != null) {
-            return layer;
+    private static float readSecondsProperty(MapObject object, String key, float defaultSeconds) throws MapLoadException {
+        String value = readProperty(object, key);
+        if (value == null) {
+            return defaultSeconds * 60.0f;
         }
-        GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine == null || gameEngine.tileMap == null) {
-            throw new IOException("No map loaded for RWX area snapshot");
+        if (value.endsWith("s") || value.endsWith("S")) {
+            value = value.substring(0, value.length() - 1).trim();
         }
         try {
-            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Element group = document.createElement("objectgroup");
-            group.setAttribute("name", "Triggers");
-            gameEngine.tileMap.objectsLayer = new MapObjectLayer(group, gameEngine.tileMap);
-            return gameEngine.tileMap.objectsLayer;
-        } catch (Exception e) {
-            throw new IOException("Failed to create RWX area snapshot object layer", e);
+            float seconds = Float.parseFloat(value);
+            if (seconds <= 0.0f) {
+                throw new MapLoadException(object.getTriggerTag() + " property '" + key + "' must be greater than 0");
+            }
+            return seconds * 60.0f;
+        } catch (NumberFormatException e) {
+            throw new MapLoadException(object.getTriggerTag() + " property '" + key + "' expected seconds, got: " + value, e);
         }
     }
 
@@ -716,36 +705,11 @@ public class AreaControlMode {
         }
     }
 
-    private static MapObject createSnapshotObject(MapObjectLayer layer, String id, String type, float x, float y, float width, float height, Map<String, String> properties) throws IOException {
-        try {
-            GameEngine gameEngine = GameEngine.getInstance();
-            if (gameEngine == null || gameEngine.tileMap == null) {
-                throw new IOException("No map loaded for RWX snapshot object");
-            }
-            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Element object = document.createElement("object");
-            object.setAttribute("id", String.valueOf(12000 + (layer.mapObjects == null ? 0 : layer.mapObjects.size())));
-            object.setAttribute("name", id);
-            object.setAttribute("type", type);
-            object.setAttribute("x", trimFloat(x));
-            object.setAttribute("y", trimFloat(y));
-            object.setAttribute("width", trimFloat(width));
-            object.setAttribute("height", trimFloat(height));
-            Element propertyRoot = document.createElement("properties");
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
-                appendProperty(document, propertyRoot, entry.getKey(), entry.getValue());
-            }
-            object.appendChild(propertyRoot);
-            MapObject mapObject = new MapObject(object, gameEngine.tileMap, layer);
-            if (layer.mapObjects != null) {
-                layer.mapObjects.add(mapObject);
-            }
-            return mapObject;
-        } catch (IOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new IOException("Failed to create RWX area snapshot object", e);
+    public void setEditorScoreLimit(int scoreLimit) throws MapLoadException {
+        if (scoreLimit <= 0) {
+            throw new MapLoadException("Area control victory score must be greater than 0");
         }
+        this.scoreLimit = scoreLimit;
     }
 
     public static void skipState(GameInputStream stream) throws IOException {
@@ -1136,23 +1100,59 @@ public class AreaControlMode {
         }
     }
 
-    private static float readSecondsProperty(MapObject object, String key, float defaultSeconds) throws MapLoadException {
-        String value = readProperty(object, key);
-        if (value == null) {
-            return defaultSeconds * 60.0f;
+    public String updateEditorZoneAt(float x, float y, EditorZoneProperties properties) throws MapLoadException {
+        int index = findEditorZoneIndexAt(x, y);
+        if (index < 0) {
+            return null;
         }
-        if (value.endsWith("s") || value.endsWith("S")) {
-            value = value.substring(0, value.length() - 1).trim();
+        if (properties == null) {
+            throw new MapLoadException("Area zone properties are missing");
         }
-        try {
-            float seconds = Float.parseFloat(value);
-            if (seconds <= 0.0f) {
-                throw new MapLoadException(object.getTriggerTag() + " property '" + key + "' must FastArrayList greater than 0");
-            }
-            return seconds * 60.0f;
-        } catch (NumberFormatException e) {
-            throw new MapLoadException(object.getTriggerTag() + " property '" + key + "' expected seconds, got: " + value, e);
+        String id = properties.id == null ? "" : properties.id.trim();
+        if (id.length() == 0) {
+            throw new MapLoadException("Area zone id must not be empty");
         }
+        float width = properties.width;
+        float height = properties.height;
+        if (properties.circle) {
+            float diameter = Math.min(width, height);
+            width = diameter;
+            height = diameter;
+        }
+        if (width <= 0.0f || height <= 0.0f) {
+            throw new MapLoadException("Area zone size must be greater than 0");
+        }
+
+        ControlZone existing = this.zones[index];
+        MapObject object = existing.object;
+        object.name = id;
+        object.normalizedName = id.trim().toLowerCase(java.util.Locale.ENGLISH);
+        object.type = CONTROL_ZONE_TYPE;
+        object.x = properties.x;
+        object.y = properties.y;
+        object.width = width;
+        object.height = height;
+        object.tileRect.a(properties.x, properties.y, properties.x + width, properties.y + height);
+        setObjectProperty(object, "id", id);
+        if (properties.circle) {
+            setObjectProperty(object, "shape", "circle");
+        } else {
+            removeObjectProperty(object, "shape");
+            removeObjectProperty(object, "circle");
+        }
+        setObjectProperty(object, "captureTime", trimFloat(properties.captureTimeSeconds));
+        setObjectProperty(object, "neutralizeTime", trimFloat(properties.neutralizeTimeSeconds));
+        setObjectProperty(object, "scoreRate", String.valueOf(properties.scoreRate));
+        setObjectProperty(object, "scoreInterval", trimFloat(properties.scoreIntervalSeconds));
+        setObjectProperty(object, "groundOnly", String.valueOf(properties.groundOnly));
+        setObjectProperty(object, "maxCaptureWeight", trimFloat(properties.maxCaptureWeight));
+        if (properties.startingOwner == -1) {
+            removeObjectProperty(object, "startingOwner");
+        } else {
+            setObjectProperty(object, "startingOwner", String.valueOf(properties.startingOwner));
+        }
+        this.zones[index] = ControlZone.fromMapObject(object, index, 180.0f);
+        return id;
     }
 
     private static boolean readBooleanProperty(MapObject object, String key, boolean defaultValue) {
@@ -1283,10 +1283,10 @@ public class AreaControlMode {
             boolean circle = isCircleZone(object);
             int startingOwner = readOwnerProperty(object, "startingOwner", -1);
             if (scoreRate < 0) {
-                throw new MapLoadException(object.getTriggerTag() + " property 'scoreRate' must FastArrayList 0 or greater");
+                throw new MapLoadException(object.getTriggerTag() + " property 'scoreRate' must be 0 or greater");
             }
             if (maxCaptureWeight <= 0.0f) {
-                throw new MapLoadException(object.getTriggerTag() + " property 'maxCaptureWeight' must FastArrayList greater than 0");
+                throw new MapLoadException(object.getTriggerTag() + " property 'maxCaptureWeight' must be greater than 0");
             }
             return new ControlZone(id, object, captureFrames, neutralizeFrames, scoreRate, scoreIntervalFrames, groundOnly, maxCaptureWeight, circle, startingOwner);
         }
@@ -1522,7 +1522,7 @@ public class AreaControlMode {
                 zone.readState(stream);
                 return zone;
             } catch (MapLoadException e) {
-                throw new IOException("Failed to read RWX area zone snapshot", e);
+                throw new IOException("Failed to read area zone snapshot", e);
             }
         }
 

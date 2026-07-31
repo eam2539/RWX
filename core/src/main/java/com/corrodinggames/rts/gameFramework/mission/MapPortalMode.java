@@ -176,48 +176,11 @@ public class MapPortalMode {
         return EditorPortalProperties.fromPortal(this.portals[index]);
     }
 
-    public String updateEditorPortalAt(float x, float y, EditorPortalProperties properties) throws MapLoadException {
-        int index = findPortalIndexAt(x, y);
-        if (index < 0) {
-            return null;
+    private static String required(String value, String label) throws MapLoadException {
+        if (value == null || value.trim().length() == 0) {
+            throw new MapLoadException("Map portal " + label + " must not be empty");
         }
-        if (properties == null) {
-            throw new MapLoadException("RWX map portal properties are missing");
-        }
-        String id = required(properties.id, "portal id");
-        String targetMapId = required(properties.targetMapId, "target map id");
-        float width = properties.width;
-        float height = properties.height;
-        if (properties.circle) {
-            float diameter = Math.min(width, height);
-            width = diameter;
-            height = diameter;
-        }
-        if (width <= 0.0f || height <= 0.0f) {
-            throw new MapLoadException("RWX map portal size must FastArrayList greater than 0");
-        }
-
-        MapObject object = this.portals[index].object;
-        object.name = id;
-        object.normalizedName = id.trim().toLowerCase(java.util.Locale.ENGLISH);
-        object.type = PORTAL_OBJECT_TYPE;
-        object.x = properties.x;
-        object.y = properties.y;
-        object.width = width;
-        object.height = height;
-        object.tileRect.a(properties.x, properties.y, properties.x + width, properties.y + height);
-        setObjectProperty(object, "id", id);
-        setObjectProperty(object, "targetMapId", targetMapId);
-        setObjectProperty(object, "targetPortalId", properties.targetPortalId == null ? "" : properties.targetPortalId.trim());
-        if (properties.circle) {
-            setObjectProperty(object, "shape", "circle");
-        } else {
-            removeObjectProperty(object, "shape");
-            removeObjectProperty(object, "circle");
-        }
-        this.portals[index] = Portal.fromMapObject(object, index, this.links);
-        ensureLinkForPortal(this.portals[index]);
-        return id;
+        return value.trim();
     }
 
     public boolean requestJumpAt(float x, float y) {
@@ -270,34 +233,54 @@ public class MapPortalMode {
         return true;
     }
 
-    private boolean requestTransfer(GameEngine gameEngine, Portal portal, BaseUnit unit) {
-        UnitType unitType = unit.r();
-        if (!(unitType instanceof UnitTypeEnum)) {
-            GameEngine.log("RWX map portal skipped custom unit transfer: " + unitType.getUnitTypeDescriptionShort());
-            return false;
+    private static MapObjectLayer ensureSnapshotObjectLayer(MapObjectLayer layer) throws IOException {
+        if (layer != null) {
+            return layer;
         }
-        int teamId = unit.team != null ? unit.team.teamId : -1;
-        if (teamId < 0) {
-            return false;
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (gameEngine == null || gameEngine.tileMap == null) {
+            throw new IOException("No map loaded for map portal snapshot");
         }
-        float healthFraction = unit.maxHealth > 0.0f ? unit.currentHealth / unit.maxHealth : 1.0f;
-        CoreUiEventQueue.requestInGameMapPortalTransfer(
-                gameEngine.currentMapPath,
-                portal.targetMapId,
-                portal.targetPortalId,
-                ((UnitTypeEnum) unitType).name(),
-                teamId,
-                healthFraction,
-                unit.direction
-        );
-        GameEngine.log("RWX map portal transfer requested: " + ((UnitTypeEnum) unitType).name());
-        return true;
+        try {
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element group = document.createElement("objectgroup");
+            group.setAttribute("name", "Triggers");
+            gameEngine.tileMap.objectsLayer = new MapObjectLayer(group, gameEngine.tileMap);
+            return gameEngine.tileMap.objectsLayer;
+        } catch (Exception e) {
+            throw new IOException("Failed to create map portal snapshot object layer", e);
+        }
     }
 
-    private void removeTransferredSourceUnit(GameEngine gameEngine, BaseUnit unit) {
-        boolean rwxP2P = gameEngine.networkEngine != null && gameEngine.networkEngine.rwxP2PSession;
-        if (!gameEngine.isNetworkGameActive() || rwxP2P) {
-            unit.removeFromGame();
+    private static MapObject createSnapshotObject(MapObjectLayer layer, String id, String type, float x, float y, float width, float height, Map<String, String> properties) throws IOException {
+        try {
+            GameEngine gameEngine = GameEngine.getInstance();
+            if (gameEngine == null || gameEngine.tileMap == null) {
+                throw new IOException("No map loaded for snapshot object");
+            }
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element object = document.createElement("object");
+            object.setAttribute("id", String.valueOf(13000 + (layer.mapObjects == null ? 0 : layer.mapObjects.size())));
+            object.setAttribute("name", id);
+            object.setAttribute("type", type);
+            object.setAttribute("x", trimFloat(x));
+            object.setAttribute("y", trimFloat(y));
+            object.setAttribute("width", trimFloat(width));
+            object.setAttribute("height", trimFloat(height));
+            Element propertyRoot = document.createElement("properties");
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                appendProperty(document, propertyRoot, entry.getKey(), entry.getValue());
+            }
+            object.appendChild(propertyRoot);
+            MapObject mapObject = new MapObject(object, gameEngine.tileMap, layer);
+            if (layer.mapObjects != null) {
+                layer.mapObjects.add(mapObject);
+            }
+            return mapObject;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException("Failed to create map portal snapshot object", e);
         }
     }
 
@@ -395,44 +378,48 @@ public class MapPortalMode {
         }
     }
 
-    public void writeEditorPortalsToPath(String abstractPath) throws IOException {
-        String path = FileHelper.convertAbstractPath(abstractPath);
-        Document document;
-        try {
-            InputStream inputStream = FileHelper.openFileByPath(abstractPath);
-            if (inputStream == null) {
-                inputStream = FileHelper.openFileByPath(path);
-            }
-            if (inputStream == null) {
-                throw new IOException("Could not open exported map: " + path);
-            }
-            try {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                factory.setValidating(false);
-                javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
-                builder.setEntityResolver((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0])));
-                document = builder.parse(inputStream);
-            } finally {
-                inputStream.close();
-            }
-        } catch (Exception e) {
-            if (e instanceof IOException) {
-                throw (IOException) e;
-            }
-            throw new IOException("Failed to parse exported RWX map", e);
+    public String updateEditorPortalAt(float x, float y, EditorPortalProperties properties) throws MapLoadException {
+        int index = findPortalIndexAt(x, y);
+        if (index < 0) {
+            return null;
         }
-        writeEditorPortalsToDocument(document);
-        try {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            OutputStream outputStream = FileHelper.openOutputStreamByPath(path, false);
-            try {
-                transformer.transform(new DOMSource(document), new StreamResult(outputStream));
-            } finally {
-                outputStream.close();
-            }
-        } catch (Exception e) {
-            throw new IOException("Failed to write exported RWX map", e);
+        if (properties == null) {
+            throw new MapLoadException("Map portal properties are missing");
         }
+        String id = required(properties.id, "portal id");
+        String targetMapId = required(properties.targetMapId, "target map id");
+        float width = properties.width;
+        float height = properties.height;
+        if (properties.circle) {
+            float diameter = Math.min(width, height);
+            width = diameter;
+            height = diameter;
+        }
+        if (width <= 0.0f || height <= 0.0f) {
+            throw new MapLoadException("Map portal size must be greater than 0");
+        }
+
+        MapObject object = this.portals[index].object;
+        object.name = id;
+        object.normalizedName = id.trim().toLowerCase(java.util.Locale.ENGLISH);
+        object.type = PORTAL_OBJECT_TYPE;
+        object.x = properties.x;
+        object.y = properties.y;
+        object.width = width;
+        object.height = height;
+        object.tileRect.a(properties.x, properties.y, properties.x + width, properties.y + height);
+        setObjectProperty(object, "id", id);
+        setObjectProperty(object, "targetMapId", targetMapId);
+        setObjectProperty(object, "targetPortalId", properties.targetPortalId == null ? "" : properties.targetPortalId.trim());
+        if (properties.circle) {
+            setObjectProperty(object, "shape", "circle");
+        } else {
+            removeObjectProperty(object, "shape");
+            removeObjectProperty(object, "circle");
+        }
+        this.portals[index] = Portal.fromMapObject(object, index, this.links);
+        ensureLinkForPortal(this.portals[index]);
+        return id;
     }
 
     public void writeEditorPortalsToDocument(Document document) {
@@ -523,11 +510,28 @@ public class MapPortalMode {
         return result;
     }
 
-    private static String required(String value, String label) throws MapLoadException {
-        if (value == null || value.trim().length() == 0) {
-            throw new MapLoadException("RWX map portal " + label + " must not FastArrayList empty");
+    private boolean requestTransfer(GameEngine gameEngine, Portal portal, BaseUnit unit) {
+        UnitType unitType = unit.r();
+        if (!(unitType instanceof UnitTypeEnum)) {
+            GameEngine.log("Map portal skipped custom unit transfer: " + unitType.getUnitTypeDescriptionShort());
+            return false;
         }
-        return value.trim();
+        int teamId = unit.team != null ? unit.team.teamId : -1;
+        if (teamId < 0) {
+            return false;
+        }
+        float healthFraction = unit.maxHealth > 0.0f ? unit.currentHealth / unit.maxHealth : 1.0f;
+        CoreUiEventQueue.requestInGameMapPortalTransfer(
+                gameEngine.currentMapPath,
+                portal.targetMapId,
+                portal.targetPortalId,
+                ((UnitTypeEnum) unitType).name(),
+                teamId,
+                healthFraction,
+                unit.direction
+        );
+        GameEngine.log("Map portal transfer requested: " + ((UnitTypeEnum) unitType).name());
+        return true;
     }
 
     private static Element findOrCreateTriggers(Document document, Element root) {
@@ -628,22 +632,10 @@ public class MapPortalMode {
         }
     }
 
-    private static MapObjectLayer ensureSnapshotObjectLayer(MapObjectLayer layer) throws IOException {
-        if (layer != null) {
-            return layer;
-        }
-        GameEngine gameEngine = GameEngine.getInstance();
-        if (gameEngine == null || gameEngine.tileMap == null) {
-            throw new IOException("No map loaded for RWX map portal snapshot");
-        }
-        try {
-            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Element group = document.createElement("objectgroup");
-            group.setAttribute("name", "Triggers");
-            gameEngine.tileMap.objectsLayer = new MapObjectLayer(group, gameEngine.tileMap);
-            return gameEngine.tileMap.objectsLayer;
-        } catch (Exception e) {
-            throw new IOException("Failed to create RWX map portal snapshot object layer", e);
+    private void removeTransferredSourceUnit(GameEngine gameEngine, BaseUnit unit) {
+        boolean p2pSession = gameEngine.networkEngine != null && gameEngine.networkEngine.p2pSession;
+        if (!gameEngine.isNetworkGameActive() || p2pSession) {
+            unit.removeFromGame();
         }
     }
 
@@ -659,35 +651,43 @@ public class MapPortalMode {
         }
     }
 
-    private static MapObject createSnapshotObject(MapObjectLayer layer, String id, String type, float x, float y, float width, float height, Map<String, String> properties) throws IOException {
+    public void writeEditorPortalsToPath(String abstractPath) throws IOException {
+        String path = FileHelper.convertAbstractPath(abstractPath);
+        Document document;
         try {
-            GameEngine gameEngine = GameEngine.getInstance();
-            if (gameEngine == null || gameEngine.tileMap == null) {
-                throw new IOException("No map loaded for RWX snapshot object");
+            InputStream inputStream = FileHelper.openFileByPath(abstractPath);
+            if (inputStream == null) {
+                inputStream = FileHelper.openFileByPath(path);
             }
-            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Element object = document.createElement("object");
-            object.setAttribute("id", String.valueOf(13000 + (layer.mapObjects == null ? 0 : layer.mapObjects.size())));
-            object.setAttribute("name", id);
-            object.setAttribute("type", type);
-            object.setAttribute("x", trimFloat(x));
-            object.setAttribute("y", trimFloat(y));
-            object.setAttribute("width", trimFloat(width));
-            object.setAttribute("height", trimFloat(height));
-            Element propertyRoot = document.createElement("properties");
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
-                appendProperty(document, propertyRoot, entry.getKey(), entry.getValue());
+            if (inputStream == null) {
+                throw new IOException("Could not open exported map: " + path);
             }
-            object.appendChild(propertyRoot);
-            MapObject mapObject = new MapObject(object, gameEngine.tileMap, layer);
-            if (layer.mapObjects != null) {
-                layer.mapObjects.add(mapObject);
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setValidating(false);
+                javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
+                builder.setEntityResolver((publicId, systemId) -> new InputSource(new ByteArrayInputStream(new byte[0])));
+                document = builder.parse(inputStream);
+            } finally {
+                inputStream.close();
             }
-            return mapObject;
-        } catch (IOException e) {
-            throw e;
         } catch (Exception e) {
-            throw new IOException("Failed to create RWX map portal snapshot object", e);
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            }
+            throw new IOException("Failed to parse exported map", e);
+        }
+        writeEditorPortalsToDocument(document);
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            OutputStream outputStream = FileHelper.openOutputStreamByPath(path, false);
+            try {
+                transformer.transform(new DOMSource(document), new StreamResult(outputStream));
+            } finally {
+                outputStream.close();
+            }
+        } catch (Exception e) {
+            throw new IOException("Failed to write exported map", e);
         }
     }
 
@@ -796,7 +796,7 @@ public class MapPortalMode {
                 }
             }
             if (targetMapId == null || targetMapId.trim().length() == 0) {
-                throw new MapLoadException("RWX map portal '" + id + "' requires targetMapId or a valid linkId");
+                throw new MapLoadException("Map portal '" + id + "' requires targetMapId or a valid linkId");
             }
             return new Portal(id.trim(), linkId, targetMapId.trim(), readProperty(object, "targetPortalId"), isCircle(object), object);
         }
@@ -838,7 +838,7 @@ public class MapPortalMode {
             try {
                 return Portal.fromMapObject(object, index, links);
             } catch (MapLoadException e) {
-                throw new IOException("Failed to read RWX map portal snapshot", e);
+                throw new IOException("Failed to read map portal snapshot", e);
             }
         }
 

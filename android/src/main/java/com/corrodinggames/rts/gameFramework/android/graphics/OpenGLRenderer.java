@@ -102,7 +102,7 @@ public class OpenGLRenderer implements GraphicsRenderer {
     public int E = -1;
     public Paint F = new Paint();
     FastArrayList L = new FastArrayList();
-    private int rwxBlendMode = RwxBlendPaint.BLEND_NORMAL;
+    private int blendMode = BlendPaint.BLEND_NORMAL;
 
     public OpenGLRenderer(GraphicsEngine graphicsEngine) {
         this.r = graphicsEngine;
@@ -131,30 +131,30 @@ public class OpenGLRenderer implements GraphicsRenderer {
         this.q = new LineBatchRenderer(this);
     }
 
-    public final void aRwxBlendMode(int blendMode) {
-        if (this.rwxBlendMode == blendMode) {
+    public final void applyBlendMode(int blendMode) {
+        if (this.blendMode == blendMode) {
             return;
         }
         g();
-        this.rwxBlendMode = blendMode;
+        this.blendMode = blendMode;
         switch (blendMode) {
-            case RwxBlendPaint.BLEND_LIGHTING_ADD:
-            case RwxBlendPaint.BLEND_ADD:
+            case BlendPaint.BLEND_LIGHTING_ADD:
+            case BlendPaint.BLEND_ADD:
                 GLES20.glBlendFunc(770, 1);
                 break;
-            case RwxBlendPaint.BLEND_TEAM_COPY:
+            case BlendPaint.BLEND_TEAM_COPY:
                 GLES20.glBlendFunc(1, 1);
                 break;
-            case RwxBlendPaint.BLEND_TEAM_ADDITIVE:
+            case BlendPaint.BLEND_TEAM_ADDITIVE:
                 GLES20.glBlendFunc(774, 771);
                 break;
-            case RwxBlendPaint.BLEND_SOURCE:
+            case BlendPaint.BLEND_SOURCE:
                 GLES20.glBlendFunc(1, 0);
                 break;
-            case RwxBlendPaint.BLEND_MULTIPLY:
+            case BlendPaint.BLEND_MULTIPLY:
                 GLES20.glBlendFunc(769, 768);
                 break;
-            case RwxBlendPaint.BLEND_SCREEN:
+            case BlendPaint.BLEND_SCREEN:
                 GLES20.glBlendFunc(1, 769);
                 break;
             default:
@@ -1091,7 +1091,7 @@ public class OpenGLRenderer implements GraphicsRenderer {
         GLES20.glVertexAttribPointer(i4, 2, 5126, false, 0, (Buffer) this.P);
         a(shaderHandleBaseArr, 0.0f, 0.0f, 1.0f, 1.0f);
         if (debugPointDrawCount < 16) {
-            Log.d("RWX_MINIMAP_GL", "glDrawArrays mode=POINTS floats=" + i2 + " vertices=" + (i2 / 2));
+            Log.d("MinimapGL", "glDrawArrays mode=POINTS floats=" + i2 + " vertices=" + (i2 / 2));
             debugPointDrawCount++;
         }
         GLES20.glDrawArrays(0, 0, i2 / 2);

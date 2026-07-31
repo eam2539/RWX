@@ -6,14 +6,7 @@ import io.github.rwx.p2p.P2PLobbyService
 import io.github.rwx.session.BattleRoomHostConfig
 import io.github.rwx.session.GameSession
 import io.github.rwx.ui.host.DialogSceneHost
-import io.github.rwx.ui.model.Dialog
-import io.github.rwx.ui.model.DialogButton
-import io.github.rwx.ui.model.DialogForm
-import io.github.rwx.ui.model.DialogFormField
-import io.github.rwx.ui.model.DialogTextInput
-import io.github.rwx.ui.model.MapEntry
-import io.github.rwx.ui.model.MultiplayerLobbyKind
-import io.github.rwx.ui.model.MultiplayerRoomItem
+import io.github.rwx.ui.model.*
 
 internal class MultiplayerConnectionController(
     private val gameSession: GameSession,
@@ -33,7 +26,7 @@ internal class MultiplayerConnectionController(
             roomLabel = roomLabel,
             failurePrefix = I18n.multiplayer.unableToJoinServer(),
         ) {
-            check(gameSession.joinBattleRoom(connectDescriptor, serverId, rwxP2PSession = false)) {
+            check(gameSession.joinBattleRoom(connectDescriptor, serverId, p2pSession = false)) {
                 "Game session rejected join request"
             }
         }
@@ -49,7 +42,7 @@ internal class MultiplayerConnectionController(
                 roomLabel = roomLabel,
                 failurePrefix = I18n.multiplayer.unableToJoinP2pRoom(),
             ) {
-                check(gameSession.joinBattleRoom(address, serverId = null, rwxP2PSession = true)) {
+                check(gameSession.joinBattleRoom(address, serverId = null, p2pSession = true)) {
                     "Game session rejected P2P join request"
                 }
             }

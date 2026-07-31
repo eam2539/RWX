@@ -22,7 +22,7 @@ class KoolTeamColorShader(
     private class Model(
         mode: KoolCanvasTeamColorMode,
         multipliesRgbByAlpha: Boolean,
-    ) : KslProgram("RWX Team Color Shader") {
+    ) : KslProgram("Team Color Shader") {
         init {
             val texCoords = interStageFloat2()
             val vertexColor = interStageFloat4()

@@ -20,9 +20,9 @@ import com.corrodinggames.rts.gameFramework.steam.DisabledSteamEngine;
 import com.corrodinggames.rts.gameFramework.ui.widgets.MenuDialog;
 import com.corrodinggames.rts.gameFramework.ui.widgets.UIEvent;
 import com.corrodinggames.rts.gameFramework.ui.widgets.UIEventHandler;
+import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import com.corrodinggames.rts.gameFramework.utility.Log;
 import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
-import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import io.github.rwx.map.MapMetadata;
 import io.github.rwx.platform.CoreGameView;
 import io.github.rwx.ui.BattleRoomUiBridge;
@@ -200,7 +200,7 @@ public final class NetworkEngine {
     private boolean bH = false;
     public volatile boolean networkGameActive = false;
     public boolean singleplayerServer = false;
-    public boolean rwxP2PSession = false;
+    public boolean p2pSession = false;
     public int I = 0;
 
     /* JADX INFO: renamed from: bI */
@@ -955,7 +955,7 @@ public final class NetworkEngine {
         this.isServer = false;
         this.f = null;
         this.singleplayerServer = false;
-        this.rwxP2PSession = false;
+        this.p2pSession = false;
         this.D = false;
         this.E = null;
         this.x = false;
@@ -1780,7 +1780,7 @@ public final class NetworkEngine {
             this.isServer = false;
             this.useMasterServer = true;
             this.singleplayerServer = false;
-            this.rwxP2PSession = false;
+            this.p2pSession = false;
             this.f = null;
             try {
                 this.queuedDisconnectLock.wait(50L);

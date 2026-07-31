@@ -4,19 +4,9 @@ import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.scene.Scene
 import io.github.rwx.i18n.I18n
 import io.github.rwx.ui.ColorSchemeDefinition
-import io.github.rwx.ui.component.PanelStyle
-import io.github.rwx.ui.model.ReplayBrowser
-import io.github.rwx.ui.model.ReplayEntry
-import io.github.rwx.ui.model.ReplaySelectAction
-import io.github.rwx.ui.model.ReplaySelectActionHandler
-import io.github.rwx.ui.model.ReplaySelectViewModelFactory
-import io.github.rwx.ui.component.RwxTextField
-import io.github.rwx.ui.component.ScrollableVerticalList
-import io.github.rwx.ui.model.SettingsModel
 import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.component.addPanelSurface
-import io.github.rwx.ui.component.Icon
-import io.github.rwx.ui.component.IconButton
+import io.github.rwx.ui.component.*
+import io.github.rwx.ui.model.*
 import io.github.rwx.ui.remainingAfter
 
 class ReplaySelectSceneHost(
@@ -35,7 +25,7 @@ class ReplaySelectSceneHost(
     fun dispatch(action: ReplaySelectAction) = onAction.onAction(action)
 
     fun createScene(): Scene = UiScene(REPLAY_SELECT_SCENE_NAME) {
-        addPanelSurface(PanelStyle.Menu, "rwx-replay-select-panel", model) { theme ->
+        addPanelSurface(PanelStyle.Menu, "replay-select-panel", model) { theme ->
             ReplaySelectList(
                 replays = replays.use(),
                 theme = theme,
@@ -46,7 +36,7 @@ class ReplaySelectSceneHost(
     }
 
     companion object {
-        const val REPLAY_SELECT_SCENE_NAME: String = "rwx-replay-select"
+        const val REPLAY_SELECT_SCENE_NAME: String = "replay-select"
     }
 }
 

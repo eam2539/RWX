@@ -14,12 +14,12 @@ import de.fabmax.kool.util.Color
 import de.fabmax.kool.util.MemoryLayout
 import de.fabmax.kool.util.Struct
 
-object KoolCanvasTextureInstanceLayout : Struct("RWXCanvasTextureInstance", MemoryLayout.TightlyPacked) {
+object KoolCanvasTextureInstanceLayout : Struct("CanvasTextureInstance", MemoryLayout.TightlyPacked) {
     val rect = float4("instattr_rect")
     val uv = float4("instattr_uv")
 }
 
-object KoolCanvasAffineTextureInstanceLayout : Struct("RWXCanvasAffineTextureInstance", MemoryLayout.TightlyPacked) {
+object KoolCanvasAffineTextureInstanceLayout : Struct("CanvasAffineTextureInstance", MemoryLayout.TightlyPacked) {
     val originAxisX = float4("instattr_origin_axis_x")
     val axisY = float4("instattr_axis_y")
     val uv = float4("instattr_uv")
@@ -35,7 +35,7 @@ class KoolCanvasInstancedTextureShader(
     private class Model(
         premultipliedAlpha: Boolean,
         multipliesRgbByAlpha: Boolean,
-    ) : KslProgram("RWX Canvas Instanced Texture Shader") {
+    ) : KslProgram("Canvas Instanced Texture Shader") {
         init {
             val texCoords = interStageFloat2()
 
@@ -90,7 +90,7 @@ class KoolCanvasAffineInstancedTextureShader(
     private class Model(
         premultipliedAlpha: Boolean,
         multipliesRgbByAlpha: Boolean,
-    ) : KslProgram("RWX Canvas Affine Instanced Texture Shader") {
+    ) : KslProgram("Canvas Affine Instanced Texture Shader") {
         init {
             val texCoords = interStageFloat2()
 

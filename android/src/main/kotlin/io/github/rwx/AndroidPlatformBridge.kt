@@ -107,7 +107,7 @@ private class AndroidPlatformAudio(context: Context) : PlatformAudio {
     private val loadedSoundIds = mutableSetOf<Int>()
     private val pendingPlaybacks = linkedMapOf<Int, MutableList<Playback>>()
     private val cachedSoundFiles = linkedMapOf<String, File>()
-    private val soundCacheDir = File(appContext.cacheDir, "rwx-sounds").apply(File::mkdirs)
+    private val soundCacheDir = File(appContext.cacheDir, "sounds").apply(File::mkdirs)
 
     init {
         soundPool.setOnLoadCompleteListener { _, soundId, status ->

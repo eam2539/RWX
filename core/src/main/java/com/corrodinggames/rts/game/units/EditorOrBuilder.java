@@ -77,9 +77,9 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     String H;
     boolean I;
     String J;
-    private static final float RWX_DEFAULT_CIRCLE_ZONE_SIZE = 320.0f;
-    private static final float RWX_DEFAULT_RECT_ZONE_WIDTH = 420.0f;
-    private static final float RWX_DEFAULT_RECT_ZONE_HEIGHT = 260.0f;
+    private static final float DEFAULT_CIRCLE_ZONE_SIZE = 320.0f;
+    private static final float DEFAULT_RECT_ZONE_WIDTH = 420.0f;
+    private static final float DEFAULT_RECT_ZONE_HEIGHT = 260.0f;
 
     /* JADX INFO: renamed from: h */
     static AbstractUnitAction editorSelectionTexture3 = new AbstractUnitAction("reloadUnits") { // from class: com.corrodinggames.rts.game.units.h.1
@@ -160,7 +160,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
-            return "Reload data only for active units on map (for modding). This is a faster than reload but will FastArrayList incomplete.";
+            return "Reload data only for active units on map (for modding). This is faster than a full reload but may be incomplete.";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -1127,10 +1127,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return GameEngine.getInstance().isDebugTempMode;
         }
     };
-    static AbstractUnitAction rwxAddCircleZone = new AbstractUnitAction("rwxAddCircleZone") {
+    static AbstractUnitAction addCircleZoneAction = new AbstractUnitAction("rwxAddCircleZone") {
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public String getDescription() {
-            return "Drag on the map to add a circular RWX area control zone";
+            return "Drag on the map to add a circular area control zone";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -1175,7 +1175,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return EditorOrBuilder.isRwxAreaEditorAvailable();
+            return EditorOrBuilder.isAreaEditorAvailable();
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -1183,10 +1183,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-    static AbstractUnitAction rwxAddRectZone = new AbstractUnitAction("rwxAddRectZone") {
+    static AbstractUnitAction addRectangleZoneAction = new AbstractUnitAction("rwxAddRectZone") {
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public String getDescription() {
-            return "Drag on the map to add a rectangular RWX area control zone";
+            return "Drag on the map to add a rectangular area control zone";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -1231,7 +1231,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return EditorOrBuilder.isRwxAreaEditorAvailable();
+            return EditorOrBuilder.isAreaEditorAvailable();
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -1239,10 +1239,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-    static AbstractUnitAction rwxEditZone = new AbstractUnitAction("rwxEditZone") {
+    static AbstractUnitAction editZoneAction = new AbstractUnitAction("rwxEditZone") {
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public String getDescription() {
-            return "Edit the RWX area control zone at the selected point";
+            return "Edit the area control zone at the selected point";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -1287,7 +1287,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return EditorOrBuilder.isRwxAreaEditorAvailable();
+            return EditorOrBuilder.isAreaEditorAvailable();
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -1295,10 +1295,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-    static AbstractUnitAction rwxDeleteZone = new AbstractUnitAction("rwxDeleteZone") {
+    static AbstractUnitAction deleteZoneAction = new AbstractUnitAction("rwxDeleteZone") {
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public String getDescription() {
-            return "Delete the RWX area control zone at the selected point";
+            return "Delete the area control zone at the selected point";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -1343,7 +1343,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return EditorOrBuilder.isRwxAreaEditorAvailable();
+            return EditorOrBuilder.isAreaEditorAvailable();
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -1351,10 +1351,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-    static AbstractUnitAction rwxAddRectMapPortal = new AbstractUnitAction("rwxAddRectMapPortal") {
+    static AbstractUnitAction addRectangleMapPortalAction = new AbstractUnitAction("rwxAddRectMapPortal") {
         @Override
         public String getDescription() {
-            return "Drag on the map to add a rectangular RWX map portal";
+            return "Drag on the map to add a rectangular map portal";
         }
 
         @Override
@@ -1399,7 +1399,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return EditorOrBuilder.isRwxAreaEditorAvailable();
+            return EditorOrBuilder.isAreaEditorAvailable();
         }
 
         @Override
@@ -1407,10 +1407,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-    static AbstractUnitAction rwxAddCircleMapPortal = new AbstractUnitAction("rwxAddCircleMapPortal") {
+    static AbstractUnitAction addCircleMapPortalAction = new AbstractUnitAction("rwxAddCircleMapPortal") {
         @Override
         public String getDescription() {
-            return "Drag on the map to add a circular RWX map portal";
+            return "Drag on the map to add a circular map portal";
         }
 
         @Override
@@ -1455,7 +1455,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return EditorOrBuilder.isRwxAreaEditorAvailable();
+            return EditorOrBuilder.isAreaEditorAvailable();
         }
 
         @Override
@@ -1463,10 +1463,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-    static AbstractUnitAction rwxEditMapPortal = new AbstractUnitAction("rwxEditMapPortal") {
+    static AbstractUnitAction editMapPortalAction = new AbstractUnitAction("rwxEditMapPortal") {
         @Override
         public String getDescription() {
-            return "Edit the RWX map portal at the selected point";
+            return "Edit the map portal at the selected point";
         }
 
         @Override
@@ -1511,7 +1511,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return EditorOrBuilder.isRwxAreaEditorAvailable();
+            return EditorOrBuilder.isAreaEditorAvailable();
         }
 
         @Override
@@ -1519,10 +1519,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-    static AbstractUnitAction rwxDeleteMapPortal = new AbstractUnitAction("rwxDeleteMapPortal") {
+    static AbstractUnitAction deleteMapPortalAction = new AbstractUnitAction("rwxDeleteMapPortal") {
         @Override
         public String getDescription() {
-            return "Delete the RWX map portal at the selected point";
+            return "Delete the map portal at the selected point";
         }
 
         @Override
@@ -1567,7 +1567,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return EditorOrBuilder.isRwxAreaEditorAvailable();
+            return EditorOrBuilder.isAreaEditorAvailable();
         }
 
         @Override
@@ -1575,20 +1575,20 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-    static AbstractUnitAction rwxSaveAreaMap = new NoneAction("rwxSaveAreaMap") {
+    static AbstractUnitAction saveAreaMapAction = new NoneAction("rwxSaveAreaMap") {
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public String getDescription() {
-            return "Export this sandbox map with all RWX editor features";
+            return "Export this sandbox map with all editor features";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public String getDisplayName() {
-            return "Save RWX Map";
+            return "Save Map";
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean b(BaseUnit baseUnit) {
-            return EditorOrBuilder.isRwxAreaEditorAvailable();
+            return EditorOrBuilder.isAreaEditorAvailable();
         }
     };
     static ActionFilter K = new ActionFilter() { // from class: com.corrodinggames.rts.game.units.h.16
@@ -1623,7 +1623,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             if (abstractUnitAction == EditorOrBuilder.C && !EditorOrBuilder.C.b(baseUnit)) {
                 return false;
             }
-            if (EditorOrBuilder.isRwxAreaEditorAction(abstractUnitAction) && !EditorOrBuilder.isRwxAreaEditorAvailable()) {
+            if (EditorOrBuilder.isAreaEditorAction(abstractUnitAction) && !EditorOrBuilder.isAreaEditorAvailable()) {
                 return false;
             }
             return editorTab.a(abstractUnitAction.getUnitType());
@@ -2090,7 +2090,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         return GameEngine.getInstance().gameUI.getEditorOrBuilder();
     }
 
-    public static AbstractUnitAction unwrapRwxAreaEditorAction(AbstractUnitAction abstractUnitAction) {
+    public static AbstractUnitAction unwrapAreaEditorAction(AbstractUnitAction abstractUnitAction) {
         if (abstractUnitAction instanceof FilteredUnitAction) {
             abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
         }
@@ -2100,106 +2100,106 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         return abstractUnitAction;
     }
 
-    public static boolean isRwxAreaEditorAction(AbstractUnitAction abstractUnitAction) {
-        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
-        return abstractUnitAction == rwxAddCircleZone || abstractUnitAction == rwxAddRectZone || abstractUnitAction == rwxEditZone || abstractUnitAction == rwxDeleteZone || abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal || abstractUnitAction == rwxEditMapPortal || abstractUnitAction == rwxDeleteMapPortal || abstractUnitAction == rwxSaveAreaMap;
+    public static boolean isAreaEditorAction(AbstractUnitAction abstractUnitAction) {
+        abstractUnitAction = unwrapAreaEditorAction(abstractUnitAction);
+        return abstractUnitAction == addCircleZoneAction || abstractUnitAction == addRectangleZoneAction || abstractUnitAction == editZoneAction || abstractUnitAction == deleteZoneAction || abstractUnitAction == addCircleMapPortalAction || abstractUnitAction == addRectangleMapPortalAction || abstractUnitAction == editMapPortalAction || abstractUnitAction == deleteMapPortalAction || abstractUnitAction == saveAreaMapAction;
     }
 
-    public static boolean isRwxAreaEditorAddAction(AbstractUnitAction abstractUnitAction) {
-        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
-        return abstractUnitAction == rwxAddCircleZone || abstractUnitAction == rwxAddRectZone || abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal;
+    public static boolean isAreaEditorAddAction(AbstractUnitAction abstractUnitAction) {
+        abstractUnitAction = unwrapAreaEditorAction(abstractUnitAction);
+        return abstractUnitAction == addCircleZoneAction || abstractUnitAction == addRectangleZoneAction || abstractUnitAction == addCircleMapPortalAction || abstractUnitAction == addRectangleMapPortalAction;
     }
 
-    public static boolean isRwxAreaEditorCircleAddAction(AbstractUnitAction abstractUnitAction) {
-        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
-        return abstractUnitAction == rwxAddCircleZone || abstractUnitAction == rwxAddCircleMapPortal;
+    public static boolean isAreaEditorCircleAddAction(AbstractUnitAction abstractUnitAction) {
+        abstractUnitAction = unwrapAreaEditorAction(abstractUnitAction);
+        return abstractUnitAction == addCircleZoneAction || abstractUnitAction == addCircleMapPortalAction;
     }
 
-    public static boolean isRwxMapPortalEditorAddAction(AbstractUnitAction abstractUnitAction) {
-        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
-        return abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal;
+    public static boolean isMapPortalEditorAddAction(AbstractUnitAction abstractUnitAction) {
+        abstractUnitAction = unwrapAreaEditorAction(abstractUnitAction);
+        return abstractUnitAction == addCircleMapPortalAction || abstractUnitAction == addRectangleMapPortalAction;
     }
 
-    public static boolean isRwxMapPortalEditorAction(AbstractUnitAction abstractUnitAction) {
-        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
-        return abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal || abstractUnitAction == rwxEditMapPortal || abstractUnitAction == rwxDeleteMapPortal;
+    public static boolean isMapPortalEditorAction(AbstractUnitAction abstractUnitAction) {
+        abstractUnitAction = unwrapAreaEditorAction(abstractUnitAction);
+        return abstractUnitAction == addCircleMapPortalAction || abstractUnitAction == addRectangleMapPortalAction || abstractUnitAction == editMapPortalAction || abstractUnitAction == deleteMapPortalAction;
     }
 
-    public static boolean isRwxAreaEditorAvailable() {
+    public static boolean isAreaEditorAvailable() {
         GameEngine gameEngine = GameEngine.getInstance();
         return gameEngine != null && gameEngine.isGameStarted && gameEngine.missionEngine != null && gameEngine.gameUI != null && gameEngine.gameUI.getEditorOrBuilder() != null && !gameEngine.replayEngine.j();
     }
 
-    static void addRwxAreaZoneAt(float x, float y, boolean circle, float width, float height) {
+    static void addAreaZoneAt(float x, float y, boolean circle, float width, float height) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!isRwxAreaEditorAvailable()) {
-            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+        if (!isAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("Area editor is only available while sandbox editor is active");
             return;
         }
         try {
             int zoneCount = gameEngine.missionEngine.addAreaControlEditorZone(x, y, circle, width, height);
-            gameEngine.gameUI.showMediumPriorityMessage("Added RWX " + (circle ? "circle" : "rect") + " zone #" + zoneCount);
+            gameEngine.gameUI.showMediumPriorityMessage("Added " + (circle ? "circle" : "rect") + " zone #" + zoneCount);
         } catch (Exception e) {
             e.printStackTrace();
-            gameEngine.showMessageBox("RWX area editor", "Failed to add RWX area zone: " + e.getMessage());
+            gameEngine.showMessageBox("Area editor", "Failed to add area zone: " + e.getMessage());
         }
     }
 
-    public static void addRwxAreaZoneBounds(float startX, float startY, float endX, float endY, boolean circle) {
+    public static void addAreaZoneBounds(float startX, float startY, float endX, float endY, boolean circle) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!isRwxAreaEditorAvailable()) {
-            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+        if (!isAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("Area editor is only available while sandbox editor is active");
             return;
         }
         try {
             int zoneCount = gameEngine.missionEngine.addAreaControlEditorZoneBounds(startX, startY, endX, endY, circle);
-            gameEngine.gameUI.showMediumPriorityMessage("Added RWX " + (circle ? "circle" : "rect") + " zone #" + zoneCount);
+            gameEngine.gameUI.showMediumPriorityMessage("Added " + (circle ? "circle" : "rect") + " zone #" + zoneCount);
         } catch (Exception e) {
             e.printStackTrace();
-            gameEngine.showMessageBox("RWX area editor", "Failed to add RWX area zone: " + e.getMessage());
+            gameEngine.showMessageBox("Area editor", "Failed to add area zone: " + e.getMessage());
         }
     }
 
-    public static void addRwxEditorBounds(AbstractUnitAction action, float startX, float startY, float endX, float endY, boolean circle) {
-        if (isRwxMapPortalEditorAddAction(action)) {
+    public static void addAreaEditorBounds(AbstractUnitAction action, float startX, float startY, float endX, float endY, boolean circle) {
+        if (isMapPortalEditorAddAction(action)) {
             if (!LinkedMapAvailability.ENABLED) {
                 GameEngine.getInstance().showMessageBox("Linked Map", LinkedMapAvailability.UNAVAILABLE_MESSAGE);
                 return;
             }
-            requestRwxAddMapPortalDialog(startX, startY, endX, endY, circle);
+            requestAddMapPortalDialog(startX, startY, endX, endY, circle);
         } else {
-            addRwxAreaZoneBounds(startX, startY, endX, endY, circle);
+            addAreaZoneBounds(startX, startY, endX, endY, circle);
         }
     }
 
-    static void requestRwxAddMapPortalDialog(final float startX, final float startY, final float endX, final float endY, final boolean circle) {
+    static void requestAddMapPortalDialog(final float startX, final float startY, final float endX, final float endY, final boolean circle) {
         final GameEngine gameEngine = GameEngine.getInstance();
-        if (!isRwxAreaEditorAvailable()) {
-            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+        if (!isAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("Area editor is only available while sandbox editor is active");
             return;
         }
-        CoreUiEventQueue.requestFormDialog("Add Map Portal", "Create a RWX map portal. Target map id can FastArrayList an existing map path, file name, base name, or display name.", new String[]{"targetMapId", "targetPortalId"}, new String[]{"Target map id", "Target portal id"}, new String[]{"", ""}, new String[]{"Lake (2p)", "optional"}, "Create", "Cancel", new FormDialogSubmitHandler() {
+        CoreUiEventQueue.requestFormDialog("Add Map Portal", "Create a map portal. Target map id can be an existing map path, file name, base name, or display name.", new String[]{"targetMapId", "targetPortalId"}, new String[]{"Target map id", "Target portal id"}, new String[]{"", ""}, new String[]{"Lake (2p)", "optional"}, "Create", "Cancel", new FormDialogSubmitHandler() {
             @Override
             public void submit(Map<String, String> values) {
                 try {
-                    String targetMapId = parseRwxRequiredString(values, "targetMapId", "Target map id");
-                    String targetPortalId = parseRwxOptionalString(values, "targetPortalId");
+                    String targetMapId = parseRequiredString(values, "targetMapId", "Target map id");
+                    String targetPortalId = parseOptionalString(values, "targetPortalId");
                     int count = gameEngine.missionEngine.addMapPortalEditorPortalBounds(startX, startY, endX, endY, circle, targetMapId, targetPortalId);
-                    gameEngine.gameUI.showMediumPriorityMessage("Added RWX " + (circle ? "circle" : "rect") + " map portal #" + count);
+                    gameEngine.gameUI.showMediumPriorityMessage("Added " + (circle ? "circle" : "rect") + " map portal #" + count);
                 } catch (IllegalArgumentException e) {
-                    gameEngine.showMessageBox("RWX map portal editor", e.getMessage());
+                    gameEngine.showMessageBox("Map portal editor", e.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    gameEngine.showMessageBox("RWX map portal editor", "Failed to add RWX map portal: " + e.getMessage());
+                    gameEngine.showMessageBox("Map portal editor", "Failed to add map portal: " + e.getMessage());
                 }
             }
         });
     }
 
-    static void requestRwxEditAreaZoneDialog(final float x, final float y) {
+    static void requestEditAreaZoneDialog(final float x, final float y) {
         final GameEngine gameEngine = GameEngine.getInstance();
-        if (!isRwxAreaEditorAvailable()) {
-            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+        if (!isAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("Area editor is only available while sandbox editor is active");
             return;
         }
         final AreaControlMode.EditorZoneProperties properties;
@@ -2209,11 +2209,11 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             scoreLimit = gameEngine.missionEngine.getAreaControlEditorScoreLimit();
         } catch (Exception e) {
             e.printStackTrace();
-            gameEngine.showMessageBox("RWX area editor", "Failed to read RWX area zone: " + e.getMessage());
+            gameEngine.showMessageBox("Area editor", "Failed to read area zone: " + e.getMessage());
             return;
         }
         if (properties == null) {
-            gameEngine.gameUI.showMediumPriorityMessage("No RWX area zone at selected point");
+            gameEngine.gameUI.showMediumPriorityMessage("No area zone at selected point");
             return;
         }
         String[] ids = new String[]{"id", "victoryScore", "shape", "x", "y", "width", "height", "captureTime", "neutralizeTime", "scoreRate", "scoreInterval", "maxCaptureWeight", "groundOnly", "startingOwner"};
@@ -2222,77 +2222,77 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                 properties.id,
                 String.valueOf(scoreLimit),
                 properties.circle ? "circle" : "rect",
-                trimRwxFloat(properties.x),
-                trimRwxFloat(properties.y),
-                trimRwxFloat(properties.width),
-                trimRwxFloat(properties.height),
-                trimRwxFloat(properties.captureTimeSeconds),
-                trimRwxFloat(properties.neutralizeTimeSeconds),
+                trimFloat(properties.x),
+                trimFloat(properties.y),
+                trimFloat(properties.width),
+                trimFloat(properties.height),
+                trimFloat(properties.captureTimeSeconds),
+                trimFloat(properties.neutralizeTimeSeconds),
                 String.valueOf(properties.scoreRate),
-                trimRwxFloat(properties.scoreIntervalSeconds),
-                trimRwxFloat(properties.maxCaptureWeight),
+                trimFloat(properties.scoreIntervalSeconds),
+                trimFloat(properties.maxCaptureWeight),
                 String.valueOf(properties.groundOnly),
                 properties.startingOwner == -1 ? "neutral" : String.valueOf(properties.startingOwner)
         };
         String[] hints = new String[]{"A", "500", "rect/circle", "0", "0", "320", "320", "8", "4", "1", "3", "5", "true/false", "neutral or team id"};
-        CoreUiEventQueue.requestFormDialog("Edit Zone", "Edit RWX area control zone properties.", ids, labels, initial, hints, "Save", "Cancel", new FormDialogSubmitHandler() {
+        CoreUiEventQueue.requestFormDialog("Edit Zone", "Edit area control zone properties.", ids, labels, initial, hints, "Save", "Cancel", new FormDialogSubmitHandler() {
             @Override
             public void submit(Map<String, String> values) {
                 try {
-                    properties.id = parseRwxRequiredString(values, "id", "Name");
-                    properties.circle = parseRwxShape(values, "shape", properties.circle);
-                    properties.x = parseRwxFloat(values, "x", properties.x, "X");
-                    properties.y = parseRwxFloat(values, "y", properties.y, "Y");
-                    properties.width = parseRwxPositiveFloat(values, "width", properties.width, "Width");
-                    properties.height = parseRwxPositiveFloat(values, "height", properties.height, "Height");
-                    properties.captureTimeSeconds = parseRwxPositiveFloat(values, "captureTime", properties.captureTimeSeconds, "Capture time");
-                    properties.neutralizeTimeSeconds = parseRwxPositiveFloat(values, "neutralizeTime", properties.neutralizeTimeSeconds, "Neutralize time");
-                    properties.scoreRate = parseRwxNonNegativeInt(values, "scoreRate", properties.scoreRate, "Score rate");
-                    properties.scoreIntervalSeconds = parseRwxPositiveFloat(values, "scoreInterval", properties.scoreIntervalSeconds, "Score interval");
-                    properties.maxCaptureWeight = parseRwxPositiveFloat(values, "maxCaptureWeight", properties.maxCaptureWeight, "Max capture weight");
-                    properties.groundOnly = parseRwxBoolean(values, "groundOnly", properties.groundOnly, "Ground only");
-                    properties.startingOwner = parseRwxOwner(values, "startingOwner", properties.startingOwner, "Starting owner");
-                    int updatedScoreLimit = parseRwxPositiveInt(values, "victoryScore", scoreLimit, "Victory score");
+                    properties.id = parseRequiredString(values, "id", "Name");
+                    properties.circle = parseShape(values, "shape", properties.circle);
+                    properties.x = parseFloat(values, "x", properties.x, "X");
+                    properties.y = parseFloat(values, "y", properties.y, "Y");
+                    properties.width = parsePositiveFloat(values, "width", properties.width, "Width");
+                    properties.height = parsePositiveFloat(values, "height", properties.height, "Height");
+                    properties.captureTimeSeconds = parsePositiveFloat(values, "captureTime", properties.captureTimeSeconds, "Capture time");
+                    properties.neutralizeTimeSeconds = parsePositiveFloat(values, "neutralizeTime", properties.neutralizeTimeSeconds, "Neutralize time");
+                    properties.scoreRate = parseNonNegativeInt(values, "scoreRate", properties.scoreRate, "Score rate");
+                    properties.scoreIntervalSeconds = parsePositiveFloat(values, "scoreInterval", properties.scoreIntervalSeconds, "Score interval");
+                    properties.maxCaptureWeight = parsePositiveFloat(values, "maxCaptureWeight", properties.maxCaptureWeight, "Max capture weight");
+                    properties.groundOnly = parseBoolean(values, "groundOnly", properties.groundOnly, "Ground only");
+                    properties.startingOwner = parseOwner(values, "startingOwner", properties.startingOwner, "Starting owner");
+                    int updatedScoreLimit = parsePositiveInt(values, "victoryScore", scoreLimit, "Victory score");
                     String id = gameEngine.missionEngine.updateAreaControlEditorZone(x, y, properties);
                     if (id == null) {
-                        gameEngine.gameUI.showMediumPriorityMessage("No RWX area zone at selected point");
+                        gameEngine.gameUI.showMediumPriorityMessage("No area zone at selected point");
                     } else {
                         gameEngine.missionEngine.updateAreaControlEditorScoreLimit(updatedScoreLimit);
-                        gameEngine.gameUI.showMediumPriorityMessage("Updated RWX area zone: " + id);
+                        gameEngine.gameUI.showMediumPriorityMessage("Updated area zone: " + id);
                     }
                 } catch (IllegalArgumentException e) {
-                    gameEngine.showMessageBox("RWX area editor", e.getMessage());
+                    gameEngine.showMessageBox("Area editor", e.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    gameEngine.showMessageBox("RWX area editor", "Failed to update RWX area zone: " + e.getMessage());
+                    gameEngine.showMessageBox("Area editor", "Failed to update area zone: " + e.getMessage());
                 }
             }
         });
     }
 
-    static void deleteRwxAreaZoneAt(float x, float y) {
+    static void deleteAreaZoneAt(float x, float y) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!isRwxAreaEditorAvailable()) {
-            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+        if (!isAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("Area editor is only available while sandbox editor is active");
             return;
         }
         try {
             String deletedZone = gameEngine.missionEngine.removeAreaControlEditorZone(x, y);
             if (deletedZone == null) {
-                gameEngine.gameUI.showMediumPriorityMessage("No RWX area zone at selected point");
+                gameEngine.gameUI.showMediumPriorityMessage("No area zone at selected point");
             } else {
-                gameEngine.gameUI.showMediumPriorityMessage("Deleted RWX area zone: " + deletedZone);
+                gameEngine.gameUI.showMediumPriorityMessage("Deleted area zone: " + deletedZone);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            gameEngine.showMessageBox("RWX area editor", "Failed to delete RWX area zone: " + e.getMessage());
+            gameEngine.showMessageBox("Area editor", "Failed to delete area zone: " + e.getMessage());
         }
     }
 
-    static void requestRwxEditMapPortalDialog(final float x, final float y) {
+    static void requestEditMapPortalDialog(final float x, final float y) {
         final GameEngine gameEngine = GameEngine.getInstance();
-        if (!isRwxAreaEditorAvailable()) {
-            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+        if (!isAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("Area editor is only available while sandbox editor is active");
             return;
         }
         final MapPortalMode.EditorPortalProperties properties;
@@ -2300,11 +2300,11 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             properties = gameEngine.missionEngine.getMapPortalEditorPortal(x, y);
         } catch (Exception e) {
             e.printStackTrace();
-            gameEngine.showMessageBox("RWX map portal editor", "Failed to read RWX map portal: " + e.getMessage());
+            gameEngine.showMessageBox("Map portal editor", "Failed to read map portal: " + e.getMessage());
             return;
         }
         if (properties == null) {
-            gameEngine.gameUI.showMediumPriorityMessage("No RWX map portal at selected point");
+            gameEngine.gameUI.showMediumPriorityMessage("No map portal at selected point");
             return;
         }
         String[] ids = new String[]{"id", "shape", "x", "y", "width", "height", "targetMapId", "targetPortalId"};
@@ -2312,89 +2312,89 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         String[] initial = new String[]{
                 properties.id,
                 properties.circle ? "circle" : "rect",
-                trimRwxFloat(properties.x),
-                trimRwxFloat(properties.y),
-                trimRwxFloat(properties.width),
-                trimRwxFloat(properties.height),
+                trimFloat(properties.x),
+                trimFloat(properties.y),
+                trimFloat(properties.width),
+                trimFloat(properties.height),
                 properties.targetMapId,
                 properties.targetPortalId == null ? "" : properties.targetPortalId
         };
         String[] hints = new String[]{"portal1", "rect/circle", "0", "0", "360", "220", "Lake (2p)", "optional"};
-        CoreUiEventQueue.requestFormDialog("Edit Map Portal", "Edit RWX map portal properties.", ids, labels, initial, hints, "Save", "Cancel", new FormDialogSubmitHandler() {
+        CoreUiEventQueue.requestFormDialog("Edit Map Portal", "Edit map portal properties.", ids, labels, initial, hints, "Save", "Cancel", new FormDialogSubmitHandler() {
             @Override
             public void submit(Map<String, String> values) {
                 try {
-                    properties.id = parseRwxRequiredString(values, "id", "Name");
-                    properties.circle = parseRwxShape(values, "shape", properties.circle);
-                    properties.x = parseRwxFloat(values, "x", properties.x, "X");
-                    properties.y = parseRwxFloat(values, "y", properties.y, "Y");
-                    properties.width = parseRwxPositiveFloat(values, "width", properties.width, "Width");
-                    properties.height = parseRwxPositiveFloat(values, "height", properties.height, "Height");
-                    properties.targetMapId = parseRwxRequiredString(values, "targetMapId", "Target map id");
-                    properties.targetPortalId = parseRwxOptionalString(values, "targetPortalId");
+                    properties.id = parseRequiredString(values, "id", "Name");
+                    properties.circle = parseShape(values, "shape", properties.circle);
+                    properties.x = parseFloat(values, "x", properties.x, "X");
+                    properties.y = parseFloat(values, "y", properties.y, "Y");
+                    properties.width = parsePositiveFloat(values, "width", properties.width, "Width");
+                    properties.height = parsePositiveFloat(values, "height", properties.height, "Height");
+                    properties.targetMapId = parseRequiredString(values, "targetMapId", "Target map id");
+                    properties.targetPortalId = parseOptionalString(values, "targetPortalId");
                     String id = gameEngine.missionEngine.updateMapPortalEditorPortal(x, y, properties);
                     if (id == null) {
-                        gameEngine.gameUI.showMediumPriorityMessage("No RWX map portal at selected point");
+                        gameEngine.gameUI.showMediumPriorityMessage("No map portal at selected point");
                     } else {
-                        gameEngine.gameUI.showMediumPriorityMessage("Updated RWX map portal: " + id);
+                        gameEngine.gameUI.showMediumPriorityMessage("Updated map portal: " + id);
                     }
                 } catch (IllegalArgumentException e) {
-                    gameEngine.showMessageBox("RWX map portal editor", e.getMessage());
+                    gameEngine.showMessageBox("Map portal editor", e.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    gameEngine.showMessageBox("RWX map portal editor", "Failed to update RWX map portal: " + e.getMessage());
+                    gameEngine.showMessageBox("Map portal editor", "Failed to update map portal: " + e.getMessage());
                 }
             }
         });
     }
 
-    static void deleteRwxMapPortalAt(float x, float y) {
+    static void deleteMapPortalAt(float x, float y) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!isRwxAreaEditorAvailable()) {
-            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+        if (!isAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("Area editor is only available while sandbox editor is active");
             return;
         }
         try {
             String deletedPortal = gameEngine.missionEngine.removeMapPortalEditorPortal(x, y);
             if (deletedPortal == null) {
-                gameEngine.gameUI.showMediumPriorityMessage("No RWX map portal at selected point");
+                gameEngine.gameUI.showMediumPriorityMessage("No map portal at selected point");
             } else {
-                gameEngine.gameUI.showMediumPriorityMessage("Deleted RWX map portal: " + deletedPortal);
+                gameEngine.gameUI.showMediumPriorityMessage("Deleted map portal: " + deletedPortal);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            gameEngine.showMessageBox("RWX map portal editor", "Failed to delete RWX map portal: " + e.getMessage());
+            gameEngine.showMessageBox("Map portal editor", "Failed to delete map portal: " + e.getMessage());
         }
     }
 
-    static void requestRwxSaveAreaMapDialog() {
-        String defaultName = defaultRwxMapExportName();
-        CoreUiEventQueue.requestFormDialog("Save RWX Map", "Export this sandbox map with all RWX editor features.", new String[]{"name"}, new String[]{"Map name"}, new String[]{defaultName}, new String[]{defaultName}, "Save", "Cancel", new FormDialogSubmitHandler() {
+    static void requestSaveAreaMapDialog() {
+        String defaultName = defaultMapExportName();
+        CoreUiEventQueue.requestFormDialog("Save Map", "Export this sandbox map with all editor features.", new String[]{"name"}, new String[]{"Map name"}, new String[]{defaultName}, new String[]{defaultName}, "Save", "Cancel", new FormDialogSubmitHandler() {
             @Override
             public void submit(Map<String, String> values) {
-                exportRwxAreaMap(values.get("name"));
+                exportAreaMap(values.get("name"));
             }
         });
     }
 
-    static void exportRwxAreaMap(String mapName) {
+    static void exportAreaMap(String mapName) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (!isRwxAreaEditorAvailable()) {
-            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+        if (!isAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("Area editor is only available while sandbox editor is active");
             return;
         }
-        String exportName = sanitizeRwxMapExportName(mapName);
+        String exportName = sanitizeMapExportName(mapName);
         String targetPath = "/SD/rustedWarfare/maps/" + exportName + ".tmx";
         try {
-            gameEngine.missionEngine.exportRwxEditorMap(targetPath);
-            gameEngine.gameUI.showMediumPriorityMessage("RWX map exported: " + exportName);
+            gameEngine.missionEngine.exportEditorMap(targetPath);
+            gameEngine.gameUI.showMediumPriorityMessage("Map exported: " + exportName);
         } catch (Exception e) {
             e.printStackTrace();
-            gameEngine.showMessageBox("RWX map editor", "Failed to export RWX map: " + e.getMessage());
+            gameEngine.showMessageBox("Map editor", "Failed to export map: " + e.getMessage());
         }
     }
 
-    static float parseRwxPositiveFloat(Map<String, String> values, String key, float defaultValue, String label) {
+    static float parsePositiveFloat(Map<String, String> values, String key, float defaultValue, String label) {
         String value = values.get(key);
         if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
             return defaultValue;
@@ -2406,11 +2406,11 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             return parsed;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(label + " must FastArrayList a number greater than 0");
+            throw new IllegalArgumentException(label + " must be a number greater than 0");
         }
     }
 
-    static float parseRwxFloat(Map<String, String> values, String key, float defaultValue, String label) {
+    static float parseFloat(Map<String, String> values, String key, float defaultValue, String label) {
         String value = values.get(key);
         if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
             return defaultValue;
@@ -2422,11 +2422,11 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             return parsed;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(label + " must FastArrayList a valid number");
+            throw new IllegalArgumentException(label + " must be a valid number");
         }
     }
 
-    static int parseRwxNonNegativeInt(Map<String, String> values, String key, int defaultValue, String label) {
+    static int parseNonNegativeInt(Map<String, String> values, String key, int defaultValue, String label) {
         String value = values.get(key);
         if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
             return defaultValue;
@@ -2438,11 +2438,11 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             return parsed;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(label + " must FastArrayList a whole number of 0 or greater");
+            throw new IllegalArgumentException(label + " must be a whole number of 0 or greater");
         }
     }
 
-    static int parseRwxPositiveInt(Map<String, String> values, String key, int defaultValue, String label) {
+    static int parsePositiveInt(Map<String, String> values, String key, int defaultValue, String label) {
         String value = values.get(key);
         if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
             return defaultValue;
@@ -2454,11 +2454,11 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             return parsed;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(label + " must FastArrayList a whole number greater than 0");
+            throw new IllegalArgumentException(label + " must be a whole number greater than 0");
         }
     }
 
-    static boolean parseRwxBoolean(Map<String, String> values, String key, boolean defaultValue, String label) {
+    static boolean parseBoolean(Map<String, String> values, String key, boolean defaultValue, String label) {
         String value = values.get(key);
         if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
             return defaultValue;
@@ -2470,10 +2470,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         if ("false".equalsIgnoreCase(value) || "no".equalsIgnoreCase(value) || "0".equals(value)) {
             return false;
         }
-        throw new IllegalArgumentException(label + " must FastArrayList true or false");
+        throw new IllegalArgumentException(label + " must be true or false");
     }
 
-    static boolean parseRwxShape(Map<String, String> values, String key, boolean defaultValue) {
+    static boolean parseShape(Map<String, String> values, String key, boolean defaultValue) {
         String value = values.get(key);
         if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
             return defaultValue;
@@ -2485,10 +2485,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         if ("rect".equalsIgnoreCase(value) || "rectangle".equalsIgnoreCase(value)) {
             return false;
         }
-        throw new IllegalArgumentException("Shape must FastArrayList rect or circle");
+        throw new IllegalArgumentException("Shape must be rect or circle");
     }
 
-    static int parseRwxOwner(Map<String, String> values, String key, int defaultValue, String label) {
+    static int parseOwner(Map<String, String> values, String key, int defaultValue, String label) {
         String value = values.get(key);
         if (value == null || value.trim().equals(VariableScope.nullOrMissingString)) {
             return defaultValue;
@@ -2504,36 +2504,36 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             return parsed;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(label + " must FastArrayList neutral or a team id of 0 or greater");
+            throw new IllegalArgumentException(label + " must be neutral or a team id of 0 or greater");
         }
     }
 
-    static String parseRwxRequiredString(Map<String, String> values, String key, String label) {
+    static String parseRequiredString(Map<String, String> values, String key, String label) {
         String value = values.get(key);
         value = value == null ? VariableScope.nullOrMissingString : value.trim();
         if (value.equals(VariableScope.nullOrMissingString)) {
-            throw new IllegalArgumentException(label + " must not FastArrayList empty");
+            throw new IllegalArgumentException(label + " must not be empty");
         }
         return value;
     }
 
-    static String parseRwxOptionalString(Map<String, String> values, String key) {
+    static String parseOptionalString(Map<String, String> values, String key) {
         String value = values.get(key);
         value = value == null ? VariableScope.nullOrMissingString : value.trim();
         return value.equals(VariableScope.nullOrMissingString) ? null : value;
     }
 
-    static String defaultRwxMapExportName() {
-        return "rwx_area_control_" + Utility.formatCurrentDate("yyyyMMdd_HHmmss");
+    static String defaultMapExportName() {
+        return "area_control_" + Utility.formatCurrentDate("yyyyMMdd_HHmmss");
     }
 
-    static String sanitizeRwxMapExportName(String name) {
+    static String sanitizeMapExportName(String name) {
         String safeName = name == null ? VariableScope.nullOrMissingString : name.trim();
         if (safeName.toLowerCase(java.util.Locale.ROOT).endsWith(".tmx")) {
             safeName = safeName.substring(0, safeName.length() - 4);
         }
         if (safeName.equals(VariableScope.nullOrMissingString)) {
-            safeName = defaultRwxMapExportName();
+            safeName = defaultMapExportName();
         }
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < safeName.length(); i++) {
@@ -2544,105 +2544,239 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                 builder.append(c);
             }
         }
-        return builder.length() == 0 ? defaultRwxMapExportName() : builder.toString();
+        return builder.length() == 0 ? defaultMapExportName() : builder.toString();
     }
 
-    static String trimRwxFloat(float value) {
+    static String trimFloat(float value) {
         if (value == (int) value) {
             return String.valueOf((int) value);
         }
         return String.valueOf(value);
     }
 
+    public static boolean a(AbstractUnitAction abstractUnitAction, BaseUnit baseUnit) {
+        if (abstractUnitAction instanceof FilteredUnitAction) {
+            abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
+        }
+        if (abstractUnitAction == editorIconTexture7 || abstractUnitAction == w || abstractUnitAction == x || abstractUnitAction == editorIconTexture5 || abstractUnitAction == editorIconTexture3 || abstractUnitAction == editorIconTexture2 || abstractUnitAction == z || abstractUnitAction == editorIconTexture8 || abstractUnitAction == editorIconTexture9 || abstractUnitAction == s || abstractUnitAction == t || abstractUnitAction == B || abstractUnitAction == C || abstractUnitAction == addCircleZoneAction || abstractUnitAction == addRectangleZoneAction || abstractUnitAction == editZoneAction || abstractUnitAction == deleteZoneAction || abstractUnitAction == addCircleMapPortalAction || abstractUnitAction == addRectangleMapPortalAction || abstractUnitAction == editMapPortalAction || abstractUnitAction == deleteMapPortalAction || abstractUnitAction == saveAreaMapAction) {
+            return true;
+        }
+        return false;
+    }
+
+    public void M() {
+        for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
+            if (playerTeam instanceof AIController) {
+                AIController aIController = (AIController) playerTeam;
+                if (!this.controlPointPaints) {
+                    aIController.aiUnitManagementTimer = 0.0f;
+                } else {
+                    aIController.aiUnitManagementTimer = Float.MAX_VALUE;
+                }
+            }
+        }
+    }
+
+    public static void a(ArrayList arrayList, int i) {
+        if (i != 1) {
+            return;
+        }
+        D = new ArrayList();
+        D.add(new TeamChangeAction(true, false));
+        D.add(new TeamChangeAction(true, true));
+        D.add(new TeamChangeAction(false, false));
+        D.add(new ChangeEditorTabAction(true, false));
+        D.add(new ChangeEditorTabAction(true, true));
+        D.add(new ChangeEditorTabAction(false, false));
+        D.add(new ModFilterAction(true, false));
+        D.add(new ModFilterAction(true, true));
+        D.add(new ModFilterAction(false, false));
+        D.add(new ChangeTypeFilterAction(true, false));
+        D.add(new ChangeTypeFilterAction(true, true));
+        D.add(new ChangeTypeFilterAction(false, false));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.grass));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.sea));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.sand));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.dust));
+        ArrayList arrayList2 = new ArrayList();
+        arrayList2.add(new AddCreditsAction());
+        arrayList2.add(y);
+        arrayList2.add(addCircleZoneAction);
+        arrayList2.add(addRectangleZoneAction);
+        arrayList2.add(editZoneAction);
+        arrayList2.add(deleteZoneAction);
+        arrayList2.add(addCircleMapPortalAction);
+        arrayList2.add(addRectangleMapPortalAction);
+        arrayList2.add(editMapPortalAction);
+        arrayList2.add(deleteMapPortalAction);
+        arrayList2.add(saveAreaMapAction);
+        arrayList2.add(editorSelectionTexture3);
+        arrayList2.add(editorIconTexture);
+        arrayList2.add(editorIconTexture3);
+        arrayList2.add(editorIconTexture2);
+        arrayList2.add(editorIconTexture4);
+        arrayList2.add(editorIconTexture6);
+        arrayList2.add(editorIconTexture5);
+        arrayList2.add(u);
+        arrayList2.add(v);
+        arrayList2.add(w);
+        arrayList2.add(x);
+        arrayList2.add(z);
+        arrayList2.add(editorIconTexture8);
+        arrayList2.add(editorIconTexture9);
+        arrayList2.add(s);
+        arrayList2.add(t);
+        if (GameEngine.isTestingBuild) {
+            arrayList2.add(A);
+        }
+        arrayList2.add(B);
+        arrayList2.add(C);
+        Iterator it = arrayList2.iterator();
+        while (it.hasNext()) {
+            D.add(new FilteredUnitAction((AbstractUnitAction) it.next(), K, true));
+        }
+        ArrayList<UnitType> arrayList3 = new ArrayList();
+        arrayList3.addAll(UnitTypeEnum.ae);
+        // from class: com.corrodinggames.rts.game.units.h.15
+// java.util.Comparator
+        /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
+        arrayList3.sort((unitType, unitType2) -> {
+            BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
+            BaseUnit baseUnitCanAttack2 = BaseUnit.canAttack(unitType2);
+            int iCompareTo = Boolean.valueOf(baseUnitCanAttack.bP()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bP()));
+            if (iCompareTo != 0) {
+                return iCompareTo;
+            }
+            int iCompareTo2 = Boolean.valueOf(unitType.j()).compareTo(Boolean.valueOf(unitType2.j()));
+            if (iCompareTo2 != 0) {
+                return iCompareTo2;
+            }
+            int iCompareTo3 = Boolean.valueOf(baseUnitCanAttack.bO()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bO()));
+            if (iCompareTo3 != 0) {
+                return iCompareTo3;
+            }
+            UnitPrice unitPriceU = unitType.u();
+            UnitPrice unitPriceU2 = unitType2.u();
+            UnitPrice unitPriceB = unitType.B();
+            UnitPrice unitPriceB2 = unitType2.B();
+            if (unitPriceB != null) {
+                unitPriceU = UnitPrice.a(unitPriceU, unitPriceB);
+            }
+            if (unitPriceB2 != null) {
+                unitPriceU2 = UnitPrice.a(unitPriceU2, unitPriceB2);
+            }
+            int iCompareTo4 = unitPriceU.compareTo(unitPriceU2);
+            if (iCompareTo4 != 0) {
+                return iCompareTo4;
+            }
+            return 0;
+        });
+        for (UnitType unitType : arrayList3) {
+            if (unitType != UnitTypeEnum.wall_v && !unitType.getUnitTypeDescriptionShort().equals("test_tank") && !unitType.getUnitTypeDescriptionShort().equals("missing") && unitType != UnitTypeEnum.tankDestroyer && unitType != UnitTypeEnum.megaTank && unitType != UnitTypeEnum.fogRevealer && unitType != UnitTypeEnum.crystalResource && unitType != UnitTypeEnum.damagingBorder && unitType != UnitTypeEnum.zoneMarker && unitType != UnitTypeEnum.editorOrBuilder && unitType != UnitTypeEnum.dummyNonUnitWithTeam && unitType != UnitTypeEnum.supplyDepot && (BaseUnit.canAttack(unitType) instanceof OrderableUnit) && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).showInEditor)) {
+                FilteredUnitAction filteredUnitAction = new FilteredUnitAction(new PlaceBuildingAction(unitType, 1, null), K);
+                boolean z2 = false;
+                Iterator it2 = D.iterator();
+                while (it2.hasNext()) {
+                    if (((AbstractUnitAction) it2.next()).equals(filteredUnitAction)) {
+                        z2 = true;
+                    }
+                }
+                if (!z2) {
+                    D.add(filteredUnitAction);
+                }
+            }
+        }
+    }
+
     /* JADX WARN: Multi-variable type inference failed */
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public void a(AbstractUnitAction abstractUnitAction, boolean z2, PointF pointF, BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
-        abstractUnitAction = unwrapRwxAreaEditorAction(abstractUnitAction);
-        if (isRwxAreaEditorAction(abstractUnitAction) && !isRwxAreaEditorAvailable()) {
-            gameEngine.gameUI.showMediumPriorityMessage("RWX area editor is only available while sandbox editor is active");
+        abstractUnitAction = unwrapAreaEditorAction(abstractUnitAction);
+        if (isAreaEditorAction(abstractUnitAction) && !isAreaEditorAvailable()) {
+            gameEngine.gameUI.showMediumPriorityMessage("Area editor is only available while sandbox editor is active");
             return;
         }
-        if (isRwxMapPortalEditorAction(abstractUnitAction) && !LinkedMapAvailability.ENABLED) {
+        if (isMapPortalEditorAction(abstractUnitAction) && !LinkedMapAvailability.ENABLED) {
             gameEngine.gameUI.clearCurrentAction();
             gameEngine.showMessageBox("Linked Map", LinkedMapAvailability.UNAVAILABLE_MESSAGE);
             return;
         }
-        if (abstractUnitAction == rwxAddCircleZone || abstractUnitAction == rwxAddRectZone) {
+        if (abstractUnitAction == addCircleZoneAction || abstractUnitAction == addRectangleZoneAction) {
             if (z2) {
                 return;
             }
             if (pointF == null) {
-                gameEngine.gameUI.showMediumPriorityMessage("Select a map point for the RWX area zone");
+                gameEngine.gameUI.showMediumPriorityMessage("Select a map point for the area zone");
                 return;
             }
-            boolean circle = abstractUnitAction == rwxAddCircleZone;
-            addRwxAreaZoneAt(pointF.x, pointF.y, circle, circle ? RWX_DEFAULT_CIRCLE_ZONE_SIZE : RWX_DEFAULT_RECT_ZONE_WIDTH, circle ? RWX_DEFAULT_CIRCLE_ZONE_SIZE : RWX_DEFAULT_RECT_ZONE_HEIGHT);
+            boolean circle = abstractUnitAction == addCircleZoneAction;
+            addAreaZoneAt(pointF.x, pointF.y, circle, circle ? DEFAULT_CIRCLE_ZONE_SIZE : DEFAULT_RECT_ZONE_WIDTH, circle ? DEFAULT_CIRCLE_ZONE_SIZE : DEFAULT_RECT_ZONE_HEIGHT);
             return;
         }
-        if (abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal) {
+        if (abstractUnitAction == addCircleMapPortalAction || abstractUnitAction == addRectangleMapPortalAction) {
             if (z2) {
                 return;
             }
             if (pointF == null) {
-                gameEngine.gameUI.showMediumPriorityMessage("Drag on the map to create a RWX map portal");
+                gameEngine.gameUI.showMediumPriorityMessage("Drag on the map to create a map portal");
                 return;
             }
-            boolean circle = abstractUnitAction == rwxAddCircleMapPortal;
-            float width = circle ? RWX_DEFAULT_CIRCLE_ZONE_SIZE : 360.0f;
-            float height = circle ? RWX_DEFAULT_CIRCLE_ZONE_SIZE : 220.0f;
-            requestRwxAddMapPortalDialog(pointF.x - (width * 0.5f), pointF.y - (height * 0.5f), pointF.x + (width * 0.5f), pointF.y + (height * 0.5f), circle);
+            boolean circle = abstractUnitAction == addCircleMapPortalAction;
+            float width = circle ? DEFAULT_CIRCLE_ZONE_SIZE : 360.0f;
+            float height = circle ? DEFAULT_CIRCLE_ZONE_SIZE : 220.0f;
+            requestAddMapPortalDialog(pointF.x - (width * 0.5f), pointF.y - (height * 0.5f), pointF.x + (width * 0.5f), pointF.y + (height * 0.5f), circle);
             return;
         }
-        if (abstractUnitAction == rwxEditZone) {
+        if (abstractUnitAction == editZoneAction) {
             if (z2) {
                 return;
             }
             if (pointF == null) {
-                gameEngine.gameUI.showMediumPriorityMessage("Select a RWX area zone to edit");
+                gameEngine.gameUI.showMediumPriorityMessage("Select an area zone to edit");
                 return;
             }
-            requestRwxEditAreaZoneDialog(pointF.x, pointF.y);
+            requestEditAreaZoneDialog(pointF.x, pointF.y);
             return;
         }
-        if (abstractUnitAction == rwxEditMapPortal) {
+        if (abstractUnitAction == editMapPortalAction) {
             if (z2) {
                 return;
             }
             if (pointF == null) {
-                gameEngine.gameUI.showMediumPriorityMessage("Select a RWX map portal to edit");
+                gameEngine.gameUI.showMediumPriorityMessage("Select a map portal to edit");
                 return;
             }
-            requestRwxEditMapPortalDialog(pointF.x, pointF.y);
+            requestEditMapPortalDialog(pointF.x, pointF.y);
             return;
         }
-        if (abstractUnitAction == rwxDeleteZone) {
+        if (abstractUnitAction == deleteZoneAction) {
             if (z2) {
                 return;
             }
             if (pointF == null) {
-                gameEngine.gameUI.showMediumPriorityMessage("Select a RWX area zone to delete");
+                gameEngine.gameUI.showMediumPriorityMessage("Select an area zone to delete");
                 return;
             }
-            deleteRwxAreaZoneAt(pointF.x, pointF.y);
+            deleteAreaZoneAt(pointF.x, pointF.y);
             return;
         }
-        if (abstractUnitAction == rwxDeleteMapPortal) {
+        if (abstractUnitAction == deleteMapPortalAction) {
             if (z2) {
                 return;
             }
             if (pointF == null) {
-                gameEngine.gameUI.showMediumPriorityMessage("Select a RWX map portal to delete");
+                gameEngine.gameUI.showMediumPriorityMessage("Select a map portal to delete");
                 return;
             }
-            deleteRwxMapPortalAt(pointF.x, pointF.y);
+            deleteMapPortalAt(pointF.x, pointF.y);
             return;
         }
-        if (abstractUnitAction == rwxSaveAreaMap) {
+        if (abstractUnitAction == saveAreaMapAction) {
             if (z2) {
                 return;
             }
-            requestRwxSaveAreaMapDialog();
+            requestSaveAreaMapDialog();
             return;
         }
         if (abstractUnitAction == editorSelectionTexture3) {
@@ -2690,7 +2824,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             int i2 = 100;
             String str = "Quick reloaded changed data for " + i + " units active on map.";
             if (gameEngine.settingsEngine.liveReloading && i == 0) {
-                str = str + " (Note: Live reloading is currently enabled, so changed units may have already FastArrayList reloaded)";
+                str = str + " (Note: Live reloading is currently enabled, so changed units may have already been reloaded)";
                 i2 = 170;
             }
             gameEngine.gameUI.showInfoMessageWithPriority(str, i2);
@@ -2817,140 +2951,6 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             TerrainAutotiler.a(((SetTerrainTypeAction) abstractUnitAction).a, pointF);
         }
         super.a(abstractUnitAction, z2, pointF, baseUnit);
-    }
-
-    public void M() {
-        for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
-            if (playerTeam instanceof AIController) {
-                AIController aIController = (AIController) playerTeam;
-                if (!this.controlPointPaints) {
-                    aIController.aiUnitManagementTimer = 0.0f;
-                } else {
-                    aIController.aiUnitManagementTimer = Float.MAX_VALUE;
-                }
-            }
-        }
-    }
-
-    public static boolean a(AbstractUnitAction abstractUnitAction, BaseUnit baseUnit) {
-        if (abstractUnitAction instanceof FilteredUnitAction) {
-            abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
-        }
-        if (abstractUnitAction == editorIconTexture7 || abstractUnitAction == w || abstractUnitAction == x || abstractUnitAction == editorIconTexture5 || abstractUnitAction == editorIconTexture3 || abstractUnitAction == editorIconTexture2 || abstractUnitAction == z || abstractUnitAction == editorIconTexture8 || abstractUnitAction == editorIconTexture9 || abstractUnitAction == s || abstractUnitAction == t || abstractUnitAction == B || abstractUnitAction == C || abstractUnitAction == rwxAddCircleZone || abstractUnitAction == rwxAddRectZone || abstractUnitAction == rwxEditZone || abstractUnitAction == rwxDeleteZone || abstractUnitAction == rwxAddCircleMapPortal || abstractUnitAction == rwxAddRectMapPortal || abstractUnitAction == rwxEditMapPortal || abstractUnitAction == rwxDeleteMapPortal || abstractUnitAction == rwxSaveAreaMap) {
-            return true;
-        }
-        return false;
-    }
-
-    public static void a(ArrayList arrayList, int i) {
-        if (i != 1) {
-            return;
-        }
-        D = new ArrayList();
-        D.add(new TeamChangeAction(true, false));
-        D.add(new TeamChangeAction(true, true));
-        D.add(new TeamChangeAction(false, false));
-        D.add(new ChangeEditorTabAction(true, false));
-        D.add(new ChangeEditorTabAction(true, true));
-        D.add(new ChangeEditorTabAction(false, false));
-        D.add(new ModFilterAction(true, false));
-        D.add(new ModFilterAction(true, true));
-        D.add(new ModFilterAction(false, false));
-        D.add(new ChangeTypeFilterAction(true, false));
-        D.add(new ChangeTypeFilterAction(true, true));
-        D.add(new ChangeTypeFilterAction(false, false));
-        D.add(new SetTerrainTypeAction(EditorTerrainType.grass));
-        D.add(new SetTerrainTypeAction(EditorTerrainType.sea));
-        D.add(new SetTerrainTypeAction(EditorTerrainType.sand));
-        D.add(new SetTerrainTypeAction(EditorTerrainType.dust));
-        ArrayList arrayList2 = new ArrayList();
-        arrayList2.add(new AddCreditsAction());
-        arrayList2.add(y);
-        arrayList2.add(rwxAddCircleZone);
-        arrayList2.add(rwxAddRectZone);
-        arrayList2.add(rwxEditZone);
-        arrayList2.add(rwxDeleteZone);
-        arrayList2.add(rwxAddCircleMapPortal);
-        arrayList2.add(rwxAddRectMapPortal);
-        arrayList2.add(rwxEditMapPortal);
-        arrayList2.add(rwxDeleteMapPortal);
-        arrayList2.add(rwxSaveAreaMap);
-        arrayList2.add(editorSelectionTexture3);
-        arrayList2.add(editorIconTexture);
-        arrayList2.add(editorIconTexture3);
-        arrayList2.add(editorIconTexture2);
-        arrayList2.add(editorIconTexture4);
-        arrayList2.add(editorIconTexture6);
-        arrayList2.add(editorIconTexture5);
-        arrayList2.add(u);
-        arrayList2.add(v);
-        arrayList2.add(w);
-        arrayList2.add(x);
-        arrayList2.add(z);
-        arrayList2.add(editorIconTexture8);
-        arrayList2.add(editorIconTexture9);
-        arrayList2.add(s);
-        arrayList2.add(t);
-        if (GameEngine.isTestingBuild) {
-            arrayList2.add(A);
-        }
-        arrayList2.add(B);
-        arrayList2.add(C);
-        Iterator it = arrayList2.iterator();
-        while (it.hasNext()) {
-            D.add(new FilteredUnitAction((AbstractUnitAction) it.next(), K, true));
-        }
-        ArrayList<UnitType> arrayList3 = new ArrayList();
-        arrayList3.addAll(UnitTypeEnum.ae);
-        // from class: com.corrodinggames.rts.game.units.h.15
-// java.util.Comparator
-        /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
-        arrayList3.sort((unitType, unitType2) -> {
-            BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
-            BaseUnit baseUnitCanAttack2 = BaseUnit.canAttack(unitType2);
-            int iCompareTo = Boolean.valueOf(baseUnitCanAttack.bP()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bP()));
-            if (iCompareTo != 0) {
-                return iCompareTo;
-            }
-            int iCompareTo2 = Boolean.valueOf(unitType.j()).compareTo(Boolean.valueOf(unitType2.j()));
-            if (iCompareTo2 != 0) {
-                return iCompareTo2;
-            }
-            int iCompareTo3 = Boolean.valueOf(baseUnitCanAttack.bO()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bO()));
-            if (iCompareTo3 != 0) {
-                return iCompareTo3;
-            }
-            UnitPrice unitPriceU = unitType.u();
-            UnitPrice unitPriceU2 = unitType2.u();
-            UnitPrice unitPriceB = unitType.B();
-            UnitPrice unitPriceB2 = unitType2.B();
-            if (unitPriceB != null) {
-                unitPriceU = UnitPrice.a(unitPriceU, unitPriceB);
-            }
-            if (unitPriceB2 != null) {
-                unitPriceU2 = UnitPrice.a(unitPriceU2, unitPriceB2);
-            }
-            int iCompareTo4 = unitPriceU.compareTo(unitPriceU2);
-            if (iCompareTo4 != 0) {
-                return iCompareTo4;
-            }
-            return 0;
-        });
-        for (UnitType unitType : arrayList3) {
-            if (unitType != UnitTypeEnum.wall_v && !unitType.getUnitTypeDescriptionShort().equals("test_tank") && !unitType.getUnitTypeDescriptionShort().equals("missing") && unitType != UnitTypeEnum.tankDestroyer && unitType != UnitTypeEnum.megaTank && unitType != UnitTypeEnum.fogRevealer && unitType != UnitTypeEnum.crystalResource && unitType != UnitTypeEnum.damagingBorder && unitType != UnitTypeEnum.zoneMarker && unitType != UnitTypeEnum.editorOrBuilder && unitType != UnitTypeEnum.dummyNonUnitWithTeam && unitType != UnitTypeEnum.supplyDepot && (BaseUnit.canAttack(unitType) instanceof OrderableUnit) && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).showInEditor)) {
-                FilteredUnitAction filteredUnitAction = new FilteredUnitAction(new PlaceBuildingAction(unitType, 1, null), K);
-                boolean z2 = false;
-                Iterator it2 = D.iterator();
-                while (it2.hasNext()) {
-                    if (((AbstractUnitAction) it2.next()).equals(filteredUnitAction)) {
-                        z2 = true;
-                    }
-                }
-                if (!z2) {
-                    D.add(filteredUnitAction);
-                }
-            }
-        }
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit

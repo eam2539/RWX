@@ -4,18 +4,8 @@ import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.scene.Scene
 import de.fabmax.kool.util.Color
 import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.component.GradientText
-import io.github.rwx.ui.component.addPanelSurface
-import io.github.rwx.ui.component.Icon
-import io.github.rwx.ui.component.LinearGradientBackground
-import io.github.rwx.ui.component.PanelStyle
-import io.github.rwx.ui.component.TextIconButton
-import io.github.rwx.ui.component.gradientColors
-import io.github.rwx.ui.model.MainMenuAction
-import io.github.rwx.ui.model.MainMenuConditions
-import io.github.rwx.ui.model.MainMenuItem
-import io.github.rwx.ui.model.MainMenuViewModel
-import io.github.rwx.ui.model.SettingsModel
+import io.github.rwx.ui.component.*
+import io.github.rwx.ui.model.*
 import io.github.rwx.ui.splitEvenly
 
 class MainMenuSceneHost(
@@ -51,7 +41,7 @@ class MainMenuSceneHost(
     fun createScene(): Scene = UiScene(MAIN_MENU_SCENE_NAME) {
         addPanelSurface(
             PanelStyle.Menu,
-            "rwx-main-menu-panel",
+            "main-menu-panel",
             model,
             backgroundColor = { theme ->
                 if (battleBackgroundVisible.use()) {
@@ -69,7 +59,7 @@ class MainMenuSceneHost(
     }
 
     companion object {
-        const val MAIN_MENU_SCENE_NAME: String = "rwx-main-menu"
+        const val MAIN_MENU_SCENE_NAME: String = "main-menu"
         const val MENU_TITLE: String = "RWX"
         const val MENU_SUBTITLE: String = "Rusted Warfare Extension"
     }
@@ -118,7 +108,7 @@ private fun UiScope.MainMenuLauncher(
             width = menuWidth,
             height = metrics.menuViewportHeight,
         ) { item ->
-            RwxMainMenuTileCard(item, theme) {
+            mainMenuTileCard(item, theme) {
                 onAction(item.action)
             }
         }
@@ -198,7 +188,7 @@ private fun UiScope.MainMenuHorizontal(
             Row(width = FitContent, height = Grow.Std) {
                 items.forEach { item ->
                     Box(width = UiTheme.Layout.mainMenuTileWidth, height = Grow.Std) {
-                        RwxMainMenuTileCard(item, theme) {
+                        mainMenuTileCard(item, theme) {
                             onAction(item.action)
                         }
                     }
@@ -300,7 +290,7 @@ private fun mainMenuColumnWidth(contentWidth: Dp): Dp =
 private fun mainMenuColumnsContentWidth(columnWidth: Dp): Dp =
     Dp(columnWidth.value * MAIN_MENU_COLUMN_COUNT + UiTheme.Layout.mainMenuColumnGap.value)
 
-private fun UiScope.RwxMainMenuTileCard(
+private fun UiScope.mainMenuTileCard(
     item: MainMenuItem,
     theme: io.github.rwx.ui.ColorSchemeDefinition,
     onPressed: () -> Unit,

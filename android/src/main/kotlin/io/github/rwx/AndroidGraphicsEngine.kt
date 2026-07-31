@@ -6,14 +6,14 @@ import android.util.Log
 import com.corrodinggames.rts.game.ColorMode
 import com.corrodinggames.rts.game.teamColorsHueType
 import com.corrodinggames.rts.gameFramework.android.graphics.AndroidGraphicsContext
+import com.corrodinggames.rts.gameFramework.android.graphics.BlendPaint
 import com.corrodinggames.rts.gameFramework.android.graphics.C0009fo
 import com.corrodinggames.rts.gameFramework.android.graphics.GraphicsInterface
-import com.corrodinggames.rts.gameFramework.android.graphics.RwxBlendPaint
 import com.corrodinggames.rts.gameFramework.graphics.*
 import com.corrodinggames.rts.gameFramework.graphics.BlendMode
 import com.corrodinggames.rts.gameFramework.m.GraphicsUtils
-import com.corrodinggames.rts.gameFramework.m.UnitTexture
 import com.corrodinggames.rts.gameFramework.m.UniquePaint
+import com.corrodinggames.rts.gameFramework.m.UnitTexture
 import com.corrodinggames.rts.gameFramework.utility.AssetInputStream
 import io.github.rwx.geometry.Rect
 import io.github.rwx.geometry.RectF
@@ -594,7 +594,7 @@ internal class AndroidGraphicsEngine(
         val revision = getStateRevision()
         if (lastPaint === this && lastPaintRevision == revision) {
             return checkNotNull(lastAndroidPaint).also { paint ->
-                (paint as? RwxBlendPaint)?.rwxShader = androidShader
+                (paint as? BlendPaint)?.shaderProgram = androidShader
             }
         }
         val binding = paintCache.getOrPut(this) {
@@ -602,7 +602,7 @@ internal class AndroidGraphicsEngine(
         }
         if (binding.matches(revision)) {
             return cacheLastPaint(this, revision, binding.paint).also { paint ->
-                (paint as? RwxBlendPaint)?.rwxShader = androidShader
+                (paint as? BlendPaint)?.shaderProgram = androidShader
             }
         }
         return binding.paint.also { paint ->
@@ -633,12 +633,12 @@ internal class AndroidGraphicsEngine(
             paint.colorFilter = koolColorFilter.toCachedAndroidColorFilter()
             if (rendererMode == AndroidRendererMode.OPENGL) {
                 paint.xfermode = null
-                (paint as? RwxBlendPaint)?.rwxBlendMode = toAndroidOpenGlBlendMode()
+                (paint as? BlendPaint)?.blendMode = toAndroidOpenGlBlendMode()
             } else {
-                (paint as? RwxBlendPaint)?.rwxBlendMode = RwxBlendPaint.BLEND_NORMAL
+                (paint as? BlendPaint)?.blendMode = BlendPaint.BLEND_NORMAL
                 paint.xfermode = canvasXfermode(toAndroidCanvasBlendMode())
             }
-            (paint as? RwxBlendPaint)?.rwxShader = androidShader
+            (paint as? BlendPaint)?.shaderProgram = androidShader
             binding.capture(revision)
             cacheLastPaint(this, revision, paint)
         }
@@ -655,7 +655,7 @@ internal class AndroidGraphicsEngine(
         if (rendererMode == AndroidRendererMode.CANVAS && this is GamePaint) {
             UniquePaint()
         } else {
-            RwxBlendPaint(Paint.ANTI_ALIAS_FLAG)
+            BlendPaint(Paint.ANTI_ALIAS_FLAG)
         }
 
     private class AndroidPaintBinding(val paint: Paint) {
@@ -793,7 +793,7 @@ internal class AndroidGraphicsEngine(
     }
 
     private companion object {
-        const val SHADER_LOG_TAG = "RWX_ANDROID_SHADER"
+        const val SHADER_LOG_TAG = "AndroidShader"
         const val OPAQUE_BLACK = -0x1000000
 
         val DEFAULT_PAINT: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -823,24 +823,24 @@ internal class AndroidGraphicsEngine(
 
         fun KoolPaint.toAndroidOpenGlBlendMode(): Int {
             when (getBlendMode()) {
-                KoolCanvasBlendMode.Source -> return RwxBlendPaint.BLEND_SOURCE
-                KoolCanvasBlendMode.Add -> return RwxBlendPaint.BLEND_ADD
-                KoolCanvasBlendMode.Multiply -> return RwxBlendPaint.BLEND_MULTIPLY
-                KoolCanvasBlendMode.Screen -> return RwxBlendPaint.BLEND_SCREEN
+                KoolCanvasBlendMode.Source -> return BlendPaint.BLEND_SOURCE
+                KoolCanvasBlendMode.Add -> return BlendPaint.BLEND_ADD
+                KoolCanvasBlendMode.Multiply -> return BlendPaint.BLEND_MULTIPLY
+                KoolCanvasBlendMode.Screen -> return BlendPaint.BLEND_SCREEN
                 else -> Unit
             }
             return when (val filter = colorFilter()) {
                 is KoolMultiplyAddColorFilter ->
-                    if (filter.usesLegacyAdditiveBlend()) RwxBlendPaint.BLEND_LIGHTING_ADD else RwxBlendPaint.BLEND_NORMAL
+                    if (filter.usesLegacyAdditiveBlend()) BlendPaint.BLEND_LIGHTING_ADD else BlendPaint.BLEND_NORMAL
 
                 is TeamColorFilter ->
                     when (filter.a) {
-                        BlendMode.copy -> RwxBlendPaint.BLEND_TEAM_COPY
-                        BlendMode.additive -> RwxBlendPaint.BLEND_TEAM_ADDITIVE
-                        else -> RwxBlendPaint.BLEND_NORMAL
+                        BlendMode.copy -> BlendPaint.BLEND_TEAM_COPY
+                        BlendMode.additive -> BlendPaint.BLEND_TEAM_ADDITIVE
+                        else -> BlendPaint.BLEND_NORMAL
                     }
 
-                else -> RwxBlendPaint.BLEND_NORMAL
+                else -> BlendPaint.BLEND_NORMAL
             }
         }
 

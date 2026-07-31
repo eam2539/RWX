@@ -7,29 +7,9 @@ import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.pipeline.Texture2d
 import de.fabmax.kool.scene.Scene
 import io.github.rwx.i18n.I18n
-import io.github.rwx.ui.component.BodyText
-import io.github.rwx.ui.ColorSchemeDefinition
-import io.github.rwx.ui.component.PanelStyle
-import io.github.rwx.ui.model.ResourceBrowserAction
-import io.github.rwx.ui.model.ResourceBrowserItem
-import io.github.rwx.ui.model.ResourceBrowserModel
-import io.github.rwx.ui.model.ResourceBrowserSearchResult
-import io.github.rwx.ui.model.ResourceBrowserType
-import io.github.rwx.ui.ResponsiveContentWidth
-import io.github.rwx.ui.ResponsiveViewportHeight
-import io.github.rwx.ui.component.RwxTextField
-import io.github.rwx.ui.component.ScrollableVerticalList
-import io.github.rwx.ui.model.SettingsModel
-import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.component.addPanelSurface
-import io.github.rwx.ui.component.CircularLoadingIndicator
-import io.github.rwx.ui.component.Icon
-import io.github.rwx.ui.component.IconButton
-import io.github.rwx.ui.component.TextIconButton
-import io.github.rwx.ui.fraction
-import io.github.rwx.ui.remainingAfter
-import io.github.rwx.ui.model.resourceBrowserColumnCount
-import io.github.rwx.ui.splitEvenly
+import io.github.rwx.ui.*
+import io.github.rwx.ui.component.*
+import io.github.rwx.ui.model.*
 
 class ResourceBrowserSceneHost(
     private val model: SettingsModel = SettingsModel(),
@@ -62,7 +42,7 @@ class ResourceBrowserSceneHost(
     fun dispatch(action: ResourceBrowserAction) = onAction(action)
 
     fun createScene(): Scene = UiScene(RESOURCE_BROWSER_SCENE_NAME) {
-        addPanelSurface(PanelStyle.Menu, "rwx-resource-browser-panel", model) { theme ->
+        addPanelSurface(PanelStyle.Menu, "resource-browser-panel", model) { theme ->
             val metrics = resourceBrowserLayoutMetrics()
             val state = browserModel.use()
 
@@ -126,7 +106,7 @@ class ResourceBrowserSceneHost(
     }
 
     companion object {
-        const val RESOURCE_BROWSER_SCENE_NAME: String = "rwx-resource-browser"
+        const val RESOURCE_BROWSER_SCENE_NAME: String = "resource-browser"
     }
 }
 
@@ -463,7 +443,7 @@ private object ResourceBrowserPreviewTextureCache {
     private val textures = mutableMapOf<String, Texture2d>()
 
     fun textureFor(imageUrl: String): Texture2d = textures.getOrPut(imageUrl) {
-        Texture2d(name = "rwx-resource-preview:$imageUrl") {
+        Texture2d(name = "resource-preview:$imageUrl") {
             Assets.defaultLoader.loadImage2d(imageUrl).getOrNull() ?: AssetLoader.textureDataLoadFailed
         }
     }
