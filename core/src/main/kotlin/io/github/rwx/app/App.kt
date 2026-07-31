@@ -10,19 +10,9 @@ import io.github.rwx.ui.model.LevelSelectMode
 import io.github.rwx.ui.model.MainMenuConditions
 import io.github.rwx.ui.model.PauseMenuConditions
 import io.github.rwx.ui.model.ResourceBrowserType
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-const val RWX_KOOL_READY_MARKER: String = "RWX_SCREENSHOT_READY"
 const val RWX_KOOL_GAME_FRAME_READY_MARKER: String = "RWX_GAME_FRAME_READY"
 private val ioSupervisor = SupervisorJob(ApplicationScope.job)
 
@@ -66,7 +56,6 @@ fun installApp(
     val appMetadata = bootstrap.appMetadata
     val gameSession = bootstrap.gameSession
     val menuBackgroundSession = bootstrap.menuBackgroundSession
-    val menuBackgroundRenderer = bootstrap.menuBackgroundRenderer
     val modRepository = bootstrap.modRepository
     val resourceBrowserRepository = bootstrap.resourceBrowserRepository
     val updateRepository = bootstrap.updateRepository
@@ -115,7 +104,6 @@ fun installApp(
     val warmupController = WarmupController(
         gameSession = gameSession,
         menuBackgroundSession = menuBackgroundSession,
-        menuBackgroundRenderer = menuBackgroundRenderer,
         loadingSceneHost = loadingSceneHost,
         navigateTo = { screen -> navigator.navigateTo(screen) },
         clearExternalFrame = { lastExternalGameFrame = null },
@@ -441,7 +429,6 @@ fun installApp(
     FrameLoopInstaller(
         context = context,
         gameSession = gameSession,
-        menuBackgroundRenderer = menuBackgroundRenderer,
         screenPresenter = screenPresenter,
         warmupController = warmupController,
         koolCanvasSceneHost = koolCanvasSceneHost,

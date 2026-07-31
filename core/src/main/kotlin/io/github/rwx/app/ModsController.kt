@@ -61,7 +61,7 @@ internal class ModsController(
         dialogSceneHost.show(
             Dialog(
                 title = "Import Mod",
-                message = "Enter a local .rwmod, .zip, .jar, .ini, .rwxkey, or mod directory path.",
+                message = "Enter a mod, asset key, author trust certificate, license, or revocation list path.",
                 textInput = DialogTextInput(
                     hint = "/path/to/mod.rwmod",
                     trailingIcon = Icon.Import,
@@ -70,7 +70,9 @@ internal class ModsController(
                         val host=getKoin().get<PlatformBridge>().filePickerHost?:return@DialogTextInput
                         host.openFilePicker(
                             title = "Choose a mod file or directory",
-                            allowedExtensions = setOf("rwmod", "zip", "jar", "ini", "rwxkey"),
+                            allowedExtensions = setOf(
+                                "rwmod", "zip", "jar", "ini", "rwxkey", "rwxpub", "rwxlicense", "rwxcrl"
+                            ),
                             allowDirectories = true
                         ) { selection ->
                             if (selection != null) {
@@ -183,4 +185,3 @@ internal class ModsController(
 private data class ModsReloadResult(
     val error: Throwable?,
 )
-

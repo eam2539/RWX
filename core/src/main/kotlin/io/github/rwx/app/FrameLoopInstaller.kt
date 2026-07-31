@@ -1,7 +1,6 @@
 package io.github.rwx.app
 
 import de.fabmax.kool.KoolContext
-import io.github.rwx.render.GameRenderBackend
 import io.github.rwx.render.canvas.KoolCanvasFrame
 import io.github.rwx.render.canvas.KoolCanvasSceneHost
 import io.github.rwx.render.canvas.KoolCanvasViewport
@@ -12,7 +11,6 @@ import io.github.rwx.ui.CoreUiEventQueue
 internal class FrameLoopInstaller(
     private val context: KoolContext,
     private val gameSession: GameSession,
-    private val menuBackgroundRenderer: GameRenderBackend,
     private val screenPresenter: ScreenPresenter,
     private val warmupController: WarmupController,
     private val koolCanvasSceneHost: KoolCanvasSceneHost,
@@ -54,11 +52,13 @@ internal class FrameLoopInstaller(
             openInGameModWindow = sessionActions::openInGameModWindow,
             closeInGameModWindow = sessionActions::closeInGameModWindow,
             refreshInGameModWindow = refreshModWindow,
+            refreshMenuBackground = {
+                screenPresenter.apply(currentScreen(), lastExternalFrame())
+            },
             onBattleRoomClosed = onBattleRoomClosed,
         )
         val frameRenderController = FrameRenderController(
             gameSession = gameSession,
-            menuBackgroundRenderer = menuBackgroundRenderer,
             screenPresenter = screenPresenter,
             warmupController = warmupController,
             koolCanvasSceneHost = koolCanvasSceneHost,

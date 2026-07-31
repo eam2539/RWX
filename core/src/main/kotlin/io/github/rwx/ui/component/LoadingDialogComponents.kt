@@ -24,9 +24,11 @@ fun UiScope.ProgressLoadingDialog(
         width = contentWidth,
         theme = theme,
     )
-    TextIconButton(I18n.common.cancel(), Icon.Close,  UiTheme.Layout.dialogButtonWidth, theme) {
-        onCancel()
+    Row {
+        modifier.alignX(AlignmentX.Center)
+        TextIconButton(I18n.common.cancel(), Icon.Close,  UiTheme.Layout.dialogButtonWidth, theme, onPressed = onCancel)
     }
+
 }
 
 fun UiScope.CircularLoadingDialog(
@@ -45,8 +47,9 @@ fun UiScope.CircularLoadingDialog(
         .alignX(AlignmentX.Center)
         .margin(bottom = UiTheme.Spacing.lg)
     LoadingDialogMessage(message, theme, contentWidth)
-    TextIconButton(I18n.common.cancel(), Icon.Close,  UiTheme.Layout.dialogButtonWidth, theme) {
-        onCancel()
+    Row{
+        modifier.alignX(AlignmentX.Center)
+        TextIconButton(I18n.common.cancel(), Icon.Close,  UiTheme.Layout.dialogButtonWidth, theme,onPressed = onCancel)
     }
 }
 

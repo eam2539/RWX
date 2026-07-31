@@ -19,6 +19,7 @@ internal class CoreEventDispatcher(
     private val openInGameModWindow: () -> Unit,
     private val closeInGameModWindow: () -> Unit,
     private val refreshInGameModWindow: () -> Unit,
+    private val refreshMenuBackground: () -> Unit,
     private val onBattleRoomClosed: (reason: String?, message: String?) -> Unit,
 ) {
     fun drain(isRenderLoopFrame: Boolean) {
@@ -31,6 +32,9 @@ internal class CoreEventDispatcher(
                 CoreUiEvent.ResourceBrowserSearchCompleted -> resourceBrowserController.handleSearchCompleted()
                 CoreUiEvent.ResourceBrowserDownloadProgress -> resourceBrowserController.handleDownloadProgress()
                 CoreUiEvent.ResourceBrowserDownloadCompleted -> resourceBrowserController.handleDownloadCompleted()
+                CoreUiEvent.MenuBackgroundReady -> {
+                    if (currentScreen() == AppScreen.MainMenu) refreshMenuBackground()
+                }
                 CoreUiEvent.InGameSaveRequested -> inGameDialogController.showSaveGameDialog()
                 CoreUiEvent.InGameExportMapRequested -> inGameDialogController.showExportMapDialog()
                 CoreUiEvent.InGameSettingsRequested -> openInGameSettings()

@@ -5,9 +5,10 @@ import io.github.rwx.logger
 import io.github.rwx.session.BattleRoomOptions
 import io.github.rwx.session.BattleRoomTeamLayout
 import io.github.rwx.session.GameSession
+import io.github.rwx.session.resolveBattleRoomPlayerSnapshot
+import io.github.rwx.ui.host.DialogSceneHost
 import io.github.rwx.ui.model.Dialog
 import io.github.rwx.ui.model.DialogButton
-import io.github.rwx.ui.host.DialogSceneHost
 
 internal class BattleRoomAdminController(
     private val gameSession: GameSession,

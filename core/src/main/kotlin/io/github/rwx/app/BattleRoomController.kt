@@ -6,8 +6,8 @@ import io.github.rwx.session.BattleRoomLaunchConfig
 import io.github.rwx.session.BattleRoomSnapshot
 import io.github.rwx.session.GameSession
 import io.github.rwx.ui.AppScreen
-import io.github.rwx.ui.model.BattleRoomChatLine
 import io.github.rwx.ui.host.BattleRoomSceneHost
+import io.github.rwx.ui.model.BattleRoomChatLine
 import io.github.rwx.ui.model.LevelSelectMode
 import io.github.rwx.ui.model.LevelSelectViewModelFactory
 import io.github.rwx.ui.model.MapEntry
@@ -187,8 +187,10 @@ internal class BattleRoomController(
 
     private fun prepareLocalSinglePlayerRoom(draft: BattleRoomDraft): Boolean {
         val launchConfig = draft.toLaunchConfig()
+        // The host stays in the room to keep configuring it, so open a draft rather than
+        // prepareLocalBattleRoom, which would queue the level and load it on the next frame.
         if (!gameSession.enterLocalBattleRoomLive(launchConfig) &&
-            !gameSession.prepareLocalBattleRoom(launchConfig)
+            !gameSession.openLocalBattleRoomDraft(launchConfig)
         ) {
             return false
         }

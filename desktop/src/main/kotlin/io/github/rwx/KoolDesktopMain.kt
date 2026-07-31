@@ -13,15 +13,14 @@ import de.fabmax.kool.pipeline.backend.vk.RenderBackendVk
 import de.fabmax.kool.util.FrontendScope
 import de.fabmax.kool.util.MsdfFont
 import io.github.rwx.app.AppOptions
-import io.github.rwx.app.RWX_KOOL_READY_MARKER
 import io.github.rwx.app.installApp
 import io.github.rwx.di.coreModule
 import io.github.rwx.di.desktopModule
 import io.github.rwx.i18n.LocaleSettings
 import io.github.rwx.settings.GameSettingsRepository
+import io.github.rwx.ui.UiTheme
 import io.github.rwx.ui.host.LoadingSceneHost
 import io.github.rwx.ui.model.SettingsModel
-import io.github.rwx.ui.UiTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -72,7 +71,6 @@ object KoolDesktopMain : KoinComponent {
             while (!session.isFinishLoading()) {
                 delay(50L.milliseconds)
             }
-            logger.info { RWX_KOOL_READY_MARKER }
         }
 
         app.ctx.run()

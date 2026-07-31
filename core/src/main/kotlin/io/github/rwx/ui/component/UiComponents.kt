@@ -194,3 +194,58 @@ private fun PanelStyle.innerPadding(isShortViewport: Boolean) = when (this) {
 }
 
 private const val SHORT_VIEWPORT_HEIGHT_DP: Float = 520f
+fun UiScope.TextFieldWithTrailingIcon(
+    value: String,
+    hint: String,
+    theme: ColorSchemeDefinition,
+    contentWidth: Dimension = UiTheme.Layout.dialogMessageWidth,
+    compact: Boolean = false,
+    trailingIcon: Icon? = null,
+    trailingIconTooltip: String? = null,
+    onTrailingIconPress: (() -> Unit)? = null,
+    onChange: (String) -> Unit,
+) {
+    val inputHeight = if (compact) UiTheme.Layout.CompactMenuButtonHeight else UiTheme.Layout.menuButtonHeight
+    Box(width = contentWidth, height = inputHeight) {
+        modifier.margin(bottom = if (compact) Dp.ZERO else UiTheme.Spacing.lg)
+        RwxTextField(value) {
+            modifier
+                .width(Grow.Std)
+                .height(Grow.Std)
+                .padding(
+                    start = UiTheme.Spacing.sm,
+                    end = if (trailingIcon == null) Dp.ZERO else inputHeight,
+                )
+                .hint(hint)
+                .font(UiTheme.Fonts.bodySmall)
+                .colors(
+                    textColor = theme.palette.textPrimary,
+                    hintColor = theme.palette.textSecondary,
+                    lineColor = theme.palette.borderSubtle,
+                    lineColorFocused = theme.palette.primary,
+                    cursorColor = theme.palette.primary,
+                    selectionColor = theme.palette.primaryContainer,
+                )
+                .onChange(onChange)
+        }
+        trailingIcon?.let { icon ->
+            val iconSize = if (compact) Dp(18f) else UiTheme.Layout.textButtonGlyphSize
+            if (onTrailingIconPress != null) {
+                IconButton(
+                    icon = icon,
+                    theme = theme,
+                    size = inputHeight,
+                    iconSize = iconSize,
+                    tooltip = trailingIconTooltip,
+                    onPressed = onTrailingIconPress,
+                ).modifier.align(AlignmentX.End, AlignmentY.Center)
+            } else {
+                Box(width = inputHeight, height = Grow.Std) {
+                    modifier.align(AlignmentX.End, AlignmentY.Center)
+                    Icon(icon, iconSize, theme.palette.primary).modifier
+                        .align(AlignmentX.Center, AlignmentY.Center)
+                }
+            }
+        }
+    }
+}

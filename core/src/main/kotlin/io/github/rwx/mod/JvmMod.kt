@@ -2,7 +2,7 @@ package io.github.rwx.mod
 
 import io.github.rwx.PlatformBridge
 import io.github.rwx.logger
-import io.github.rwx.mod.assets.AssetPrivateKey
+import io.github.rwx.mod.assets.AssetCredentialResolver
 import net.peanuuutz.tomlkt.*
 import org.koin.mp.KoinPlatform.getKoin
 import java.io.Closeable
@@ -13,7 +13,7 @@ class JvmModLoader @JvmOverloads constructor(
     private val platformClassLoader: ClassLoader = JvmModLoader::class.java.classLoader,
     private val createClassLoader: ((File, ClassLoader) -> ClassLoader)? = null,
     private val platformBridge: PlatformBridge? = null,
-    private val assetKeyResolver: ((String) -> AssetPrivateKey?)? = null,
+    private val assetCredentialResolver: AssetCredentialResolver? = null,
 ) : AutoCloseable {
     val errors: MutableList<Throwable> = mutableListOf()
 
@@ -87,7 +87,7 @@ class JvmModLoader @JvmOverloads constructor(
             mod.apply {
                 this.classLoader = classLoader
                 this.metadata = metadata
-                this.api = ApiImpl.create(metadata, jarFile, resolvedPlatformBridge, assetKeyResolver)
+                this.api = ApiImpl.create(metadata, jarFile, resolvedPlatformBridge, assetCredentialResolver)
             }
         } catch (error: Throwable) {
             if (classLoader is Closeable) runCatching(classLoader::close)

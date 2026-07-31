@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import com.corrodinggames.rts.game.GameLogic
 import com.corrodinggames.rts.game.map.TileMap
 import com.corrodinggames.rts.gameFramework.GameEngine
+import io.github.rwx.app.launchOnIO
 import io.github.rwx.geometry.Point
 import io.github.rwx.input.MultiTouchPointerState
 import io.github.rwx.platform.CoreGameView
@@ -20,18 +21,8 @@ import io.github.rwx.ui.InGameMenuController
 import kotlin.math.roundToInt
 
 internal class AndroidGameSession(
-    rendererMode: AndroidRendererMode,
+    override var rendererMode: AndroidRendererMode,
 ) : GameSession() {
-    private var rendererMode: AndroidRendererMode = rendererMode
-
-    override val sessionLogName: String
-        get() = rendererMode.sessionLogName
-    override val backgroundThreadPrefix: String
-        get() = rendererMode.threadPrefix
-    override val supportsMenuBackground: Boolean = true
-
-    val backendId: String
-        get() = rendererMode.backendId
 
     private val view = AndroidCoreGameView(inGameMenuController)
     private var activity: Activity? = null
@@ -135,7 +126,7 @@ internal class AndroidGameSession(
                     koolOverlayView?.bringToFront()
                 }
             }
-            logger.info { "Switched Android game renderer to ${rendererMode.backendId}" }
+            logger.info { "Switched Android game renderer to ${rendererMode.id}" }
         }
     }
 
@@ -181,10 +172,10 @@ internal class AndroidGameSession(
         view.movePointer(screenX, screenY)
     }
 
-    fun updateFrame(
+  override fun updateFrame(
         viewport: KoolCanvasViewport,
         deltaSeconds: Float,
-        drainVisibleLayerBuffers: Boolean = false,
+        drainVisibleLayerBuffers: Boolean ,
     ): KoolCanvasFrame {
         if (asyncMapLoadInProgress) {
             return lastFrame
@@ -276,7 +267,7 @@ internal class AndroidGameSession(
         }
     }
 
-    fun currentFrame(): KoolCanvasFrame = lastFrame
+    override fun currentFrame(): KoolCanvasFrame = lastFrame
 
     override fun prepareMenuBackgroundAsync(viewport: KoolCanvasViewport) {
         val generation: Long
@@ -295,11 +286,8 @@ internal class AndroidGameSession(
             lastFrame = KoolCanvasFrame(viewport, emptyList())
         }
         logger.info { "Preparing Android Canvas RW menu background asynchronously" }
-        Thread({
+        launchOnIO("${rendererMode.id}-menu-background-loader") {
             loadMenuBackgroundInBackground(viewport, generation)
-        }, "$backgroundThreadPrefix-menu-background-loader").apply {
-            isDaemon = true
-            start()
         }
     }
 

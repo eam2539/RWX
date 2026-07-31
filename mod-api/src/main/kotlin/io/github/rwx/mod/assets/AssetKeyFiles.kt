@@ -1,10 +1,6 @@
 package io.github.rwx.mod.assets
 
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.File
+import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
@@ -39,7 +35,6 @@ data class AssetPublicKey(
 
 object AssetKeyFiles {
     private const val PRIVATE_MAGIC = 0x5257584b // RWXK
-    private const val PUBLIC_MAGIC = 0x52575850 // RWXP
     private const val FORMAT_VERSION = 1
     private const val AES_KEY_SIZE = 32
     private const val MAX_ENCODED_KEY_SIZE = 64 * 1024
@@ -82,26 +77,7 @@ object AssetKeyFiles {
             val encoded = readBytes(input)
             val key = AssetPrivateKey(kind, storedKeyId, encoded)
             validatePrivate(key)
-            key
-        }
-
-    fun writePublic(file: File, key: AssetPublicKey) {
-        validatePublic(key)
-        file.absoluteFile.parentFile?.mkdirs()
-        DataOutputStream(BufferedOutputStream(file.outputStream())).use { output ->
-            output.writeInt(PUBLIC_MAGIC)
-            output.writeInt(FORMAT_VERSION)
-            writeString(output, key.keyId)
-            writeBytes(output, key.encoded)
-        }
-    }
-
-    fun readPublic(file: File): AssetPublicKey =
-        DataInputStream(BufferedInputStream(file.inputStream())).use { input ->
-            require(input.readInt() == PUBLIC_MAGIC) { "Not an public asset key" }
-            require(input.readInt() == FORMAT_VERSION) { "Unsupported public key version" }
-            val key = AssetPublicKey(readString(input), readBytes(input))
-            validatePublic(key)
+            require(input.read() == -1) { "Trailing data in private asset key" }
             key
         }
 
@@ -192,7 +168,7 @@ object AssetKeyFiles {
         return ByteArray(size).also(input::readFully)
     }
 
-    private fun restrictPrivateKeyPermissions(file: File) {
+    internal fun restrictPrivateKeyPermissions(file: File) {
         runCatching {
             Files.setPosixFilePermissions(
                 file.toPath(),

@@ -20,7 +20,7 @@ internal class ScreenPresenter(
         screen: AppScreen,
         lastExternalGameFrame: KoolCanvasFrame?,
     ) {
-        ensureMenuBackground(screen)
+        val isMenuBackgroundPreparing = ensureMenuBackground(screen)
         val gameSession = bootstrap.gameSession
         val visibility = AppScreenLayout.visibilityFor(screen)
         val isRwMenuBackgroundVisible = shouldShowRwMenuBackground(screen)
@@ -36,7 +36,7 @@ internal class ScreenPresenter(
             isResumeBackgroundVisible = isResumeBackgroundVisible,
             rendersIntoKoolCanvas = gameSession.rendersIntoKoolCanvas,
             usesNativeSurfaceForResumeBackground = gameSession.usesNativeSurfaceForResumeBackground,
-        )
+        ) || (isMenuBackgroundPreparing && !gameSession.rendersIntoKoolCanvas)
         val isLastExternalFrameBackgroundVisible = screen == AppScreen.MainMenu &&
                 !gameSession.rendersIntoKoolCanvas &&
                 lastExternalGameFrame != null
@@ -69,13 +69,12 @@ internal class ScreenPresenter(
         )
     }
 
-    private fun ensureMenuBackground(screen: AppScreen) {
-        val gameSession = bootstrap.gameSession
-        if (!bootstrap.settingsModel.showMainMenuBackgroundDemo.value) return
-        if (!bootstrap.menuBackgroundSession.supportsMenuBackground) return
-        if (screen != AppScreen.MainMenu) return
-        if (gameSession.canResume() || bootstrap.menuBackgroundSession.isMenuBackgroundActive()) return
+    private fun ensureMenuBackground(screen: AppScreen): Boolean {
+        if (!bootstrap.settingsModel.showMainMenuBackgroundDemo.value) return false
+        if (screen != AppScreen.MainMenu) return false
+        if (bootstrap.gameSession.canResume() || bootstrap.menuBackgroundSession.isMenuBackgroundActive()) return false
         bootstrap.menuBackgroundSession.prepareMenuBackgroundAsync(viewport())
+        return true
     }
 }
 

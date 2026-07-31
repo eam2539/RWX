@@ -4,22 +4,18 @@ import android.app.Activity
 import android.view.View
 import com.corrodinggames.rts.appFramework.GameViewOpenGL
 import com.corrodinggames.rts.gameFramework.android.graphics.GraphicsInterface
+import io.github.rwx.render.RendererMode
 
 internal enum class AndroidRendererMode(
-    val backendId: String,
-    val sessionLogName: String,
-    val threadPrefix: String,
-) {
+    override val id: String,
+) : RendererMode{
     CANVAS(
-        backendId = "android-canvas",
-        sessionLogName = "Android Canvas RW",
-        threadPrefix = "RWX-android-canvas",
+        id = "android-canvas"
     ),
     OPENGL(
-        backendId = "android-opengles",
-        sessionLogName = "Android OpenGL RW",
-        threadPrefix = "RWX-android-opengl",
+        id = "android-opengles"
     ),
+    //KOOL
 }
 
 internal class AndroidPresentedFrame(

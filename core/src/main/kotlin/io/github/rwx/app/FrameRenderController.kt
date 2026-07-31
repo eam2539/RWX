@@ -1,13 +1,11 @@
 package io.github.rwx.app
 
-import io.github.rwx.render.GameRenderBackend
 import io.github.rwx.render.canvas.*
 import io.github.rwx.session.GameSession
 import io.github.rwx.ui.AppScreen
 
 internal class FrameRenderController(
     private val gameSession: GameSession,
-    private val menuBackgroundRenderer: GameRenderBackend,
     private val screenPresenter: ScreenPresenter,
     private val warmupController: WarmupController,
     private val koolCanvasSceneHost: KoolCanvasSceneHost,
@@ -35,9 +33,9 @@ internal class FrameRenderController(
         val isRwGameLoading = warmupController.isRwGameLoading(screen)
         val rwCanvasFrame = when {
             isExternalBattleRoomJoinPending -> KoolCanvasFrame(canvasViewport, emptyList())
-            isRwGameVisible -> gameSession.renderFrame(canvasViewport, deltaSeconds)
+            isRwGameVisible -> gameSession.updateFrame(canvasViewport, deltaSeconds)
             isRwMenuBackgroundVisible -> {
-                menuBackgroundRenderer.updateFrame(
+                gameSession.updateFrame(
                     canvasViewport,
                     deltaSeconds,
                     drainVisibleLayerBuffers = true,
@@ -58,14 +56,14 @@ internal class FrameRenderController(
                 deltaSeconds,
             )
 
-            else -> gameSession.currentRenderFrame()
+            else -> gameSession.currentFrame()
         }
         if (!gameSession.rendersIntoKoolCanvas && isRwGameVisible && rwCanvasFrame.commands.isNotEmpty()) {
             setLastExternalFrame(rwCanvasFrame)
         }
         warmupController.updateLoadingStatus(screen)
         val externalFrameBackground = if (isLastExternalFrameBackgroundVisible) {
-            val currentFrame = gameSession.currentRenderFrame()
+            val currentFrame = gameSession.currentFrame()
             currentFrame.takeIf { it.commands.isNotEmpty() } ?: lastExternalFrame()
         } else {
             null
@@ -98,9 +96,9 @@ internal fun resumeBackgroundFrameForSession(
     deltaSeconds: Float,
 ): KoolCanvasFrame =
     if (gameSession.rendersIntoKoolCanvas) {
-        gameSession.currentBackgroundRenderFrame()
+        gameSession.currentFrame()
     } else {
-        gameSession.renderFrame(
+        gameSession.updateFrame(
             canvasViewport,
             deltaSeconds,
             drainVisibleLayerBuffers = true,

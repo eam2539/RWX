@@ -1,33 +1,49 @@
 package io.github.rwx.mod
 
-import io.github.rwx.mod.assets.AssetVaultFormat
-import io.github.rwx.mod.assets.AssetKeyFiles
-import io.github.rwx.mod.assets.AssetKeyKind
-import io.github.rwx.mod.assets.AssetPrivateKey
-import io.github.rwx.mod.assets.AssetProtectionMode
-import io.github.rwx.mod.assets.AssetVaultHeader
+import io.github.rwx.mod.assets.*
 import java.io.Closeable
 import java.io.File
 import java.io.InputStream
+import java.security.DigestInputStream
+import java.security.MessageDigest
 import java.util.zip.ZipFile
 
 internal class JvmModAssetStore(
     jarFile: File,
     private val modId: String,
-    private val keyResolver: (String) -> AssetPrivateKey? = { null },
+    private val credentialResolver: AssetCredentialResolver = EmptyAssetCredentialResolver,
 ) : Closeable {
     private val zip = ZipFile(jarFile)
-    private val header: AssetVaultHeader? = loadHeader()
-    private val encryptedAssets: Map<String, AssetVaultFormat.AssetRecord> = loadEncryptedIndex()
-    private val plainAssets: Map<String, String> = zip.entries().asSequence()
-        .filterNot { it.isDirectory }
-        .map { it.name.replace('\\', '/') }
-        .filter(::isPackagedAsset)
-        .filterNot(encryptedAssets::containsKey)
-        .associateWith { it }
-    private val allPaths: Set<String> = plainAssets.keys + encryptedAssets.keys
+    private val header: AssetVaultHeader?
+    private val encryptedAssets: Map<String, AssetVaultFormat.AssetRecord>
+    private val plainAssets: Map<String, String>
+    private val allPaths: Set<String>
     private val contentKey: ByteArray by lazy(::resolveContentKey)
     private var closed = false
+
+    init {
+        try {
+            requireUniqueArchiveEntries()
+            header = loadHeader()
+            encryptedAssets = loadEncryptedIndex()
+            plainAssets = zip.entries().asSequence()
+                .filterNot { it.isDirectory }
+                .map { it.name.replace('\\', '/') }
+                .filter(::isPackagedAsset)
+                .filterNot(encryptedAssets::containsKey)
+                .associateWith { it }
+            allPaths = plainAssets.keys + encryptedAssets.keys
+            if (header != null) {
+                require(encryptedAssets.isNotEmpty()) { "Encrypted asset vault is empty" }
+                require(plainAssets.isEmpty()) {
+                    "Encrypted asset vault contains unsigned plaintext assets: ${plainAssets.keys.first()}"
+                }
+            }
+        } catch (error: Throwable) {
+            zip.close()
+            throw error
+        }
+    }
 
     val encrypted: Boolean
         get() = encryptedAssets.isNotEmpty()
@@ -90,17 +106,44 @@ internal class JvmModAssetStore(
 
     private fun loadEncryptedIndex(): Map<String, AssetVaultFormat.AssetRecord> {
         val indexEntry = zip.getEntry(AssetVaultFormat.INDEX_ENTRY) ?: run {
-            require(header == null) { "asset vault is missing its index" }
+            require(header == null) { "Asset vault is missing its index" }
             return emptyMap()
         }
-        require(header != null) { "asset vault index is missing its header" }
-        return zip.getInputStream(indexEntry).use(AssetVaultFormat::readIndex)
+        val vaultHeader = requireNotNull(header) { "Asset vault index is missing its header" }
+        val digest = MessageDigest.getInstance("SHA-256")
+        val records = zip.getInputStream(indexEntry).use { input ->
+            AssetVaultFormat.readIndex(DigestInputStream(input, digest))
+        }
+        require(MessageDigest.isEqual(vaultHeader.indexDigest, digest.digest())) {
+            "Asset vault index digest mismatch"
+        }
+        return records
             .onEach { record ->
                 require(AssetVaultFormat.isProtectedAsset(record.path)) {
                     "Encrypted asset is outside assets/: ${record.path}"
                 }
+                verifyEncryptedBlob(record)
             }
             .associateBy(AssetVaultFormat.AssetRecord::path)
+    }
+
+    private fun verifyEncryptedBlob(record: AssetVaultFormat.AssetRecord) {
+        val entry = zip.getEntry(record.blobEntry)
+            ?: error("Missing encrypted asset blob ${record.blobEntry} for ${record.path}")
+        val expectedSize = record.plaintextSize + AssetVaultFormat.NONCE_SIZE + 16L
+        require(entry.size == expectedSize) { "Encrypted asset size mismatch for ${record.path}" }
+        val digest = MessageDigest.getInstance("SHA-256")
+        zip.getInputStream(entry).use { input ->
+            val buffer = ByteArray(64 * 1024)
+            while (true) {
+                val count = input.read(buffer)
+                if (count < 0) break
+                digest.update(buffer, 0, count)
+            }
+        }
+        require(MessageDigest.isEqual(record.ciphertextDigest, digest.digest())) {
+            "Encrypted asset digest mismatch for ${record.path}"
+        }
     }
 
     private fun loadHeader(): AssetVaultHeader? {
@@ -108,32 +151,101 @@ internal class JvmModAssetStore(
         return zip.getInputStream(entry).use(AssetVaultFormat::readHeader)
     }
 
-    private fun resolveContentKey(): ByteArray {
-        val header = checkNotNull(header)
-        return when (header.mode) {
-            AssetProtectionMode.SYMMETRIC_KEY -> {
-                val key = resolveRequiredKey(header.keyId)
-                require(key.kind == AssetKeyKind.SYMMETRIC) {
-                    "Imported asset key ${header.keyId} is not symmetric"
-                }
-                key.encoded.copyOf()
-            }
-
-            AssetProtectionMode.RSA_PUBLIC_KEY -> {
-                val key = resolveRequiredKey(header.keyId)
-                require(key.kind == AssetKeyKind.RSA) {
-                    "Imported asset key ${header.keyId} is not an RSA private key"
-                }
-                AssetKeyFiles.unwrapContentKey(key, header.wrappedContentKey)
-            }
+    private fun requireUniqueArchiveEntries() {
+        val names = hashSetOf<String>()
+        zip.entries().asSequence().forEach { entry ->
+            require(names.add(entry.name)) { "Duplicate JAR entry: ${entry.name}" }
         }
     }
 
-    private fun resolveRequiredKey(keyId: String): AssetPrivateKey {
-        val key = keyResolver(keyId) ?: throw MissingJvmModAssetKeyException(keyId)
+    private fun resolveContentKey(): ByteArray {
+        val vaultHeader = checkNotNull(header)
+        return when (vaultHeader.mode) {
+            AssetProtectionMode.SYMMETRIC -> {
+                if (vaultHeader.embeddedContentKey.isNotEmpty()) {
+                    vaultHeader.embeddedContentKey.copyOf()
+                } else {
+                    resolveRequiredSymmetricKey(vaultHeader.keyId).encoded.copyOf()
+                }
+            }
+
+            AssetProtectionMode.PKI -> resolvePkiContentKey(vaultHeader)
+        }
+    }
+
+    private fun resolveRequiredSymmetricKey(keyId: String): AssetPrivateKey {
+        val key = credentialResolver.findSymmetricKey(keyId)
+            ?: throw MissingJvmModAssetKeyException(keyId)
         AssetKeyFiles.validatePrivate(key)
+        require(key.kind == AssetKeyKind.SYMMETRIC) { "Imported asset key $keyId is not symmetric" }
         require(key.keyId == keyId) { "Imported asset key does not match requested key $keyId" }
         return key
+    }
+
+    private fun resolvePkiContentKey(vaultHeader: AssetVaultHeader): ByteArray {
+        val authority = credentialResolver.findTrustedAuthority(vaultHeader.authorityId)
+            ?: throw UntrustedJvmModAssetAuthorityException(vaultHeader.authorityId)
+        AssetPki.validateAuthority(authority)
+        require(authority.authorityId == vaultHeader.authorityId) {
+            "Trusted asset authority does not match ${vaultHeader.authorityId}"
+        }
+        require(
+            AssetPki.verifyPackage(
+                authority,
+                AssetVaultFormat.packageSignaturePayload(vaultHeader, modId),
+                vaultHeader.signature,
+            )
+        ) { "Invalid asset package signature for authority ${vaultHeader.authorityId}" }
+
+        val revocationList = selectRevocationList(vaultHeader, authority)
+        var revokedCredential: AssetLicenseCredential? = null
+        vaultHeader.recipients.forEach { recipient ->
+            val credential = credentialResolver.findLicense(recipient.certificateId) ?: return@forEach
+            AssetPki.validateCredential(
+                credential,
+                authority,
+                enforceValidity = true,
+            )
+            require(credential.certificate.certificateId == recipient.certificateId) {
+                "Imported asset license does not match recipient ${recipient.certificateId}"
+            }
+            require(credential.certificate.keyId == recipient.keyId) {
+                "Asset recipient key does not match license ${recipient.certificateId}"
+            }
+            if (AssetPki.isRevoked(revocationList, recipient.certificateId)) {
+                revokedCredential = credential
+                return@forEach
+            }
+            return AssetKeyFiles.unwrapContentKey(
+                AssetPrivateKey(AssetKeyKind.RSA, recipient.keyId, credential.privateKey),
+                recipient.wrappedContentKey,
+            )
+        }
+        revokedCredential?.let {
+            throw RevokedJvmModAssetLicenseException(it.certificate.certificateId)
+        }
+        throw MissingJvmModAssetLicenseException(
+            vaultHeader.authorityId,
+            vaultHeader.recipients.map { it.certificateId },
+        )
+    }
+
+    private fun selectRevocationList(
+        vaultHeader: AssetVaultHeader,
+        authority: io.github.rwx.mod.assets.AssetAuthorityCertificate,
+    ): AssetRevocationList? {
+        val embedded = vaultHeader.revocationList
+        val local = credentialResolver.findRevocationList(authority.authorityId)
+        listOfNotNull(embedded, local).forEach { list ->
+            AssetPki.validateRevocationList(list, authority)
+        }
+        if (embedded != null && local != null && embedded.sequence == local.sequence) {
+            require(
+                AssetPkiFiles.encodeRevocationList(embedded)
+                    .contentEquals(AssetPkiFiles.encodeRevocationList(local))
+            ) { "Conflicting asset revocation lists at sequence ${embedded.sequence}" }
+        }
+        return listOfNotNull(embedded, local).maxByOrNull(AssetRevocationList::sequence)
     }
 
     private fun normalizeAssetOrNull(path: String): String? =
@@ -169,4 +281,17 @@ internal class JvmModAssetStore(
 
 class MissingJvmModAssetKeyException(keyId: String) : IllegalStateException(
     "Missing JVM mod asset key $keyId; import the matching .rwxkey file into RWX"
+)
+
+class UntrustedJvmModAssetAuthorityException(authorityId: String) : IllegalStateException(
+    "Untrusted JVM mod asset authority $authorityId; import the author's .rwxpub trust certificate into RWX"
+)
+
+class MissingJvmModAssetLicenseException(authorityId: String, recipientIds: List<String>) : IllegalStateException(
+    "Missing JVM mod asset license for authority $authorityId; import an authorized .rwxlicense file " +
+            "(${recipientIds.size} accepted recipient certificate(s))"
+)
+
+class RevokedJvmModAssetLicenseException(certificateId: String) : IllegalStateException(
+    "JVM mod asset license $certificateId has been revoked"
 )

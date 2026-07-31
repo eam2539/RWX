@@ -6,18 +6,7 @@ import io.github.rwx.*
 import io.github.rwx.i18n.I18n
 import io.github.rwx.p2p.MapFeatureDetector
 import io.github.rwx.session.*
-import io.github.rwx.ui.model.BattleRoomChatLine
-import io.github.rwx.ui.model.BattleRoomInfo
-import io.github.rwx.ui.model.BattleRoomModel
-import io.github.rwx.ui.model.BattleRoomPlayer
-import io.github.rwx.ui.model.CompatibilityLabel
-import io.github.rwx.ui.model.DialogForm
-import io.github.rwx.ui.model.DialogFormField
-import io.github.rwx.ui.model.DialogFormOption
-import io.github.rwx.ui.model.LevelEntryType
-import io.github.rwx.ui.model.MapEntry
-import io.github.rwx.ui.model.ModeLabel
-import io.github.rwx.ui.model.MultiplayerRoomItem
+import io.github.rwx.ui.model.*
 import java.util.*
 
 internal const val BATTLE_ROOM_JOIN_POLL_INTERVAL_MS: Long = 100L
@@ -146,7 +135,7 @@ private fun BattleRoomDraft.draftBattleRoomPlayers(): List<BattleRoomPlayer> {
         val teamIndex = draftTeamColorIndex(index)
         val isSpectator = teamIndex < 0
         BattleRoomPlayer(
-            id = if (isLocal) "local" else "ai-$index",
+            id = if (isLocal) DRAFT_LOCAL_PLAYER_ID else "$DRAFT_AI_PLAYER_ID_PREFIX$index",
             name = if (isLocal) {
                 "Player"
             } else {
@@ -356,10 +345,6 @@ private fun playerOverrideFields(): List<DialogFormField> {
     )
 }
 
-private val battleRoomColorNames = listOf(
-    "Green", "Red", "Blue", "Yellow", "Cyan", "White", "Black", "Pink", "Orange", "Purple",
-)
-
 internal fun BattleRoomSnapshot.toBattleRoomModel(
     previewAssetPath: String?,
     chatLines: List<BattleRoomChatLine>,
@@ -396,24 +381,6 @@ internal fun BattleRoomOptions.toGameRoomSettings(): GameRoomSettings =
         settings.applyBattleRoomOptions(this)
     }
 
-internal fun resolveBattleRoomPlayerSnapshot(
-    playerId: String,
-    players: List<BattleRoomPlayerSnapshot>,
-): BattleRoomPlayerSnapshot? {
-    players.firstOrNull { it.id == playerId }?.let { return it }
-    if (playerId == DRAFT_LOCAL_PLAYER_ID) {
-        return players.firstOrNull { it.isLocal }
-    }
-    val draftIndex = draftBattleRoomPlayerIndex(playerId) ?: return null
-    return players.firstOrNull { it.spawnLabel.toIntOrNull() == draftIndex + 1 }
-        ?: players.getOrNull(draftIndex)
-}
-
-private fun draftBattleRoomPlayerIndex(playerId: String): Int? =
-    playerId.removePrefix(DRAFT_AI_PLAYER_ID_PREFIX)
-        .takeIf { it.length != playerId.length }
-        ?.toIntOrNull()
-
 private fun BattleRoomPlayerSnapshot.toBattleRoomPlayer(): BattleRoomPlayer =
     BattleRoomPlayer(
         id = id,
@@ -429,13 +396,6 @@ private fun BattleRoomPlayerSnapshot.toBattleRoomPlayer(): BattleRoomPlayer =
         isAI = isAI,
         isLocal = isLocal,
     )
-
-private fun teamLabelFor(teamColorId: Int): String =
-    if (teamColorId in 0..25) {
-        ('A'.code + teamColorId).toChar().toString()
-    } else {
-        "-"
-    }
 
 private fun battleRoomDetailLines(
     settings: GameRoomSettings,
@@ -474,16 +434,16 @@ internal fun originalBattleRoomStatusLines(statusText: String): List<String> =
 
 internal fun startingCreditsLabel(code: Int): String =
     when (code) {
-        0 -> "Default (\$4000)"
-        1 -> "\$0"
-        2 -> "\$1000"
-        3 -> "\$2000"
-        4 -> "\$5000"
-        5 -> "\$10000"
-        6 -> "\$50000"
-        7 -> "\$100000"
-        8 -> "\$200000"
-        else -> "\$999"
+        0 -> "Default ($4000)"
+        1 -> "$0"
+        2 -> "$1000"
+        3 -> "$2000"
+        4 -> "$5000"
+        5 -> "$10000"
+        6 -> "$50000"
+        7 -> "$100000"
+        8 -> "$200000"
+        else -> "$999"
     }
 
 internal fun startingUnitsLabel(value: Int): String =
@@ -515,5 +475,3 @@ private fun fogLabel(fogMode: Int): String =
     }
 
 internal const val DEFAULT_MAX_PLAYERS: Int = 10
-private const val DRAFT_LOCAL_PLAYER_ID: String = "local"
-private const val DRAFT_AI_PLAYER_ID_PREFIX: String = "ai-"

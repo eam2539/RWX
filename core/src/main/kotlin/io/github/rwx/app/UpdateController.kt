@@ -44,7 +44,7 @@ internal class UpdateController(
         if (inProgress) return
 
         inProgress = true
-        launchOnIO("resource-browser-search"){
+        launchOnIO("updates-check"){
             val response = updateRepository.checkLatestRelease(appMetadata.versionName)
             result.set(
                 UpdateCheckResult(

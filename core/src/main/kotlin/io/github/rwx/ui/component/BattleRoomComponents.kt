@@ -4,19 +4,8 @@ import com.corrodinggames.rts.gameFramework.GameEngine
 import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.util.Color
 import io.github.rwx.i18n.I18n
-import io.github.rwx.ui.model.BattleRoomActions
-import io.github.rwx.ui.model.BattleRoomChatLine
-import io.github.rwx.ui.model.BattleRoomModel
-import io.github.rwx.ui.model.BattleRoomPlayer
-import io.github.rwx.ui.model.BattleRoomTeamColors
-import io.github.rwx.ui.ColorSchemeDefinition
-import io.github.rwx.ui.ResponsiveContentWidth
-import io.github.rwx.ui.ResponsiveViewportHeight
-import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.model.battleRoomChatColorIndexFor
-import io.github.rwx.ui.fraction
-import io.github.rwx.ui.remainingAfter
-import io.github.rwx.ui.splitEvenly
+import io.github.rwx.ui.*
+import io.github.rwx.ui.model.*
 
 
 fun UiScope.BattleRoom(
@@ -159,16 +148,20 @@ private fun UiScope.BattleRoomInfoPanel(
             }
         }
         if (model.isHost)
-        TextIconButton(
-            label = I18n.battleroom.options(),
-            icon = Icon.Options,
-            width = UiTheme.Layout.battleRoomActionButtonWidth,
-            theme = theme,
-            font = UiTheme.Fonts.bodyMedium,
-        ) {
-            modifier.align(AlignmentX.Center, AlignmentY.Center)
-            onOpenOptions()
-        }
+            Row {
+                modifier.alignX(AlignmentX.Center)
+                TextIconButton(
+                    label = I18n.battleroom.options(),
+                    icon = Icon.Options,
+                    width = UiTheme.Layout.battleRoomActionButtonWidth,
+                    theme = theme,
+                    font = UiTheme.Fonts.bodyMedium,
+                ) {
+                    modifier.align(AlignmentX.Center, AlignmentY.Center)
+                    onOpenOptions()
+                }
+            }
+
     }
 }
 

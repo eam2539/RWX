@@ -62,15 +62,16 @@ class FileSystemModRepository(
         if (!source.exists()) {
             return ModImportResult(false, "Import failed: file does not exist")
         }
-        if (source.isFile && source.extension.equals(PRIVATE_ASSET_KEY_EXTENSION, ignoreCase = true)) {
+        if (source.isFile && source.extension.lowercase(Locale.ROOT) in ASSET_CREDENTIAL_EXTENSIONS) {
             return runCatching {
-                val imported = JvmModAssetKeyStore(storage).importKey(source)
+                val imported = JvmModAssetKeyStore(storage).importFile(source)
                 ModImportResult(
                     true,
-                    "Imported JVM mod asset key ${imported.keyId.take(12)}… (${imported.kind.name.lowercase()})",
+                    "Imported JVM mod asset ${imported.kind.name.lowercase().replace('_', ' ')} " +
+                            "${imported.id.take(12)}...",
                 )
             }.getOrElse { error ->
-                ModImportResult(false, "Key import failed: ${error.message ?: error.javaClass.simpleName}")
+                ModImportResult(false, "Credential import failed: ${error.message ?: error.javaClass.simpleName}")
             }
         }
         if (!source.isModSourceCandidate()) {
@@ -392,7 +393,6 @@ class FileSystemModRepository(
     companion object {
         private const val MOD_INFO_FILE = "mod-info.txt"
         private const val JVM_MOD_MANIFEST = "mod.toml"
-        private const val PRIVATE_ASSET_KEY_EXTENSION = "rwxkey"
         private const val MAX_MOD_INFO_DEPTH = 4
         private const val MAX_ORIGINAL_SELECTION_LABEL_LENGTH = 15
         private const val ORIGINAL_MOD_SETTINGS_KEY = "modSettings"
@@ -400,6 +400,7 @@ class FileSystemModRepository(
         private const val ORIGINAL_MOD_SETTINGS_VERSION = 1
         private const val ORIGINAL_LAST_MOD_COUNT_KEY = "lastModCount"
         private const val DEFAULT_ENABLED = false
+        private val ASSET_CREDENTIAL_EXTENSIONS = setOf("rwxkey", "rwxpub", "rwxlicense", "rwxcrl")
         private val SUPPORTED_MOD_FILE_EXTENSIONS = setOf("rwmod", "zip", "jar", "ini")
     }
 }

@@ -53,13 +53,11 @@ internal class SlickAwtGLCanvas(
 
     private fun applyWindowsSwapInterval(interval: Int): Boolean {
         val capabilities = GL.getCapabilitiesWGL()
-        if (!capabilities.WGL_EXT_swap_control) return false
-        return WGLEXTSwapControl.wglSwapIntervalEXT(interval)
+        return capabilities.WGL_EXT_swap_control && WGLEXTSwapControl.wglSwapIntervalEXT(interval)
     }
 
     private fun applyMacSwapInterval(interval: Int): Boolean {
         val context = CGL.CGLGetCurrentContext()
-        if (context == 0L) return false
-        return CGL.CGLSetParameter(context, CGL.kCGLCPSwapInterval, interval) == 0
+        return context != 0L && CGL.CGLSetParameter(context, CGL.kCGLCPSwapInterval, interval) == 0
     }
 }

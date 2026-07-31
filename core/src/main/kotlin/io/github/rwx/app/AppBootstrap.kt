@@ -8,43 +8,14 @@ import io.github.rwx.i18n.I18n
 import io.github.rwx.mod.ModRepository
 import io.github.rwx.net.ResourceBrowserRepository
 import io.github.rwx.net.UpdateRepository
-import io.github.rwx.render.GameRenderBackend
 import io.github.rwx.render.canvas.KoolCanvasSceneHost
 import io.github.rwx.session.GameSession
 import io.github.rwx.settings.GameSettingsRepository
-import io.github.rwx.ui.*
+import io.github.rwx.ui.ColorSchemeRegistry
+import io.github.rwx.ui.CoreUiEventQueue
 import io.github.rwx.ui.component.SnackbarSceneHost
-import io.github.rwx.ui.host.BattleRoomSceneHost
-import io.github.rwx.ui.host.DialogSceneHost
-import io.github.rwx.ui.host.LevelSelectSceneHost
-import io.github.rwx.ui.host.LoadingDialogSceneHost
-import io.github.rwx.ui.host.LoadingSceneHost
-import io.github.rwx.ui.host.MainMenuSceneHost
-import io.github.rwx.ui.host.ModHudSceneHost
-import io.github.rwx.ui.host.ModWindowSceneHost
-import io.github.rwx.ui.host.ModsSceneHost
-import io.github.rwx.ui.host.MultiplayerSceneHost
-import io.github.rwx.ui.host.PauseMenuSceneHost
-import io.github.rwx.ui.host.ReplaySelectSceneHost
-import io.github.rwx.ui.host.ResourceBrowserSceneHost
-import io.github.rwx.ui.host.SettingsSceneHost
-import io.github.rwx.ui.model.BattleRoomAction
-import io.github.rwx.ui.model.Dialog
-import io.github.rwx.ui.model.DialogButton
-import io.github.rwx.ui.model.LevelSelectAction
-import io.github.rwx.ui.model.LevelSelectActionHandler
-import io.github.rwx.ui.model.LevelSelectViewModelFactory
-import io.github.rwx.ui.model.MainMenuAction
-import io.github.rwx.ui.model.MainMenuConditions
-import io.github.rwx.ui.model.ModsAction
-import io.github.rwx.ui.model.MultiplayerAction
-import io.github.rwx.ui.model.PauseMenuAction
-import io.github.rwx.ui.model.PauseMenuConditions
-import io.github.rwx.ui.model.ReplaySelectAction
-import io.github.rwx.ui.model.ReplaySelectActionHandler
-import io.github.rwx.ui.model.ResourceBrowserAction
-import io.github.rwx.ui.model.SettingsAction
-import io.github.rwx.ui.model.SettingsModel
+import io.github.rwx.ui.host.*
+import io.github.rwx.ui.model.*
 import org.koin.core.parameter.parametersOf
 import org.koin.mp.KoinPlatform.getKoin
 
@@ -64,9 +35,7 @@ internal data class AppBootstrap(
     val platformBridge: PlatformBridge?,
     val appMetadata: AppMetadata,
     val gameSession: GameSession,
-    val gameRenderBackend: GameRenderBackend,
     val menuBackgroundSession: GameSession,
-    val menuBackgroundRenderer: GameRenderBackend,
     val modRepository: ModRepository,
     val resourceBrowserRepository: ResourceBrowserRepository,
     val updateRepository: UpdateRepository,
@@ -116,12 +85,8 @@ internal fun createAppBootstrap(
     val platformBridge = runCatching { koin.get<PlatformBridge>() }.getOrNull()
     val appMetadata = platformBridge?.appMetadata ?: runCatching { koin.get<AppMetadata>() }.getOrDefault(AppMetadata())
 
-    val gameRenderBackend = koin.get<GameRenderBackend>()
     val gameSession = koin.get<GameSession>()
-    gameSession.registerFrameRenderer(gameRenderBackend)
-
     val menuBackgroundSession = gameSession
-    val menuBackgroundRenderer = gameRenderBackend
     val modRepository = koin.get<ModRepository>()
     val resourceBrowserRepository = koin.get<ResourceBrowserRepository>()
     val updateRepository = koin.get<UpdateRepository>()
@@ -260,9 +225,7 @@ internal fun createAppBootstrap(
         platformBridge = platformBridge,
         appMetadata = appMetadata,
         gameSession = gameSession,
-        gameRenderBackend = gameRenderBackend,
         menuBackgroundSession = menuBackgroundSession,
-        menuBackgroundRenderer = menuBackgroundRenderer,
         modRepository = modRepository,
         resourceBrowserRepository = resourceBrowserRepository,
         updateRepository = updateRepository,

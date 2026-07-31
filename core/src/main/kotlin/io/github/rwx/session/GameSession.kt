@@ -1,16 +1,13 @@
 package io.github.rwx.session
 
-import com.corrodinggames.rts.game.GameTeam
 import com.corrodinggames.rts.game.PlayerTeam
 import com.corrodinggames.rts.game.map.TileMap
 import com.corrodinggames.rts.game.units.UnitTypeEnum
-import com.corrodinggames.rts.gameFramework.GameEngine
-import com.corrodinggames.rts.gameFramework.GameMode
-import com.corrodinggames.rts.gameFramework.GameObject
-import com.corrodinggames.rts.gameFramework.PlatformCallbacks
-import com.corrodinggames.rts.gameFramework.SettingsEngine
+import com.corrodinggames.rts.gameFramework.*
 import com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
 import com.corrodinggames.rts.gameFramework.network.*
+import com.corrodinggames.rts.gameFramework.network.ChatMessage
+import io.github.rwx.app.launchOnIO
 import io.github.rwx.applyBattleRoomPlayerConfig
 import io.github.rwx.battleRoomPlayerDisplayName
 import io.github.rwx.battleRoomPlayerPingLabel
@@ -20,7 +17,7 @@ import io.github.rwx.map.MapMetadata
 import io.github.rwx.map.TransferredUnit
 import io.github.rwx.net.CoreUiNetworkCallbacks
 import io.github.rwx.platform.CoreGameView
-import io.github.rwx.render.GameRenderBackend
+import io.github.rwx.render.RendererMode
 import io.github.rwx.render.canvas.KoolCanvasFrame
 import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.ui.BattleRoomUiBridge
@@ -53,8 +50,9 @@ abstract class GameSession {
     protected val gameLock = Any()
     private val engineStartLock = Any()
     val inGameMenuController = InGameMenuController()
-    protected open val sessionLogName: String = "RW"
-    protected open val backgroundThreadPrefix: String = "RWX-game"
+    protected val sessionLogName: String
+        get() = rendererMode.id.uppercase().replace('-',' ')+" RW"
+    protected abstract val rendererMode: RendererMode
     protected open val defaultPreloadViewport: KoolCanvasViewport = KoolCanvasViewport(1280, 720)
 
     @Volatile
@@ -67,8 +65,6 @@ abstract class GameSession {
         get() = rendererProfile.canStartNewSessionInPlace
     open val usesNativeSurfaceForResumeBackground: Boolean
         get() = rendererProfile.usesNativeSurfaceForResumeBackground
-    open val supportsMenuBackground: Boolean
-        get() = false
 
     @Volatile
     protected var gameEngine: GameEngine? = null
@@ -115,30 +111,17 @@ abstract class GameSession {
     @Volatile
     var latestBattleRoomJoinError: String? = null
 
-    @Volatile
-    private var frameRenderer: GameRenderBackend? = null
-
     open fun configureRendererProfile(profile: GameSessionRendererProfile) {
         rendererProfile = profile
     }
 
-    open fun registerFrameRenderer(renderer: GameRenderBackend?) {
-        frameRenderer = renderer
-    }
-
-    open fun renderFrame(
+    open fun updateFrame(
         viewport: KoolCanvasViewport,
         deltaSeconds: Float,
         drainVisibleLayerBuffers: Boolean = false,
-    ): KoolCanvasFrame =
-        frameRenderer?.updateFrame(viewport, deltaSeconds, drainVisibleLayerBuffers)
-            ?: lastFrame
+    ): KoolCanvasFrame = lastFrame
 
-    open fun currentRenderFrame(): KoolCanvasFrame =
-        frameRenderer?.currentFrame() ?: lastFrame
-
-    open fun currentBackgroundRenderFrame(): KoolCanvasFrame =
-        frameRenderer?.currentBackgroundFrame() ?: lastFrame
+    open fun currentFrame(): KoolCanvasFrame = lastFrame
 
     open fun setGameVisible(
         visible: Boolean,
@@ -223,11 +206,8 @@ abstract class GameSession {
             lastViewport = viewport
         }
         logger.info { "Preparing $sessionLogName engine asynchronously" }
-        Thread({
+        launchOnIO("${rendererMode.id}-engine-preloader") {
             preloadEngineInBackground(viewport)
-        }, "$backgroundThreadPrefix-engine-preloader").apply {
-            isDaemon = true
-            start()
         }
     }
 
@@ -257,29 +237,19 @@ abstract class GameSession {
         if (isMapLoaded(requestedMapPath)) {
             return
         }
-        val generation: Long
-        synchronized(gameLock) {
-            if (asyncMapLoadInProgress && asyncMapLoadPath == requestedMapPath) {
-                return
-            }
-            mapLoadGeneration += 1
-            generation = mapLoadGeneration
-            if (runningMapPath != requestedMapPath) {
-                lastFrame = KoolCanvasFrame(viewport, emptyList())
-            }
-            asyncMapLoadPath = requestedMapPath
-            asyncMapLoadInProgress = true
-            asyncMapLoadError = null
+        val generation = synchronized(gameLock) {
+            val ticket = beginAsyncLoadLocked(
+                requestKey = requestedMapPath,
+                viewport = viewport,
+                resetLastFrame = runningMapPath != requestedMapPath,
+            ) ?: return
             pendingRendererBattleRoomConfig = null
             activeRendererBattleRoomConfig = null
-            menuBackgroundActive = false
+            ticket
         }
         logger.info { "Preparing $sessionLogName map asynchronously: $requestedMapPath" }
-        Thread({
+        launchOnIO("${rendererMode.id}-map-loader") {
             loadMapInBackground(requestedMapPath, viewport, generation)
-        }, "$backgroundThreadPrefix-map-loader").apply {
-            isDaemon = true
-            start()
         }
     }
 
@@ -287,52 +257,35 @@ abstract class GameSession {
         if (isMapLoaded(snapshot.mapPath)) {
             return
         }
-        val generation: Long
-        synchronized(gameLock) {
-            if (asyncMapLoadInProgress && asyncMapLoadPath == snapshot.mapPath) {
-                return
-            }
-            mapLoadGeneration += 1
-            generation = mapLoadGeneration
-            lastFrame = KoolCanvasFrame(viewport, emptyList())
-            asyncMapLoadPath = snapshot.mapPath
-            asyncMapLoadInProgress = true
-            asyncMapLoadError = null
+        val generation = synchronized(gameLock) {
+            val ticket = beginAsyncLoadLocked(
+                requestKey = snapshot.mapPath,
+                viewport = viewport,
+                resetLastFrame = true,
+            ) ?: return
             pendingMapPath = snapshot.mapPath
             pendingMemorySnapshot = snapshot
             pendingRendererBattleRoomConfig = snapshot.battleRoomConfig
-            menuBackgroundActive = false
+            ticket
         }
         logger.info { "Preparing $sessionLogName memory snapshot asynchronously: ${snapshot.mapPath}" }
-        Thread({
+        launchOnIO("${rendererMode.id}-memory-snapshot-loader") {
             loadMemorySnapshotInBackground(snapshot, viewport, generation)
-        }, "$backgroundThreadPrefix-memory-snapshot-loader").apply {
-            isDaemon = true
-            start()
         }
     }
 
     open fun prepareReplayAsync(replayName: String, viewport: KoolCanvasViewport) {
         val requestedReplayName = replayName.takeIf { it.isNotBlank() } ?: return
-        val generation: Long
-        synchronized(gameLock) {
-            if (asyncMapLoadInProgress && asyncMapLoadPath == requestedReplayName) {
-                return
-            }
-            mapLoadGeneration += 1
-            generation = mapLoadGeneration
-            lastFrame = KoolCanvasFrame(viewport, emptyList())
-            asyncMapLoadPath = requestedReplayName
-            asyncMapLoadInProgress = true
-            asyncMapLoadError = null
-            menuBackgroundActive = false
+        val generation = synchronized(gameLock) {
+            beginAsyncLoadLocked(
+                requestKey = requestedReplayName,
+                viewport = viewport,
+                resetLastFrame = true,
+            ) ?: return
         }
         logger.info { "Preparing $sessionLogName replay asynchronously: $requestedReplayName" }
-        Thread({
+        launchOnIO("${rendererMode.id}-replay-loader") {
             loadReplayInBackground(requestedReplayName, viewport, generation)
-        }, "$backgroundThreadPrefix-replay-loader").apply {
-            isDaemon = true
-            start()
         }
     }
 
@@ -341,45 +294,88 @@ abstract class GameSession {
         if (isMapLoaded(requestedMapPath) && activeRendererBattleRoomConfig == config) {
             return
         }
-        val generation: Long
-        synchronized(gameLock) {
-            if (asyncMapLoadInProgress && asyncMapLoadPath == requestedMapPath) {
-                return
-            }
-            mapLoadGeneration += 1
-            generation = mapLoadGeneration
-            if (runningMapPath != requestedMapPath) {
-                lastFrame = KoolCanvasFrame(viewport, emptyList())
-            }
+        val generation = synchronized(gameLock) {
+            val ticket = beginAsyncLoadLocked(
+                requestKey = requestedMapPath,
+                viewport = viewport,
+                resetLastFrame = runningMapPath != requestedMapPath,
+            ) ?: return
             pendingMapPath = requestedMapPath
             pendingMemorySnapshot = null
             pendingRendererBattleRoomConfig = config
-            asyncMapLoadPath = requestedMapPath
-            asyncMapLoadInProgress = true
-            asyncMapLoadError = null
-            menuBackgroundActive = false
+            ticket
         }
         logger.info { "Preparing $sessionLogName battle room map asynchronously: $requestedMapPath" }
-        Thread({
+        launchOnIO("${rendererMode.id}-battleroom-map-loader") {
             loadMapInBackground(requestedMapPath, viewport, generation)
-        }, "$backgroundThreadPrefix-battleroom-map-loader").apply {
-            isDaemon = true
-            start()
         }
+    }
+
+    /**
+     * Registers a new asynchronous load and returns its [mapLoadGeneration] ticket, or null when an
+     * identical request is already in flight. Must be called while holding [gameLock].
+     *
+     * The ticket is what makes a superseded load harmless: the loader compares it against the
+     * current generation before it publishes a frame or records an error.
+     */
+    private fun beginAsyncLoadLocked(
+        requestKey: String,
+        viewport: KoolCanvasViewport,
+        resetLastFrame: Boolean,
+    ): Long? {
+        if (asyncMapLoadInProgress && asyncMapLoadPath == requestKey) {
+            return null
+        }
+        mapLoadGeneration += 1
+        if (resetLastFrame) {
+            lastFrame = KoolCanvasFrame(viewport, emptyList())
+        }
+        asyncMapLoadPath = requestKey
+        asyncMapLoadInProgress = true
+        asyncMapLoadError = null
+        menuBackgroundActive = false
+        return mapLoadGeneration
     }
 
     open fun adoptStartedGameFromEngine(viewport: KoolCanvasViewport): Boolean = false
 
+    /**
+     * Queues [config] as the next level to load, launching straight into the game.
+     *
+     * The room is only a staging area here: the very next frame loads it. Use
+     * [openLocalBattleRoomDraft] instead when the host should stay in the room and keep editing it.
+     */
     open fun prepareLocalBattleRoom(config: BattleRoomLaunchConfig): Boolean {
         synchronized(gameLock) {
-            menuBackgroundActive = false
-            gameEngine?.networkEngine?.takeIf { it.networkGameActive && !it.gameHasBeenStarted }
-                ?.disconnectNetworking("starting local battleroom")
+            disconnectUnstartedNetworkingLocked()
             pendingMapPath = config.mapPath.takeIf { it.isNotBlank() }
             pendingRendererBattleRoomConfig = config
             lastFrame = KoolCanvasFrame(lastViewport, emptyList())
         }
         return true
+    }
+
+    /**
+     * Opens [config] as an editable draft room without loading its level.
+     *
+     * The draft is what [currentBattleRoom] reports and what the `*BattleRoom*` mutators edit until
+     * the host presses "Start game". Unlike [prepareLocalBattleRoom] this queues no load, so the
+     * room stays open instead of being consumed by the next frame.
+     */
+    open fun openLocalBattleRoomDraft(config: BattleRoomLaunchConfig): Boolean {
+        synchronized(gameLock) {
+            disconnectUnstartedNetworkingLocked()
+            pendingRendererBattleRoomConfig = config
+            lastFrame = KoolCanvasFrame(lastViewport, emptyList())
+        }
+        return true
+    }
+
+    /** Drops a network room that was opened but never started. Must hold [gameLock]. */
+    private fun disconnectUnstartedNetworkingLocked() {
+        menuBackgroundActive = false
+        gameEngine?.networkEngine?.takeIf { it.networkGameActive && !it.gameHasBeenStarted }
+            ?.disconnectNetworking("starting local battleroom")
     }
 
     open fun enterLocalBattleRoomLive(config: BattleRoomLaunchConfig): Boolean =
@@ -388,37 +384,7 @@ abstract class GameSession {
                 networkEngine.disconnectNetworking("starting local battleroom")
             }
             initBattleRoomMap(engine, config.mapPath, force = true, savedGame = config.savedGame)
-            val playerName = networkEngine.playerName
-                ?: engine.settingsEngine.lastNetworkPlayerName
-                ?: "Player"
-            networkEngine.playerName = playerName
-            networkEngine.requireActiveMods = true
-            val localPlayerTeam = prepareSinglePlayerLocalTeam(engine, networkEngine, playerName)
-
-            val started = if (config.sandbox) {
-                networkEngine.startSandboxServer()
-            } else {
-                networkEngine.startSingleplayerServer()
-            }
-            check(started) { "Unable to start $sessionLogName local battle room" }
-            check(networkEngine.localPlayerTeam === localPlayerTeam) {
-                "Unable to start $sessionLogName local battle room: local player team was not registered"
-            }
-
-            val settings = networkEngine.getEditableRoomSettings() ?: networkEngine.roomSettings
-            settings.gameModeType = if (config.savedGame) GameModeType.savedGame else engine.getGameModeType()
-            settings.mapPath = if (config.savedGame) config.mapPath else engine.currentMapFilename
-            settings.applyBattleRoomOptions(
-                if (config.sandbox) config.options.copy(fogMode = 0, revealedMap = true) else config.options
-            )
-            networkEngine.a(settings)
-
-            repeat(config.aiPlayerCount.coerceAtLeast(0)) {
-                networkEngine.addAIToGame()
-            }
-            config.teamLayout?.let { layout ->
-                applyTeamLayoutLocked(networkEngine, layout)
-            }
+            engine.configureLocalBattleRoom(config, "$sessionLogName local")
 
             // Keep the config around so an in-game map switch / memory snapshot can rebuild the room,
             // but do NOT mark the level running: the level loads only at "Start game".
@@ -527,17 +493,39 @@ abstract class GameSession {
         }
     }
 
-    open fun setBattleRoomMap(mapPath: String, savedGame: Boolean = false): Boolean {
-        val requestedMapPath = mapPath.takeIf { it.isNotBlank() } ?: return false
+    /**
+     * Applies a battle room change to whichever room is real right now.
+     *
+     * Until the host presses "Start game" the room exists only as [pendingRendererBattleRoomConfig]:
+     * a local draft with no engine or network state, so an edit rewrites that config. Once the engine
+     * owns a live room the same edit becomes a network command instead.
+     *
+     * @param editDraft the replacement draft, or null to reject the change.
+     */
+    private inline fun editBattleRoom(
+        label: String,
+        editDraft: (BattleRoomLaunchConfig) -> BattleRoomLaunchConfig?,
+        noinline commandLiveRoom: (GameEngine, NetworkEngine) -> Boolean,
+    ): Boolean {
         synchronized(gameLock) {
             if (currentBattleRoomFromEngineLocked() == null) {
-                val config = pendingRendererBattleRoomConfig ?: return false
-                pendingRendererBattleRoomConfig = config.copy(mapPath = requestedMapPath, savedGame = savedGame)
-                pendingMapPath = requestedMapPath
+                val draft = pendingRendererBattleRoomConfig ?: return false
+                pendingRendererBattleRoomConfig = editDraft(draft) ?: return false
                 return true
             }
         }
-        return runBattleRoomCommand("set battle room map") { engine, networkEngine ->
+        return runBattleRoomCommand(label, commandLiveRoom)
+    }
+
+    open fun setBattleRoomMap(mapPath: String, savedGame: Boolean = false): Boolean {
+        val requestedMapPath = mapPath.takeIf { it.isNotBlank() } ?: return false
+        return editBattleRoom(
+            "set battle room map",
+            editDraft = { draft ->
+                pendingMapPath = requestedMapPath
+                draft.copy(mapPath = requestedMapPath, savedGame = savedGame)
+            },
+        ) { engine, networkEngine ->
             initBattleRoomMap(engine, requestedMapPath, force = true, savedGame = savedGame)
             networkEngine.getEditableRoomSettings()?.let { settings ->
                 settings.gameModeType = if (savedGame) GameModeType.savedGame else engine.getGameModeType()
@@ -552,14 +540,10 @@ abstract class GameSession {
     open fun addBattleRoomAi(count: Int): Boolean {
         val addCount = count.coerceAtLeast(0)
         if (addCount == 0) return true
-        synchronized(gameLock) {
-            if (currentBattleRoomFromEngineLocked() == null) {
-                val config = pendingRendererBattleRoomConfig ?: return false
-                pendingRendererBattleRoomConfig = config.copy(aiPlayerCount = config.aiPlayerCount + addCount)
-                return true
-            }
-        }
-        return runBattleRoomCommand("add battle room AI") { _, networkEngine ->
+        return editBattleRoom(
+            "add battle room AI",
+            editDraft = { draft -> draft.copy(aiPlayerCount = draft.aiPlayerCount + addCount) },
+        ) { _, networkEngine ->
             repeat(addCount) {
                 networkEngine.addAIToGame()
             }
@@ -570,6 +554,7 @@ abstract class GameSession {
 
     open fun setBattleRoomMaxPlayers(maxPlayers: Int): Boolean {
         val target = maxPlayers.coerceIn(BATTLE_ROOM_MIN_MAX_PLAYERS, BATTLE_ROOM_MAX_MAX_PLAYERS)
+        // Team slots are an engine-global, so there is no draft equivalent to edit.
         return runBattleRoomCommand("set battle room max players") { _, networkEngine ->
             if (!networkEngine.isServer) return@runBattleRoomCommand false
             if (PlayerTeam.TEAM_NEUTRAL == target) return@runBattleRoomCommand true
@@ -579,37 +564,27 @@ abstract class GameSession {
         }
     }
 
-    open fun applyBattleRoomTeamLayout(layout: BattleRoomTeamLayout): Boolean {
-        synchronized(gameLock) {
-            if (currentBattleRoomFromEngineLocked() == null) {
-                val config = pendingRendererBattleRoomConfig ?: return false
-                pendingRendererBattleRoomConfig = config.copy(teamLayout = layout)
-                return true
-            }
-        }
-        return runBattleRoomCommand("apply battle room team layout") { _, networkEngine ->
-            applyTeamLayoutLocked(networkEngine, layout)
+    open fun applyBattleRoomTeamLayout(layout: BattleRoomTeamLayout): Boolean =
+        editBattleRoom(
+            "apply battle room team layout",
+            editDraft = { draft -> draft.copy(teamLayout = layout) },
+        ) { _, networkEngine ->
+            networkEngine.applyBattleRoomTeamLayout(layout)
             BattleRoomUiBridge.updateUI()
             true
         }
-    }
 
-    open fun applyBattleRoomOptions(options: BattleRoomOptions): Boolean {
-        synchronized(gameLock) {
-            if (currentBattleRoomFromEngineLocked() == null) {
-                val config = pendingRendererBattleRoomConfig ?: return false
-                pendingRendererBattleRoomConfig = config.copy(options = options)
-                return true
-            }
-        }
-        return runBattleRoomCommand("apply battle room options") { _, networkEngine ->
+    open fun applyBattleRoomOptions(options: BattleRoomOptions): Boolean =
+        editBattleRoom(
+            "apply battle room options",
+            editDraft = { draft -> draft.copy(options = options) },
+        ) { _, networkEngine ->
             val settings = networkEngine.getEditableRoomSettings() ?: networkEngine.roomSettings
             settings.applyBattleRoomOptions(options)
             networkEngine.a(settings)
             BattleRoomUiBridge.updateUI()
             true
         }
-    }
 
     open fun configureBattleRoomPlayer(
         playerId: String,
@@ -617,43 +592,45 @@ abstract class GameSession {
         team: Int?,
         startingUnits: Int? = null,
         aiDifficulty: Int? = null,
-    ): Boolean {
-        synchronized(gameLock) {
-            if (currentBattleRoomFromEngineLocked() == null) {
-                val config = pendingRendererBattleRoomConfig ?: return false
-                val players = config.pendingBattleRoomPlayers()
-                return resolveBattleRoomPlayerSnapshot(playerId, players) != null
-            }
-        }
-        return runBattleRoomCommand("configure battle room player") { engine, networkEngine ->
-            val player = resolveBattleRoomPlayer(playerId, engine, networkEngine) ?: return@runBattleRoomCommand false
+    ): Boolean =
+        editBattleRoom(
+            "configure battle room player",
+            // A draft slot carries no per-player overrides yet, so this only reports whether the
+            // player exists and returns the draft unchanged.
+            editDraft = { draft ->
+                draft.takeIf { resolveBattleRoomPlayerSnapshot(playerId, it.pendingBattleRoomPlayers()) != null }
+            },
+        ) { engine, networkEngine ->
+            val player = resolveBattleRoomPlayer(playerId, engine, networkEngine)
+                ?: return@editBattleRoom false
             applyBattleRoomPlayerConfig(networkEngine, player, spawn, team, startingUnits, aiDifficulty)
         }
-    }
 
-    open fun kickBattleRoomPlayer(playerId: String): Boolean {
-        synchronized(gameLock) {
-            if (currentBattleRoomFromEngineLocked() == null) {
-                // Local draft room: drop the AI slot from the pending config.
-                val config = pendingRendererBattleRoomConfig ?: return false
-                val index = playerId.removePrefix(DRAFT_AI_PLAYER_ID_PREFIX)
-                    .takeIf { it.length != playerId.length }
-                    ?.toIntOrNull()
-                    ?: return false
-                if (index <= 0 || index > config.aiPlayerCount) return false
-                pendingRendererBattleRoomConfig = config.copy(aiPlayerCount = config.aiPlayerCount - 1)
-                return true
+    open fun kickBattleRoomPlayer(playerId: String): Boolean =
+        editBattleRoom(
+            "kick battle room player",
+            // Local draft room: drop the AI slot from the pending config.
+            editDraft = { draft ->
+                val index = draftAiPlayerIndex(playerId)
+                if (index == null || index <= 0 || index > draft.aiPlayerCount) {
+                    null
+                } else {
+                    draft.copy(aiPlayerCount = draft.aiPlayerCount - 1)
+                }
+            },
+        ) { engine, networkEngine ->
+            if (!(networkEngine.isServer || networkEngine.isProxyController)) {
+                return@editBattleRoom false
             }
-        }
-        return runBattleRoomCommand("kick battle room player") { engine, networkEngine ->
-            if (!(networkEngine.isServer || networkEngine.isProxyController)) return@runBattleRoomCommand false
-            val player = resolveBattleRoomPlayer(playerId, engine, networkEngine) ?: return@runBattleRoomCommand false
-            if (player == networkEngine.localPlayerTeam || player == engine.playerTeam) return@runBattleRoomCommand false
+            val player = resolveBattleRoomPlayer(playerId, engine, networkEngine)
+                ?: return@editBattleRoom false
+            if (player == networkEngine.localPlayerTeam || player == engine.playerTeam) {
+                return@editBattleRoom false
+            }
             networkEngine.e(player)
             BattleRoomUiBridge.updateUI()
             true
         }
-    }
 
     open fun startBattleRoom(): Boolean =
         runBattleRoomCommand("start battle room") { _, networkEngine ->
@@ -754,6 +731,99 @@ abstract class GameSession {
 
     open fun activeRendererBattleRoomConfig(): BattleRoomLaunchConfig? =
         synchronized(gameLock) { activeRendererBattleRoomConfig ?: pendingRendererBattleRoomConfig }
+
+    protected data class RendererPreparationSnapshot(
+        val mapPath: String?,
+        val memorySnapshot: GameMemorySnapshot?,
+        val battleRoomConfig: BattleRoomLaunchConfig?,
+    )
+
+    protected fun rendererPreparationSnapshot(): RendererPreparationSnapshot =
+        synchronized(gameLock) {
+            RendererPreparationSnapshot(
+                mapPath = pendingRendererBattleRoomConfig?.mapPath?.takeIf { it.isNotBlank() }
+                    ?: pendingMapPath?.takeIf { it.isNotBlank() },
+                memorySnapshot = pendingMemorySnapshot,
+                battleRoomConfig = pendingRendererBattleRoomConfig,
+            )
+        }
+
+    protected fun beginRendererMapPreparation(
+        mapPath: String,
+        memorySnapshot: GameMemorySnapshot? = null,
+        battleRoomConfig: BattleRoomLaunchConfig? = null,
+    ) {
+        require(memorySnapshot == null || memorySnapshot.mapPath == mapPath) {
+            "Memory snapshot path does not match renderer map path"
+        }
+        require(battleRoomConfig == null || battleRoomConfig.mapPath == mapPath) {
+            "Battle room path does not match renderer map path"
+        }
+        synchronized(gameLock) {
+            mapLoadGeneration += 1
+            pendingMapPath = mapPath
+            pendingMemorySnapshot = memorySnapshot
+            pendingRendererBattleRoomConfig = battleRoomConfig
+            activeRendererBattleRoomConfig = null
+            asyncMapLoadPath = mapPath
+            asyncMapLoadInProgress = true
+            asyncMapLoadError = null
+            runningMapPath = null
+            menuBackgroundActive = false
+        }
+    }
+
+    protected fun beginRendererStandalonePreparation(requestPath: String) {
+        synchronized(gameLock) {
+            mapLoadGeneration += 1
+            pendingMapPath = null
+            pendingMemorySnapshot = null
+            pendingRendererBattleRoomConfig = null
+            activeRendererBattleRoomConfig = null
+            asyncMapLoadPath = requestPath
+            asyncMapLoadInProgress = true
+            asyncMapLoadError = null
+            runningMapPath = null
+            menuBackgroundActive = false
+        }
+    }
+
+    protected fun beginRendererStartedGamePreparation(mapPath: String) {
+        synchronized(gameLock) {
+            pendingMapPath = null
+            pendingMemorySnapshot = null
+            pendingRendererBattleRoomConfig = null
+            asyncMapLoadPath = mapPath
+            asyncMapLoadInProgress = true
+            asyncMapLoadError = null
+            runningMapPath = null
+            menuBackgroundActive = false
+        }
+    }
+
+    protected fun markRendererMenuBackgroundReady() {
+        synchronized(gameLock) {
+            asyncMapLoadPath = null
+            asyncMapLoadInProgress = false
+            asyncMapLoadError = null
+            menuBackgroundActive = true
+        }
+    }
+
+    protected fun markRendererMenuBackgroundError(requestPath: String, error: Throwable) {
+        synchronized(gameLock) {
+            asyncMapLoadPath = requestPath
+            asyncMapLoadInProgress = false
+            asyncMapLoadError = error
+            menuBackgroundActive = false
+        }
+    }
+
+    protected fun markRendererSurfaceStopped() {
+        synchronized(gameLock) {
+            menuBackgroundActive = false
+        }
+    }
 
     open fun markRendererMapReady(mapPath: String, viewport: KoolCanvasViewport) {
         synchronized(gameLock) {
@@ -870,7 +940,7 @@ abstract class GameSession {
         }
     }
 
-    open fun requestReloadMods(): Boolean {
+    open suspend fun requestReloadMods(): Boolean {
         synchronized(gameLock) {
             val engine = gameEngine ?: ensureStarted(lastViewport)
             runCatching {
@@ -1258,82 +1328,9 @@ abstract class GameSession {
         if (playerId == DRAFT_LOCAL_PLAYER_ID) {
             return networkEngine.localPlayerTeam ?: engine.playerTeam
         }
-        val draftIndex = playerId.removePrefix(DRAFT_AI_PLAYER_ID_PREFIX)
-            .takeIf { it.length != playerId.length }
-            ?.toIntOrNull()
-            ?: return null
+        val draftIndex = draftAiPlayerIndex(playerId) ?: return null
         return teams.firstOrNull { it.teamId == draftIndex }
             ?: teams.getOrNull(draftIndex)
-    }
-
-    private fun resolveBattleRoomPlayerSnapshot(
-        playerId: String,
-        players: List<BattleRoomPlayerSnapshot>,
-    ): BattleRoomPlayerSnapshot? {
-        players.firstOrNull { it.id == playerId }?.let { return it }
-        if (playerId == DRAFT_LOCAL_PLAYER_ID) {
-            return players.firstOrNull { it.isLocal }
-        }
-        val draftIndex = playerId.removePrefix(DRAFT_AI_PLAYER_ID_PREFIX)
-            .takeIf { it.length != playerId.length }
-            ?.toIntOrNull()
-            ?: return null
-        return players.firstOrNull { it.spawnLabel.toIntOrNull() == draftIndex + 1 }
-            ?: players.getOrNull(draftIndex)
-    }
-
-    private fun BattleRoomTeamLayout.toSlickTeamLayoutType(): TeamLayoutType? =
-        when (this) {
-            BattleRoomTeamLayout.TwoSides -> TeamLayoutType.layout_2sides
-            BattleRoomTeamLayout.ThreeSides -> TeamLayoutType.layout_3sides
-            BattleRoomTeamLayout.Ffa -> TeamLayoutType.layout_ffa
-            BattleRoomTeamLayout.Spectators -> TeamLayoutType.layout_spectators
-            BattleRoomTeamLayout.Random,
-            BattleRoomTeamLayout.AllVsAi,
-            BattleRoomTeamLayout.AllVs2 -> null
-        }
-
-    private fun applyCustomTeamModeLocked(networkEngine: NetworkEngine, layout: BattleRoomTeamLayout) {
-        if (!networkEngine.isServer) return
-        val teams = PlayerTeam.getTeams().filter { !it.isSpectatorTeamColor() }
-        when (layout) {
-            BattleRoomTeamLayout.AllVsAi ->
-                teams.forEach { it.teamColorId = if (it.isTeamControlledByAI) 1 else 0 }
-
-            BattleRoomTeamLayout.AllVs2 ->
-                teams.forEach { it.teamColorId = if (it.teamId == 0) 1 else 0 }
-
-            BattleRoomTeamLayout.Random -> {
-                val shuffled = teams.shuffled()
-                val teamCount = when (shuffled.size) {
-                    in 0..8 -> 2
-                    in 9..21 -> 3
-                    in 22..32 -> 4
-                    else -> 5
-                }
-                var leftCount = teamCount
-                var currentTeam = 0
-                shuffled.forEach { team ->
-                    team.teamColorId = currentTeam
-                    leftCount--
-                    if (leftCount == 0) {
-                        leftCount = teamCount
-                        currentTeam++
-                    }
-                }
-            }
-
-            else -> return
-        }
-    }
-
-    private fun applyTeamLayoutLocked(networkEngine: NetworkEngine, layout: BattleRoomTeamLayout) {
-        val slickLayout = layout.toSlickTeamLayoutType()
-        if (slickLayout != null) {
-            networkEngine.a(slickLayout)
-        } else {
-            applyCustomTeamModeLocked(networkEngine, layout)
-        }
     }
 
     private fun PlayerTeam.toBattleRoomSnapshotPlayer(isLocal: Boolean): BattleRoomPlayerSnapshot {
@@ -1356,15 +1353,24 @@ abstract class GameSession {
         )
     }
 
-    private fun teamLabelFor(teamColorId: Int): String =
-        if (teamColorId in 0..25) {
-            ('A'.code + teamColorId).toChar().toString()
-        } else {
-            "-"
-        }
-
-    protected fun loadMapInBackground(mapPath: String, requestedViewport: KoolCanvasViewport, generation: Long) {
-        var loadMapMs = 0L
+    /**
+     * Loads a level on the calling thread while holding [gameLock], then publishes its first frame.
+     *
+     * [generation] is the load's ticket: a newer request bumps [mapLoadGeneration], so a load that
+     * finds its generation stale is discarded instead of overwriting the current frame or reporting
+     * an error for a request nobody is waiting on any more.
+     *
+     * @param kind noun used in log lines, e.g. "map", "replay", "memory snapshot".
+     * @param requestKey what was asked for, logged alongside [kind].
+     */
+    private fun loadLevelInBackground(
+        kind: String,
+        requestKey: String,
+        requestedViewport: KoolCanvasViewport,
+        generation: Long,
+        load: (GameEngine) -> Unit,
+    ) {
+        var loadMs = 0L
         var firstFrameMs = 0L
         val startedAt = System.nanoTime()
         var loadedCurrentRequest = false
@@ -1377,9 +1383,9 @@ abstract class GameSession {
                 lastViewport = viewport
                 val engine = ensureStarted(viewport)
                 applyViewport(engine, viewport)
-                val loadMapStartedAt = System.nanoTime()
-                loadMap(engine, mapPath)
-                loadMapMs = elapsedMs(loadMapStartedAt)
+                val loadStartedAt = System.nanoTime()
+                load(engine)
+                loadMs = elapsedMs(loadStartedAt)
                 val firstFrameStartedAt = System.nanoTime()
                 val preparedFrame = prepareFrameAfterBackgroundLoad(engine, viewport)
                 firstFrameMs = elapsedMs(firstFrameStartedAt)
@@ -1389,19 +1395,19 @@ abstract class GameSession {
                 }
             }
             if (!loadedCurrentRequest) {
-                logger.info { "Discarded stale $sessionLogName map preparation: $mapPath" }
+                logger.info { "Discarded stale $sessionLogName $kind preparation: $requestKey" }
                 return@runCatching
             }
             logger.info {
-                "Prepared $sessionLogName map asynchronously: $mapPath " +
-                        "(total=${elapsedMs(startedAt)}ms, load=${loadMapMs}ms, firstFrame=${firstFrameMs}ms)"
+                "Prepared $sessionLogName $kind asynchronously: $requestKey " +
+                        "(total=${elapsedMs(startedAt)}ms, load=${loadMs}ms, firstFrame=${firstFrameMs}ms)"
             }
         }.onFailure { error ->
             if (generation == mapLoadGeneration) {
                 asyncMapLoadError = error
-                logger.error(error) { "$sessionLogName async map load failed: $mapPath" }
+                logger.error(error) { "$sessionLogName async $kind load failed: $requestKey" }
             } else {
-                logger.info { "Ignored stale $sessionLogName map load failure for: $mapPath" }
+                logger.info { "Ignored stale $sessionLogName $kind load failure for: $requestKey" }
             }
         }.also {
             if (generation == mapLoadGeneration) {
@@ -1410,126 +1416,28 @@ abstract class GameSession {
         }
     }
 
-    protected fun loadReplayInBackground(replayName: String, requestedViewport: KoolCanvasViewport, generation: Long) {
-        var loadReplayMs = 0L
-        var firstFrameMs = 0L
-        val startedAt = System.nanoTime()
-        var loadedCurrentRequest = false
-        runCatching {
-            synchronized(gameLock) {
-                if (generation != mapLoadGeneration) {
-                    return@synchronized
-                }
-                val viewport = requestedViewport.takeIf { it.width > 0 && it.height > 0 } ?: defaultPreloadViewport
-                lastViewport = viewport
-                val engine = ensureStarted(viewport)
-                applyViewport(engine, viewport)
-                val loadReplayStartedAt = System.nanoTime()
-                loadReplay(engine, replayName)
-                loadReplayMs = elapsedMs(loadReplayStartedAt)
-                val firstFrameStartedAt = System.nanoTime()
-                val preparedFrame = prepareFrameAfterBackgroundLoad(engine, viewport)
-                firstFrameMs = elapsedMs(firstFrameStartedAt)
-                if (generation == mapLoadGeneration) {
-                    lastFrame = preparedFrame
-                    loadedCurrentRequest = true
-                }
-            }
-            if (!loadedCurrentRequest) {
-                logger.info { "Discarded stale $sessionLogName replay preparation: $replayName" }
-                return@runCatching
-            }
-            logger.info {
-                "Prepared $sessionLogName replay asynchronously: $replayName " +
-                        "(total=${elapsedMs(startedAt)}ms, load=${loadReplayMs}ms, firstFrame=${firstFrameMs}ms)"
-            }
-        }.onFailure { error ->
-            if (generation == mapLoadGeneration) {
-                asyncMapLoadError = error
-                logger.error(error) { "$sessionLogName async replay load failed: $replayName" }
-            } else {
-                logger.info { "Ignored stale $sessionLogName replay load failure for: $replayName" }
-            }
-        }.also {
-            if (generation == mapLoadGeneration) {
-                asyncMapLoadInProgress = false
-            }
+    private fun loadMapInBackground(mapPath: String, requestedViewport: KoolCanvasViewport, generation: Long) =
+        loadLevelInBackground("map", mapPath, requestedViewport, generation) { engine ->
+            loadMap(engine, mapPath)
         }
-    }
 
-    protected fun loadMemorySnapshotInBackground(
+    private fun loadReplayInBackground(replayName: String, requestedViewport: KoolCanvasViewport, generation: Long) =
+        loadLevelInBackground("replay", replayName, requestedViewport, generation) { engine ->
+            loadReplay(engine, replayName)
+        }
+
+    private fun loadMemorySnapshotInBackground(
         snapshot: GameMemorySnapshot,
         requestedViewport: KoolCanvasViewport,
         generation: Long,
-    ) {
-        var loadMapMs = 0L
-        var firstFrameMs = 0L
-        val startedAt = System.nanoTime()
-        var loadedCurrentRequest = false
-        runCatching {
-            synchronized(gameLock) {
-                if (generation != mapLoadGeneration) {
-                    return@synchronized
-                }
-                val viewport = requestedViewport.takeIf { it.width > 0 && it.height > 0 } ?: defaultPreloadViewport
-                lastViewport = viewport
-                val engine = ensureStarted(viewport)
-                applyViewport(engine, viewport)
-                val loadMapStartedAt = System.nanoTime()
-                loadMemorySnapshot(engine, snapshot)
-                loadMapMs = elapsedMs(loadMapStartedAt)
-                val firstFrameStartedAt = System.nanoTime()
-                val preparedFrame = prepareFrameAfterBackgroundLoad(engine, viewport)
-                firstFrameMs = elapsedMs(firstFrameStartedAt)
-                if (generation == mapLoadGeneration) {
-                    lastFrame = preparedFrame
-                    loadedCurrentRequest = true
-                }
-            }
-            if (!loadedCurrentRequest) {
-                logger.info { "Discarded stale $sessionLogName memory snapshot preparation: ${snapshot.mapPath}" }
-                return@runCatching
-            }
-            logger.info {
-                "Prepared $sessionLogName memory snapshot asynchronously: ${snapshot.mapPath} " +
-                        "(total=${elapsedMs(startedAt)}ms, load=${loadMapMs}ms, firstFrame=${firstFrameMs}ms)"
-            }
-        }.onFailure { error ->
-            if (generation == mapLoadGeneration) {
-                asyncMapLoadError = error
-                logger.error(error) { "$sessionLogName async memory snapshot load failed: ${snapshot.mapPath}" }
-            } else {
-                logger.info { "Ignored stale $sessionLogName memory snapshot load failure for: ${snapshot.mapPath}" }
-            }
-        }.also {
-            if (generation == mapLoadGeneration) {
-                asyncMapLoadInProgress = false
-            }
-        }
+    ) = loadLevelInBackground("memory snapshot", snapshot.mapPath, requestedViewport, generation) { engine ->
+        loadMemorySnapshot(engine, snapshot)
     }
 
     protected open fun prepareFrameAfterBackgroundLoad(
         engine: GameEngine,
         viewport: KoolCanvasViewport,
     ): KoolCanvasFrame = KoolCanvasFrame(viewport, emptyList())
-
-    private fun prepareSinglePlayerLocalTeam(
-        engine: GameEngine,
-        networkEngine: NetworkEngine,
-        playerName: String,
-    ): GameTeam {
-        PlayerTeam.resetTeamRegistry()
-        val localPlayerTeam = GameTeam(0)
-        localPlayerTeam.teamName = playerName.ifBlank { "Player" }
-        localPlayerTeam.isTeamSpectator = false
-        localPlayerTeam.isTeamControlledByAI = false
-        localPlayerTeam.isTeamObserver = false
-        localPlayerTeam.isTeamReady = true
-        localPlayerTeam.teamPingTime = 0
-        engine.playerTeam = localPlayerTeam
-        networkEngine.localPlayerTeam = localPlayerTeam
-        return localPlayerTeam
-    }
 
     protected fun loadPendingMap(engine: GameEngine) {
         val mapPath = pendingMapPath ?: return
@@ -1552,6 +1460,12 @@ abstract class GameSession {
                 loadMap(engine, mapPath)
             }
         }.onFailure { error ->
+            // A successful load clears the draft itself. On failure it must be dropped here too:
+            // currentBattleRoom() reads the draft before the engine, so a leaked one would keep
+            // showing a room that was never created.
+            if (battleRoomConfig != null && pendingRendererBattleRoomConfig == battleRoomConfig) {
+                pendingRendererBattleRoomConfig = null
+            }
             logger.error(error) { "$sessionLogName map load failed: $mapPath" }
         }
     }
@@ -1580,39 +1494,9 @@ abstract class GameSession {
         engine.isStopped = false
         engine.isPaused = false
         engine.minimap?.release()
-        val networkEngine = engine.networkEngine ?: run {
+        val networkEngine = engine.configureLocalBattleRoom(config, sessionLogName) ?: run {
             loadMap(engine, if (config.savedGame) savedGameRequestPath(config.mapPath) else config.mapPath)
             return
-        }
-
-        networkEngine.selectedMapPath = config.mapPath
-        val playerName = networkEngine.playerName
-            ?: engine.settingsEngine.lastNetworkPlayerName
-            ?: "Player"
-        networkEngine.playerName = playerName
-        networkEngine.requireActiveMods = true
-        val localPlayerTeam = prepareSinglePlayerLocalTeam(engine, networkEngine, playerName)
-
-        val started =
-            if (config.sandbox) networkEngine.startSandboxServer() else networkEngine.startSingleplayerServer()
-        check(started) { "Unable to start $sessionLogName battle room" }
-        check(networkEngine.localPlayerTeam === localPlayerTeam) {
-            "Unable to start $sessionLogName battle room: local player team was not registered"
-        }
-
-        val settings = networkEngine.getEditableRoomSettings() ?: networkEngine.roomSettings
-        settings.gameModeType = if (config.savedGame) GameModeType.savedGame else engine.getGameModeType()
-        settings.mapPath = if (config.savedGame) config.mapPath else engine.getCurrentMapFilename()
-        settings.applyBattleRoomOptions(
-            if (config.sandbox) config.options.copy(fogMode = 0, revealedMap = true) else config.options
-        )
-        networkEngine.a(settings)
-
-        repeat(config.aiPlayerCount.coerceAtLeast(0)) {
-            networkEngine.addAIToGame()
-        }
-        config.teamLayout?.let { layout ->
-            applyTeamLayoutLocked(networkEngine, layout)
         }
 
         check(networkEngine.startBattleRoomGame()) { "Unable to start $sessionLogName battle room game" }
@@ -1652,30 +1536,6 @@ abstract class GameSession {
     protected fun Float.toGameSpeedDelta(): Float =
         (this * 60f).coerceIn(0f, 3f)
 }
-
-private fun String.toRwSaveName(): String =
-    trim()
-        .ifBlank { "rwx_save" }
-        .replace(".", "_")
-        .replace("/", "_")
-        .replace("\\", "_")
-
-private fun String.toRwExportMapName(): String =
-    trim()
-        .ifBlank { "rwx_map" }
-        .replace(".", "_")
-        .replace("/", "_")
-        .replace("\\", "_")
-        .replace("|", "_")
-        .replace("?", "_")
-        .replace(":", "_")
-        .replace("*", "_")
-        .replace("\"", "_")
-        .replace("<", "_")
-        .replace(">", "_")
-
-private const val DRAFT_LOCAL_PLAYER_ID: String = "local"
-private const val DRAFT_AI_PLAYER_ID_PREFIX: String = "ai-"
 
 // Engine team-slot bounds: PlayerTeam.setMaxTeamId rejects < 10, and TEAM_ALLIES is the hard cap.
 private const val BATTLE_ROOM_MIN_MAX_PLAYERS: Int = 10

@@ -3,7 +3,6 @@ package io.github.rwx.di
 import android.content.Context
 import io.github.rwx.*
 import io.github.rwx.p2p.WebRtcTunnelProxy
-import io.github.rwx.render.GameRenderBackend
 import io.github.rwx.session.GameSession
 import io.github.rwx.settings.KEY_ANDROID_OPENGL_RENDERER
 import org.koin.dsl.module
@@ -24,9 +23,7 @@ fun androidModule(context: Context) = module {
             },
         )
     }
-    single { AndroidExternalGameRenderBackend(gameSession = get()) }
     single<GameSession> { get<AndroidGameSession>() }
-    single<GameRenderBackend> { get<AndroidExternalGameRenderBackend>() }
 }
 
 private fun org.koin.core.scope.Scope.selectedAndroidGameRenderBackend(): AndroidGameRenderBackend {

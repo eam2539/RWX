@@ -1,19 +1,15 @@
 package io.github.rwx.app
 
 import io.github.rwx.logger
-import io.github.rwx.render.GameRenderBackend
 import io.github.rwx.render.canvas.KoolCanvasFrame
 import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.session.GameSession
 import io.github.rwx.ui.AppScreen
 import io.github.rwx.ui.host.LoadingSceneHost
 
-internal const val MIN_STARTUP_LOADING_SECONDS: Double = 0.0
-
 internal class WarmupController(
     private val gameSession: GameSession,
     private val menuBackgroundSession: GameSession,
-    private val menuBackgroundRenderer: GameRenderBackend,
     private val loadingSceneHost: LoadingSceneHost,
     private val navigateTo: (AppScreen) -> Unit,
     private val clearExternalFrame: () -> Unit,
@@ -41,15 +37,6 @@ internal class WarmupController(
             deferRwWarmupUntilNextFrame = false
             pendingRwPreparation = null
             if (!isMenuBackgroundDemoEnabled()) {
-                pendingStartupMenuBackgroundLoad = false
-                pendingRwGameLoad = true
-                deferRwWarmupUntilNextFrame = true
-                pendingRwPreparation = gameSession::prepareEngineAsync
-                loadingSceneHost.update(gameSession.loadingStatus())
-                navigateTo(AppScreen.Loading)
-                return
-            }
-            if (!menuBackgroundSession.supportsMenuBackground) {
                 pendingStartupMenuBackgroundLoad = false
                 pendingRwGameLoad = true
                 deferRwWarmupUntilNextFrame = true
@@ -147,7 +134,7 @@ internal class WarmupController(
             )
             startupMenuBackgroundSurfaceVisible = true
         }
-        val frame = menuBackgroundRenderer.updateFrame(
+        val frame = menuBackgroundSession.updateFrame(
             canvasViewport,
             deltaSeconds,
             drainVisibleLayerBuffers = true,
@@ -198,9 +185,9 @@ internal class WarmupController(
         }
         val warmingMap = warmingRwMapPath
         return if (gameSession.isPreparingMap(warmingMap)) {
-            gameSession.currentRenderFrame()
+            gameSession.currentFrame()
         } else {
-            gameSession.renderFrame(
+            gameSession.updateFrame(
                 canvasViewport,
                 deltaSeconds,
                 drainVisibleLayerBuffers = true,

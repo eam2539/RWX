@@ -2,26 +2,27 @@ package io.github.rwx.slick
 
 import com.corrodinggames.rts.R
 import com.corrodinggames.rts.game.GameLogic
-import com.corrodinggames.rts.game.GameTeam
-import com.corrodinggames.rts.game.PlayerTeam
 import com.corrodinggames.rts.game.map.LayerBufferManager
 import com.corrodinggames.rts.game.map.TileMap
 import com.corrodinggames.rts.gameFramework.GameEngine
 import com.corrodinggames.rts.gameFramework.GameMode
 import com.corrodinggames.rts.gameFramework.InputController
 import com.corrodinggames.rts.gameFramework.PlatformCallbacks
-import com.corrodinggames.rts.gameFramework.network.*
+import com.corrodinggames.rts.gameFramework.network.GameInputStream
+import com.corrodinggames.rts.gameFramework.network.GameModeType
+import com.corrodinggames.rts.gameFramework.network.PasswordHandler
 import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes
 import io.github.rwx.DesktopInputHandler
 import io.github.rwx.ensureDesktopOpenAlMusicFactory
 import io.github.rwx.geometry.Point
 import io.github.rwx.input.MultiTouchPointerState
+import io.github.rwx.logger
 import io.github.rwx.net.CoreUiNetworkCallbacks
 import io.github.rwx.platform.CoreGameView
 import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.session.*
-import io.github.rwx.session.BattleRoomTeamLayout.*
 import io.github.rwx.ui.InGameMenuController
+import kotlinx.coroutines.CompletableDeferred
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11
 import org.newdawn.slick.BasicGame
@@ -71,10 +72,7 @@ object SlickGraphicsBinding {
     }
 }
 
-private const val SLICK_MAP_READY_MARKER = "RWX_SLICK_MAP_READY:"
-private const val SLICK_MAP_ERROR_MARKER = "RWX_SLICK_MAP_ERROR:"
 private const val SLICK_LAYER_REDRAW_BUDGET_MS = 2
-private const val SLICK_MENU_BACKGROUND_TARGET_FPS = 30
 private val SLICK_TARGET_FPS_OVERRIDE: Int? =
     System.getenv("RWX_SLICK_TARGET_FPS")?.toIntOrNull()?.takeIf { it > 0 }
 
@@ -134,17 +132,25 @@ internal class SlickFrameDelta {
     fun consumeMillis(): Int = pendingMillis.also { pendingMillis = 0 }
 }
 
-internal class SlickModReloadQueue {
-    private val pendingRequest = AtomicReference<CompletableFuture<Unit>?>(null)
+class SlickModReloadQueue {
+    private val pendingRequest = AtomicReference<CompletableDeferred<Unit>?>(null)
 
-    fun request(): CompletableFuture<Unit> {
+    fun request(): CompletableDeferred<Unit> {
         while (true) {
             pendingRequest.get()?.let { return it }
-            val request = CompletableFuture<Unit>()
+            val request = CompletableDeferred<Unit>()
             if (pendingRequest.compareAndSet(null, request)) {
                 return request
             }
         }
+    }
+
+    fun cancelPending(request: CompletableDeferred<Unit>): Boolean {
+        if (!pendingRequest.compareAndSet(request, null)) {
+            return false
+        }
+        request.cancel()
+        return true
     }
 
     fun executePending(reload: () -> Unit) {
@@ -165,25 +171,20 @@ data class SlickTextInputRequest(
     val cancelButtonLabel: String,
 )
 
-internal class SlickGame(
+class SlickGame(
     private val graphicsEngine: SlickGraphicsEngine,
     private val gameSession: GameSession,
     private val initialWidth: Int,
     private val initialHeight: Int,
-    private val initialMapPath: String?,
-    private val initialReplayName: String? = null,
-    private val initialMenuBackground: Boolean = false,
-    private val initialBattleRoomConfig: BattleRoomLaunchConfig? = null,
-    private val initialMemorySnapshot: GameMemorySnapshot? = null,
-    private val initialAdoptStartedGame: Boolean = false,
+    initialRequest: SlickSessionRequest? = null,
     private val noFog: Boolean = System.getenv("RWX_SLICK_NO_FOG") == "1",
     private val onTextInputRequest: (SlickGame, SlickTextInputRequest) -> Boolean = { _, _ -> false },
     private val onMapReady: (String) -> Unit = { mapPath ->
-        println("$SLICK_MAP_READY_MARKER$mapPath")
+        logger.info { "Map($mapPath) is ready" }
         System.out.flush()
     },
     private val onMapError: (String, Throwable) -> Unit = { mapPath, error ->
-        println("$SLICK_MAP_ERROR_MARKER$mapPath\t${error.javaClass.simpleName}: ${error.message.orEmpty()}")
+        logger.error(error) {  "Failed to load map:$mapPath"}
         System.out.flush()
     },
     private val onLoadingStatus: (String) -> Unit = {},
@@ -193,27 +194,14 @@ internal class SlickGame(
     private val keyStates = BooleanArray(SLICK_KEY_COUNT)
     private var engine: GameEngine? = null
 
+    /**
+     * The one thing this renderer has been asked to show but has not loaded yet.
+     *
+     * Single-valued on purpose: the previous six parallel `pending*` fields encoded a closed set of
+     * mutually-exclusive states, so every request had to null out the other five by hand.
+     */
     @Volatile
-    private var pendingMapPath: String? = if (initialAdoptStartedGame) {
-        null
-    } else {
-        initialMemorySnapshot?.mapPath ?: initialBattleRoomConfig?.mapPath ?: initialMapPath
-    }
-
-    @Volatile
-    private var pendingReplayName: String? = initialReplayName
-
-    @Volatile
-    private var pendingBattleRoomConfig: BattleRoomLaunchConfig? = initialBattleRoomConfig
-
-    @Volatile
-    private var pendingMemorySnapshot: GameMemorySnapshot? = initialMemorySnapshot
-
-    @Volatile
-    private var pendingStartedGameMapPath: String? = initialMapPath.takeIf { initialAdoptStartedGame }
-
-    @Volatile
-    private var pendingMenuBackground: Boolean = initialMenuBackground
+    private var pendingRequest: SlickSessionRequest? = initialRequest
 
     @Volatile
     private var runningMapPath: String? = null
@@ -247,7 +235,7 @@ internal class SlickGame(
     @Volatile
     private var pendingSurrender: Boolean = false
 
-    private val modReloadQueue = SlickModReloadQueue()
+    val modReloadQueue = SlickModReloadQueue()
     private val pendingChatMessages = ConcurrentLinkedQueue<PendingChatMessage>()
     private val pendingTextInputRequests = ConcurrentLinkedQueue<SlickTextInputRequest>()
     private val pendingTextInputResponses = ConcurrentLinkedQueue<PendingTextInputResponse>()
@@ -357,24 +345,27 @@ internal class SlickGame(
         frameDelta.update(delta)
     }
 
+    /**
+     * Drives one frame of the embedded renderer.
+     *
+     * Despite the name this is the backend's whole tick, not just drawing. Slick calls `update()`
+     * a variable number of times per frame (zero when paused, N when catching up) but `render()`
+     * exactly once, and the legacy `GameEngine.gameLoop()` simulates *and* draws in a single call
+     * that needs a live `Graphics`. So the engine tick has to happen here, and everything that
+     * mutates engine state has to be sequenced against it here too.
+     *
+     * Order matters: [drainPendingWork] must run before the engine tick so a queued level load,
+     * resize or input event is visible to the frame that follows it, rather than being applied
+     * one frame late.
+     */
     override fun render(container: GameContainer, graphics: Graphics) {
         val activeEngine = engine ?: return
         graphicsEngine.setGraphics(graphics, container.width, container.height)
         activeEngine.renderGraphicsEngine = graphicsEngine
         applyContainerRuntimeSettings(activeEngine, container)
-        applyPendingInputEvents(activeEngine)
-        applyPendingSize(activeEngine, container)
-        adoptPendingStartedGame(activeEngine)
-        loadPendingReplay(activeEngine)
-        loadPendingMap(activeEngine)
-        loadPendingMenuBackground(activeEngine)
-        savePendingGame(activeEngine)
-        exportPendingMap(activeEngine)
-        reloadPendingMods(activeEngine)
-        applyPendingInGameCommands(activeEngine)
-        applyPendingTextInputResponses()
-        updatePointerCursor(container, activeEngine)
-        abortStartedGameAfterDisconnect(activeEngine)
+
+        drainPendingWork(activeEngine, container)
+
         val deltaMillis = frameDelta.consumeMillis()
         val pausedFrame = shouldRenderPausedFrame(activeEngine)
         val gameLoopDriven = !pausedFrame && shouldDriveGameLoop(activeEngine)
@@ -389,6 +380,26 @@ internal class SlickGame(
         notifyReadyAfterVisibleFrames(activeEngine)
     }
 
+    /**
+     * Applies everything other threads queued up since the last frame.
+     *
+     * Every caller-facing `request*`/`submit` method only parks its argument in a field or a
+     * concurrent queue; this is the single point where that work is applied, on the render thread
+     * that owns the engine. Keeping it in one place is what lets those methods stay lock-free.
+     */
+    private fun drainPendingWork(activeEngine: GameEngine, container: GameContainer) {
+        applyPendingInputEvents(activeEngine)
+        applyPendingSize(activeEngine, container)
+        applyPendingRequest(activeEngine)
+        savePendingGame(activeEngine)
+        exportPendingMap(activeEngine)
+        reloadPendingMods(activeEngine)
+        applyPendingInGameCommands(activeEngine)
+        applyPendingTextInputResponses()
+        updatePointerCursor(container, activeEngine)
+        abortStartedGameAfterDisconnect(activeEngine)
+    }
+
     private fun renderPendingLayerRedraws(activeEngine: GameEngine) {
         synchronized(activeEngine.gameStateLock) {
             if (!activeEngine.hasLoadedLevel || activeEngine.tileMap == null) return
@@ -397,11 +408,9 @@ internal class SlickGame(
     }
 
     private fun shouldDriveGameLoop(activeEngine: GameEngine): Boolean {
-        val hasPendingLoad = pendingStartedGameMapPath != null || pendingReplayName != null ||
-                pendingMapPath != null || pendingMenuBackground
         val networkEngine = activeEngine.networkEngine
         return shouldDriveSlickGameLoop(
-            hasPendingLoad = hasPendingLoad,
+            hasPendingLoad = pendingRequest?.loadsLevel == true,
             hasLoadedLevel = activeEngine.hasLoadedLevel,
             hasRunningMap = runningMapPath != null,
             gameVisible = gameVisible,
@@ -442,9 +451,6 @@ internal class SlickGame(
 
     private fun targetFrameRateFor(activeEngine: GameEngine, container: GameContainer): Int {
         SLICK_TARGET_FPS_OVERRIDE?.let { return it }
-        if (runningMenuBackground) {
-            return SLICK_MENU_BACKGROUND_TARGET_FPS
-        }
         val highRefreshRate = activeEngine.settingsEngine.highRefreshRate
         return (container as? EmbeddedSlickGameContainer)
             ?.recommendedTargetFrameRate(highRefreshRate)
@@ -469,34 +475,85 @@ internal class SlickGame(
         }
     }
 
-    private fun loadPendingMap(activeEngine: GameEngine) {
-        if (pendingReplayName != null) return
-        val mapPath = pendingMapPath ?: return
-        val memorySnapshot = pendingMemorySnapshot?.takeIf { it.mapPath == mapPath }
-        val battleRoomConfig = pendingBattleRoomConfig?.takeIf { it.mapPath == mapPath }
-        try {
-            if (memorySnapshot != null) {
-                loadMemorySnapshot(activeEngine, memorySnapshot)
-            } else if (battleRoomConfig != null) {
-                loadBattleRoomMap(activeEngine, battleRoomConfig)
-            } else {
-                loadDirectMap(activeEngine, mapPath)
+    private fun applyPendingRequest(activeEngine: GameEngine) {
+        when (val request = pendingRequest) {
+            null,
+            SlickSessionRequest.EnginePreparation -> return
+
+            is SlickSessionRequest.StartedGame -> adoptStartedGame(activeEngine, request)
+
+            is SlickSessionRequest.Replay -> {
+                // Deliberately skips applyNoFogOverride: a replay must render the fog it recorded.
+                if (loadOrReportError(request.replayName) { loadReplay(activeEngine, request.replayName) }) {
+                    beginRunningMap(request.replayName)
+                }
+                clearPendingRequest(request)
             }
+
+            is SlickSessionRequest.Map ->
+                loadRequestedLevel(activeEngine, request, request.mapPath) {
+                    loadDirectMap(activeEngine, request.mapPath)
+                }
+
+            is SlickSessionRequest.BattleRoom ->
+                loadRequestedLevel(activeEngine, request, request.config.mapPath) {
+                    loadBattleRoomMap(activeEngine, request.config)
+                }
+
+            is SlickSessionRequest.MemorySnapshot ->
+                loadRequestedLevel(activeEngine, request, request.snapshot.mapPath) {
+                    loadMemorySnapshot(activeEngine, request.snapshot)
+                }
+
+            SlickSessionRequest.MenuBackground -> loadMenuBackground(activeEngine, request)
+        }
+    }
+
+    private inline fun loadRequestedLevel(
+        activeEngine: GameEngine,
+        request: SlickSessionRequest,
+        mapPath: String,
+        load: () -> Unit,
+    ) {
+        if (loadOrReportError(mapPath, load)) {
+            applyNoFogOverride(activeEngine)
+            beginRunningMap(mapPath)
+        }
+        clearPendingRequest(request)
+    }
+
+    /**
+     * Runs [load], reporting a failure as a map error rather than letting it escape.
+     *
+     * A throw here would propagate out of `render()`, which the embedded container treats as a
+     * terminal failure: it stops the loop and tears down the GL context, so one unloadable map
+     * would kill the renderer and force a full restart. [onMapError] already tells the session the
+     * request failed, which is enough for it to surface the error and offer another map.
+     *
+     * @return true when [load] completed, so the caller may mark the level running.
+     */
+    private inline fun loadOrReportError(mapPath: String, load: () -> Unit): Boolean =
+        try {
+            load()
+            true
         } catch (error: Throwable) {
             onMapError(mapPath, error)
-            throw error
+            false
         }
-        applyNoFogOverride(activeEngine)
+
+    private fun beginRunningMap(mapPath: String?) {
         runningMapPath = mapPath
         readyNotifiedMapPath = null
         renderedFramesForRunningMap = 0
-        pendingMapPath = null
-        pendingBattleRoomConfig = null
-        pendingMemorySnapshot = null
     }
 
-    private fun adoptPendingStartedGame(activeEngine: GameEngine) {
-        val requestedMapPath = pendingStartedGameMapPath ?: return
+    private fun clearPendingRequest(request: SlickSessionRequest) {
+        if (pendingRequest == request) {
+            pendingRequest = null
+        }
+    }
+
+    private fun adoptStartedGame(activeEngine: GameEngine, request: SlickSessionRequest.StartedGame) {
         try {
             val networkEngine = activeEngine.networkEngine
                 ?: error("Started battle room has no network engine")
@@ -506,11 +563,11 @@ internal class SlickGame(
             if (activeEngine.hasLoadedLevel && !activeEngine.isMenuBackgroundMap) {
                 startedBattleRoomGameSetupComplete = true
                 runningMenuBackground = false
-                runningMapPath = networkEngine.selectedMapPath
-                    ?: activeEngine.currentMapPath
-                            ?: requestedMapPath
-                readyNotifiedMapPath = null
-                renderedFramesForRunningMap = 0
+                beginRunningMap(
+                    networkEngine.selectedMapPath
+                        ?: activeEngine.currentMapPath
+                        ?: request.mapPath
+                )
             } else {
                 completeStartedBattleRoomGame(activeEngine)
             }
@@ -518,9 +575,9 @@ internal class SlickGame(
                 "Battle room network connection closed while loading the map"
             }
             check(activeEngine.hasLoadedLevel) { "Started battle room did not load a level" }
-            pendingStartedGameMapPath = null
+            clearPendingRequest(request)
         } catch (error: Throwable) {
-            failStartedBattleRoomGame(activeEngine, requestedMapPath, error)
+            failStartedBattleRoomGame(activeEngine, request.mapPath, error)
         }
     }
 
@@ -535,7 +592,9 @@ internal class SlickGame(
         ) {
             return
         }
-        val mapPath = runningMapPath ?: pendingStartedGameMapPath ?: return
+        val mapPath = runningMapPath
+            ?: (pendingRequest as? SlickSessionRequest.StartedGame)?.mapPath
+            ?: return
         failStartedBattleRoomGame(
             activeEngine,
             mapPath,
@@ -548,29 +607,13 @@ internal class SlickGame(
         mapPath: String,
         error: Throwable,
     ) {
-        pendingStartedGameMapPath = null
+        (pendingRequest as? SlickSessionRequest.StartedGame)?.let(::clearPendingRequest)
         startedBattleRoomGameSetupComplete = false
-        runningMapPath = null
-        readyNotifiedMapPath = null
-        renderedFramesForRunningMap = 0
+        beginRunningMap(null)
         activeEngine.networkEngine
             ?.takeIf { it.gameHasBeenStarted }
             ?.onStartGameFailed()
         onMapError(mapPath, error)
-    }
-
-    private fun loadPendingReplay(activeEngine: GameEngine) {
-        val replayName = pendingReplayName ?: return
-        try {
-            loadReplay(activeEngine, replayName)
-        } catch (error: Throwable) {
-            onMapError(replayName, error)
-            throw error
-        }
-        runningMapPath = replayName
-        readyNotifiedMapPath = null
-        renderedFramesForRunningMap = 0
-        pendingReplayName = null
     }
 
     private fun loadReplay(activeEngine: GameEngine, replayName: String) {
@@ -607,24 +650,10 @@ internal class SlickGame(
         }
     }
 
-    private fun prepareSinglePlayerLocalTeam(activeEngine: GameEngine, playerName: String): GameTeam {
-        PlayerTeam.resetTeamRegistry()
-        val localPlayerTeam = GameTeam(0)
-        localPlayerTeam.teamName = playerName.ifBlank { "Player" }
-        localPlayerTeam.isTeamSpectator = false
-        localPlayerTeam.isTeamControlledByAI = false
-        localPlayerTeam.isTeamObserver = false
-        localPlayerTeam.isTeamReady = true
-        localPlayerTeam.teamPingTime = 0
-        activeEngine.playerTeam = localPlayerTeam
-        activeEngine.networkEngine?.localPlayerTeam = localPlayerTeam
-        return localPlayerTeam
-    }
-
     private fun loadBattleRoomMap(activeEngine: GameEngine, config: BattleRoomLaunchConfig) {
         prepareActiveGameLoad(activeEngine)
         activeEngine.currentMapPath = config.mapPath
-        val networkEngine = activeEngine.networkEngine ?: run {
+        val networkEngine = activeEngine.configureLocalBattleRoom(config, "Slick") ?: run {
             loadDirectMap(
                 activeEngine,
                 if (config.savedGame) savedGameRequestPath(config.mapPath) else config.mapPath,
@@ -632,61 +661,22 @@ internal class SlickGame(
             return
         }
 
-        networkEngine.selectedMapPath = config.mapPath
-        val playerName = networkEngine.playerName
-            ?: activeEngine.settingsEngine.lastNetworkPlayerName
-            ?: "Player"
-        networkEngine.playerName = playerName
-        networkEngine.requireActiveMods = true
-        val localPlayerTeam = prepareSinglePlayerLocalTeam(activeEngine, playerName)
-
-        val started =
-            if (config.sandbox) networkEngine.startSandboxServer() else networkEngine.startSingleplayerServer()
-        check(started) { "Unable to start Slick battle room" }
-        check(networkEngine.localPlayerTeam === localPlayerTeam) {
-            "Unable to start Slick battle room: local player team was not registered"
-        }
-
-        val settings = networkEngine.getEditableRoomSettings() ?: networkEngine.roomSettings
-        settings.gameModeType = if (config.savedGame) GameModeType.savedGame else activeEngine.getGameModeType()
-        settings.mapPath = if (config.savedGame) config.mapPath else activeEngine.getCurrentMapFilename()
-        settings.applyBattleRoomOptions(
-            if (config.sandbox) config.options.copy(fogMode = 0, revealedMap = true) else config.options
-        )
-        networkEngine.a(settings)
-
-        repeat(config.aiPlayerCount.coerceAtLeast(0)) {
-            networkEngine.addAIToGame()
-        }
-        config.teamLayout?.let { layout ->
-            val slickLayout = layout.toSlickTeamLayout()
-            if (slickLayout != null) {
-                networkEngine.a(slickLayout)
-            } else {
-                applySlickCustomTeamMode(networkEngine, layout)
-            }
-        }
-
         startedBattleRoomGameSetupComplete = false
         check(networkEngine.startBattleRoomGame()) { "Unable to start Slick battle room game" }
         completeStartedBattleRoomGame(activeEngine)
     }
 
-    private fun loadPendingMenuBackground(activeEngine: GameEngine) {
-        if (!pendingMenuBackground || pendingMapPath != null) return
-        pendingMenuBackground = false
-        try {
+    private fun loadMenuBackground(activeEngine: GameEngine, request: SlickSessionRequest) {
+        // Cleared up front: unlike a level load, a failing menu background must not be retried.
+        clearPendingRequest(request)
+        val loaded = loadOrReportError(activeEngine.currentMapPath ?: "") {
             activeEngine.isStopped = true
             activeEngine.isPaused = true
             activeEngine.loadMenuBackground()
-        } catch (error: Throwable) {
-            onMapError(activeEngine.currentMapPath ?: "", error)
-            throw error
         }
-        runningMapPath = activeEngine.currentMapPath
+        if (!loaded) return
         runningMenuBackground = true
-        readyNotifiedMapPath = null
-        renderedFramesForRunningMap = 0
+        beginRunningMap(activeEngine.currentMapPath)
     }
 
     private fun setupBattleRoomGame(activeEngine: GameEngine) {
@@ -789,75 +779,14 @@ internal class SlickGame(
         }
     }
 
-    fun requestMap(mapPath: String) {
+    fun submit(request: SlickSessionRequest) {
         resetFrameSnapshot()
-        pendingMenuBackground = false
-        runningMenuBackground = false
         startedBattleRoomGameSetupComplete = false
-        pendingReplayName = null
-        pendingBattleRoomConfig = null
-        pendingMemorySnapshot = null
-        pendingStartedGameMapPath = null
-        pendingMapPath = mapPath
-    }
-
-    fun requestReplay(replayName: String) {
-        resetFrameSnapshot()
-        pendingMenuBackground = false
-        runningMenuBackground = false
-        startedBattleRoomGameSetupComplete = false
-        pendingBattleRoomConfig = null
-        pendingMapPath = null
-        pendingMemorySnapshot = null
-        pendingStartedGameMapPath = null
-        pendingReplayName = replayName
-    }
-
-    fun requestBattleRoom(config: BattleRoomLaunchConfig) {
-        resetFrameSnapshot()
-        pendingMenuBackground = false
-        runningMenuBackground = false
-        startedBattleRoomGameSetupComplete = false
-        pendingReplayName = null
-        pendingBattleRoomConfig = config
-        pendingMapPath = config.mapPath
-        pendingMemorySnapshot = null
-        pendingStartedGameMapPath = null
-    }
-
-    fun requestMemorySnapshot(snapshot: GameMemorySnapshot) {
-        resetFrameSnapshot()
-        pendingMenuBackground = false
-        runningMenuBackground = false
-        startedBattleRoomGameSetupComplete = false
-        pendingReplayName = null
-        pendingBattleRoomConfig = snapshot.battleRoomConfig
-        pendingMemorySnapshot = snapshot
-        pendingMapPath = snapshot.mapPath
-        pendingStartedGameMapPath = null
-    }
-
-    fun requestStartedGame(mapPath: String) {
-        resetFrameSnapshot()
-        pendingMenuBackground = false
-        runningMenuBackground = false
-        startedBattleRoomGameSetupComplete = false
-        pendingReplayName = null
-        pendingBattleRoomConfig = null
-        pendingMemorySnapshot = null
-        pendingMapPath = null
-        pendingStartedGameMapPath = mapPath
-    }
-
-    fun requestMenuBackground() {
-        resetFrameSnapshot()
-        pendingReplayName = null
-        pendingBattleRoomConfig = null
-        pendingMapPath = null
-        pendingMemorySnapshot = null
-        pendingStartedGameMapPath = null
-        pendingMenuBackground = true
-        startedBattleRoomGameSetupComplete = false
+        if (request != SlickSessionRequest.MenuBackground) {
+            // The menu background keeps its flag until its own load replaces it.
+            runningMenuBackground = false
+        }
+        pendingRequest = request
     }
 
     fun runningMapPath(): String? = runningMapPath
@@ -892,8 +821,6 @@ internal class SlickGame(
     fun requestExportMap(name: String) {
         pendingExportMapName = name.toRwExportMapName()
     }
-
-    fun requestReloadMods(): CompletableFuture<Unit> = modReloadQueue.request()
 
     fun requestSurrender() {
         pendingSurrender = true
@@ -967,15 +894,6 @@ internal class SlickGame(
             activeEngine.gameUI?.showHighPriorityMessage("Mod reload failed: ${error.message ?: error.javaClass.simpleName}")
             throw error
         }
-    }
-
-    fun loadingStatus(): GameLoadingStatus {
-        val activeEngine = engine ?: GameEngine.getInstance()
-        ?: return GameLoadingStatus("Starting renderer", 0.05f)
-        return GameLoadingStatus(
-            text = activeEngine.getLoadingText(),
-            progress = activeEngine.getLoadingProgress().coerceIn(0.0f, 1.0f),
-        )
     }
 
     private fun applyPendingInGameCommands(activeEngine: GameEngine) {
@@ -1251,27 +1169,6 @@ internal class SlickGame(
     }
 }
 
-private fun String.toRwSaveName(): String =
-    trim()
-        .ifBlank { "rwx_save" }
-        .replace(".", "_")
-        .replace("/", "_")
-        .replace("\\", "_")
-
-private fun String.toRwExportMapName(): String =
-    trim()
-        .ifBlank { "rwx_map" }
-        .replace(".", "_")
-        .replace("/", "_")
-        .replace("\\", "_")
-        .replace("|", "_")
-        .replace("?", "_")
-        .replace(":", "_")
-        .replace("*", "_")
-        .replace("\"", "_")
-        .replace("<", "_")
-        .replace(">", "_")
-
 private data class PendingChatMessage(
     val message: String,
     val teamOnly: Boolean,
@@ -1282,51 +1179,6 @@ private data class PendingTextInputResponse(
     val text: String?,
     val cancel: Boolean,
 )
-
-private data class PendingPlayerConfig(
-    val playerId: String,
-    val spawn: Int?,
-    val team: Int?,
-)
-
-private fun BattleRoomTeamLayout.toSlickTeamLayout(): TeamLayoutType? =
-    when (this) {
-        TwoSides -> TeamLayoutType.layout_2sides
-        ThreeSides -> TeamLayoutType.layout_3sides
-        Ffa -> TeamLayoutType.layout_ffa
-        Spectators -> TeamLayoutType.layout_spectators
-        Random, AllVsAi, AllVs2 -> null
-    }
-
-private fun applySlickCustomTeamMode(networkEngine: NetworkEngine, layout: BattleRoomTeamLayout) {
-    if (!networkEngine.isServer) return
-    val teams = PlayerTeam.getTeams().filter { !it.isSpectatorTeamColor() }
-    when (layout) {
-        AllVsAi -> teams.forEach { it.teamColorId = if (it.isTeamControlledByAI) 1 else 0 }
-        AllVs2 -> teams.forEach { it.teamColorId = if (it.teamId == 0) 1 else 0 }
-        Random -> {
-            val shuffled = teams.shuffled()
-            val teamCount = when (shuffled.size) {
-                in 0..8 -> 2
-                in 9..21 -> 3
-                in 22..32 -> 4
-                else -> 5
-            }
-            var leftCount = teamCount
-            var currentTeam = 0
-            shuffled.forEach { team ->
-                team.teamColorId = currentTeam
-                leftCount--
-                if (leftCount == 0) {
-                    leftCount = teamCount
-                    currentTeam++
-                }
-            }
-        }
-
-        else -> return
-    }
-}
 
 data class SlickFrameSnapshot(
     val width: Int,

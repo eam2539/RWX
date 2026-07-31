@@ -15,7 +15,8 @@ import de.fabmax.kool.modules.ui2.UiScope
 import io.github.rwx.PlatformBridge
 import io.github.rwx.logger
 import io.github.rwx.mod.api.*
-import io.github.rwx.mod.assets.AssetPrivateKey
+import io.github.rwx.mod.assets.AssetCredentialResolver
+import io.github.rwx.mod.assets.EmptyAssetCredentialResolver
 import io.github.rwx.render.ModRenderRegistry
 import java.io.File
 import java.io.InputStream
@@ -422,11 +423,11 @@ class ApiImpl private constructor(
             metadata: ModMetadata,
             jarFile: File,
             platformBridge: PlatformBridge? = null,
-            assetKeyResolver: ((String) -> AssetPrivateKey?)? = null,
+            assetCredentialResolver: AssetCredentialResolver? = null,
         ): ApiImpl {
             val root = File(FileHelper.getWorkingDirectory(), "jvm-mod-api/${sanitizePathSegment(metadata.id)}")
             val keyStore = platformBridge?.storage?.let(::JvmModAssetKeyStore)
-            val resolver = assetKeyResolver ?: keyStore?.let { store -> store::find } ?: { null }
+            val resolver = assetCredentialResolver ?: keyStore ?: EmptyAssetCredentialResolver
             val assetStore = JvmModAssetStore(jarFile, metadata.id, resolver)
             return try {
                 assetStore.requireAuthorized()
