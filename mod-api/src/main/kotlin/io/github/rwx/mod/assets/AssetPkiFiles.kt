@@ -2,6 +2,8 @@ package io.github.rwx.mod.assets
 
 import java.io.*
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.security.KeyFactory
 import java.security.MessageDigest
 import java.security.Signature
@@ -47,6 +49,7 @@ data class AssetRevocationList(
     val authorityId: String,
     val sequence: Long,
     val issuedAtEpochSeconds: Long,
+    val nextUpdateEpochSeconds: Long,
     val entries: List<AssetRevocation>,
     val signature: ByteArray,
 )
@@ -55,19 +58,21 @@ interface AssetCredentialResolver {
     fun findSymmetricKey(keyId: String): AssetPrivateKey?
     fun findLicense(certificateId: String): AssetLicenseCredential?
     fun findTrustedAuthority(authorityId: String): AssetAuthorityCertificate?
-    fun findRevocationList(authorityId: String): AssetRevocationList?
 }
 
 object EmptyAssetCredentialResolver : AssetCredentialResolver {
     override fun findSymmetricKey(keyId: String): AssetPrivateKey? = null
     override fun findLicense(certificateId: String): AssetLicenseCredential? = null
     override fun findTrustedAuthority(authorityId: String): AssetAuthorityCertificate? = null
-    override fun findRevocationList(authorityId: String): AssetRevocationList? = null
 }
 
 object AssetPki {
+    const val DEFAULT_REVOCATION_LIST_VALIDITY_HOURS: Long = 24
+    const val MAX_REVOCATION_LIST_VALIDITY_HOURS: Long = 24
+
     private const val SIGNATURE_ALGORITHM = "SHA256withRSA"
     private const val MAX_VALIDITY_DAYS = 3650L
+    private const val CLOCK_SKEW_SECONDS = 300L
 
     fun createAuthority(
         displayName: String,
@@ -129,6 +134,7 @@ object AssetPki {
         certificate: AssetLicenseCertificate,
         previous: AssetRevocationList? = null,
         reason: String = "revoked",
+        validityHours: Long = DEFAULT_REVOCATION_LIST_VALIDITY_HOURS,
         nowEpochSeconds: Long = currentEpochSeconds(),
     ): AssetRevocationList {
         validateAuthorityPrivate(authority)
@@ -147,10 +153,52 @@ object AssetPki {
             }
             .values
             .sortedBy(AssetRevocation::certificateId)
+        return issueRevocationList(authority, previous, entries, validityHours, nowEpochSeconds)
+    }
+
+    fun refreshRevocationList(
+        authority: AssetAuthorityPrivate,
+        previous: AssetRevocationList? = null,
+        validityHours: Long = DEFAULT_REVOCATION_LIST_VALIDITY_HOURS,
+        nowEpochSeconds: Long = currentEpochSeconds(),
+    ): AssetRevocationList {
+        validateAuthorityPrivate(authority)
+        previous?.let { validateRevocationList(it, authority.certificate) }
+        require(previous == null || previous.authorityId == authority.certificate.authorityId) {
+            "Revocation list belongs to another authority"
+        }
+        return issueRevocationList(
+            authority,
+            previous,
+            previous?.entries.orEmpty(),
+            validityHours,
+            nowEpochSeconds,
+        )
+    }
+
+    private fun issueRevocationList(
+        authority: AssetAuthorityPrivate,
+        previous: AssetRevocationList?,
+        entries: List<AssetRevocation>,
+        validityHours: Long,
+        nowEpochSeconds: Long,
+    ): AssetRevocationList {
+        require(validityHours in 1..MAX_REVOCATION_LIST_VALIDITY_HOURS) {
+            "Revocation list validity must be between 1 and $MAX_REVOCATION_LIST_VALIDITY_HOURS hours"
+        }
+        previous?.let {
+            require(nowEpochSeconds >= it.issuedAtEpochSeconds) {
+                "Revocation list issue time cannot move backwards"
+            }
+        }
         val unsigned = AssetRevocationList(
             authorityId = authority.certificate.authorityId,
-            sequence = (previous?.sequence ?: 0L) + 1L,
+            sequence = Math.addExact(previous?.sequence ?: 0L, 1L),
             issuedAtEpochSeconds = nowEpochSeconds,
+            nextUpdateEpochSeconds = Math.addExact(
+                nowEpochSeconds,
+                Math.multiplyExact(validityHours, 3_600L),
+            ),
             entries = entries,
             signature = byteArrayOf(),
         )
@@ -223,19 +271,42 @@ object AssetPki {
         }
     }
 
-    fun validateRevocationList(list: AssetRevocationList, authority: AssetAuthorityCertificate) {
+    fun validateRevocationList(
+        list: AssetRevocationList,
+        authority: AssetAuthorityCertificate,
+        nowEpochSeconds: Long = currentEpochSeconds(),
+        enforceFreshness: Boolean = false,
+    ) {
         validateAuthority(authority)
         require(list.authorityId == authority.authorityId) { "Revocation list issuer mismatch" }
         require(list.sequence > 0) { "Revocation list sequence must be positive" }
+        require(list.nextUpdateEpochSeconds > list.issuedAtEpochSeconds) {
+            "Revocation list validity interval is invalid"
+        }
+        val validitySeconds = Math.subtractExact(list.nextUpdateEpochSeconds, list.issuedAtEpochSeconds)
+        require(validitySeconds <= MAX_REVOCATION_LIST_VALIDITY_HOURS * 3_600L) {
+            "Revocation list validity exceeds $MAX_REVOCATION_LIST_VALIDITY_HOURS hours"
+        }
         require(list.entries.size <= 100_000) { "Revocation list is too large" }
         require(list.entries.map(AssetRevocation::certificateId).toSet().size == list.entries.size) {
             "Revocation list contains duplicate certificate ids"
         }
         list.entries.forEach { entry ->
             require(ID.matches(entry.certificateId)) { "Invalid revoked certificate id" }
+            require(entry.revokedAtEpochSeconds <= Math.addExact(list.issuedAtEpochSeconds, CLOCK_SKEW_SECONDS)) {
+                "Revocation time is later than the CRL issue time"
+            }
         }
         require(verify(authority.publicKey, revocationPayload(list), list.signature)) {
             "Invalid revocation list signature"
+        }
+        if (enforceFreshness) {
+            require(Math.addExact(nowEpochSeconds, CLOCK_SKEW_SECONDS) >= list.issuedAtEpochSeconds) {
+                "Online revocation list is not valid yet"
+            }
+            require(nowEpochSeconds <= list.nextUpdateEpochSeconds) {
+                "Online revocation list has expired"
+            }
         }
     }
 
@@ -249,8 +320,8 @@ object AssetPki {
         return verify(authority.publicKey, payload, signature)
     }
 
-    fun isRevoked(list: AssetRevocationList?, certificateId: String): Boolean =
-        list?.entries?.any { it.certificateId == certificateId } == true
+    fun isRevoked(list: AssetRevocationList, certificateId: String): Boolean =
+        list.entries.any { it.certificateId == certificateId }
 
     fun currentEpochSeconds(): Long = System.currentTimeMillis() / 1000L
 
@@ -293,10 +364,11 @@ object AssetPki {
     }
 
     private fun revocationPayload(list: AssetRevocationList): ByteArray = canonical {
-        writeDomain(it, "RWX-ASSET-CRL-V1")
+        writeDomain(it, "RWX-ASSET-CRL-V2")
         writeString(it, list.authorityId)
         it.writeLong(list.sequence)
         it.writeLong(list.issuedAtEpochSeconds)
+        it.writeLong(list.nextUpdateEpochSeconds)
         val entries = list.entries.sortedBy(AssetRevocation::certificateId)
         it.writeInt(entries.size)
         entries.forEach { entry ->
@@ -348,12 +420,14 @@ object AssetPki {
 }
 
 object AssetPkiFiles {
+    const val MAX_REVOCATION_LIST_FILE_BYTES: Int = 8 * 1024 * 1024 + 12
+
     private const val AUTHORITY_PRIVATE_MAGIC = 0x52574150 // RWAP
     private const val AUTHORITY_PUBLIC_MAGIC = 0x52574155 // RWAU
     private const val LICENSE_CERTIFICATE_MAGIC = 0x52574c43 // RWLC
     private const val LICENSE_PRIVATE_MAGIC = 0x52574c50 // RWLP
     private const val REVOCATION_LIST_MAGIC = 0x52574352 // RWCR
-    private const val FORMAT_VERSION = 1
+    private const val FORMAT_VERSION = 2
     private const val MAX_FIELD_BYTES = 4 * 1024
     private const val MAX_KEY_BYTES = 64 * 1024
     private const val MAX_SIGNATURE_BYTES = 64 * 1024
@@ -362,11 +436,10 @@ object AssetPkiFiles {
 
     fun writeAuthorityPrivate(file: File, authority: AssetAuthorityPrivate) {
         AssetPki.validateAuthorityPrivate(authority)
-        writeFile(file, AUTHORITY_PRIVATE_MAGIC) { output ->
+        writeFile(file, AUTHORITY_PRIVATE_MAGIC, privateMaterial = true) { output ->
             writeBytes(output, encodeAuthority(authority.certificate), MAX_ENCODED_OBJECT_BYTES)
             writeBytes(output, authority.privateKey, MAX_KEY_BYTES)
         }
-        AssetKeyFiles.restrictPrivateKeyPermissions(file)
     }
 
     fun readAuthorityPrivate(file: File): AssetAuthorityPrivate = readFile(file, AUTHORITY_PRIVATE_MAGIC) { input ->
@@ -400,11 +473,10 @@ object AssetPkiFiles {
 
     fun writeLicenseCredential(file: File, credential: AssetLicenseCredential) {
         AssetPki.validateCredential(credential)
-        writeFile(file, LICENSE_PRIVATE_MAGIC) { output ->
+        writeFile(file, LICENSE_PRIVATE_MAGIC, privateMaterial = true) { output ->
             writeBytes(output, encodeLicenseCertificate(credential.certificate), MAX_ENCODED_OBJECT_BYTES)
             writeBytes(output, credential.privateKey, MAX_KEY_BYTES)
         }
-        AssetKeyFiles.restrictPrivateKeyPermissions(file)
     }
 
     fun readLicenseCredential(file: File): AssetLicenseCredential = readFile(file, LICENSE_PRIVATE_MAGIC) { input ->
@@ -420,14 +492,17 @@ object AssetPkiFiles {
         }
     }
 
-    fun readRevocationList(file: File): AssetRevocationList = readFile(file, REVOCATION_LIST_MAGIC) { input ->
-        decodeRevocationList(readBytes(input, MAX_ENCODED_OBJECT_BYTES))
+    fun readRevocationList(file: File): AssetRevocationList = file.inputStream().use(::readRevocationList)
+
+    fun readRevocationList(input: InputStream): AssetRevocationList = readFile(input, REVOCATION_LIST_MAGIC) { data ->
+        decodeRevocationList(readBytes(data, MAX_ENCODED_OBJECT_BYTES))
     }
 
     fun encodeRevocationList(list: AssetRevocationList): ByteArray = encode { output ->
         writeString(output, list.authorityId)
         output.writeLong(list.sequence)
         output.writeLong(list.issuedAtEpochSeconds)
+        output.writeLong(list.nextUpdateEpochSeconds)
         require(list.entries.size <= MAX_REVOCATIONS) { "Revocation list is too large" }
         output.writeInt(list.entries.size)
         list.entries.forEach { entry ->
@@ -442,12 +517,20 @@ object AssetPkiFiles {
         val authorityId = readString(input)
         val sequence = input.readLong()
         val issuedAt = input.readLong()
+        val nextUpdate = input.readLong()
         val count = input.readInt()
         require(count in 0..MAX_REVOCATIONS) { "Invalid revocation count: $count" }
         val entries = List(count) {
             AssetRevocation(readString(input), input.readLong(), readString(input))
         }
-        AssetRevocationList(authorityId, sequence, issuedAt, entries, readBytes(input, MAX_SIGNATURE_BYTES))
+        AssetRevocationList(
+            authorityId,
+            sequence,
+            issuedAt,
+            nextUpdate,
+            entries,
+            readBytes(input, MAX_SIGNATURE_BYTES),
+        )
     }
 
     private fun encodeAuthority(certificate: AssetAuthorityCertificate): ByteArray = encode { output ->
@@ -492,20 +575,52 @@ object AssetPkiFiles {
         )
     }
 
-    private fun writeFile(file: File, magic: Int, block: (DataOutputStream) -> Unit) {
-        file.absoluteFile.parentFile?.mkdirs()
-        DataOutputStream(BufferedOutputStream(file.outputStream())).use { output ->
-            output.writeInt(magic)
-            output.writeInt(FORMAT_VERSION)
-            block(output)
+    private fun writeFile(
+        file: File,
+        magic: Int,
+        privateMaterial: Boolean = false,
+        block: (DataOutputStream) -> Unit,
+    ) {
+        val target = file.absoluteFile
+        val parent = checkNotNull(target.parentFile) { "Asset PKI output has no parent directory: $target" }
+        require(parent.mkdirs() || parent.isDirectory) { "Cannot create asset PKI directory: $parent" }
+        val temporary = Files.createTempFile(parent.toPath(), ".asset-pki-", ".tmp").toFile()
+        try {
+            if (privateMaterial) AssetKeyFiles.restrictPrivateKeyPermissions(temporary)
+            DataOutputStream(BufferedOutputStream(temporary.outputStream())).use { output ->
+                output.writeInt(magic)
+                output.writeInt(FORMAT_VERSION)
+                block(output)
+            }
+            if (privateMaterial) AssetKeyFiles.restrictPrivateKeyPermissions(temporary)
+            moveIntoPlace(temporary, target)
+            if (privateMaterial) AssetKeyFiles.restrictPrivateKeyPermissions(target)
+        } finally {
+            temporary.delete()
+        }
+    }
+
+    private fun moveIntoPlace(temporary: File, target: File) {
+        runCatching {
+            Files.move(
+                temporary.toPath(),
+                target.toPath(),
+                StandardCopyOption.ATOMIC_MOVE,
+                StandardCopyOption.REPLACE_EXISTING,
+            )
+        }.getOrElse {
+            Files.move(temporary.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
     }
 
     private fun <T> readFile(file: File, magic: Int, block: (DataInputStream) -> T): T =
-        DataInputStream(BufferedInputStream(file.inputStream())).use { input ->
-            require(input.readInt() == magic) { "Unexpected asset PKI file type" }
-            require(input.readInt() == FORMAT_VERSION) { "Unsupported asset PKI file version" }
-            block(input).also { require(input.read() == -1) { "Trailing data in asset PKI file" } }
+        file.inputStream().use { readFile(it, magic, block) }
+
+    private fun <T> readFile(input: InputStream, magic: Int, block: (DataInputStream) -> T): T =
+        DataInputStream(BufferedInputStream(input)).use { data ->
+            require(data.readInt() == magic) { "Unexpected asset PKI file type" }
+            require(data.readInt() == FORMAT_VERSION) { "Unsupported asset PKI file version" }
+            block(data).also { require(data.read() == -1) { "Trailing data in asset PKI file" } }
         }
 
     private fun encode(block: (DataOutputStream) -> Unit): ByteArray =

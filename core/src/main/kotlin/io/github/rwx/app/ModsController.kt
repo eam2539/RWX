@@ -61,7 +61,7 @@ internal class ModsController(
         dialogSceneHost.show(
             Dialog(
                 title = "Import Mod",
-                message = "Enter a mod, asset key, author trust certificate, license, or revocation list path.",
+                message = "Enter a mod, asset key, author trust certificate, or license path.",
                 textInput = DialogTextInput(
                     hint = "/path/to/mod.rwmod",
                     trailingIcon = Icon.Import,
@@ -71,7 +71,7 @@ internal class ModsController(
                         host.openFilePicker(
                             title = "Choose a mod file or directory",
                             allowedExtensions = setOf(
-                                "rwmod", "zip", "jar", "ini", "rwxkey", "rwxpub", "rwxlicense", "rwxcrl"
+                                "rwmod", "zip", "jar", "ini", "rwxkey", "rwxpub", "rwxlicense"
                             ),
                             allowDirectories = true
                         ) { selection ->

@@ -78,18 +78,29 @@ class JvmModLoader @JvmOverloads constructor(
 
         val resolvedPlatformBridge = platformBridge
             ?: runCatching { getKoin().get<PlatformBridge>() }.getOrNull()
-        val classLoader = createClassLoader?.invoke(jarFile, platformClassLoader)
-            ?: requireNotNull(resolvedPlatformBridge) { "A PlatformBridge or classloader factory is required" }
-                .createModClassLoader(jarFile, platformClassLoader)
+        val api = ApiImpl.create(metadata, jarFile, resolvedPlatformBridge, assetCredentialResolver)
+        val classLoader = try {
+            createClassLoader?.invoke(jarFile, platformClassLoader)
+                ?: requireNotNull(resolvedPlatformBridge) { "A PlatformBridge or classloader factory is required" }
+                    .createModClassLoader(jarFile, platformClassLoader)
+        } catch (error: Throwable) {
+            api.close()
+            throw error
+        }
 
-        val mod = instantiateMod(entryClassName, classLoader, jarFile.name) ?: return null
+        val mod = instantiateMod(entryClassName, classLoader, jarFile.name) ?: run {
+            api.close()
+            if (classLoader is Closeable) runCatching(classLoader::close)
+            return null
+        }
         try {
             mod.apply {
                 this.classLoader = classLoader
                 this.metadata = metadata
-                this.api = ApiImpl.create(metadata, jarFile, resolvedPlatformBridge, assetCredentialResolver)
+                this.api = api
             }
         } catch (error: Throwable) {
+            api.close()
             if (classLoader is Closeable) runCatching(classLoader::close)
             throw error
         }

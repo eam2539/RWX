@@ -1,6 +1,7 @@
 package io.github.rwx.mod.assets
 
 import java.io.*
+import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -33,8 +34,9 @@ data class AssetVaultHeader(
     val embeddedContentKey: ByteArray = byteArrayOf(),
     val authorityId: String = "",
     val recipients: List<AssetRecipientEnvelope> = emptyList(),
-    val revocationList: AssetRevocationList? = null,
+    val revocationListUrl: String = "",
     val indexDigest: ByteArray,
+    val archiveDigest: ByteArray,
     val signature: ByteArray = byteArrayOf(),
 )
 
@@ -42,18 +44,24 @@ object AssetVaultFormat {
     const val HEADER_ENTRY: String = "META-INF/rwx-assets/header.bin"
     const val INDEX_ENTRY: String = "META-INF/rwx-assets/index.bin"
     const val BLOB_DIRECTORY: String = "META-INF/rwx-assets/blobs/"
-    const val FORMAT_VERSION: Int = 1
+    const val FORMAT_VERSION: Int = 2
     const val NONCE_SIZE: Int = 12
     const val AUTH_TAG_BITS: Int = 128
+    const val MAX_HEADER_ENTRY_BYTES: Long = 16L * 1024 * 1024
+    const val MAX_INDEX_ENTRY_BYTES: Long = 64L * 1024 * 1024
 
     private const val INDEX_MAGIC = 0x52575841 // RWXA
     private const val HEADER_MAGIC = 0x52575848 // RWXH
     private const val MAX_INDEX_ENTRIES = 100_000
-    private const val MAX_RECIPIENTS = 10_000
+    private const val MAX_RECIPIENTS = 4_096
+    private const val MAX_SIGNED_ARCHIVE_ENTRIES = 100_000
+    private const val MAX_SIGNED_ARCHIVE_BYTES = 512L * 1024 * 1024
     private const val MAX_PATH_BYTES = 16 * 1024
-    private const val MAX_WRAPPED_KEY_BYTES = 16 * 1024
-    private const val MAX_CRL_BYTES = 8 * 1024 * 1024
-    private const val MAX_SIGNATURE_BYTES = 64 * 1024
+    private const val MAX_BLOB_PATH_BYTES = 256
+    private const val MAX_ID_BYTES = 64
+    private const val MAX_WRAPPED_KEY_BYTES = 1024
+    private const val MAX_CRL_URL_BYTES = 2 * 1024
+    private const val MAX_SIGNATURE_BYTES = 1024
     private const val COPY_BUFFER_SIZE = 64 * 1024
     private val random = SecureRandom()
     private val idPattern = Regex("[0-9a-f]{64}")
@@ -74,19 +82,19 @@ object AssetVaultFormat {
             writeInt(HEADER_MAGIC)
             writeInt(FORMAT_VERSION)
             writeInt(header.mode.formatId)
-            writeString(this, header.vaultId)
-            writeString(this, header.keyId)
+            writeRequiredId(this, header.vaultId)
+            writeOptionalId(this, header.keyId)
             writeBytes(this, header.embeddedContentKey, 32)
-            writeString(this, header.authorityId)
+            writeOptionalId(this, header.authorityId)
             writeInt(header.recipients.size)
             header.recipients.forEach { recipient ->
-                writeString(this, recipient.certificateId)
-                writeString(this, recipient.keyId)
+                writeRequiredId(this, recipient.certificateId)
+                writeRequiredId(this, recipient.keyId)
                 writeBytes(this, recipient.wrappedContentKey, MAX_WRAPPED_KEY_BYTES)
             }
-            val encodedCrl = header.revocationList?.let(AssetPkiFiles::encodeRevocationList) ?: byteArrayOf()
-            writeBytes(this, encodedCrl, MAX_CRL_BYTES)
+            writeString(this, header.revocationListUrl, MAX_CRL_URL_BYTES)
             writeBytes(this, header.indexDigest, 32)
+            writeBytes(this, header.archiveDigest, 32)
             writeBytes(this, header.signature, MAX_SIGNATURE_BYTES)
             flush()
         }
@@ -99,22 +107,19 @@ object AssetVaultFormat {
             val modeId = data.readInt()
             val mode = AssetProtectionMode.entries.firstOrNull { it.formatId == modeId }
                 ?: error("Unsupported asset protection mode: $modeId")
-            val vaultId = readString(data)
-            val keyId = readString(data)
+            val vaultId = readRequiredId(data)
+            val keyId = readOptionalId(data)
             val embeddedContentKey = readBytes(data, 32)
-            val authorityId = readString(data)
+            val authorityId = readOptionalId(data)
             val recipientCount = data.readInt()
             require(recipientCount in 0..MAX_RECIPIENTS) { "Invalid asset recipient count: $recipientCount" }
             val recipients = List(recipientCount) {
                 AssetRecipientEnvelope(
-                    certificateId = readString(data),
-                    keyId = readString(data),
+                    certificateId = readRequiredId(data),
+                    keyId = readRequiredId(data),
                     wrappedContentKey = readBytes(data, MAX_WRAPPED_KEY_BYTES),
                 )
             }
-            val revocationList = readBytes(data, MAX_CRL_BYTES)
-                .takeIf(ByteArray::isNotEmpty)
-                ?.let(AssetPkiFiles::decodeRevocationList)
             val header = AssetVaultHeader(
                 mode = mode,
                 vaultId = vaultId,
@@ -122,8 +127,9 @@ object AssetVaultFormat {
                 embeddedContentKey = embeddedContentKey,
                 authorityId = authorityId,
                 recipients = recipients,
-                revocationList = revocationList,
+                revocationListUrl = readString(data, MAX_CRL_URL_BYTES),
                 indexDigest = readBytes(data, 32),
+                archiveDigest = readBytes(data, 32),
                 signature = readBytes(data, MAX_SIGNATURE_BYTES),
             ).also(::validateHeader)
             require(data.read() == -1) { "Trailing data in asset vault header" }
@@ -135,7 +141,7 @@ object AssetVaultFormat {
         validateHeader(header, requireSignature = false)
         return ByteArrayOutputStream().also { bytes ->
             DataOutputStream(bytes).use { output ->
-                writeString(output, "RWX-ASSET-PACKAGE-V1")
+                writeString(output, "RWX-ASSET-PACKAGE-V2")
                 writeString(output, modId)
                 output.writeInt(FORMAT_VERSION)
                 output.writeInt(header.mode.formatId)
@@ -148,11 +154,46 @@ object AssetVaultFormat {
                     writeString(output, recipient.keyId)
                     writeBytes(output, recipient.wrappedContentKey, MAX_WRAPPED_KEY_BYTES)
                 }
-                val encodedCrl = header.revocationList?.let(AssetPkiFiles::encodeRevocationList) ?: byteArrayOf()
-                writeBytes(output, encodedCrl, MAX_CRL_BYTES)
+                writeString(output, header.revocationListUrl, MAX_CRL_URL_BYTES)
                 writeBytes(output, header.indexDigest, 32)
+                writeBytes(output, header.archiveDigest, 32)
             }
         }.toByteArray()
+    }
+
+    fun computeArchiveDigest(zip: ZipFile): ByteArray {
+        val entries = zip.entries().asSequence()
+            .filterNot(ZipEntry::isDirectory)
+            .filterNot { isProtectedAsset(it.name) || isVaultManagedEntry(it.name) }
+            .take(MAX_SIGNED_ARCHIVE_ENTRIES + 1)
+            .toList()
+        require(entries.size <= MAX_SIGNED_ARCHIVE_ENTRIES) { "Too many signed JAR entries" }
+        val sortedEntries = entries.sortedBy(ZipEntry::getName)
+        require(sortedEntries.map(ZipEntry::getName).toSet().size == sortedEntries.size) {
+            "Duplicate signed JAR entry"
+        }
+        val totalBytes = sortedEntries.fold(0L) { total, entry ->
+            require(entry.size >= 0) { "JAR entry size is unavailable: ${entry.name}" }
+            Math.addExact(total, entry.size)
+        }
+        require(totalBytes <= MAX_SIGNED_ARCHIVE_BYTES) {
+            "Signed non-asset JAR content is too large: $totalBytes bytes"
+        }
+        val digest = MessageDigest.getInstance("SHA-256")
+        val sink = object : OutputStream() {
+            override fun write(value: Int) = Unit
+            override fun write(bytes: ByteArray, offset: Int, length: Int) = Unit
+        }
+        DataOutputStream(java.security.DigestOutputStream(sink, digest)).use { output ->
+            writeString(output, "RWX-ASSET-ARCHIVE-V2")
+            output.writeInt(entries.size)
+            sortedEntries.forEach { entry ->
+                writeString(output, entry.name)
+                output.writeLong(entry.size)
+                zip.getInputStream(entry).use { input -> input.copyTo(output) }
+            }
+        }
+        return digest.digest()
     }
 
     fun normalizeAssetPath(path: String): String {
@@ -167,13 +208,14 @@ object AssetVaultFormat {
     }
 
     fun writeIndex(records: Collection<AssetRecord>, output: OutputStream) {
+        require(records.size <= MAX_INDEX_ENTRIES) { "Too many encrypted asset index entries" }
         val data = DataOutputStream(output)
         data.writeInt(INDEX_MAGIC)
         data.writeInt(FORMAT_VERSION)
         data.writeInt(records.size)
         records.sortedBy(AssetRecord::path).forEach { record ->
             writeString(data, normalizeAssetPath(record.path))
-            writeString(data, validateBlobEntry(record.blobEntry))
+            writeString(data, validateBlobEntry(record.blobEntry), MAX_BLOB_PATH_BYTES)
             require(record.plaintextSize >= 0) { "Negative asset size for ${record.path}" }
             data.writeLong(record.plaintextSize)
             require(record.ciphertextDigest.size == 32) {
@@ -198,7 +240,7 @@ object AssetVaultFormat {
             val seenBlobs = hashSetOf<String>()
             val records = List(count) {
                 val path = normalizeAssetPath(readString(data))
-                val blob = validateBlobEntry(readString(data))
+                val blob = validateBlobEntry(readString(data, MAX_BLOB_PATH_BYTES))
                 val size = data.readLong()
                 require(size >= 0) { "Negative asset size for $path" }
                 val ciphertextDigest = readBytes(data, 32)
@@ -268,7 +310,7 @@ object AssetVaultFormat {
         return Cipher.getInstance("AES/GCM/NoPadding").apply {
             init(mode, SecretKeySpec(contentKey, "AES"), GCMParameterSpec(AUTH_TAG_BITS, nonce))
             updateAAD(
-                "RWX-ASSET-V1\u0000${header.mode.name}\u0000${header.vaultId}\u0000$modId\u0000$path"
+                "RWX-ASSET-V2\u0000${header.mode.name}\u0000${header.vaultId}\u0000$modId\u0000$path"
                     .toByteArray(StandardCharsets.UTF_8)
             )
         }
@@ -286,6 +328,7 @@ object AssetVaultFormat {
     private fun validateHeader(header: AssetVaultHeader, requireSignature: Boolean = true) {
         require(idPattern.matches(header.vaultId)) { "Invalid asset vault id" }
         require(header.indexDigest.size == 32) { "Asset vault index digest must be SHA-256" }
+        require(header.archiveDigest.size == 32) { "Asset vault archive digest must be SHA-256" }
         require(header.recipients.size <= MAX_RECIPIENTS) { "Too many asset recipients" }
         require(header.recipients.map(AssetRecipientEnvelope::certificateId).toSet().size == header.recipients.size) {
             "Duplicate asset recipient certificate"
@@ -307,33 +350,73 @@ object AssetVaultFormat {
                     require(idPattern.matches(header.keyId)) { "Invalid symmetric asset key id" }
                 }
                 require(header.authorityId.isEmpty() && header.recipients.isEmpty()) { "Symmetric vault must not contain PKI data" }
-                require(header.revocationList == null && header.signature.isEmpty()) { "Symmetric vault must not be signed" }
+                require(header.revocationListUrl.isEmpty() && header.signature.isEmpty()) {
+                    "Symmetric vault must not contain PKI revocation data or a signature"
+                }
             }
 
             AssetProtectionMode.PKI -> {
                 require(header.keyId.isEmpty() && header.embeddedContentKey.isEmpty()) { "PKI vault must not contain symmetric authorization data" }
                 require(idPattern.matches(header.authorityId)) { "Invalid asset authority id" }
                 require(header.recipients.isNotEmpty()) { "PKI asset vault has no recipients" }
-                header.revocationList?.let { require(it.authorityId == header.authorityId) { "Embedded CRL issuer mismatch" } }
+                validateRevocationListUrl(header.revocationListUrl)
                 if (requireSignature) require(header.signature.isNotEmpty()) { "PKI asset vault is unsigned" }
             }
         }
     }
 
+    fun validateRevocationListUrl(value: String): String = value.also {
+        require(it.toByteArray(StandardCharsets.UTF_8).size in 1..MAX_CRL_URL_BYTES) {
+            "Online revocation list URL is empty or too long"
+        }
+        val uri = runCatching { URI(it) }.getOrElse { error ->
+            throw IllegalArgumentException("Invalid online revocation list URL", error)
+        }
+        require(uri.scheme.equals("https", ignoreCase = true) && !uri.host.isNullOrBlank()) {
+            "Online revocation list URL must use HTTPS with an explicit host"
+        }
+        require(uri.userInfo == null && uri.fragment == null) {
+            "Online revocation list URL must not contain user information or a fragment"
+        }
+    }
+
     private fun normalizeArchivePath(path: String): String = path.replace('\\', '/')
 
-    private fun writeString(output: DataOutputStream, value: String) {
+    private fun isVaultManagedEntry(path: String): Boolean =
+        path == HEADER_ENTRY || path == INDEX_ENTRY || path.startsWith(BLOB_DIRECTORY)
+
+    private fun writeString(output: DataOutputStream, value: String, maximum: Int = MAX_PATH_BYTES) {
         val bytes = value.toByteArray(StandardCharsets.UTF_8)
-        require(bytes.size <= MAX_PATH_BYTES) { "Asset field is too long" }
+        require(bytes.size <= maximum) { "Asset field is too long" }
         output.writeInt(bytes.size)
         output.write(bytes)
     }
 
-    private fun readString(input: DataInputStream): String {
+    private fun readString(input: DataInputStream, maximum: Int = MAX_PATH_BYTES): String {
         val length = input.readInt()
-        require(length in 0..MAX_PATH_BYTES) { "Invalid asset field length: $length" }
+        require(length in 0..maximum) { "Invalid asset field length: $length" }
         return String(input.readExactly(length), StandardCharsets.UTF_8)
     }
+
+    private fun writeRequiredId(output: DataOutputStream, value: String) {
+        require(value.toByteArray(StandardCharsets.UTF_8).size == MAX_ID_BYTES) { "Invalid asset id length" }
+        writeString(output, value, MAX_ID_BYTES)
+    }
+
+    private fun writeOptionalId(output: DataOutputStream, value: String) {
+        require(value.isEmpty() || value.toByteArray(StandardCharsets.UTF_8).size == MAX_ID_BYTES) {
+            "Invalid optional asset id length"
+        }
+        writeString(output, value, MAX_ID_BYTES)
+    }
+
+    private fun readRequiredId(input: DataInputStream): String =
+        readString(input, MAX_ID_BYTES).also { require(it.length == MAX_ID_BYTES) { "Invalid asset id length" } }
+
+    private fun readOptionalId(input: DataInputStream): String =
+        readString(input, MAX_ID_BYTES).also {
+            require(it.isEmpty() || it.length == MAX_ID_BYTES) { "Invalid optional asset id length" }
+        }
 
     private fun writeBytes(output: DataOutputStream, bytes: ByteArray, maximum: Int) {
         require(bytes.size <= maximum) { "Asset binary field is too large" }
@@ -370,7 +453,7 @@ object ModAssetPacker {
         data class Pki(
             val authority: AssetAuthorityPrivate,
             val recipients: List<AssetLicenseCertificate>,
-            val revocationList: AssetRevocationList? = null,
+            val revocationListUrl: String,
         ) : Protection
     }
 
@@ -412,9 +495,11 @@ object ModAssetPacker {
             val result = ZipFile(input).use { source ->
                 require(
                     source.getEntry(AssetVaultFormat.HEADER_ENTRY) == null &&
-                            source.getEntry(AssetVaultFormat.INDEX_ENTRY) == null
+                            source.getEntry(AssetVaultFormat.INDEX_ENTRY) == null &&
+                            source.entries().asSequence().none { it.name.startsWith(AssetVaultFormat.BLOB_DIRECTORY) }
                 ) { "The input JAR already contains an encrypted asset vault" }
                 val modId = readModId(source)
+                val archiveDigest = AssetVaultFormat.computeArchiveDigest(source)
                 val assets = source.entries().asSequence()
                     .filterNot(ZipEntry::isDirectory)
                     .filter { AssetVaultFormat.isProtectedAsset(it.name) }
@@ -430,7 +515,7 @@ object ModAssetPacker {
                     }
                     .toList()
                 require(assets.isNotEmpty()) { "No files under assets/ were found in ${input.name}" }
-                val plan = createPlan(protection)
+                val plan = createPlan(protection, archiveDigest)
                 lateinit var finalizedHeader: AssetVaultHeader
 
                 ZipOutputStream(BufferedOutputStream(temporary.outputStream())).use { target ->
@@ -503,6 +588,7 @@ object ModAssetPacker {
 
     private fun createPlan(
         protection: Protection,
+        archiveDigest: ByteArray,
     ): EncryptionPlan {
         val vaultId = AssetVaultFormat.newVaultId()
         return when (protection) {
@@ -514,6 +600,7 @@ object ModAssetPacker {
                         vaultId = vaultId,
                         embeddedContentKey = key.copyOf(),
                         indexDigest = ByteArray(32),
+                        archiveDigest = archiveDigest,
                     ),
                     key,
                 )
@@ -530,6 +617,7 @@ object ModAssetPacker {
                         vaultId = vaultId,
                         keyId = protection.key.keyId,
                         indexDigest = ByteArray(32),
+                        archiveDigest = archiveDigest,
                     ),
                     protection.key.encoded.copyOf(),
                 )
@@ -539,16 +627,12 @@ object ModAssetPacker {
                 AssetPki.validateAuthorityPrivate(protection.authority)
                 require(protection.recipients.isNotEmpty()) { "PKI protection requires at least one recipient" }
                 val authority = protection.authority.certificate
-                protection.revocationList?.let { AssetPki.validateRevocationList(it, authority) }
                 val now = AssetPki.currentEpochSeconds()
                 val contentKey = AssetVaultFormat.newContentKey()
                 val recipients = protection.recipients
                     .distinctBy(AssetLicenseCertificate::certificateId)
                     .onEach { certificate ->
                         AssetPki.validateLicenseCertificate(certificate, authority, now, enforceValidity = true)
-                        require(!AssetPki.isRevoked(protection.revocationList, certificate.certificateId)) {
-                            "Recipient ${certificate.certificateId} is revoked"
-                        }
                     }
                     .sortedBy(AssetLicenseCertificate::certificateId)
                     .map { certificate ->
@@ -566,8 +650,9 @@ object ModAssetPacker {
                     vaultId = vaultId,
                     authorityId = authority.authorityId,
                     recipients = recipients,
-                    revocationList = protection.revocationList,
+                    revocationListUrl = AssetVaultFormat.validateRevocationListUrl(protection.revocationListUrl),
                     indexDigest = ByteArray(32),
+                    archiveDigest = archiveDigest,
                 )
                 EncryptionPlan(unsigned, contentKey)
             }

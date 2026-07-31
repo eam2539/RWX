@@ -3,6 +3,7 @@ package io.github.rwx.mod.assets
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.PosixFilePermission
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
@@ -55,15 +56,13 @@ object AssetKeyFiles {
 
     fun writePrivate(file: File, key: AssetPrivateKey) {
         validatePrivate(key)
-        file.absoluteFile.parentFile?.mkdirs()
-        DataOutputStream(BufferedOutputStream(file.outputStream())).use { output ->
+        writeAtomically(file, privateMaterial = true) { output ->
             output.writeInt(PRIVATE_MAGIC)
             output.writeInt(FORMAT_VERSION)
             output.writeInt(key.kind.formatId)
             writeString(output, key.keyId)
             writeBytes(output, key.encoded)
         }
-        restrictPrivateKeyPermissions(file)
     }
 
     fun readPrivate(file: File): AssetPrivateKey =
@@ -179,6 +178,39 @@ object AssetKeyFiles {
             file.setWritable(false, false)
             file.setReadable(true, true)
             file.setWritable(true, true)
+        }
+    }
+
+    private fun writeAtomically(
+        file: File,
+        privateMaterial: Boolean,
+        block: (DataOutputStream) -> Unit,
+    ) {
+        val target = file.absoluteFile
+        val parent = checkNotNull(target.parentFile) { "Asset key output has no parent directory: $target" }
+        require(parent.mkdirs() || parent.isDirectory) { "Cannot create asset key directory: $parent" }
+        val temporary = Files.createTempFile(parent.toPath(), ".asset-key-", ".tmp").toFile()
+        try {
+            if (privateMaterial) restrictPrivateKeyPermissions(temporary)
+            DataOutputStream(BufferedOutputStream(temporary.outputStream())).use(block)
+            if (privateMaterial) restrictPrivateKeyPermissions(temporary)
+            moveIntoPlace(temporary, target)
+            if (privateMaterial) restrictPrivateKeyPermissions(target)
+        } finally {
+            temporary.delete()
+        }
+    }
+
+    private fun moveIntoPlace(temporary: File, target: File) {
+        runCatching {
+            Files.move(
+                temporary.toPath(),
+                target.toPath(),
+                StandardCopyOption.ATOMIC_MOVE,
+                StandardCopyOption.REPLACE_EXISTING,
+            )
+        }.getOrElse {
+            Files.move(temporary.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
     }
 

@@ -428,7 +428,12 @@ class ApiImpl private constructor(
             val root = File(FileHelper.getWorkingDirectory(), "jvm-mod-api/${sanitizePathSegment(metadata.id)}")
             val keyStore = platformBridge?.storage?.let(::JvmModAssetKeyStore)
             val resolver = assetCredentialResolver ?: keyStore ?: EmptyAssetCredentialResolver
-            val assetStore = JvmModAssetStore(jarFile, metadata.id, resolver)
+            val assetStore = JvmModAssetStore(
+                jarFile,
+                metadata.id,
+                resolver,
+                OnlineAssetRevocationListFetcher,
+            )
             return try {
                 assetStore.requireAuthorized()
                 ApiImpl(metadata, jarFile, root, platformBridge, assetStore)

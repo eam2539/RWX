@@ -11,17 +11,14 @@ class JvmModAssetKeyStore(storage: PlatformStorage) : AssetCredentialResolver {
     private val symmetricDirectory = root.resolve("symmetric").also(File::mkdirs)
     private val authorityDirectory = root.resolve("authorities").also(File::mkdirs)
     private val licenseDirectory = root.resolve("licenses").also(File::mkdirs)
-    private val revocationDirectory = root.resolve("revocations").also(File::mkdirs)
     private val symmetricCache = ConcurrentHashMap<String, AssetPrivateKey>()
     private val authorityCache = ConcurrentHashMap<String, AssetAuthorityCertificate>()
     private val licenseCache = ConcurrentHashMap<String, AssetLicenseCredential>()
-    private val revocationCache = ConcurrentHashMap<String, AssetRevocationList>()
 
     enum class CredentialKind {
         SYMMETRIC_KEY,
         TRUSTED_AUTHORITY,
         LICENSE,
-        REVOCATION_LIST,
     }
 
     data class ImportResult(
@@ -37,7 +34,6 @@ class JvmModAssetKeyStore(storage: PlatformStorage) : AssetCredentialResolver {
             "rwxkey" -> importSymmetricKey(source)
             "rwxpub" -> importAuthority(source)
             "rwxlicense" -> importLicense(source)
-            "rwxcrl" -> importRevocationList(source)
             else -> error("Unsupported asset credential type: ${source.extension}")
         }
     }
@@ -75,19 +71,6 @@ class JvmModAssetKeyStore(storage: PlatformStorage) : AssetCredentialResolver {
             ?.also { authorityCache[authorityId] = it }
     }
 
-    override fun findRevocationList(authorityId: String): AssetRevocationList? {
-        if (!ID.matches(authorityId)) return null
-        revocationCache[authorityId]?.let { return it }
-        val file = revocationDirectory.resolve("$authorityId.rwxcrl")
-        if (!file.isFile) return null
-        val authority = findTrustedAuthority(authorityId) ?: return null
-        return runCatching { AssetPkiFiles.readRevocationList(file) }
-            .getOrNull()
-            ?.takeIf { it.authorityId == authorityId }
-            ?.also { AssetPki.validateRevocationList(it, authority) }
-            ?.also { revocationCache[authorityId] = it }
-    }
-
     private fun importSymmetricKey(source: File): ImportResult {
         val key = AssetKeyFiles.readPrivate(source)
         require(key.kind == AssetKeyKind.SYMMETRIC) {
@@ -122,28 +105,6 @@ class JvmModAssetKeyStore(storage: PlatformStorage) : AssetCredentialResolver {
         AssetPkiFiles.writeLicenseCredential(destination, credential)
         licenseCache[certificateId] = credential
         return ImportResult(certificateId, CredentialKind.LICENSE, destination)
-    }
-
-    private fun importRevocationList(source: File): ImportResult {
-        val list = AssetPkiFiles.readRevocationList(source)
-        val authority = findTrustedAuthority(list.authorityId)
-            ?: error("Import the matching .rwxpub authority certificate before its CRL")
-        AssetPki.validateRevocationList(list, authority)
-        findRevocationList(list.authorityId)?.let { existing ->
-            require(list.sequence >= existing.sequence) {
-                "Refusing CRL rollback from sequence ${existing.sequence} to ${list.sequence}"
-            }
-            if (list.sequence == existing.sequence) {
-                require(
-                    AssetPkiFiles.encodeRevocationList(list)
-                        .contentEquals(AssetPkiFiles.encodeRevocationList(existing))
-                ) { "A conflicting CRL already exists at sequence ${list.sequence}" }
-            }
-        }
-        val destination = revocationDirectory.resolve("${list.authorityId}.rwxcrl")
-        AssetPkiFiles.writeRevocationList(destination, list)
-        revocationCache[list.authorityId] = list
-        return ImportResult(list.authorityId, CredentialKind.REVOCATION_LIST, destination)
     }
 
     private fun sameAuthority(left: AssetAuthorityCertificate, right: AssetAuthorityCertificate): Boolean =
