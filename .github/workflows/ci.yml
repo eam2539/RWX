@@ -272,18 +272,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG_MESSAGE=$(git cat-file tag "$RWX_VERSION" 2>/dev/null | sed '1,/^$/d' || echo "")
-          if [ -z "$TAG_MESSAGE" ]; then
-            AUTO_NOTES=$(gh api \
+          TAG_MESSAGE=$(git cat-file tag "$GITHUB_REF_NAME" 2>/dev/null | sed '1,/^$/d' || echo "")
+          AUTO_NOTES=$(gh api \
               --method POST \
               -H "Accept: application/vnd.github+json" \
               "/repos/$GITHUB_REPOSITORY/releases/generate-notes" \
-              -f tag_name="$RWX_VERSION" \
+              -f tag_name="$GITHUB_REF_NAME" \
               --jq '.body')
+          if [ -z "$TAG_MESSAGE" ]; then
             echo "$AUTO_NOTES" > release_notes.md
           else
-            #printf "%s\n\n---\n\n%s" "$TAG_MESSAGE"  "$AUTO_NOTES" > release_notes.md
-            echo "$TAG_MESSAGE" > release_notes.md
+            printf "%s\n\n---\n\n%s" "$TAG_MESSAGE"  "$AUTO_NOTES" > release_notes.md
           fi
 
       - name: Create or update release
