@@ -12,11 +12,15 @@ import com.corrodinggames.rts.gameFramework.steam.DisabledSteamEngine;
 import com.corrodinggames.rts.gameFramework.ui.GameUI;
 import com.corrodinggames.rts.gameFramework.utility.FileLoaderFactory;
 import com.corrodinggames.rts.gameFramework.utility.StringUtils;
+import io.github.rwx.LegacyAssetBridge;
 import io.github.rwx.mod.*;
 import io.github.rwx.mod.api.Api;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.i.a */
@@ -677,28 +681,83 @@ public class ModManager {
         ModUiRegistry.clear();
         UnitEventRuntime.clear();
 
-        String[] modDirs = {
-                CustomUnitConfigParser.getDefaultUserModsFolder(),
-                CustomUnitConfigParser.getBuiltinModsFolderName(),
-                CustomUnitConfigParser.getBuiltinModsEnabledFolderName()
-        };
-
+        File stagingDirectory = new File(LegacyAssetBridge.cacheDir(), "jvm-mod-staging");
+        clearDirectory(stagingDirectory);
+        ArrayList<File> candidateFiles = new ArrayList<>();
+        ArrayList<String> modDirs = new ArrayList<>();
+        modDirs.add(CustomUnitConfigParser.getBuiltinModsFolderName());
+        modDirs.add(CustomUnitConfigParser.getBuiltinModsEnabledFolderName());
+        modDirs.add(CustomUnitConfigParser.getDefaultUserModsFolder());
         for (String dirPath : modDirs) {
-            File dir = new File(FileHelper.convertAbstractPath(dirPath));
-            if (!dir.exists() || !dir.isDirectory()) {
+            String[] entries = FileHelper.listFiles(dirPath);
+            if (entries == null) {
                 continue;
             }
-            GameEngine.log("Loading JVM mods from: " + dirPath + " -> " + dir.getPath());
-            try {
-                this.jvmMods.addAll(this.jvmModLoader.discoverMods(dir));
-            } catch (Exception e) {
-                GameEngine.log("Failed to load JVM mods from " + dirPath + ": " + e.getMessage());
+            for (String entry : entries) {
+                if (!entry.toLowerCase(Locale.ROOT).endsWith(".jar")) {
+                    continue;
+                }
+                String candidatePath = dirPath + "/" + entry;
+                File candidateFile = new File(FileHelper.convertAbstractPath(candidatePath));
+                if (!candidateFile.isFile()) {
+                    candidateFile = stageJvmMod(candidatePath, entry, stagingDirectory);
+                }
+                if (candidateFile != null) {
+                    candidateFiles.add(candidateFile);
+                }
             }
+        }
+        try {
+            this.jvmMods.addAll(this.jvmModLoader.discoverModFiles(candidateFiles));
+        } catch (Exception e) {
+            GameEngine.log("Failed to discover JVM mods: " + e.getMessage());
         }
         for (Mod mod : this.jvmMods) {
             registerJvmModInfo(mod);
         }
         GameEngine.log("Discovered " + this.jvmMods.size() + " JVM mods");
+    }
+
+    private File stageJvmMod(String sourcePath, String entry, File stagingDirectory) {
+        String fileName = new File(entry).getName();
+        String sourceId = UUID.nameUUIDFromBytes(sourcePath.getBytes(StandardCharsets.UTF_8)).toString();
+        File stagedFile = new File(stagingDirectory, sourceId + "-" + fileName);
+        try {
+            if (!stagingDirectory.isDirectory() && !stagingDirectory.mkdirs()) {
+                throw new IOException("Unable to create JVM mod staging directory");
+            }
+            InputStream input = FileHelper.openFileByPath(sourcePath);
+            if (input == null) {
+                throw new IOException("Unable to open mod source");
+            }
+            try (InputStream source = input; FileOutputStream output = new FileOutputStream(stagedFile)) {
+                byte[] buffer = new byte[64 * 1024];
+                int read;
+                while ((read = source.read(buffer)) != -1) {
+                    output.write(buffer, 0, read);
+                }
+            }
+            return stagedFile;
+        } catch (IOException e) {
+            stagedFile.delete();
+            GameEngine.log("Failed to stage JVM mod " + fileName + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    private void clearDirectory(File directory) {
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
+            if (file.isDirectory()) {
+                clearDirectory(file);
+            }
+            if (!file.delete()) {
+                GameEngine.log("Failed to delete stale JVM mod staging file: " + file.getName());
+            }
+        }
     }
 
     private void registerJvmModInfo(Mod mod) {

@@ -30,12 +30,8 @@ public class FileHelper {
 
     /* JADX INFO: renamed from: a */
     protected static String getInternalPath() {
-        File fileB = LegacyAssetBridge.localDir();
-        if (fileB != null) {
-            return fileB.getAbsolutePath();
-        }
-        GameEngine.logColored("Failed to get an internal path.");
-        return null;
+        File fileB = LegacyAssetBridge.storageRootDir();
+        return fileB.getAbsolutePath();
     }
 
     /* JADX WARN: Failed to analyze thrown exceptions
@@ -252,6 +248,10 @@ public class FileHelper {
     /* JADX INFO: renamed from: m */
     public static long getFileSize(String str) {
         return activeFileLoader.getLastModified(str);
+    }
+
+    public static long getFileLength(String str) {
+        return activeFileLoader.getFileLength(str);
     }
 
     /* JADX INFO: renamed from: a */

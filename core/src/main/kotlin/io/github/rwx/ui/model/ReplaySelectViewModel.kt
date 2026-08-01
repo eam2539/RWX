@@ -1,9 +1,9 @@
 package io.github.rwx.ui.model
 
-import io.github.rwx.PlatformStorage
+import com.corrodinggames.rts.gameFramework.Utility
+import com.corrodinggames.rts.gameFramework.file.FileHelper
 import io.github.rwx.i18n.I18n
 import io.github.rwx.ui.AppScreen
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,34 +27,33 @@ object ReplayBrowser {
     }
 }
 
-class ReplaySelectViewModel(
-    private val storage: PlatformStorage,
-) {
+class ReplaySelectViewModel {
     fun items(): List<ReplayEntry> {
-        val replaysRoot = storage.replaysDir.file
-        return replaysRoot
-            .takeIf(File::isDirectory)
-            ?.walkTopDown()
-            ?.filter { it.isFile && it.extension.equals("replay", ignoreCase = true) }
-            ?.sortedByDescending(File::lastModified)
-            ?.mapIndexed { index, file -> replayEntry(index, replaysRoot, file) }
+        return FileHelper.listFiles(REPLAY_DIRECTORY)
+            ?.asSequence()
+            ?.filter { it.substringAfterLast('/').endsWith(".replay", ignoreCase = true) }
+            ?.map { entry ->
+                val replayPath = Utility.joinPath(REPLAY_DIRECTORY, entry)
+                Triple(entry, replayPath, FileHelper.getFileSize(replayPath))
+            }
+            ?.sortedByDescending { (_, _, lastModified) -> lastModified }
+            ?.mapIndexed { index, (entry, replayPath, lastModified) ->
+                val fileName = entry.substringAfterLast('/')
+                ReplayEntry(
+                    id = index,
+                    fileName = fileName,
+                    displayName = displayName(fileName),
+                    replayName = entry,
+                    modifiedAt = modifiedAt(lastModified),
+                    sizeLabel = sizeLabel(FileHelper.getFileLength(replayPath)),
+                )
+            }
             ?.toList()
             ?: emptyList()
     }
 
-    private fun replayEntry(index: Int, root: File, file: File): ReplayEntry {
-        val replayName = file.relativeTo(root).invariantSeparatorsPath
-        return ReplayEntry(
-            id = index,
-            fileName = file.name,
-            displayName = displayName(file.name),
-            replayName = replayName,
-            modifiedAt = modifiedAt(file.lastModified()),
-            sizeLabel = sizeLabel(file.length()),
-        )
-    }
-
     companion object {
+        private const val REPLAY_DIRECTORY = "/SD/rustedWarfare/replays"
         private val whitespaceRegex = Regex("""\s+""")
         private val replayExtensionRegex = Regex("""\.replay$""", RegexOption.IGNORE_CASE)
         private val dateFormat = ThreadLocal.withInitial {

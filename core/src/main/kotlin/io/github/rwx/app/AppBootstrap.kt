@@ -13,7 +13,6 @@ import io.github.rwx.session.GameSession
 import io.github.rwx.settings.GameSettingsRepository
 import io.github.rwx.ui.ColorSchemeRegistry
 import io.github.rwx.ui.CoreUiEventQueue
-import io.github.rwx.ui.component.SnackbarSceneHost
 import io.github.rwx.ui.host.*
 import io.github.rwx.ui.model.*
 import org.koin.core.parameter.parametersOf
@@ -110,6 +109,20 @@ internal fun createAppBootstrap(
         settingsModel.selectedColorSchemeId.value = options.colorSchemeId
     }
 
+    lateinit var snackbarScene: Scene
+    val snackbarSceneHost = koin.get<SnackbarSceneHost> {
+        parametersOf(settingsModel, { visible: Boolean -> snackbarScene.isVisible = visible })
+    }
+    snackbarScene = snackbarSceneHost.createScene()
+    snackbarScene.isVisible = false
+
+    lateinit var loadingDialogScene: Scene
+    val loadingDialogSceneHost = koin.get<LoadingDialogSceneHost> {
+        parametersOf(settingsModel, { visible: Boolean -> loadingDialogScene.isVisible = visible })
+    }
+    loadingDialogScene = loadingDialogSceneHost.createScene()
+    loadingDialogScene.isVisible = false
+
     val loadingSceneHost = LoadingSceneHost(settingsModel)
     val loadingScene = loadingSceneHost.createScene(LoadingSceneHost.GAME_LOADING_SCENE_NAME)
     context.addScene(loadingScene)
@@ -172,14 +185,6 @@ internal fun createAppBootstrap(
     val resourceBrowserScene = resourceBrowserSceneHost.createScene()
     context.addScene(resourceBrowserScene)
 
-    lateinit var loadingDialogScene: Scene
-    val loadingDialogSceneHost = koin.get<LoadingDialogSceneHost> {
-        parametersOf(settingsModel, { visible: Boolean -> loadingDialogScene.isVisible = visible })
-    }
-    loadingDialogScene = loadingDialogSceneHost.createScene()
-    loadingDialogScene.isVisible = false
-    context.addScene(loadingDialogScene)
-
     val battleRoomSceneHost = koin.get<BattleRoomSceneHost> {
         parametersOf(settingsModel, { action: BattleRoomAction -> actions.battleRoom(action) })
     }
@@ -193,21 +198,15 @@ internal fun createAppBootstrap(
     val modWindowScene = modWindowSceneHost.createScene()
     context.addScene(modWindowScene)
 
-    lateinit var snackbarScene: Scene
-    val snackbarSceneHost = koin.get<SnackbarSceneHost> {
-        parametersOf(settingsModel, { visible: Boolean -> snackbarScene.isVisible = visible })
-    }
-    snackbarScene = snackbarSceneHost.createScene()
-    snackbarScene.isVisible = false
-    context.addScene(snackbarScene)
-
-    lateinit var errorDialogScene: Scene
+    lateinit var dialogScene: Scene
     val dialogSceneHost = koin.get<DialogSceneHost> {
-        parametersOf(settingsModel, { visible: Boolean -> errorDialogScene.isVisible = visible })
+        parametersOf(settingsModel, { visible: Boolean -> dialogScene.isVisible = visible })
     }
-    errorDialogScene = dialogSceneHost.createScene()
-    errorDialogScene.isVisible = false
-    context.addScene(errorDialogScene)
+    dialogScene = dialogSceneHost.createScene()
+    dialogScene.isVisible = false
+    context.addScene(snackbarScene)
+    context.addScene(dialogScene)
+    context.addScene(loadingDialogScene)
 
     options.levelSelectMode?.let(levelSelectSceneHost::updateMaps)
     options.settingsPage?.let(settingsSceneHost::showPage)
@@ -264,6 +263,6 @@ internal fun createAppBootstrap(
         snackbarSceneHost = snackbarSceneHost,
         snackbarScene = snackbarScene,
         dialogSceneHost = dialogSceneHost,
-        dialogScene = errorDialogScene,
+        dialogScene = dialogScene,
     )
 }

@@ -8,23 +8,29 @@ import io.github.rwx.ui.ResponsiveViewportHeight
 import io.github.rwx.ui.UiTheme
 import io.github.rwx.ui.component.*
 import io.github.rwx.ui.model.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
 class ModsSceneHost(
     private val model: SettingsModel = SettingsModel(),
     private val onAction: (ModsAction) -> Unit = {},
-) {
+) : KoinComponent {
     private val mods = mutableStateListOf<ModEntry>()
     private val filter: MutableStateValue<String> = mutableStateOf("")
-    private var statusText: String = ""
-
-    /** Replaces the displayed mod list (platform-supplied), e.g. after a reload. */
+    private val snackbarSceneHost: SnackbarSceneHost by inject()
     fun updateMods(mods: List<ModEntry>, statusText: String = "") {
-        this.statusText = statusText
         this.mods.atomic {
             clear()
             addAll(mods)
         }
+        if (statusText.isNotBlank())
+            snackbarSceneHost.showSnackbar(
+                SnackbarVisuals(
+                    statusText,
+                    withDismissAction = true,
+                )
+            )
     }
 
     fun dispatch(action: ModsAction) = onAction(action)
@@ -64,12 +70,12 @@ class ModsSceneHost(
                 onChange = ::setFilter,
             )
 
-            val listModel = ModsListModel(mods.use(), filter.use(), statusText)
+            val listModel = ModsListModel(mods.use(), filter.use())
             val rows = ModsScrollRows.from(
                 model = listModel,
                 enabledTitle = I18n.mods.enabled(),
                 disabledTitle = I18n.mods.disabled(),
-                emptyText = statusText.ifBlank { I18n.mods.empty() },
+                emptyText = I18n.mods.empty(),
             )
 
             ScrollableVerticalList(

@@ -13,8 +13,12 @@ import io.github.rwx.ui.host.ModsSceneHost
 import io.github.rwx.ui.model.Dialog
 import io.github.rwx.ui.model.DialogButton
 import io.github.rwx.ui.model.DialogTextInput
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import org.koin.mp.KoinPlatform.getKoin
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class ModsController(
     private val modRepository: ModRepository,
@@ -25,6 +29,8 @@ internal class ModsController(
     private val onModsReloaded: () -> Unit = {},
 ) {
     private var reloadLoading = false
+    private var reloadDialogVisible = false
+    private var reloadJob: Job? = null
     private val reloadResult = AtomicReference<ModsReloadResult?>(null)
 
     fun refresh(statusText: String = "") {
@@ -119,9 +125,8 @@ internal class ModsController(
         reloadLoading = true
         reloadResult.set(null)
 
-        val job = launchOnIO("mods-reload")
-        {
-            val error = runCatching {
+        val job = launchOnIO("mods-reload") {
+            val result = try {
                 modRepository.applyChanges()
                 val handledByBackend = gameSession.requestReloadMods()
                 if (handledByBackend) {
@@ -129,21 +134,32 @@ internal class ModsController(
                 } else {
                     modRepository.reloadAppliedMods()
                 }
-            }.exceptionOrNull()
-            reloadResult.set(ModsReloadResult(error))
+                ModsReloadResult.Success
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Throwable) {
+                ModsReloadResult.Failed(error)
+            }
+            reloadResult.set(result)
         }
+        reloadJob = job
+        job.invokeOnCompletion { cause ->
+            if (cause is CancellationException) {
+                reloadResult.compareAndSet(null, ModsReloadResult.Cancelled)
+            }
+        }
+        reloadDialogVisible = true
         loadingDialogSceneHost.showProgress(
             title = "Reloading Mods",
             message = "Loading custom unit data",
             progress = 0.05f,
         ) {
-            loadingDialogSceneHost.hide()
-            job.cancel()
+            cancelReload(job)
         }
     }
 
-    fun driveReload() {
-        if (reloadLoading) {
+    fun driveReload(): Boolean {
+        if (reloadLoading && reloadDialogVisible) {
             val status = gameSession.loadingStatus()
             loadingDialogSceneHost.updateProgress(
                 message = status.text.ifBlank { "Loading custom unit data" },
@@ -152,36 +168,58 @@ internal class ModsController(
         }
         reloadResult.getAndSet(null)?.let { result ->
             if (reloadLoading) {
-                finishReload(result.error)
+                finishReload(result)
             }
         }
+        return reloadLoading
     }
 
-    private fun waitForLoadingText(expectedText: String, timeoutMillis: Long) {
+    private fun cancelReload(job: Job) {
+        if (!reloadLoading || reloadJob !== job) {
+            return
+        }
+        reloadDialogVisible = false
+        loadingDialogSceneHost.hide()
+        job.cancel()
+    }
+
+    private suspend fun waitForLoadingText(expectedText: String, timeoutMillis: Long) {
         val deadline = System.currentTimeMillis() + timeoutMillis
         while (System.currentTimeMillis() < deadline) {
             val status = gameSession.loadingStatus()
             if (status.text == expectedText && (status.progress ?: 0.0f) >= 1.0f) {
                 return
             }
-            Thread.sleep(50L)
+            delay(50L.milliseconds)
         }
         throw IllegalStateException("Timed out waiting for $expectedText")
     }
 
-    private fun finishReload(error: Throwable?) {
+    private fun finishReload(result: ModsReloadResult) {
         reloadLoading = false
-        loadingDialogSceneHost.hide()
-        if (error == null) {
-            onModsReloaded()
-            refresh("Mods reloaded")
-        } else {
-            logger.warn(error) { "Unable to reload mods" }
-            refresh("Unable to reload mods: ${error.message ?: error.javaClass.simpleName}")
+        reloadJob = null
+        if (reloadDialogVisible) {
+            reloadDialogVisible = false
+            loadingDialogSceneHost.hide()
+        }
+        when (result) {
+            ModsReloadResult.Success -> {
+                onModsReloaded()
+                refresh("Mods reloaded")
+            }
+
+            ModsReloadResult.Cancelled -> Unit
+            is ModsReloadResult.Failed -> {
+                val error = result.error
+                logger.warn(error) { "Unable to reload mods" }
+                refresh("Unable to reload mods: ${error.message ?: error.javaClass.simpleName}")
+            }
         }
     }
 }
 
-private data class ModsReloadResult(
-    val error: Throwable?,
-)
+private sealed interface ModsReloadResult {
+    data object Success : ModsReloadResult
+    data object Cancelled : ModsReloadResult
+    data class Failed(val error: Throwable) : ModsReloadResult
+}

@@ -8,36 +8,8 @@ import io.github.rwx.net.ResourceBrowserRepository
 import io.github.rwx.net.UpdateRepository
 import io.github.rwx.render.canvas.*
 import io.github.rwx.settings.GameSettingsRepository
-import io.github.rwx.ui.*
-import io.github.rwx.ui.component.SnackbarSceneHost
-import io.github.rwx.ui.host.BattleRoomSceneHost
-import io.github.rwx.ui.host.DialogSceneHost
-import io.github.rwx.ui.host.LevelSelectSceneHost
-import io.github.rwx.ui.host.LoadingDialogSceneHost
-import io.github.rwx.ui.host.MainMenuSceneHost
-import io.github.rwx.ui.host.ModHudSceneHost
-import io.github.rwx.ui.host.ModWindowSceneHost
-import io.github.rwx.ui.host.ModsSceneHost
-import io.github.rwx.ui.host.MultiplayerSceneHost
-import io.github.rwx.ui.host.PauseMenuSceneHost
-import io.github.rwx.ui.host.ReplaySelectSceneHost
-import io.github.rwx.ui.host.ResourceBrowserSceneHost
-import io.github.rwx.ui.host.SettingsSceneHost
-import io.github.rwx.ui.model.BattleRoomAction
-import io.github.rwx.ui.model.LevelSelectActionHandler
-import io.github.rwx.ui.model.LevelSelectMode
-import io.github.rwx.ui.model.LevelSelectViewModel
-import io.github.rwx.ui.model.LevelSelectViewModelFactory
-import io.github.rwx.ui.model.MainMenuAction
-import io.github.rwx.ui.model.ModsAction
-import io.github.rwx.ui.model.MultiplayerAction
-import io.github.rwx.ui.model.PauseMenuAction
-import io.github.rwx.ui.model.ReplaySelectActionHandler
-import io.github.rwx.ui.model.ReplaySelectViewModel
-import io.github.rwx.ui.model.ReplaySelectViewModelFactory
-import io.github.rwx.ui.model.ResourceBrowserAction
-import io.github.rwx.ui.model.SettingsAction
-import io.github.rwx.ui.model.SettingsModel
+import io.github.rwx.ui.host.*
+import io.github.rwx.ui.model.*
 import org.koin.dsl.module
 
 val coreModule = module {
@@ -80,8 +52,7 @@ val coreModule = module {
         }
     }
     single<ReplaySelectViewModelFactory> {
-        val storage = get<PlatformStorage>()
-        ReplaySelectViewModelFactory { ReplaySelectViewModel(storage) }
+        ReplaySelectViewModelFactory { ReplaySelectViewModel() }
     }
 
     factory { parameters ->
@@ -128,7 +99,7 @@ val coreModule = module {
             onVisibilityChanged = parameters.getOrNull<(Boolean) -> Unit>() ?: {},
         )
     }
-    factory { parameters ->
+    single { parameters ->
         SnackbarSceneHost(
             model = parameters.getOrNull<SettingsModel>() ?: SettingsModel(),
             onVisibilityChanged = parameters.getOrNull<(Boolean) -> Unit>() ?: {},

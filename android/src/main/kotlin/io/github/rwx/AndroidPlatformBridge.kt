@@ -48,7 +48,7 @@ class AndroidPlatformBridge(context: Context) : PlatformBridge {
     override val preferenceStorage: PreferenceStorage = AndroidPreferenceStorage(appContext)
     override val logger: AppLogger = AndroidLogger()
     override val crashReporter: CrashReporter = FileCrashReporter.get(
-        crashFile = storage.localDir.resolve(CRASH_FILE_NAME),
+        crashFile = storage.rootDir.resolve(CRASH_FILE_NAME),
         environment = androidCrashEnvironment(appContext, appMetadata),
     )
 

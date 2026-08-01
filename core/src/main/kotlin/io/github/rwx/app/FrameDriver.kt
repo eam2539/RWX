@@ -26,6 +26,9 @@ internal class FrameDriver(
     private var nextBattleRoomNetworkPollMillis: Long = 0L
 
     fun drive(isRenderLoopFrame: Boolean = false) {
+        if (modsController.driveReload()) {
+            return
+        }
         coreEventDispatcher.drain(isRenderLoopFrame)
         battleRoomLaunchController.driveDeferredNetworkGameStart()
         updateController.maybeRequestAutomatic(currentScreen() == AppScreen.MainMenu)
@@ -43,8 +46,6 @@ internal class FrameDriver(
             screen = currentScreen(),
             isStartingMap = pendingStartController.isPending,
         )
-        modsController.driveReload()
-
         val isExternalBattleRoomJoinPending = battleRoomJoinController.isPending &&
                 !gameSession.rendersIntoKoolCanvas
         val canResumeForFrame = !isExternalBattleRoomJoinPending && gameSession.canResume()

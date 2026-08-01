@@ -18,7 +18,6 @@ data class ModEntry(
 data class ModsListModel(
     val mods: List<ModEntry>,
     val filter: String = "",
-    val statusText: String = "",
 ) {
     /** Mods matching the current filter (case-insensitive name match); all mods when filter blank. */
     val filtered: List<ModEntry>

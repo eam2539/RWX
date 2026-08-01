@@ -532,6 +532,15 @@ public class FileLoader {
         return file.lastModified();
     }
 
+    public long getFileLength(String str) {
+        String convertedPath = convertAbstractPath(str);
+        IFileLoader fileLoaderForPath = FileLoaderFactory.getFileLoaderForPath(convertedPath);
+        if (fileLoaderForPath != null) {
+            return fileLoaderForPath.getSize(convertedPath, true);
+        }
+        return new File(convertedPath).length();
+    }
+
     /* JADX INFO: renamed from: a */
     public void scanFile(File file) {
         if (GameEngine.isAndroidPlatform()) {

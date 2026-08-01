@@ -12,6 +12,20 @@ internal class SlickAwtGLCanvas(
 ) : AWTGLCanvas(data) {
     private var appliedSwapInterval: Int? = null
 
+    @Volatile
+    private var drawingSurfaceInitialized = false
+
+    override fun beforeRender() {
+        super.beforeRender()
+        drawingSurfaceInitialized = true
+    }
+
+    override fun disposeCanvas() {
+        if (!drawingSurfaceInitialized) return
+        drawingSurfaceInitialized = false
+        super.disposeCanvas()
+    }
+
     override fun initGL() = Unit
 
     override fun paintGL() = Unit

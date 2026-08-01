@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.DocumentsContract.Document
+import androidx.core.net.toUri
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.concurrent.ConcurrentHashMap
@@ -14,36 +15,42 @@ internal class AndroidSafAccess(context: Context) : SafPlatformAccess {
     private val trees = ConcurrentHashMap<String, Uri>()
 
     override fun registerTree(uri: String): String? = runCatching {
-        val treeUri = Uri.parse(uri)
+        val treeUri = uri.toUri()
         DocumentsContract.getTreeDocumentId(treeUri)
         val key = "saf-${uri.hashCode().toUInt().toString(16)}.[saflink]"
         trees[key] = treeUri
         "/$key"
     }.getOrNull()
 
-    override fun exists(path: String): Boolean = resolve(path) != null
+    override fun exists(path: String): Boolean =
+        runCatching { resolve(path) != null }.getOrDefault(false)
 
-    override fun isDirectory(path: String): Boolean = resolve(path)?.mimeType == Document.MIME_TYPE_DIR
+    override fun isDirectory(path: String): Boolean =
+        runCatching { resolve(path)?.mimeType == Document.MIME_TYPE_DIR }.getOrDefault(false)
 
     override fun createDirectory(path: String): Boolean {
         val parsed = parse(path) ?: return false
         return ensureDirectory(parsed.treeUri, parsed.segments) != null
     }
 
-    override fun list(path: String): Array<String>? {
-        val directory = resolve(path)?.takeIf { it.mimeType == Document.MIME_TYPE_DIR } ?: return null
-        return queryChildren(directory.treeUri, directory.documentId)
+    override fun list(path: String): Array<String>? = runCatching {
+        val directory = resolve(path)?.takeIf { it.mimeType == Document.MIME_TYPE_DIR }
+            ?: return@runCatching null
+        queryChildren(directory.treeUri, directory.documentId)
             .map { it.name }
             .sorted()
             .toTypedArray()
-    }
+    }.getOrNull()
 
-    override fun size(path: String): Long = resolve(path)?.size ?: -1L
+    override fun size(path: String): Long =
+        runCatching { resolve(path)?.size ?: -1L }.getOrDefault(-1L)
 
-    override fun lastModified(path: String): Long = resolve(path)?.lastModified ?: 0L
+    override fun lastModified(path: String): Long =
+        runCatching { resolve(path)?.lastModified ?: 0L }.getOrDefault(0L)
 
-    override fun openInput(path: String): InputStream? =
-        resolve(path)?.let { runCatching { resolver.openInputStream(it.documentUri) }.getOrNull() }
+    override fun openInput(path: String): InputStream? = runCatching {
+        resolve(path)?.let { resolver.openInputStream(it.documentUri) }
+    }.getOrNull()
 
     override fun openOutput(path: String, append: Boolean): OutputStream? {
         val parsed = parse(path) ?: return null
@@ -66,8 +73,7 @@ internal class AndroidSafAccess(context: Context) : SafPlatformAccess {
         val target = parse(targetPath) ?: return false
         val targetName = target.segments.lastOrNull() ?: return false
         val targetParentSegments = target.segments.dropLast(1)
-        if (source.parentSegments != targetParentSegments) return false
-        return runCatching {
+        return source.parentSegments == targetParentSegments && runCatching {
             DocumentsContract.renameDocument(resolver, source.documentUri, targetName) != null
         }.getOrDefault(false)
     }

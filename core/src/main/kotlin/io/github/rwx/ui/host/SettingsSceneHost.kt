@@ -221,6 +221,12 @@ class SettingsSceneHost(
         dispatch(SettingsAction.ApplyChanges)
         if (GameEngine.getInstance() != null) {
             FileHelper.initialize()
+            GameEngine.getInstance()?.modManager?.let { manager ->
+                runCatching {
+                    manager.loadAllMods()
+                    manager.loadModSelection()
+                }
+            }
         }
     }
 

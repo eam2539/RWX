@@ -6,6 +6,7 @@ import com.corrodinggames.rts.gameFramework.utility.Log;
 import com.corrodinggames.rts.gameFramework.utility.saf.SafFileLoader;
 import io.github.rwx.Preference;
 import io.github.rwx.PreferenceStorage;
+import io.github.rwx.SafPlatformBridge;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -636,7 +637,13 @@ public class SettingsEngine {
             gameEngine.settingsEngine.externalSAFWorking = false;
             return false;
         }
-        FileHelper.overriddenExternalPath = strA;
+        String storageRoot = SafPlatformBridge.resolveStorageRoot(strA, str3);
+        if (storageRoot == null) {
+            GameEngine.log("Unable to read external SAF folder");
+            gameEngine.settingsEngine.externalSAFWorking = false;
+            return false;
+        }
+        FileHelper.overriddenExternalPath = storageRoot;
         gameEngine.settingsEngine.externalSAFWorking = true;
         return true;
     }

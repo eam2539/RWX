@@ -332,7 +332,9 @@ class FileSystemModRepository(
     }
 
     private fun modScanRoots(): List<File> = buildList {
-        add(File(storage.modsDir.file, "units"))
+        if (storage.modsDir.file != storage.unitsDir.file) {
+            add(File(storage.modsDir.file, "units"))
+        }
         add(storage.unitsDir.file)
     }.distinctBy { it.absoluteFile.normalize().path }
         .filter { it.isDirectory }

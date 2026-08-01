@@ -32,7 +32,7 @@ class DesktopPlatformBridge : PlatformBridge {
     override val appMetadata: AppMetadata = AppMetadata()
     override val logger: AppLogger = DesktopLogger()
     override val crashReporter: CrashReporter = FileCrashReporter.get(
-        crashFile = storage.localDir.resolve(CRASH_FILE_NAME),
+        crashFile = storage.rootDir.resolve(CRASH_FILE_NAME),
         environment = linkedMapOf(
             "platform" to "Desktop",
             "app.versionName" to appMetadata.versionName,
@@ -124,7 +124,7 @@ private class DesktopPlatformAudio(
 }
 
 class DesktopPlatformStorage : PlatformStorage {
-    val baseDir: File = defaultProjectRoot()
+    val baseDir: File = defaultRoot()
     private val assetRoot: File = resolveAssetRoot()
     val localBaseDir: File = defaultLocalBaseDir()
     override val rootDir: StorageLocation = location("/SD/rustedWarfare/", baseDir)
@@ -211,7 +211,7 @@ class DesktopPlatformStorage : PlatformStorage {
             configuredAssetRoot()
                 ?: externalAssetRoot()
                 ?: extractBundledAssets()
-                ?: File(defaultProjectRoot(), "assets")
+                ?: File(defaultRoot(), "assets")
         }
 
         internal fun resolveAssetRoot(): File = resolvedAssetRoot
@@ -230,18 +230,22 @@ class DesktopPlatformStorage : PlatformStorage {
                 )
             }
         }
+        fun defaultRoot(): File {
+            val launchDir = System.getProperty("launch.dir")
+            if (launchDir != null) {
+                return File(launchDir)
+            }
+            val location = this::class.java.protectionDomain.codeSource?.location ?: return File(".")
 
-        private fun defaultProjectRoot(): File {
-            val cwd = File(System.getProperty("user.dir")).absoluteFile
-            return generateSequence(cwd) { it.parentFile }
-                .firstOrNull { candidate ->
-                    File(candidate, "assets").isDirectory &&
-                            (File(candidate, "settings.gradle.kts").isFile || File(
-                                candidate,
-                                "build.gradle.kts"
-                            ).isFile)
+            return try {
+                val file = File(location.toURI())
+                when {
+                    file.name.endsWith(".jar") -> file.parentFile!!
+                    else -> File(System.getProperty("user.dir")).absoluteFile
                 }
-                ?: cwd
+            } catch (e: Exception) {
+                File(".")
+            }
         }
 
         private fun configuredAssetRoot(): File? =
@@ -262,7 +266,7 @@ class DesktopPlatformStorage : PlatformStorage {
                     findAssetsFrom(source)?.let { return it }
                 }
             }
-            return findAssetsFrom(defaultProjectRoot())
+            return findAssetsFrom(defaultRoot())
         }
 
         private fun findAssetsFrom(start: File): File? =
@@ -322,7 +326,7 @@ internal fun configureDesktopLogging() {
     configure(
         property = "rwx.log.dir",
         environment = "RWX_LOG_DIR",
-        defaultValue = File(DesktopPlatformStorage.defaultLocalBaseDir(), "logs").absolutePath,
+        defaultValue = File(DesktopPlatformStorage.defaultRoot(), "logs").absolutePath,
     )
     configure("rwx.log.level", "RWX_LOG_LEVEL", "INFO")
     configure("rwx.log.consoleLevel", "RWX_CONSOLE_LOG_LEVEL", "INFO")

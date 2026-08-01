@@ -20,12 +20,12 @@ fun Node.addPanelSurface(
     style: PanelStyle,
     name: String,
     model: SettingsModel,
-    backgroundColor: UiScope.(ColorSchemeDefinition) -> Color = { style.backgroundColor(it) },
-    themeBackgroundColor: UiScope.(ColorSchemeDefinition) -> Color = backgroundColor,
+    backgroundColor: UiScope.(ColorSchemeDefinition) -> Color? = { style.backgroundColor(it) },
+    themeBackgroundColor: UiScope.(ColorSchemeDefinition) -> Color = { style.backgroundColor(it) },
     block: UiScope.(ColorSchemeDefinition) -> Unit,
-) {
+): UiSurface {
     val initialScheme = ColorSchemeRegistry.schemeFor(model.selectedColorSchemeId.value)
-    addPanelSurface(
+    return addPanelSurface(
         name = name,
         colors = UiTheme.colors(initialScheme, style.backgroundColor(initialScheme)),
         sizes = UiTheme.sizes,

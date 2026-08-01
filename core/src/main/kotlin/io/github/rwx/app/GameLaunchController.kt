@@ -6,7 +6,7 @@ import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.session.BattleRoomLaunchConfig
 import io.github.rwx.session.GameSession
 import io.github.rwx.session.savedGameRequestPath
-import io.github.rwx.ui.*
+import io.github.rwx.ui.AppScreen
 import io.github.rwx.ui.host.DialogSceneHost
 import io.github.rwx.ui.model.Dialog
 import io.github.rwx.ui.model.DialogButton
@@ -96,7 +96,7 @@ internal class GameLaunchController(
             }
             return
         }
-        gameSession.discardRunningGame()
+        discardRunningGameBeforeStandaloneLaunch()
         pendingStartController.set(replay.replayName, mapStartFailureReturnScreen(currentScreen()))
         gameSession.prepareReplayAsync(replay.replayName, viewport())
         logger.info { "Entering RW replay while it prepares: ${replay.replayName}" }
@@ -113,10 +113,16 @@ internal class GameLaunchController(
             return
         }
         val requestPath = savedGameRequestPath(requestedSaveName)
-        gameSession.discardRunningGame()
+        discardRunningGameBeforeStandaloneLaunch()
         pendingStartController.set(requestPath, mapStartFailureReturnScreen(currentScreen()))
         gameSession.prepareMapAsync(requestPath, viewport())
         logger.info { "Entering RW saved game while it prepares: $requestedSaveName" }
         navigateTo(AppScreen.InGame)
+    }
+
+    private fun discardRunningGameBeforeStandaloneLaunch() {
+        if (!gameSession.canStartNewSessionInPlace) {
+            gameSession.discardRunningGame()
+        }
     }
 }

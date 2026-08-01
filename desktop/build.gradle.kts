@@ -350,6 +350,7 @@ val createJpackageImage by tasks.registering(Exec::class) {
             "--main-class", application.mainClass.get(),
             "--java-options", "-Dfile.encoding=UTF-8",
             "--java-options", "-Dorg.lwjgl.opengl.contextAPI=native",
+            "--java-options", "-Dlaunch.dir=\$ROOTDIR"
         )
         val icon = if (targetPlatform.osName == "macos") {
             generatedMacIcon.get().asFile

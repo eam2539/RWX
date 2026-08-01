@@ -35,6 +35,19 @@ object SafPlatformBridge {
     fun registerTree(uri: String): String? = access?.registerTree(uri)
 
     @JvmStatic
+    fun resolveStorageRoot(treePath: String, pathExtra: String?): String? {
+        if (!isDirectory(treePath)) return null
+
+        normalizedRelativePath(pathExtra)?.let { relativePath ->
+            join(treePath, relativePath).takeIf(::isDirectory)?.let { return it }
+        }
+
+        return join(treePath, LEGACY_ROOT_DIRECTORY)
+            .takeIf(::isDirectory)
+            ?: treePath
+    }
+
+    @JvmStatic
     fun exists(path: String): Boolean = access?.exists(path) == true
 
     @JvmStatic
@@ -64,4 +77,19 @@ object SafPlatformBridge {
 
     @JvmStatic
     fun delete(path: String): Boolean = access?.delete(path) == true
+
+    private fun normalizedRelativePath(path: String?): String? {
+        val normalized = path
+            ?.replace('\\', '/')
+            ?.trim('/')
+            ?.takeIf(String::isNotBlank)
+            ?: return null
+        val segments = normalized.split('/')
+        return normalized.takeIf { segments.none { segment -> segment == "." || segment == ".." } }
+    }
+
+    private fun join(root: String, child: String): String =
+        root.trimEnd('/', '\\') + "/" + child.trimStart('/', '\\')
+
+    private const val LEGACY_ROOT_DIRECTORY = "rustedWarfare"
 }

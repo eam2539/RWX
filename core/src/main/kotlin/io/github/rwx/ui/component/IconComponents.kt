@@ -108,7 +108,7 @@ fun UiScope.IconButton(
 fun UiScope.TextIconButton(
     label: String,
     icon: Icon,
-    width: Dp,
+    width: Dp? = null,
     theme: ColorSchemeDefinition,
     emphasized: Boolean = false,
     font: Font = UiTheme.Fonts.bodySmall,
@@ -126,7 +126,7 @@ fun UiScope.TextIconButton(
     val textColor = if (isHovered) theme.palette.primary else theme.palette.textPrimary
     val iconColor = if (isHovered) theme.palette.secondary else theme.palette.primary
 
-    Box(width = width, height = height) {
+    Box(width = width ?: FitContent, height = height) {
         modifier
             .margin(UiTheme.Spacing.xs)
             .padding(horizontal = UiTheme.Spacing.md, vertical = UiTheme.Spacing.xs)
@@ -151,7 +151,6 @@ fun UiScope.TextIconButton(
                     .clipToBounds(true)
                     .textColor(textColor)
             }
-            Box(width = UiTheme.Layout.textButtonIconSlotSize, height = Grow.Std) {}
         }
     }
 }

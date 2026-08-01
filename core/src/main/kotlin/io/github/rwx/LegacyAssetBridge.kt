@@ -69,6 +69,10 @@ object LegacyAssetBridge {
         (platformStorage()?.localDir?.file ?: File(System.getProperty("user.dir"), "local")).also { it.mkdirs() }
 
     @JvmStatic
+    fun storageRootDir(): File =
+        (platformStorage()?.rootDir?.file ?: localDir()).also { it.mkdirs() }
+
+    @JvmStatic
     fun cacheDir(): File =
         (platformStorage()?.cacheDir?.file ?: File(localDir(), "cache")).also { it.mkdirs() }
 

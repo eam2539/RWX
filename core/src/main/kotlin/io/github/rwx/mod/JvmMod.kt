@@ -22,7 +22,7 @@ class JvmModLoader @JvmOverloads constructor(
     val loadedMods = mutableListOf<Mod>()
 
     fun loadMods(handle: File): List<Mod> {
-        return discoverMods(handle).mapNotNull { mod ->
+        return discoverModFiles(listCandidateModFiles(handle)).mapNotNull { mod ->
             runCatching {
                 initializeMod(mod)
                 mod
@@ -33,9 +33,9 @@ class JvmModLoader @JvmOverloads constructor(
         }
     }
 
-    fun discoverMods(handle: File): List<JvmMod> {
+    fun discoverModFiles(files: Iterable<File>): List<JvmMod> {
         val currentBatch = mutableListOf<JvmMod>()
-        listCandidateModFiles(handle).forEach { file ->
+        files.forEach { file ->
             runCatching {
                 discoverModFile(file)?.let { mod ->
                     currentBatch += mod

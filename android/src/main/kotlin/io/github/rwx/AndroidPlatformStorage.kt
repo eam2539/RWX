@@ -25,8 +25,8 @@ class AndroidPlatformStorage(context: Context) : PlatformStorage {
         this.rootDir = location("/SD/rustedWarfare/", this.externalRoot)
         this.localDir = location("/LOCAL/", this.localRoot)
         this.cacheDir = location("/LOCAL/cache/", appContext.externalCacheDir ?: appContext.cacheDir)
-        this.modsDir = location("/SD/mods/", File(this.externalRoot, "mods"))
         this.unitsDir = location("/SD/rustedWarfare/units/", File(this.externalRoot, "units"))
+        this.modsDir = this.unitsDir
         this.mapsDir = location("/SD/rustedWarfare/maps/", File(this.externalRoot, "maps"))
         this.savesDir = location("/SD/rustedWarfare/saves/", File(this.externalRoot, "saves"))
         this.replaysDir = location("/SD/rustedWarfare/replays/", File(this.externalRoot, "replays"))
@@ -109,7 +109,6 @@ class AndroidPlatformStorage(context: Context) : PlatformStorage {
         this.rootDir.file.mkdirs()
         this.localDir.file.mkdirs()
         this.cacheDir.file.mkdirs()
-        this.modsDir.file.mkdirs()
         this.unitsDir.file.mkdirs()
         this.mapsDir.file.mkdirs()
         this.savesDir.file.mkdirs()

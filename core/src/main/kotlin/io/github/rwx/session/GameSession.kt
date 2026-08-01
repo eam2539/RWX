@@ -73,6 +73,8 @@ abstract class GameSession {
     protected var pendingRendererBattleRoomConfig: BattleRoomLaunchConfig? = null
     protected var activeRendererBattleRoomConfig: BattleRoomLaunchConfig? = null
     protected var runningMapPath: String? = null
+
+    @Volatile
     protected var lastViewport: KoolCanvasViewport = KoolCanvasViewport(0, 0)
 
     @Volatile
