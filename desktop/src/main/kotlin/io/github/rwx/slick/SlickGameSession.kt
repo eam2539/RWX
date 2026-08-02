@@ -423,28 +423,30 @@ class SlickGameSession(
         return true
     }
 
-    // The Slick render thread owns the engine while it is alive and does not take `gameLock`, so
-    // the base implementations would mutate the engine concurrently with `gameLoop()`. Hand these
-    // to the render thread instead, and only fall back to the direct path when it is not running.
+    // The Slick render thread owns the engine while it is alive and never takes gameLock, so the
+    // base class's inline-under-gameLock execution would race gameLoop(). Hand every engine
+    // command to that thread instead; fall back to the base path only when the runtime is not
+    // running (no owner to race) or when we are already on the render thread.
 
-    override fun requestSaveGame(name: String) {
-        val game = activeGame()
-        if (game != null) game.requestSaveGame(name) else super.requestSaveGame(name)
+    override fun <T> runEngineCommand(label: String, command: (GameEngine) -> T?): T? {
+        val activeGame = routedEngineCommandTarget() ?: return super.runEngineCommand(label, command)
+        return activeGame.awaitEngineCommand(label, ENGINE_COMMAND_TIMEOUT_MILLIS, command)
     }
 
-    override fun requestExportMap(name: String) {
-        val game = activeGame()
-        if (game != null) game.requestExportMap(name) else super.requestExportMap(name)
+    override fun postEngineCommand(label: String, command: (GameEngine) -> Unit) {
+        val activeGame = routedEngineCommandTarget()
+        if (activeGame == null) {
+            super.postEngineCommand(label, command)
+        } else {
+            activeGame.postEngineCommand(label, command)
+        }
     }
 
-    override fun requestSurrender() {
-        val game = activeGame()
-        if (game != null) game.requestSurrender() else super.requestSurrender()
-    }
-
-    override fun requestChatMessage(message: String, teamOnly: Boolean) {
-        val game = activeGame()
-        if (game != null) game.requestChatMessage(message, teamOnly) else super.requestChatMessage(message, teamOnly)
+    private fun routedEngineCommandTarget(): SlickGame? {
+        // Re-entrant call from render-thread code must run inline or it would deadlock waiting on
+        // its own drain.
+        if (Thread.currentThread() === renderThread) return null
+        return activeGame()
     }
 
 
@@ -782,6 +784,7 @@ class SlickGameSession(
 }
 
 private const val MENU_BACKGROUND_REQUEST = "<menu-background>"
+private const val ENGINE_COMMAND_TIMEOUT_MILLIS = 2_000L
 private const val EXIT_FRAME_SNAPSHOT_TIMEOUT_MILLIS = 150L
 private const val RENDER_THREAD_JOIN_TIMEOUT_MILLIS = 2_000L
 private const val SLICK_CANVAS_INSTALL_TIMEOUT_MILLIS = 15_000L

@@ -158,6 +158,28 @@ abstract class GameSession {
     @Volatile
     var latestBattleRoomJoinError: String? = null
 
+    /**
+     * Runs [command] against the live engine on whichever thread owns it and returns its result,
+     * or null when no engine is available or the owner could not complete it in time.
+     *
+     * Base behavior executes inline under [gameLock]; that is correct wherever the engine's owner
+     * itself serializes on [gameLock] (Android's tick, the background loaders). A backend whose
+     * owner thread never takes [gameLock] — the embedded Slick render thread — overrides this to
+     * hand the command to that thread, so UI-triggered engine access stops racing the game loop.
+     */
+    protected open fun <T> runEngineCommand(label: String, command: (GameEngine) -> T?): T? =
+        synchronized(gameLock) {
+            val engine = activeEngineLocked() ?: return null
+            runCatching { command(engine) }
+                .onFailure { error -> logger.warn(error) { "Engine command failed: $label" } }
+                .getOrNull()
+        }
+
+    /** Fire-and-forget form of [runEngineCommand]: the caller never waits for the result. */
+    protected open fun postEngineCommand(label: String, command: (GameEngine) -> Unit) {
+        runEngineCommand(label, command)
+    }
+
     open fun configureRendererProfile(profile: GameSessionRendererProfile) {
         rendererProfile = profile
     }
@@ -190,16 +212,16 @@ abstract class GameSession {
         // Input during a long engine hold is meaningless (nothing interactive is running) and must
         // not park the UI thread on gameLock — drop it.
         if (isEngineBusyForUiReads()) return
-        synchronized(gameLock) {
-            gameEngine?.setKeyState(androidKeyCode, isDown)
+        postEngineCommand("key state") { engine ->
+            engine.setKeyState(androidKeyCode, isDown)
         }
     }
 
     open fun submitMouseWheel(amount: Int) {
         if (amount == 0) return
         if (isEngineBusyForUiReads()) return
-        synchronized(gameLock) {
-            gameEngine?.queueMouseWheelDelta(amount)
+        postEngineCommand("mouse wheel") { engine ->
+            engine.queueMouseWheelDelta(amount)
         }
     }
 
@@ -1024,9 +1046,8 @@ abstract class GameSession {
     }
 
     open fun requestSaveGame(name: String) {
-        synchronized(gameLock) {
-            val engine = activeEngineLocked() ?: return
-            val saveName = name.toRwSaveName()
+        val saveName = name.toRwSaveName()
+        postEngineCommand("save game") { engine ->
             runCatching {
                 engine.gameSaver.saveGame(saveName, false)
                 engine.gameUI?.showMediumPriorityMessage("Game saved")
@@ -1037,18 +1058,18 @@ abstract class GameSession {
         }
     }
 
-    open fun captureMemorySnapshot(): GameMemorySnapshot? {
-        synchronized(gameLock) {
-            val engine = activeEngineLocked() ?: return null
+    open fun captureMemorySnapshot(): GameMemorySnapshot? =
+        runEngineCommand("capture memory snapshot") { engine ->
             if (engine.isNetworkGameActive() || !engine.hasLoadedLevel) {
-                return null
+                return@runEngineCommand null
             }
-            val mapPath = activeRunningMapPath(engine)?.takeIf { it.isNotBlank() } ?: return null
+            val mapPath = activeRunningMapPath(engine)?.takeIf { it.isNotBlank() }
+                ?: return@runEngineCommand null
             val state = loadState
             val battleRoomConfig = state.activeRendererBattleRoomConfig
                 ?.copy(mapPath = mapPath)
                 ?: state.pendingRendererBattleRoomConfig?.copy(mapPath = mapPath)
-            return runCatching {
+            runCatching {
                 val output = GameOutputStream()
                 engine.gameSaver.writeSaveToStream(output)
                 GameMemorySnapshot(mapPath, output.toByteArray(), battleRoomConfig)
@@ -1057,15 +1078,13 @@ abstract class GameSession {
                 engine.gameUI?.showHighPriorityMessage("Map snapshot failed: ${error.message ?: error.javaClass.simpleName}")
             }.getOrNull()
         }
-    }
 
     open fun requestExportMap(name: String) {
-        synchronized(gameLock) {
-            val engine = activeEngineLocked() ?: return
+        val exportName = name.toRwExportMapName()
+        postEngineCommand("export map") { engine ->
             val sourceMap = engine.currentMapPath?.takeIf { it.isNotBlank() }
                 ?: loadState.runningMapPath?.takeIf { it.isNotBlank() }
-                ?: return
-            val exportName = name.toRwExportMapName()
+                ?: return@postEngineCommand
             val exportPath = "/SD/rustedWarfare/maps/$exportName.tmx"
             runCatching {
                 engine.tileMap.exportMapToPath(sourceMap, exportPath)
@@ -1104,15 +1123,16 @@ abstract class GameSession {
     }
 
     open fun requestSurrender() {
-        synchronized(gameLock) {
-            activeEngineLocked()?.networkEngine?.sendChatMessage("-surrender")
+        postEngineCommand("surrender") { engine ->
+            engine.networkEngine?.sendChatMessage("-surrender")
         }
     }
 
     open fun requestChatMessage(message: String, teamOnly: Boolean = false) {
-        if (message.isBlank()) return
-        synchronized(gameLock) {
-            activeEngineLocked()?.networkEngine?.sendChatMessage(if (teamOnly) "-t $message" else message)
+        val trimmed = message.trim()
+        if (trimmed.isBlank()) return
+        postEngineCommand("chat message") { engine ->
+            engine.networkEngine?.sendChatMessage(if (teamOnly) "-t $trimmed" else trimmed)
         }
     }
 
@@ -1164,21 +1184,21 @@ abstract class GameSession {
     }
 
     open fun disconnectRunningMultiplayer() {
-        synchronized(gameLock) {
-            activeEngineLocked()?.networkEngine?.disconnectNetworking("exited")
+        postEngineCommand("disconnect multiplayer") { engine ->
+            engine.networkEngine?.disconnectNetworking("exited")
         }
     }
 
-    open fun scheduleReturnToBattleRoom(): Boolean = synchronized(gameLock) {
-        val engine = activeEngineLocked() ?: return@synchronized false
-        val networkEngine = engine.networkEngine ?: return@synchronized false
-        if (!networkEngine.networkGameActive || !networkEngine.gameHasBeenStarted || !networkEngine.isServer) {
-            return@synchronized false
-        }
-        networkEngine.scheduleDefaultReturnToBattleroom()
-        engine.gameUI?.isDraggingSelection = false
-        true
-    }
+    open fun scheduleReturnToBattleRoom(): Boolean =
+        runEngineCommand("schedule return to battle room") { engine ->
+            val networkEngine = engine.networkEngine ?: return@runEngineCommand false
+            if (!networkEngine.networkGameActive || !networkEngine.gameHasBeenStarted || !networkEngine.isServer) {
+                return@runEngineCommand false
+            }
+            networkEngine.scheduleDefaultReturnToBattleroom()
+            engine.gameUI?.isDraggingSelection = false
+            true
+        } ?: false
 
     open fun currentMultiplayerPlayerName(): String {
         if (isEngineBusyForUiReads()) {
@@ -1196,21 +1216,24 @@ abstract class GameSession {
     open fun updateMultiplayerPlayerName(name: String): Boolean {
         val normalizedName = name.trim().replace(' ', '_')
         if (normalizedName.isBlank()) return false
-        synchronized(gameLock) {
-            val engine = activeEngineLocked()
-            engine?.networkEngine?.playerName = normalizedName
-            val settings = engine?.settingsEngine ?: SettingsEngine.getInstance() ?: return false
+        runEngineCommand("update multiplayer player name") { engine ->
+            engine.networkEngine?.playerName = normalizedName
+            val settings = engine.settingsEngine ?: SettingsEngine.getInstance() ?: return@runEngineCommand false
             settings.lastNetworkPlayerName = normalizedName
             settings.save()
-        }
+            true
+        }?.let { return it }
+        // No engine yet: persist to settings alone, like before.
+        val settings = SettingsEngine.getInstance() ?: return false
+        settings.lastNetworkPlayerName = normalizedName
+        settings.save()
         return true
     }
 
     open fun injectTransferredUnits(units: List<TransferredUnit>, targetPortalId: String?): Int {
         if (units.isEmpty()) return 0
-        synchronized(gameLock) {
-            val engine = activeEngineLocked() ?: return 0
-            if (!engine.hasLoadedLevel) return 0
+        return runEngineCommand("inject transferred units") { engine ->
+            if (!engine.hasLoadedLevel) return@runEngineCommand 0
             val center = engine.missionEngine?.getMapPortalCenter(targetPortalId)
             val spawnX = center?.getOrNull(0) ?: (engine.viewpointX + engine.halfVisibleWorldWidth)
             val spawnY = center?.getOrNull(1) ?: (engine.viewpointY + engine.halfVisibleWorldHeight)
@@ -1236,8 +1259,8 @@ abstract class GameSession {
             if (createdCount > 0) {
                 engine.gameUI?.showMediumPriorityMessage("Transferred $createdCount unit(s)")
             }
-            return createdCount
-        }
+            createdCount
+        } ?: 0
     }
 
     open fun isMapLoaded(mapPath: String? = runningMapPath()): Boolean {
@@ -1337,12 +1360,11 @@ abstract class GameSession {
         runCatching {
             val viewport = lastViewport.takeIf { it.width > 0 && it.height > 0 } ?: defaultPreloadViewport
             ensureStartedOutsideGameLock(viewport)
-            synchronized(gameLock) {
-                val engine = activeEngineLocked() ?: return@synchronized false
-                val networkEngine = engine.networkEngine ?: return@synchronized false
+            runEngineCommand(label) { engine ->
+                val networkEngine = engine.networkEngine ?: return@runEngineCommand false
                 prepareActiveBattleRoomEngine(engine)
                 command(engine, networkEngine)
-            }
+            } ?: false
         }.onFailure { error ->
             logger.warn(error) { "Unable to $label" }
         }.getOrDefault(false)

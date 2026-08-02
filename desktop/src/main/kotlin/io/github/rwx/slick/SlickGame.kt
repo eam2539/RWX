@@ -34,6 +34,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
@@ -232,17 +233,8 @@ class SlickGame(
     @Volatile
     private var pendingHeight: Int = initialHeight
 
-    @Volatile
-    private var pendingSaveName: String? = null
-
-    @Volatile
-    private var pendingExportMapName: String? = null
-
-    @Volatile
-    private var pendingSurrender: Boolean = false
-
     val modReloadQueue = SlickModReloadQueue()
-    private val pendingChatMessages = ConcurrentLinkedQueue<PendingChatMessage>()
+    private val pendingEngineCommands = ConcurrentLinkedQueue<PendingEngineCommand>()
     private val pendingTextInputRequests = ConcurrentLinkedQueue<SlickTextInputRequest>()
     private val pendingTextInputResponses = ConcurrentLinkedQueue<PendingTextInputResponse>()
     private val pendingTextInputHandlers = ConcurrentHashMap<Int, PasswordHandler>()
@@ -402,9 +394,7 @@ class SlickGame(
         applyPendingInputEvents(activeEngine)
         applyPendingSize(activeEngine, container)
         applyPendingRequest(activeEngine)
-        savePendingGame(activeEngine)
-        exportPendingMap(activeEngine)
-        applyPendingInGameCommands(activeEngine)
+        applyPendingEngineCommands(activeEngine)
         applyPendingTextInputResponses()
         updatePointerCursor(container, activeEngine)
         abortStartedGameAfterDisconnect(activeEngine)
@@ -824,20 +814,27 @@ class SlickGame(
         pendingHeight = height
     }
 
-    fun requestSaveGame(name: String) {
-        pendingSaveName = name.toRwSaveName()
+    /** Queues [command] for the render thread's next drain without waiting for its result. */
+    fun postEngineCommand(label: String, command: (GameEngine) -> Any?) {
+        pendingEngineCommands.add(PendingEngineCommand(label, command))
     }
 
-    fun requestExportMap(name: String) {
-        pendingExportMapName = name.toRwExportMapName()
-    }
-
-    fun requestSurrender() {
-        pendingSurrender = true
-    }
-
-    fun requestChatMessage(message: String, teamOnly: Boolean) {
-        pendingChatMessages.add(PendingChatMessage(message.trim(), teamOnly))
+    /**
+     * Queues [command] and waits for the render thread to run it, returning its result. Returns
+     * null when it does not complete within [timeoutMillis] (render thread mid-load or shutting
+     * down); the command is then abandoned so it cannot apply late and surprise the caller.
+     */
+    fun <T> awaitEngineCommand(label: String, timeoutMillis: Long, command: (GameEngine) -> T?): T? {
+        val pending = PendingEngineCommand(label) { engine -> command(engine) }
+        pendingEngineCommands.add(pending)
+        return try {
+            @Suppress("UNCHECKED_CAST")
+            pending.result.get(timeoutMillis, TimeUnit.MILLISECONDS) as T?
+        } catch (error: Exception) {
+            pending.abandoned.set(true)
+            GameEngine.log("Engine command did not complete on the render thread: $label ($error)")
+            null
+        }
     }
 
     fun pollTextInputRequests(): List<SlickTextInputRequest> {
@@ -854,34 +851,6 @@ class SlickGame(
 
     fun cancelTextInput(requestId: Int) {
         pendingTextInputResponses.add(PendingTextInputResponse(requestId, null, cancel = true))
-    }
-
-    private fun savePendingGame(activeEngine: GameEngine) {
-        val saveName = pendingSaveName ?: return
-        pendingSaveName = null
-        runCatching {
-            activeEngine.gameSaver.saveGame(saveName, false)
-            activeEngine.gameUI?.showMediumPriorityMessage("Game saved")
-        }.onFailure { error ->
-            GameEngine.log("Failed to save game: $saveName", error)
-            activeEngine.gameUI?.showHighPriorityMessage("Save failed: ${error.message ?: error.javaClass.simpleName}")
-        }
-    }
-
-    private fun exportPendingMap(activeEngine: GameEngine) {
-        val exportName = pendingExportMapName ?: return
-        pendingExportMapName = null
-        val sourceMap = activeEngine.currentMapPath?.takeIf { it.isNotBlank() }
-            ?: runningMapPath?.takeIf { it.isNotBlank() }
-            ?: return
-        val exportPath = "/SD/rustedWarfare/maps/$exportName.tmx"
-        runCatching {
-            activeEngine.tileMap.exportMapToPath(sourceMap, exportPath)
-            activeEngine.gameUI?.showMediumPriorityMessage("Map exported: $exportName")
-        }.onFailure { error ->
-            GameEngine.log("Failed to export map: $exportPath", error)
-            activeEngine.gameUI?.showHighPriorityMessage("Export failed: ${error.message ?: error.javaClass.simpleName}")
-        }
     }
 
     internal fun runPendingNonRenderingWork(): Boolean {
@@ -955,15 +924,15 @@ class SlickGame(
         }
     }
 
-    private fun applyPendingInGameCommands(activeEngine: GameEngine) {
-        if (pendingSurrender) {
-            pendingSurrender = false
-            activeEngine.networkEngine?.sendChatMessage("-surrender")
-        }
+    private fun applyPendingEngineCommands(activeEngine: GameEngine) {
         while (true) {
-            val chat = pendingChatMessages.poll() ?: break
-            if (chat.message.isBlank()) continue
-            activeEngine.networkEngine?.sendChatMessage(if (chat.teamOnly) "-t ${chat.message}" else chat.message)
+            val pending = pendingEngineCommands.poll() ?: break
+            if (pending.abandoned.get()) continue
+            val outcome = runCatching { pending.command(activeEngine) }
+            outcome.exceptionOrNull()?.let { error ->
+                GameEngine.log("Engine command failed: ${pending.label}", error)
+            }
+            pending.result.complete(outcome.getOrNull())
         }
     }
 
@@ -1228,10 +1197,16 @@ class SlickGame(
     }
 }
 
-private data class PendingChatMessage(
-    val message: String,
-    val teamOnly: Boolean,
-)
+/** A session-issued engine mutation waiting for the render thread that owns the engine. */
+private class PendingEngineCommand(
+    val label: String,
+    val command: (GameEngine) -> Any?,
+) {
+    val result = CompletableFuture<Any?>()
+
+    /** Set when the poster stopped waiting; the drain then skips the command entirely. */
+    val abandoned = AtomicBoolean(false)
+}
 
 private data class PendingTextInputResponse(
     val requestId: Int,
