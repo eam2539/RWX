@@ -123,6 +123,29 @@ abstract class GameSession {
     @Volatile
     protected var asyncEnginePreloadError: Throwable? = null
 
+    /**
+     * True while a mod reload owns the engine (and typically [gameLock]) for seconds. UI-facing
+     * reads consult this *before* touching [gameLock] so the frame loop never parks behind the
+     * reload — set it before acquiring the lock, clear it after releasing.
+     */
+    @Volatile
+    protected var modReloadInProgress: Boolean = false
+
+    /**
+     * True while some background worker holds the engine for a long stretch (map load, engine
+     * preload, mod reload). UI-facing reads return a fast fallback instead of blocking on
+     * [gameLock] behind that work.
+     */
+    protected fun isEngineBusyForUiReads(): Boolean =
+        modReloadInProgress || asyncEnginePreloadInProgress.get() || loadState.asyncMapLoadInProgress
+
+    // Last successfully built engine-backed UI views. Rebuilds happen on battle-room UI events and
+    // the app layer's 500ms network poll; while the engine is busy, readers get these instead of
+    // parking on gameLock behind a multi-second load.
+    private val publishedBattleRoom = AtomicReference<BattleRoomSnapshot?>(null)
+    private val publishedPlayerList = AtomicReference<List<BattleRoomPlayerSnapshot>>(emptyList())
+    private val publishedChatHistory = AtomicReference<List<MultiplayerChatSnapshot>>(emptyList())
+
     @Volatile
     private var activeBattleRoomJoinConnector: SocketConnector? = null
 
@@ -164,6 +187,9 @@ abstract class GameSession {
     open fun movePointer(screenX: Float, screenY: Float) = Unit
 
     open fun submitKey(androidKeyCode: Int, isDown: Boolean) {
+        // Input during a long engine hold is meaningless (nothing interactive is running) and must
+        // not park the UI thread on gameLock — drop it.
+        if (isEngineBusyForUiReads()) return
         synchronized(gameLock) {
             gameEngine?.setKeyState(androidKeyCode, isDown)
         }
@@ -171,6 +197,7 @@ abstract class GameSession {
 
     open fun submitMouseWheel(amount: Int) {
         if (amount == 0) return
+        if (isEngineBusyForUiReads()) return
         synchronized(gameLock) {
             gameEngine?.queueMouseWheelDelta(amount)
         }
@@ -435,8 +462,11 @@ abstract class GameSession {
         }
 
     /** True when a live engine-backed battle room is open (host or client), started or not. */
-    open fun isBattleRoomLive(): Boolean =
-        synchronized(gameLock) { currentBattleRoomFromEngineLocked() != null }
+    open fun isBattleRoomLive(): Boolean {
+        if (gameEngine == null && GameEngine.getInstance() == null) return false
+        if (isEngineBusyForUiReads()) return publishedBattleRoom.get() != null
+        return synchronized(gameLock) { currentBattleRoomFromEngineLocked() != null }
+    }
 
     open fun prepareMenuBackgroundAsync(viewport: KoolCanvasViewport) = Unit
 
@@ -518,6 +548,9 @@ abstract class GameSession {
         activeBattleRoomJoinConnector?.a()
         activeBattleRoomJoinConnector = null
         latestBattleRoomJoinError = null
+        publishedBattleRoom.set(null)
+        publishedPlayerList.set(emptyList())
+        publishedChatHistory.set(emptyList())
         updateLoadState {
             it.copy(
                 pendingRendererBattleRoomConfig = null,
@@ -533,9 +566,17 @@ abstract class GameSession {
 
     open fun currentBattleRoom(refreshNetworkStatus: Boolean = true): BattleRoomSnapshot? {
         loadState.pendingRendererBattleRoomConfig?.toBattleRoomSnapshot()?.let { return it }
+        if (gameEngine == null && GameEngine.getInstance() == null) {
+            return null
+        }
+        // While a loader/reload owns the engine, serve the last published room instead of parking
+        // the UI thread on gameLock for the duration of that work.
+        if (isEngineBusyForUiReads()) {
+            return publishedBattleRoom.get()
+        }
         return synchronized(gameLock) {
             currentBattleRoomFromEngineLocked(refreshNetworkStatus)
-        }
+        }.also(publishedBattleRoom::set)
     }
 
     /**
@@ -767,21 +808,27 @@ abstract class GameSession {
     }
 
     open fun canResume(): Boolean {
-        if (loadState.menuBackgroundActive) return false
+        val state = loadState
+        if (state.menuBackgroundActive || state.asyncMapLoadInProgress) return false
+        // Never park the frame loop behind a long engine hold: no engine or a busy engine simply
+        // means "nothing to resume right now".
+        val engine = gameEngine ?: return false
+        if (isEngineBusyForUiReads()) return false
         return synchronized(gameLock) {
-            val engine = gameEngine ?: return@synchronized false
             engine.hasLoadedLevel && !engine.isMenuBackgroundMap && activeRunningMapPath(engine) != null
         }
     }
 
     open fun runningMapPath(): String? = loadState.runningMapPath
 
-    open fun currentMapDisplayName(): String? =
-        synchronized(gameLock) {
+    open fun currentMapDisplayName(): String? {
+        if (gameEngine == null || isEngineBusyForUiReads()) return null
+        return synchronized(gameLock) {
             activeEngineLocked()
                 ?.getCurrentMapName()
                 ?.takeIf { it.isNotBlank() }
         }
+    }
 
     open fun pendingRendererMapPath(): String? {
         val state = loadState
@@ -943,6 +990,9 @@ abstract class GameSession {
     }
 
     open fun discardRunningGame() {
+        publishedBattleRoom.set(null)
+        publishedPlayerList.set(emptyList())
+        publishedChatHistory.set(emptyList())
         updateLoadState {
             it.copy(
                 mapLoadGeneration = it.mapLoadGeneration + 1,
@@ -1028,20 +1078,27 @@ abstract class GameSession {
     }
 
     open suspend fun requestReloadMods(): Boolean {
-        synchronized(gameLock) {
-            val engine = gameEngine ?: ensureStarted(lastViewport)
-            runCatching {
-                engine.beginLoadingStatus("Loading custom unit data", 12)
-                engine.loadLevel("Loading custom unit data")
-                engine.modManager.saveModSelection()
-                engine.modManager.applyAndSaveMods()
-                engine.markLoadingStatusComplete("Mods reloaded")
-                engine.settingsEngine?.save()
-            }.onFailure { error ->
-                logger.error(error) { "Failed to reload mods" }
-                engine.gameUI?.showHighPriorityMessage("Mod reload failed: ${error.message ?: error.javaClass.simpleName}")
-                throw error
+        // Flag first, lock second: readers check the flag before touching gameLock, so the frame
+        // loop keeps rendering (and the reload dialog stays clickable) for the whole reload.
+        modReloadInProgress = true
+        try {
+            synchronized(gameLock) {
+                val engine = gameEngine ?: ensureStarted(lastViewport)
+                runCatching {
+                    engine.beginLoadingStatus("Loading custom unit data", 12)
+                    engine.loadLevel("Loading custom unit data")
+                    engine.modManager.saveModSelection()
+                    engine.modManager.applyAndSaveMods()
+                    engine.markLoadingStatusComplete("Mods reloaded")
+                    engine.settingsEngine?.save()
+                }.onFailure { error ->
+                    logger.error(error) { "Failed to reload mods" }
+                    engine.gameUI?.showHighPriorityMessage("Mod reload failed: ${error.message ?: error.javaClass.simpleName}")
+                    throw error
+                }
             }
+        } finally {
+            modReloadInProgress = false
         }
         return true
     }
@@ -1059,39 +1116,51 @@ abstract class GameSession {
         }
     }
 
-    open fun isNetworkMultiplayerActive(): Boolean = synchronized(gameLock) {
-        activeEngineLocked()?.isNetworkGameActive() == true
-    }
-
-    open fun multiplayerPlayerList(): List<BattleRoomPlayerSnapshot> = synchronized(gameLock) {
-        val engine = activeEngineLocked() ?: return@synchronized emptyList()
-        val networkEngine = engine.networkEngine ?: return@synchronized emptyList()
-        if (!engine.isNetworkGameActive()) return@synchronized emptyList()
-        battleRoomPlayerTeams().map { team ->
-            team.toBattleRoomSnapshotPlayer(
-                isLocal = team == networkEngine.localPlayerTeam || team == engine.playerTeam,
-            )
+    open fun isNetworkMultiplayerActive(): Boolean {
+        if (gameEngine == null || isEngineBusyForUiReads()) return false
+        return synchronized(gameLock) {
+            activeEngineLocked()?.isNetworkGameActive() == true
         }
     }
 
-    open fun multiplayerChatHistory(): List<MultiplayerChatSnapshot> = synchronized(gameLock) {
-        val engine = activeEngineLocked() ?: return@synchronized emptyList()
-        val networkEngine = engine.networkEngine ?: return@synchronized emptyList()
-        if (!engine.isNetworkGameActive()) return@synchronized emptyList()
-        networkEngine.chatLog.b().mapNotNull { entry ->
-            val message = entry as? ChatMessage ?: return@mapNotNull null
-            MultiplayerChatSnapshot(
-                text = message.displayText,
-                teamColorIndex = message.teamColorIndex,
-            )
-        }
+    open fun multiplayerPlayerList(): List<BattleRoomPlayerSnapshot> {
+        if (isEngineBusyForUiReads()) return publishedPlayerList.get()
+        return synchronized(gameLock) {
+            val engine = activeEngineLocked() ?: return@synchronized emptyList()
+            val networkEngine = engine.networkEngine ?: return@synchronized emptyList()
+            if (!engine.isNetworkGameActive()) return@synchronized emptyList<BattleRoomPlayerSnapshot>()
+            battleRoomPlayerTeams().map { team ->
+                team.toBattleRoomSnapshotPlayer(
+                    isLocal = team == networkEngine.localPlayerTeam || team == engine.playerTeam,
+                )
+            }
+        }.also(publishedPlayerList::set)
     }
 
-    open fun runningMultiplayerExitInfo(): RunningMultiplayerExitInfo? = synchronized(gameLock) {
-        val engine = activeEngineLocked() ?: return@synchronized null
-        val networkEngine = engine.networkEngine ?: return@synchronized null
-        if (!engine.isNetworkGameActive() || !networkEngine.gameHasBeenStarted) return@synchronized null
-        RunningMultiplayerExitInfo(isHost = networkEngine.isServer)
+    open fun multiplayerChatHistory(): List<MultiplayerChatSnapshot> {
+        if (isEngineBusyForUiReads()) return publishedChatHistory.get()
+        return synchronized(gameLock) {
+            val engine = activeEngineLocked() ?: return@synchronized emptyList()
+            val networkEngine = engine.networkEngine ?: return@synchronized emptyList()
+            if (!engine.isNetworkGameActive()) return@synchronized emptyList<MultiplayerChatSnapshot>()
+            networkEngine.chatLog.b().mapNotNull { entry ->
+                val message = entry as? ChatMessage ?: return@mapNotNull null
+                MultiplayerChatSnapshot(
+                    text = message.displayText,
+                    teamColorIndex = message.teamColorIndex,
+                )
+            }
+        }.also(publishedChatHistory::set)
+    }
+
+    open fun runningMultiplayerExitInfo(): RunningMultiplayerExitInfo? {
+        if (gameEngine == null || isEngineBusyForUiReads()) return null
+        return synchronized(gameLock) {
+            val engine = activeEngineLocked() ?: return@synchronized null
+            val networkEngine = engine.networkEngine ?: return@synchronized null
+            if (!engine.isNetworkGameActive() || !networkEngine.gameHasBeenStarted) return@synchronized null
+            RunningMultiplayerExitInfo(isHost = networkEngine.isServer)
+        }
     }
 
     open fun disconnectRunningMultiplayer() {
@@ -1111,12 +1180,17 @@ abstract class GameSession {
         true
     }
 
-    open fun currentMultiplayerPlayerName(): String = synchronized(gameLock) {
-        val engine = activeEngineLocked()
-        engine?.networkEngine?.playerName
-            ?: engine?.settingsEngine?.lastNetworkPlayerName
-            ?: SettingsEngine.getInstance()?.lastNetworkPlayerName
-            ?: "Player"
+    open fun currentMultiplayerPlayerName(): String {
+        if (isEngineBusyForUiReads()) {
+            return SettingsEngine.getInstance()?.lastNetworkPlayerName ?: "Player"
+        }
+        return synchronized(gameLock) {
+            val engine = activeEngineLocked()
+            engine?.networkEngine?.playerName
+                ?: engine?.settingsEngine?.lastNetworkPlayerName
+                ?: SettingsEngine.getInstance()?.lastNetworkPlayerName
+                ?: "Player"
+        }
     }
 
     open fun updateMultiplayerPlayerName(name: String): Boolean {
@@ -1170,8 +1244,11 @@ abstract class GameSession {
         if (loadState.asyncMapLoadInProgress) {
             return false
         }
+        // Fast, lock-free exits for the per-frame callers: no engine or an engine owned by a
+        // long-running worker cannot have the requested map ready.
+        val engine = gameEngine ?: return false
+        if (isEngineBusyForUiReads()) return false
         synchronized(gameLock) {
-            val engine = gameEngine ?: return false
             val activeMapPath = activeRunningMapPath(engine)
             if (mapPath != null && activeMapPath != mapPath) {
                 return false

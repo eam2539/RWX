@@ -177,7 +177,7 @@ internal class AndroidGameSession(
         deltaSeconds: Float,
         drainVisibleLayerBuffers: Boolean ,
     ): KoolCanvasFrame {
-        if (loadState.asyncMapLoadInProgress) {
+        if (loadState.asyncMapLoadInProgress || modReloadInProgress) {
             return lastFrame
         }
         if (loadState.menuBackgroundActive && (!requestedGameVisible || !requestedKoolOverlay)) {

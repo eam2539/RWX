@@ -402,6 +402,9 @@ class SlickGameSession(
         val activeCanvas = SlickCanvasHost.gameCanvas()
         val exposedCanvasForReload = activeCanvas != null && !activeCanvas.isShowing
         val activeGame = activeGame() ?: return false
+        // The render thread performs the reload; the flag keeps Kool-side UI reads off the engine
+        // (and off gameLock) while it runs.
+        modReloadInProgress = true
         val request = activeGame.modReloadQueue.request()
         if (exposedCanvasForReload) {
             SlickCanvasHost.setGameVisible(visible = true, koolOverlay = true)
@@ -409,6 +412,7 @@ class SlickGameSession(
         try {
             request.await()
         } finally {
+            modReloadInProgress = false
             if (!request.isCompleted) {
                 activeGame.modReloadQueue.cancelPending(request)
             }
