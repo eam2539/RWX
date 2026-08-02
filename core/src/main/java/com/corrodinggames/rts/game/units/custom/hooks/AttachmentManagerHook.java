@@ -135,13 +135,11 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                 AttachmentSlotDefinition attachmentSlotDefinition = (AttachmentSlotDefinition) objArrA[i];
                 if (attachmentSlotDefinition.D && customUnit.transportedUnits.size > 0 && a(customUnit, attachmentSlotDefinition) == null) {
                     Iterator it = customUnit.transportedUnits.iterator();
-                    while (true) {
-                        if (it.hasNext()) {
-                            BaseUnit baseUnit = (BaseUnit) it.next();
-                            if ((baseUnit instanceof OrderableUnit) && baseUnit.parentEntity == null && customUnit.a((OrderableUnit) baseUnit, attachmentSlotDefinition)) {
-                                baseUnit.unitTransportTarget = null;
-                                break;
-                            }
+                    while (it.hasNext()) {
+                        BaseUnit baseUnit = (BaseUnit) it.next();
+                        if ((baseUnit instanceof OrderableUnit) && baseUnit.parentEntity == null && customUnit.a((OrderableUnit) baseUnit, attachmentSlotDefinition)) {
+                            baseUnit.unitTransportTarget = null;
+                            break;
                         }
                     }
                 }
