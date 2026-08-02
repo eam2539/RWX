@@ -23,6 +23,8 @@ import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.ui.BattleRoomUiBridge
 import io.github.rwx.ui.InGameMenuCallbacks
 import io.github.rwx.ui.InGameMenuController
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 private const val SAVED_GAME_REQUEST_PREFIX: String = "rwx-save://"
 
@@ -68,11 +70,47 @@ abstract class GameSession {
 
     @Volatile
     protected var gameEngine: GameEngine? = null
-    protected var pendingMapPath: String? = null
-    protected var pendingMemorySnapshot: GameMemorySnapshot? = null
-    protected var pendingRendererBattleRoomConfig: BattleRoomLaunchConfig? = null
-    protected var activeRendererBattleRoomConfig: BattleRoomLaunchConfig? = null
-    protected var runningMapPath: String? = null
+
+    /**
+     * Every pending-request / load-progress value the session tracks, as one immutable state.
+     *
+     * All mutation goes through [updateLoadState] — a lock-free CAS loop — so writers on any
+     * thread never block, and readers always observe a *consistent combination* of these fields
+     * instead of the half-updated views the previous individual `@Volatile` fields allowed.
+     * [gameLock] now guards engine access only, never this state.
+     */
+    protected data class SessionLoadState(
+        val pendingMapPath: String? = null,
+        val pendingMemorySnapshot: GameMemorySnapshot? = null,
+        val pendingRendererBattleRoomConfig: BattleRoomLaunchConfig? = null,
+        val activeRendererBattleRoomConfig: BattleRoomLaunchConfig? = null,
+        val runningMapPath: String? = null,
+        val asyncMapLoadPath: String? = null,
+        val asyncMapLoadInProgress: Boolean = false,
+        val asyncMapLoadError: Throwable? = null,
+        val mapLoadGeneration: Long = 0L,
+        val menuBackgroundActive: Boolean = false,
+    )
+
+    private val loadStateRef = AtomicReference(SessionLoadState())
+
+    /** Consistent snapshot of the session's pending-request / load-progress state. */
+    protected val loadState: SessionLoadState
+        get() = loadStateRef.get()
+
+    /**
+     * Atomically applies [transform] and returns the state it installed (or the unchanged current
+     * state when the transform was a no-op). [transform] may run more than once under contention,
+     * so it must be pure.
+     */
+    protected fun updateLoadState(transform: (SessionLoadState) -> SessionLoadState): SessionLoadState {
+        while (true) {
+            val current = loadStateRef.get()
+            val next = transform(current)
+            if (next == current) return current
+            if (loadStateRef.compareAndSet(current, next)) return next
+        }
+    }
 
     @Volatile
     protected var lastViewport: KoolCanvasViewport = KoolCanvasViewport(0, 0)
@@ -80,26 +118,10 @@ abstract class GameSession {
     @Volatile
     protected var lastFrame: KoolCanvasFrame = KoolCanvasFrame(lastViewport, emptyList())
 
-    @Volatile
-    protected var menuBackgroundActive: Boolean = false
-
-    @Volatile
-    protected var asyncEnginePreloadInProgress: Boolean = false
+    private val asyncEnginePreloadInProgress = AtomicBoolean(false)
 
     @Volatile
     protected var asyncEnginePreloadError: Throwable? = null
-
-    @Volatile
-    protected var asyncMapLoadPath: String? = null
-
-    @Volatile
-    protected var asyncMapLoadInProgress: Boolean = false
-
-    @Volatile
-    protected var asyncMapLoadError: Throwable? = null
-
-    @Volatile
-    protected var mapLoadGeneration: Long = 0L
 
     @Volatile
     private var activeBattleRoomJoinConnector: SocketConnector? = null
@@ -159,9 +181,7 @@ abstract class GameSession {
     }
 
     open fun preload(viewport: KoolCanvasViewport): GameEngine {
-        synchronized(gameLock) {
-            lastViewport = viewport
-        }
+        lastViewport = viewport
         val engine = ensureStartedOutsideGameLock(viewport)
         synchronized(gameLock) {
             applyViewport(engine, viewport)
@@ -192,45 +212,49 @@ abstract class GameSession {
             engine.colorizeLogMessage(view, false)
             view.onResume()
             engine.updateWindowResolution(width, height)
-            asyncEnginePreloadInProgress = false
+            asyncEnginePreloadInProgress.set(false)
             asyncEnginePreloadError = null
             return engine
         }
     }
 
     open fun prepareEngineAsync(viewport: KoolCanvasViewport) {
-        synchronized(gameLock) {
-            if (gameEngine != null || asyncEnginePreloadInProgress) {
-                return
-            }
-            asyncEnginePreloadInProgress = true
-            asyncEnginePreloadError = null
-            lastViewport = viewport
+        if (gameEngine != null) {
+            return
         }
+        if (!asyncEnginePreloadInProgress.compareAndSet(false, true)) {
+            return
+        }
+        asyncEnginePreloadError = null
+        lastViewport = viewport
         logger.info { "Preparing $sessionLogName engine asynchronously" }
         launchOnIO("${rendererMode.id}-engine-preloader") {
             preloadEngineInBackground(viewport)
         }
     }
 
-    open fun isPreparingEngine(): Boolean = asyncEnginePreloadInProgress
+    open fun isPreparingEngine(): Boolean = asyncEnginePreloadInProgress.get()
 
     open fun requestMap(mapPath: String?) {
-        synchronized(gameLock) {
-            menuBackgroundActive = false
-            pendingRendererBattleRoomConfig = null
-            activeRendererBattleRoomConfig = null
-            pendingMemorySnapshot = null
-            pendingMapPath = mapPath?.takeIf { it.isNotBlank() }
+        updateLoadState {
+            it.copy(
+                menuBackgroundActive = false,
+                pendingRendererBattleRoomConfig = null,
+                activeRendererBattleRoomConfig = null,
+                pendingMemorySnapshot = null,
+                pendingMapPath = mapPath?.takeIf { path -> path.isNotBlank() },
+            )
         }
     }
 
     open fun requestMemorySnapshot(snapshot: GameMemorySnapshot) {
-        synchronized(gameLock) {
-            menuBackgroundActive = false
-            pendingRendererBattleRoomConfig = snapshot.battleRoomConfig
-            pendingMemorySnapshot = snapshot
-            pendingMapPath = snapshot.mapPath
+        updateLoadState {
+            it.copy(
+                menuBackgroundActive = false,
+                pendingRendererBattleRoomConfig = snapshot.battleRoomConfig,
+                pendingMemorySnapshot = snapshot,
+                pendingMapPath = snapshot.mapPath,
+            )
         }
     }
 
@@ -239,16 +263,12 @@ abstract class GameSession {
         if (isMapLoaded(requestedMapPath)) {
             return
         }
-        val generation = synchronized(gameLock) {
-            val ticket = beginAsyncLoadLocked(
-                requestKey = requestedMapPath,
-                viewport = viewport,
-                resetLastFrame = runningMapPath != requestedMapPath,
-            ) ?: return
-            pendingRendererBattleRoomConfig = null
-            activeRendererBattleRoomConfig = null
-            ticket
-        }
+        val generation = tryBeginAsyncLoad(
+            requestKey = requestedMapPath,
+            viewport = viewport,
+            resetLastFrame = { it.runningMapPath != requestedMapPath },
+            mutate = { it.copy(pendingRendererBattleRoomConfig = null, activeRendererBattleRoomConfig = null) },
+        ) ?: return
         logger.info { "Preparing $sessionLogName map asynchronously: $requestedMapPath" }
         launchOnIO("${rendererMode.id}-map-loader") {
             loadMapInBackground(requestedMapPath, viewport, generation)
@@ -259,17 +279,18 @@ abstract class GameSession {
         if (isMapLoaded(snapshot.mapPath)) {
             return
         }
-        val generation = synchronized(gameLock) {
-            val ticket = beginAsyncLoadLocked(
-                requestKey = snapshot.mapPath,
-                viewport = viewport,
-                resetLastFrame = true,
-            ) ?: return
-            pendingMapPath = snapshot.mapPath
-            pendingMemorySnapshot = snapshot
-            pendingRendererBattleRoomConfig = snapshot.battleRoomConfig
-            ticket
-        }
+        val generation = tryBeginAsyncLoad(
+            requestKey = snapshot.mapPath,
+            viewport = viewport,
+            resetLastFrame = { true },
+            mutate = {
+                it.copy(
+                    pendingMapPath = snapshot.mapPath,
+                    pendingMemorySnapshot = snapshot,
+                    pendingRendererBattleRoomConfig = snapshot.battleRoomConfig,
+                )
+            },
+        ) ?: return
         logger.info { "Preparing $sessionLogName memory snapshot asynchronously: ${snapshot.mapPath}" }
         launchOnIO("${rendererMode.id}-memory-snapshot-loader") {
             loadMemorySnapshotInBackground(snapshot, viewport, generation)
@@ -278,13 +299,11 @@ abstract class GameSession {
 
     open fun prepareReplayAsync(replayName: String, viewport: KoolCanvasViewport) {
         val requestedReplayName = replayName.takeIf { it.isNotBlank() } ?: return
-        val generation = synchronized(gameLock) {
-            beginAsyncLoadLocked(
-                requestKey = requestedReplayName,
-                viewport = viewport,
-                resetLastFrame = true,
-            ) ?: return
-        }
+        val generation = tryBeginAsyncLoad(
+            requestKey = requestedReplayName,
+            viewport = viewport,
+            resetLastFrame = { true },
+        ) ?: return
         logger.info { "Preparing $sessionLogName replay asynchronously: $requestedReplayName" }
         launchOnIO("${rendererMode.id}-replay-loader") {
             loadReplayInBackground(requestedReplayName, viewport, generation)
@@ -293,20 +312,21 @@ abstract class GameSession {
 
     open fun prepareBattleRoomAsync(config: BattleRoomLaunchConfig, viewport: KoolCanvasViewport) {
         val requestedMapPath = config.mapPath.takeIf { it.isNotBlank() } ?: return
-        if (isMapLoaded(requestedMapPath) && activeRendererBattleRoomConfig == config) {
+        if (isMapLoaded(requestedMapPath) && loadState.activeRendererBattleRoomConfig == config) {
             return
         }
-        val generation = synchronized(gameLock) {
-            val ticket = beginAsyncLoadLocked(
-                requestKey = requestedMapPath,
-                viewport = viewport,
-                resetLastFrame = runningMapPath != requestedMapPath,
-            ) ?: return
-            pendingMapPath = requestedMapPath
-            pendingMemorySnapshot = null
-            pendingRendererBattleRoomConfig = config
-            ticket
-        }
+        val generation = tryBeginAsyncLoad(
+            requestKey = requestedMapPath,
+            viewport = viewport,
+            resetLastFrame = { it.runningMapPath != requestedMapPath },
+            mutate = {
+                it.copy(
+                    pendingMapPath = requestedMapPath,
+                    pendingMemorySnapshot = null,
+                    pendingRendererBattleRoomConfig = config,
+                )
+            },
+        ) ?: return
         logger.info { "Preparing $sessionLogName battle room map asynchronously: $requestedMapPath" }
         launchOnIO("${rendererMode.id}-battleroom-map-loader") {
             loadMapInBackground(requestedMapPath, viewport, generation)
@@ -314,29 +334,41 @@ abstract class GameSession {
     }
 
     /**
-     * Registers a new asynchronous load and returns its [mapLoadGeneration] ticket, or null when an
-     * identical request is already in flight. Must be called while holding [gameLock].
+     * Registers a new asynchronous load and returns its [SessionLoadState.mapLoadGeneration]
+     * ticket, or null when an identical request is already in flight. [mutate] stages the
+     * request-specific pending fields inside the same atomic update.
      *
      * The ticket is what makes a superseded load harmless: the loader compares it against the
      * current generation before it publishes a frame or records an error.
      */
-    private fun beginAsyncLoadLocked(
+    private fun tryBeginAsyncLoad(
         requestKey: String,
         viewport: KoolCanvasViewport,
-        resetLastFrame: Boolean,
+        resetLastFrame: (SessionLoadState) -> Boolean,
+        mutate: (SessionLoadState) -> SessionLoadState = { it },
     ): Long? {
-        if (asyncMapLoadInProgress && asyncMapLoadPath == requestKey) {
-            return null
+        var ticket: Long? = null
+        var resetFrame = false
+        updateLoadState { current ->
+            if (current.asyncMapLoadInProgress && current.asyncMapLoadPath == requestKey) {
+                ticket = null
+                current
+            } else {
+                resetFrame = resetLastFrame(current)
+                mutate(current).copy(
+                    mapLoadGeneration = current.mapLoadGeneration + 1,
+                    asyncMapLoadPath = requestKey,
+                    asyncMapLoadInProgress = true,
+                    asyncMapLoadError = null,
+                    menuBackgroundActive = false,
+                ).also { ticket = it.mapLoadGeneration }
+            }
         }
-        mapLoadGeneration += 1
-        if (resetLastFrame) {
+        val issuedTicket = ticket ?: return null
+        if (resetFrame) {
             lastFrame = KoolCanvasFrame(viewport, emptyList())
         }
-        asyncMapLoadPath = requestKey
-        asyncMapLoadInProgress = true
-        asyncMapLoadError = null
-        menuBackgroundActive = false
-        return mapLoadGeneration
+        return issuedTicket
     }
 
     open fun adoptStartedGameFromEngine(viewport: KoolCanvasViewport): Boolean = false
@@ -348,12 +380,15 @@ abstract class GameSession {
      * [openLocalBattleRoomDraft] instead when the host should stay in the room and keep editing it.
      */
     open fun prepareLocalBattleRoom(config: BattleRoomLaunchConfig): Boolean {
-        synchronized(gameLock) {
-            disconnectUnstartedNetworkingLocked()
-            pendingMapPath = config.mapPath.takeIf { it.isNotBlank() }
-            pendingRendererBattleRoomConfig = config
-            lastFrame = KoolCanvasFrame(lastViewport, emptyList())
+        updateLoadState {
+            it.copy(
+                menuBackgroundActive = false,
+                pendingMapPath = config.mapPath.takeIf { path -> path.isNotBlank() },
+                pendingRendererBattleRoomConfig = config,
+            )
         }
+        disconnectUnstartedNetworking("starting local battleroom")
+        lastFrame = KoolCanvasFrame(lastViewport, emptyList())
         return true
     }
 
@@ -365,19 +400,23 @@ abstract class GameSession {
      * room stays open instead of being consumed by the next frame.
      */
     open fun openLocalBattleRoomDraft(config: BattleRoomLaunchConfig): Boolean {
-        synchronized(gameLock) {
-            disconnectUnstartedNetworkingLocked()
-            pendingRendererBattleRoomConfig = config
-            lastFrame = KoolCanvasFrame(lastViewport, emptyList())
+        updateLoadState {
+            it.copy(
+                menuBackgroundActive = false,
+                pendingRendererBattleRoomConfig = config,
+            )
         }
+        disconnectUnstartedNetworking("starting local battleroom")
+        lastFrame = KoolCanvasFrame(lastViewport, emptyList())
         return true
     }
 
-    /** Drops a network room that was opened but never started. Must hold [gameLock]. */
-    private fun disconnectUnstartedNetworkingLocked() {
-        menuBackgroundActive = false
-        gameEngine?.networkEngine?.takeIf { it.networkGameActive && !it.gameHasBeenStarted }
-            ?.disconnectNetworking("starting local battleroom")
+    /** Drops a network room that was opened but never started. */
+    private fun disconnectUnstartedNetworking(reason: String) {
+        synchronized(gameLock) {
+            gameEngine?.networkEngine?.takeIf { it.networkGameActive && !it.gameHasBeenStarted }
+                ?.disconnectNetworking(reason)
+        }
     }
 
     open fun enterLocalBattleRoomLive(config: BattleRoomLaunchConfig): Boolean =
@@ -390,7 +429,7 @@ abstract class GameSession {
 
             // Keep the config around so an in-game map switch / memory snapshot can rebuild the room,
             // but do NOT mark the level running: the level loads only at "Start game".
-            activeRendererBattleRoomConfig = config
+            updateLoadState { it.copy(activeRendererBattleRoomConfig = config) }
             BattleRoomUiBridge.updateUI()
             true
         }
@@ -401,7 +440,7 @@ abstract class GameSession {
 
     open fun prepareMenuBackgroundAsync(viewport: KoolCanvasViewport) = Unit
 
-    open fun isMenuBackgroundActive(): Boolean = menuBackgroundActive
+    open fun isMenuBackgroundActive(): Boolean = loadState.menuBackgroundActive
 
     open fun hostBattleRoom(config: BattleRoomHostConfig): Boolean =
         runBattleRoomCommand("host battle room") { engine, networkEngine ->
@@ -476,12 +515,16 @@ abstract class GameSession {
     }
 
     open fun leaveBattleRoom() {
+        activeBattleRoomJoinConnector?.a()
+        activeBattleRoomJoinConnector = null
+        latestBattleRoomJoinError = null
+        updateLoadState {
+            it.copy(
+                pendingRendererBattleRoomConfig = null,
+                pendingMapPath = null,
+            )
+        }
         synchronized(gameLock) {
-            activeBattleRoomJoinConnector?.a()
-            activeBattleRoomJoinConnector = null
-            latestBattleRoomJoinError = null
-            pendingRendererBattleRoomConfig = null
-            pendingMapPath = null
             val engine = gameEngine ?: GameEngine.getInstance() ?: return
             engine.networkEngine?.takeIf { it.networkGameActive && !it.gameHasBeenStarted }
                 ?.disconnectNetworking("left battleroom")
@@ -489,32 +532,42 @@ abstract class GameSession {
     }
 
     open fun currentBattleRoom(refreshNetworkStatus: Boolean = true): BattleRoomSnapshot? {
-        synchronized(gameLock) {
-            pendingRendererBattleRoomConfig?.toBattleRoomSnapshot()?.let { return it }
-            return currentBattleRoomFromEngineLocked(refreshNetworkStatus)
+        loadState.pendingRendererBattleRoomConfig?.toBattleRoomSnapshot()?.let { return it }
+        return synchronized(gameLock) {
+            currentBattleRoomFromEngineLocked(refreshNetworkStatus)
         }
     }
 
     /**
      * Applies a battle room change to whichever room is real right now.
      *
-     * Until the host presses "Start game" the room exists only as [pendingRendererBattleRoomConfig]:
-     * a local draft with no engine or network state, so an edit rewrites that config. Once the engine
-     * owns a live room the same edit becomes a network command instead.
+     * Until the host presses "Start game" the room exists only as a draft config inside
+     * [loadState]: a local staging area with no engine or network state, so an edit rewrites that
+     * config via one atomic state update. Once the engine owns a live room the same edit becomes a
+     * network command instead.
      *
-     * @param editDraft the replacement draft, or null to reject the change.
+     * @param editDraft returns the replacement state for a draft edit, or null to reject it.
      */
     private inline fun editBattleRoom(
         label: String,
-        editDraft: (BattleRoomLaunchConfig) -> BattleRoomLaunchConfig?,
+        crossinline editDraft: (SessionLoadState, BattleRoomLaunchConfig) -> SessionLoadState?,
         noinline commandLiveRoom: (GameEngine, NetworkEngine) -> Boolean,
     ): Boolean {
-        synchronized(gameLock) {
-            if (currentBattleRoomFromEngineLocked() == null) {
-                val draft = pendingRendererBattleRoomConfig ?: return false
-                pendingRendererBattleRoomConfig = editDraft(draft) ?: return false
-                return true
+        val hasLiveRoom = synchronized(gameLock) { currentBattleRoomFromEngineLocked() != null }
+        if (!hasLiveRoom) {
+            var applied = false
+            updateLoadState { current ->
+                val draft = current.pendingRendererBattleRoomConfig
+                val edited = draft?.let { editDraft(current, it) }
+                if (edited == null) {
+                    applied = false
+                    current
+                } else {
+                    applied = true
+                    edited
+                }
             }
+            return applied
         }
         return runBattleRoomCommand(label, commandLiveRoom)
     }
@@ -523,9 +576,11 @@ abstract class GameSession {
         val requestedMapPath = mapPath.takeIf { it.isNotBlank() } ?: return false
         return editBattleRoom(
             "set battle room map",
-            editDraft = { draft ->
-                pendingMapPath = requestedMapPath
-                draft.copy(mapPath = requestedMapPath, savedGame = savedGame)
+            editDraft = { state, draft ->
+                state.copy(
+                    pendingMapPath = requestedMapPath,
+                    pendingRendererBattleRoomConfig = draft.copy(mapPath = requestedMapPath, savedGame = savedGame),
+                )
             },
         ) { engine, networkEngine ->
             initBattleRoomMap(engine, requestedMapPath, force = true, savedGame = savedGame)
@@ -544,7 +599,9 @@ abstract class GameSession {
         if (addCount == 0) return true
         return editBattleRoom(
             "add battle room AI",
-            editDraft = { draft -> draft.copy(aiPlayerCount = draft.aiPlayerCount + addCount) },
+            editDraft = { state, draft ->
+                state.copy(pendingRendererBattleRoomConfig = draft.copy(aiPlayerCount = draft.aiPlayerCount + addCount))
+            },
         ) { _, networkEngine ->
             repeat(addCount) {
                 networkEngine.addAIToGame()
@@ -569,7 +626,9 @@ abstract class GameSession {
     open fun applyBattleRoomTeamLayout(layout: BattleRoomTeamLayout): Boolean =
         editBattleRoom(
             "apply battle room team layout",
-            editDraft = { draft -> draft.copy(teamLayout = layout) },
+            editDraft = { state, draft ->
+                state.copy(pendingRendererBattleRoomConfig = draft.copy(teamLayout = layout))
+            },
         ) { _, networkEngine ->
             networkEngine.applyBattleRoomTeamLayout(layout)
             BattleRoomUiBridge.updateUI()
@@ -579,7 +638,9 @@ abstract class GameSession {
     open fun applyBattleRoomOptions(options: BattleRoomOptions): Boolean =
         editBattleRoom(
             "apply battle room options",
-            editDraft = { draft -> draft.copy(options = options) },
+            editDraft = { state, draft ->
+                state.copy(pendingRendererBattleRoomConfig = draft.copy(options = options))
+            },
         ) { _, networkEngine ->
             val settings = networkEngine.getEditableRoomSettings() ?: networkEngine.roomSettings
             settings.applyBattleRoomOptions(options)
@@ -598,9 +659,9 @@ abstract class GameSession {
         editBattleRoom(
             "configure battle room player",
             // A draft slot carries no per-player overrides yet, so this only reports whether the
-            // player exists and returns the draft unchanged.
-            editDraft = { draft ->
-                draft.takeIf { resolveBattleRoomPlayerSnapshot(playerId, it.pendingBattleRoomPlayers()) != null }
+            // player exists and returns the state unchanged.
+            editDraft = { state, draft ->
+                state.takeIf { resolveBattleRoomPlayerSnapshot(playerId, draft.pendingBattleRoomPlayers()) != null }
             },
         ) { engine, networkEngine ->
             val player = resolveBattleRoomPlayer(playerId, engine, networkEngine)
@@ -612,12 +673,12 @@ abstract class GameSession {
         editBattleRoom(
             "kick battle room player",
             // Local draft room: drop the AI slot from the pending config.
-            editDraft = { draft ->
+            editDraft = { state, draft ->
                 val index = draftAiPlayerIndex(playerId)
                 if (index == null || index <= 0 || index > draft.aiPlayerCount) {
                     null
                 } else {
-                    draft.copy(aiPlayerCount = draft.aiPlayerCount - 1)
+                    state.copy(pendingRendererBattleRoomConfig = draft.copy(aiPlayerCount = draft.aiPlayerCount - 1))
                 }
             },
         ) { engine, networkEngine ->
@@ -642,10 +703,9 @@ abstract class GameSession {
 
     open fun sendBattleRoomMessage(message: String): Boolean {
         if (message.isBlank()) return false
-        synchronized(gameLock) {
-            if (currentBattleRoomFromEngineLocked() == null && pendingRendererBattleRoomConfig != null) {
-                return true
-            }
+        val hasLiveRoom = synchronized(gameLock) { currentBattleRoomFromEngineLocked() != null }
+        if (!hasLiveRoom && loadState.pendingRendererBattleRoomConfig != null) {
+            return true
         }
         return runBattleRoomCommand("send battle room message") { _, networkEngine ->
             networkEngine.sendChatMessage(message)
@@ -670,15 +730,17 @@ abstract class GameSession {
     }
 
     open fun isPreparingMap(mapPath: String? = null): Boolean {
-        if (!asyncMapLoadInProgress) {
+        val state = loadState
+        if (!state.asyncMapLoadInProgress) {
             return false
         }
-        return mapPath == null || asyncMapLoadPath == mapPath
+        return mapPath == null || state.asyncMapLoadPath == mapPath
     }
 
     open fun mapLoadError(mapPath: String? = null): Throwable? {
-        val error = asyncMapLoadError ?: return null
-        return if (mapPath == null || asyncMapLoadPath == mapPath) error else null
+        val state = loadState
+        val error = state.asyncMapLoadError ?: return null
+        return if (mapPath == null || state.asyncMapLoadPath == mapPath) error else null
     }
 
     open fun loadingStatus(): GameLoadingStatus {
@@ -688,29 +750,31 @@ abstract class GameSession {
                 progress = 1.0f,
             )
         }
+        val state = loadState
         val engine = gameEngine ?: GameEngine.getInstance()
         val fallbackText = when {
-            asyncMapLoadInProgress -> "Loading map data"
-            asyncEnginePreloadInProgress -> "Loading..."
+            state.asyncMapLoadInProgress -> "Loading map data"
             else -> "Loading..."
         }
         val text = engine?.getLoadingText()?.takeIf { it.isNotBlank() } ?: fallbackText
         val progress = engine?.getLoadingProgress()?.coerceIn(0.0f, 1.0f)
             ?: when {
-                asyncMapLoadInProgress -> 0.15f
-                asyncEnginePreloadInProgress -> 0.05f
+                state.asyncMapLoadInProgress -> 0.15f
+                asyncEnginePreloadInProgress.get() -> 0.05f
                 else -> null
             }
         return GameLoadingStatus(text = text, progress = progress)
     }
 
-    open fun canResume(): Boolean =
-        synchronized(gameLock) {
+    open fun canResume(): Boolean {
+        if (loadState.menuBackgroundActive) return false
+        return synchronized(gameLock) {
             val engine = gameEngine ?: return@synchronized false
-            engine.hasLoadedLevel && !engine.isMenuBackgroundMap && activeRunningMapPath(engine) != null && !menuBackgroundActive
+            engine.hasLoadedLevel && !engine.isMenuBackgroundMap && activeRunningMapPath(engine) != null
         }
+    }
 
-    open fun runningMapPath(): String? = synchronized(gameLock) { runningMapPath }
+    open fun runningMapPath(): String? = loadState.runningMapPath
 
     open fun currentMapDisplayName(): String? =
         synchronized(gameLock) {
@@ -719,20 +783,22 @@ abstract class GameSession {
                 ?.takeIf { it.isNotBlank() }
         }
 
-    open fun pendingRendererMapPath(): String? =
-        synchronized(gameLock) {
-            pendingRendererBattleRoomConfig?.mapPath?.takeIf { it.isNotBlank() }
-                ?: pendingMapPath?.takeIf { it.isNotBlank() }
-        }
+    open fun pendingRendererMapPath(): String? {
+        val state = loadState
+        return state.pendingRendererBattleRoomConfig?.mapPath?.takeIf { it.isNotBlank() }
+            ?: state.pendingMapPath?.takeIf { it.isNotBlank() }
+    }
 
     open fun pendingRendererBattleRoomConfig(): BattleRoomLaunchConfig? =
-        synchronized(gameLock) { pendingRendererBattleRoomConfig }
+        loadState.pendingRendererBattleRoomConfig
 
     open fun pendingMemorySnapshot(): GameMemorySnapshot? =
-        synchronized(gameLock) { pendingMemorySnapshot }
+        loadState.pendingMemorySnapshot
 
-    open fun activeRendererBattleRoomConfig(): BattleRoomLaunchConfig? =
-        synchronized(gameLock) { activeRendererBattleRoomConfig ?: pendingRendererBattleRoomConfig }
+    open fun activeRendererBattleRoomConfig(): BattleRoomLaunchConfig? {
+        val state = loadState
+        return state.activeRendererBattleRoomConfig ?: state.pendingRendererBattleRoomConfig
+    }
 
     protected data class RendererPreparationSnapshot(
         val mapPath: String?,
@@ -740,15 +806,15 @@ abstract class GameSession {
         val battleRoomConfig: BattleRoomLaunchConfig?,
     )
 
-    protected fun rendererPreparationSnapshot(): RendererPreparationSnapshot =
-        synchronized(gameLock) {
-            RendererPreparationSnapshot(
-                mapPath = pendingRendererBattleRoomConfig?.mapPath?.takeIf { it.isNotBlank() }
-                    ?: pendingMapPath?.takeIf { it.isNotBlank() },
-                memorySnapshot = pendingMemorySnapshot,
-                battleRoomConfig = pendingRendererBattleRoomConfig,
-            )
-        }
+    protected fun rendererPreparationSnapshot(): RendererPreparationSnapshot {
+        val state = loadState
+        return RendererPreparationSnapshot(
+            mapPath = state.pendingRendererBattleRoomConfig?.mapPath?.takeIf { it.isNotBlank() }
+                ?: state.pendingMapPath?.takeIf { it.isNotBlank() },
+            memorySnapshot = state.pendingMemorySnapshot,
+            battleRoomConfig = state.pendingRendererBattleRoomConfig,
+        )
+    }
 
     protected fun beginRendererMapPreparation(
         mapPath: String,
@@ -761,123 +827,141 @@ abstract class GameSession {
         require(battleRoomConfig == null || battleRoomConfig.mapPath == mapPath) {
             "Battle room path does not match renderer map path"
         }
-        synchronized(gameLock) {
-            mapLoadGeneration += 1
-            pendingMapPath = mapPath
-            pendingMemorySnapshot = memorySnapshot
-            pendingRendererBattleRoomConfig = battleRoomConfig
-            activeRendererBattleRoomConfig = null
-            asyncMapLoadPath = mapPath
-            asyncMapLoadInProgress = true
-            asyncMapLoadError = null
-            runningMapPath = null
-            menuBackgroundActive = false
+        updateLoadState {
+            it.copy(
+                mapLoadGeneration = it.mapLoadGeneration + 1,
+                pendingMapPath = mapPath,
+                pendingMemorySnapshot = memorySnapshot,
+                pendingRendererBattleRoomConfig = battleRoomConfig,
+                activeRendererBattleRoomConfig = null,
+                asyncMapLoadPath = mapPath,
+                asyncMapLoadInProgress = true,
+                asyncMapLoadError = null,
+                runningMapPath = null,
+                menuBackgroundActive = false,
+            )
         }
     }
 
     protected fun beginRendererStandalonePreparation(requestPath: String) {
-        synchronized(gameLock) {
-            mapLoadGeneration += 1
-            pendingMapPath = null
-            pendingMemorySnapshot = null
-            pendingRendererBattleRoomConfig = null
-            activeRendererBattleRoomConfig = null
-            asyncMapLoadPath = requestPath
-            asyncMapLoadInProgress = true
-            asyncMapLoadError = null
-            runningMapPath = null
-            menuBackgroundActive = false
+        updateLoadState {
+            it.copy(
+                mapLoadGeneration = it.mapLoadGeneration + 1,
+                pendingMapPath = null,
+                pendingMemorySnapshot = null,
+                pendingRendererBattleRoomConfig = null,
+                activeRendererBattleRoomConfig = null,
+                asyncMapLoadPath = requestPath,
+                asyncMapLoadInProgress = true,
+                asyncMapLoadError = null,
+                runningMapPath = null,
+                menuBackgroundActive = false,
+            )
         }
     }
 
     protected fun beginRendererStartedGamePreparation(mapPath: String) {
-        synchronized(gameLock) {
-            pendingMapPath = null
-            pendingMemorySnapshot = null
-            pendingRendererBattleRoomConfig = null
-            asyncMapLoadPath = mapPath
-            asyncMapLoadInProgress = true
-            asyncMapLoadError = null
-            runningMapPath = null
-            menuBackgroundActive = false
+        updateLoadState {
+            it.copy(
+                pendingMapPath = null,
+                pendingMemorySnapshot = null,
+                pendingRendererBattleRoomConfig = null,
+                asyncMapLoadPath = mapPath,
+                asyncMapLoadInProgress = true,
+                asyncMapLoadError = null,
+                runningMapPath = null,
+                menuBackgroundActive = false,
+            )
         }
     }
 
     protected fun markRendererMenuBackgroundReady() {
-        synchronized(gameLock) {
-            asyncMapLoadPath = null
-            asyncMapLoadInProgress = false
-            asyncMapLoadError = null
-            menuBackgroundActive = true
+        updateLoadState {
+            it.copy(
+                asyncMapLoadPath = null,
+                asyncMapLoadInProgress = false,
+                asyncMapLoadError = null,
+                menuBackgroundActive = true,
+            )
         }
     }
 
     protected fun markRendererMenuBackgroundError(requestPath: String, error: Throwable) {
-        synchronized(gameLock) {
-            asyncMapLoadPath = requestPath
-            asyncMapLoadInProgress = false
-            asyncMapLoadError = error
-            menuBackgroundActive = false
+        updateLoadState {
+            it.copy(
+                asyncMapLoadPath = requestPath,
+                asyncMapLoadInProgress = false,
+                asyncMapLoadError = error,
+                menuBackgroundActive = false,
+            )
         }
     }
 
     protected fun markRendererSurfaceStopped() {
-        synchronized(gameLock) {
-            menuBackgroundActive = false
+        updateLoadState {
+            it.copy(menuBackgroundActive = false)
         }
     }
 
     open fun markRendererMapReady(mapPath: String, viewport: KoolCanvasViewport) {
-        synchronized(gameLock) {
-            lastViewport = viewport
-            if (pendingMapPath == mapPath) {
-                pendingMapPath = null
-            }
-            if (pendingMemorySnapshot?.mapPath == mapPath) {
-                pendingMemorySnapshot = null
-            }
-            if (pendingRendererBattleRoomConfig?.mapPath == mapPath) {
-                activeRendererBattleRoomConfig = pendingRendererBattleRoomConfig
-                pendingRendererBattleRoomConfig = null
-            }
-            asyncMapLoadPath = null
-            asyncMapLoadInProgress = false
-            asyncMapLoadError = null
-            menuBackgroundActive = false
-            runningMapPath = mapPath
+        lastViewport = viewport
+        updateLoadState { current ->
+            val promotesBattleRoomConfig = current.pendingRendererBattleRoomConfig?.mapPath == mapPath
+            current.copy(
+                pendingMapPath = current.pendingMapPath.takeUnless { it == mapPath },
+                pendingMemorySnapshot = current.pendingMemorySnapshot?.takeUnless { it.mapPath == mapPath },
+                pendingRendererBattleRoomConfig = if (promotesBattleRoomConfig) {
+                    null
+                } else {
+                    current.pendingRendererBattleRoomConfig
+                },
+                activeRendererBattleRoomConfig = if (promotesBattleRoomConfig) {
+                    current.pendingRendererBattleRoomConfig
+                } else {
+                    current.activeRendererBattleRoomConfig
+                },
+                asyncMapLoadPath = null,
+                asyncMapLoadInProgress = false,
+                asyncMapLoadError = null,
+                menuBackgroundActive = false,
+                runningMapPath = mapPath,
+            )
         }
     }
 
     open fun markRendererMapError(mapPath: String, error: Throwable) {
-        synchronized(gameLock) {
-            if (pendingMapPath == mapPath) {
-                pendingMapPath = null
-            }
-            if (pendingRendererBattleRoomConfig?.mapPath == mapPath) {
-                pendingRendererBattleRoomConfig = null
-            }
-            asyncMapLoadPath = mapPath
-            asyncMapLoadInProgress = false
-            asyncMapLoadError = error
+        updateLoadState { current ->
+            current.copy(
+                pendingMapPath = current.pendingMapPath.takeUnless { it == mapPath },
+                pendingRendererBattleRoomConfig = current.pendingRendererBattleRoomConfig
+                    ?.takeUnless { it.mapPath == mapPath },
+                asyncMapLoadPath = mapPath,
+                asyncMapLoadInProgress = false,
+                asyncMapLoadError = error,
+            )
         }
     }
 
     open fun discardRunningGame() {
+        updateLoadState {
+            it.copy(
+                mapLoadGeneration = it.mapLoadGeneration + 1,
+                pendingMapPath = null,
+                pendingMemorySnapshot = null,
+                pendingRendererBattleRoomConfig = null,
+                activeRendererBattleRoomConfig = null,
+                asyncMapLoadPath = null,
+                asyncMapLoadInProgress = false,
+                asyncMapLoadError = null,
+                runningMapPath = null,
+                menuBackgroundActive = false,
+            )
+        }
+        asyncEnginePreloadInProgress.set(false)
+        asyncEnginePreloadError = null
+        lastFrame = KoolCanvasFrame(lastViewport, emptyList())
+        clearInputState()
         synchronized(gameLock) {
-            mapLoadGeneration += 1
-            pendingMapPath = null
-            pendingMemorySnapshot = null
-            pendingRendererBattleRoomConfig = null
-            activeRendererBattleRoomConfig = null
-            asyncEnginePreloadInProgress = false
-            asyncEnginePreloadError = null
-            asyncMapLoadPath = null
-            asyncMapLoadInProgress = false
-            asyncMapLoadError = null
-            runningMapPath = null
-            menuBackgroundActive = false
-            lastFrame = KoolCanvasFrame(lastViewport, emptyList())
-            clearInputState()
             gameEngine?.let { engine ->
                 runCatching { engine.networkEngine?.disconnectNetworking("exited") }
                 engine.hasLoadedLevel = false
@@ -910,9 +994,10 @@ abstract class GameSession {
                 return null
             }
             val mapPath = activeRunningMapPath(engine)?.takeIf { it.isNotBlank() } ?: return null
-            val battleRoomConfig = activeRendererBattleRoomConfig
+            val state = loadState
+            val battleRoomConfig = state.activeRendererBattleRoomConfig
                 ?.copy(mapPath = mapPath)
-                ?: pendingRendererBattleRoomConfig?.copy(mapPath = mapPath)
+                ?: state.pendingRendererBattleRoomConfig?.copy(mapPath = mapPath)
             return runCatching {
                 val output = GameOutputStream()
                 engine.gameSaver.writeSaveToStream(output)
@@ -928,7 +1013,7 @@ abstract class GameSession {
         synchronized(gameLock) {
             val engine = activeEngineLocked() ?: return
             val sourceMap = engine.currentMapPath?.takeIf { it.isNotBlank() }
-                ?: runningMapPath?.takeIf { it.isNotBlank() }
+                ?: loadState.runningMapPath?.takeIf { it.isNotBlank() }
                 ?: return
             val exportName = name.toRwExportMapName()
             val exportPath = "/SD/rustedWarfare/maps/$exportName.tmx"
@@ -1082,7 +1167,7 @@ abstract class GameSession {
     }
 
     open fun isMapLoaded(mapPath: String? = runningMapPath()): Boolean {
-        if (asyncMapLoadInProgress) {
+        if (loadState.asyncMapLoadInProgress) {
             return false
         }
         synchronized(gameLock) {
@@ -1099,9 +1184,7 @@ abstract class GameSession {
         if (!isMapLoaded(mapPath)) {
             return false
         }
-        return synchronized(gameLock) {
-            lastFrame.commands.isNotEmpty() || !TileMap.layerBufferManager.hasVisiblePendingRedraws()
-        }
+        return lastFrame.commands.isNotEmpty() || !TileMap.layerBufferManager.hasVisiblePendingRedraws()
     }
 
     abstract fun loadPendingMapNow(): KoolCanvasFrame
@@ -1113,7 +1196,7 @@ abstract class GameSession {
     protected open fun clearInputState() = Unit
 
     protected open fun activeRunningMapPath(engine: GameEngine): String? =
-        runningMapPath
+        loadState.runningMapPath
             ?: engine.networkEngine?.selectedMapPath?.takeIf { it.isNotBlank() }
             ?: engine.currentMapPath?.takeIf { it.isNotBlank() }
 
@@ -1156,9 +1239,7 @@ abstract class GameSession {
         val startedAt = System.nanoTime()
         runCatching {
             val viewport = requestedViewport.takeIf { it.width > 0 && it.height > 0 } ?: defaultPreloadViewport
-            synchronized(gameLock) {
-                lastViewport = viewport
-            }
+            lastViewport = viewport
             val engine = ensureStartedOutsideGameLock(viewport)
             synchronized(gameLock) {
                 applyViewport(engine, viewport)
@@ -1168,7 +1249,7 @@ abstract class GameSession {
             asyncEnginePreloadError = error
             logger.error(error) { "$sessionLogName async engine preload failed" }
         }.also {
-            asyncEnginePreloadInProgress = false
+            asyncEnginePreloadInProgress.set(false)
         }
     }
 
@@ -1177,9 +1258,7 @@ abstract class GameSession {
         command: (GameEngine, NetworkEngine) -> Boolean,
     ): Boolean =
         runCatching {
-            val viewport = synchronized(gameLock) {
-                lastViewport.takeIf { it.width > 0 && it.height > 0 } ?: defaultPreloadViewport
-            }
+            val viewport = lastViewport.takeIf { it.width > 0 && it.height > 0 } ?: defaultPreloadViewport
             ensureStartedOutsideGameLock(viewport)
             synchronized(gameLock) {
                 val engine = activeEngineLocked() ?: return@synchronized false
@@ -1281,9 +1360,13 @@ abstract class GameSession {
     }
 
     private fun prepareActiveBattleRoomEngine(engine: GameEngine) {
-        menuBackgroundActive = false
-        pendingRendererBattleRoomConfig = null
-        pendingMapPath = null
+        updateLoadState {
+            it.copy(
+                menuBackgroundActive = false,
+                pendingRendererBattleRoomConfig = null,
+                pendingMapPath = null,
+            )
+        }
         engine.isStopped = false
         engine.isPaused = false
         installCoreNetworkCallbacksIfMissing(engine)
@@ -1378,7 +1461,7 @@ abstract class GameSession {
         var loadedCurrentRequest = false
         runCatching {
             synchronized(gameLock) {
-                if (generation != mapLoadGeneration) {
+                if (generation != loadState.mapLoadGeneration) {
                     return@synchronized
                 }
                 val viewport = requestedViewport.takeIf { it.width > 0 && it.height > 0 } ?: defaultPreloadViewport
@@ -1391,7 +1474,7 @@ abstract class GameSession {
                 val firstFrameStartedAt = System.nanoTime()
                 val preparedFrame = prepareFrameAfterBackgroundLoad(engine, viewport)
                 firstFrameMs = elapsedMs(firstFrameStartedAt)
-                if (generation == mapLoadGeneration) {
+                if (generation == loadState.mapLoadGeneration) {
                     lastFrame = preparedFrame
                     loadedCurrentRequest = true
                 }
@@ -1405,16 +1488,14 @@ abstract class GameSession {
                         "(total=${elapsedMs(startedAt)}ms, load=${loadMs}ms, firstFrame=${firstFrameMs}ms)"
             }
         }.onFailure { error ->
-            if (generation == mapLoadGeneration) {
-                asyncMapLoadError = error
+            if (loadState.mapLoadGeneration == generation) {
+                updateLoadState { if (it.mapLoadGeneration == generation) it.copy(asyncMapLoadError = error) else it }
                 logger.error(error) { "$sessionLogName async $kind load failed: $requestKey" }
             } else {
                 logger.info { "Ignored stale $sessionLogName $kind load failure for: $requestKey" }
             }
         }.also {
-            if (generation == mapLoadGeneration) {
-                asyncMapLoadInProgress = false
-            }
+            updateLoadState { if (it.mapLoadGeneration == generation) it.copy(asyncMapLoadInProgress = false) else it }
         }
     }
 
@@ -1442,17 +1523,27 @@ abstract class GameSession {
     ): KoolCanvasFrame = KoolCanvasFrame(viewport, emptyList())
 
     protected fun loadPendingMap(engine: GameEngine) {
-        val mapPath = pendingMapPath ?: return
-        val snapshot = pendingMemorySnapshot?.takeIf { it.mapPath == mapPath }
-        val battleRoomConfig = pendingRendererBattleRoomConfig?.takeIf { it.mapPath == mapPath }
-        if (runningMapPath == mapPath && engine.hasLoadedLevel) {
-            pendingMapPath = null
-            pendingMemorySnapshot = null
-            pendingRendererBattleRoomConfig = null
+        val staged = loadState
+        val mapPath = staged.pendingMapPath ?: return
+        val snapshot = staged.pendingMemorySnapshot?.takeIf { it.mapPath == mapPath }
+        val battleRoomConfig = staged.pendingRendererBattleRoomConfig?.takeIf { it.mapPath == mapPath }
+        // Consume only the values read above: a request staged concurrently by another thread must
+        // survive this clear instead of being wiped along with the one being handled.
+        updateLoadState { current ->
+            current.copy(
+                pendingMapPath = current.pendingMapPath.takeUnless { it == mapPath },
+                pendingMemorySnapshot = current.pendingMemorySnapshot
+                    ?.takeUnless { it === staged.pendingMemorySnapshot },
+                pendingRendererBattleRoomConfig = if (staged.runningMapPath == mapPath && engine.hasLoadedLevel) {
+                    current.pendingRendererBattleRoomConfig?.takeUnless { it === staged.pendingRendererBattleRoomConfig }
+                } else {
+                    current.pendingRendererBattleRoomConfig
+                },
+            )
+        }
+        if (staged.runningMapPath == mapPath && engine.hasLoadedLevel) {
             return
         }
-        pendingMapPath = null
-        pendingMemorySnapshot = null
         runCatching {
             if (snapshot != null) {
                 loadMemorySnapshot(engine, snapshot)
@@ -1465,17 +1556,26 @@ abstract class GameSession {
             // A successful load clears the draft itself. On failure it must be dropped here too:
             // currentBattleRoom() reads the draft before the engine, so a leaked one would keep
             // showing a room that was never created.
-            if (battleRoomConfig != null && pendingRendererBattleRoomConfig == battleRoomConfig) {
-                pendingRendererBattleRoomConfig = null
+            if (battleRoomConfig != null) {
+                updateLoadState { current ->
+                    current.copy(
+                        pendingRendererBattleRoomConfig = current.pendingRendererBattleRoomConfig
+                            ?.takeUnless { it == battleRoomConfig },
+                    )
+                }
             }
             logger.error(error) { "$sessionLogName map load failed: $mapPath" }
         }
     }
 
     protected open fun loadMap(engine: GameEngine, mapPath: String) {
-        menuBackgroundActive = false
-        activeRendererBattleRoomConfig = null
-        runningMapPath = mapPath
+        updateLoadState {
+            it.copy(
+                menuBackgroundActive = false,
+                activeRendererBattleRoomConfig = null,
+                runningMapPath = mapPath,
+            )
+        }
         engine.isStopped = false
         engine.isPaused = false
         val saveName = savedGameNameFromRequestPath(mapPath)
@@ -1490,8 +1590,12 @@ abstract class GameSession {
     }
 
     protected open fun loadBattleRoomMap(engine: GameEngine, config: BattleRoomLaunchConfig) {
-        menuBackgroundActive = false
-        runningMapPath = config.mapPath
+        updateLoadState {
+            it.copy(
+                menuBackgroundActive = false,
+                runningMapPath = config.mapPath,
+            )
+        }
         engine.currentMapPath = config.mapPath
         engine.isStopped = false
         engine.isPaused = false
@@ -1503,29 +1607,46 @@ abstract class GameSession {
 
         check(networkEngine.startBattleRoomGame()) { "Unable to start $sessionLogName battle room game" }
         BattleRoomUiBridge.setupGame()
-        activeRendererBattleRoomConfig = config
-        pendingRendererBattleRoomConfig = null
-        runningMapPath = activeRunningMapPath(engine) ?: config.mapPath
+        val resolvedMapPath = activeRunningMapPath(engine) ?: config.mapPath
+        updateLoadState {
+            it.copy(
+                activeRendererBattleRoomConfig = config,
+                pendingRendererBattleRoomConfig = null,
+                runningMapPath = resolvedMapPath,
+            )
+        }
     }
 
     protected open fun loadMemorySnapshot(engine: GameEngine, snapshot: GameMemorySnapshot) {
-        menuBackgroundActive = false
-        runningMapPath = snapshot.mapPath
-        pendingRendererBattleRoomConfig = null
-        activeRendererBattleRoomConfig = snapshot.battleRoomConfig
+        updateLoadState {
+            it.copy(
+                menuBackgroundActive = false,
+                runningMapPath = snapshot.mapPath,
+                pendingRendererBattleRoomConfig = null,
+                activeRendererBattleRoomConfig = snapshot.battleRoomConfig,
+            )
+        }
         engine.isStopped = false
         engine.isPaused = false
         check(engine.gameSaver.readSaveFromStream(GameInputStream(snapshot.saveBytes), false, false, false)) {
             "Unable to restore in-memory save: ${snapshot.mapPath}"
         }
-        runningMapPath = activeRunningMapPath(engine) ?: snapshot.mapPath
-        activeRendererBattleRoomConfig =
-            activeRendererBattleRoomConfig?.copy(mapPath = runningMapPath ?: snapshot.mapPath)
+        val resolvedMapPath = activeRunningMapPath(engine) ?: snapshot.mapPath
+        updateLoadState {
+            it.copy(
+                runningMapPath = resolvedMapPath,
+                activeRendererBattleRoomConfig = it.activeRendererBattleRoomConfig?.copy(mapPath = resolvedMapPath),
+            )
+        }
     }
 
     protected open fun loadReplay(engine: GameEngine, replayName: String) {
-        menuBackgroundActive = false
-        runningMapPath = replayName
+        updateLoadState {
+            it.copy(
+                menuBackgroundActive = false,
+                runningMapPath = replayName,
+            )
+        }
         engine.isGameStarted = false
         engine.isStopped = false
         engine.isPaused = false

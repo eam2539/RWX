@@ -177,10 +177,10 @@ internal class AndroidGameSession(
         deltaSeconds: Float,
         drainVisibleLayerBuffers: Boolean ,
     ): KoolCanvasFrame {
-        if (asyncMapLoadInProgress) {
+        if (loadState.asyncMapLoadInProgress) {
             return lastFrame
         }
-        if (menuBackgroundActive && (!requestedGameVisible || !requestedKoolOverlay)) {
+        if (loadState.menuBackgroundActive && (!requestedGameVisible || !requestedKoolOverlay)) {
             setGameVisible(true, viewport, koolOverlay = true)
         }
         synchronized(gameLock) {
@@ -270,30 +270,40 @@ internal class AndroidGameSession(
     override fun currentFrame(): KoolCanvasFrame = lastFrame
 
     override fun prepareMenuBackgroundAsync(viewport: KoolCanvasViewport) {
-        val generation: Long
-        synchronized(gameLock) {
-            if (menuBackgroundActive || asyncMapLoadInProgress) {
-                return
-            }
-            if (runningMapPath != null && gameEngine?.hasLoadedLevel == true) {
-                return
-            }
-            mapLoadGeneration += 1
-            generation = mapLoadGeneration
-            asyncMapLoadPath = MENU_BACKGROUND_REQUEST
-            asyncMapLoadInProgress = true
-            asyncMapLoadError = null
-            lastFrame = KoolCanvasFrame(viewport, emptyList())
+        val state = loadState
+        if (state.menuBackgroundActive) {
+            return
         }
+        if (state.runningMapPath != null && gameEngine?.hasLoadedLevel == true) {
+            return
+        }
+        var generation: Long? = null
+        updateLoadState { current ->
+            if (current.asyncMapLoadInProgress || current.menuBackgroundActive) {
+                generation = null
+                current
+            } else {
+                current.copy(
+                    mapLoadGeneration = current.mapLoadGeneration + 1,
+                    asyncMapLoadPath = MENU_BACKGROUND_REQUEST,
+                    asyncMapLoadInProgress = true,
+                    asyncMapLoadError = null,
+                ).also { generation = it.mapLoadGeneration }
+            }
+        }
+        val issuedGeneration = generation ?: return
+        lastFrame = KoolCanvasFrame(viewport, emptyList())
         logger.info { "Preparing Android Canvas RW menu background asynchronously" }
         launchOnIO("${rendererMode.id}-menu-background-loader") {
-            loadMenuBackgroundInBackground(viewport, generation)
+            loadMenuBackgroundInBackground(viewport, issuedGeneration)
         }
     }
 
-    override fun isMenuBackgroundActive(): Boolean =
-        menuBackgroundActive ||
-                (asyncMapLoadInProgress && asyncMapLoadPath == MENU_BACKGROUND_REQUEST)
+    override fun isMenuBackgroundActive(): Boolean {
+        val state = loadState
+        return state.menuBackgroundActive ||
+                (state.asyncMapLoadInProgress && state.asyncMapLoadPath == MENU_BACKGROUND_REQUEST)
+    }
 
     override fun adoptStartedGameFromEngine(viewport: KoolCanvasViewport): Boolean =
         synchronized(gameLock) {
@@ -312,12 +322,16 @@ internal class AndroidGameSession(
             BattleRoomUiBridge.setupGame()
             val activeMapPath = activeRunningMapPath(engine) ?: return@synchronized false
 
-            pendingMapPath = null
-            asyncMapLoadPath = null
-            asyncMapLoadInProgress = false
-            asyncMapLoadError = null
-            menuBackgroundActive = false
-            runningMapPath = activeMapPath
+            updateLoadState {
+                it.copy(
+                    pendingMapPath = null,
+                    asyncMapLoadPath = null,
+                    asyncMapLoadInProgress = false,
+                    asyncMapLoadError = null,
+                    menuBackgroundActive = false,
+                    runningMapPath = activeMapPath,
+                )
+            }
             engine.isStopped = false
             engine.isPaused = false
             true
@@ -436,7 +450,7 @@ internal class AndroidGameSession(
         var loadedCurrentRequest = false
         runCatching {
             synchronized(gameLock) {
-                if (generation != mapLoadGeneration) {
+                if (generation != loadState.mapLoadGeneration) {
                     return@synchronized
                 }
                 val viewport = requestedViewport.takeIf { it.width > 0 && it.height > 0 }
@@ -457,28 +471,42 @@ internal class AndroidGameSession(
                     engine.screenHeight.toInt(),
                     engine.renderSurfaceScale,
                 )
-                runningMapPath = engine.currentMapPath
-                menuBackgroundActive = true
-                loadedCurrentRequest = generation == mapLoadGeneration
+                val currentMapPath = engine.currentMapPath
+                updateLoadState { current ->
+                    if (current.mapLoadGeneration == generation) {
+                        current.copy(runningMapPath = currentMapPath, menuBackgroundActive = true)
+                            .also { loadedCurrentRequest = true }
+                    } else {
+                        current
+                    }
+                }
             }
             if (loadedCurrentRequest) {
                 logger.info {
-                    "Prepared Android Canvas RW menu background: ${runningMapPath ?: "<unknown>"} " +
+                    "Prepared Android Canvas RW menu background: ${loadState.runningMapPath ?: "<unknown>"} " +
                             "(${elapsedMs(startedAt)}ms)"
                 }
             } else {
                 logger.info { "Discarded stale Android Canvas RW menu background preparation" }
             }
         }.onFailure { error ->
-            if (generation == mapLoadGeneration) {
-                menuBackgroundActive = false
-                asyncMapLoadError = error
+            if (loadState.mapLoadGeneration == generation) {
+                updateLoadState { current ->
+                    if (current.mapLoadGeneration == generation) {
+                        current.copy(menuBackgroundActive = false, asyncMapLoadError = error)
+                    } else {
+                        current
+                    }
+                }
                 logger.error(error) { "Android Canvas RW menu background load failed" }
             }
         }.also {
-            if (generation == mapLoadGeneration) {
-                asyncMapLoadInProgress = false
-                asyncMapLoadPath = null
+            updateLoadState { current ->
+                if (current.mapLoadGeneration == generation) {
+                    current.copy(asyncMapLoadInProgress = false, asyncMapLoadPath = null)
+                } else {
+                    current
+                }
             }
         }
     }

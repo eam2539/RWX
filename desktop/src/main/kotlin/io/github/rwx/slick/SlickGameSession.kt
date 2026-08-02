@@ -12,27 +12,31 @@ import io.github.rwx.render.canvas.*
 import io.github.rwx.session.*
 import io.github.rwx.ui.CoreUiEventQueue
 import java.awt.Canvas
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.locks.ReentrantLock
+import java.util.concurrent.atomic.AtomicReference
 import javax.swing.SwingUtilities
-import kotlin.concurrent.withLock
 
 class SlickGameSession(
     private val storage: PlatformStorage,
     registerShutdownHook: Boolean = true,
 ) : GameSession() {
     override val rendererMode: RendererMode= DesktopRendererMode.Slick
-    private val lock = Any()
-    private val frameLock = Any()
     private val running = AtomicBoolean(false)
     private val requestState = SlickSessionRequestState()
     private val stopRequested = AtomicBoolean(false)
 
     private val loadingStatusTracker = SlickLoadingStatusTracker()
     private val textInputBridge = SlickTextInputBridge()
-    private val engineReadyLock = ReentrantLock()
-    private val engineReadyCondition = engineReadyLock.newCondition()
+
+    /**
+     * Wakes [ensureStarted] waiters whenever engine-startup state may have changed. Waiters grab
+     * the current future *before* re-checking state, then wait on it, so a signal can never be
+     * lost; [signalEngineStartup] swaps in a fresh future and completes the old one.
+     */
+    private val engineStartupWaiters = AtomicReference(CompletableFuture<Unit>())
     @Volatile
     private var game: SlickGame? = null
     @Volatile
@@ -45,8 +49,8 @@ class SlickGameSession(
     @Volatile
     private var lastSlickViewport: KoolCanvasViewport = KoolCanvasViewport(1280, 720)
 
-    @Volatile
-    private var frameSnapshotState: SlickFrameSnapshotState = SlickFrameSnapshotState.empty(lastSlickViewport)
+    private val frameSnapshotState =
+        AtomicReference(SlickFrameSnapshotState.empty(KoolCanvasViewport(1280, 720)))
     @Volatile
     private var rendererStartupError: Throwable? = null
 
@@ -85,20 +89,25 @@ class SlickGameSession(
     ): SlickGame {
         val width = viewport.width.coerceAtLeast(320)
         val height = viewport.height.coerceAtLeast(240)
-        val createdGame = synchronized(lock) {
-            if (running.get()) {
-                return game ?: error("Slick runtime is stopping")
+        // `running` is the single-starter gate: exactly one caller flips it and owns the startup
+        // sequence below. A losing caller waits out the winner's tiny publish window instead of
+        // failing spuriously; only a genuinely stopping runtime raises the error.
+        if (!running.compareAndSet(false, true)) {
+            val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
+            while (System.nanoTime() < deadline) {
+                game?.let { return it }
+                if (stopRequested.get() || !running.get()) break
+                Thread.sleep(10)
             }
-            stopRequested.set(false)
-            configureLegacyDesktopPlatform()
-            storage.createDirectories()
-            createGame(request, width, height).also { newGame ->
-                game = newGame
-                running.set(true)
-            }
+            return game ?: error("Slick runtime is stopping")
         }
 
         try {
+            stopRequested.set(false)
+            configureLegacyDesktopPlatform()
+            storage.createDirectories()
+            val createdGame = createGame(request, width, height).also { game = it }
+
             Thread({
                 var containerToDestroy: EmbeddedSlickGameContainer? = null
                 try {
@@ -117,9 +126,7 @@ class SlickGameSession(
                         onParentCanvasResize = createdGame::requestSize,
                     )
                     containerToDestroy = createdContainer
-                    synchronized(lock) {
-                        container = createdContainer
-                    }
+                    container = createdContainer
                     createdContainer.setDisplayMode(
                         displayWidth.coerceAtLeast(320),
                         displayHeight.coerceAtLeast(240),
@@ -142,31 +149,25 @@ class SlickGameSession(
                     // Linux JAWT surfaces retain their creator thread's JNIEnv, so release before this thread exits.
                     runCatching { containerToDestroy?.destroy() }
                         .onFailure { error -> logger.warn(error) { "Failed to destroy the embedded Slick container" } }
-                    synchronized(lock) {
-                        container = null
-                        game = null
-                        renderThread = null
-                    }
+                    container = null
+                    game = null
+                    renderThread = null
                     stopRequested.set(false)
                     running.set(false)
                     handleRendererStopped()
                 }
             }, RENDER_THREAD_NAME).apply {
                 isDaemon = true
-                synchronized(lock) {
-                    renderThread = this
-                }
+                renderThread = this
                 start()
             }
 
             createdGame.setGameVisible(visible, pausedBackground)
             return createdGame
         } catch (error: Throwable) {
-            synchronized(lock) {
-                game = null
-                container = null
-                renderThread = null
-            }
+            game = null
+            container = null
+            renderThread = null
             stopRequested.set(false)
             running.set(false)
             throw error
@@ -174,15 +175,14 @@ class SlickGameSession(
     }
 
     fun stop() {
-        val containerToStop = synchronized(lock) {
-            stopRequested.set(true)
-            game = null
-            container.also { container = null }
-        }
+        stopRequested.set(true)
+        game = null
+        val containerToStop = container
+        container = null
         containerToStop?.requestExitFromAnyThread()
     }
     fun stopAndWait(timeoutMillis: Long) {
-        val thread = synchronized(lock) { renderThread }
+        val thread = renderThread
         stop()
         if (thread == null || thread === Thread.currentThread() || !thread.isAlive) return
         runCatching { thread.join(timeoutMillis) }
@@ -243,11 +243,7 @@ class SlickGameSession(
             super.ensureRendererEngine(viewport, graphicsEngine, view, platformCallbacks)
         }.onSuccess {
             rendererStartupError = null
-            synchronized(lock) {
-                if (requestState.desired is SlickSessionRequest.EnginePreparation) {
-                    requestState.clearRequest()
-                }
-            }
+            requestState.clearRequestIf { it.desired is SlickSessionRequest.EnginePreparation }
             signalEngineStartup()
         }.onFailure { error ->
             rendererStartupError = error
@@ -309,7 +305,7 @@ class SlickGameSession(
 
     override fun currentFrame(): KoolCanvasFrame {
         val viewport = lastSlickViewport
-        val snapshotState = frameSnapshotState
+        val snapshotState = frameSnapshotState.get()
         if (!snapshotState.isAvailable) {
             return emptyFrameFor(viewport)
         }
@@ -333,14 +329,10 @@ class SlickGameSession(
             activeEngineLocked()?.let { return it }
         }
         val requestedViewport = normalizedViewport(viewport)
-        synchronized(lock) {
-            lastSlickViewport = requestedViewport
-            lastViewport = requestedViewport
-            if (requestState.desired == null) {
-                requestState.replace(SlickSessionRequest.EnginePreparation)
-            }
-            rendererStartupError = null
-        }
+        lastSlickViewport = requestedViewport
+        lastViewport = requestedViewport
+        requestState.replaceIfEmpty(SlickSessionRequest.EnginePreparation)
+        rendererStartupError = null
 
         val canvasDeadline = deadlineAfterMillis(SLICK_CANVAS_INSTALL_TIMEOUT_MILLIS)
         while (SlickCanvasHost.gameCanvas() == null && System.nanoTime() < canvasDeadline) {
@@ -359,29 +351,31 @@ class SlickGameSession(
         try {
             startSlickGameIfNeeded()
             val engineDeadline = deadlineAfterMillis(SLICK_ENGINE_INITIALIZATION_TIMEOUT_MILLIS)
-            engineReadyLock.withLock {
-                while (true) {
-                    synchronized(gameLock) {
-                        activeEngineLocked()?.let { return it }
-                    }
-                    rendererStartupError?.let { error ->
-                        throw IllegalStateException("Unable to start the Slick renderer", error)
-                    }
-                    val remainingNanos = engineDeadline - System.nanoTime()
-                    check(remainingNanos > 0L) {
-                        "Slick renderer did not initialize within ${SLICK_ENGINE_INITIALIZATION_TIMEOUT_MILLIS}ms"
-                    }
-                    engineReadyCondition.await(remainingNanos, TimeUnit.NANOSECONDS)
+            while (true) {
+                // Grab the waiter before re-checking state so a startup signal that fires between
+                // the check and the wait completes this future rather than being lost.
+                val waiter = engineStartupWaiters.get()
+                synchronized(gameLock) {
+                    activeEngineLocked()?.let { return it }
                 }
-
+                rendererStartupError?.let { error ->
+                    throw IllegalStateException("Unable to start the Slick renderer", error)
+                }
+                val remainingNanos = engineDeadline - System.nanoTime()
+                check(remainingNanos > 0L) {
+                    "Slick renderer did not initialize within ${SLICK_ENGINE_INITIALIZATION_TIMEOUT_MILLIS}ms"
+                }
+                try {
+                    waiter.get(remainingNanos, TimeUnit.NANOSECONDS)
+                } catch (_: TimeoutException) {
+                    // Loop re-evaluates the deadline and fails with the message above.
+                }
             }
-
         } finally {
             if (exposedCanvasForStartup && !gameVisible) {
                 SlickCanvasHost.setGameVisible(visible = false)
             }
         }
-        return gameEngine!!
     }
 
     protected override fun applyViewport(engine: GameEngine, viewport: KoolCanvasViewport) {
@@ -451,12 +445,10 @@ class SlickGameSession(
 
 
     private fun stopRenderer() {
-        synchronized(lock) {
-            requestState.clearRequest()
-            rendererStartupError = IllegalStateException("Slick renderer stopped before startup completed")
-            gameVisible = false
-            pausedBackground = false
-        }
+        requestState.clearRequest()
+        rendererStartupError = IllegalStateException("Slick renderer stopped before startup completed")
+        gameVisible = false
+        pausedBackground = false
         clearFrameSnapshot(unregisterTexture = true)
         markRendererSurfaceStopped()
         stop()
@@ -464,12 +456,10 @@ class SlickGameSession(
     }
 
     fun stopRendererAndWait(timeoutMillis: Long = RENDER_THREAD_JOIN_TIMEOUT_MILLIS) {
-        synchronized(lock) {
-            requestState.clearRequest()
-            rendererStartupError = IllegalStateException("Slick renderer stopped before startup completed")
-            gameVisible = false
-            pausedBackground = false
-        }
+        requestState.clearRequest()
+        rendererStartupError = IllegalStateException("Slick renderer stopped before startup completed")
+        gameVisible = false
+        pausedBackground = false
         clearFrameSnapshot(unregisterTexture = true)
         markRendererSurfaceStopped()
         signalEngineStartup()
@@ -542,11 +532,9 @@ class SlickGameSession(
             return false
         }
 
-        synchronized(lock) {
-            lastSlickViewport = normalizedViewport
-            lastViewport = normalizedViewport
-            requestState.replace(SlickSessionRequest.StartedGame(mapPath))
-        }
+        lastSlickViewport = normalizedViewport
+        lastViewport = normalizedViewport
+        requestState.replace(SlickSessionRequest.StartedGame(mapPath))
         clearFrameSnapshot(unregisterTexture = true)
         beginRendererStartedGamePreparation(mapPath)
         logger.info { "Adopting started battle room in embedded Slick renderer: $mapPath" }
@@ -555,17 +543,15 @@ class SlickGameSession(
     }
 
     override fun prepareMenuBackgroundAsync(viewport: KoolCanvasViewport) {
-        synchronized(lock) {
-            if (menuBackgroundActive || requestState.desired is SlickSessionRequest.MenuBackground) {
-                return
-            }
+        if (loadState.menuBackgroundActive || requestState.desired is SlickSessionRequest.MenuBackground) {
+            return
         }
         beginRendererStandalonePreparation(MENU_BACKGROUND_REQUEST)
         prepareRendererRequest(viewport, SlickSessionRequest.MenuBackground)
         startSlickGameIfNeeded()
     }
 
-    override fun isMenuBackgroundActive(): Boolean = menuBackgroundActive
+    override fun isMenuBackgroundActive(): Boolean = loadState.menuBackgroundActive
 
     override fun prepareReplayAsync(replayName: String, viewport: KoolCanvasViewport) {
         val requestedReplayName = replayName.takeIf { it.isNotBlank() } ?: return
@@ -582,20 +568,16 @@ class SlickGameSession(
         request: SlickSessionRequest,
     ) {
         val requestedViewport = normalizedViewport(viewport)
-        synchronized(lock) {
-            lastSlickViewport = requestedViewport
-            lastViewport = requestedViewport
-            requestState.replace(request)
-            rendererStartupError = null
-        }
+        lastSlickViewport = requestedViewport
+        lastViewport = requestedViewport
+        requestState.replace(request)
+        rendererStartupError = null
         loadingStatusTracker.reset()
         clearFrameSnapshot(unregisterTexture = true)
     }
 
     private fun signalEngineStartup() {
-        engineReadyLock.withLock {
-            engineReadyCondition.signalAll()
-        }
+        engineStartupWaiters.getAndSet(CompletableFuture()).complete(Unit)
     }
 
     private fun resizeFromCanvasHost(width: Int, height: Int) {
@@ -612,20 +594,17 @@ class SlickGameSession(
         val pendingBattleRoomConfig = preparation.battleRoomConfig
         val pendingMapPath = preparation.mapPath
         if (pendingMemorySnapshot == null && pendingMapPath == null) {
-            val preservesStandaloneRequest = synchronized(lock) {
-                requestState.desired is SlickSessionRequest.MenuBackground ||
-                        requestState.desired is SlickSessionRequest.Replay ||
-                        requestState.desired is SlickSessionRequest.StartedGame
-            }
+            val desired = requestState.desired
+            val preservesStandaloneRequest = desired is SlickSessionRequest.MenuBackground ||
+                    desired is SlickSessionRequest.Replay ||
+                    desired is SlickSessionRequest.StartedGame
             if (preservesStandaloneRequest) {
                 return
             }
             val activeMapPath = runningMapPath()
                 ?.takeIf { it.isNotBlank() && isMapLoaded(it) }
                 ?: return
-            synchronized(lock) {
-                requestState.synchronize(SlickSessionRequest.Map(activeMapPath))
-            }
+            requestState.synchronize(SlickSessionRequest.Map(activeMapPath))
             return
         }
         val sessionMapPath = pendingMemorySnapshot?.mapPath
@@ -636,15 +615,7 @@ class SlickGameSession(
             pendingBattleRoomConfig != null -> SlickSessionRequest.BattleRoom(pendingBattleRoomConfig)
             else -> SlickSessionRequest.Map(sessionMapPath)
         }
-        val requestChanged = synchronized(lock) {
-            if (requestState.desired == request) {
-                false
-            } else {
-                requestState.synchronize(request)
-                true
-            }
-        }
-        if (requestChanged) {
+        if (requestState.synchronize(request)) {
             clearFrameSnapshot(unregisterTexture = true)
         }
     }
@@ -655,23 +626,15 @@ class SlickGameSession(
     }
 
     private fun startSlickGameIfNeeded() {
-        val request: SlickSessionRequest
-        val viewport: KoolCanvasViewport
-        val existingGame: SlickGame?
-        val requestToDispatch: SlickSessionRequest?
-        val shouldShowGame: Boolean
-        val shouldPauseBackground: Boolean
-        synchronized(lock) {
-            request = requestState.desired ?: return
-            shouldShowGame = gameVisible
-            shouldPauseBackground = pausedBackground
-            viewport = lastSlickViewport
-            existingGame = activeGame()
-            requestToDispatch = if (existingGame != null || !running.get()) {
-                requestState.nextDispatch()
-            } else {
-                null
-            }
+        val request = requestState.desired ?: return
+        val shouldShowGame = gameVisible
+        val shouldPauseBackground = pausedBackground
+        val viewport = lastSlickViewport
+        val existingGame = activeGame()
+        val requestToDispatch = if (existingGame != null || !running.get()) {
+            requestState.nextDispatch()
+        } else {
+            null
         }
         if (existingGame != null) {
             existingGame.requestSize(viewport.width.coerceAtLeast(320), viewport.height.coerceAtLeast(240))
@@ -684,9 +647,7 @@ class SlickGameSession(
 
         val canvas = SlickCanvasHost.gameCanvas()
         if (canvas == null) {
-            synchronized(lock) {
-                requestState.runtimeStopped()
-            }
+            requestState.runtimeStopped()
             logger.warn { "Slick game canvas is not installed" }
             return
         }
@@ -700,24 +661,15 @@ class SlickGameSession(
                 pausedBackground = shouldPauseBackground,
             )
         }.onFailure { error ->
-            synchronized(lock) {
-                requestState.runtimeStopped()
-            }
+            requestState.runtimeStopped()
             handleRendererStartupError(error)
             logger.error(error) { "Failed to launch embedded Slick backend" }
         }
     }
 
     private fun handleMapReady(mapPath: String) {
-        var menuBackgroundReady = false
-        val viewport: KoolCanvasViewport
-        synchronized(lock) {
-            val dispatchedRequest = requestState.dispatched
-            viewport = lastSlickViewport
-            if (dispatchedRequest is SlickSessionRequest.MenuBackground) {
-                menuBackgroundReady = true
-            }
-        }
+        val menuBackgroundReady = requestState.dispatched is SlickSessionRequest.MenuBackground
+        val viewport = lastSlickViewport
         if (menuBackgroundReady) {
             markRendererMenuBackgroundReady()
             CoreUiEventQueue.requestMenuBackgroundReady()
@@ -734,15 +686,13 @@ class SlickGameSession(
     }
 
     private fun handleMapError(mapPath: String, error: Throwable) {
-        val failedMapPath: String?
-        val failedMenuBackground: Boolean
-        synchronized(lock) {
-            val dispatchedRequest = requestState.dispatched
-            failedMapPath = mapPath.takeIf { it.isNotBlank() } ?: dispatchedRequest?.loadingPath
-            failedMenuBackground = dispatchedRequest is SlickSessionRequest.MenuBackground
-            if (failedMenuBackground || failedMapPath == null || dispatchedRequest?.loadingPath == failedMapPath) {
-                requestState.clearRequest()
-            }
+        val dispatchedRequest = requestState.dispatched
+        val failedMapPath = mapPath.takeIf { it.isNotBlank() } ?: dispatchedRequest?.loadingPath
+        val failedMenuBackground = dispatchedRequest is SlickSessionRequest.MenuBackground
+        if (failedMenuBackground || failedMapPath == null || dispatchedRequest?.loadingPath == failedMapPath) {
+            // Only drop the request that actually failed: a newer request that replaced it in the
+            // meantime must survive this error.
+            requestState.clearRequestIf { it.dispatched == dispatchedRequest }
         }
         if (failedMenuBackground) {
             markRendererMenuBackgroundError(MENU_BACKGROUND_REQUEST, error)
@@ -759,9 +709,7 @@ class SlickGameSession(
 
     private fun handleRendererStopped() {
         if (activeGame() == null) {
-            synchronized(lock) {
-                requestState.runtimeStopped()
-            }
+            requestState.runtimeStopped()
         }
     }
 
@@ -779,15 +727,21 @@ class SlickGameSession(
                 height = viewport.height.takeIf { it > 0 } ?: 720,
             )
     private fun updateFrameSnapshot(snapshot: SlickFrameSnapshot) {
-        synchronized(frameLock) {
-            if (snapshot.width <= 0 || snapshot.height <= 0 || snapshot.pixels.size < snapshot.width * snapshot.height) {
-                return
-            }
-            val previousState = frameSnapshotState
+        if (snapshot.width <= 0 || snapshot.height <= 0 || snapshot.pixels.size < snapshot.width * snapshot.height) {
+            return
+        }
+        while (true) {
+            val previousState = frameSnapshotState.get()
             val snapshotChanged = snapshot.sequence != previousState.sequence ||
                     snapshot.width != previousState.width ||
                     snapshot.height != previousState.height
+            val viewport = lastSlickViewport
+            if (!snapshotChanged && previousState.frame.viewport == viewport) {
+                return
+            }
             if (snapshotChanged) {
+                // Upload before publishing so a state that references the texture never precedes
+                // its pixels. A lost CAS race just re-uploads the same constant texture id.
                 KoolCanvasTextureRegistry.registerArgb(
                     SLICK_CURRENT_FRAME_TEXTURE_ID,
                     snapshot.width,
@@ -795,27 +749,24 @@ class SlickGameSession(
                     snapshot.pixels,
                 )
             }
-            val viewport = lastSlickViewport
-            if (!snapshotChanged && previousState.frame.viewport == viewport) {
-                return
-            }
             val width = if (snapshotChanged) snapshot.width else previousState.width
             val height = if (snapshotChanged) snapshot.height else previousState.height
-            frameSnapshotState = SlickFrameSnapshotState(
+            val nextState = SlickFrameSnapshotState(
                 sequence = if (snapshotChanged) snapshot.sequence else previousState.sequence,
                 width = width,
                 height = height,
                 frame = frameForSnapshotTexture(viewport, width, height),
             )
+            if (frameSnapshotState.compareAndSet(previousState, nextState)) {
+                return
+            }
         }
     }
 
     private fun clearFrameSnapshot(unregisterTexture: Boolean) {
-        synchronized(frameLock) {
-            frameSnapshotState = SlickFrameSnapshotState.empty(lastSlickViewport)
-            if (unregisterTexture) {
-                KoolCanvasTextureRegistry.unregister(SLICK_CURRENT_FRAME_TEXTURE_ID)
-            }
+        frameSnapshotState.set(SlickFrameSnapshotState.empty(lastSlickViewport))
+        if (unregisterTexture) {
+            KoolCanvasTextureRegistry.unregister(SLICK_CURRENT_FRAME_TEXTURE_ID)
         }
     }
     companion object{
