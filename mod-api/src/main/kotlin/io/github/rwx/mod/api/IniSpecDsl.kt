@@ -46,6 +46,9 @@ class UnitIniBuilder internal constructor() {
     fun effect(name: String, configure: EffectSpec.() -> Unit) =
         section(named("effect", name), ::EffectSpec, configure)
 
+    fun effect(name: String, spec: EffectSpec) =
+        section(named("effect", name), { spec.copy() }) {}
+
     fun decal(name: String, configure: DecalSpec.() -> Unit) =
         section(named("decal", name), ::DecalSpec, configure)
 

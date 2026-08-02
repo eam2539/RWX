@@ -49,7 +49,7 @@ object UnitEventRuntime {
                 "Missing JVM unit declaration for activated native unit ${unitId.value}"
             }
             val effectTemplates = referencedEffects(definition).associateWith { effectId ->
-                nativeType.resolveEffect("CUSTOM:${UnitIniCompiler.engineEffectName(effectId)}")
+                nativeType.resolveEffect("CUSTOM:${effectId.nativeName}")
             }
             nativeType to Registration(api, definition, nativeType, effectTemplates)
         }

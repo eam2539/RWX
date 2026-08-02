@@ -1,6 +1,7 @@
 package io.github.rwx.mod.api
 
 import kotlin.Double
+import kotlin.Int
 import kotlin.String
 import kotlin.collections.Map
 import kotlin.collections.firstOrNull
@@ -29,6 +30,23 @@ value class ResourceId(val value: String) {
 data class Cost(val resources: Map<ResourceId, Double>) {
     companion object {
         val ZERO = Cost(emptyMap())
+    }
+}
+
+data class RgbaColor(
+    val red: Int,
+    val green: Int,
+    val blue: Int,
+    val alpha: Int = 255,
+) {
+    init {
+        require(red in 0..255 && green in 0..255 && blue in 0..255 && alpha in 0..255) {
+            "RGBA color channels must be between 0 and 255"
+        }
+    }
+
+    companion object {
+        fun rgb(red: Int, green: Int, blue: Int) = RgbaColor(red, green, blue)
     }
 }
 

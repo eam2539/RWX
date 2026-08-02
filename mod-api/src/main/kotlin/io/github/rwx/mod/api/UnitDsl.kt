@@ -48,6 +48,7 @@ class UnitBuilder internal constructor(private val id: UnitId) {
     fun turret(name: String, configure: TurretSpec.() -> kotlin.Unit) = ini.turret(name, configure)
     fun projectile(name: String, configure: ProjectileSpec.() -> kotlin.Unit) = ini.projectile(name, configure)
     fun effect(name: String, configure: EffectSpec.() -> kotlin.Unit) = ini.effect(name, configure)
+    fun effect(name: String, spec: EffectSpec) = ini.effect(name, spec)
     fun decal(name: String, configure: DecalSpec.() -> kotlin.Unit) = ini.decal(name, configure)
     fun attachment(name: String, configure: AttachmentSpec.() -> kotlin.Unit) = ini.attachment(name, configure)
     fun leg(name: String, configure: LegSpec.() -> kotlin.Unit) = ini.leg(name, configure)

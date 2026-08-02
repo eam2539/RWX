@@ -35,7 +35,6 @@ class ApiImpl private constructor(
     private val unitApi = UnitApiImpl()
     private val unitWorldApi = UnitWorldImpl()
     private val commandApi = UnitCommandsImpl(this)
-    private val effectApi = EffectApiImpl()
     private val activeNativeUnits = linkedMapOf<UnitId, CustomUnitConfig>()
     private val shaderDefinitions = linkedMapOf<String, ShaderDefinition>()
     private val shaderPrograms = linkedMapOf<String, ShaderProgram>()
@@ -52,7 +51,6 @@ class ApiImpl private constructor(
     override val localization: io.github.rwx.mod.api.Localization = Localization()
     override val audio: Audio = ModAudio(this)
     override val graphics: Graphics = RecordingGraphics(this)
-    override val effects: Effects = effectApi
     override val ui: Ui = RecordingUi(this)
     override val ai: io.github.rwx.mod.api.AiBehavior = AiBehavior(commandApi, unitWorldApi)
 
@@ -144,13 +142,12 @@ class ApiImpl private constructor(
 
     private fun applyUnitDeclarations() {
         val generatedDirectory = workDir.resolve("units/_jvm_generated")
-        val effectsById = effectApi.effects().associateBy { it.id }
         var generatedCount = 0
         unitExtensionBindings.clear()
 
         unitApi.units().forEach { definition ->
             runCatching {
-                val compilation = UnitIniCompiler.compile(definition, effectsById)
+                val compilation = UnitIniCompiler.compile(definition)
                 generatedDirectory.mkdirs()
                 generatedDirectory.resolve(compilation.fileName).writeText(compilation.content)
                 unitExtensionBindings[definition.id] = compilation.extensionBindings

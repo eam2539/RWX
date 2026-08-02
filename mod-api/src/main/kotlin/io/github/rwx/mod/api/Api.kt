@@ -11,7 +11,6 @@ interface Api {
     val localization: Localization
     val audio: Audio
     val graphics: Graphics
-    val effects: Effects
     val ui: Ui
     val ai: AiBehavior
 }

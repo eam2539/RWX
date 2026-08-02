@@ -59,6 +59,9 @@ data class EffectSpec(
     // Example: delayedStartTimer: 2s
     /** Hide for x time before showing and updating effect. */
     var delayedStartTimer: Float? = null,
+    // Example: delayedStartTimerRandom: 2
+    /** Random offset delayed start by +/- this value */
+    var delayedStartTimerRandom: Float? = null,
     // Example: liveAfterAttachedDies: false
     /** Defaults false when attachedToUnit is being used */
     var liveAfterAttachedDies: Boolean? = null,
@@ -193,12 +196,30 @@ data class EffectSpec(
     // Example: imageShadow: AUTO
     /** Custom image file to use for shadows */
     var imageShadow: String? = null,
+    // Example: imageAnchor: center
+    /** Vertical anchor for the custom image. Options: top|center|bottom */
+    var imageAnchor: String? = null,
+    // Example: blendMode: additive
+    /** Sprite blending mode. Options: alpha|additive */
+    var blendMode: String? = null,
     // Example: scaleTo: 2
     /** Defaults to 1. Resizes the unit into the specified scale */
     var scaleTo: Float? = null,
     // Example: scaleFrom: 4
     /** Defaults to 1. Resizes the unit from the specified scale */
     var scaleFrom: Float? = null,
+    // Example: scaleXFrom: 1
+    /** Horizontal scale at effect start */
+    var scaleXFrom: Float? = null,
+    // Example: scaleYFrom: 1
+    /** Vertical scale at effect start */
+    var scaleYFrom: Float? = null,
+    // Example: scaleXTo: 1
+    /** Horizontal scale at effect end */
+    var scaleXTo: Float? = null,
+    // Example: scaleYTo: 1
+    /** Vertical scale at effect end */
+    var scaleYTo: Float? = null,
     // Example: color: #ff00ff
     /**
      * Defaults #FFFFFFFF. Changes the color of the effect sprite. Use pure white sprite for most use cases.
@@ -237,9 +258,18 @@ data class EffectSpec(
      * Total frames of 'image', used with animation or frameIndex. Only needed with custom images
      */
     var totalFrames: Int? = null,
+    // Example: frame_width: 40
+    /** Width of each frame in a custom image strip */
+    var frameWidth: Int? = null,
+    // Example: frame_height: 40
+    /** Height of each frame in a custom image strip */
+    var frameHeight: Int? = null,
     // Example: animateFrameStart: 0
     /** Starting frame for the animation */
     var animateFrameStart: Int? = null,
+    // Example: animateFrameStartRandomAdd: 2
+    /** Adds a random value from zero through this value to the starting frame */
+    var animateFrameStartRandomAdd: Int? = null,
     // Example: animateFrameEnd: 3
     /** Ending frame for the animation */
     var animateFrameEnd: Int? = null,
