@@ -15,6 +15,7 @@ import com.corrodinggames.rts.gameFramework.ui.LagHidingManager;
 import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import com.corrodinggames.rts.gameFramework.utility.IniFile;
+
 import java.util.Iterator;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.custom.b.m */
@@ -134,13 +135,11 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                 AttachmentSlotDefinition attachmentSlotDefinition = (AttachmentSlotDefinition) objArrA[i];
                 if (attachmentSlotDefinition.D && customUnit.transportedUnits.size > 0 && a(customUnit, attachmentSlotDefinition) == null) {
                     Iterator it = customUnit.transportedUnits.iterator();
-                    while (true) {
-                        if (it.hasNext()) {
-                            BaseUnit baseUnit = (BaseUnit) it.next();
-                            if ((baseUnit instanceof OrderableUnit) && baseUnit.parentEntity == null && customUnit.a((OrderableUnit) baseUnit, attachmentSlotDefinition)) {
-                                baseUnit.unitTransportTarget = null;
-                                break;
-                            }
+                    while (it.hasNext()) {
+                        BaseUnit baseUnit = (BaseUnit) it.next();
+                        if ((baseUnit instanceof OrderableUnit) && baseUnit.parentEntity == null && customUnit.a((OrderableUnit) baseUnit, attachmentSlotDefinition)) {
+                            baseUnit.unitTransportTarget = null;
+                            break;
                         }
                     }
                 }
@@ -287,7 +286,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
         Object[] var4 = var3.a();
 
         for (int var5 = var3.size - 1; var5 >= 0; var5--) {
-            AttachmentSlotDefinition var6 = (AttachmentSlotDefinition)var4[var5];
+            AttachmentSlotDefinition var6 = (AttachmentSlotDefinition) var4[var5];
             if (var6.w != null) {
                 OrderableUnit var7 = a(j, var6);
                 if (var7 != null) {
@@ -304,19 +303,19 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                     GameEngine.logColored("onCreateSpawnUnitOf: created an extra " + (var8.size() - 1) + " units");
 
                     for (int var9 = 1; var9 < var8.size(); var9++) {
-                        ((BaseUnit)var8.get(var9)).removeFromGame();
+                        ((BaseUnit) var8.get(var9)).removeFromGame();
                     }
                 }
 
                 if (var8.size() == 0) {
                     GameEngine.logColored("onCreateSpawnUnitOf: Warning no units created");
                 } else {
-                    BaseUnit var11 = (BaseUnit)var8.get(0);
+                    BaseUnit var11 = (BaseUnit) var8.get(0);
                     if (!(var11 instanceof OrderableUnit)) {
                         GameEngine.logColored("onCreateSpawnUnitOf: Warning " + var11.r().getUnitTypeDescriptionShort() + " not an orderable unit type, cannot attach");
                         var11.removeFromGame();
                     } else {
-                        OrderableUnit var10 = (OrderableUnit)var11;
+                        OrderableUnit var10 = (OrderableUnit) var11;
                         if (j.a(var10, var6)) {
                             var10.unitTransportCapacity = -9999;
                             if (j.buildProgress < 1.0F && var6.x) {
@@ -335,6 +334,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
             this.b(j, 0.0F);
         }
     }
+
     @Override // com.corrodinggames.rts.game.units.custom.hooks.CustomUnitRenderHook
     public void a(CustomUnit customUnit, CustomUnitConfig customUnitConfig) {
         FastArrayList fastArrayList = customUnit.C;
