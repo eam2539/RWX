@@ -64,6 +64,10 @@ internal class EmbeddedSlickGameContainer(
     fun start() {
         running = true
         while (running() && !exitRequested.get() && awtCanvas.isDisplayable) {
+            // A long mod reload must not retain the JAWT drawing-surface lock held by runInContext.
+            if ((game as? SlickGame)?.runPendingNonRenderingWork() == true) {
+                getDelta()
+            }
             if (!awtCanvas.isRenderable()) {
                 skipFrameUntilCanvasReady()
                 continue

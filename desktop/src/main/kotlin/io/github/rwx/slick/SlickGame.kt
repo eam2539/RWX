@@ -20,6 +20,7 @@ import io.github.rwx.logger
 import io.github.rwx.net.CoreUiNetworkCallbacks
 import io.github.rwx.platform.CoreGameView
 import io.github.rwx.render.canvas.KoolCanvasViewport
+import io.github.rwx.render.canvas.KoolGraphicsEngine
 import io.github.rwx.session.*
 import io.github.rwx.ui.InGameMenuController
 import kotlinx.coroutines.CompletableDeferred
@@ -153,13 +154,18 @@ class SlickModReloadQueue {
         return true
     }
 
-    fun executePending(reload: () -> Unit) {
-        val request = pendingRequest.getAndSet(null) ?: return
-        runCatching(reload)
-            .onSuccess { request.complete(Unit) }
-            .onFailure(request::completeExceptionally)
-    }
+    fun takePending(): CompletableDeferred<Unit>? = pendingRequest.getAndSet(null)
 }
+
+private data class CompletedModReload(
+    val request: CompletableDeferred<Unit>,
+    val error: Throwable?,
+)
+
+private data class PreparedModReload(
+    val request: CompletableDeferred<Unit>,
+    val graphicsEngine: KoolGraphicsEngine,
+)
 
 internal fun legacySlickDeltaSpeed(deltaMillis: Int): Float = deltaMillis * 0.060000002f
 
@@ -250,6 +256,8 @@ class SlickGame(
     private var lastAppliedVsync: Boolean? = null
     private var lastAppliedSmoothDeltas: Boolean? = null
     private var pointerCursorApplied: Boolean = false
+    private var preparedModReload: PreparedModReload? = null
+    private var completedModReload: CompletedModReload? = null
 
     @Volatile
     private var latestFrameSnapshot: SlickFrameSnapshot? = null
@@ -297,11 +305,11 @@ class SlickGame(
 
     private fun resetSlickRenderCaches(activeEngine: GameEngine) {
         graphicsEngine.resetBackendState()
-        activeEngine.minimap?.release()
+        activeEngine.minimap?.bindGraphicsBackend(graphicsEngine)
         TileMap.layerBufferManager.releaseLayerBuffers()
         TileMap.layerBufferManager = LayerBufferManager()
         TileMap.layerBufferManager.bindGraphicsBackend(graphicsEngine)
-        TileMap.buildFogSmoothAtlas(graphicsEngine)
+        TileMap.bindGraphicsBackend(graphicsEngine)
     }
 
     private fun installNetworkCallbacks(activeEngine: GameEngine) {
@@ -352,7 +360,7 @@ class SlickGame(
      * a variable number of times per frame (zero when paused, N when catching up) but `render()`
      * exactly once, and the legacy `GameEngine.gameLoop()` simulates *and* draws in a single call
      * that needs a live `Graphics`. So the engine tick has to happen here, and everything that
-     * mutates engine state has to be sequenced against it here too.
+     * mutates engine state has to be sequenced against it on the same renderer thread.
      *
      * Order matters: [drainPendingWork] must run before the engine tick so a queued level load,
      * resize or input event is visible to the frame that follows it, rather than being applied
@@ -362,7 +370,9 @@ class SlickGame(
         val activeEngine = engine ?: return
         graphicsEngine.setGraphics(graphics, container.width, container.height)
         activeEngine.renderGraphicsEngine = graphicsEngine
+        completeModReload(activeEngine)
         applyContainerRuntimeSettings(activeEngine, container)
+        if (prepareModReload(activeEngine)) return
 
         drainPendingWork(activeEngine, container)
 
@@ -381,11 +391,12 @@ class SlickGame(
     }
 
     /**
-     * Applies everything other threads queued up since the last frame.
+     * Applies frame-bound work that other threads queued up since the last frame.
      *
      * Every caller-facing `request*`/`submit` method only parks its argument in a field or a
-     * concurrent queue; this is the single point where that work is applied, on the render thread
-     * that owns the engine. Keeping it in one place is what lets those methods stay lock-free.
+     * concurrent queue. Work that needs live graphics is applied here; long CPU-only work is
+     * applied before entering the graphics context by [runPendingNonRenderingWork]. Both paths
+     * stay on the renderer thread that owns the engine, so callers remain lock-free.
      */
     private fun drainPendingWork(activeEngine: GameEngine, container: GameContainer) {
         applyPendingInputEvents(activeEngine)
@@ -393,7 +404,6 @@ class SlickGame(
         applyPendingRequest(activeEngine)
         savePendingGame(activeEngine)
         exportPendingMap(activeEngine)
-        reloadPendingMods(activeEngine)
         applyPendingInGameCommands(activeEngine)
         applyPendingTextInputResponses()
         updatePointerCursor(container, activeEngine)
@@ -874,9 +884,58 @@ class SlickGame(
         }
     }
 
-    private fun reloadPendingMods(activeEngine: GameEngine) {
-        modReloadQueue.executePending {
-            reloadMods(activeEngine)
+    internal fun runPendingNonRenderingWork(): Boolean {
+        val activeEngine = engine ?: return false
+        if (completedModReload != null) return false
+        val reload = preparedModReload ?: return false
+        preparedModReload = null
+        val error = runCatching {
+            activeEngine.renderGraphicsEngine = reload.graphicsEngine
+            try {
+                TileMap.buildFogSmoothAtlas(reload.graphicsEngine)
+                reloadMods(activeEngine)
+            } finally {
+                activeEngine.renderGraphicsEngine = graphicsEngine
+            }
+        }.exceptionOrNull()
+        completedModReload = CompletedModReload(reload.request, error)
+        return true
+    }
+
+    private fun prepareModReload(activeEngine: GameEngine): Boolean {
+        if (preparedModReload != null || completedModReload != null) return false
+        val request = modReloadQueue.takePending() ?: return false
+        val reloadGraphicsEngine = KoolGraphicsEngine()
+        val error = runCatching {
+            graphicsEngine.resetBackendState()
+            activeEngine.minimap?.bindGraphicsBackend(reloadGraphicsEngine)
+            TileMap.layerBufferManager.releaseLayerBuffers()
+            TileMap.layerBufferManager = LayerBufferManager()
+            TileMap.layerBufferManager.bindGraphicsBackend(reloadGraphicsEngine)
+            TileMap.releaseFogSmoothAtlas()
+        }.exceptionOrNull()
+        if (error == null) {
+            preparedModReload = PreparedModReload(request, reloadGraphicsEngine)
+        } else {
+            completedModReload = CompletedModReload(request, error)
+            completeModReload(activeEngine)
+        }
+        return true
+    }
+
+    private fun completeModReload(activeEngine: GameEngine) {
+        val completion = completedModReload ?: return
+        completedModReload = null
+        val cacheResetError = runCatching {
+            resetSlickRenderCaches(activeEngine)
+        }.exceptionOrNull()
+        val error = completion.error?.also { reloadError ->
+            cacheResetError?.let(reloadError::addSuppressed)
+        } ?: cacheResetError
+        if (error == null) {
+            completion.request.complete(Unit)
+        } else {
+            completion.request.completeExceptionally(error)
         }
     }
 
