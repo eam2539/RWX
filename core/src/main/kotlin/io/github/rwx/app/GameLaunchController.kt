@@ -5,7 +5,6 @@ import io.github.rwx.logger
 import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.session.BattleRoomLaunchConfig
 import io.github.rwx.session.GameSession
-import io.github.rwx.session.savedGameRequestPath
 import io.github.rwx.ui.AppScreen
 import io.github.rwx.ui.host.DialogSceneHost
 import io.github.rwx.ui.model.Dialog
@@ -112,10 +111,9 @@ internal class GameLaunchController(
             }
             return
         }
-        val requestPath = savedGameRequestPath(requestedSaveName)
         discardRunningGameBeforeStandaloneLaunch()
-        pendingStartController.set(requestPath, mapStartFailureReturnScreen(currentScreen()))
-        gameSession.prepareMapAsync(requestPath, viewport())
+        pendingStartController.set(requestedSaveName, mapStartFailureReturnScreen(currentScreen()))
+        gameSession.prepareSavedGameAsync(requestedSaveName, viewport())
         logger.info { "Entering RW saved game while it prepares: $requestedSaveName" }
         navigateTo(AppScreen.InGame)
     }

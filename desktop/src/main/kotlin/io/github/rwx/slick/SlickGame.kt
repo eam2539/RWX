@@ -495,6 +495,11 @@ class SlickGame(
                     loadDirectMap(activeEngine, request.mapPath)
                 }
 
+            is SlickSessionRequest.SavedGame ->
+                loadRequestedLevel(activeEngine, request, request.saveName) {
+                    loadSavedGame(activeEngine, request.saveName)
+                }
+
             is SlickSessionRequest.BattleRoom ->
                 loadRequestedLevel(activeEngine, request, request.config.mapPath) {
                     loadBattleRoomMap(activeEngine, request.config)
@@ -626,19 +631,21 @@ class SlickGame(
 
     private fun loadDirectMap(activeEngine: GameEngine, mapPath: String) {
         prepareActiveGameLoad(activeEngine)
-        val saveName = savedGameNameFromRequestPath(mapPath)
-        if (saveName != null) {
-            check(activeEngine.gameSaver.loadSaveFile(saveName, true)) {
-                "Unable to load saved game: $saveName"
-            }
-        } else {
-            activeEngine.currentMapPath = mapPath
-            if (noFog) {
-                activeEngine.networkEngine.roomSettings.fogMode = 0
-                activeEngine.networkEngine.roomSettings.revealedMap = true
-            }
-            activeEngine.loadGame(true, GameMode.normal)
+        activeEngine.currentMapPath = mapPath
+        if (noFog) {
+            activeEngine.networkEngine.roomSettings.fogMode = 0
+            activeEngine.networkEngine.roomSettings.revealedMap = true
         }
+        activeEngine.loadGame(true, GameMode.normal)
+    }
+
+    private fun loadSavedGame(activeEngine: GameEngine, saveName: String) {
+        activeEngine.networkEngine?.disconnectNetworking("loading new save")
+        prepareActiveGameLoad(activeEngine)
+        check(activeEngine.gameSaver.loadSaveFile(saveName, false)) {
+            "Unable to load saved game: $saveName"
+        }
+        activeEngine.applyLoadedSinglePlayerFogRules()
     }
 
     private fun loadMemorySnapshot(activeEngine: GameEngine, snapshot: GameMemorySnapshot) {
@@ -654,10 +661,11 @@ class SlickGame(
         prepareActiveGameLoad(activeEngine)
         activeEngine.currentMapPath = config.mapPath
         val networkEngine = activeEngine.configureLocalBattleRoom(config, "Slick") ?: run {
-            loadDirectMap(
-                activeEngine,
-                if (config.savedGame) savedGameRequestPath(config.mapPath) else config.mapPath,
-            )
+            if (config.savedGame) {
+                loadSavedGame(activeEngine, config.mapPath)
+            } else {
+                loadDirectMap(activeEngine, config.mapPath)
+            }
             return
         }
 
@@ -853,10 +861,15 @@ class SlickGame(
         pendingTextInputResponses.add(PendingTextInputResponse(requestId, null, cancel = true))
     }
 
-    internal fun runPendingNonRenderingWork(): Boolean {
+    internal fun runPendingNonRenderingWork(drainEngineCommands: Boolean = false): Boolean {
         val activeEngine = engine ?: return false
-        if (completedModReload != null) return false
-        val reload = preparedModReload ?: return false
+        var didWork = false
+        if (drainEngineCommands) {
+            didWork = applyPendingEngineCommands(activeEngine) || didWork
+            didWork = applyPendingTextInputResponses() || didWork
+        }
+        if (completedModReload != null) return didWork
+        val reload = preparedModReload ?: return didWork
         preparedModReload = null
         val error = runCatching {
             activeEngine.renderGraphicsEngine = reload.graphicsEngine
@@ -924,9 +937,11 @@ class SlickGame(
         }
     }
 
-    private fun applyPendingEngineCommands(activeEngine: GameEngine) {
+    private fun applyPendingEngineCommands(activeEngine: GameEngine): Boolean {
+        var didWork = false
         while (true) {
             val pending = pendingEngineCommands.poll() ?: break
+            didWork = true
             if (pending.abandoned.get()) continue
             val outcome = runCatching { pending.command(activeEngine) }
             outcome.exceptionOrNull()?.let { error ->
@@ -934,11 +949,14 @@ class SlickGame(
             }
             pending.result.complete(outcome.getOrNull())
         }
+        return didWork
     }
 
-    private fun applyPendingTextInputResponses() {
+    private fun applyPendingTextInputResponses(): Boolean {
+        var didWork = false
         while (true) {
             val response = pendingTextInputResponses.poll() ?: break
+            didWork = true
             val handler = pendingTextInputHandlers.remove(response.requestId) ?: continue
             runCatching {
                 if (response.cancel) {
@@ -950,6 +968,7 @@ class SlickGame(
                 GameEngine.log("Failed to apply Slick text input response", error)
             }
         }
+        return didWork
     }
 
     private fun captureFrameSnapshotAfterWorldRender(container: GameContainer) {

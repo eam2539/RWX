@@ -30,6 +30,37 @@ fun GameEngine.installSinglePlayerLocalTeam(playerName: String): GameTeam {
     return localPlayerTeam
 }
 
+/**
+ * Applies the room fog rules restored by a standalone skirmish/sandbox save to the loaded map.
+ *
+ * A sandbox save restores its room rules but deliberately leaves the map's initial fog untouched.
+ * Android initializes a skirmish map without explicit fog metadata as no-fog, while the desktop
+ * engine initializes it as LOS. Apply the restored room rules here so that backend default does
+ * not change the saved game mode.
+ */
+fun GameEngine.applyLoadedSinglePlayerFogRules() {
+    val network = networkEngine ?: return
+    if (!network.singleplayerServer || network.networkGameActive) return
+    val map = tileMap ?: return
+    when (network.roomSettings.fogMode) {
+        0 -> {
+            map.fogEnabled = false
+            map.fogPeriodicMaintenanceEnabled = false
+        }
+
+        1 -> {
+            map.fogEnabled = true
+            map.fogPeriodicMaintenanceEnabled = false
+        }
+
+        2 -> {
+            map.fogEnabled = true
+            map.fogPeriodicMaintenanceEnabled = true
+        }
+    }
+    map.fogRenderActive = network.roomSettings.revealedMap
+}
+
 /** The engine layout constant for [this], or null when the layout has no direct engine equivalent. */
 fun BattleRoomTeamLayout.toEngineTeamLayoutType(): TeamLayoutType? =
     when (this) {

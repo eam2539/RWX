@@ -32,6 +32,12 @@ sealed interface SlickSessionRequest {
         override val loadingPath: String = mapPath
     }
 
+    data class SavedGame(
+        val saveName: String,
+    ) : SlickSessionRequest {
+        override val loadingPath: String = saveName
+    }
+
     data class Replay(
         val replayName: String,
     ) : SlickSessionRequest {

@@ -64,11 +64,13 @@ internal class EmbeddedSlickGameContainer(
     fun start() {
         running = true
         while (running() && !exitRequested.get() && awtCanvas.isDisplayable) {
+            val isRenderable = awtCanvas.isRenderable()
             // A long mod reload must not retain the JAWT drawing-surface lock held by runInContext.
-            if ((game as? SlickGame)?.runPendingNonRenderingWork() == true) {
+            // Engine commands must also keep moving while the battle-room UI hides the canvas.
+            if ((game as? SlickGame)?.runPendingNonRenderingWork(drainEngineCommands = !isRenderable) == true) {
                 getDelta()
             }
-            if (!awtCanvas.isRenderable()) {
+            if (!isRenderable) {
                 skipFrameUntilCanvasReady()
                 continue
             }

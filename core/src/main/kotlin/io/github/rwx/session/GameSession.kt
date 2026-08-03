@@ -26,15 +26,6 @@ import io.github.rwx.ui.InGameMenuController
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
-private const val SAVED_GAME_REQUEST_PREFIX: String = "rwx-save://"
-
-fun savedGameRequestPath(saveName: String): String = SAVED_GAME_REQUEST_PREFIX + saveName
-
-fun savedGameNameFromRequestPath(path: String): String? =
-    path.takeIf { it.startsWith(SAVED_GAME_REQUEST_PREFIX) }
-        ?.removePrefix(SAVED_GAME_REQUEST_PREFIX)
-        ?.takeIf { it.isNotBlank() }
-
 data class RunningMultiplayerExitInfo(
     val isHost: Boolean,
 )
@@ -321,6 +312,23 @@ abstract class GameSession {
         logger.info { "Preparing $sessionLogName map asynchronously: $requestedMapPath" }
         launchOnIO("${rendererMode.id}-map-loader") {
             loadMapInBackground(requestedMapPath, viewport, generation)
+        }
+    }
+
+    open fun prepareSavedGameAsync(saveName: String, viewport: KoolCanvasViewport) {
+        val requestedSaveName = saveName.takeIf { it.isNotBlank() } ?: return
+        if (isMapLoaded(requestedSaveName)) {
+            return
+        }
+        val generation = tryBeginAsyncLoad(
+            requestKey = requestedSaveName,
+            viewport = viewport,
+            resetLastFrame = { true },
+            mutate = { it.copy(pendingRendererBattleRoomConfig = null, activeRendererBattleRoomConfig = null) },
+        ) ?: return
+        logger.info { "Preparing $sessionLogName saved game asynchronously: $requestedSaveName" }
+        launchOnIO("${rendererMode.id}-saved-game-loader") {
+            loadSavedGameInBackground(requestedSaveName, viewport, generation)
         }
     }
 
@@ -1603,6 +1611,14 @@ abstract class GameSession {
             loadMap(engine, mapPath)
         }
 
+    private fun loadSavedGameInBackground(
+        saveName: String,
+        requestedViewport: KoolCanvasViewport,
+        generation: Long,
+    ) = loadLevelInBackground("saved game", saveName, requestedViewport, generation) { engine ->
+        loadSavedGame(engine, saveName)
+    }
+
     private fun loadReplayInBackground(replayName: String, requestedViewport: KoolCanvasViewport, generation: Long) =
         loadLevelInBackground("replay", replayName, requestedViewport, generation) { engine ->
             loadReplay(engine, replayName)
@@ -1677,15 +1693,25 @@ abstract class GameSession {
         }
         engine.isStopped = false
         engine.isPaused = false
-        val saveName = savedGameNameFromRequestPath(mapPath)
-        if (saveName != null) {
-            check(engine.gameSaver.loadSaveFile(saveName, true)) {
-                "Unable to load saved game: $saveName"
-            }
-        } else {
-            engine.currentMapPath = mapPath
-            engine.loadGame(true, GameMode.normal)
+        engine.currentMapPath = mapPath
+        engine.loadGame(true, GameMode.normal)
+    }
+
+    protected open fun loadSavedGame(engine: GameEngine, saveName: String) {
+        updateLoadState {
+            it.copy(
+                menuBackgroundActive = false,
+                activeRendererBattleRoomConfig = null,
+                runningMapPath = saveName,
+            )
         }
+        engine.networkEngine?.disconnectNetworking("loading new save")
+        engine.isStopped = false
+        engine.isPaused = false
+        check(engine.gameSaver.loadSaveFile(saveName, false)) {
+            "Unable to load saved game: $saveName"
+        }
+        engine.applyLoadedSinglePlayerFogRules()
     }
 
     protected open fun loadBattleRoomMap(engine: GameEngine, config: BattleRoomLaunchConfig) {
@@ -1700,7 +1726,11 @@ abstract class GameSession {
         engine.isPaused = false
         engine.minimap?.release()
         val networkEngine = engine.configureLocalBattleRoom(config, sessionLogName) ?: run {
-            loadMap(engine, if (config.savedGame) savedGameRequestPath(config.mapPath) else config.mapPath)
+            if (config.savedGame) {
+                loadSavedGame(engine, config.mapPath)
+            } else {
+                loadMap(engine, config.mapPath)
+            }
             return
         }
 
