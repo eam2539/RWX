@@ -57,7 +57,7 @@ android {
 
     defaultConfig {
         applicationId = project.group.toString()
-        minSdk = 29
+        minSdk = 28
         targetSdk = 36
         versionCode = releaseVersionCode
         versionName = project.version.toString()
