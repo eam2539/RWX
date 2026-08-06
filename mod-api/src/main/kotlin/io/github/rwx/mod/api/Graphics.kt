@@ -145,6 +145,32 @@ interface RenderCanvas {
         opacity: Float = 1f,
         blendMode: RenderBlendMode = RenderBlendMode.ALPHA,
     )
+
+    fun drawTextureRegion(
+        textureId: TextureId,
+        source: TextureRegion,
+        centerX: Float,
+        centerY: Float,
+        width: Float,
+        height: Float,
+        tint: RgbaColor = RgbaColor(255, 255, 255),
+        opacity: Float = 1f,
+        blendMode: RenderBlendMode = RenderBlendMode.ALPHA,
+    ) = drawTexture(textureId, centerX, centerY, width, height, tint, opacity, blendMode)
+}
+
+data class TextureRegion(
+    val left: Float,
+    val top: Float,
+    val right: Float,
+    val bottom: Float,
+) {
+    init {
+        require(left in 0f..1f && top in 0f..1f && right in 0f..1f && bottom in 0f..1f) {
+            "Texture region coordinates must be normalized"
+        }
+        require(left < right && top < bottom) { "Texture region must have positive area" }
+    }
 }
 
 enum class RenderBlendMode {

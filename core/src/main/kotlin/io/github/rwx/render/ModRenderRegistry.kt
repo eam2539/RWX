@@ -391,6 +391,46 @@ object ModRenderRegistry {
             graphics.a(texture, source, destination, paint)
         }
 
+        override fun drawTextureRegion(
+            textureId: TextureId,
+            source: TextureRegion,
+            centerX: Float,
+            centerY: Float,
+            width: Float,
+            height: Float,
+            tint: RgbaColor,
+            opacity: Float,
+            blendMode: RenderBlendMode,
+        ) {
+            require(width > 0f && height > 0f) { "Texture dimensions must be positive: $textureId" }
+            val (texture, options) = resolveTexture(textureId)
+            paint.a(options.filter == TextureFilter.LINEAR)
+            paint.a(
+                (tint.alpha * opacity.coerceIn(0f, 1f)).roundToInt(),
+                tint.red,
+                tint.green,
+                tint.blue,
+            )
+            paint.a(
+                when (blendMode) {
+                    RenderBlendMode.ALPHA -> KoolCanvasBlendMode.SourceOver
+                    RenderBlendMode.ADDITIVE -> KoolCanvasBlendMode.Add
+                }
+            )
+            val left = (source.left * texture.width()).roundToInt().coerceIn(0, texture.width() - 1)
+            val top = (source.top * texture.height()).roundToInt().coerceIn(0, texture.height() - 1)
+            val right = (source.right * texture.width()).roundToInt().coerceIn(left + 1, texture.width())
+            val bottom = (source.bottom * texture.height()).roundToInt().coerceIn(top + 1, texture.height())
+            this.source.a(left, top, right, bottom)
+            destination.a(
+                centerX - width * 0.5f,
+                centerY - height * 0.5f,
+                centerX + width * 0.5f,
+                centerY + height * 0.5f,
+            )
+            graphics.a(texture, this.source, destination, paint)
+        }
+
         fun finish() {
             while (saveDepth > 0) {
                 graphics.l()
