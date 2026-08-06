@@ -30,9 +30,6 @@ val signingValues = listOf(
     releaseKeyPassword,
 )
 val releaseSigningConfigured = signingValues.all { it.isPresent }
-val androidAbiSplitsEnabled = providers.gradleProperty("androidAbiSplits")
-    .map(String::toBoolean)
-    .getOrElse(false)
 
 kotlin {
     jvmToolchain(25)
@@ -62,7 +59,8 @@ android {
         versionCode = releaseVersionCode
         versionName = project.version.toString()
         ndk {
-            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+            //noinspection ChromeOsAbiSupport
+            abiFilters += listOf("arm64-v8a")
         }
     }
 
@@ -88,15 +86,6 @@ android {
             if (releaseSigningConfigured) {
                 signingConfig = signingConfigs.getByName("release")
             }
-        }
-    }
-
-    splits {
-        abi {
-            isEnable = androidAbiSplitsEnabled
-            reset()
-            include("arm64-v8a", "armeabi-v7a", "x86_64")
-            isUniversalApk = true
         }
     }
 

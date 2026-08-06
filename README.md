@@ -6,6 +6,9 @@
 
 ![GitHub Created At](https://img.shields.io/github/created-at/eam2539/RWX?color=blue&style=for-the-badge)
 [![Discord](https://img.shields.io/discord/1352880561215246376?style=for-the-badge&logo=discord)](https://discord.gg/q2amh4Gt3f)
+[![License](https://img.shields.io/github/license/eam2539/RWX?style=for-the-badge&color=blue)](./LICENSE)
+
+[![Downloads](https://img.shields.io/github/downloads/eam2539/RWX/total?style=flat-square&color=e74c3c)](https://github.com/eam2539/RWX/releases)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/5c73d6b0-e2f9-46d7-a0d2-271b8f81b6b2/deploy-status)](https://app.netlify.com/projects/rwx-docs/deploys)
 
 **R**usted **W**arfare e**X**tension
@@ -55,9 +58,8 @@ Java 25 is required. Common release tasks:
 # One large JAR containing every supported desktop native library
 ./gradlew :desktop:multiPlatformFatJar
 
-# Android App Bundle, or per-ABI plus universal APKs
-./gradlew :android:bundleRelease
-./gradlew -PandroidAbiSplits=true :android:assembleRelease
+# Android APK
+./gradlew :android:assembleRelease
 ```
 
 See the [workflow](.github/workflows/ci.yml) and the

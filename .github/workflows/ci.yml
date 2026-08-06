@@ -192,19 +192,11 @@ jobs:
           echo "KEY_ALIAS=$SIGNING_KEY_ALIAS" >> "$GITHUB_ENV"
           echo "KEY_PASSWORD=$SIGNING_KEY_PASSWORD" >> "$GITHUB_ENV"
 
-      - name: Build Android app bundle
+      - name: Build APK
         shell: bash
         run: |
           ./gradlew --no-daemon \
             -Pversion="$RWX_VERSION" \
-            :android:bundleRelease
-
-      - name: Build per-ABI and universal APKs
-        shell: bash
-        run: |
-          ./gradlew --no-daemon \
-            -Pversion="$RWX_VERSION" \
-            -PandroidAbiSplits=true \
             :android:assembleRelease
 
       - name: Stage Android artifacts
