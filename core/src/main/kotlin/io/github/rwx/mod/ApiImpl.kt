@@ -19,7 +19,7 @@ import io.github.rwx.logger
 import io.github.rwx.mod.api.*
 import io.github.rwx.mod.assets.AssetCredentialResolver
 import io.github.rwx.mod.assets.EmptyAssetCredentialResolver
-import io.github.rwx.render.ModRenderRegistry
+import io.github.rwx.render.RenderRegistry
 import java.io.File
 import java.io.InputStream
 import java.nio.charset.Charset
@@ -61,7 +61,7 @@ class ApiImpl private constructor(
     fun materializeDeclarations() {
         checkNotNull(engineModInfo) { "JVM mod ${metadata.id} must be registered with ModManager before loading content" }
         extractJarResources()
-        ModAudioRegistry.materialize(this)
+        AudioRegistry.materialize(this)
         applyUnitDeclarations()
     }
 
@@ -132,7 +132,7 @@ class ApiImpl private constructor(
         unitWorldApi.activate(resolved)
         UnitEventRuntime.activate(this, resolved, unitApi.units())
         val appliedExtensionBindings = applyUnitExtensionBindings(resolved)
-        val appliedUnitRenderers = ModRenderRegistry.activateUnitBindings(this, resolved, unitApi.units())
+        val appliedUnitRenderers = RenderRegistry.activateUnitBindings(this, resolved, unitApi.units())
         val appliedShaders = applyUnitShaderBindings(resolved)
         logger.info {
             "JVM mod ${metadata.id}: activated and instantiated ${resolved.size} native unit types " +
@@ -186,16 +186,16 @@ class ApiImpl private constructor(
                 require(avoidChance == null || avoidChance in 0f..1f) {
                     "damageAvoidChance must be between 0 and 1 for ${unitId.value}"
                 }
-                ModDamageRegistry.bindUnit(
+                DamageRegistry.bindUnit(
                     owner = this,
                     config = nativeUnit,
-                    damage = ModDamageRegistry.UnitDamage(
+                    damage = DamageRegistry.UnitDamage(
                         avoidChance = avoidChance ?: 0f,
                         exposure = if (exposureWidth != null && exposureHeight != null) {
                             require(exposureWidth >= 0f && exposureHeight >= 0f) {
                                 "exposureWidth and exposureHeight cannot be negative for ${unitId.value}"
                             }
-                            ModDamageRegistry.UnitExposure(
+                            DamageRegistry.UnitExposure(
                                 offsetX = bindings.unit.exposureOffsetX ?: 0f,
                                 offsetY = bindings.unit.exposureOffsetY ?: 0f,
                                 width = exposureWidth,
@@ -240,7 +240,7 @@ class ApiImpl private constructor(
     }
 
     /**
-     * Hands a projectile's damage extensions to [ModDamageRegistry].
+     * Hands a projectile's damage extensions to [DamageRegistry].
      *
      * Area damage that only exists as an extension needs the native area-damage flag raised
      * here: the parser decides that from the INI's own `areaDamage`, which a mod binding a
@@ -251,7 +251,7 @@ class ApiImpl private constructor(
         binding: ProjectileExtensionBinding,
         unitId: UnitId,
     ) {
-        val damage = ModDamageRegistry.ProjectileDamage(
+        val damage = DamageRegistry.ProjectileDamage(
             directDamageAmount = binding.directDamageAmount,
             areaDamageAmount = binding.areaDamageAmount,
             directDamageHitRateBonus = binding.directDamageHitRateBonus,
@@ -271,7 +271,7 @@ class ApiImpl private constructor(
         require(!damage.rayDamage || projectile.I) {
             "rayDamage requires an instant projectile for ${unitId.value}"
         }
-        runCatching { ModDamageRegistry.bindProjectile(this, projectile, damage) }
+        runCatching { DamageRegistry.bindProjectile(this, projectile, damage) }
             .getOrElse { error ->
                 throw IllegalArgumentException("${error.message} for ${unitId.value}", error)
             }
@@ -492,7 +492,7 @@ class ApiImpl private constructor(
 
     companion object {
         /** A binding that carries no damage extensions, so nothing needs registering. */
-        private val EMPTY_PROJECTILE_DAMAGE = ModDamageRegistry.ProjectileDamage()
+        private val EMPTY_PROJECTILE_DAMAGE = DamageRegistry.ProjectileDamage()
 
         @JvmStatic
         fun create(
@@ -551,18 +551,18 @@ private class GameImpl(private val api: Api) : Game {
     override fun team(teamId: Int): TeamState? = PlayerTeam.k(teamId)?.toTeamState()
 
     override fun registerTeamAction(id: TeamActionId, handler: TeamActionHandler) {
-        ModTeamActionRegistry.register(api as ApiImpl, id, handler)
+        TeamActionRegistry.register(api as ApiImpl, id, handler)
     }
 
     override fun requestTeamAction(id: TeamActionId, targetPosition: WorldPosition?): Boolean =
-        ModTeamActionRegistry.request(GameEngine.getInstance().playerTeam, id, targetPosition)
+        TeamActionRegistry.request(GameEngine.getInstance().playerTeam, id, targetPosition)
 
     override fun registerProjectileObserver(id: ProjectileObserverId, observer: ProjectileObserver) {
-        ModProjectileObserverRegistry.register(api as ApiImpl, id, observer)
+        ProjectileObserverRegistry.register(api as ApiImpl, id, observer)
     }
 
     override fun registerPreFireObserver(id: PreFireObserverId, observer: PreFireObserver) {
-        ModPreFireObserverRegistry.register(api as ApiImpl, id, observer)
+        PreFireObserverRegistry.register(api as ApiImpl, id, observer)
     }
 }
 
@@ -650,19 +650,19 @@ private class Localization : io.github.rwx.mod.api.Localization {
 
 private class RecordingGraphics(private val api: ApiImpl) : Graphics {
     override fun registerTexture(id: TextureId, file: ResourcePath, options: TextureOptions) =
-        ModRenderRegistry.registerTexture(api, id, file, options)
+        RenderRegistry.registerTexture(api, id, file, options)
 
     override fun registerProjectileRenderer(id: RendererId, renderer: ProjectileRenderer) =
-        ModRenderRegistry.registerProjectileRenderer(api, id, renderer)
+        RenderRegistry.registerProjectileRenderer(api, id, renderer)
 
     override fun registerPreFireRenderer(id: RendererId, renderer: PreFireRenderer) =
-        ModRenderRegistry.registerPreFireRenderer(api, id, renderer)
+        RenderRegistry.registerPreFireRenderer(api, id, renderer)
 
     override fun registerEffectRenderer(id: RendererId, renderer: EffectRenderer) =
-        ModRenderRegistry.registerEffectRenderer(api, id, renderer)
+        RenderRegistry.registerEffectRenderer(api, id, renderer)
 
     override fun registerUnitRenderer(id: RendererId, renderer: UnitRenderer) =
-        ModRenderRegistry.registerUnitRenderer(api, id, renderer)
+        RenderRegistry.registerUnitRenderer(api, id, renderer)
 
     override fun registerAnimation(definition: AnimationDefinition) {}
     override fun registerShader(definition: ShaderDefinition) = api.registerShader(definition)
@@ -689,12 +689,12 @@ private class RecordingRule : Rule {
 
 private class ModAudio(private val api: ApiImpl) : Audio {
     override fun registerSound(id: String, file: ResourcePath, properties: Map<String, Any?>) {
-        ModAudioRegistry.registerSound(api, id, file, properties)
+        AudioRegistry.registerSound(api, id, file, properties)
     }
 
     override fun registerMusic(id: String, file: ResourcePath, properties: Map<String, Any?>) {}
     override fun playSound(id: String, x: Float?, y: Float?, volume: Float) {
-        ModAudioRegistry.playSound(api, id, x, y, volume)
+        AudioRegistry.playSound(api, id, x, y, volume)
     }
 }
 
@@ -1048,25 +1048,25 @@ private class AiBehavior(
 
 private class RecordingUi(private val api: ApiImpl) : Ui {
     override fun addInGameMenuItem(menuId: Int?, text: LocalizedText, onClick: (Int) -> Unit) {
-        ModUiRegistry.addInGameMenuItem(api, menuId, text, onClick)
+        UiRegistry.addInGameMenuItem(api, menuId, text, onClick)
     }
 
     override fun removeInGameMenuItem(menuId: Int) {
-        ModUiRegistry.removeInGameMenuItem(menuId)
+        UiRegistry.removeInGameMenuItem(menuId)
     }
 
     override fun selectedUnits(): List<UnitRuntimeState> = api.selectedUnits()
 
     override fun registerHud(id: HudId, order: Int, content: UiScope.() -> Unit) {
-        ModUiRegistry.registerHud(api, id, order, content)
+        UiRegistry.registerHud(api, id, order, content)
     }
 
     override fun unregisterHud(id: HudId) {
-        ModUiRegistry.unregisterHud(api, id)
+        UiRegistry.unregisterHud(api, id)
     }
 
     override fun setNativeHudVisible(visible: Boolean) {
-        ModUiRegistry.setNativeHudVisible(api, visible)
+        UiRegistry.setNativeHudVisible(api, visible)
     }
 
     override fun registerWindow(
@@ -1074,19 +1074,19 @@ private class RecordingUi(private val api: ApiImpl) : Ui {
         title: LocalizedText,
         content: UiScope.(ModWindowContext, Dp) -> Unit,
     ) {
-        ModUiRegistry.registerWindow(api, id, title, content)
+        UiRegistry.registerWindow(api, id, title, content)
     }
 
     override fun openWindow(id: ModWindowId) {
-        ModUiRegistry.openWindow(id)
+        UiRegistry.openWindow(id)
     }
 
     override fun closeWindow() {
-        ModUiRegistry.closeWindow()
+        UiRegistry.closeWindow()
     }
 
     override fun refreshWindow() {
-        ModUiRegistry.refreshWindow()
+        UiRegistry.refreshWindow()
     }
 
     override fun showMessage(message: LocalizedText, durationTicks: Int) {
@@ -1096,7 +1096,7 @@ private class RecordingUi(private val api: ApiImpl) : Ui {
     override fun requestWorldPosition(
         onSelected: (WorldPosition) -> Unit,
         onCancelled: () -> Unit,
-    ): WorldPositionSelection = ModUiRegistry.requestWorldPosition(api, onSelected, onCancelled)
+    ): WorldPositionSelection = UiRegistry.requestWorldPosition(api, onSelected, onCancelled)
 }
 
 private fun Any?.toIniValue(): String = when (this) {

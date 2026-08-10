@@ -7,7 +7,7 @@ import io.github.rwx.i18n.I18n
 import io.github.rwx.mod.api.*
 import io.github.rwx.ui.CoreUiEventQueue
 
-object ModUiRegistry : ModOwnedRegistry {
+object UiRegistry : OwnedRegistry {
     private const val MENU_ID_BASE = 26000
 
     /**
@@ -17,9 +17,9 @@ object ModUiRegistry : ModOwnedRegistry {
      * cannot interleave with a lookup.
      */
     private val lock = this
-    private val items = ModRegistrationTable<Int, RegisteredMenuItem>("Mod menu item", lock)
-    private val hudLayers = ModRegistrationTable<String, RegisteredHudLayer>("Mod HUD", lock)
-    private val windows = ModRegistrationTable<String, RegisteredWindow>("Mod window", lock)
+    private val items = RegistrationTable<Int, RegisteredMenuItem>("Mod menu item", lock)
+    private val hudLayers = RegistrationTable<String, RegisteredHudLayer>("Mod HUD", lock)
+    private val windows = RegistrationTable<String, RegisteredWindow>("Mod window", lock)
     private val nativeHudHiddenOwners = linkedSetOf<ApiImpl>()
     private var activeWindowId: String? = null
     private var worldPositionSelection: RegisteredWorldPositionSelection? = null
@@ -219,12 +219,12 @@ object ModUiRegistry : ModOwnedRegistry {
         private val registration: RegisteredWorldPositionSelection,
     ) : WorldPositionSelection {
         override val active: Boolean
-            get() = synchronized(ModUiRegistry) {
+            get() = synchronized(UiRegistry) {
                 worldPositionSelection === registration
             }
 
         override fun cancel() {
-            val callback = synchronized(ModUiRegistry) {
+            val callback = synchronized(UiRegistry) {
                 if (worldPositionSelection !== registration) return
                 worldPositionSelection = null
                 registration.onCancelled

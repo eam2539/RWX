@@ -4,17 +4,13 @@ import com.corrodinggames.rts.gameFramework.local.Locale
 import de.fabmax.kool.scene.Scene
 import io.github.rwx.i18n.I18n
 import io.github.rwx.logger
-import io.github.rwx.mod.ModUiRegistry
+import io.github.rwx.mod.UiRegistry
 import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.session.GameSession
-import io.github.rwx.ui.*
+import io.github.rwx.ui.AppScreen
+import io.github.rwx.ui.CoreUiEvent
 import io.github.rwx.ui.host.DialogSceneHost
-import io.github.rwx.ui.model.Dialog
-import io.github.rwx.ui.model.DialogButton
-import io.github.rwx.ui.model.DialogForm
-import io.github.rwx.ui.model.DialogFormField
-import io.github.rwx.ui.model.DialogListItem
-import io.github.rwx.ui.model.DialogTextInput
+import io.github.rwx.ui.model.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -35,7 +31,7 @@ internal class InGameDialogController(
                 gameSession.setGameVisible(
                     true,
                     viewport(),
-                    koolOverlay = ModUiRegistry.hasActiveHudLayers(),
+                    koolOverlay = UiRegistry.hasActiveHudLayers(),
                     pausedBackground = false,
                 )
             }

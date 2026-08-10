@@ -5,10 +5,10 @@ import com.corrodinggames.rts.game.units.actions.ActionId
 import com.corrodinggames.rts.game.units.custom.AnimationTag
 import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.geometry.PointF
-import io.github.rwx.mod.ModTeamActionRegistry.actions
+import io.github.rwx.mod.TeamActionRegistry.actions
 import io.github.rwx.mod.api.*
 
-object ModTeamActionRegistry : ModOwnedRegistry {
+object TeamActionRegistry : OwnedRegistry {
     const val SYSTEM_ACTION_TYPE = 300
 
     /**
@@ -18,7 +18,7 @@ object ModTeamActionRegistry : ModOwnedRegistry {
      * belongs to a mod that is already gone.
      */
     private val lock = Any()
-    private val actions = ModRegistrationTable<String, TeamActionHandler>("Team action", lock)
+    private val actions = RegistrationTable<String, TeamActionHandler>("Team action", lock)
 
     fun register(owner: ApiImpl, id: TeamActionId, handler: TeamActionHandler) {
         actions.register(owner, id.value, handler)
@@ -27,7 +27,7 @@ object ModTeamActionRegistry : ModOwnedRegistry {
     override fun unregister(owner: ApiImpl) {
         synchronized(lock) {
             actions.removeOwned(owner)
-            NativeCommandQueue.cancel(owner)
+            CommandQueue.cancel(owner)
         }
     }
 
@@ -38,7 +38,7 @@ object ModTeamActionRegistry : ModOwnedRegistry {
         if (team == null) return false
         synchronized(lock) {
             val owner = actions.owned(id.value)?.owner ?: return false
-            NativeCommandQueue.enqueue(owner) {
+            CommandQueue.enqueue(owner) {
                 val command = GameEngine.getInstance().commandController.newCommandForTeam(team)
                 command.isSystemAction = true
                 command.systemActionType = SYSTEM_ACTION_TYPE

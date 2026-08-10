@@ -4,7 +4,7 @@ import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.mod.api.ResourcePath
 import kotlin.math.sqrt
 
-object ModAudioRegistry : ModOwnedRegistry {
+object AudioRegistry : OwnedRegistry {
     private class RegisteredSound(
         val backendId: String,
         val path: ResourcePath,
@@ -13,7 +13,7 @@ object ModAudioRegistry : ModOwnedRegistry {
     )
 
     /** Keyed per owner, so two mods may each register the same sound id. */
-    private val sounds = ModRegistrationTable<String, RegisteredSound>(
+    private val sounds = RegistrationTable<String, RegisteredSound>(
         label = "Sound",
         describeKey = { it.substringAfter(KEY_SEPARATOR) },
     )

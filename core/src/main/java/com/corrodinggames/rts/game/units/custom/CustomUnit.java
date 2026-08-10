@@ -42,11 +42,11 @@ import com.corrodinggames.rts.gameFramework.utility.Vector3D;
 import io.github.rwx.geometry.PointF;
 import io.github.rwx.geometry.Rect;
 import io.github.rwx.geometry.RectF;
-import io.github.rwx.mod.ModDamageRegistry;
-import io.github.rwx.mod.ModPreFireObserverRegistry;
+import io.github.rwx.mod.DamageRegistry;
+import io.github.rwx.mod.PreFireObserverRegistry;
 import io.github.rwx.mod.UnitEventRuntime;
 import io.github.rwx.mod.api.UnitRenderLayer;
-import io.github.rwx.render.ModRenderRegistry;
+import io.github.rwx.render.RenderRegistry;
 import io.github.rwx.render.canvas.KoolArgbColor;
 import io.github.rwx.render.canvas.KoolPaint;
 
@@ -1376,8 +1376,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         projectile.g = customProjectileTemplate;
         projectile.G = customProjectileTemplate.flameWeapon;
         projectile.aR = customProjectileTemplate.hitSound;
-        projectile.U = ModDamageRegistry.directDamageAmount(customProjectileTemplate, customProjectileTemplate.b);
-        projectile.Y = ModDamageRegistry.areaDamageAmount(customProjectileTemplate, customProjectileTemplate.c);
+        projectile.U = DamageRegistry.directDamageAmount(customProjectileTemplate, customProjectileTemplate.b);
+        projectile.Y = DamageRegistry.areaDamageAmount(customProjectileTemplate, customProjectileTemplate.c);
         if (!customProjectileTemplate.ignoreParentShootDamageMultiplier && (baseUnit instanceof CustomUnit)) {
             CustomUnit customUnit = (CustomUnit) baseUnit;
             projectile.U *= customUnit.y.shootDamageMultiplier;
@@ -1668,7 +1668,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         CustomUnitConfig customUnitConfig = this.unitConfig;
         super.update(f);
-        ModPreFireObserverRegistry.update(this);
+        PreFireObserverRegistry.update(this);
         if (this.isDead && !this.isDeathFallComplete) {
             if (this.posZ > 0.0f) {
                 if (customUnitConfig.slowDeathFall && !(this.rotation == 0.0f && this.velocityX == 0.0f && this.velocityY == 0.0f)) {
@@ -2403,7 +2403,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         float maxHealth = getRenderScale();
         PointF unitAIPosition = getRenderOffset();
         drawShadow();
-        ModRenderRegistry.drawUnit(this, gameEngine, UnitRenderLayer.UNDER_UNIT);
+        RenderRegistry.drawUnit(this, gameEngine, UnitRenderLayer.UNDER_UNIT);
         int i = customUnitConfig.onDestroyListeners.size;
         if (i > 0) {
             Object[] objArrA = customUnitConfig.onDestroyListeners.a();
@@ -2447,8 +2447,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 ((CustomUnitRenderHook) objArrA2[i3]).e(this, f);
             }
         }
-        ModRenderRegistry.drawUnit(this, gameEngine, UnitRenderLayer.OVER_UNIT);
-        ModRenderRegistry.drawPreFire(this, gameEngine);
+        RenderRegistry.drawUnit(this, gameEngine, UnitRenderLayer.OVER_UNIT);
+        RenderRegistry.drawPreFire(this, gameEngine);
         GameViewUtils.a((OrderableUnit) this);
         if (this.legInstances != null && !z && customUnitConfig.energyStartPercentage) {
             CustomUnitLegController.a(this, f, true, false);
@@ -2688,9 +2688,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         CustomProjectileTemplate customProjectileTemplate = this.unitConfig.projectileTemplatesById[turretConfig.a(this)];
         float f = 0.0f;
         if (!customProjectileTemplate.s) {
-            f = 0.0f + ModDamageRegistry.directDamageAmount(customProjectileTemplate, customProjectileTemplate.b);
+            f = 0.0f + DamageRegistry.directDamageAmount(customProjectileTemplate, customProjectileTemplate.b);
         }
-        float f2 = f + ModDamageRegistry.areaDamageAmount(customProjectileTemplate, customProjectileTemplate.c);
+        float f2 = f + DamageRegistry.areaDamageAmount(customProjectileTemplate, customProjectileTemplate.c);
         if (!customProjectileTemplate.ignoreParentShootDamageMultiplier) {
             f2 *= this.y.shootDamageMultiplier;
         }

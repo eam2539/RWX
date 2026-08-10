@@ -8,7 +8,7 @@ import io.github.rwx.map.LinkedMapAvailability
 import io.github.rwx.map.MapLinkResolver
 import io.github.rwx.map.MapMetadata
 import io.github.rwx.map.PortalTransferMessage
-import io.github.rwx.mod.ModUiRegistry
+import io.github.rwx.mod.UiRegistry
 import io.github.rwx.p2p.P2PLobbyService
 import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.session.BattleRoomSnapshot
@@ -277,7 +277,7 @@ internal class MapController(
             gameSession.setGameVisible(
                 true,
                 viewport(),
-                koolOverlay = ModUiRegistry.hasActiveHudLayers(),
+                koolOverlay = UiRegistry.hasActiveHudLayers(),
             )
         }
     }

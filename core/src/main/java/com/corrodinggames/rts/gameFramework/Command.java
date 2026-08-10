@@ -534,12 +534,12 @@ public class Command {
                     gameEngine.networkEngine.quickResyncRequested = true;
                     return;
                 }
-                if (this.systemActionType == io.github.rwx.mod.ModTeamActionRegistry.SYSTEM_ACTION_TYPE) {
+                if (this.systemActionType == io.github.rwx.mod.TeamActionRegistry.SYSTEM_ACTION_TYPE) {
                     if (this.team == null || this.actionId == null) {
                         GameEngine.log("mod team action command missing team or action id");
                         return;
                     }
-                    io.github.rwx.mod.ModTeamActionRegistry.execute(
+                    io.github.rwx.mod.TeamActionRegistry.execute(
                             this.team,
                             this.actionId.getId(),
                             this.targetPoint,

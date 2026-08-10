@@ -2,11 +2,11 @@ package io.github.rwx.ui.host
 
 import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.scene.Scene
-import io.github.rwx.mod.ModUiRegistry
+import io.github.rwx.mod.UiRegistry
 
 class ModHudSceneHost {
     fun createScene(): Scene = UiScene(SCENE_NAME) {
-        var observedRevision = ModUiRegistry.hudRevision()
+        var observedRevision = UiRegistry.hudRevision()
         lateinit var surface: UiSurface
         surface = addPanelSurface(
             name = SURFACE_NAME,
@@ -15,13 +15,13 @@ class ModHudSceneHost {
             width = Grow.Std,
             height = Grow.Std,
         ) {
-            ModUiRegistry.activeHudLayers().forEach { layer ->
+            UiRegistry.activeHudLayers().forEach { layer ->
                 layer.content(this)
             }
         }
         surface.inputMode = UiSurface.InputCaptureMode.CaptureOverBackground
         onUpdate {
-            val revision = ModUiRegistry.hudRevision()
+            val revision = UiRegistry.hudRevision()
             if (revision != observedRevision) {
                 observedRevision = revision
                 surface.triggerUpdate()

@@ -5,7 +5,7 @@ import com.corrodinggames.rts.gameFramework.GameMode;
 import com.corrodinggames.rts.gameFramework.local.Locale;
 import com.corrodinggames.rts.gameFramework.statistics.AndroidMenu;
 import com.corrodinggames.rts.gameFramework.steam.DisabledSteamEngine;
-import io.github.rwx.mod.ModUiRegistry;
+import io.github.rwx.mod.UiRegistry;
 
 import java.io.IOException;
 
@@ -73,7 +73,7 @@ public class InGameMenuController {
                 }
                 menu.add(0, 15, 0, Locale.get("menus.ingame.exitGame"));
             }
-            for (ModUiRegistry.InGameMenuItem item : ModUiRegistry.getInGameMenuItems()) {
+            for (UiRegistry.InGameMenuItem item : UiRegistry.getInGameMenuItems()) {
                 menu.add(0, item.getMenuId(), 0, item.getLabel());
             }
             if (gameEngine.settingsEngine.allowGameRecording) {
@@ -109,7 +109,7 @@ public class InGameMenuController {
             GameEngine.log("InGameMenuController ignored menu option without game engine: " + i);
             return;
         }
-        if (ModUiRegistry.handleInGameMenuSelection(i)) {
+        if (UiRegistry.handleInGameMenuSelection(i)) {
             return;
         }
         switch (i) {

@@ -14,7 +14,7 @@ import io.github.rwx.geometry.Rect
 import io.github.rwx.geometry.RectF
 import io.github.rwx.mod.ApiImpl
 import io.github.rwx.mod.ModFailureLog
-import io.github.rwx.mod.ModRegistrationTable
+import io.github.rwx.mod.RegistrationTable
 import io.github.rwx.mod.api.*
 import io.github.rwx.render.canvas.KoolCanvasBlendMode
 import io.github.rwx.render.canvas.KoolPaint
@@ -23,7 +23,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-object ModRenderRegistry : io.github.rwx.mod.ModOwnedRegistry {
+object RenderRegistry : io.github.rwx.mod.OwnedRegistry {
     private class RegisteredTexture(
         val path: ResourcePath,
         val options: TextureOptions,
@@ -40,13 +40,13 @@ object ModRenderRegistry : io.github.rwx.mod.ModOwnedRegistry {
      * the binding it implies as a single step, so these cannot be locked independently.
      */
     private val lock = Any()
-    private val textures = ModRegistrationTable<String, RegisteredTexture>("Texture", lock)
+    private val textures = RegistrationTable<String, RegisteredTexture>("Texture", lock)
     private val projectileRenderers =
-        ModRegistrationTable<String, ProjectileRenderer>("Projectile renderer", lock)
-    private val preFireRenderers = ModRegistrationTable<String, PreFireRenderer>("Pre-fire renderer", lock)
-    private val effectRenderers = ModRegistrationTable<String, EffectRenderer>("Effect renderer", lock)
-    private val unitRenderers = ModRegistrationTable<String, UnitRenderer>("Unit renderer", lock)
-    private val unitBindings = ModRegistrationTable<CustomUnitConfig, BoundUnitRenderer>(
+        RegistrationTable<String, ProjectileRenderer>("Projectile renderer", lock)
+    private val preFireRenderers = RegistrationTable<String, PreFireRenderer>("Pre-fire renderer", lock)
+    private val effectRenderers = RegistrationTable<String, EffectRenderer>("Effect renderer", lock)
+    private val unitRenderers = RegistrationTable<String, UnitRenderer>("Unit renderer", lock)
+    private val unitBindings = RegistrationTable<CustomUnitConfig, BoundUnitRenderer>(
         label = "Unit render binding",
         lock = lock,
         entries = IdentityHashMap(),

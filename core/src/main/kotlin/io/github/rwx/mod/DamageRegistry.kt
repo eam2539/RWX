@@ -11,7 +11,7 @@ import com.corrodinggames.rts.gameFramework.Utility
 import java.util.*
 
 
-object ModDamageRegistry : ModOwnedRegistry {
+object DamageRegistry : OwnedRegistry {
     /** Damage extensions bound to one native projectile template. */
     data class ProjectileDamage(
         val directDamageAmount: Float? = null,
@@ -50,12 +50,12 @@ object ModDamageRegistry : ModOwnedRegistry {
     )
 
     private val lock = Any()
-    private val projectiles = ModRegistrationTable<ProjectileTemplate, ProjectileDamage>(
+    private val projectiles = RegistrationTable<ProjectileTemplate, ProjectileDamage>(
         label = "Projectile damage",
         lock = lock,
         entries = IdentityHashMap(),
     )
-    private val units = ModRegistrationTable<CustomUnitConfig, UnitDamage>(
+    private val units = RegistrationTable<CustomUnitConfig, UnitDamage>(
         label = "Unit damage",
         lock = lock,
         entries = IdentityHashMap(),

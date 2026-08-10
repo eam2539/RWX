@@ -72,7 +72,7 @@ private class EngineUnitCommandBackend(
             return command.rejected("Unknown build unit type: ${command.buildUnitTypeId}")
         }
 
-        NativeCommandQueue.enqueue(owner) {
+        CommandQueue.enqueue(owner) {
             val native = GameEngine.getInstance().commandController.createCommandForTeam(team)
             native.isQueued = command.queued
             native.isHighPriority = command.highPriority

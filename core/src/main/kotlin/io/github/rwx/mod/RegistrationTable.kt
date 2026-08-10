@@ -10,18 +10,18 @@ import io.github.rwx.logger
  * This holds that logic once so registries only describe what they store.
  *
  * [lock] is supplied by the owning registry rather than created here: registries that keep
- * several tables consistent with each other (see [io.github.rwx.render.ModRenderRegistry])
+ * several tables consistent with each other (see [io.github.rwx.render.RenderRegistry])
  * must guard them all with one monitor, which per-table locks would silently break.
  *
  * Pass an [IdentityHashMap][java.util.IdentityHashMap] as [entries] to key by native object
  * identity instead of by id.
  */
-class ModRegistrationTable<K : Any, V : Any>(
+class RegistrationTable<K : Any, V : Any>(
     private val label: String,
     private val lock: Any = Any(),
     private val entries: MutableMap<K, Owned<V>> = LinkedHashMap(),
     private val describeKey: (K) -> String = { it.toString() },
-) : ModOwnedRegistry {
+) : OwnedRegistry {
 
     /** A [value] together with the mod that registered it. */
     class Owned<V>(val owner: ApiImpl, val value: V)

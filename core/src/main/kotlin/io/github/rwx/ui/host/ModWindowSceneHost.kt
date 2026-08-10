@@ -5,15 +5,11 @@ import de.fabmax.kool.modules.ui2.UiScene
 import de.fabmax.kool.modules.ui2.mutableStateOf
 import de.fabmax.kool.scene.Scene
 import io.github.rwx.i18n.I18n
-import io.github.rwx.mod.ModUiRegistry
-import io.github.rwx.ui.component.BackButton
-import io.github.rwx.ui.component.BodyText
+import io.github.rwx.mod.UiRegistry
 import io.github.rwx.ui.CoreUiEventQueue
-import io.github.rwx.ui.component.PanelStyle
 import io.github.rwx.ui.ResponsiveContentWidth
-import io.github.rwx.ui.component.ScreenTitle
+import io.github.rwx.ui.component.*
 import io.github.rwx.ui.model.SettingsModel
-import io.github.rwx.ui.component.addPanelSurface
 
 class ModWindowSceneHost(
     private val model: SettingsModel = SettingsModel(),
@@ -28,7 +24,7 @@ class ModWindowSceneHost(
     fun createScene(): Scene = UiScene(SCENE_NAME) {
         addPanelSurface(PanelStyle.Menu, "mod-window-panel", model) { theme ->
             revision.use()
-            val active = ModUiRegistry.activeWindow()
+            val active = UiRegistry.activeWindow()
             val contentWidth = ResponsiveContentWidth(
                 defaultWidth = Dp(860f),
                 minWidth = Dp(420f),

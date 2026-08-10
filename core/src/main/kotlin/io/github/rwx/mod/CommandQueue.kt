@@ -1,9 +1,8 @@
 package io.github.rwx.mod
 
-import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.logger
 
-object NativeCommandQueue {
+object CommandQueue {
     private data class Entry(
         val owner: Any,
         val command: () -> Unit,

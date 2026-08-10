@@ -1,7 +1,7 @@
 package com.corrodinggames.rts.gameFramework;
 
 import com.corrodinggames.rts.game.PlayerTeam;
-import io.github.rwx.mod.NativeCommandQueue;
+import io.github.rwx.mod.CommandQueue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class CommandController {
 
     /* JADX INFO: renamed from: a */
     public void clearAllCommands() {
-        NativeCommandQueue.clear();
+        CommandQueue.clear();
         this.pendingCommands.clear();
         this.executedCommands.clear();
         this.queuedCommands.clear();

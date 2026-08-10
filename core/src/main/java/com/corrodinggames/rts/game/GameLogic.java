@@ -35,9 +35,9 @@ import io.github.rwx.AppMetadataBridge;
 import io.github.rwx.PlatformBridge;
 import io.github.rwx.geometry.Rect;
 import io.github.rwx.geometry.RectF;
+import io.github.rwx.mod.CommandQueue;
 import io.github.rwx.mod.ModScheduler;
-import io.github.rwx.mod.ModUiRegistry;
-import io.github.rwx.mod.NativeCommandQueue;
+import io.github.rwx.mod.UiRegistry;
 import io.github.rwx.mod.UnitEventRuntime;
 import io.github.rwx.platform.CoreGameView;
 import io.github.rwx.render.canvas.KoolArgbColor;
@@ -1497,7 +1497,7 @@ public class GameLogic extends GameEngine {
         this.lastDelta = f;
         this.networkEngine.update(f);
         this.gameTimeMillis = (int) (this.gameTimeMillis + (f * 16.666666f));
-        NativeCommandQueue.drain();
+        CommandQueue.drain();
         this.commandController.executeAllCommands();
         this.replayEngine.update(f);
         this.currentTick++;
@@ -1721,7 +1721,7 @@ public class GameLogic extends GameEngine {
                 this.performanceProfiler.b(ProfilerSection.draw_game);
             }
             notifyWorldFrameRendered();
-            boolean isNativeHudVisible = ModUiRegistry.isNativeHudVisible();
+            boolean isNativeHudVisible = UiRegistry.isNativeHudVisible();
             if (includeUi && !isGamePaused() && isNativeHudVisible) {
                 this.performanceProfiler.a(ProfilerSection.draw_gui);
                 drawUI(f);

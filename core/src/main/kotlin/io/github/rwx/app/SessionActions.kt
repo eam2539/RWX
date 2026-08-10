@@ -1,12 +1,12 @@
 package io.github.rwx.app
 
-import io.github.rwx.mod.ModUiRegistry
+import io.github.rwx.mod.UiRegistry
 import io.github.rwx.session.GameSession
 import io.github.rwx.settings.GameSettingsRepository
 import io.github.rwx.ui.AppScreen
+import io.github.rwx.ui.host.SettingsSceneHost
 import io.github.rwx.ui.model.SettingsModel
 import io.github.rwx.ui.model.SettingsPage
-import io.github.rwx.ui.host.SettingsSceneHost
 
 internal class SessionActions(
     private val gameSession: GameSession,
@@ -47,7 +47,7 @@ internal class SessionActions(
     fun openInGameModWindow() = navigateTo(AppScreen.ModWindow)
 
     fun closeInGameModWindow() {
-        ModUiRegistry.deactivateWindow()
+        UiRegistry.deactivateWindow()
         navigateTo(AppScreen.InGame)
     }
 

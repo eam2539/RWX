@@ -1,6 +1,6 @@
 package io.github.rwx.app
 
-import io.github.rwx.mod.ModUiRegistry
+import io.github.rwx.mod.UiRegistry
 import io.github.rwx.render.canvas.KoolCanvasFrame
 import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.ui.AppScreen
@@ -28,7 +28,7 @@ internal class ScreenPresenter(
         val isExternalModHudOverlayVisible = shouldShowExternalModHudOverlay(
             hudVisible = visibility.hud,
             rendersIntoKoolCanvas = gameSession.rendersIntoKoolCanvas,
-            hasActiveHudLayers = ModUiRegistry.hasActiveHudLayers(),
+            hasActiveHudLayers = UiRegistry.hasActiveHudLayers(),
         )
         val isResumeBackgroundVisible = shouldShowResumeMenuBackground(screen, gameSession.canResume())
         val isExternalRwBackgroundVisible = shouldShowExternalRwBackgroundSurface(

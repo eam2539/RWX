@@ -7,7 +7,7 @@ import de.fabmax.kool.input.KeyEvent
 import de.fabmax.kool.input.Pointer
 import de.fabmax.kool.input.PointerState
 import io.github.rwx.input.KoolKeyCodeMapping
-import io.github.rwx.mod.ModUiRegistry
+import io.github.rwx.mod.UiRegistry
 import io.github.rwx.mod.api.WorldPosition
 import io.github.rwx.session.GameSession
 
@@ -73,7 +73,7 @@ class LegacyGamePointerSink(
     }
 
     private fun handleWorldPositionSelection(pointer: Pointer, screenX: Float, screenY: Float): Boolean {
-        if (!ModUiRegistry.hasActiveWorldPositionSelection()) {
+        if (!UiRegistry.hasActiveWorldPositionSelection()) {
             if (!suppressPointerUntilRelease) return false
             if (!pointer.hasLegacyButtonActivity()) suppressPointerUntilRelease = false
             return true
@@ -81,12 +81,12 @@ class LegacyGamePointerSink(
 
         suppressPointerUntilRelease = true
         when {
-            pointer.isRightButtonPressed -> ModUiRegistry.cancelWorldPositionSelection()
+            pointer.isRightButtonPressed -> UiRegistry.cancelWorldPositionSelection()
             pointer.isLeftButtonPressed -> {
                 val engine = GameEngine.getInstance()
                 val zoom = engine.zoom
                 if (zoom.isFinite() && zoom > 0f && screenX.isFinite() && screenY.isFinite()) {
-                    ModUiRegistry.selectWorldPosition(
+                    UiRegistry.selectWorldPosition(
                         WorldPosition(
                             x = screenX / zoom + engine.viewpointXSnapped,
                             y = screenY / zoom + engine.viewpointYSnapped,

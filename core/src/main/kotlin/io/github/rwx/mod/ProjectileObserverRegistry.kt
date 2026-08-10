@@ -5,7 +5,7 @@ import com.corrodinggames.rts.game.ProjectileTemplate
 import com.corrodinggames.rts.game.units.custom.CustomProjectileTemplate
 import io.github.rwx.mod.api.*
 
-object ModProjectileObserverRegistry : ModOwnedRegistry {
+object ProjectileObserverRegistry : OwnedRegistry {
     private data class ActiveProjectile(
         val observerId: String,
         val variantId: String,
@@ -14,7 +14,7 @@ object ModProjectileObserverRegistry : ModOwnedRegistry {
         val lastRemaining: Float,
     )
 
-    private val observers = ModRegistrationTable<String, ProjectileObserver>("Projectile observer")
+    private val observers = RegistrationTable<String, ProjectileObserver>("Projectile observer")
     private val active = linkedMapOf<Long, ActiveProjectile>()
     private val failures = ModFailureLog("Mod projectile observer")
 

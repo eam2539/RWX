@@ -1,17 +1,17 @@
 package io.github.rwx.mod
 
-import io.github.rwx.render.ModRenderRegistry
+import io.github.rwx.render.RenderRegistry
 
 object ModRegistry {
     private val mods = mutableListOf<Mod>()
-    private val owned: List<ModOwnedRegistry> = listOf(
-        ModRenderRegistry,
-        ModProjectileObserverRegistry,
-        ModPreFireObserverRegistry,
-        ModDamageRegistry,
-        ModAudioRegistry,
-        ModTeamActionRegistry,
-        ModUiRegistry,
+    private val owned: List<OwnedRegistry> = listOf(
+        RenderRegistry,
+        ProjectileObserverRegistry,
+        PreFireObserverRegistry,
+        DamageRegistry,
+        AudioRegistry,
+        TeamActionRegistry,
+        UiRegistry,
     )
     @JvmStatic
     fun register(mod: Mod) {
@@ -36,11 +36,11 @@ object ModRegistry {
     fun clear() {
         mods.mapNotNull { it.apiImplOrNull() }.forEach(::release)
         mods.clear()
-        NativeCommandQueue.clear()
+        CommandQueue.clear()
     }
 }
 
-interface ModOwnedRegistry {
+interface OwnedRegistry {
     fun unregister(owner: ApiImpl)
 }
 

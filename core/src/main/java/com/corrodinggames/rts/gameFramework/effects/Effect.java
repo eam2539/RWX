@@ -11,7 +11,7 @@ import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import io.github.rwx.geometry.PointF;
 import io.github.rwx.geometry.Rect;
 import io.github.rwx.geometry.RectF;
-import io.github.rwx.render.ModRenderRegistry;
+import io.github.rwx.render.RenderRegistry;
 import io.github.rwx.render.canvas.*;
 
 import java.io.IOException;
@@ -413,7 +413,7 @@ public final class Effect {
         if (z && this.K < 1.0f) {
             return false;
         }
-        if (ModRenderRegistry.drawEffect(this, gameEngine, z)) {
+        if (RenderRegistry.drawEffect(this, gameEngine, z)) {
             return true;
         }
         if (this.a.imageStrip != null) {

@@ -19,9 +19,9 @@ import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
 import com.corrodinggames.rts.gameFramework.utility.*;
 import io.github.rwx.geometry.Rect;
 import io.github.rwx.geometry.RectF;
-import io.github.rwx.mod.ModDamageRegistry;
-import io.github.rwx.mod.ModProjectileObserverRegistry;
-import io.github.rwx.render.ModRenderRegistry;
+import io.github.rwx.mod.DamageRegistry;
+import io.github.rwx.mod.ProjectileObserverRegistry;
+import io.github.rwx.render.RenderRegistry;
 import io.github.rwx.render.canvas.KoolArgbColor;
 import io.github.rwx.render.canvas.KoolMultiplyAddColorFilter;
 import io.github.rwx.render.canvas.KoolPaint;
@@ -212,12 +212,66 @@ public class Projectile extends PositionedObject {
         }
     }
 
-    @Override // com.corrodinggames.rts.gameFramework.GameObject
-    /* JADX INFO: renamed from: a */
-    public void remove() {
-        ModProjectileObserverRegistry.end(this);
-        a.remove(this);
-        super.remove();
+    public static void a(BaseUnit baseUnit, BaseUnit baseUnit2, float f2, Projectile projectile, boolean z) {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (baseUnit2 != null && !baseUnit2.isDead) {
+            f2 = DamageRegistry.applyHitRate(baseUnit2, f2, projectile, z);
+        }
+        if (gameEngine.isUnitInvincibilityEnabled && f2 > 0.0f) {
+            f2 = 0.0f;
+        }
+        if (baseUnit2 != null && !baseUnit2.isDead) {
+            if (projectile != null && projectile.g.convertHitToSourceTeam && baseUnit != null) {
+                baseUnit2.changeTeam(baseUnit.team);
+            }
+            if (projectile != null) {
+                if (projectile.ai != 1.0f && baseUnit2.bI()) {
+                    f2 *= projectile.ai;
+                }
+                if (projectile.aj != 1.0f && baseUnit2.i()) {
+                    f2 *= projectile.aj;
+                }
+            }
+            if (f2 < 0.0f) {
+                baseUnit2.calculateTurnSpeed(baseUnit, -f2, projectile);
+            } else {
+                boolean z2 = !baseUnit2.isDead && baseUnit2.currentHealth > 0.0f;
+                float armourIgnoreBefore = projectile == null ? 0.0f : projectile.an;
+                if (projectile != null) {
+                    projectile.an = DamageRegistry.armourIgnoreAmount(projectile, z, armourIgnoreBefore);
+                }
+                try {
+                    baseUnit2.setTarget(baseUnit, f2, projectile);
+                } finally {
+                    if (projectile != null) {
+                        projectile.an = armourIgnoreBefore;
+                    }
+                }
+                float f3 = f2;
+                if (baseUnit2.isDamageImmune()) {
+                    f3 = 0.0f;
+                }
+                if (f3 > 0.0f) {
+                    gameEngine.gameStatistics.a(baseUnit, baseUnit2, f3);
+                }
+                if (baseUnit != null) {
+                    baseUnit.unitCargoMass += f3;
+                    if (z2 && (baseUnit2.isDead || baseUnit2.currentHealth < 0.0f)) {
+                        baseUnit.unitCargoType++;
+                        baseUnit.a(UnitEventType.killedAnyUnit, baseUnit2);
+                    }
+                }
+            }
+            if (projectile != null && !baseUnit2.isDead) {
+                float fBQ = baseUnit2.bQ();
+                if (fBQ != -1.0f) {
+                    float angleBetweenPoints = Utility.getAngleBetweenPoints(projectile.posX, projectile.posY, baseUnit2.posX, baseUnit2.posY);
+                    float f4 = 100.0f / fBQ;
+                    baseUnit2.velocityX += Utility.fastCos(angleBetweenPoints) * f4;
+                    baseUnit2.velocityY += Utility.fastSin(angleBetweenPoints) * f4;
+                }
+            }
+        }
     }
 
     public static Projectile a(Projectile projectile) {
@@ -584,66 +638,12 @@ public class Projectile extends PositionedObject {
         baseUnit.velocityY += Utility.fastSin(angleBetweenPoints) * pushMass;
     }
 
-    public static void a(BaseUnit baseUnit, BaseUnit baseUnit2, float f2, Projectile projectile, boolean z) {
-        GameEngine gameEngine = GameEngine.getInstance();
-        if (baseUnit2 != null && !baseUnit2.isDead) {
-            f2 = ModDamageRegistry.applyHitRate(baseUnit2, f2, projectile, z);
-        }
-        if (gameEngine.isUnitInvincibilityEnabled && f2 > 0.0f) {
-            f2 = 0.0f;
-        }
-        if (baseUnit2 != null && !baseUnit2.isDead) {
-            if (projectile != null && projectile.g.convertHitToSourceTeam && baseUnit != null) {
-                baseUnit2.changeTeam(baseUnit.team);
-            }
-            if (projectile != null) {
-                if (projectile.ai != 1.0f && baseUnit2.bI()) {
-                    f2 *= projectile.ai;
-                }
-                if (projectile.aj != 1.0f && baseUnit2.i()) {
-                    f2 *= projectile.aj;
-                }
-            }
-            if (f2 < 0.0f) {
-                baseUnit2.calculateTurnSpeed(baseUnit, -f2, projectile);
-            } else {
-                boolean z2 = !baseUnit2.isDead && baseUnit2.currentHealth > 0.0f;
-                float armourIgnoreBefore = projectile == null ? 0.0f : projectile.an;
-                if (projectile != null) {
-                    projectile.an = ModDamageRegistry.armourIgnoreAmount(projectile, z, armourIgnoreBefore);
-                }
-                try {
-                    baseUnit2.setTarget(baseUnit, f2, projectile);
-                } finally {
-                    if (projectile != null) {
-                        projectile.an = armourIgnoreBefore;
-                    }
-                }
-                float f3 = f2;
-                if (baseUnit2.isDamageImmune()) {
-                    f3 = 0.0f;
-                }
-                if (f3 > 0.0f) {
-                    gameEngine.gameStatistics.a(baseUnit, baseUnit2, f3);
-                }
-                if (baseUnit != null) {
-                    baseUnit.unitCargoMass += f3;
-                    if (z2 && (baseUnit2.isDead || baseUnit2.currentHealth < 0.0f)) {
-                        baseUnit.unitCargoType++;
-                        baseUnit.a(UnitEventType.killedAnyUnit, baseUnit2);
-                    }
-                }
-            }
-            if (projectile != null && !baseUnit2.isDead) {
-                float fBQ = baseUnit2.bQ();
-                if (fBQ != -1.0f) {
-                    float angleBetweenPoints = Utility.getAngleBetweenPoints(projectile.posX, projectile.posY, baseUnit2.posX, baseUnit2.posY);
-                    float f4 = 100.0f / fBQ;
-                    baseUnit2.velocityX += Utility.fastCos(angleBetweenPoints) * f4;
-                    baseUnit2.velocityY += Utility.fastSin(angleBetweenPoints) * f4;
-                }
-            }
-        }
+    @Override // com.corrodinggames.rts.gameFramework.GameObject
+    /* JADX INFO: renamed from: a */
+    public void remove() {
+        ProjectileObserverRegistry.end(this);
+        a.remove(this);
+        super.remove();
     }
 
     public float e() {
@@ -685,7 +685,7 @@ public class Projectile extends PositionedObject {
         }
         ProjectileTemplate projectileTemplate = this.g;
         if (!this.isDestroyed) {
-            ModProjectileObserverRegistry.update(this, projectileTemplate);
+            ProjectileObserverRegistry.update(this, projectileTemplate);
         }
         if (this.i == 0.0f) {
             this.i = -1.0f;
@@ -1055,13 +1055,13 @@ public class Projectile extends PositionedObject {
                 float hitEffectY = this.aW;
                 float hitEffectZ = this.aX;
                 boolean emitHitEffect = true;
-                if (ModDamageRegistry.isRayDamage(projectileTemplate)) {
-                    float[] impact = ModDamageRegistry.rayDamageImpactPoint(this, this.l, rayDirectionX, rayDirectionY);
+                if (DamageRegistry.isRayDamage(projectileTemplate)) {
+                    float[] impact = DamageRegistry.rayDamageImpactPoint(this, this.l, rayDirectionX, rayDirectionY);
                     if (impact != null) {
                         hitEffectX = impact[0];
                         hitEffectY = impact[1];
                         hitEffectZ = impact[2];
-                    } else if (ModDamageRegistry.suppressesPrimaryHitEffect(this, this.l, rayDirectionX, rayDirectionY)) {
+                    } else if (DamageRegistry.suppressesPrimaryHitEffect(this, this.l, rayDirectionX, rayDirectionY)) {
                         emitHitEffect = false;
                     }
                 }
@@ -1103,7 +1103,7 @@ public class Projectile extends PositionedObject {
                     this.j.f(this.aV, this.aW);
                 }
                 if (!z8 && baseUnit != null) {
-                    ModDamageRegistry.applyRayDamageToSecondaryTargets(
+                    DamageRegistry.applyRayDamageToSecondaryTargets(
                             this,
                             rayDirectionX,
                             rayDirectionY,
@@ -1457,7 +1457,7 @@ public class Projectile extends PositionedObject {
     }
 
     public void b(BaseUnit baseUnit, float f2, float f3) {
-        if (ModDamageRegistry.excludesAreaDamage(this, baseUnit)) {
+        if (DamageRegistry.excludesAreaDamage(this, baseUnit)) {
             return;
         }
         if (baseUnit.unitTransportTarget != null) {
@@ -1575,7 +1575,7 @@ public class Projectile extends PositionedObject {
             this.aZ = true;
         }
         if (this.E || projectileTemplate.X) {
-            if (ModRenderRegistry.drawProjectile(this, projectileTemplate, gameEngine, f3, f4, f5)) {
+            if (RenderRegistry.drawProjectile(this, projectileTemplate, gameEngine, f3, f4, f5)) {
                 return true;
             }
             if (projectileTemplate.Y != null) {

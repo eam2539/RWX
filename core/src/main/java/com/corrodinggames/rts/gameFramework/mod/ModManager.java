@@ -678,7 +678,7 @@ public class ModManager {
         this.jvmModInfos.clear();
         ModRegistry.clear();
         ModScheduler.clear();
-        ModUiRegistry.clear();
+        UiRegistry.clear();
         UnitEventRuntime.clear();
 
         File stagingDirectory = new File(LegacyAssetBridge.cacheDir(), "jvm-mod-staging");
@@ -841,7 +841,7 @@ public class ModManager {
         this.jvmModInfos.clear();
         ModRegistry.clear();
         ModScheduler.clear();
-        ModUiRegistry.clear();
+        UiRegistry.clear();
         UnitEventRuntime.clear();
     }
 }

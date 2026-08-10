@@ -3,7 +3,7 @@ package io.github.rwx.mod
 import com.corrodinggames.rts.game.units.custom.CustomUnit
 import io.github.rwx.mod.api.*
 
-object ModPreFireObserverRegistry : ModOwnedRegistry {
+object PreFireObserverRegistry : OwnedRegistry {
     private data class InstanceKey(val sourceObjectId: Long, val turretIndex: Int)
 
     private data class Snapshot(
@@ -19,7 +19,7 @@ object ModPreFireObserverRegistry : ModOwnedRegistry {
         val duration: Float,
     )
 
-    private val observers = ModRegistrationTable<String, PreFireObserver>("Pre-fire observer")
+    private val observers = RegistrationTable<String, PreFireObserver>("Pre-fire observer")
     private val active = linkedMapOf<InstanceKey, Snapshot>()
     private val generations = mutableMapOf<InstanceKey, Int>()
     private val failures = ModFailureLog("Mod pre-fire observer")
