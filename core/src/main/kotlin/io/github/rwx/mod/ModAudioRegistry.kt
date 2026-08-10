@@ -4,34 +4,35 @@ import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.mod.api.ResourcePath
 import kotlin.math.sqrt
 
-object ModAudioRegistry {
+object ModAudioRegistry : ModOwnedRegistry {
     private class RegisteredSound(
-        val owner: ApiImpl,
         val backendId: String,
         val path: ResourcePath,
         val minimumVolume: Float,
         var loaded: Boolean = false,
     )
 
-    private val sounds = linkedMapOf<String, RegisteredSound>()
+    /** Keyed per owner, so two mods may each register the same sound id. */
+    private val sounds = ModRegistrationTable<String, RegisteredSound>(
+        label = "Sound",
+        describeKey = { it.substringAfter(KEY_SEPARATOR) },
+    )
 
     fun registerSound(owner: ApiImpl, id: String, file: ResourcePath, properties: Map<String, Any?>) {
         require(id.isNotBlank() && id == id.trim()) { "Sound id must be non-blank and trimmed" }
-        val key = key(owner, id)
-        check(key !in sounds) { "Sound is already registered: $id" }
         val backendId = "${owner.metadata.id}:$id"
         val minimumVolume = (properties["minimumVolume"] as? Number)?.toFloat() ?: 0f
         require(minimumVolume in 0f..1f) { "Sound minimumVolume must be between 0 and 1: $id" }
-        sounds[key] = RegisteredSound(owner, backendId, file, minimumVolume)
+        sounds.register(owner, key(owner, id), RegisteredSound(backendId, file, minimumVolume))
     }
 
     fun materialize(owner: ApiImpl) {
-        sounds.values.filter { it.owner === owner }.forEach(::materialize)
+        sounds.ownedBy(owner).forEach { sound -> materialize(owner, sound) }
     }
 
     fun playSound(owner: ApiImpl, id: String, x: Float?, y: Float?, volume: Float) {
-        val sound = sounds[key(owner, id)] ?: error("Sound is not registered: $id")
-        materialize(sound)
+        val sound = sounds.required(key(owner, id))
+        materialize(owner, sound)
         val engine = GameEngine.getInstance()
         var resolvedVolume = volume.coerceAtLeast(0f)
         var pan = 0f
@@ -55,24 +56,22 @@ object ModAudioRegistry {
         }
     }
 
-    fun unregister(owner: ApiImpl) {
-        sounds.entries.removeAll { (_, sound) ->
-            if (sound.owner === owner) {
-                if (sound.loaded) owner.platformBridge?.audio?.unregisterSound(sound.backendId)
-                true
-            } else {
-                false
-            }
+    override fun unregister(owner: ApiImpl) {
+        sounds.removeOwned(owner).values.forEach { sound ->
+            if (sound.loaded) owner.platformBridge?.audio?.unregisterSound(sound.backendId)
         }
     }
 
-    private fun materialize(sound: RegisteredSound) {
+    private fun materialize(owner: ApiImpl, sound: RegisteredSound) {
         if (sound.loaded) return
-        val audio = sound.owner.platformBridge?.audio ?: return
-        val data = sound.owner.openPackagedResource(sound.path).use { it.readBytes() }
+        val audio = owner.platformBridge?.audio ?: return
+        val data = owner.openPackagedResource(sound.path).use { it.readBytes() }
         audio.registerSound(sound.backendId, data, sound.path.value)
         sound.loaded = true
     }
 
-    private fun key(owner: ApiImpl, id: String): String = "${owner.metadata.id}\u0000$id"
+    private fun key(owner: ApiImpl, id: String): String = "${owner.metadata.id}$KEY_SEPARATOR$id"
+
+    /** Separates mod id from sound id; not legal in either, so keys cannot collide. */
+    private const val KEY_SEPARATOR = "\u0000"
 }

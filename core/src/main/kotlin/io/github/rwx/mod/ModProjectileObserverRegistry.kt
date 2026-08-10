@@ -3,15 +3,9 @@ package io.github.rwx.mod
 import com.corrodinggames.rts.game.Projectile
 import com.corrodinggames.rts.game.ProjectileTemplate
 import com.corrodinggames.rts.game.units.custom.CustomProjectileTemplate
-import io.github.rwx.logger
 import io.github.rwx.mod.api.*
 
-object ModProjectileObserverRegistry {
-    private data class Registration(
-        val owner: ApiImpl,
-        val observer: ProjectileObserver,
-    )
-
+object ModProjectileObserverRegistry : ModOwnedRegistry {
     private data class ActiveProjectile(
         val observerId: String,
         val variantId: String,
@@ -20,13 +14,12 @@ object ModProjectileObserverRegistry {
         val lastRemaining: Float,
     )
 
-    private val registrations = linkedMapOf<String, Registration>()
+    private val observers = ModRegistrationTable<String, ProjectileObserver>("Projectile observer")
     private val active = linkedMapOf<Long, ActiveProjectile>()
-    private val reportedFailures = mutableSetOf<String>()
+    private val failures = ModFailureLog("Mod projectile observer")
 
     fun register(owner: ApiImpl, id: ProjectileObserverId, observer: ProjectileObserver) {
-        check(id.value !in registrations) { "Projectile observer is already registered: ${id.value}" }
-        registrations[id.value] = Registration(owner, observer)
+        observers.register(owner, id.value, observer)
     }
 
     @JvmStatic
@@ -34,7 +27,7 @@ object ModProjectileObserverRegistry {
         val custom = projectileTemplate as? CustomProjectileTemplate ?: return
         val observerId = custom.projectileObserverId ?: return
         val variantId = custom.projectileObserverVariant ?: return
-        val registration = registrations[observerId] ?: return
+        val observer = observers[observerId] ?: return
         val previous = active[projectile.objectId]
         val restarted = previous != null && (
                 previous.observerId != observerId ||
@@ -42,7 +35,7 @@ object ModProjectileObserverRegistry {
                         projectile.J + RESTART_EPSILON < previous.lastAge
                 )
         if (restarted) {
-            dispatch(projectile, previous, ProjectileLifecyclePhase.ENDED, registrationFor(previous.observerId))
+            dispatch(projectile, previous, ProjectileLifecyclePhase.ENDED, observers[previous.observerId])
         }
         val current = if (previous == null || restarted) {
             ActiveProjectile(
@@ -64,7 +57,7 @@ object ModProjectileObserverRegistry {
             } else {
                 ProjectileLifecyclePhase.UPDATED
             },
-            registration = registration,
+            observer = observer,
             previousAge = if (previous == null || restarted) null else previous.lastAge,
             previousRemaining = if (previous == null || restarted) null else previous.lastRemaining,
         )
@@ -73,31 +66,28 @@ object ModProjectileObserverRegistry {
     @JvmStatic
     fun end(projectile: Projectile) {
         val state = active.remove(projectile.objectId) ?: return
-        dispatch(projectile, state, ProjectileLifecyclePhase.ENDED, registrationFor(state.observerId))
+        dispatch(projectile, state, ProjectileLifecyclePhase.ENDED, observers[state.observerId])
     }
 
-    fun unregister(owner: ApiImpl) {
-        val removedIds = registrations.filterValues { it.owner === owner }.keys
-        registrations.keys.removeAll(removedIds)
+    override fun unregister(owner: ApiImpl) {
+        val removedIds = observers.removeOwned(owner).keys
         active.entries.removeAll { it.value.observerId in removedIds }
     }
-
-    private fun registrationFor(id: String): Registration? = registrations[id]
 
     private fun dispatch(
         projectile: Projectile,
         state: ActiveProjectile,
         phase: ProjectileLifecyclePhase,
-        registration: Registration?,
+        observer: ProjectileObserver?,
         previousAge: Float? = state.lastAge,
         previousRemaining: Float? = state.lastRemaining,
     ) {
-        registration ?: return
+        observer ?: return
         val target = projectile.l
         val endX = target?.posX ?: projectile.n
         val endY = target?.posY ?: projectile.o
-        runCatching {
-            registration.observer.onLifecycle(
+        failures.runSafely(state.observerId) {
+            observer.onLifecycle(
                 ProjectileLifecycleContext(
                     instanceId = ProjectileInstanceId(projectile.objectId, state.generation),
                     phase = phase,
@@ -112,11 +102,6 @@ object ModProjectileObserverRegistry {
                     variantId = RenderVariantId(state.variantId),
                 )
             )
-        }.onFailure { error ->
-            val key = "${state.observerId}:${error.javaClass.name}:${error.message}"
-            if (reportedFailures.add(key)) {
-                logger.error(error) { "Mod projectile observer failed: ${state.observerId}" }
-            }
         }
     }
 

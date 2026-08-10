@@ -4,26 +4,26 @@ import io.github.rwx.render.ModRenderRegistry
 
 object ModRegistry {
     private val mods = mutableListOf<Mod>()
-
+    private val owned: List<ModOwnedRegistry> = listOf(
+        ModRenderRegistry,
+        ModProjectileObserverRegistry,
+        ModPreFireObserverRegistry,
+        ModDamageRegistry,
+        ModAudioRegistry,
+        ModTeamActionRegistry,
+        ModUiRegistry,
+    )
     @JvmStatic
     fun register(mod: Mod) {
         mods.add(mod)
     }
-
+    fun release(owner: ApiImpl) {
+        owned.forEach { it.unregister(owner) }
+    }
     @JvmStatic
     fun unregister(mod: Mod) {
         mods.remove(mod)
-        (mod as? JvmMod)?.let { jvmMod ->
-            (runCatching { jvmMod.api }.getOrNull() as? ApiImpl)?.let { api ->
-                ModRenderRegistry.unregister(api)
-                ModProjectileObserverRegistry.unregister(api)
-                ModPreFireObserverRegistry.unregister(api)
-                ModDamageRegistry.unregister(api)
-                ModAudioRegistry.unregister(api)
-                ModTeamActionRegistry.unregister(api)
-                ModUiRegistry.unregister(api)
-            }
-        }
+        mod.apiImplOrNull()?.let(::release)
     }
 
     @JvmStatic
@@ -34,18 +34,15 @@ object ModRegistry {
 
     @JvmStatic
     fun clear() {
-        mods.filterIsInstance<JvmMod>().forEach { mod ->
-            (runCatching { mod.api }.getOrNull() as? ApiImpl)?.let { api ->
-                ModRenderRegistry.unregister(api)
-                ModProjectileObserverRegistry.unregister(api)
-                ModPreFireObserverRegistry.unregister(api)
-                ModDamageRegistry.unregister(api)
-                ModAudioRegistry.unregister(api)
-                ModTeamActionRegistry.unregister(api)
-                ModUiRegistry.unregister(api)
-            }
-        }
+        mods.mapNotNull { it.apiImplOrNull() }.forEach(::release)
         mods.clear()
         NativeCommandQueue.clear()
     }
 }
+
+interface ModOwnedRegistry {
+    fun unregister(owner: ApiImpl)
+}
+
+internal fun Mod.apiImplOrNull(): ApiImpl? =
+    (this as? JvmMod)?.let { it.api as? ApiImpl }

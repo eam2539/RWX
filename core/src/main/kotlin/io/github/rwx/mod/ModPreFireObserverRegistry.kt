@@ -1,15 +1,9 @@
 package io.github.rwx.mod
 
 import com.corrodinggames.rts.game.units.custom.CustomUnit
-import io.github.rwx.logger
 import io.github.rwx.mod.api.*
 
-object ModPreFireObserverRegistry {
-    private data class Registration(
-        val owner: ApiImpl,
-        val observer: PreFireObserver,
-    )
-
+object ModPreFireObserverRegistry : ModOwnedRegistry {
     private data class InstanceKey(val sourceObjectId: Long, val turretIndex: Int)
 
     private data class Snapshot(
@@ -25,14 +19,13 @@ object ModPreFireObserverRegistry {
         val duration: Float,
     )
 
-    private val registrations = linkedMapOf<String, Registration>()
+    private val observers = ModRegistrationTable<String, PreFireObserver>("Pre-fire observer")
     private val active = linkedMapOf<InstanceKey, Snapshot>()
     private val generations = mutableMapOf<InstanceKey, Int>()
-    private val reportedFailures = mutableSetOf<String>()
+    private val failures = ModFailureLog("Mod pre-fire observer")
 
     fun register(owner: ApiImpl, id: PreFireObserverId, observer: PreFireObserver) {
-        check(id.value !in registrations) { "Pre-fire observer is already registered: ${id.value}" }
-        registrations[id.value] = Registration(owner, observer)
+        observers.register(owner, id.value, observer)
     }
 
     @JvmStatic
@@ -96,9 +89,8 @@ object ModPreFireObserverRegistry {
         }
     }
 
-    fun unregister(owner: ApiImpl) {
-        val removedIds = registrations.filterValues { it.owner === owner }.keys
-        registrations.keys.removeAll(removedIds)
+    override fun unregister(owner: ApiImpl) {
+        val removedIds = observers.removeOwned(owner).keys
         active.entries.removeAll { it.value.observerId in removedIds }
     }
 
@@ -108,9 +100,9 @@ object ModPreFireObserverRegistry {
         previous: Snapshot?,
         phase: PreFireLifecyclePhase,
     ) {
-        val registration = registrations[current.observerId] ?: return
-        runCatching {
-            registration.observer.onLifecycle(
+        val observer = observers[current.observerId] ?: return
+        failures.runSafely(current.observerId) {
+            observer.onLifecycle(
                 PreFireLifecycleContext(
                     instanceId = PreFireInstanceId(key.sourceObjectId, key.turretIndex, current.generation),
                     phase = phase,
@@ -126,11 +118,6 @@ object ModPreFireObserverRegistry {
                     variantId = RenderVariantId(current.variantId),
                 )
             )
-        }.onFailure { error ->
-            val failureKey = "${current.observerId}:${error.javaClass.name}:${error.message}"
-            if (reportedFailures.add(failureKey)) {
-                logger.error(error) { "Mod pre-fire observer failed: ${current.observerId}" }
-            }
         }
     }
 

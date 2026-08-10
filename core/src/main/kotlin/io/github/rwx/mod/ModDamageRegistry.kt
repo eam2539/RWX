@@ -11,7 +11,7 @@ import com.corrodinggames.rts.gameFramework.Utility
 import java.util.*
 
 
-object ModDamageRegistry {
+object ModDamageRegistry : ModOwnedRegistry {
     /** Damage extensions bound to one native projectile template. */
     data class ProjectileDamage(
         val directDamageAmount: Float? = null,
@@ -49,11 +49,17 @@ object ModDamageRegistry {
         val exposure: UnitExposure? = null,
     )
 
-    private class Registration<T>(val owner: ApiImpl, val value: T)
-
     private val lock = Any()
-    private val projectiles = IdentityHashMap<ProjectileTemplate, Registration<ProjectileDamage>>()
-    private val units = IdentityHashMap<CustomUnitConfig, Registration<UnitDamage>>()
+    private val projectiles = ModRegistrationTable<ProjectileTemplate, ProjectileDamage>(
+        label = "Projectile damage",
+        lock = lock,
+        entries = IdentityHashMap(),
+    )
+    private val units = ModRegistrationTable<CustomUnitConfig, UnitDamage>(
+        label = "Unit damage",
+        lock = lock,
+        entries = IdentityHashMap(),
+    )
 
     fun bindProjectile(owner: ApiImpl, template: ProjectileTemplate, damage: ProjectileDamage) {
         damage.directDamageHitRateBonus?.let {
@@ -71,7 +77,7 @@ object ModDamageRegistry {
                 require(it >= 0f) { "rayDamageHitEffectOffsetFactor cannot be negative" }
             }
         }
-        synchronized(lock) { projectiles[template] = Registration(owner, damage) }
+        projectiles.put(owner, template, damage)
     }
 
     fun bindUnit(owner: ApiImpl, config: CustomUnitConfig, damage: UnitDamage) {
@@ -81,25 +87,21 @@ object ModDamageRegistry {
                 "exposureWidth and exposureHeight cannot be negative"
             }
         }
-        synchronized(lock) { units[config] = Registration(owner, damage) }
+        units.put(owner, config, damage)
     }
 
-    fun unregister(owner: ApiImpl) {
+    override fun unregister(owner: ApiImpl) {
         synchronized(lock) {
-            projectiles.entries.removeAll { it.value.owner === owner }
-            units.entries.removeAll { it.value.owner === owner }
+            projectiles.removeOwned(owner)
+            units.removeOwned(owner)
         }
     }
 
-    private fun damageOf(template: ProjectileTemplate?): ProjectileDamage? {
-        template ?: return null
-        return synchronized(lock) { projectiles[template]?.value }
-    }
+    private fun damageOf(template: ProjectileTemplate?): ProjectileDamage? =
+        template?.let { projectiles[it] }
 
-    private fun damageOf(unit: BaseUnit): UnitDamage? {
-        val config = (unit as? CustomUnit)?.unitConfig ?: return null
-        return synchronized(lock) { units[config]?.value }
-    }
+    private fun damageOf(unit: BaseUnit): UnitDamage? =
+        (unit as? CustomUnit)?.unitConfig?.let { units[it] }
 
     /** Half-extents of [unit]'s exposure box, falling back to its collision radius. */
     private fun exposureBox(unit: BaseUnit): UnitExposure =

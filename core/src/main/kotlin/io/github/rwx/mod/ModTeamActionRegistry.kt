@@ -5,46 +5,48 @@ import com.corrodinggames.rts.game.units.actions.ActionId
 import com.corrodinggames.rts.game.units.custom.AnimationTag
 import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.geometry.PointF
+import io.github.rwx.mod.ModTeamActionRegistry.actions
 import io.github.rwx.mod.api.*
 
-object ModTeamActionRegistry {
+object ModTeamActionRegistry : ModOwnedRegistry {
     const val SYSTEM_ACTION_TYPE = 300
 
-    private data class Registration(
-        val owner: ApiImpl,
-        val handler: TeamActionHandler,
-    )
+    /**
+     * Shared with [actions] so a lookup and the queue write it implies stay atomic against
+     * teardown: otherwise [unregister] could drop an action and cancel its pending commands
+     * between [request] resolving an owner and enqueuing for it, stranding a command that
+     * belongs to a mod that is already gone.
+     */
+    private val lock = Any()
+    private val actions = ModRegistrationTable<String, TeamActionHandler>("Team action", lock)
 
-    private val actions = linkedMapOf<String, Registration>()
-
-    @Synchronized
     fun register(owner: ApiImpl, id: TeamActionId, handler: TeamActionHandler) {
-        check(id.value !in actions) { "Team action is already registered: ${id.value}" }
-        actions[id.value] = Registration(owner, handler)
+        actions.register(owner, id.value, handler)
     }
 
-    @Synchronized
-    fun unregister(owner: ApiImpl) {
-        actions.entries.removeIf { it.value.owner === owner }
-        NativeCommandQueue.cancel(owner)
+    override fun unregister(owner: ApiImpl) {
+        synchronized(lock) {
+            actions.removeOwned(owner)
+            NativeCommandQueue.cancel(owner)
+        }
     }
 
-    @Synchronized
     fun clear() = actions.clear()
 
     @JvmStatic
-    @Synchronized
     fun request(team: PlayerTeam?, id: TeamActionId, targetPosition: WorldPosition?): Boolean {
         if (team == null) return false
-        val registration = actions[id.value] ?: return false
-        NativeCommandQueue.enqueue(registration.owner) {
-            val command = GameEngine.getInstance().commandController.newCommandForTeam(team)
-            command.isSystemAction = true
-            command.systemActionType = SYSTEM_ACTION_TYPE
-            command.actionId = ActionId.intern(id.value)
-            targetPosition?.let { position ->
-                command.targetPoint = PointF(position.x, position.y)
-                command.systemFloat = position.height
+        synchronized(lock) {
+            val owner = actions.owned(id.value)?.owner ?: return false
+            NativeCommandQueue.enqueue(owner) {
+                val command = GameEngine.getInstance().commandController.newCommandForTeam(team)
+                command.isSystemAction = true
+                command.systemActionType = SYSTEM_ACTION_TYPE
+                command.actionId = ActionId.intern(id.value)
+                targetPosition?.let { position ->
+                    command.targetPoint = PointF(position.x, position.y)
+                    command.systemFloat = position.height
+                }
             }
         }
         return true
@@ -53,9 +55,9 @@ object ModTeamActionRegistry {
     @JvmStatic
     fun execute(team: PlayerTeam?, actionId: String?, targetPoint: PointF?, targetHeight: Float): Boolean {
         if (team == null || actionId == null) return false
-        val registration = synchronized(this) { actions[actionId] } ?: return false
+        val handler = actions[actionId] ?: return false
         val targetPosition = targetPoint?.let { WorldPosition(it.x, it.y, targetHeight) }
-        registration.handler.execute(TeamActionContextImpl(team, targetPosition))
+        handler.execute(TeamActionContextImpl(team, targetPosition))
         return true
     }
 }

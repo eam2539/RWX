@@ -7,14 +7,20 @@ import io.github.rwx.i18n.I18n
 import io.github.rwx.mod.api.*
 import io.github.rwx.ui.CoreUiEventQueue
 
-object ModUiRegistry {
+object ModUiRegistry : ModOwnedRegistry {
     private const val MENU_ID_BASE = 26000
 
-    private val items = linkedMapOf<Int, RegisteredMenuItem>()
-    private val callbacks = linkedMapOf<Int, (Int) -> Unit>()
-    private val hudLayers = linkedMapOf<String, RegisteredHudLayer>()
+    /**
+     * All state here shares one monitor: the object itself, which is what [Synchronized]
+     * on these methods and `synchronized(ModUiRegistry)` in [SelectionHandle] already take.
+     * The tables are handed the same monitor so a teardown that spans several of them
+     * cannot interleave with a lookup.
+     */
+    private val lock = this
+    private val items = ModRegistrationTable<Int, RegisteredMenuItem>("Mod menu item", lock)
+    private val hudLayers = ModRegistrationTable<String, RegisteredHudLayer>("Mod HUD", lock)
+    private val windows = ModRegistrationTable<String, RegisteredWindow>("Mod window", lock)
     private val nativeHudHiddenOwners = linkedSetOf<ApiImpl>()
-    private val windows = linkedMapOf<String, RegisteredWindow>()
     private var activeWindowId: String? = null
     private var worldPositionSelection: RegisteredWorldPositionSelection? = null
 
@@ -22,29 +28,27 @@ object ModUiRegistry {
     private var hudRevision = 0L
 
     @JvmStatic
-    fun addInGameMenuItem(owner: ApiImpl, menuId: Int?, label: LocalizedText, callback: (Int) -> Unit): Int {
-        val resolvedId = menuId ?: generateSequence(MENU_ID_BASE) { it + 1 }.first { it !in items }
-        items[resolvedId] = RegisteredMenuItem(owner, resolvedId, label)
-        callbacks[resolvedId] = callback
-        return resolvedId
-    }
+    fun addInGameMenuItem(owner: ApiImpl, menuId: Int?, label: LocalizedText, callback: (Int) -> Unit): Int =
+        synchronized(lock) {
+            val resolvedId = menuId ?: generateSequence(MENU_ID_BASE) { it + 1 }.first { it !in items }
+            items.put(owner, resolvedId, RegisteredMenuItem(resolvedId, label, callback))
+            resolvedId
+        }
 
     @JvmStatic
     fun removeInGameMenuItem(menuId: Int) {
         items.remove(menuId)
-        callbacks.remove(menuId)
     }
 
     @Synchronized
     fun registerHud(owner: ApiImpl, id: HudId, order: Int, content: UiScope.() -> Unit) {
-        check(id.value !in hudLayers) { "Mod HUD is already registered: ${id.value}" }
-        hudLayers[id.value] = RegisteredHudLayer(owner, id, order, content)
+        hudLayers.register(owner, id.value, RegisteredHudLayer(id, order, content))
         hudRevision++
     }
 
     @Synchronized
     fun unregisterHud(owner: ApiImpl, id: HudId) {
-        val registration = hudLayers[id.value] ?: return
+        val registration = hudLayers.owned(id.value) ?: return
         check(registration.owner === owner) { "Mod HUD is owned by another mod: ${id.value}" }
         hudLayers.remove(id.value)
         hudRevision++
@@ -64,20 +68,20 @@ object ModUiRegistry {
     fun isNativeHudVisible(): Boolean = nativeHudHiddenOwners.isEmpty()
 
     @Synchronized
-    fun activeHudLayers(): List<ActiveHudLayer> = hudLayers.values
+    fun activeHudLayers(): List<ActiveHudLayer> = hudLayers.snapshot().values
         .sortedWith(compareBy<RegisteredHudLayer> { it.order }.thenBy { it.id.value })
         .map { ActiveHudLayer(it.id, it.order, it.content) }
 
     @Synchronized
-    fun hasActiveHudLayers(): Boolean = hudLayers.isNotEmpty()
+    fun hasActiveHudLayers(): Boolean = !hudLayers.isEmpty()
 
     fun hudRevision(): Long = hudRevision
 
     @JvmStatic
+    @Synchronized
     fun clear() {
         items.clear()
-        callbacks.clear()
-        if (hudLayers.isNotEmpty()) hudRevision++
+        if (!hudLayers.isEmpty()) hudRevision++
         hudLayers.clear()
         nativeHudHiddenOwners.clear()
         windows.clear()
@@ -86,7 +90,7 @@ object ModUiRegistry {
     }
 
     @JvmStatic
-    fun getInGameMenuItems(): List<InGameMenuItem> = items.values.map { item ->
+    fun getInGameMenuItems(): List<InGameMenuItem> = items.snapshot().values.map { item ->
         InGameMenuItem(
             item.menuId,
             item.label.resolve(I18n.currentLocale.toLanguageTag()),
@@ -95,7 +99,7 @@ object ModUiRegistry {
 
     @JvmStatic
     fun handleInGameMenuSelection(menuId: Int): Boolean {
-        val callback = callbacks[menuId] ?: return false
+        val callback = items[menuId]?.callback ?: return false
         callback(menuId)
         return true
     }
@@ -107,8 +111,7 @@ object ModUiRegistry {
         title: LocalizedText,
         content: UiScope.(context: ModWindowContext, contentWidth: Dp) -> Unit,
     ) {
-        check(id.value !in windows) { "Mod window is already registered: ${id.value}" }
-        windows[id.value] = RegisteredWindow(owner, title, content)
+        windows.register(owner, id.value, RegisteredWindow(owner, title, content))
     }
 
     @Synchronized
@@ -170,7 +173,7 @@ object ModUiRegistry {
 
     @Synchronized
     fun activeWindow(): ActiveWindow? {
-        val registration = activeWindowId?.let(windows::get) ?: return null
+        val registration = activeWindowId?.let { windows[it] } ?: return null
         return ActiveWindow(
             title = registration.title,
             content = registration.content,
@@ -179,29 +182,22 @@ object ModUiRegistry {
     }
 
     @Synchronized
-    fun unregister(owner: ApiImpl) {
-        val menuIds = items.filterValues { it.owner === owner }.keys
-        menuIds.forEach {
-            items.remove(it)
-            callbacks.remove(it)
-        }
-        val windowIds = windows.filterValues { it.owner === owner }.keys
-        if (activeWindowId in windowIds) activeWindowId = null
-        windowIds.forEach(windows::remove)
-        val removedHud = hudLayers.values.removeIf { it.owner === owner }
-        if (removedHud) hudRevision++
+    override fun unregister(owner: ApiImpl) {
+        items.removeOwned(owner)
+        val removedWindows = windows.removeOwned(owner)
+        if (activeWindowId in removedWindows.keys) activeWindowId = null
+        if (hudLayers.removeOwned(owner).isNotEmpty()) hudRevision++
         nativeHudHiddenOwners.remove(owner)
         if (worldPositionSelection?.owner === owner) worldPositionSelection = null
     }
 
     private data class RegisteredMenuItem(
-        val owner: ApiImpl,
         val menuId: Int,
         val label: LocalizedText,
+        val callback: (Int) -> Unit,
     )
 
     private data class RegisteredHudLayer(
-        val owner: ApiImpl,
         val id: HudId,
         val order: Int,
         val content: UiScope.() -> Unit,

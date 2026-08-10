@@ -5,14 +5,16 @@ import com.corrodinggames.rts.game.ProjectileTemplate
 import com.corrodinggames.rts.game.units.OrderableUnit
 import com.corrodinggames.rts.game.units.custom.CustomProjectileTemplate
 import com.corrodinggames.rts.game.units.custom.CustomUnit
+import com.corrodinggames.rts.game.units.custom.CustomUnitConfig
 import com.corrodinggames.rts.gameFramework.GameEngine
 import com.corrodinggames.rts.gameFramework.effects.Effect
 import com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
 import com.corrodinggames.rts.gameFramework.graphics.Texture
 import io.github.rwx.geometry.Rect
 import io.github.rwx.geometry.RectF
-import io.github.rwx.logger
 import io.github.rwx.mod.ApiImpl
+import io.github.rwx.mod.ModFailureLog
+import io.github.rwx.mod.ModRegistrationTable
 import io.github.rwx.mod.api.*
 import io.github.rwx.render.canvas.KoolCanvasBlendMode
 import io.github.rwx.render.canvas.KoolPaint
@@ -21,95 +23,66 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-object ModRenderRegistry {
-    private data class RegisteredTexture(
-        val owner: ApiImpl,
+object ModRenderRegistry : io.github.rwx.mod.ModOwnedRegistry {
+    private class RegisteredTexture(
         val path: ResourcePath,
         val options: TextureOptions,
         var texture: Texture? = null,
     )
 
-    private data class RegisteredProjectileRenderer(
-        val owner: ApiImpl,
-        val renderer: ProjectileRenderer,
-    )
-
-    private data class RegisteredPreFireRenderer(
-        val owner: ApiImpl,
-        val renderer: PreFireRenderer,
-    )
-
-    private data class RegisteredEffectRenderer(
-        val owner: ApiImpl,
-        val renderer: EffectRenderer,
-    )
-
-    private data class RegisteredUnitRenderer(
-        val owner: ApiImpl,
-        val renderer: UnitRenderer,
-    )
-
     private data class BoundUnitRenderer(
-        val owner: ApiImpl,
         val definitionId: UnitId,
         val binding: UnitRenderBinding,
     )
 
+    /**
+     * One monitor for every table: [activateUnitBindings] resolves a renderer and records
+     * the binding it implies as a single step, so these cannot be locked independently.
+     */
     private val lock = Any()
-    private val textures = linkedMapOf<String, RegisteredTexture>()
-    private val projectileRenderers = linkedMapOf<String, RegisteredProjectileRenderer>()
-    private val preFireRenderers = linkedMapOf<String, RegisteredPreFireRenderer>()
-    private val effectRenderers = linkedMapOf<String, RegisteredEffectRenderer>()
-    private val unitRenderers = linkedMapOf<String, RegisteredUnitRenderer>()
-    private val unitBindings =
-        IdentityHashMap<com.corrodinggames.rts.game.units.custom.CustomUnitConfig, BoundUnitRenderer>()
-    private val reportedFailures = mutableSetOf<String>()
+    private val textures = ModRegistrationTable<String, RegisteredTexture>("Texture", lock)
+    private val projectileRenderers =
+        ModRegistrationTable<String, ProjectileRenderer>("Projectile renderer", lock)
+    private val preFireRenderers = ModRegistrationTable<String, PreFireRenderer>("Pre-fire renderer", lock)
+    private val effectRenderers = ModRegistrationTable<String, EffectRenderer>("Effect renderer", lock)
+    private val unitRenderers = ModRegistrationTable<String, UnitRenderer>("Unit renderer", lock)
+    private val unitBindings = ModRegistrationTable<CustomUnitConfig, BoundUnitRenderer>(
+        label = "Unit render binding",
+        lock = lock,
+        entries = IdentityHashMap(),
+    )
+    private val failures = ModFailureLog("Mod renderer")
 
     fun registerTexture(owner: ApiImpl, id: TextureId, path: ResourcePath, options: TextureOptions) {
-        synchronized(lock) {
-            check(id.value !in textures) { "Texture is already registered: ${id.value}" }
-            textures[id.value] = RegisteredTexture(owner, path, options)
-        }
+        textures.register(owner, id.value, RegisteredTexture(path, options))
     }
 
     fun registerProjectileRenderer(owner: ApiImpl, id: RendererId, renderer: ProjectileRenderer) {
-        synchronized(lock) {
-            check(id.value !in projectileRenderers) { "Projectile renderer is already registered: ${id.value}" }
-            projectileRenderers[id.value] = RegisteredProjectileRenderer(owner, renderer)
-        }
+        projectileRenderers.register(owner, id.value, renderer)
     }
 
     fun registerPreFireRenderer(owner: ApiImpl, id: RendererId, renderer: PreFireRenderer) {
-        synchronized(lock) {
-            check(id.value !in preFireRenderers) { "Pre-fire renderer is already registered: ${id.value}" }
-            preFireRenderers[id.value] = RegisteredPreFireRenderer(owner, renderer)
-        }
+        preFireRenderers.register(owner, id.value, renderer)
     }
 
     fun registerEffectRenderer(owner: ApiImpl, id: RendererId, renderer: EffectRenderer) {
-        synchronized(lock) {
-            check(id.value !in effectRenderers) { "Effect renderer is already registered: ${id.value}" }
-            effectRenderers[id.value] = RegisteredEffectRenderer(owner, renderer)
-        }
+        effectRenderers.register(owner, id.value, renderer)
     }
 
     fun registerUnitRenderer(owner: ApiImpl, id: RendererId, renderer: UnitRenderer) {
-        synchronized(lock) {
-            check(id.value !in unitRenderers) { "Unit renderer is already registered: ${id.value}" }
-            unitRenderers[id.value] = RegisteredUnitRenderer(owner, renderer)
-        }
+        unitRenderers.register(owner, id.value, renderer)
     }
 
     fun activateUnitBindings(
         owner: ApiImpl,
-        nativeUnits: Map<UnitId, com.corrodinggames.rts.game.units.custom.CustomUnitConfig>,
+        nativeUnits: Map<UnitId, CustomUnitConfig>,
         definitions: List<UnitDefinition>,
     ): Int = synchronized(lock) {
-        unitBindings.entries.removeAll { it.value.owner === owner }
+        unitBindings.removeOwned(owner)
         var count = 0
         definitions.forEach { definition ->
             val binding = definition.extension.renderBinding ?: return@forEach
-            val renderer = checkNotNull(unitRenderers[binding.rendererId.value]) {
+            val renderer = checkNotNull(unitRenderers.owned(binding.rendererId.value)) {
                 "Unit renderer is not registered: ${binding.rendererId.value}"
             }
             check(renderer.owner === owner) {
@@ -118,38 +91,40 @@ object ModRenderRegistry {
             val nativeUnit = checkNotNull(nativeUnits[definition.id]) {
                 "Native unit is not active: ${definition.id.value}"
             }
-            unitBindings[nativeUnit] = BoundUnitRenderer(owner, definition.id, binding)
+            unitBindings.put(owner, nativeUnit, BoundUnitRenderer(definition.id, binding))
             count++
         }
         count
     }
 
-    fun unregister(owner: ApiImpl) {
+    override fun unregister(owner: ApiImpl) {
         synchronized(lock) {
-            textures.entries.removeAll { it.value.owner === owner }
-            projectileRenderers.entries.removeAll { it.value.owner === owner }
-            preFireRenderers.entries.removeAll { it.value.owner === owner }
-            effectRenderers.entries.removeAll { it.value.owner === owner }
-            unitRenderers.entries.removeAll { it.value.owner === owner }
-            unitBindings.entries.removeAll { it.value.owner === owner }
+            textures.removeOwned(owner)
+            projectileRenderers.removeOwned(owner)
+            preFireRenderers.removeOwned(owner)
+            effectRenderers.removeOwned(owner)
+            unitRenderers.removeOwned(owner)
+            unitBindings.removeOwned(owner)
         }
     }
 
     @JvmStatic
     fun drawUnit(unit: CustomUnit, gameEngine: GameEngine, layer: UnitRenderLayer) {
-        val bound = synchronized(lock) { unitBindings[unit.unitConfig] } ?: return
-        val registration = synchronized(lock) { unitRenderers[bound.binding.rendererId.value] } ?: return
+        val (bound, renderer) = synchronized(lock) {
+            val bound = unitBindings[unit.unitConfig] ?: return
+            bound to (unitRenderers[bound.binding.rendererId.value] ?: return)
+        }
         val unitOffset = unit.getRenderOffset()
         val centerX = unit.posX + unitOffset.x - gameEngine.viewpointXSnapped
         val centerY = unit.posY + unitOffset.y - unit.posZ - gameEngine.viewpointYSnapped
         val bounds = unit.getUnitBounds()
         val imageScale = unit.getRenderScale()
-        val width = (abs(bounds.c - bounds.a).takeIf { it > 0f } ?: unit.radius * 2f) * imageScale
-        val height = (abs(bounds.d - bounds.b).takeIf { it > 0f } ?: unit.radius * 2f) * imageScale
+        val width = (abs(bounds.c - bounds.a).takeIf { it > 0f } ?: (unit.radius * 2f)) * imageScale
+        val height = (abs(bounds.d - bounds.b).takeIf { it > 0f } ?: (unit.radius * 2f)) * imageScale
         val canvas = EngineRenderCanvas(gameEngine.renderGraphicsEngine)
         try {
-            renderSafely("unit:${bound.binding.rendererId.value}") {
-                registration.renderer.render(
+            failures.runSafelyOncePerId("unit:${bound.binding.rendererId.value}") {
+                renderer.render(
                     UnitRenderContext(
                         instanceId = UnitInstanceId(unit.objectId),
                         definitionId = bound.definitionId,
@@ -179,8 +154,7 @@ object ModRenderRegistry {
             unit.unitConfig.turrets.forEachIndexed { turretIndex, turret ->
                 val rendererId = turret?.preFireRendererId ?: return@forEachIndexed
                 val variantId = turret.preFireRendererVariant ?: return@forEachIndexed
-                val registration = synchronized(lock) { preFireRenderers[rendererId] }
-                    ?: return@forEachIndexed
+                val renderer = preFireRenderers[rendererId] ?: return@forEachIndexed
                 val movement = unit.movementLevels[turretIndex]
                 val target = movement.targetUnit ?: return@forEachIndexed
                 val phaseStart = (turret.warmup - turret.preFireDuration).coerceAtLeast(0f)
@@ -189,8 +163,8 @@ object ModRenderRegistry {
 
                 val muzzle = unit.D(turretIndex)
                 val activeCanvas = canvas ?: EngineRenderCanvas(gameEngine.renderGraphicsEngine).also { canvas = it }
-                renderSafely("pre-fire:$rendererId") {
-                    registration.renderer.render(
+                failures.runSafelyOncePerId("pre-fire:$rendererId") {
+                    renderer.render(
                         PreFireRenderContext(
                             startX = muzzle.a - gameEngine.viewpointXSnapped,
                             startY = muzzle.b - unit.posZ - muzzle.c - gameEngine.viewpointYSnapped,
@@ -222,15 +196,15 @@ object ModRenderRegistry {
         val custom = projectileTemplate as? CustomProjectileTemplate ?: return false
         val rendererId = custom.renderExtensionId ?: return false
         val variantId = custom.renderExtensionVariant ?: return false
-        val registration = synchronized(lock) { projectileRenderers[rendererId] } ?: return false
+        val renderer = projectileRenderers[rendererId] ?: return false
         val startX = projectile.posX - gameEngine.viewpointXSnapped
         val startY = projectile.posY - gameEngine.viewpointYSnapped - projectile.posZ
         val endX = targetX - gameEngine.viewpointXSnapped + projectile.K
         val endY = targetY - targetHeight - gameEngine.viewpointYSnapped + projectile.L
         val canvas = EngineRenderCanvas(gameEngine.renderGraphicsEngine)
         try {
-            renderSafely("projectile:$rendererId") {
-                registration.renderer.render(
+            failures.runSafelyOncePerId("projectile:$rendererId") {
+                renderer.render(
                     ProjectileRenderContext(
                         startX = startX,
                         startY = startY,
@@ -254,7 +228,7 @@ object ModRenderRegistry {
     fun drawEffect(effect: Effect, gameEngine: GameEngine, shadowPass: Boolean): Boolean {
         val rendererId = effect.a.renderExtensionId ?: return false
         val variantId = effect.a.renderExtensionVariant ?: return false
-        val registration = synchronized(lock) { effectRenderers[rendererId] } ?: return false
+        val renderer = effectRenderers[rendererId] ?: return false
 
         var worldX = effect.I
         var worldY = effect.J
@@ -285,8 +259,8 @@ object ModRenderRegistry {
             planarSpeedFraction(source.velocityX, source.velocityY, source.getMoveSpeed())
         }
         try {
-            renderSafely("effect:$rendererId") {
-                registration.renderer.render(
+            failures.runSafelyOncePerId("effect:$rendererId") {
+                renderer.render(
                     EffectRenderContext(
                         originX = worldX - gameEngine.viewpointXSnapped,
                         originY = worldY - (if (shadowPass) 0f else height) - gameEngine.viewpointYSnapped,
@@ -309,25 +283,15 @@ object ModRenderRegistry {
         return true
     }
 
-    private inline fun renderSafely(key: String, render: () -> Unit) {
-        try {
-            render()
-        } catch (error: Throwable) {
-            if (synchronized(lock) { reportedFailures.add(key) }) {
-                logger.error(error) { "Mod renderer failed: $key" }
-            }
-        }
-    }
-
     private fun resolveTexture(id: TextureId): Pair<Texture, TextureOptions> {
-        val registration = synchronized(lock) {
-            checkNotNull(textures[id.value]) { "Texture is not registered: ${id.value}" }
+        val registration = textures.owned(id.value)
+            ?: error("Texture is not registered: ${id.value}")
+        val entry = registration.value
+        val texture = entry.texture ?: synchronized(entry) {
+            entry.texture ?: registration.owner.loadRenderTexture(entry.path, entry.options)
+                .also { entry.texture = it }
         }
-        val texture = registration.texture ?: synchronized(registration) {
-            registration.texture ?: registration.owner.loadRenderTexture(registration.path, registration.options)
-                .also { registration.texture = it }
-        }
-        return texture to registration.options
+        return texture to entry.options
     }
 
     private class EngineRenderCanvas(private val graphics: GraphicsEngine) : RenderCanvas {

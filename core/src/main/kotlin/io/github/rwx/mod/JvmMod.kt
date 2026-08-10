@@ -251,7 +251,7 @@ class JvmModLoader @JvmOverloads constructor(
         }
         discoveredMods.distinct().forEach { mod ->
             runCatching {
-                (runCatching { mod.api }.getOrNull() as? ApiImpl)?.close()
+                mod.apiImplOrNull()?.close()
             }.onFailure { e ->
                 logger.error(e) { "Error closing assets for mod ${mod.metadata.id}" }
             }
