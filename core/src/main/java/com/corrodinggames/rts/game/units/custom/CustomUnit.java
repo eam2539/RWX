@@ -35,10 +35,14 @@ import com.corrodinggames.rts.gameFramework.graphics.Texture;
 import com.corrodinggames.rts.gameFramework.network.GameInputStream;
 import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
 import com.corrodinggames.rts.gameFramework.network.NetworkEngine;
-import com.corrodinggames.rts.gameFramework.utility.*;
+import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
+import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
+import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
+import com.corrodinggames.rts.gameFramework.utility.Vector3D;
 import io.github.rwx.geometry.PointF;
 import io.github.rwx.geometry.Rect;
 import io.github.rwx.geometry.RectF;
+import io.github.rwx.mod.ModDamageRegistry;
 import io.github.rwx.mod.ModPreFireObserverRegistry;
 import io.github.rwx.mod.UnitEventRuntime;
 import io.github.rwx.mod.api.UnitRenderLayer;
@@ -1372,8 +1376,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         projectile.g = customProjectileTemplate;
         projectile.G = customProjectileTemplate.flameWeapon;
         projectile.aR = customProjectileTemplate.hitSound;
-        projectile.U = customProjectileTemplate.b;
-        projectile.Y = customProjectileTemplate.c;
+        projectile.U = ModDamageRegistry.directDamageAmount(customProjectileTemplate, customProjectileTemplate.b);
+        projectile.Y = ModDamageRegistry.areaDamageAmount(customProjectileTemplate, customProjectileTemplate.c);
         if (!customProjectileTemplate.ignoreParentShootDamageMultiplier && (baseUnit instanceof CustomUnit)) {
             CustomUnit customUnit = (CustomUnit) baseUnit;
             projectile.U *= customUnit.y.shootDamageMultiplier;
@@ -2684,9 +2688,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         CustomProjectileTemplate customProjectileTemplate = this.unitConfig.projectileTemplatesById[turretConfig.a(this)];
         float f = 0.0f;
         if (!customProjectileTemplate.s) {
-            f = 0.0f + customProjectileTemplate.b;
+            f = 0.0f + ModDamageRegistry.directDamageAmount(customProjectileTemplate, customProjectileTemplate.b);
         }
-        float f2 = f + customProjectileTemplate.c;
+        float f2 = f + ModDamageRegistry.areaDamageAmount(customProjectileTemplate, customProjectileTemplate.c);
         if (!customProjectileTemplate.ignoreParentShootDamageMultiplier) {
             f2 *= this.y.shootDamageMultiplier;
         }

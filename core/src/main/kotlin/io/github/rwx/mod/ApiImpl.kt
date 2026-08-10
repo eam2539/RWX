@@ -2,6 +2,8 @@ package io.github.rwx.mod
 
 import com.corrodinggames.rts.game.PlayerTeam
 import com.corrodinggames.rts.game.units.UnitTypeEnum
+import com.corrodinggames.rts.game.units.custom.AnimationTag
+import com.corrodinggames.rts.game.units.custom.CustomProjectileTemplate
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig
 import com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope
 import com.corrodinggames.rts.gameFramework.GameEngine
@@ -174,6 +176,37 @@ class ApiImpl private constructor(
             val nativeUnit = checkNotNull(nativeUnits[unitId]) {
                 "Missing native unit for extension bindings: ${unitId.value}"
             }
+            val exposureWidth = bindings.unit.exposureWidth
+            val exposureHeight = bindings.unit.exposureHeight
+            require((exposureWidth == null) == (exposureHeight == null)) {
+                "exposureWidth and exposureHeight must be set together for ${unitId.value}"
+            }
+            val avoidChance = bindings.unit.damageAvoidChance
+            if (avoidChance != null || exposureWidth != null) {
+                require(avoidChance == null || avoidChance in 0f..1f) {
+                    "damageAvoidChance must be between 0 and 1 for ${unitId.value}"
+                }
+                ModDamageRegistry.bindUnit(
+                    owner = this,
+                    config = nativeUnit,
+                    damage = ModDamageRegistry.UnitDamage(
+                        avoidChance = avoidChance ?: 0f,
+                        exposure = if (exposureWidth != null && exposureHeight != null) {
+                            require(exposureWidth >= 0f && exposureHeight >= 0f) {
+                                "exposureWidth and exposureHeight cannot be negative for ${unitId.value}"
+                            }
+                            ModDamageRegistry.UnitExposure(
+                                offsetX = bindings.unit.exposureOffsetX ?: 0f,
+                                offsetY = bindings.unit.exposureOffsetY ?: 0f,
+                                width = exposureWidth,
+                                height = exposureHeight,
+                            )
+                        } else {
+                            null
+                        },
+                    ),
+                )
+            }
             bindings.projectiles.forEach { (name, binding) ->
                 val projectile = checkNotNull(nativeUnit.findProjectileTemplateByName(name)) {
                     "Missing projectile $name for extension binding on ${unitId.value}"
@@ -182,6 +215,7 @@ class ApiImpl private constructor(
                 projectile.renderExtensionVariant = binding.renderer?.variantId?.value
                 projectile.projectileObserverId = binding.observer?.observerId?.value
                 projectile.projectileObserverVariant = binding.observer?.variantId?.value
+                bindProjectileDamage(projectile, binding, unitId)
                 applied++
             }
             bindings.turrets.forEach { (name, binding) ->
@@ -203,6 +237,48 @@ class ApiImpl private constructor(
             }
         }
         return applied
+    }
+
+    /**
+     * Hands a projectile's damage extensions to [ModDamageRegistry].
+     *
+     * Area damage that only exists as an extension needs the native area-damage flag raised
+     * here: the parser decides that from the INI's own `areaDamage`, which a mod binding a
+     * fractional amount never sets, and without it the engine skips the area sweep entirely.
+     */
+    private fun bindProjectileDamage(
+        projectile: CustomProjectileTemplate,
+        binding: ProjectileExtensionBinding,
+        unitId: UnitId,
+    ) {
+        val damage = ModDamageRegistry.ProjectileDamage(
+            directDamageAmount = binding.directDamageAmount,
+            areaDamageAmount = binding.areaDamageAmount,
+            directDamageHitRateBonus = binding.directDamageHitRateBonus,
+            areaDamageHitRateBonus = binding.areaDamageHitRateBonus,
+            areaDamageExcludeDirectHit = binding.areaDamageExcludeDirectHit ?: false,
+            directDamageArmourIgnoreAmount = binding.directDamageArmourIgnoreAmount,
+            areaDamageArmourIgnoreAmount = binding.areaDamageArmourIgnoreAmount,
+            rayDamage = binding.rayDamage ?: false,
+            rayDamageRange = binding.rayDamageRange ?: 0f,
+            rayDamageWidth = binding.rayDamageWidth ?: 0f,
+            rayDamageTargetWidthFactor = binding.rayDamageTargetWidthFactor ?: 0f,
+            rayDamageHitEffectOffsetFactor = binding.rayDamageHitEffectOffsetFactor,
+            rayDamageSecondaryTargetTags = binding.rayDamageSecondaryTargetTags
+                ?.let { AnimationTag.a(it.joinToString(",")) },
+        )
+        if (damage == EMPTY_PROJECTILE_DAMAGE) return
+        require(!damage.rayDamage || projectile.I) {
+            "rayDamage requires an instant projectile for ${unitId.value}"
+        }
+        runCatching { ModDamageRegistry.bindProjectile(this, projectile, damage) }
+            .getOrElse { error ->
+                throw IllegalArgumentException("${error.message} for ${unitId.value}", error)
+            }
+        val areaAmount = binding.areaDamageAmount
+        if (areaAmount != null && areaAmount != 0f && projectile.i > 0) {
+            projectile.e = true
+        }
     }
 
     fun bindEngineModInfo(modInfo: ModInfo) {
@@ -415,6 +491,9 @@ class ApiImpl private constructor(
     }
 
     companion object {
+        /** A binding that carries no damage extensions, so nothing needs registering. */
+        private val EMPTY_PROJECTILE_DAMAGE = ModDamageRegistry.ProjectileDamage()
+
         @JvmStatic
         fun create(
             metadata: ModMetadata,

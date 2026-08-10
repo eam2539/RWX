@@ -10,14 +10,36 @@ internal data class UnitIniCompilation(
 )
 
 internal data class UnitExtensionBindings(
+    val unit: UnitExtensionBinding,
     val projectiles: Map<String, ProjectileExtensionBinding>,
     val turrets: Map<String, TurretExtensionBinding>,
     val effects: Map<String, EffectExtensionBinding>,
 )
 
+internal data class UnitExtensionBinding(
+    val damageAvoidChance: Float?,
+    val exposureOffsetX: Float?,
+    val exposureOffsetY: Float?,
+    val exposureWidth: Float?,
+    val exposureHeight: Float?,
+)
+
 internal data class ProjectileExtensionBinding(
     val renderer: ProjectileRenderBinding?,
     val observer: ProjectileObserverBinding?,
+    val directDamageAmount: Float?,
+    val areaDamageAmount: Float?,
+    val directDamageHitRateBonus: Float?,
+    val areaDamageHitRateBonus: Float?,
+    val areaDamageExcludeDirectHit: Boolean?,
+    val rayDamage: Boolean?,
+    val rayDamageRange: Float?,
+    val rayDamageWidth: Float?,
+    val rayDamageTargetWidthFactor: Float?,
+    val rayDamageHitEffectOffsetFactor: Float?,
+    val rayDamageSecondaryTargetTags: List<String>?,
+    val directDamageArmourIgnoreAmount: Float?,
+    val areaDamageArmourIgnoreAmount: Float?,
 )
 
 internal data class TurretExtensionBinding(
@@ -29,11 +51,12 @@ internal data class TurretExtensionBinding(
 internal data class EffectExtensionBinding(val renderer: EffectRenderBinding)
 
 private class MutableUnitExtensionBindings {
+    var unit = UnitExtensionBinding(null, null, null, null, null)
     val projectiles = linkedMapOf<String, ProjectileExtensionBinding>()
     val turrets = linkedMapOf<String, TurretExtensionBinding>()
     val effects = linkedMapOf<String, EffectExtensionBinding>()
 
-    fun freeze() = UnitExtensionBindings(projectiles.toMap(), turrets.toMap(), effects.toMap())
+    fun freeze() = UnitExtensionBindings(unit, projectiles.toMap(), turrets.toMap(), effects.toMap())
 }
 
 internal object UnitIniCompiler {
@@ -109,6 +132,13 @@ internal object UnitIniCompiler {
         definition: UnitDefinition,
         bindings: MutableUnitExtensionBindings,
     ) {
+        bindings.unit = UnitExtensionBinding(
+            damageAvoidChance = definition.extension.damageAvoidChance,
+            exposureOffsetX = definition.extension.exposureOffsetX,
+            exposureOffsetY = definition.extension.exposureOffsetY,
+            exposureWidth = definition.extension.exposureWidth,
+            exposureHeight = definition.extension.exposureHeight,
+        )
         val sectionNames = definition.iniSections.mapTo(hashSetOf()) { it.name }
         definition.extension.projectiles.forEach { (name, extension) ->
             require("projectile_$name" in sectionNames) {
@@ -117,6 +147,19 @@ internal object UnitIniCompiler {
             bindings.projectiles[name] = ProjectileExtensionBinding(
                 renderer = extension.renderBinding,
                 observer = extension.observerBinding,
+                directDamageAmount = extension.directDamageAmount,
+                areaDamageAmount = extension.areaDamageAmount,
+                directDamageHitRateBonus = extension.directDamageHitRateBonus,
+                areaDamageHitRateBonus = extension.areaDamageHitRateBonus,
+                areaDamageExcludeDirectHit = extension.areaDamageExcludeDirectHit,
+                rayDamage = extension.rayDamage,
+                rayDamageRange = extension.rayDamageRange,
+                rayDamageWidth = extension.rayDamageWidth,
+                rayDamageTargetWidthFactor = extension.rayDamageTargetWidthFactor,
+                rayDamageHitEffectOffsetFactor = extension.rayDamageHitEffectOffsetFactor,
+                rayDamageSecondaryTargetTags = extension.rayDamageSecondaryTargetTags,
+                directDamageArmourIgnoreAmount = extension.directDamageArmourIgnoreAmount,
+                areaDamageArmourIgnoreAmount = extension.areaDamageArmourIgnoreAmount,
             )
         }
         definition.extension.turrets.forEach { (name, extension) ->

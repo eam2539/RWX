@@ -68,14 +68,32 @@ data class UnitDefinition(
 data class UnitExtension(
     val shaderId: String? = null,
     val renderBinding: UnitRenderBinding? = null,
+    val damageAvoidChance: Float? = null,
+    val exposureOffsetX: Float? = null,
+    val exposureOffsetY: Float? = null,
+    val exposureWidth: Float? = null,
+    val exposureHeight: Float? = null,
     val projectiles: Map<String, ProjectileExtension> = emptyMap(),
     val turrets: Map<String, TurretExtension> = emptyMap(),
-    val effects: Map<String, NativeEffectExtension> = emptyMap(),
+    val effects: Map<String, EffectExtension> = emptyMap(),
 )
 
 data class ProjectileExtension(
     val renderBinding: ProjectileRenderBinding? = null,
     val observerBinding: ProjectileObserverBinding? = null,
+    val directDamageAmount: Float? = null,
+    val areaDamageAmount: Float? = null,
+    val directDamageHitRateBonus: Float? = null,
+    val areaDamageHitRateBonus: Float? = null,
+    val areaDamageExcludeDirectHit: Boolean? = null,
+    val rayDamage: Boolean? = null,
+    val rayDamageRange: Float? = null,
+    val rayDamageWidth: Float? = null,
+    val rayDamageTargetWidthFactor: Float? = null,
+    val rayDamageHitEffectOffsetFactor: Float? = null,
+    val rayDamageSecondaryTargetTags: List<String>? = null,
+    val directDamageArmourIgnoreAmount: Float? = null,
+    val areaDamageArmourIgnoreAmount: Float? = null,
 )
 
 data class TurretExtension(
@@ -84,7 +102,7 @@ data class TurretExtension(
     val observerBinding: PreFireObserverBinding? = null,
 )
 
-data class NativeEffectExtension(
+data class EffectExtension(
     val renderBinding: EffectRenderBinding,
 )
 

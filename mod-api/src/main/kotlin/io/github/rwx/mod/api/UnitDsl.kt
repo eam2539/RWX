@@ -109,9 +109,14 @@ class UnitBuilder internal constructor(private val id: UnitId) {
 class UnitExtensionBuilder internal constructor() {
     var shaderId: String? = null
     var renderBinding: UnitRenderBinding? = null
+    var damageAvoidChance: Float? = null
+    var exposureOffsetX: Float? = null
+    var exposureOffsetY: Float? = null
+    var exposureWidth: Float? = null
+    var exposureHeight: Float? = null
     private val projectiles = linkedMapOf<String, ProjectileExtensionBuilder>()
     private val turrets = linkedMapOf<String, TurretExtensionBuilder>()
-    private val effects = linkedMapOf<String, NativeEffectExtensionBuilder>()
+    private val effects = linkedMapOf<String, EffectExtensionBuilder>()
 
     fun projectile(name: String, configure: ProjectileExtensionBuilder.() -> kotlin.Unit) {
         projectiles.getOrPut(requireExtensionSectionName(name), ::ProjectileExtensionBuilder).configure()
@@ -121,13 +126,18 @@ class UnitExtensionBuilder internal constructor() {
         turrets.getOrPut(requireExtensionSectionName(name), ::TurretExtensionBuilder).configure()
     }
 
-    fun effect(name: String, configure: NativeEffectExtensionBuilder.() -> kotlin.Unit) {
-        effects.getOrPut(requireExtensionSectionName(name), ::NativeEffectExtensionBuilder).configure()
+    fun effect(name: String, configure: EffectExtensionBuilder.() -> kotlin.Unit) {
+        effects.getOrPut(requireExtensionSectionName(name), ::EffectExtensionBuilder).configure()
     }
 
     internal fun buildDefinition() = UnitExtension(
         shaderId = shaderId,
         renderBinding = renderBinding,
+        damageAvoidChance = damageAvoidChance,
+        exposureOffsetX = exposureOffsetX,
+        exposureOffsetY = exposureOffsetY,
+        exposureWidth = exposureWidth,
+        exposureHeight = exposureHeight,
         projectiles = projectiles.mapValues { it.value.buildDefinition() },
         turrets = turrets.mapValues { it.value.buildDefinition() },
         effects = effects.mapValues { it.value.buildDefinition() },
@@ -138,8 +148,37 @@ class UnitExtensionBuilder internal constructor() {
 class ProjectileExtensionBuilder internal constructor() {
     var renderBinding: ProjectileRenderBinding? = null
     var observerBinding: ProjectileObserverBinding? = null
+    var directDamageAmount: Float? = null
+    var areaDamageAmount: Float? = null
+    var directDamageHitRateBonus: Float? = null
+    var areaDamageHitRateBonus: Float? = null
+    var areaDamageExcludeDirectHit: Boolean? = null
+    var rayDamage: Boolean? = null
+    var rayDamageRange: Float? = null
+    var rayDamageWidth: Float? = null
+    var rayDamageTargetWidthFactor: Float? = null
+    var rayDamageHitEffectOffsetFactor: Float? = null
+    var rayDamageSecondaryTargetTags: List<String>? = null
+    var directDamageArmourIgnoreAmount: Float? = null
+    var areaDamageArmourIgnoreAmount: Float? = null
 
-    internal fun buildDefinition() = ProjectileExtension(renderBinding, observerBinding)
+    internal fun buildDefinition() = ProjectileExtension(
+        renderBinding = renderBinding,
+        observerBinding = observerBinding,
+        directDamageAmount = directDamageAmount,
+        areaDamageAmount = areaDamageAmount,
+        directDamageHitRateBonus = directDamageHitRateBonus,
+        areaDamageHitRateBonus = areaDamageHitRateBonus,
+        areaDamageExcludeDirectHit = areaDamageExcludeDirectHit,
+        rayDamage = rayDamage,
+        rayDamageRange = rayDamageRange,
+        rayDamageWidth = rayDamageWidth,
+        rayDamageTargetWidthFactor = rayDamageTargetWidthFactor,
+        rayDamageHitEffectOffsetFactor = rayDamageHitEffectOffsetFactor,
+        rayDamageSecondaryTargetTags = rayDamageSecondaryTargetTags,
+        directDamageArmourIgnoreAmount = directDamageArmourIgnoreAmount,
+        areaDamageArmourIgnoreAmount = areaDamageArmourIgnoreAmount,
+    )
 }
 
 @UnitDsl
@@ -152,10 +191,10 @@ class TurretExtensionBuilder internal constructor() {
 }
 
 @UnitDsl
-class NativeEffectExtensionBuilder internal constructor() {
+class EffectExtensionBuilder internal constructor() {
     var renderBinding: EffectRenderBinding? = null
 
-    internal fun buildDefinition() = NativeEffectExtension(
+    internal fun buildDefinition() = EffectExtension(
         requireNotNull(renderBinding) { "Native effect extension must define renderBinding" },
     )
 }

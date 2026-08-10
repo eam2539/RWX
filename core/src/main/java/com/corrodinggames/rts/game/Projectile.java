@@ -19,6 +19,7 @@ import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
 import com.corrodinggames.rts.gameFramework.utility.*;
 import io.github.rwx.geometry.Rect;
 import io.github.rwx.geometry.RectF;
+import io.github.rwx.mod.ModDamageRegistry;
 import io.github.rwx.mod.ModProjectileObserverRegistry;
 import io.github.rwx.render.ModRenderRegistry;
 import io.github.rwx.render.canvas.KoolArgbColor;
@@ -585,6 +586,9 @@ public class Projectile extends PositionedObject {
 
     public static void a(BaseUnit baseUnit, BaseUnit baseUnit2, float f2, Projectile projectile, boolean z) {
         GameEngine gameEngine = GameEngine.getInstance();
+        if (baseUnit2 != null && !baseUnit2.isDead) {
+            f2 = ModDamageRegistry.applyHitRate(baseUnit2, f2, projectile, z);
+        }
         if (gameEngine.isUnitInvincibilityEnabled && f2 > 0.0f) {
             f2 = 0.0f;
         }
@@ -604,7 +608,17 @@ public class Projectile extends PositionedObject {
                 baseUnit2.calculateTurnSpeed(baseUnit, -f2, projectile);
             } else {
                 boolean z2 = !baseUnit2.isDead && baseUnit2.currentHealth > 0.0f;
-                baseUnit2.setTarget(baseUnit, f2, projectile);
+                float armourIgnoreBefore = projectile == null ? 0.0f : projectile.an;
+                if (projectile != null) {
+                    projectile.an = ModDamageRegistry.armourIgnoreAmount(projectile, z, armourIgnoreBefore);
+                }
+                try {
+                    baseUnit2.setTarget(baseUnit, f2, projectile);
+                } finally {
+                    if (projectile != null) {
+                        projectile.an = armourIgnoreBefore;
+                    }
+                }
                 float f3 = f2;
                 if (baseUnit2.isDamageImmune()) {
                     f3 = 0.0f;
@@ -1035,8 +1049,24 @@ public class Projectile extends PositionedObject {
                 if (this.l != null && (customUnitSpawnListA = projectileTemplate.a(this.l)) != null) {
                     customUnitSpawnList = customUnitSpawnListA;
                 }
-                if (customUnitSpawnList != null) {
-                    customUnitSpawnList.a(this.aV, this.aW, this.aX, this.aT, this.l);
+                float rayDirectionX = Utility.fastCos(angleBetweenPoints);
+                float rayDirectionY = Utility.fastSin(angleBetweenPoints);
+                float hitEffectX = this.aV;
+                float hitEffectY = this.aW;
+                float hitEffectZ = this.aX;
+                boolean emitHitEffect = true;
+                if (ModDamageRegistry.isRayDamage(projectileTemplate)) {
+                    float[] impact = ModDamageRegistry.rayDamageImpactPoint(this, this.l, rayDirectionX, rayDirectionY);
+                    if (impact != null) {
+                        hitEffectX = impact[0];
+                        hitEffectY = impact[1];
+                        hitEffectZ = impact[2];
+                    } else if (ModDamageRegistry.suppressesPrimaryHitEffect(this, this.l, rayDirectionX, rayDirectionY)) {
+                        emitHitEffect = false;
+                    }
+                }
+                if (customUnitSpawnList != null && emitHitEffect) {
+                    customUnitSpawnList.a(hitEffectX, hitEffectY, hitEffectZ, this.aT, this.l);
                 }
                 if (projectileTemplate.spawnProjectilesOnExplode != null) {
                     projectileTemplate.spawnProjectilesOnExplode.a(this.posX, this.posY, this.posZ, this.az, this.j, null, false, this.aD + 1, this, this.l);
@@ -1073,6 +1103,27 @@ public class Projectile extends PositionedObject {
                     this.j.f(this.aV, this.aW);
                 }
                 if (!z8 && baseUnit != null) {
+                    ModDamageRegistry.applyRayDamageToSecondaryTargets(
+                            this,
+                            rayDirectionX,
+                            rayDirectionY,
+                            secondaryTarget -> a(
+                                    this.j,
+                                    secondaryTarget,
+                                    projectileTemplate.a(secondaryTarget, this.U, false),
+                                    this,
+                                    false
+                            ),
+                            (effectTarget, effectX, effectY, effectZ) -> {
+                                CustomUnitSpawnList hitEffect = projectileTemplate.a(effectTarget);
+                                if (hitEffect == null) {
+                                    hitEffect = projectileTemplate.explodeEffect;
+                                }
+                                if (hitEffect != null) {
+                                    hitEffect.a(effectX, effectY, effectZ, this.aT, effectTarget);
+                                }
+                            }
+                    );
                     if (this.E) {
                         this.bn = false;
                         float fE = (this.U / 60.0f) * f2 * e();
@@ -1406,6 +1457,9 @@ public class Projectile extends PositionedObject {
     }
 
     public void b(BaseUnit baseUnit, float f2, float f3) {
+        if (ModDamageRegistry.excludesAreaDamage(this, baseUnit)) {
+            return;
+        }
         if (baseUnit.unitTransportTarget != null) {
             return;
         }
