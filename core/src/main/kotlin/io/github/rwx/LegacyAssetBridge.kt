@@ -48,10 +48,7 @@ object LegacyAssetBridge {
     @JvmStatic
     fun assetExists(path: String): Boolean {
         val normalized = path.trimAssetPath()
-        if (File(assetRoot, normalized).isFile) {
-            return true
-        }
-        return platformStorage()?.assetExists(normalized) == true
+        return File(assetRoot, normalized).isFile || platformStorage()?.assetFileExists(normalized) == true
     }
 
     @JvmStatic

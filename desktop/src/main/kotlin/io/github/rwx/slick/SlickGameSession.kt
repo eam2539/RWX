@@ -272,22 +272,22 @@ class SlickGameSession(
         startSlickGameIfNeeded()
     }
 
-    override fun prepareMemorySnapshotAsync(snapshot: GameMemorySnapshot, viewport: KoolCanvasViewport) {
+    override fun prepareMapSnapshotAsync(snapshot: MapSnapshot, viewport: KoolCanvasViewport) {
         if (isMapLoaded(snapshot.mapPath)) return
         beginRendererMapPreparation(
             mapPath = snapshot.mapPath,
-            memorySnapshot = snapshot,
+            mapSnapshot = snapshot,
             battleRoomConfig = snapshot.battleRoomConfig,
         )
         prepareRendererRequest(
             viewport,
-            SlickSessionRequest.MemorySnapshot(snapshot),
+            SlickSessionRequest.MapSnapshotRequest(snapshot),
         )
         startSlickGameIfNeeded()
     }
 
     override fun prepareBattleRoomAsync(config: BattleRoomLaunchConfig, viewport: KoolCanvasViewport) {
-        val requestedMapPath = config.mapPath.takeIf { it.isNotBlank() } ?: return
+        val requestedMapPath = config.room.mapPath.takeIf { it.isNotBlank() } ?: return
         if (isMapLoaded(requestedMapPath) && activeRendererBattleRoomConfig() == config) return
         beginRendererMapPreparation(
             mapPath = requestedMapPath,
@@ -607,10 +607,10 @@ class SlickGameSession(
 
     private fun syncRequestedMapFromSession() {
         val preparation = rendererPreparationSnapshot()
-        val pendingMemorySnapshot = preparation.memorySnapshot
+        val pendingMapSnapshot = preparation.mapSnapshot
         val pendingBattleRoomConfig = preparation.battleRoomConfig
         val pendingMapPath = preparation.mapPath
-        if (pendingMemorySnapshot == null && pendingMapPath == null) {
+        if (pendingMapSnapshot == null && pendingMapPath == null) {
             val desired = requestState.desired
             val preservesStandaloneRequest = desired is SlickSessionRequest.MenuBackground ||
                     desired is SlickSessionRequest.Replay ||
@@ -625,12 +625,12 @@ class SlickGameSession(
             requestState.synchronize(SlickSessionRequest.Map(activeMapPath))
             return
         }
-        val sessionMapPath = pendingMemorySnapshot?.mapPath
+        val sessionMapPath = pendingMapSnapshot?.mapPath
             ?: pendingMapPath
             ?: return
         val desiredRequest = requestState.desired
         val request = when {
-            pendingMemorySnapshot != null -> SlickSessionRequest.MemorySnapshot(pendingMemorySnapshot)
+            pendingMapSnapshot != null -> SlickSessionRequest.MapSnapshotRequest(pendingMapSnapshot)
             pendingBattleRoomConfig != null -> SlickSessionRequest.BattleRoom(pendingBattleRoomConfig)
             desiredRequest is SlickSessionRequest.SavedGame &&
                     desiredRequest.saveName == sessionMapPath -> desiredRequest

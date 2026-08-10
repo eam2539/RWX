@@ -5,36 +5,12 @@ import io.github.rwx.i18n.I18n
 import io.github.rwx.logger
 import io.github.rwx.session.BattleRoomLaunchConfig
 import io.github.rwx.settings.GameSettingsRepository
-import io.github.rwx.ui.*
+import io.github.rwx.ui.AppScreen
+import io.github.rwx.ui.MainMenuNavigation
+import io.github.rwx.ui.MainMenuOutcome
+import io.github.rwx.ui.ScreenNavigator
 import io.github.rwx.ui.host.LevelSelectSceneHost
-import io.github.rwx.ui.model.BattleRoomAction
-import io.github.rwx.ui.model.BattleRoomNavigation
-import io.github.rwx.ui.model.BattleRoomOutcome
-import io.github.rwx.ui.model.LevelSelectAction
-import io.github.rwx.ui.model.LevelSelectNavigation
-import io.github.rwx.ui.model.LevelSelectOutcome
-import io.github.rwx.ui.model.MainMenuAction
-import io.github.rwx.ui.model.MapEntry
-import io.github.rwx.ui.model.ModsAction
-import io.github.rwx.ui.model.ModsNavigation
-import io.github.rwx.ui.model.ModsOutcome
-import io.github.rwx.ui.model.MultiplayerAction
-import io.github.rwx.ui.model.MultiplayerNavigation
-import io.github.rwx.ui.model.MultiplayerOutcome
-import io.github.rwx.ui.model.PauseMenuAction
-import io.github.rwx.ui.model.PauseMenuNavigation
-import io.github.rwx.ui.model.PauseMenuOutcome
-import io.github.rwx.ui.model.ReplayEntry
-import io.github.rwx.ui.model.ReplaySelectAction
-import io.github.rwx.ui.model.ReplaySelectNavigation
-import io.github.rwx.ui.model.ReplaySelectOutcome
-import io.github.rwx.ui.model.ResourceBrowserAction
-import io.github.rwx.ui.model.ResourceBrowserNavigation
-import io.github.rwx.ui.model.ResourceBrowserOutcome
-import io.github.rwx.ui.model.SettingsAction
-import io.github.rwx.ui.model.SettingsModel
-import io.github.rwx.ui.model.SettingsNavigation
-import io.github.rwx.ui.model.SettingsOutcome
+import io.github.rwx.ui.model.*
 
 internal class ActionRouter(
     private val actions: ActionHandlers,
@@ -115,7 +91,7 @@ internal class ActionRouter(
         when (val outcome = LevelSelectNavigation.outcomeFor(action)) {
             is LevelSelectOutcome.Navigate -> {
                 if (battleRoomController.isSelectingMapForBattleRoom) {
-                    battleRoomController.cancelMapSelection()
+                    battleRoomController.isSelectingMapForBattleRoom = false
                     navigator.navigateTo(AppScreen.BattleRoom)
                 } else {
                     navigator.navigateTo(outcome.screen)
@@ -127,12 +103,12 @@ internal class ActionRouter(
     }
 
     private fun handleLevelSelectStartGame(map: MapEntry) {
-        map.saveName?.let { saveName ->
+        if (map.isSavedGame) {
             if (battleRoomController.isSelectingMapForBattleRoom) {
                 battleRoomController.selectBattleRoomMap(map)
                 navigator.navigateTo(AppScreen.BattleRoom)
             } else {
-                enterSavedGame(saveName)
+                enterSavedGame(map.fileName)
             }
             return
         }
@@ -179,7 +155,7 @@ internal class ActionRouter(
             BattleRoomOutcome.AddAI -> battleRoomAdminController.addAiToBattleRoom()
             BattleRoomOutcome.OpenGameOptions -> battleRoomAdminController.showBattleRoomOptionsDialog()
             BattleRoomOutcome.OpenMapSelect -> {
-                battleRoomController.beginMapSelection()
+                battleRoomController.isSelectingMapForBattleRoom = true
                 levelSelectSceneHost.updateMaps(battleRoomController.selectedMode)
                 navigator.navigateTo(AppScreen.LevelSelect)
             }

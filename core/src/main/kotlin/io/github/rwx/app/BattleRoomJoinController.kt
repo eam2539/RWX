@@ -124,7 +124,7 @@ internal class BattleRoomJoinController(
             val snapshot = gameSession.currentBattleRoom()
             val isJoinInProgress = gameSession.isJoiningBattleRoom
             val hasJoinedSnapshot = snapshot != null &&
-                    snapshot.isReadyForJoinedRoom()
+                    snapshot.players.isNotEmpty()
             val errorMessage = gameSession.latestBattleRoomJoinError
             probe.set(
                 PendingBattleRoomJoinProbe(

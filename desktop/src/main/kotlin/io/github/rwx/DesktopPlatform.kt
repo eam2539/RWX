@@ -147,48 +147,45 @@ class DesktopPlatformStorage : PlatformStorage {
         StorageKind.REPLAYS -> replaysDir
     }
 
-    override fun resolveVirtualPath(virtualPath: String): File {
-        val normalized = virtualPath.replace('\\', '/')
-        val resolved = listOf(
-            cacheDir,
-            mapsDir,
-            unitsDir,
-            savesDir,
-            replaysDir,
-            modsDir,
-            localDir,
-            rootDir,
-        ).firstNotNullOfOrNull { location ->
-            location.resolveVirtualPathOrNull(normalized)
-        }
-        return resolved ?: when {
-            normalized.startsWith("/SD/") -> File(rootDir.file, normalized.substring("/SD/".length))
-            else -> File(normalized)
-        }
-    }
-
     override fun listAssets(prefix: String): List<String> {
         val normalized = prefix.trimAssetPath()
         val dir = File(assetRoot, normalized)
         return dir.listFiles()
             ?.map { file -> "$normalized/${file.name}".trimAssetPath() }
-            ?.sorted()
-            ?: emptyList()
+            ?.sorted() ?: (resolveVirtualPath(normalized)?.list()?.toList()?.sorted() ?: emptyList())
     }
 
-    override fun assetExists(path: String): Boolean {
-        return File(assetRoot, path.trimAssetPath()).isFile
+    override fun assetFileExists(path: String): Boolean {
+        val normalized = path.trimAssetPath()
+        val file = File(assetRoot, normalized)
+        return if (file.exists()) {
+            file.isFile
+        } else {
+            val virtualFile = resolveVirtualPath(normalized) ?: return false
+            virtualFile.exists() && virtualFile.isFile
+        }
     }
 
     override fun readAssetBytes(path: String): ByteArray? {
-        return File(assetRoot, path.trimAssetPath()).takeIf(File::isFile)?.readBytes()
+        val normalized = path.trimAssetPath()
+        val file = File(assetRoot, normalized)
+        return if (file.isFile) {
+            file.readBytes()
+        } else {
+            resolveVirtualPath(normalized)?.takeIf(File::isFile)?.readBytes()
+        }
     }
 
     override fun openAssetStream(path: String): InputStream? {
-        return File(assetRoot, path.trimAssetPath()).takeIf(File::isFile)?.inputStream()
+        val normalized = path.trimAssetPath()
+        val file = File(assetRoot, normalized)
+        return if (file.isFile) {
+            file.inputStream()
+        } else {
+            resolveVirtualPath(normalized)?.takeIf(File::isFile)?.inputStream()
+        }
     }
 
-    override fun assetLoadPath(path: String): String = path.trimAssetPath()
 
     override fun createDirectories() {
         listOf(

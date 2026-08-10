@@ -1,8 +1,8 @@
 package io.github.rwx.app
 
+import com.corrodinggames.rts.gameFramework.network.GameRoomSettings
 import io.github.rwx.i18n.I18n
 import io.github.rwx.logger
-import io.github.rwx.session.BattleRoomOptions
 import io.github.rwx.session.BattleRoomTeamLayout
 import io.github.rwx.session.GameSession
 import io.github.rwx.session.resolveBattleRoomPlayerSnapshot
@@ -31,7 +31,7 @@ internal class BattleRoomAdminController(
     }
 
     fun showBattleRoomOptionsDialog() {
-        val initialOptions = gameSession.currentBattleRoom()?.options
+        val initialOptions = gameSession.currentBattleRoom()?.room?.options
         if (initialOptions == null) {
             showUnavailableDialog("Game options require a hosted RW room")
             return
@@ -149,8 +149,8 @@ internal class BattleRoomAdminController(
     }
 
     private fun applyBattleRoomOptionsForm(values: Map<String, String>) {
-        val base = gameSession.currentBattleRoom()?.options ?: BattleRoomOptions()
-        val options = values.toBattleRoomOptions(base)
+        val base = gameSession.currentBattleRoom()?.room?.options ?: GameRoomSettings()
+        val options = values.toGameRoomSettings(base)
         val layout = values["teamLayout"]?.toBattleRoomTeamLayoutOrNull()
         if (gameSession.currentBattleRoom() == null) {
             showUnavailableDialog("Game options require a hosted RW room")

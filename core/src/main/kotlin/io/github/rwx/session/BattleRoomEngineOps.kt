@@ -2,33 +2,11 @@ package io.github.rwx.session
 
 import com.corrodinggames.rts.game.GameTeam
 import com.corrodinggames.rts.game.PlayerTeam
+import com.corrodinggames.rts.game.PlayerTeam.resetTeamRegistry
 import com.corrodinggames.rts.gameFramework.GameEngine
-import com.corrodinggames.rts.gameFramework.network.GameModeType
 import com.corrodinggames.rts.gameFramework.network.NetworkEngine
 import com.corrodinggames.rts.gameFramework.network.TeamLayoutType
 
-/**
- * Engine-level battle room operations shared by every renderer backend.
- *
- * These used to be copy-pasted into [GameSession] (twice) and into the desktop Slick renderer,
- * which let the three copies drift. They are plain functions on [GameEngine]/[NetworkEngine] so a
- * backend can call them from whichever thread owns the engine at that moment.
- */
-
-/** Rebuilds the team registry around a single local human player and returns that team. */
-fun GameEngine.installSinglePlayerLocalTeam(playerName: String): GameTeam {
-    PlayerTeam.resetTeamRegistry()
-    val localPlayerTeam = GameTeam(0)
-    localPlayerTeam.teamName = playerName.ifBlank { "Player" }
-    localPlayerTeam.isTeamSpectator = false
-    localPlayerTeam.isTeamControlledByAI = false
-    localPlayerTeam.isTeamObserver = false
-    localPlayerTeam.isTeamReady = true
-    localPlayerTeam.teamPingTime = 0
-    playerTeam = localPlayerTeam
-    networkEngine?.localPlayerTeam = localPlayerTeam
-    return localPlayerTeam
-}
 
 /**
  * Applies the room fog rules restored by a standalone skirmish/sandbox save to the loaded map.
@@ -117,28 +95,28 @@ private fun NetworkEngine.applyCustomTeamMode(layout: BattleRoomTeamLayout) {
     }
 }
 
-/**
- * Brings up a host-side battle room for [config]: starts the singleplayer/sandbox server, registers
- * the local team, publishes the room settings and fills the AI slots.
- *
- * Stops short of `startBattleRoomGame()` so callers can decide whether the room stays open (the
- * battle room screen) or immediately loads the level (a direct skirmish launch).
- *
- * @param logLabel backend name used in failure messages, e.g. "Slick".
- * @return the engine's [NetworkEngine], or null when the engine has none (mods-only / headless).
- */
+
 fun GameEngine.configureLocalBattleRoom(
     config: BattleRoomLaunchConfig,
     logLabel: String,
 ): NetworkEngine? {
     val networkEngine = networkEngine ?: return null
-    networkEngine.selectedMapPath = config.mapPath
+    networkEngine.selectedMapPath = config.room.mapPath
     val playerName = networkEngine.playerName
         ?: settingsEngine?.lastNetworkPlayerName
         ?: "Player"
     networkEngine.playerName = playerName
     networkEngine.requireActiveMods = true
-    val localPlayerTeam = installSinglePlayerLocalTeam(playerName)
+    resetTeamRegistry()
+    val localPlayerTeam = GameTeam(0)
+    localPlayerTeam.teamName = playerName.ifBlank { "Player" }
+    localPlayerTeam.isTeamSpectator = false
+    localPlayerTeam.isTeamControlledByAI = false
+    localPlayerTeam.isTeamObserver = false
+    localPlayerTeam.isTeamReady = true
+    localPlayerTeam.teamPingTime = 0
+    playerTeam = localPlayerTeam
+    this.networkEngine?.localPlayerTeam = localPlayerTeam
 
     val started = if (config.sandbox) {
         networkEngine.startSandboxServer()
@@ -150,13 +128,19 @@ fun GameEngine.configureLocalBattleRoom(
         "Unable to start $logLabel battle room: local player team was not registered"
     }
 
+    if (config.sandbox)
+        networkEngine.roomSettings.apply {
+            fogMode = 0
+            revealedMap = true
+        }
+
     val settings = networkEngine.getEditableRoomSettings() ?: networkEngine.roomSettings
-    settings.gameModeType = if (config.savedGame) GameModeType.savedGame else getGameModeType()
-    settings.mapPath = if (config.savedGame) config.mapPath else currentMapFilename
-    settings.applyBattleRoomOptions(
-        // Sandbox always reveals the map regardless of what the room options carry.
-        if (config.sandbox) config.options.copy(fogMode = 0, revealedMap = true) else config.options
-    )
+    if (!config.room.isSavedGame) {
+        config.room.options.apply {
+            gameModeType = getGameModeType()
+        }
+    }
+
     networkEngine.a(settings)
 
     repeat(config.aiPlayerCount.coerceAtLeast(0)) {

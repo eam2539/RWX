@@ -22,7 +22,7 @@ internal class GameLaunchController(
     private val navigateTo: (AppScreen) -> Unit,
 ) {
     fun enterRwGame(startNew: Boolean = false, launchConfig: BattleRoomLaunchConfig? = null) {
-        val mapPath = launchConfig?.mapPath ?: battleRoomController.selectedOrDefaultMap()?.mapAssetPath
+        val mapPath = launchConfig?.room?.mapPath ?: battleRoomController.selectedOrDefaultMap()?.mapAssetPath
         warmupController.clear()
         if (mapPath == null) {
             pendingStartController.clear()

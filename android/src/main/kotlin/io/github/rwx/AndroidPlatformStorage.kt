@@ -1,6 +1,7 @@
 package io.github.rwx
 
 import android.content.Context
+import com.corrodinggames.rts.gameFramework.file.FileHelper
 import java.io.File
 import java.io.InputStream
 
@@ -45,63 +46,46 @@ class AndroidPlatformStorage(context: Context) : PlatformStorage {
         }
     }
 
-    override fun resolveVirtualPath(virtualPath: String): File {
-        val normalized = virtualPath.replace('\\', '/')
-        if (normalized == trimTrailingSlash(this.rootDir.virtualPath) || normalized == this.rootDir.virtualPath) {
-            return this.rootDir.file
-        }
-        if (normalized == trimTrailingSlash(this.localDir.virtualPath) || normalized == this.localDir.virtualPath) {
-            return this.localDir.file
-        }
-        if (normalized.startsWith(this.rootDir.virtualPath)) {
-            return File(this.rootDir.file, normalized.substring(this.rootDir.virtualPath.length))
-        }
-        if (normalized.startsWith("/SD/")) {
-            return File(this.rootDir.file, normalized.substring("/SD/".length))
-        }
-        if (normalized.startsWith(this.localDir.virtualPath)) {
-            return File(this.localDir.file, normalized.substring(this.localDir.virtualPath.length))
-        }
-        return File(normalized)
-    }
 
     override fun listAssets(prefix: String): List<String> {
         val normalized = prefix.trimAssetPath()
-        return try {
+        return runCatching {
             assets.list(normalized)
                 ?.map { child -> "$normalized/$child".trimAssetPath() }
                 ?.sorted()
+                ?: resolveVirtualPath(normalized)?.list()?.toList()?.sorted()
+                ?: safList(normalized)?.map { child -> "$normalized/$child".trimAssetPath() }?.sorted()
                 ?: emptyList()
-        } catch (_: Exception) {
-            emptyList()
-        }
+        }.getOrElse { emptyList() }
     }
 
-    override fun assetExists(path: String): Boolean {
+    override fun assetFileExists(path: String): Boolean {
         val normalized = path.trimAssetPath()
-        return try {
+        return runCatching {
             assets.open(normalized).use { }
             true
-        } catch (_: Exception) {
-            false
+        }.getOrElse {
+            resolveVirtualPath(normalized)?.isFile == true || safExists(normalized)
         }
     }
 
     override fun readAssetBytes(path: String): ByteArray? {
         val normalized = path.trimAssetPath()
-        return try {
+        return runCatching {
             assets.open(normalized).use { it.readBytes() }
-        } catch (_: Exception) {
-            null
+        }.getOrElse {
+            resolveVirtualPath(normalized)?.takeIf(File::isFile)?.readBytes()
+                ?: safOpen(normalized)?.readBytes()
         }
     }
 
     override fun openAssetStream(path: String): InputStream? {
         val normalized = path.trimAssetPath()
-        return try {
+        return runCatching {
             assets.open(normalized)
-        } catch (_: Exception) {
-            null
+        }.getOrElse {
+            resolveVirtualPath(normalized)?.takeIf(File::isFile)?.inputStream()
+                ?: safOpen(normalized)
         }
     }
 
@@ -115,10 +99,20 @@ class AndroidPlatformStorage(context: Context) : PlatformStorage {
         this.replaysDir.file.mkdirs()
     }
 
-    private fun trimTrailingSlash(path: String): String {
-        if (path.endsWith("/") && path.length > 1) {
-            return path.substring(0, path.length - 1)
-        }
-        return path
+    private fun safPath(normalized: String): String? = runCatching {
+        FileHelper.convertAbstractPath(normalized)
+    }.getOrNull()?.takeIf { it.contains(SAF_LINK_SUFFIX) }
+
+    private fun safExists(normalized: String): Boolean =
+        safPath(normalized)?.let(SafPlatformBridge::exists) == true
+
+    private fun safList(normalized: String): List<String>? =
+        safPath(normalized)?.let(SafPlatformBridge::list)?.toList()
+
+    private fun safOpen(normalized: String): InputStream? =
+        safPath(normalized)?.let(SafPlatformBridge::openInput)
+
+    private companion object {
+        const val SAF_LINK_SUFFIX = ".[saflink]"
     }
 }

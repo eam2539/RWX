@@ -25,7 +25,6 @@ import io.github.rwx.app.AppOptions
 import io.github.rwx.app.AppSession
 import io.github.rwx.app.asyncOnIO
 import io.github.rwx.app.installApp
-import io.github.rwx.app.launchOnIO
 import io.github.rwx.di.AndroidGameRenderBackend
 import io.github.rwx.di.selectedAndroidGameRenderBackend
 import io.github.rwx.p2p.P2PLobbyService
@@ -33,12 +32,8 @@ import io.github.rwx.render.canvas.KoolCanvasContextResourceInvalidator
 import io.github.rwx.session.GameLoadingStatus
 import io.github.rwx.session.GameSession
 import io.github.rwx.settings.KEY_ANDROID_OPENGL_RENDERER
-import io.github.rwx.ui.*
-import io.github.rwx.ui.component.PlatformTextInputBridge
-import io.github.rwx.ui.component.invalidateMapPreviewTextureCache
-import io.github.rwx.ui.component.invalidateUiIconTextureCache
-import io.github.rwx.ui.component.preloadMapPreviewTextures
-import io.github.rwx.ui.component.preloadUiIconTextures
+import io.github.rwx.ui.UiTheme
+import io.github.rwx.ui.component.*
 import io.github.rwx.ui.host.LoadingSceneHost
 import io.github.rwx.ui.host.invalidateResourceBrowserPreviewTextureCache
 import io.github.rwx.ui.model.LevelSelectMode
@@ -50,7 +45,8 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.get
 import org.koin.core.component.KoinComponent
 import java.io.File
-import java.util.UUID
+import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
 
 class MainActivity : Activity(),  PlatformFilePickerHost, KoinComponent {
 
@@ -144,10 +140,10 @@ class MainActivity : Activity(),  PlatformFilePickerHost, KoinComponent {
             }
             loadingHost.update(GameLoadingStatus("Preparing UI renderer", UI_RENDERER_PROGRESS))
             loadingHost.showUiTextureWarmup()
-            delay(UI_RENDERER_WARMUP_MILLIS)
+            delay(UI_RENDERER_WARMUP_MILLIS.milliseconds)
             loadingHost.hideUiTextureWarmup()
             loadingHost.update(GameLoadingStatus("Preparing game session", 0.95f))
-            delay(STARTING_GAME_STATUS_FRAME_MILLIS)
+            delay(STARTING_GAME_STATUS_FRAME_MILLIS.milliseconds)
             appSession = installApp(
                 context = ctx,
                 options = AppOptions(isDesktop = false),

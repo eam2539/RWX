@@ -3,14 +3,13 @@ package io.github.rwx.p2p
 import io.github.rwx.PlatformStorage
 import io.github.rwx.map.LinkedMapGraph
 import io.github.rwx.map.MapLinkResolver
-import io.github.rwx.session.BattleRoomPlayerSnapshot
+import io.github.rwx.ui.model.BattleRoomPlayer
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class MapInstanceAssignment(
     val mapId: String,
     val mapPath: String,
-    val mapDisplayName: String,
     val simulatorPlayerId: String,
     val simulatorPlayerName: String,
     val simulatorSpawnLabel: String,
@@ -25,7 +24,7 @@ data class MultiMapAssignments(
 data class MultiMapAssignmentPlan(
     val graph: LinkedMapGraph,
     val assignments: MultiMapAssignments?,
-    val eligiblePlayers: List<BattleRoomPlayerSnapshot>,
+    val eligiblePlayers: List<BattleRoomPlayer>,
 ) {
     val missingTargetMapIds: List<String>
         get() = graph.missingTargetMapIds
@@ -44,12 +43,12 @@ object MultiMapCoordinator {
     fun createAssignmentPlan(
         storage: PlatformStorage,
         sourceMapPath: String,
-        players: List<BattleRoomPlayerSnapshot>,
+        players: List<BattleRoomPlayer>,
     ): MultiMapAssignmentPlan {
         val graph = MapLinkResolver.resolveLinkedMapGraph(storage, sourceMapPath)
         val eligiblePlayers = players
             .filterNot { it.isSpectator || it.isAI }
-            .sortedWith(compareBy<BattleRoomPlayerSnapshot> { it.spawnLabel.toIntOrNull() ?: Int.MAX_VALUE }
+            .sortedWith(compareBy<BattleRoomPlayer> { it.spawnLabel.toIntOrNull() ?: Int.MAX_VALUE }
                 .thenBy { it.id })
         val assignments = if (graph.missingTargetMapIds.isEmpty() && eligiblePlayers.size >= graph.maps.size) {
             MultiMapAssignments(
@@ -59,7 +58,6 @@ object MultiMapCoordinator {
                     MapInstanceAssignment(
                         mapId = map.mapId,
                         mapPath = map.mapPath,
-                        mapDisplayName = map.displayName,
                         simulatorPlayerId = player.id,
                         simulatorPlayerName = player.name,
                         simulatorSpawnLabel = player.spawnLabel,

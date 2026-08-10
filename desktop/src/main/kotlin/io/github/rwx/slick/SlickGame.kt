@@ -345,19 +345,6 @@ class SlickGame(
         frameDelta.update(delta)
     }
 
-    /**
-     * Drives one frame of the embedded renderer.
-     *
-     * Despite the name this is the backend's whole tick, not just drawing. Slick calls `update()`
-     * a variable number of times per frame (zero when paused, N when catching up) but `render()`
-     * exactly once, and the legacy `GameEngine.gameLoop()` simulates *and* draws in a single call
-     * that needs a live `Graphics`. So the engine tick has to happen here, and everything that
-     * mutates engine state has to be sequenced against it on the same renderer thread.
-     *
-     * Order matters: [drainPendingWork] must run before the engine tick so a queued level load,
-     * resize or input event is visible to the frame that follows it, rather than being applied
-     * one frame late.
-     */
     override fun render(container: GameContainer, graphics: Graphics) {
         val activeEngine = engine ?: return
         graphicsEngine.setGraphics(graphics, container.width, container.height)
@@ -382,14 +369,6 @@ class SlickGame(
         notifyReadyAfterVisibleFrames(activeEngine)
     }
 
-    /**
-     * Applies frame-bound work that other threads queued up since the last frame.
-     *
-     * Every caller-facing `request*`/`submit` method only parks its argument in a field or a
-     * concurrent queue. Work that needs live graphics is applied here; long CPU-only work is
-     * applied before entering the graphics context by [runPendingNonRenderingWork]. Both paths
-     * stay on the renderer thread that owns the engine, so callers remain lock-free.
-     */
     private fun drainPendingWork(activeEngine: GameEngine, container: GameContainer) {
         applyPendingInputEvents(activeEngine)
         applyPendingSize(activeEngine, container)
@@ -501,13 +480,13 @@ class SlickGame(
                 }
 
             is SlickSessionRequest.BattleRoom ->
-                loadRequestedLevel(activeEngine, request, request.config.mapPath) {
+                loadRequestedLevel(activeEngine, request, request.config.room.mapPath) {
                     loadBattleRoomMap(activeEngine, request.config)
                 }
 
-            is SlickSessionRequest.MemorySnapshot ->
+            is SlickSessionRequest.MapSnapshotRequest ->
                 loadRequestedLevel(activeEngine, request, request.snapshot.mapPath) {
-                    loadMemorySnapshot(activeEngine, request.snapshot)
+                    loadMapSnapshot(activeEngine, request.snapshot)
                 }
 
             SlickSessionRequest.MenuBackground -> loadMenuBackground(activeEngine, request)
@@ -648,7 +627,7 @@ class SlickGame(
         activeEngine.applyLoadedSinglePlayerFogRules()
     }
 
-    private fun loadMemorySnapshot(activeEngine: GameEngine, snapshot: GameMemorySnapshot) {
+    private fun loadMapSnapshot(activeEngine: GameEngine, snapshot: MapSnapshot) {
         runningMenuBackground = false
         activeEngine.isStopped = false
         activeEngine.isPaused = false
@@ -659,12 +638,12 @@ class SlickGame(
 
     private fun loadBattleRoomMap(activeEngine: GameEngine, config: BattleRoomLaunchConfig) {
         prepareActiveGameLoad(activeEngine)
-        activeEngine.currentMapPath = config.mapPath
+        activeEngine.currentMapPath = config.room.mapPath
         val networkEngine = activeEngine.configureLocalBattleRoom(config, "Slick") ?: run {
-            if (config.savedGame) {
-                loadSavedGame(activeEngine, config.mapPath)
+            if (config.room.isSavedGame) {
+                loadSavedGame(activeEngine, config.room.mapPath)
             } else {
-                loadDirectMap(activeEngine, config.mapPath)
+                loadDirectMap(activeEngine, config.room.mapPath)
             }
             return
         }
@@ -796,8 +775,6 @@ class SlickGame(
         }
         pendingRequest = request
     }
-
-    fun runningMapPath(): String? = runningMapPath
 
     fun currentFrameSnapshot(): SlickFrameSnapshot? = latestFrameSnapshot
 

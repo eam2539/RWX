@@ -1326,7 +1326,7 @@ class SlickGraphicsEngine private constructor(
         val assetPath = if (normalized.startsWith("drawable/") && '.' !in normalized.substringAfterLast('/')) {
             drawableAssetPath(normalized.substringAfterLast('/'))
         } else {
-            legacyAssetCandidates(normalized).firstOrNull(storage::assetExists)
+            legacyAssetCandidates(normalized).firstOrNull(storage::assetFileExists)
         } ?: return null
         val bytes = storage.readAssetBytes(assetPath) ?: return null
         return (createTexture(bytes, sourceKey) as? SlickTexture)?.image()
@@ -1351,10 +1351,10 @@ class SlickGraphicsEngine private constructor(
     private fun drawableAssetPath(drawableName: String): String? =
         imageFileNames(drawableName)
             .map { "drawable/$it" }
-            .firstOrNull(storage::assetExists)
+            .firstOrNull(storage::assetFileExists)
             ?: imageFileNames(drawableName)
                 .map { "assets/drawable/$it" }
-                .firstOrNull(storage::assetExists)
+                .firstOrNull(storage::assetFileExists)
 
     private companion object {
         val BACKEND_CAPABILITIES = GraphicsBackendCapabilities(

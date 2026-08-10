@@ -2,7 +2,6 @@ package io.github.rwx
 
 import com.corrodinggames.rts.game.PlayerTeam
 import com.corrodinggames.rts.gameFramework.network.NetworkEngine
-import io.github.rwx.session.BattleRoomPlayerSnapshot
 import io.github.rwx.ui.BattleRoomUiBridge
 
 fun applyBattleRoomPlayerConfig(
@@ -90,11 +89,6 @@ private fun autoTeamForSlot(player: PlayerTeam, targetSlot: Int?): Int {
         ?.teamColorId
         ?: (slot % 2)
 }
-
-private fun snapshotSlotIndex(player: BattleRoomPlayerSnapshot): Int =
-    player.spawnLabel.toIntOrNull()?.minus(1)
-        ?: player.spawnColorIndex.takeIf { it >= 0 }
-        ?: 0
 
 /*
  * - spawn=-3 means spectator.

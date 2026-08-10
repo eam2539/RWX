@@ -2,24 +2,20 @@ package io.github.rwx.app
 
 import com.corrodinggames.rts.gameFramework.GameEngine
 import com.corrodinggames.rts.gameFramework.network.GameRoomSettings
-import io.github.rwx.*
+import io.github.rwx.BATTLE_ROOM_AUTO_TEAM_VALUE
+import io.github.rwx.BATTLE_ROOM_CLEAR_OVERRIDE
+import io.github.rwx.BATTLE_ROOM_SPECTATOR_SPAWN_VALUE
 import io.github.rwx.i18n.I18n
 import io.github.rwx.p2p.MapFeatureDetector
-import io.github.rwx.session.*
+import io.github.rwx.session.BattleRoomSnapshot
+import io.github.rwx.session.BattleRoomTeamLayout
+import io.github.rwx.session.teamLabelFor
 import io.github.rwx.ui.model.*
 import java.util.*
 
 internal const val BATTLE_ROOM_JOIN_POLL_INTERVAL_MS: Long = 100L
 
 private const val BATTLE_ROOM_JOIN_TIMEOUT_NANOS: Long = 120_000_000_000L
-
-internal data class BattleRoomDraft(
-    val map: MapEntry,
-    val sandbox: Boolean,
-    val settings: GameRoomSettings,
-    val aiPlayerCount: Int = 0,
-    val teamLayout: BattleRoomTeamLayout? = null,
-)
 
 internal enum class BattleRoomJoinPollResult {
     Connecting,
@@ -67,119 +63,9 @@ internal fun joinRoomDialogMessage(room: MultiplayerRoomItem): String =
         ).joinToString("\n"),
     ).joinToString("\n\n")
 
-internal fun isBattleRoomSnapshotReadyForJoin(snapshot: BattleRoomSnapshot): Boolean =
-    snapshot.players.isNotEmpty()
-
-internal fun BattleRoomSnapshot.isReadyForJoinedRoom(): Boolean =
-    isBattleRoomSnapshotReadyForJoin(this)
-
 internal fun defaultBattleRoomAiPlayerCount(playerCount: Int?): Int =
     (playerCount ?: 1).minus(1).coerceAtLeast(0)
 
-internal fun newBattleRoomDraft(
-    map: MapEntry,
-    sandbox: Boolean,
-    aiDifficulty: Int,
-): BattleRoomDraft {
-    val settings = GameRoomSettings()
-    settings.mapPath = map.saveName ?: map.fileName
-    settings.aiDifficulty = aiDifficulty
-    if (sandbox) {
-        settings.fogMode = 0
-        settings.revealedMap = true
-    }
-    return BattleRoomDraft(
-        map = map,
-        sandbox = sandbox,
-        settings = settings,
-        aiPlayerCount = defaultBattleRoomAiPlayerCount(map.playerCount),
-    )
-}
-
-internal fun BattleRoomDraft.toLaunchConfig(): BattleRoomLaunchConfig =
-    BattleRoomLaunchConfig(
-        mapPath = map.saveName ?: map.mapAssetPath,
-        savedGame = map.type == LevelEntryType.SavedGame,
-        sandbox = sandbox,
-        options = settings.toBattleRoomOptions().let { base ->
-            // Sandbox forces no-fog/revealed regardless of the draft's stored fog rules.
-            if (sandbox) base.copy(fogMode = 0, revealedMap = true) else base
-        },
-        aiPlayerCount = aiPlayerCount,
-        teamLayout = teamLayout,
-    )
-
-internal fun BattleRoomDraft.toBattleRoomModel(
-    mapTypeLabel: String,
-    chatLines: List<BattleRoomChatLine>,
-): BattleRoomModel =
-    BattleRoomModel(
-        info = BattleRoomInfo(
-            mapName = map.displayName,
-            mapTypeLabel = mapTypeLabel,
-            detailLines = battleRoomDetailLines(settings) +
-                    listOfNotNull(teamLayout?.let { "Teams: ${it.displayLabel()}" }),
-            mapPreviewAssetPath = map.previewAssetPath,
-            rwxModeLabel = map.ModeLabel(),
-            rwxCompatibilityLabel = map.CompatibilityLabel(),
-        ),
-        players = draftBattleRoomPlayers(),
-        chatLines = chatLines,
-        isHost = true,
-    )
-
-private fun BattleRoomDraft.draftBattleRoomPlayers(): List<BattleRoomPlayer> {
-    val totalPlayers = 1 + aiPlayerCount.coerceAtLeast(0)
-    return (0 until totalPlayers).map { index ->
-        val isLocal = index == 0
-        val teamIndex = draftTeamColorIndex(index)
-        val isSpectator = teamIndex < 0
-        BattleRoomPlayer(
-            id = if (isLocal) DRAFT_LOCAL_PLAYER_ID else "$DRAFT_AI_PLAYER_ID_PREFIX$index",
-            name = if (isLocal) {
-                "Player"
-            } else {
-                battleRoomPlayerDisplayName(
-                    rawName = "AI - ${battleRoomAiDifficultyLabel(settings.aiDifficulty)}",
-                    isAi = true,
-                    slotIndex = index,
-                )
-            },
-            spawnLabel = if (isSpectator) "Spec" else (index + 1).toString(),
-            teamLabel = if (isSpectator) "-" else teamLabelFor(teamIndex),
-            nameColorIndex = teamIndex,
-            spawnColorIndex = if (isSpectator) -1 else index,
-            teamColorIndex = teamIndex,
-            isSpectator = isSpectator,
-            isAI = !isLocal,
-            isLocal = isLocal,
-        )
-    }
-}
-
-private fun BattleRoomDraft.draftTeamColorIndex(playerIndex: Int): Int =
-    when (teamLayout) {
-        BattleRoomTeamLayout.TwoSides -> playerIndex % 2
-        BattleRoomTeamLayout.ThreeSides -> playerIndex % 3
-        BattleRoomTeamLayout.Ffa,
-        null -> playerIndex
-
-        BattleRoomTeamLayout.Spectators -> -1
-        BattleRoomTeamLayout.AllVsAi -> if (playerIndex == 0) 0 else 1
-        BattleRoomTeamLayout.AllVs2 -> if (playerIndex == 0) 0 else 1
-        BattleRoomTeamLayout.Random -> playerIndex % 2
-    }
-
-private fun BattleRoomTeamLayout.displayLabel(): String =
-    when (this) {
-        BattleRoomTeamLayout.TwoSides -> "2 Sides"
-        BattleRoomTeamLayout.ThreeSides -> "3 Sides"
-        BattleRoomTeamLayout.Ffa -> "FFA"
-        BattleRoomTeamLayout.Spectators -> "Spectators"
-        BattleRoomTeamLayout.AllVsAi -> "All vs AI"
-        BattleRoomTeamLayout.AllVs2 -> "All vs 2 (survival)"
-        BattleRoomTeamLayout.Random -> "Random Team"
-    }
 
 internal fun String.toBattleRoomTeamLayoutOrNull(): BattleRoomTeamLayout? =
     when (this) {
@@ -193,25 +79,26 @@ internal fun String.toBattleRoomTeamLayoutOrNull(): BattleRoomTeamLayout? =
         else -> null
     }
 
-// GameRoomSettings <-> BattleRoomOptions mapping lives in
+// GameRoomSettings <-> GameRoomSettings mapping lives in
 
-internal fun Map<String, String>.toBattleRoomOptions(base: BattleRoomOptions = BattleRoomOptions()): BattleRoomOptions =
-    BattleRoomOptions(
-        aiDifficulty = get("aiDifficulty")?.toIntOrNull() ?: base.aiDifficulty,
-        startingUnits = get("startingUnits")?.toIntOrNull() ?: base.startingUnits,
-        fogMode = get("fogMode")?.toIntOrNull() ?: base.fogMode,
-        revealedMap = get("revealedMap")?.toBooleanStrictOrNull() ?: base.revealedMap,
-        startingCredits = get("startingCredits")?.toIntOrNull() ?: base.startingCredits,
-        incomeMultiplier = get("incomeMultiplier")?.toFloatOrNull() ?: base.incomeMultiplier,
-        noNukes = get("noNukes")?.toBooleanStrictOrNull() ?: base.noNukes,
-        sharedControl = get("sharedControl")?.toBooleanStrictOrNull() ?: base.sharedControl,
-        allowSpectators = get("allowSpectators")?.toBooleanStrictOrNull() ?: base.allowSpectators,
-        teamLock = get("teamLock")?.toBooleanStrictOrNull() ?: base.teamLock,
-        roomLocked = get("roomLocked")?.toBooleanStrictOrNull() ?: base.roomLocked,
+internal fun Map<String, String>.toGameRoomSettings(base: GameRoomSettings = GameRoomSettings()): GameRoomSettings =
+    GameRoomSettings().apply {
+        aiDifficulty = get("aiDifficulty")?.toIntOrNull() ?: base.aiDifficulty
+        startingUnits = get("startingUnits")?.toIntOrNull() ?: base.startingUnits
+        fogMode = get("fogMode")?.toIntOrNull() ?: base.fogMode
+        revealedMap = get("revealedMap")?.toBooleanStrictOrNull() ?: base.revealedMap
+        startingCredits = get("startingCredits")?.toIntOrNull() ?: base.startingCredits
+        incomeMultiplier = get("incomeMultiplier")?.toFloatOrNull() ?: base.incomeMultiplier
+        noNukes = get("noNukes")?.toBooleanStrictOrNull() ?: base.noNukes
+        sharedControl = get("sharedControl")?.toBooleanStrictOrNull() ?: base.sharedControl
+        allowSpectators = get("allowSpectators")?.toBooleanStrictOrNull() ?: base.allowSpectators
+        teamLock = get("teamLock")?.toBooleanStrictOrNull() ?: base.teamLock
+        roomLock = get("roomLocked")?.toBooleanStrictOrNull() ?: base.roomLock
         fixedAllyTeams = get("fixedAllyTeams")?.toBooleanStrictOrNull() ?: base.fixedAllyTeams
-    )
+    }
 
-internal fun battleRoomOptionsForm(options: BattleRoomOptions, maxPlayers: Int = 10): DialogForm =
+
+internal fun battleRoomOptionsForm(options: GameRoomSettings, maxPlayers: Int = 10): DialogForm =
     DialogForm(
         fields = listOf(
             DialogFormField.Choice(
@@ -292,12 +179,12 @@ internal fun battleRoomOptionsForm(options: BattleRoomOptions, maxPlayers: Int =
             DialogFormField.Toggle("sharedControl", "Shared control", options.sharedControl),
             DialogFormField.Toggle("allowSpectators", "Allow spectators", options.allowSpectators),
             DialogFormField.Toggle("teamLock", "Team lock", options.teamLock),
-            DialogFormField.Toggle("roomLocked", "Lock room (no new players)", options.roomLocked),
+            DialogFormField.Toggle("roomLocked", "Lock room (no new players)", options.roomLock),
             DialogFormField.Toggle("fixedAllyTeams", "Fixed ally teams", options.fixedAllyTeams),
         ),
     )
 
-internal fun playerConfigForm(player: BattleRoomPlayerSnapshot, isHost: Boolean = false): DialogForm {
+internal fun playerConfigForm(player: BattleRoomPlayer, isHost: Boolean = false): DialogForm {
     val spawn = player.spawnLabel.toIntOrNull() ?: 1
     val baseFields = listOf(
         DialogFormField.Choice(
@@ -349,14 +236,14 @@ internal fun BattleRoomSnapshot.toBattleRoomModel(
     previewAssetPath: String?,
     chatLines: List<BattleRoomChatLine>,
 ): BattleRoomModel {
-    val requiredRwxFeatures = MapFeatureDetector.requiredFeaturesForMap(mapPath)
+    val requiredRwxFeatures = MapFeatureDetector.requiredFeaturesForMap(room.mapPath)
     val rwxModeLabel = requiredRwxFeatures.ModeLabel()
     return BattleRoomModel(
         info = BattleRoomInfo(
             mapName = mapDisplayName,
             mapTypeLabel = mapTypeLabel,
             detailLines = battleRoomDetailLines(
-                settings = options.toGameRoomSettings(),
+                settings = room.options,
                 networkStatusText = networkStatusText,
                 requiredModsSummary = requiredModsSummary,
             ),
@@ -370,34 +257,13 @@ internal fun BattleRoomSnapshot.toBattleRoomModel(
                 }
             },
         ),
-        players = players.map { it.toBattleRoomPlayer() },
+        players = players,
         chatLines = chatLines.toList(),
         isHost = isHost,
     )
 }
 
-internal fun BattleRoomOptions.toGameRoomSettings(): GameRoomSettings =
-    GameRoomSettings().also { settings ->
-        settings.applyBattleRoomOptions(this)
-    }
-
-private fun BattleRoomPlayerSnapshot.toBattleRoomPlayer(): BattleRoomPlayer =
-    BattleRoomPlayer(
-        id = id,
-        name = name,
-        spawnLabel = spawnLabel,
-        teamLabel = teamLabel,
-        pingLabel = pingLabel,
-        nameColorIndex = nameColorIndex,
-        spawnColorIndex = spawnColorIndex,
-        teamColorIndex = teamColorIndex,
-        isSpectator = isSpectator,
-        isReady = isReady,
-        isAI = isAI,
-        isLocal = isLocal,
-    )
-
-private fun battleRoomDetailLines(
+internal fun battleRoomDetailLines(
     settings: GameRoomSettings,
     networkStatusText: String? = null,
     requiredModsSummary: String? = null,

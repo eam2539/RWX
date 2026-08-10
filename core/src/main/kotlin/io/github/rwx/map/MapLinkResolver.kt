@@ -3,7 +3,6 @@ package io.github.rwx.map
 import com.corrodinggames.rts.game.map.TileMap
 import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.PlatformStorage
-import io.github.rwx.ui.model.LevelSelectViewModel
 import org.w3c.dom.Element
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
@@ -60,7 +59,6 @@ object MapLinkResolver {
             maps += LinkedMapNode(
                 mapId = info?.explicitMapId ?: existingMapIds(mapPath).firstOrNull().orEmpty(),
                 mapPath = mapPath,
-                displayName = displayNameForPath(mapPath),
                 targetMapIds = targetMapIds,
             )
             targetMapIds.forEach { targetId ->
@@ -171,8 +169,7 @@ object MapLinkResolver {
         val normalizedPath = mapPath.replace('\\', '/').trim()
         val fileName = normalizedPath.substringAfterLast('/')
         val baseName = fileName.removeSuffix(".tmx")
-        val displayName = LevelSelectViewModel.displayName(fileName)
-        return listOf(normalizedPath, fileName, baseName, displayName)
+        return listOf(normalizedPath, fileName, baseName)
             .map { it.trim() }
             .filter { it.isNotEmpty() }
             .distinct()
@@ -187,11 +184,6 @@ object MapLinkResolver {
 
     private fun normalizeMapPath(mapPath: String): String =
         mapPath.replace('\\', '/').trim().lowercase()
-
-    private fun displayNameForPath(mapPath: String): String {
-        val fileName = mapPath.replace('\\', '/').substringAfterLast('/')
-        return LevelSelectViewModel.displayName(fileName)
-    }
 
     private fun parseLinkedTargetIds(text: String?): List<String> {
         if (text.isNullOrBlank()) {
@@ -254,9 +246,10 @@ data class LinkedMapGraph(
 data class LinkedMapNode(
     val mapId: String,
     val mapPath: String,
-    val displayName: String,
     val targetMapIds: List<String>,
-)
+) {
+    val fileName: String get() = mapPath.replace('\\', '/').substringAfterLast('/')
+}
 
 private data class MapIndex(
     val byId: Map<String, IndexedMap>,

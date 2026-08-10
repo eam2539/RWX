@@ -23,8 +23,6 @@ internal class BattleRoomLaunchController(
     private val storage: () -> PlatformStorage?,
     private val viewport: () -> KoolCanvasViewport,
     private val currentScreen: () -> AppScreen,
-    private val draftLaunchConfig: () -> BattleRoomLaunchConfig?,
-    private val draftMapPath: () -> String?,
     private val showStartNewGameDialog: (() -> Unit) -> Unit,
     private val enterRwGame: (Boolean, BattleRoomLaunchConfig?) -> Unit,
     private val clearPendingRwStartState: () -> Unit,
@@ -34,8 +32,7 @@ internal class BattleRoomLaunchController(
     private val showUnavailableDialog: (String) -> Unit,
 ) {
     fun startBattleRoomGame() {
-        val launchConfig = draftLaunchConfig()
-            ?: gameSession.pendingRendererBattleRoomConfig()
+        val launchConfig = gameSession.loadState.pendingRendererBattleRoomConfig
         currentOriginalMultiplayerRwxMapBlockMessage()?.let { message ->
             showUnavailableDialog(message)
             return
@@ -142,7 +139,7 @@ internal class BattleRoomLaunchController(
     }
 
     private fun enterStartedBattleRoomGame() {
-        val mapPath = gameSession.currentBattleRoom()?.mapPath?.takeIf { it.isNotBlank() }
+        val mapPath = gameSession.currentBattleRoom()?.room?.mapPath?.takeIf { it.isNotBlank() }
         if (mapPath == null) {
             logger.warn { "Unable to enter started battle room without an active map" }
             showUnavailableDialog(
@@ -168,11 +165,11 @@ internal class BattleRoomLaunchController(
 
     private fun currentOriginalMultiplayerRwxMapBlockMessage(): String? {
         val snapshot = gameSession.currentBattleRoom() ?: return null
-        if (snapshot.savedGame) return null
+        if (snapshot.room.isSavedGame) return null
         if (!snapshot.isHost || !snapshot.isNetworkMultiplayer || snapshot.rwxP2PSession) {
             return null
         }
-        val requiredFeatures = MapFeatureDetector.requiredFeaturesForMap(snapshot.mapPath)
+        val requiredFeatures = MapFeatureDetector.requiredFeaturesForMap(snapshot.room.mapPath)
         if (requiredFeatures.isEmpty()) {
             return null
         }
@@ -180,11 +177,10 @@ internal class BattleRoomLaunchController(
     }
 
     private fun currentLinkedMapUnavailableMessage(): String? {
-        if (draftLaunchConfig()?.savedGame == true || gameSession.currentBattleRoom()?.savedGame == true) {
+        if (gameSession.currentBattleRoom()?.room?.isSavedGame == true) {
             return null
         }
-        val mapPath = draftMapPath()
-            ?: gameSession.currentBattleRoom()?.mapPath
+        val mapPath = gameSession.currentBattleRoom()?.room?.mapPath?.takeIf { it.isNotBlank() }
             ?: return null
         if (FeatureIds.MAP_LINKS in MapFeatureDetector.requiredFeaturesForMap(mapPath) &&
             !LinkedMapAvailability.ENABLED
@@ -200,11 +196,11 @@ internal class BattleRoomLaunchController(
     }
 
     private fun prepareP2PMultiMapAssignmentsForStart(snapshot: BattleRoomSnapshot): Boolean {
-        if (snapshot.savedGame) return true
+        if (snapshot.room.isSavedGame) return true
         if (!snapshot.isHost || !snapshot.isNetworkMultiplayer || !snapshot.rwxP2PSession) {
             return true
         }
-        val mapPath = snapshot.mapPath?.takeIf { it.isNotBlank() } ?: return true
+        val mapPath = snapshot.room.mapPath.takeIf { it.isNotBlank() } ?: return true
         val requiredFeatures = MapFeatureDetector.requiredFeaturesForMap(mapPath)
         if (FeatureIds.MAP_LINKS !in requiredFeatures) {
             return true

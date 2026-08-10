@@ -4,6 +4,7 @@ import com.corrodinggames.rts.gameFramework.GameEngine
 import com.corrodinggames.rts.gameFramework.GameSaver
 import com.corrodinggames.rts.gameFramework.file.FileHelper
 import com.corrodinggames.rts.gameFramework.mod.ModManagerAccess
+import io.github.rwx.LegacyAssetBridge
 import io.github.rwx.PlatformStorage
 import io.github.rwx.i18n.I18n
 import io.github.rwx.i18n.I18nText
@@ -12,23 +13,17 @@ import io.github.rwx.p2p.MapFeatureDetector
 import io.github.rwx.ui.AppScreen
 import java.io.File
 
-/**
- * The game mode whose maps the level-select screen shows. Built-in modes map to asset
- * subdirectories under assets/maps/; custom maps enumerate the platform maps directory. Display
- * labels use the same single-player translations as the main menu.
- */
+
 enum class LevelSelectMode(
     private val text: I18nText,
     val assetSubdir: String?,
-    val custom: Boolean = false,
-    val savedGames: Boolean = false,
 ) {
     Campaign(I18n.singleplayer.campaign, "normal"),
     Skirmish(I18n.singleplayer.skirmish, "skirmish"),
     Challenge(I18n.singleplayer.challenge, "challenge"),
     Survival(I18n.singleplayer.survival, "survival"),
-    CustomMaps(I18n.singleplayer.customMaps, null, custom = true),
-    SavedGames(I18n.singleplayer.loadSave, null, savedGames = true),
+    CustomMaps(I18n.singleplayer.customMaps, null),
+    SavedGames(I18n.singleplayer.loadSave, null),
     ;
 
     val label: String
@@ -37,22 +32,62 @@ enum class LevelSelectMode(
     override fun toString(): String = label
 }
 
-enum class LevelEntryType {
-    Map,
-    SavedGame,
-}
-
-/** A single map entry shown in the level-select list. */
 data class MapEntry(
-    val fileName: String,
-    val displayName: String,
     val mapAssetPath: String,
-    val previewAssetPath: String?,
-    val playerCount: Int?,
+    val playerCount: Int? = null,
     val requiredRwxFeatures: List<String> = emptyList(),
-    val type: LevelEntryType = LevelEntryType.Map,
-    val saveName: String? = null,
-)
+    val type: LevelSelectMode = LevelSelectMode.Skirmish,
+) {
+    val previewAssetPath: String? =
+        if (type == LevelSelectMode.SavedGames) {
+            null
+        } else {
+            MAP_PREVIEW_SUFFIX.map {
+                mapAssetPath.removeSuffix(".tmx") + "_map" + it
+            }.firstOrNull { LegacyAssetBridge.assetExists(it) }
+        }
+    val fileName: String
+        get() = mapAssetPath.trimEnd('/', '\\').substringAfterLast('/')
+    val displayName: String
+        get() = displayName(fileName)
+    val isSavedGame: Boolean get() = type == LevelSelectMode.SavedGames
+
+    companion object {
+        private fun generateCaseCombinations(strings: Collection<String>): Set<String> = strings.flatMap { str ->
+            val chars = str.toList()
+            val n = chars.size
+            (0 until (1 shl n)).map { mask ->
+                chars.mapIndexed { index, ch ->
+                    if (ch.isLetter()) {
+                        if (mask shr index and 1 == 1) ch.uppercaseChar()
+                        else
+                            ch.lowercaseChar()
+                    } else ch
+                }.joinToString("")
+
+            }
+        }.toSet()
+
+        private val MAP_PREVIEW_SUFFIX = generateCaseCombinations(
+            listOf(".png", ".jpg", ".jpeg")
+        )
+
+        private val leadingPlayerTagRegex = Regex("""^\[(?:z;)?[po]\d+]\s*""", RegexOption.IGNORE_CASE)
+        private val sortPrefixRegex = Regex("""^[a-z]\d+;""", RegexOption.IGNORE_CASE)
+        private val whitespaceRegex = Regex("""\s+""")
+
+        /** Strip the sort prefix (e.g. "l030;") and replace underscores with spaces. */
+        fun displayName(fileName: String): String {
+            val withoutExt = fileName.removeSuffix(".tmx")
+            val afterPrefix = withoutExt.replace(sortPrefixRegex, "")
+            return afterPrefix
+                .replace(leadingPlayerTagRegex, "")
+                .replace('_', ' ')
+                .replace(whitespaceRegex, " ")
+                .trim()
+        }
+    }
+}
 
 data class LevelSelectFilterOption(
     val label: String,
@@ -126,18 +161,16 @@ class LevelSelectViewModel(
         GameSaver.getSaveFile("", "saves/", false)
     },
     private val customMapPathsProvider: (() -> List<String>)? = null,
-    private val customMapFileExists: (String) -> Boolean = { path ->
-        runCatching { FileHelper.fileExists(path) }.getOrDefault(false)
-    },
-) {
+
+    ) {
     @Volatile
     private var builtInItems: List<MapEntry>? = null
 
     fun items(): List<MapEntry> {
-        if (mode.savedGames) {
+        if (mode == LevelSelectMode.SavedGames) {
             return savedGameItems()
         }
-        if (mode.custom) {
+        if (mode == LevelSelectMode.CustomMaps) {
             return customMapItems()
         }
         builtInItems?.let { return it }
@@ -195,15 +228,8 @@ class LevelSelectViewModel(
 
     private fun engineCustomMapEntry(mapPath: String): MapEntry {
         val fileName = mapPath.substringAfterLast('/')
-        val previewPath = mapPath.removeSuffix(".tmx") + "_map.png"
         return MapEntry(
-            fileName = fileName,
-            displayName = displayName(fileName),
             mapAssetPath = mapPath,
-            previewAssetPath = previewPath.takeIf {
-                !FileHelper.isManagedPath(previewPath) &&
-                        customMapFileExists(previewPath)
-            },
             playerCount = playerCount(fileName),
             requiredRwxFeatures = MapFeatureDetector.requiredFeaturesForMap(mapPath),
         )
@@ -211,26 +237,6 @@ class LevelSelectViewModel(
 
     private fun savedGameItems(): List<MapEntry> {
         val saveRoot = savedGamesDirectory()
-        val localItems = saveRoot
-            .takeIf(File::isDirectory)
-            ?.walkTopDown()
-            ?.filter { it.isFile && it.extension.equals("rwsave", ignoreCase = true) }
-            ?.sortedByDescending(File::lastModified)
-            ?.map { file ->
-                val relativePath = file.relativeTo(saveRoot).invariantSeparatorsPath
-                MapEntry(
-                    fileName = file.name,
-                    displayName = file.nameWithoutExtension.ifBlank { file.name },
-                    mapAssetPath = file.absolutePath,
-                    previewAssetPath = null,
-                    playerCount = null,
-                    type = LevelEntryType.SavedGame,
-                    saveName = relativePath,
-                )
-            }
-            ?.toList()
-        if (localItems != null) return localItems
-
         val rootPath = saveRoot.absolutePath
         return FileHelper.listFiles(rootPath)
             ?.asSequence()
@@ -238,13 +244,9 @@ class LevelSelectViewModel(
             ?.map { name ->
                 val path = rootPath.trimEnd('/', '\\') + "/" + name
                 MapEntry(
-                    fileName = name,
-                    displayName = name.substringBeforeLast('.').ifBlank { name },
                     mapAssetPath = path,
-                    previewAssetPath = null,
                     playerCount = null,
-                    type = LevelEntryType.SavedGame,
-                    saveName = name,
+                    type = LevelSelectMode.SavedGames
                 ) to FileHelper.getFileSize(path)
             }
             ?.sortedByDescending { (_, modifiedAt) -> modifiedAt }
@@ -253,12 +255,6 @@ class LevelSelectViewModel(
             ?: emptyList()
     }
 
-    /**
-     * Enumerates `.tmx` maps bundled inside enabled mods (including `.rwmod` archives), mirroring the
-     * original engine's mod-map merge. `FileHelper.listFiles` delegates `.rwmod/...` paths to the zip
-     * loader, and the resulting inner paths are engine-loadable via the same delegation, so a selected
-     * mod map loads through the normal `currentMapPath` → `loadGame` path.
-     */
     private fun modMapItems(): List<MapEntry> {
         val manager = GameEngine.getInstance()?.modManager ?: return emptyList()
         return ModManagerAccess.allMods(manager)
@@ -292,52 +288,17 @@ class LevelSelectViewModel(
 
     private fun modMapEntry(mapPath: String): MapEntry {
         val fileName = mapPath.substringAfterLast('/')
-        val previewPath = mapPath.removeSuffix(".tmx") + "_map.png"
         return MapEntry(
-            fileName = fileName,
-            displayName = displayName(fileName),
             mapAssetPath = mapPath,
-            previewAssetPath = previewPath.takeIf {
-                runCatching { FileHelper.fileExists(it) }.getOrDefault(false)
-            },
             playerCount = playerCount(fileName),
             requiredRwxFeatures = MapFeatureDetector.requiredFeaturesForMap(mapPath),
         )
     }
 
-    private fun customMapEntry(mapFile: File): MapEntry {
-        val relativePath = mapFile.relativeTo(storage.mapsDir.file).invariantSeparatorsPath
-        val mapVirtualPath = storage.mapsDir.virtualPath.trimEnd('/') + "/" + relativePath
-        val previewFile = File(mapFile.parentFile, mapFile.nameWithoutExtension + "_map.png")
-        return MapEntry(
-            fileName = mapFile.name,
-            displayName = displayName(mapFile.name),
-            mapAssetPath = mapVirtualPath,
-            previewAssetPath = previewFile.takeIf(File::isFile)?.absolutePath,
-            playerCount = playerCount(mapFile.name),
-            requiredRwxFeatures = MapFeatureDetector.requiredFeaturesForMap(mapFile.absolutePath),
-        )
-    }
-
-    /**
-     * Resolves a [MapEntry] (including its `_map.png` preview, if bundled) for a built-in map asset
-     * path. Used to recover the preview for a joined multiplayer room where no local [MapEntry] was
-     * selected — the room snapshot only carries the map path.
-     */
-    fun resolveMapEntry(mapAssetPath: String): MapEntry = mapEntry(mapAssetPath)
-
-    private fun mapEntry(mapAssetPath: String): MapEntry {
+    fun mapEntry(mapAssetPath: String): MapEntry {
         val fileName = mapAssetPath.substringAfterLast('/')
-        val previewAssetPath = mapAssetPath.removeSuffix(".tmx") + "_map.png"
         return MapEntry(
-            fileName = fileName,
-            displayName = displayName(fileName),
             mapAssetPath = mapAssetPath,
-            previewAssetPath = if (storage.assetExists(previewAssetPath)) {
-                storage.assetLoadPath(previewAssetPath)
-            } else {
-                null
-            },
             playerCount = playerCount(fileName),
             requiredRwxFeatures = MapFeatureDetector.requiredFeaturesForMap(mapAssetPath),
         )
@@ -347,24 +308,9 @@ class LevelSelectViewModel(
         private const val MAX_MOD_MAP_SCAN_DEPTH: Int = 4
         private const val MAX_CUSTOM_MAP_SCAN_DEPTH: Int = 8
         private const val ENGINE_CUSTOM_MAP_ROOT: String = "/SD/rustedWarfare/maps"
-        private val leadingPlayerTagRegex = Regex("""^\[(?:z;)?[po]\d+]\s*""", RegexOption.IGNORE_CASE)
         private val playerTagRegex = Regex("""\[(?:[^]]*;)?[po](\d+)]""", RegexOption.IGNORE_CASE)
         private val playerSuffixRegex = Regex("""\((\d+)p\)""", RegexOption.IGNORE_CASE)
-        private val sortPrefixRegex = Regex("""^[a-z]\d+;""", RegexOption.IGNORE_CASE)
-        private val whitespaceRegex = Regex("""\s+""")
 
-        /** Strip the sort prefix (e.g. "l030;") and replace underscores with spaces. */
-        fun displayName(fileName: String): String {
-            val withoutExt = fileName.removeSuffix(".tmx")
-            val afterPrefix = withoutExt.replace(sortPrefixRegex, "")
-            return afterPrefix
-                .replace(leadingPlayerTagRegex, "")
-                .replace('_', ' ')
-                .replace(whitespaceRegex, " ")
-                .trim()
-        }
-
-        fun previewFileName(fileName: String): String = fileName.removeSuffix(".tmx") + "_map.png"
 
         fun playerCount(fileName: String): Int? {
             playerTagRegex.find(fileName)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let { return it }

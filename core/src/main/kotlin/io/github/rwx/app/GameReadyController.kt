@@ -3,7 +3,6 @@ package io.github.rwx.app
 import io.github.rwx.ui.AppScreen
 
 internal class GameReadyController(
-    private val battleRoomController: BattleRoomController,
     private val gameLaunchController: GameLaunchController,
     private val exitRwGameToMainMenu: () -> Unit,
     autoReturnMainMenuAfterGameReady: Boolean,
@@ -34,12 +33,7 @@ internal class GameReadyController(
                     pendingAutoStartSecondBattleRoom = false
                     gameFrameReadyMarkerPrinted = false
                     renderedGameFrameCount = 0
-                    val launchConfig = battleRoomController.draftLaunchConfig()
-                    if (launchConfig != null) {
-                        gameLaunchController.enterRwGame(startNew = true, launchConfig = launchConfig)
-                    } else {
-                        gameLaunchController.enterRwGame(startNew = true)
-                    }
+                    gameLaunchController.enterRwGame(startNew = true)
                 }
             }
         } else if (currentScreen != AppScreen.InGame) {

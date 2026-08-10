@@ -16,7 +16,7 @@ interface PlatformBridge {
         get() = 1f
     val audio: PlatformAudio
         get() = NoopPlatformAudio
-    var filePickerHost:PlatformFilePickerHost?
+    var filePickerHost: PlatformFilePickerHost?
 
     /**
      * Create an isolated ClassLoader for a mod JAR file.
@@ -54,7 +54,7 @@ data class AppMetadata(
     val installerPackageName: String = DEFAULT_INSTALLER_PACKAGE_NAME,
     val versionName: String = VERSION_NAME,
     val versionCode: Int = VERSION_CODE,
-    val compatibleCoreVersionCode:Int=COMPATIBLE_CORE_VERSION_CODE,
+    val compatibleCoreVersionCode: Int = COMPATIBLE_CORE_VERSION_CODE,
     val signature: String? = null,
 ) {
     companion object {
@@ -88,16 +88,36 @@ interface PlatformStorage {
         return StorageLocation(virtualPath, file.absoluteFile)
     }
 
-    fun resolveVirtualPath(virtualPath: String): File
+    fun resolveVirtualPath(virtualPath: String): File? {
+        val normalized = virtualPath.trimAssetPath().replace(mergedPathTagRegex, "")
+        val resolved = listOf(
+            cacheDir,
+            mapsDir,
+            unitsDir,
+            savesDir,
+            replaysDir,
+            modsDir,
+            localDir,
+            rootDir,
+        ).firstNotNullOfOrNull { location ->
+            location.resolveLocationPath(normalized)
+        }
+        return resolved ?: when {
+            normalized.startsWith("/SD/") -> File(rootDir.file, normalized.substring("/SD/".length))
+            else -> null
+        }
+    }
+
     fun listAssets(prefix: String): List<String>
-    fun assetExists(path: String): Boolean
+    fun assetFileExists(path: String): Boolean
     fun readAssetBytes(path: String): ByteArray? = null
     fun openAssetStream(path: String): InputStream? = readAssetBytes(path)?.inputStream()
-    fun assetLoadPath(path: String): String = path.trimAssetPath()
     fun createDirectories()
 }
 
-fun String.trimAssetPath(): String = trim().replace('\\', '/').trim('/')
+fun String.trimAssetPath(): String = trim().replace('\\', '/').trimEnd('/')
+
+private val mergedPathTagRegex = Regex("""\[(?:INTERNAL|EXTERNAL|NULL)-PATH]/""")
 
 enum class StorageKind {
     ROOT,
@@ -116,9 +136,9 @@ data class StorageLocation(
 ) {
     fun resolve(relativePath: String): File = File(file, relativePath)
 
-    fun resolveVirtualPathOrNull(path: String): File? {
-        val normalizedRoot = virtualPath.replace('\\', '/').trimEnd('/')
-        val normalizedPath = path.replace('\\', '/')
+    fun resolveLocationPath(path: String): File? {
+        val normalizedRoot = virtualPath.trimAssetPath()
+        val normalizedPath = path.trimAssetPath()
         if (normalizedPath == normalizedRoot) {
             return file
         }

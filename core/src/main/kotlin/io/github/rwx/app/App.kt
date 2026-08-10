@@ -218,8 +218,6 @@ fun installApp(
         storage = { platformBridge?.storage },
         viewport = ::rwGameViewport,
         currentScreen = { navigator.current },
-        draftLaunchConfig = battleRoomController::draftLaunchConfig,
-        draftMapPath = battleRoomController::draftMapPath,
         showStartNewGameDialog = gameLaunchController::showStartNewGameDialog,
         enterRwGame = gameLaunchController::enterRwGame,
         clearPendingRwStartState = warmupController::clear,
@@ -305,7 +303,6 @@ fun installApp(
         onQuit = onQuit,
     )
     val gameReadyController = GameReadyController(
-        battleRoomController = battleRoomController,
         gameLaunchController = gameLaunchController,
         exitRwGameToMainMenu = sessionActions::exitRwGameToMainMenu,
         autoReturnMainMenuAfterGameReady = options.autoReturnMainMenuAfterGameReady,

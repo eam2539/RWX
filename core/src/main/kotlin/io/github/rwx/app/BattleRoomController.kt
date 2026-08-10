@@ -1,7 +1,10 @@
 package io.github.rwx.app
 
 import com.corrodinggames.rts.gameFramework.GameEngine
+import com.corrodinggames.rts.gameFramework.network.GameModeType
+import com.corrodinggames.rts.gameFramework.network.GameRoomSettings
 import io.github.rwx.logger
+import io.github.rwx.session.BattleRoomCoreConfig
 import io.github.rwx.session.BattleRoomLaunchConfig
 import io.github.rwx.session.BattleRoomSnapshot
 import io.github.rwx.session.GameSession
@@ -23,13 +26,8 @@ internal class BattleRoomController(
     var selectedMap: MapEntry? = null
         private set
     var isSelectingMapForBattleRoom: Boolean = false
-        private set
     private var returnScreen: AppScreen = AppScreen.LevelSelect
-    private var draft: BattleRoomDraft? = null
     private val chatLines = mutableListOf<BattleRoomChatLine>()
-
-    val hasDraft: Boolean
-        get() = draft != null
 
     fun selectedOrDefaultMap(): MapEntry? =
         selectedMap ?: selectDefaultMap()
@@ -49,12 +47,6 @@ internal class BattleRoomController(
     fun currentSnapshot(refreshNetworkStatus: Boolean = true): BattleRoomSnapshot? =
         gameSession.currentBattleRoom(refreshNetworkStatus)
 
-    fun draftLaunchConfig(): BattleRoomLaunchConfig? =
-        draft?.toLaunchConfig()
-
-    fun draftMapPath(): String? =
-        draft?.map?.let { it.saveName ?: it.mapAssetPath }
-
     fun prepareForMap(
         map: MapEntry,
         sandbox: Boolean = false,
@@ -62,16 +54,26 @@ internal class BattleRoomController(
     ) {
         selectedMap = map
         this.returnScreen = returnScreen
-        val nextDraft = newBattleRoomDraft(
-            map = map,
+        val newConfig = BattleRoomLaunchConfig(
             sandbox = sandbox,
-            aiDifficulty = GameEngine.getInstance()?.settingsEngine?.aiDifficulty ?: 1,
+            aiPlayerCount = defaultBattleRoomAiPlayerCount(map.playerCount),
+            room = BattleRoomCoreConfig(
+                mapPath = map.mapAssetPath,
+                options = GameRoomSettings(),
+            ),
         )
+        newConfig.room.options.apply {
+            aiDifficulty = GameEngine.getInstance()?.settingsEngine?.aiDifficulty ?: 1
+            if (map.isSavedGame) gameModeType = GameModeType.savedGame
+            if (sandbox) {
+                fogMode = 0
+                revealedMap = true
+            }
+        }
         chatLines.clear()
-        if (prepareLocalSinglePlayerRoom(nextDraft)) {
+        if (prepareLocalSinglePlayerRoom(newConfig)) {
             return
         }
-        draft = null
         showUnavailableDialog("Unable to prepare battle room")
     }
 
@@ -90,14 +92,6 @@ internal class BattleRoomController(
         return true
     }
 
-    fun beginMapSelection() {
-        isSelectingMapForBattleRoom = true
-    }
-
-    fun cancelMapSelection() {
-        isSelectingMapForBattleRoom = false
-    }
-
     fun closeRoom(): AppScreen {
         isSelectingMapForBattleRoom = false
         gameSession.leaveBattleRoom()
@@ -105,44 +99,41 @@ internal class BattleRoomController(
     }
 
     fun selectBattleRoomMap(map: MapEntry) {
+        val previousMap = selectedMap
         selectedMap = map
-        val currentDraft = draft
-        if (currentDraft != null) {
-            val previousDefaultAiCount = defaultBattleRoomAiPlayerCount(currentDraft.map.playerCount)
-            val nextDefaultAiCount = defaultBattleRoomAiPlayerCount(map.playerCount)
-            currentDraft.settings.mapPath = map.saveName ?: map.fileName
-            draft = currentDraft.copy(
-                map = map,
-                aiPlayerCount = if (currentDraft.aiPlayerCount == previousDefaultAiCount) {
-                    nextDefaultAiCount
-                } else {
-                    currentDraft.aiPlayerCount
-                },
-            )
-            updateFromDraft()
-        } else {
-            runCatching {
-                check(gameSession.setBattleRoomMap(map.saveName ?: map.mapAssetPath, map.saveName != null)) {
-                    "Game session rejected map change"
-                }
-            }.onFailure { error ->
-                logger.warn(error) { "Unable to set battle room map" }
-                showUnavailableDialog("Unable to set map: ${error.message ?: error.javaClass.simpleName}")
+        val snapshot = currentSnapshot(refreshNetworkStatus = false)
+        val currentAiCount = snapshot?.players?.count { it.isAI } ?: 0
+        val targetAiCount =
+            if (currentAiCount == defaultBattleRoomAiPlayerCount(playerCount = previousMap?.playerCount)) {
+                defaultBattleRoomAiPlayerCount(playerCount = map.playerCount)
+            } else {
+                currentAiCount
             }
-            updateFromNetwork()
+        runCatching {
+            check(gameSession.setBattleRoomMap(map.mapAssetPath, map.isSavedGame)) {
+                "Game session rejected map change"
+            }
+            val diff = targetAiCount - currentAiCount
+            when {
+                diff > 0 -> gameSession.addBattleRoomAi(diff)
+                diff < 0 -> snapshot?.players?.filter { it.isAI }?.sortedBy { it.spawnColorIndex }?.takeLast(-diff)
+                    ?.forEach { gameSession.kickBattleRoomPlayer(it.id) }
+            }
+        }.onFailure { error ->
+            logger.warn(error) { "Unable to set battle room map" }
+            showUnavailableDialog("Unable to set map: ${error.message ?: error.javaClass.simpleName}")
         }
+        updateFromNetwork()
         isSelectingMapForBattleRoom = false
     }
 
     fun prepareHostRoom(map: MapEntry) {
-        draft = null
         chatLines.clear()
         returnScreen = AppScreen.Multiplayer
         selectedMap = map
     }
 
     fun markJoinedRoomStarted() {
-        draft = null
         chatLines.clear()
         returnScreen = AppScreen.Multiplayer
     }
@@ -155,29 +146,17 @@ internal class BattleRoomController(
 
     fun updateFromNetwork(refreshNetworkStatus: Boolean = true) {
         val snapshot = currentSnapshot(refreshNetworkStatus) ?: return
-        draft = null
         sceneHost.updateRoom(snapshot.toBattleRoomModel(previewFor(snapshot), chatLines))
     }
 
     private fun previewFor(snapshot: BattleRoomSnapshot): String? =
         selectedMap?.previewAssetPath
-            ?: snapshot.mapPath
-                ?.takeIf { it.isNotBlank() }
+            ?: snapshot.room.mapPath.takeIf { it.isNotBlank() }
                 ?.let { path ->
                     runCatching {
-                        levelSelectViewModelFactory.create(selectedMode).resolveMapEntry(path).previewAssetPath
+                        levelSelectViewModelFactory.create(selectedMode).mapEntry(path).previewAssetPath
                     }.getOrNull()
                 }
-
-    fun updateFromDraft() {
-        val currentDraft = draft ?: return
-        sceneHost.updateRoom(
-            currentDraft.toBattleRoomModel(
-                mapTypeLabel = if (currentDraft.sandbox) "Sandbox" else selectedMode.label,
-                chatLines = chatLines,
-            ),
-        )
-    }
 
     fun appendChat(text: String, teamColorIndex: Int = -1) {
         val line = BattleRoomChatLine(text, teamColorIndex)
@@ -185,16 +164,10 @@ internal class BattleRoomController(
         sceneHost.appendChat(line)
     }
 
-    private fun prepareLocalSinglePlayerRoom(draft: BattleRoomDraft): Boolean {
-        val launchConfig = draft.toLaunchConfig()
-        // The host stays in the room to keep configuring it, so open a draft rather than
-        // prepareLocalBattleRoom, which would queue the level and load it on the next frame.
-        if (!gameSession.enterLocalBattleRoomLive(launchConfig) &&
-            !gameSession.openLocalBattleRoomDraft(launchConfig)
-        ) {
+    private fun prepareLocalSinglePlayerRoom(config: BattleRoomLaunchConfig): Boolean {
+        if (!gameSession.enterLocalBattleRoomLive(config)) {
             return false
         }
-        this.draft = null
         gameSession.currentBattleRoom()?.let { snapshot ->
             sceneHost.updateRoom(
                 snapshot.toBattleRoomModel(previewFor(snapshot), chatLines),

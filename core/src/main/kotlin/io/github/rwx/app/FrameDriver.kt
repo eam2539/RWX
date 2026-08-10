@@ -74,7 +74,6 @@ internal class FrameDriver(
             isRenderLoopFrame = isRenderLoopFrame,
             screen = currentScreen(),
             rendersIntoKoolCanvas = gameSession.rendersIntoKoolCanvas,
-            hasDraft = battleRoomController.hasDraft,
             nowMillis = nowMillis,
             nextPollMillis = nextBattleRoomNetworkPollMillis,
         )
@@ -105,12 +104,10 @@ internal fun shouldPollConnectedBattleRoomNetwork(
     isRenderLoopFrame: Boolean,
     screen: AppScreen,
     rendersIntoKoolCanvas: Boolean,
-    hasDraft: Boolean,
     nowMillis: Long,
     nextPollMillis: Long,
 ): Boolean =
     isRenderLoopFrame &&
             screen == AppScreen.BattleRoom &&
             !rendersIntoKoolCanvas &&
-            !hasDraft &&
             nowMillis >= nextPollMillis

@@ -3,7 +3,6 @@ package io.github.rwx.app
 import io.github.rwx.i18n.I18n
 import io.github.rwx.logger
 import io.github.rwx.p2p.P2PLobbyService
-import io.github.rwx.session.BattleRoomHostConfig
 import io.github.rwx.session.GameSession
 import io.github.rwx.ui.host.DialogSceneHost
 import io.github.rwx.ui.model.*
@@ -175,14 +174,12 @@ internal class MultiplayerConnectionController(
             onHostPreparing(map)
             check(
                 gameSession.hostBattleRoom(
-                    BattleRoomHostConfig(
-                        mapPath = map.saveName ?: map.mapAssetPath,
-                        savedGame = map.saveName != null,
-                        isPublic = options.isPublic,
-                        password = options.password,
-                        useMods = options.useMods,
-                        rwxP2PSession = lobbyKind == MultiplayerLobbyKind.P2P,
-                    ),
+                    mapPath = map.mapAssetPath,
+                    savedGame = map.isSavedGame,
+                    isPublic = options.isPublic,
+                    password = options.password,
+                    useMods = options.useMods,
+                    rwxP2PSession = lobbyKind == MultiplayerLobbyKind.P2P,
                 )
             ) { "Game session rejected host request" }
             if (lobbyKind == MultiplayerLobbyKind.P2P) {

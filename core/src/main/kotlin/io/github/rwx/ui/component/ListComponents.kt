@@ -2,19 +2,17 @@ package io.github.rwx.ui.component
 
 import de.fabmax.kool.AssetLoader
 import de.fabmax.kool.Assets
+import de.fabmax.kool.MimeType
 import de.fabmax.kool.modules.ui2.*
+import de.fabmax.kool.pipeline.ImageData2d
+import de.fabmax.kool.pipeline.TexFormat
 import de.fabmax.kool.pipeline.Texture2d
+import de.fabmax.kool.util.Uint8Buffer
+import io.github.rwx.LegacyAssetBridge
 import io.github.rwx.i18n.I18n
 import io.github.rwx.ui.ColorSchemeDefinition
 import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.model.CompatibilityLabel
-import io.github.rwx.ui.model.LevelEntryType
-import io.github.rwx.ui.model.LevelSelectFilterOption
-import io.github.rwx.ui.model.LevelSelectMapBrowser
-import io.github.rwx.ui.model.LevelSelectMode
-import io.github.rwx.ui.model.LevelSelectSortOption
-import io.github.rwx.ui.model.MapEntry
-import io.github.rwx.ui.model.ModeLabel
+import io.github.rwx.ui.model.*
 import io.github.rwx.ui.remainingAfter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -108,11 +106,6 @@ private fun UiScope.MapModeBadge(
     }
 }
 
-/**
- * A bordered map-preview box that draws the `_map.png` asset at [previewAssetPath] (scaled to fit),
- * or a "No preview" placeholder when the asset is missing. Shared by the level-select grid tile and
- * the battle-room info panel; the caller supplies the box [width]/[height].
- */
 internal fun UiScope.MapPreviewImage(
     previewAssetPath: String?,
     theme: ColorSchemeDefinition,
@@ -149,8 +142,8 @@ private object MapPreviewTextureCache {
     private val textures = mutableMapOf<String, Texture2d>()
 
     fun textureFor(assetPath: String): Texture2d = textures.getOrPut(assetPath) {
-        Texture2d(name = "rwx-map-preview:$assetPath") {
-            Assets.defaultLoader.loadImage2d(assetPath).getOrNull() ?: AssetLoader.textureDataLoadFailed
+        Texture2d(name = "map-preview:$assetPath") {
+            loadPreviewImage(assetPath) ?: AssetLoader.textureDataLoadFailed
         }
     }
 
@@ -163,15 +156,12 @@ private object MapPreviewTextureCache {
                 val loaded = coroutineScope {
                     paths.map { assetPath ->
                         async {
-                            assetPath to (
-                                    Assets.defaultLoader.loadImage2d(assetPath).getOrNull()
-                                        ?: AssetLoader.textureDataLoadFailed
-                                    )
+                            assetPath to (loadPreviewImage(assetPath) ?: AssetLoader.textureDataLoadFailed)
                         }
                     }.awaitAll()
                 }
                 loaded.forEach { (assetPath, imageData) ->
-                    val texture = Texture2d(name = "rwx-map-preview:$assetPath")
+                    val texture = Texture2d(name = "map-preview:$assetPath")
                     texture.upload(imageData)
                     textures[assetPath] = texture
                     completed++
@@ -182,6 +172,20 @@ private object MapPreviewTextureCache {
 
     fun invalidate() {
         textures.clear()
+    }
+
+    private suspend fun loadPreviewImage(assetPath: String): ImageData2d? {
+        Assets.defaultLoader.loadImage2d(assetPath).getOrNull()?.let { return it }
+        val bytes = LegacyAssetBridge.openAsset(assetPath)?.use { it.readBytes() } ?: return null
+        val encoded = Uint8Buffer(bytes.size)
+        bytes.forEachIndexed { index, value -> encoded[index] = value.toUByte() }
+        return runCatching {
+            Assets.loadImageFromBuffer(
+                texData = encoded,
+                mimeType = MimeType.forFileName(assetPath),
+                format = TexFormat.RGBA,
+            )
+        }.getOrNull()
     }
 }
 
@@ -198,7 +202,7 @@ fun invalidateMapPreviewTextureCache() {
 private const val MAP_PREVIEW_PRELOAD_CONCURRENCY: Int = 4
 
 private fun MapEntry.playerLabel(): String =
-    if (type == LevelEntryType.SavedGame) {
+    if (isSavedGame) {
         I18n.singleplayer.loadSave()
     } else {
         CompatibilityLabel() ?: playerCount?.let { "${it}p" } ?: "Scenario"
@@ -284,7 +288,7 @@ fun UiScope.LevelSelectList(
                     .modifier.align(AlignmentX.Center, AlignmentY.Center)
             } else {
                 Text(
-                    if (model.currentMode.savedGames) "No saved games found" else "No maps match the current filter"
+                    if (model.currentMode == LevelSelectMode.SavedGames) "No saved games found" else "No maps match the current filter"
                 ) {
                     modifier
                         .width(Grow.Std)

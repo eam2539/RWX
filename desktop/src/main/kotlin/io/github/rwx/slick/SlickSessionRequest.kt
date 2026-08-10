@@ -1,7 +1,7 @@
 package io.github.rwx.slick
 
 import io.github.rwx.session.BattleRoomLaunchConfig
-import io.github.rwx.session.GameMemorySnapshot
+import io.github.rwx.session.MapSnapshot
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -47,11 +47,11 @@ sealed interface SlickSessionRequest {
     data class BattleRoom(
         val config: BattleRoomLaunchConfig,
     ) : SlickSessionRequest {
-        override val loadingPath: String = config.mapPath
+        override val loadingPath: String = config.room.mapPath
     }
 
-    data class MemorySnapshot(
-        val snapshot: GameMemorySnapshot,
+    data class MapSnapshotRequest(
+        val snapshot: MapSnapshot,
     ) : SlickSessionRequest {
         override val loadingPath: String = snapshot.mapPath
     }

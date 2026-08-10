@@ -12,8 +12,8 @@ import io.github.rwx.mod.ModUiRegistry
 import io.github.rwx.p2p.P2PLobbyService
 import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.session.BattleRoomSnapshot
-import io.github.rwx.session.GameMemorySnapshot
 import io.github.rwx.session.GameSession
+import io.github.rwx.session.MapSnapshot
 import io.github.rwx.ui.AppScreen
 import io.github.rwx.ui.CoreUiEvent
 import io.github.rwx.ui.component.Icon
@@ -59,7 +59,7 @@ internal class MapController(
         }
         val currentMapPath = gameSession.runningMapPath()
             ?: pendingStartMapPath()
-            ?: currentBattleRoomSnapshotForJoin()?.mapPath
+            ?: currentBattleRoomSnapshotForJoin()?.room?.mapPath
         if (currentMapPath.isNullOrBlank()) {
             showUnavailableDialog("No active RWX map.")
             return
@@ -74,14 +74,14 @@ internal class MapController(
         val graph = MapLinkResolver.resolveLinkedMapGraph(mapStorage, rootPath)
         val mapRows = linkedMapOf<String, String>()
         graph.maps.forEach { node ->
-            mapRows[node.mapPath] = node.displayName
+            mapRows[node.mapPath] = node.fileName
         }
         state.runtimeLinkedMapNames.forEach { (path, name) ->
             mapRows.putIfAbsent(path, name)
         }
         mapRows.putIfAbsent(currentMapPath, MapMetadata.getMapName(currentMapPath))
         val runtimeMissingTargets = mutableListOf<String>()
-        GameEngine.getInstance()?.missionEngine?.getMapPortalTargetMapIds()?.forEach { targetId ->
+        GameEngine.getInstance()?.missionEngine?.mapPortalTargetMapIds?.forEach { targetId ->
             val targetPath = MapLinkResolver.findMapPathById(mapStorage, targetId)
             if (targetPath == null) {
                 runtimeMissingTargets += targetId
@@ -229,7 +229,7 @@ internal class MapController(
             return
         }
         currentMapPath?.let { mapPath ->
-            gameSession.captureMemorySnapshot()?.let { snapshot ->
+            gameSession.captureMapSnapshot()?.let { snapshot ->
                 state.putSnapshot(mapPath, snapshot)
             }
         }
@@ -242,29 +242,25 @@ internal class MapController(
         state.appliedP2PAssignedMapPath = targetMapPath
     }
 
-    private fun queueMapLoad(targetMapPath: String, snapshot: GameMemorySnapshot? = null) {
+    private fun queueMapLoad(targetMapPath: String, snapshot: MapSnapshot? = null) {
         val currentBattleRoomConfig = gameSession.activeRendererBattleRoomConfig()
-        val effectiveSnapshot = snapshot?.let { savedSnapshot ->
-            if (savedSnapshot.battleRoomConfig == null && currentBattleRoomConfig != null) {
-                savedSnapshot.copy(battleRoomConfig = currentBattleRoomConfig.copy(mapPath = targetMapPath))
-            } else {
-                savedSnapshot
+        val battleRoomConfig = if (snapshot == null) {
+            currentBattleRoomConfig.copy().apply {
+                //TODO 之后调整
+                // mapPath=targetMapPath
             }
-        }
-        val battleRoomConfig = if (effectiveSnapshot == null) {
-            currentBattleRoomConfig?.copy(mapPath = targetMapPath)
         } else {
             null
         }
         if (gameSession.rendersIntoKoolCanvas) {
             when {
-                effectiveSnapshot != null -> gameSession.prepareMemorySnapshotAsync(effectiveSnapshot, viewport())
+                snapshot != null -> gameSession.prepareMapSnapshotAsync(snapshot, viewport())
                 battleRoomConfig != null -> gameSession.prepareBattleRoomAsync(battleRoomConfig, viewport())
                 else -> gameSession.prepareMapAsync(targetMapPath, viewport())
             }
         } else {
             when {
-                effectiveSnapshot != null -> gameSession.requestMemorySnapshot(effectiveSnapshot)
+                snapshot != null -> gameSession.requestMapSnapshot(snapshot)
                 battleRoomConfig != null -> {
                     check(gameSession.prepareLocalBattleRoom(battleRoomConfig)) {
                         "Game session rejected local battle room map switch"
