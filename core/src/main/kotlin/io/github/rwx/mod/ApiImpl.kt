@@ -223,10 +223,11 @@ class ApiImpl private constructor(
                     "Missing turret $name for extension binding on ${unitId.value}"
                 }
                 turret.preFireDuration = binding.preFireDuration.toFloat()
+                turret.postFireDuration = binding.postFireDuration.toFloat()
                 turret.preFireRendererId = binding.renderer?.rendererId?.value
                 turret.preFireRendererVariant = binding.renderer?.variantId?.value
-                turret.preFireObserverId = binding.observer?.observerId?.value
-                turret.preFireObserverVariant = binding.observer?.variantId?.value
+                turret.turretFireCycleObserverId = binding.observer?.observerId?.value
+                turret.turretFireCycleObserverVariant = binding.observer?.variantId?.value
                 applied++
             }
             bindings.effects.forEach { (name, binding) ->
@@ -561,8 +562,11 @@ private class GameImpl(private val api: Api) : Game {
         ProjectileObserverRegistry.register(api as ApiImpl, id, observer)
     }
 
-    override fun registerPreFireObserver(id: PreFireObserverId, observer: PreFireObserver) {
-        PreFireObserverRegistry.register(api as ApiImpl, id, observer)
+    override fun registerTurretFireCycleObserver(
+        id: TurretFireCycleObserverId,
+        observer: TurretFireCycleObserver,
+    ) {
+        TurretFireCycleObserverRegistry.register(api as ApiImpl, id, observer)
     }
 }
 

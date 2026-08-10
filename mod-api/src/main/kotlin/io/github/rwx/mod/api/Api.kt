@@ -28,7 +28,7 @@ interface Game {
     fun registerTeamAction(id: TeamActionId, handler: TeamActionHandler)
     fun requestTeamAction(id: TeamActionId, targetPosition: WorldPosition? = null): Boolean
     fun registerProjectileObserver(id: ProjectileObserverId, observer: ProjectileObserver)
-    fun registerPreFireObserver(id: PreFireObserverId, observer: PreFireObserver)
+    fun registerTurretFireCycleObserver(id: TurretFireCycleObserverId, observer: TurretFireCycleObserver)
 }
 
 @JvmInline

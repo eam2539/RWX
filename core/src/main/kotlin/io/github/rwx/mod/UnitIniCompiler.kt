@@ -44,8 +44,9 @@ internal data class ProjectileExtensionBinding(
 
 internal data class TurretExtensionBinding(
     val preFireDuration: Int,
+    val postFireDuration: Int,
     val renderer: PreFireRenderBinding?,
-    val observer: PreFireObserverBinding?,
+    val observer: TurretFireCycleObserverBinding?,
 )
 
 internal data class EffectExtensionBinding(val renderer: EffectRenderBinding)
@@ -168,6 +169,7 @@ internal object UnitIniCompiler {
             }
             bindings.turrets[name] = TurretExtensionBinding(
                 preFireDuration = extension.preFireDuration.value,
+                postFireDuration = extension.postFireDuration.value,
                 renderer = extension.renderBinding,
                 observer = extension.observerBinding,
             )

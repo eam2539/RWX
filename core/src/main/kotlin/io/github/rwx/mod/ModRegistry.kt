@@ -7,7 +7,7 @@ object ModRegistry {
     private val owned: List<OwnedRegistry> = listOf(
         RenderRegistry,
         ProjectileObserverRegistry,
-        PreFireObserverRegistry,
+        TurretFireCycleObserverRegistry,
         DamageRegistry,
         AudioRegistry,
         TeamActionRegistry,

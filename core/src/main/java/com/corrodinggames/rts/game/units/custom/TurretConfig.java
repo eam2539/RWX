@@ -71,10 +71,11 @@ public class TurretConfig {
     public CustomUnitSpawnList warmupStartEffect;
 
     public float preFireDuration;
+    public float postFireDuration;
     public String preFireRendererId;
     public String preFireRendererVariant;
-    public String preFireObserverId;
-    public String preFireObserverVariant;
+    public String turretFireCycleObserverId;
+    public String turretFireCycleObserverVariant;
 
     /* JADX INFO: renamed from: G */
     public Integer shootLightColor;
@@ -253,10 +254,11 @@ public class TurretConfig {
         this.shootLightColor = turretConfig.shootLightColor;
         this.warmupStartEffect = turretConfig.warmupStartEffect;
         this.preFireDuration = turretConfig.preFireDuration;
+        this.postFireDuration = turretConfig.postFireDuration;
         this.preFireRendererId = turretConfig.preFireRendererId;
         this.preFireRendererVariant = turretConfig.preFireRendererVariant;
-        this.preFireObserverId = turretConfig.preFireObserverId;
-        this.preFireObserverVariant = turretConfig.preFireObserverVariant;
+        this.turretFireCycleObserverId = turretConfig.turretFireCycleObserverId;
+        this.turretFireCycleObserverVariant = turretConfig.turretFireCycleObserverVariant;
         this.canAttackFlyingUnits = turretConfig.canAttackFlyingUnits;
         this.canAttackLandUnits = turretConfig.canAttackLandUnits;
         this.canAttackUnderwaterUnits = turretConfig.canAttackUnderwaterUnits;

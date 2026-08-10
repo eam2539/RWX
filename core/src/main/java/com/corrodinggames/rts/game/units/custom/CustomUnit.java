@@ -43,7 +43,7 @@ import io.github.rwx.geometry.PointF;
 import io.github.rwx.geometry.Rect;
 import io.github.rwx.geometry.RectF;
 import io.github.rwx.mod.DamageRegistry;
-import io.github.rwx.mod.PreFireObserverRegistry;
+import io.github.rwx.mod.TurretFireCycleObserverRegistry;
 import io.github.rwx.mod.UnitEventRuntime;
 import io.github.rwx.mod.api.UnitRenderLayer;
 import io.github.rwx.render.RenderRegistry;
@@ -1668,7 +1668,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         CustomUnitConfig customUnitConfig = this.unitConfig;
         super.update(f);
-        PreFireObserverRegistry.update(this);
+        TurretFireCycleObserverRegistry.update(this);
         if (this.isDead && !this.isDeathFallComplete) {
             if (this.posZ > 0.0f) {
                 if (customUnitConfig.slowDeathFall && !(this.rotation == 0.0f && this.velocityX == 0.0f && this.velocityY == 0.0f)) {

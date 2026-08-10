@@ -112,9 +112,12 @@ data class ProjectileExtension(
 
 @UnitDsl
 data class TurretExtension(
+    /** Wind-up before the shot; zero disables the pre-fire window entirely. */
     var preFireDuration: Ticks = Ticks.ZERO,
+    /** Recovery after the shot; zero disables the post-fire window entirely. */
+    var postFireDuration: Ticks = Ticks.ZERO,
     var renderBinding: PreFireRenderBinding? = null,
-    var observerBinding: PreFireObserverBinding? = null,
+    var observerBinding: TurretFireCycleObserverBinding? = null,
 )
 
 @UnitDsl
