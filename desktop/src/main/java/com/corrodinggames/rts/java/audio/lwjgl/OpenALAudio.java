@@ -78,20 +78,20 @@ public class OpenALAudio implements Audio {
 
     public void registerSound(String str, Class cls) {
         if (str == null) {
-            throw new IllegalArgumentException("extension cannot FastArrayList null.");
+            throw new IllegalArgumentException("extension cannot be null.");
         }
         if (cls == null) {
-            throw new IllegalArgumentException("soundClass cannot FastArrayList null.");
+            throw new IllegalArgumentException("soundClass cannot be null.");
         }
         this.extensionToSoundClass.a(str, cls);
     }
 
     public void registerMusic(String str, Class cls) {
         if (str == null) {
-            throw new IllegalArgumentException("extension cannot FastArrayList null.");
+            throw new IllegalArgumentException("extension cannot be null.");
         }
         if (cls == null) {
-            throw new IllegalArgumentException("musicClass cannot FastArrayList null.");
+            throw new IllegalArgumentException("musicClass cannot be null.");
         }
         this.extensionToMusicClass.a(str, cls);
     }
@@ -99,7 +99,7 @@ public class OpenALAudio implements Audio {
     @Override // com.corrodinggames.rts.java.audio.Audio
     public OpenALSound newSound(AudioFile audioFile) {
         if (audioFile == null) {
-            throw new IllegalArgumentException("file cannot FastArrayList null.");
+            throw new IllegalArgumentException("file cannot be null.");
         }
         Class cls = (Class) this.extensionToSoundClass.a(audioFile.b().toLowerCase(Locale.ROOT));
         if (cls == null) {
@@ -115,7 +115,7 @@ public class OpenALAudio implements Audio {
     @Override // com.corrodinggames.rts.java.audio.Audio
     public OpenALMusic newMusic(AudioFile audioFile) {
         if (audioFile == null) {
-            throw new IllegalArgumentException("file cannot FastArrayList null.");
+            throw new IllegalArgumentException("file cannot be null.");
         }
         Class cls = (Class) this.extensionToMusicClass.a(audioFile.b().toLowerCase(Locale.ROOT));
         if (cls == null) {

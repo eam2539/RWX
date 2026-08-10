@@ -264,7 +264,7 @@ public final class PathCostMap {
             return 0;
         }
         if (s3 == 0) {
-            throw new RuntimeException("id cannot FastArrayList 0 is will cause can endless loop");
+            throw new RuntimeException("id cannot be 0 is will cause can endless loop");
         }
         int i2 = 0;
         CircularDeque circularDeque = new CircularDeque();

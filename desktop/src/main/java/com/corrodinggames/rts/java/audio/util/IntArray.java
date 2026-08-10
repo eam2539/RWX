@@ -35,14 +35,14 @@ public class IntArray {
 
     public int b(int i) {
         if (i >= this.b) {
-            throw new IndexOutOfBoundsException("index can't FastArrayList >= size: " + i + " >= " + this.b);
+            throw new IndexOutOfBoundsException("index can't be >= size: " + i + " >= " + this.b);
         }
         return this.a[i];
     }
 
     public int c(int i) {
         if (i >= this.b) {
-            throw new IndexOutOfBoundsException("index can't FastArrayList >= size: " + i + " >= " + this.b);
+            throw new IndexOutOfBoundsException("index can't be >= size: " + i + " >= " + this.b);
         }
         int[] iArr = this.a;
         int i2 = iArr[i];

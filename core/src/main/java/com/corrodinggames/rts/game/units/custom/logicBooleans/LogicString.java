@@ -369,7 +369,7 @@ public abstract class LogicString extends LogicBoolean {
             }
             this.commonType = this.childA.getReturnType();
             if (this.commonType != this.childB.getReturnType()) {
-                throw new BooleanParseException("Select() expected 2 and 3 argument to FastArrayList the same type, got: " + this.commonType.name() + " and " + this.childB.getReturnType().name());
+                throw new BooleanParseException("Select() expected 2 and 3 argument to be the same type, got: " + this.commonType.name() + " and " + this.childB.getReturnType().name());
             }
         }
 

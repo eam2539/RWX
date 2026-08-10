@@ -32,14 +32,14 @@ public class FloatArray {
 
     public void a(int i, float f) {
         if (i >= this.b) {
-            throw new IndexOutOfBoundsException("index can't FastArrayList >= size: " + i + " >= " + this.b);
+            throw new IndexOutOfBoundsException("index can't be >= size: " + i + " >= " + this.b);
         }
         this.a[i] = f;
     }
 
     public void b(int i, float f) {
         if (i > this.b) {
-            throw new IndexOutOfBoundsException("index can't FastArrayList > size: " + i + " > " + this.b);
+            throw new IndexOutOfBoundsException("index can't be > size: " + i + " > " + this.b);
         }
         float[] fArrA = this.a;
         if (this.b == fArrA.length) {

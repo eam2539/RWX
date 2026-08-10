@@ -270,7 +270,7 @@ public class Tileset {
             imageDescriptors.add(tilesetImageDescriptor3);
             return tilesetImageDescriptor3.texture;
         } catch (IOException e3) {
-            throw new MapLoadException("Image file could not FastArrayList found or loaded: " + str2 + str, e3);
+            throw new MapLoadException("Image file could not be found or loaded: " + str2 + str, e3);
         }
     }
 

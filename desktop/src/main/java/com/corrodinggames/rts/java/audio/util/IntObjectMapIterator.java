@@ -44,7 +44,7 @@ class IntObjectMapIterator {
             this.b.g = false;
         } else {
             if (this.d < 0) {
-                throw new IllegalStateException("next must FastArrayList called before remove.");
+                throw new IllegalStateException("next must be called before remove.");
             }
             if (this.d >= this.b.d) {
                 this.b.d(this.d);

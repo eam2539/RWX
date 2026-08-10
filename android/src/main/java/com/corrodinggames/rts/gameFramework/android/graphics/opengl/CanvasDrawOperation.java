@@ -464,7 +464,7 @@ public abstract class CanvasDrawOperation {
             }
         };
         final String str46 = "drawTextOnPath_chararray_int_int_Path_float_float_Paint";
-        T = new CanvasDrawOperation(str46) { // from class: com.corrodinggames.rts.gameFramework.m.FastArrayList
+        T = new CanvasDrawOperation(str46) { // from class: com.corrodinggames.rts.gameFramework.m.be
             @Override // com.corrodinggames.rts.gameFramework.android.graphics.opengl.CanvasDrawOperation
             public final void a(GraphicsInterface graphicsInterface, GLDrawCommand gLDrawCommand) {
                 Object[] objArr = gLDrawCommand.b;

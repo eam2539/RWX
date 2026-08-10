@@ -149,7 +149,7 @@ public class MapObject {
         float fE = this.tileRect.e();
         String attribute2 = element.getAttribute("type");
         if (attribute2 != null && !attribute2.equals(VariableScope.nullOrMissingString) && !attribute2.equals("unit") && !attribute2.equals("comment") && !mapObjectLayer.name.equalsIgnoreCase("triggers")) {
-            logTriggerMessage("Triggers should FastArrayList on triggers layer");
+            logTriggerMessage("Triggers should be on triggers layer");
         }
         if (properties != null) {
             String property = properties.getProperty("unit");

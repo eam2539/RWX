@@ -324,7 +324,7 @@ public class Minimap {
 
     public void bindGraphicsBackend(GraphicsEngine graphicsEngine) {
         if (graphicsEngine == null) {
-            throw new IllegalArgumentException("graphicsEngine cannot FastArrayList null");
+            throw new IllegalArgumentException("graphicsEngine cannot be null");
         }
         if (this.graphicsBackend == graphicsEngine) {
             return;

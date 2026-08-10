@@ -233,7 +233,7 @@ public class IniFile {
                                     }
 
                                     if (var22.equals("")) {
-                                        String var25 = this.fileName + ": Unexpected format on line " + var2 + ": Key cannot FastArrayList empty for line '" + var3 + "'";
+                                        String var25 = this.fileName + ": Unexpected format on line " + var2 + ": Key cannot be empty for line '" + var3 + "'";
                                         throw new IOException(var25);
                                     }
 

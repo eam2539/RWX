@@ -380,7 +380,7 @@ public class TurretConfig {
                 throw new RuntimeException("[" + str + "] Could not find attachedTo turret target:" + string3);
             }
             if (turretConfig.parentTurret == turretConfig) {
-                throw new RuntimeException("Turret cannot FastArrayList attachedTo self");
+                throw new RuntimeException("Turret cannot be attachedTo self");
             }
             customUnitConfig.hasAttachedTurrets = true;
         }
@@ -420,7 +420,7 @@ public class TurretConfig {
         turretConfig.isSlave = iniFile.getBoolean(str, "slave", Boolean.valueOf(turretConfig.isSlave)).booleanValue();
         if (turretConfig.isSlave) {
             if (turretConfig.parentTurret == null) {
-                throw new RuntimeException("Turret cannot FastArrayList a slave without being 'attachedTo' to another turret");
+                throw new RuntimeException("Turret cannot be a slave without being 'attachedTo' to another turret");
             }
             turretConfig.childTurret = turretConfig.parentTurret;
         }
@@ -464,7 +464,7 @@ public class TurretConfig {
         Float f7 = iniFile.getFloat(str, "barrelY", (Float) null);
         Float f8 = iniFile.getFloat(str, "size", (Float) null);
         if (f7 != null && f8 != null) {
-            throw new RuntimeException("Turret [" + str + "]: barrelY and size can not both FastArrayList used at the same time as they have the same meaning");
+            throw new RuntimeException("Turret [" + str + "]: barrelY and size can not both be used at the same time as they have the same meaning");
         }
         if (f7 != null) {
             turretConfig.barrelY = f7.floatValue();
@@ -526,10 +526,10 @@ public class TurretConfig {
         }
         turretConfig.idleSweepAddRandomAngle = iniFile.getFloat(str, "idleSweepAddRandomAngle", Float.valueOf(turretConfig.idleSweepAddRandomAngle)).floatValue();
         if (turretConfig.idleSweepAddRandomAngle < 0.0f) {
-            throw new RuntimeException("Turret [" + str + "]: idleSweepAddRandomAngle must FastArrayList >= 0");
+            throw new RuntimeException("Turret [" + str + "]: idleSweepAddRandomAngle must be >= 0");
         }
         if (turretConfig.idleSweepAngle < 0.0f) {
-            throw new RuntimeException("Turret [" + str + "]: idleSweepAngle must FastArrayList >= 0");
+            throw new RuntimeException("Turret [" + str + "]: idleSweepAngle must be >= 0");
         }
         turretConfig.clearTurretTargetAfterFiring = iniFile.getBoolean(str, "clearTurretTargetAfterFiring", Boolean.valueOf(turretConfig.clearTurretTargetAfterFiring)).booleanValue();
         turretConfig.onShootPlayAnimation = customUnitConfig.loadCore(iniFile.getString(str, "onShoot_playAnimation", (String) null), turretConfig.onShootPlayAnimation);

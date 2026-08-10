@@ -44,13 +44,13 @@ public class ConvertResourceAction extends LogicAction {
             convertResourceAction.convertResourceMinAmount = iniFile.getDouble(str, "convertResource_minAmount", 0.0d);
             convertResourceAction.convertResourceMaxAmount = iniFile.getDoubleStrictRaw(str, "convertResource_maxAmount");
             if (convertResourceAction.convertResourceMinAmount < 0.0d) {
-                throw new ConfigParseException("[" + str + "] convertResource_minAmount cannot FastArrayList < 0");
+                throw new ConfigParseException("[" + str + "] convertResource_minAmount cannot be < 0");
             }
             if (convertResourceAction.convertResourceMaxAmount < 0.0d) {
-                throw new ConfigParseException("[" + str + "] convertResource_maxAmount cannot FastArrayList < 0");
+                throw new ConfigParseException("[" + str + "] convertResource_maxAmount cannot be < 0");
             }
             if (convertResourceAction.convertResourceMaxAmount < convertResourceAction.convertResourceMinAmount) {
-                throw new ConfigParseException("[" + str + "] convertResource_maxAmount cannot FastArrayList < convertResource_minAmount");
+                throw new ConfigParseException("[" + str + "] convertResource_maxAmount cannot be < convertResource_minAmount");
             }
             convertResourceAction.convertResourceMultiplyAmountBy = iniFile.getFloat(str, "convertResource_multiplyAmountBy", Float.valueOf(1.0f)).floatValue();
             customActionDef.logicActions.add(convertResourceAction);

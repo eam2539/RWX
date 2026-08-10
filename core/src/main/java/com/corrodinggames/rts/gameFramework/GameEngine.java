@@ -466,7 +466,7 @@ public abstract class GameEngine {
     /* JADX INFO: renamed from: bd */
     public static boolean isReplayRecordingEnabledOnPCOrIOS = true;
 
-    /* JADX INFO: renamed from: FastArrayList */
+    /* JADX INFO: renamed from: be */
     public static boolean spaceGameMode = false;
 
     /* JADX INFO: renamed from: bf */

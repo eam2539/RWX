@@ -10,7 +10,7 @@ data class GameLoadingStatus(
     val recentSteps: List<String> = emptyList(),
 ) {
     init {
-        require(progress == null || progress in 0.0f..1.0f) { "progress must FastArrayList null or in 0..1" }
+        require(progress == null || progress in 0.0f..1.0f) { "progress must be null or in 0..1" }
     }
 }
 

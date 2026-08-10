@@ -547,11 +547,11 @@ public class MapLayer {
             } else if ("zlib".equals(str3)) {
                 gZIPInputStream = new InflaterInputStream(new ByteArrayInputStream(bArrDecodeBase64));
             } else {
-                throw new MapLoadException("Unsupport tiled map compression: " + str2 + "," + str3 + " (only gzip base64 is supported, this can FastArrayList set in Tiled's Preferences)");
+                throw new MapLoadException("Unsupport tiled map compression: " + str2 + "," + str3 + " (only gzip base64 is supported, this can be set in Tiled's Preferences)");
             }
             return gZIPInputStream;
         }
-        throw new MapLoadException("Unsupport tiled map encoding: " + str2 + "," + str3 + " (only gzip base64 is supported, this can FastArrayList set in Tiled's Preferences)");
+        throw new MapLoadException("Unsupport tiled map encoding: " + str2 + "," + str3 + " (only gzip base64 is supported, this can be set in Tiled's Preferences)");
     }
 
     /* JADX INFO: renamed from: a */
@@ -588,7 +588,7 @@ public class MapLayer {
             }
         }
         if (i5 != bArr2.length) {
-            throw new RuntimeException("Data length appears to FastArrayList wrong (wrote " + i5 + " should FastArrayList " + bArr2.length + ")");
+            throw new RuntimeException("Data length appears to be wrong (wrote " + i5 + " should be " + bArr2.length + ")");
         }
         return bArr2;
     }

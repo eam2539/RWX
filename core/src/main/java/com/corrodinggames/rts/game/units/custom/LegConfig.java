@@ -244,7 +244,7 @@ public class LegConfig {
             customUnitConfig.energyCanBeRecievedFromInAnotherUnit = true;
         }
         if (legConfig.Q && legConfig.P) {
-            throw new RuntimeException("Both drawUnderAllUnits and drawOverBody can not FastArrayList set true at the same time in leg/arm");
+            throw new RuntimeException("Both drawUnderAllUnits and drawOverBody can not be set true at the same time in leg/arm");
         }
         legConfig.R = iniFile.getFloat(str, "drawDirOffset", Float.valueOf(legConfig.R)).floatValue();
         legConfig.T = iniFile.getFloat(str, "spinRate", Float.valueOf(legConfig.T)).floatValue();

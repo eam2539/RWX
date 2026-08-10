@@ -16,10 +16,10 @@ import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.Utility;
 import com.corrodinggames.rts.gameFramework.network.GameInputStream;
 import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
+import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
 import com.corrodinggames.rts.gameFramework.utility.UnitList;
-import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import io.github.rwx.geometry.PointF;
 
 import java.io.IOException;
@@ -857,7 +857,7 @@ public class BaseZone extends AIStrategyNode {
 
     private boolean a(UnitType unitType, boolean z, int i) {
         if (i < 1) {
-            GameEngine.log("AI", "buildUnit: quantity cannot FastArrayList < 1");
+            GameEngine.log("AI", "buildUnit: quantity cannot be < 1");
             return false;
         }
         OrderableUnit orderableUnitA = a(unitType, true, z);

@@ -111,19 +111,19 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
             decalDefinition.m = iniFile.getBoolean(str2, "onlyInPreview", (Boolean) false).booleanValue();
             decalDefinition.n = iniFile.getBoolean(str2, "onlyOnNonPreview", (Boolean) false).booleanValue();
             if (decalDefinition.m && decalDefinition.n) {
-                throw new ConfigParseException("[" + str2 + "]decal with both onlyInPreview and onlyOnNonPreview will never FastArrayList visible");
+                throw new ConfigParseException("[" + str2 + "]decal with both onlyInPreview and onlyOnNonPreview will never be visible");
             }
             if (decalDefinition.j > 5.0f) {
-                throw new ConfigParseException("[" + str2 + "]decal with onlyWithZoomLevelOrMore:" + decalDefinition.j + " will never FastArrayList visible");
+                throw new ConfigParseException("[" + str2 + "]decal with onlyWithZoomLevelOrMore:" + decalDefinition.j + " will never be visible");
             }
             if (decalDefinition.j < 0.0f) {
-                throw new ConfigParseException("[" + str2 + "]onlyWithZoomLevelOrMore:" + decalDefinition.j + " cannot FastArrayList less than zero");
+                throw new ConfigParseException("[" + str2 + "]onlyWithZoomLevelOrMore:" + decalDefinition.j + " cannot be less than zero");
             }
             Integer logicBooleanUnit = iniFile.getLogicBooleanUnit(str2, "onlyOnBodyFrameOf", (Integer) null);
             if (logicBooleanUnit != null) {
                 decalDefinition.o = logicBooleanUnit.intValue();
                 if (decalDefinition.o < 0) {
-                    throw new ConfigParseException("[" + str2 + "]onlyOnBodyFrameOf cannot FastArrayList: " + decalDefinition.o);
+                    throw new ConfigParseException("[" + str2 + "]onlyOnBodyFrameOf cannot be: " + decalDefinition.o);
                 }
             }
             LogicBoolean logicBooleanNumber = iniFile.getLogicBooleanNumber(customUnitConfig, str2, "imageScale", null);
@@ -146,23 +146,23 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
             if (logicBooleanUnit2 != null) {
                 decalDefinition.J = logicBooleanUnit2.intValue();
                 if (decalDefinition.J < 1) {
-                    throw new ConfigParseException("[" + str2 + "] TOTAL_FRAMES cannot FastArrayList: " + decalDefinition.J + " (must FastArrayList 1 or more)");
+                    throw new ConfigParseException("[" + str2 + "] TOTAL_FRAMES cannot be: " + decalDefinition.J + " (must be 1 or more)");
                 }
             }
             decalDefinition.M = iniFile.getBoolean(str2, "frame_verticalOrdering", (Boolean) false).booleanValue();
             decalDefinition.K = iniFile.getLogicBooleanUnit(str2, "frame_width", (Integer) (-1)).intValue();
             decalDefinition.L = iniFile.getLogicBooleanUnit(str2, "frame_height", (Integer) (-1)).intValue();
             if (decalDefinition.K != -1 && decalDefinition.J != -1) {
-                throw new ConfigParseException("[" + str2 + "]TOTAL_FRAMES and frame_width cannot FastArrayList both set");
+                throw new ConfigParseException("[" + str2 + "]TOTAL_FRAMES and frame_width cannot be both set");
             }
             if (decalDefinition.L != -1 && decalDefinition.L <= 0) {
-                throw new ConfigParseException("[" + str2 + "]frame_height cannot FastArrayList: " + decalDefinition.L);
+                throw new ConfigParseException("[" + str2 + "]frame_height cannot be: " + decalDefinition.L);
             }
             if (decalDefinition.K != -1 && decalDefinition.K <= 0) {
-                throw new ConfigParseException("[" + str2 + "]frame_width cannot FastArrayList: " + decalDefinition.K);
+                throw new ConfigParseException("[" + str2 + "]frame_width cannot be: " + decalDefinition.K);
             }
             if (decalDefinition.J != -1 && decalDefinition.J <= 0) {
-                throw new ConfigParseException("[" + str2 + "]TOTAL_FRAMES cannot FastArrayList: " + decalDefinition.J);
+                throw new ConfigParseException("[" + str2 + "]TOTAL_FRAMES cannot be: " + decalDefinition.J);
             }
             if (decalDefinition.L != -1 || decalDefinition.K != -1 || decalDefinition.J != -1) {
                 decalDefinition.I = true;
@@ -275,7 +275,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
             String string2 = iniFile.getString(str2, "basePositionFromLegEnd", (String) null);
             if (string2 != null || 0 != 0) {
                 if (string2 != null && 0 != 0) {
-                    throw new ConfigParseException("[" + str2 + "]basePositionFromLegEnd and basePositionFromLegMiddle cannot FastArrayList used at the same time");
+                    throw new ConfigParseException("[" + str2 + "]basePositionFromLegEnd and basePositionFromLegMiddle cannot be used at the same time");
                 }
                 if (0 != 0) {
                     str = null;
@@ -297,10 +297,10 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                 decalDefinition.ag = turretConfigFindProjectileConfigByName.turretIndex;
             }
             if (decalDefinition.ae != -1 && decalDefinition.ag != -1) {
-                throw new ConfigParseException("[" + str2 + "]basePositionFromTurret and basePositionFromLeg cannot FastArrayList used at the same time");
+                throw new ConfigParseException("[" + str2 + "]basePositionFromTurret and basePositionFromLeg cannot be used at the same time");
             }
             if ((decalDefinition.ae != -1 || decalDefinition.ag != -1) && decalDefinition.ac != null) {
-                throw new ConfigParseException("[" + str2 + "]basePositionFromTurret/basePositionFromLeg cannot FastArrayList used at the same time as basePosition");
+                throw new ConfigParseException("[" + str2 + "]basePositionFromTurret/basePositionFromLeg cannot be used at the same time as basePosition");
             }
             decalDefinition.C = customUnitConfig.a(iniFile, str2, "image_shadow");
             decalDefinition.D = iniFile.getFloat(str2, "shadowOffsetX", Float.valueOf(1.0f)).floatValue();
@@ -313,7 +313,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                 if (LogicBoolean.isStaticNumber(logicBooleanNumber4)) {
                     float knownStaticNumber = LogicBoolean.getKnownStaticNumber(logicBooleanNumber4);
                     if (knownStaticNumber < 0.0f || knownStaticNumber > 1.0f) {
-                        throw new ConfigParseException("[" + str2 + "]alpha should FastArrayList between 0-1");
+                        throw new ConfigParseException("[" + str2 + "]alpha should be between 0-1");
                     }
                     f = knownStaticNumber;
                 } else {

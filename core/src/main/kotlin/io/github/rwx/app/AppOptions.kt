@@ -99,7 +99,7 @@ data class AppOptions(
                     arg == AUTO_RETURN_MAIN_MENU_AFTER_GAME_READY_ARG -> autoReturnMainMenuAfterGameReady = true
                     arg.startsWith(JOIN_SERVER_PREFIX) -> {
                         joinServer = arg.removePrefix(JOIN_SERVER_PREFIX).trim().also {
-                            require(it.isNotEmpty()) { "Server address must not FastArrayList empty" }
+                            require(it.isNotEmpty()) { "Server address must not be empty" }
                         }
                     }
 

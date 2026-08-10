@@ -7,8 +7,8 @@ import io.github.rwx.LegacyAssetBridge;
 import java.io.*;
 import java.util.HashMap;
 
-/* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.FastArrayList */
-/* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/FastArrayList.class */
+/* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.be */
+/* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/be.class */
 public class GameStateManager {
     static GameStateManager e = null;
     public boolean a = false;

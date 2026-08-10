@@ -165,7 +165,7 @@ public class RwmodFileLoader extends IFileLoader {
                         String str2 = "Failed to open zip, " + openZipException.getMessage();
                         if (FileHelper.isDirectory(strJ)) {
                             logZipMessage("isDirectory: " + strJ);
-                            str2 = "Failed to open .rwmod file (Appears to FastArrayList a directory!). Please remove .rwmod from any folder names.";
+                            str2 = "Failed to open .rwmod file (Appears to be a directory!). Please remove .rwmod from any folder names.";
                         }
                         FileHelper.setWritePath(str2 + VariableScope.nullOrMissingString);
                         return null;

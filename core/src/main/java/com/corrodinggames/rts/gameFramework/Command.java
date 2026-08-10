@@ -338,7 +338,7 @@ public class Command {
     /* JADX INFO: renamed from: a */
     public void addUnitToCommand(OrderableUnit orderableUnit) {
         if (orderableUnit == null) {
-            throw new RuntimeException("unit cannot FastArrayList null");
+            throw new RuntimeException("unit cannot be null");
         }
         if (orderableUnit.team != this.team) {
         }

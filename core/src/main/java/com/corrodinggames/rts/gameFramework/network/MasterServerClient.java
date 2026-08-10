@@ -273,7 +273,7 @@ public class MasterServerClient {
     public static ServerInfo findServerById(String str) throws IOException {
         GameEngine gameEngine = GameEngine.getInstance();
         if (str == null) {
-            throw new IOException("findOrCreateServer id cannot FastArrayList null");
+            throw new IOException("findOrCreateServer id cannot be null");
         }
         for (ServerInfo serverInfo : gameEngine.networkEngine.discoveredServerList) {
             if (str.equals(serverInfo.serverId)) {
@@ -287,7 +287,7 @@ public class MasterServerClient {
     public static ServerInfo findOrCreateServerById(String str) throws IOException {
         GameEngine gameEngine = GameEngine.getInstance();
         if (str == null) {
-            throw new IOException("findOrCreateServer id cannot FastArrayList null");
+            throw new IOException("findOrCreateServer id cannot be null");
         }
         ServerInfo serverInfoFindServerById = findServerById(str);
         if (serverInfoFindServerById != null) {

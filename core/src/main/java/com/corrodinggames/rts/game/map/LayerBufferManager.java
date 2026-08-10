@@ -136,7 +136,7 @@ public final class LayerBufferManager {
 
     /**
      * Returns the backend that owns this manager's targets and capability policy. The active
-     * render backend may temporarily FastArrayList a post-processing target; that backend must not change
+     * render backend may temporarily be a post-processing target; that backend must not change
      * layer-buffer creation or redraw policy.
      */
     GraphicsEngine resourceBackend() {

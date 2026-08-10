@@ -19,7 +19,7 @@ internal class UnitApiImpl : Units {
     private fun validate(definition: UnitDefinition) {
         definition.extension.shaderId?.let { shaderId ->
             require(shaderId.isNotBlank() && shaderId == shaderId.trim()) {
-                "Unit shaderId must FastArrayList non-blank and trimmed: ${definition.id}"
+                "Unit shaderId must be non-blank and trimmed: ${definition.id}"
             }
         }
         val eventHandlerIds = hashSetOf<UnitEventBindingId>()
@@ -28,7 +28,7 @@ internal class UnitApiImpl : Units {
                 "Duplicate event handler '${binding.id}' on unit ${definition.id}"
             }
             require(binding.recursionLimit in 0..MAX_EVENT_RECURSION_LIMIT) {
-                "Unit event recursionLimit must FastArrayList between zero and $MAX_EVENT_RECURSION_LIMIT: ${definition.id}"
+                "Unit event recursionLimit must be between zero and $MAX_EVENT_RECURSION_LIMIT: ${definition.id}"
             }
             require(binding.actions.size <= MAX_EVENT_ACTIONS) {
                 "Unit event handler cannot contain more than $MAX_EVENT_ACTIONS actions: ${definition.id}"
@@ -69,7 +69,7 @@ internal class UnitApiImpl : Units {
         require(depth <= MAX_CONDITION_DEPTH) { "Unit expression exceeds maximum depth of $MAX_CONDITION_DEPTH" }
         when (expression) {
             is UnitNumberExpression.Constant -> require(expression.value.isFinite()) {
-                "Unit expression constants must FastArrayList finite"
+                "Unit expression constants must be finite"
             }
 
             is UnitNumberExpression.Property -> Unit

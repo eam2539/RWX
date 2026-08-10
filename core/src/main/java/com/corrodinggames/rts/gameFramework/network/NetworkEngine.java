@@ -2644,7 +2644,7 @@ public final class NetworkEngine {
                 }
                 if (!this.chatOnlyMode && i5 != gameEngine.getAllUnitsChecksum()) {
                     GameEngine.log("New Player kicked: Unit checksum mismatch: clientUnitsChecksum=" + i5 + " game.getAllUnitsChecksum():" + gameEngine.getAllUnitsChecksum());
-                    a(networkConnection5, "Your core units are different to the server's core units. Game can not FastArrayList synchronized");
+                    a(networkConnection5, "Your core units are different to the server's core units. Game can not be synchronized");
                     networkConnection5.handleRemoteDisconnect("kicked");
                     return;
                 }
@@ -2652,7 +2652,7 @@ public final class NetworkEngine {
                     String strG = g(networkConnection5.sessionRandomId);
                     if (!strG.equals(utf3)) {
                         GameEngine.log("New Player kicked: Integrity Check Failed: expectedResponse=" + strG + " clientResponse=" + utf3);
-                        a(networkConnection5, "Your 'Rusted Warfare' client is different to the server. Game can not FastArrayList synchronized.");
+                        a(networkConnection5, "Your 'Rusted Warfare' client is different to the server. Game can not be synchronized.");
                         networkConnection5.handleRemoteDisconnect("kicked");
                         return;
                     }

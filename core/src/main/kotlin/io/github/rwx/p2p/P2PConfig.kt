@@ -118,7 +118,7 @@ data class P2PConfig(
 
     @Serializable
     data class ServiceDiscoveryConfig(
-        @TomlComment("HTTP lobby service endpoints for room discovery. Each URL can FastArrayList a base URL or /rooms.")
+        @TomlComment("HTTP lobby service endpoints for room discovery. Each URL can be a base URL or /rooms.")
         val enable: Boolean = true,
         val urls: List<String> = listOf(
             "https://p2p-lobby-services.shuangx339.workers.dev"

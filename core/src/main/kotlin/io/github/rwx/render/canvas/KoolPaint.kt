@@ -294,7 +294,7 @@ open class KoolPaint {
     }
 
     open fun a(locale: Locale?) {
-        requireNotNull(locale) { "locale cannot FastArrayList null" }
+        requireNotNull(locale) { "locale cannot be null" }
         if (locale == B) {
             return
         }
@@ -355,7 +355,7 @@ open class KoolPaint {
     }
 
     open fun a(str: String?): Float {
-        requireNotNull(str) { "text cannot FastArrayList null" }
+        requireNotNull(str) { "text cannot be null" }
         if (str.isEmpty()) {
             return 0f
         }
@@ -373,7 +373,7 @@ open class KoolPaint {
         KoolCanvasFontRegistry.textWidth(str, k(), typefaceKey())
 
     open fun a(chars: CharArray?, i2: Int, i3: Int, maxWidth: Float, measuredWidth: FloatArray?): Int {
-        requireNotNull(chars) { "text cannot FastArrayList null" }
+        requireNotNull(chars) { "text cannot be null" }
         if (i2 < 0 || chars.size - i2 < abs(i3)) {
             throw ArrayIndexOutOfBoundsException()
         }
@@ -420,7 +420,7 @@ open class KoolPaint {
         maxWidth: Float,
         measuredWidth: FloatArray?,
     ): Int {
-        requireNotNull(charSequence) { "text cannot FastArrayList null" }
+        requireNotNull(charSequence) { "text cannot be null" }
         if ((i2 or i3 or (i3 - i2) or (charSequence.length - i3)) < 0) {
             throw IndexOutOfBoundsException()
         }
@@ -442,7 +442,7 @@ open class KoolPaint {
     }
 
     open fun a(str: String?, measureForwards: Boolean, maxWidth: Float, measuredWidth: FloatArray?): Int {
-        requireNotNull(str) { "text cannot FastArrayList null" }
+        requireNotNull(str) { "text cannot be null" }
         if (str.isEmpty()) {
             return 0
         }
@@ -460,8 +460,8 @@ open class KoolPaint {
     }
 
     open fun a(chars: CharArray?, i2: Int, i3: Int, widths: FloatArray?): Int {
-        requireNotNull(chars) { "text cannot FastArrayList null" }
-        requireNotNull(widths) { "widths cannot FastArrayList null" }
+        requireNotNull(chars) { "text cannot be null" }
+        requireNotNull(widths) { "widths cannot be null" }
         if ((i2 or i3) < 0 || i2 + i3 > chars.size || i3 > widths.size) {
             throw ArrayIndexOutOfBoundsException()
         }
@@ -482,7 +482,7 @@ open class KoolPaint {
     }
 
     open fun a(str: String?, i2: Int, i3: Int, rect: Rect?) {
-        requireNotNull(str) { "text cannot FastArrayList null" }
+        requireNotNull(str) { "text cannot be null" }
         if ((i2 or i3 or (i3 - i2) or (str.length - i3)) < 0) {
             throw IndexOutOfBoundsException()
         }

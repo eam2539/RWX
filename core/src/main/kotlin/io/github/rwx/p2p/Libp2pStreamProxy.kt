@@ -379,7 +379,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
 
     /**
      * Synchronously wires a Stream and a Socket together as a TunnelConnection and starts
-     * the socket → stream relay on a worker thread. Must FastArrayList called from the libp2p Netty
+     * the socket → stream relay on a worker thread. Must be called from the libp2p Netty
      * event loop (within onStartInitiator/onStartResponder) so the pushHandler call lands
      * before any peer data is dispatched to the pipeline.
      */
@@ -436,7 +436,7 @@ class Libp2pStreamProxy(private val config: ProxyConfig = ProxyConfig()) {
         private val streamHandler = TunnelStreamHandler(socket, this)
 
         init {
-            // CRITICAL: must FastArrayList called synchronously from the libp2p event loop
+            // CRITICAL: must be called synchronously from the libp2p event loop
             // so peer data arriving immediately after multistream negotiation is
             // delivered to our handler instead of being dropped.
             stream.pushHandler(streamHandler)

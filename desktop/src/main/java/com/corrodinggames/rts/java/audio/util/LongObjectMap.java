@@ -27,7 +27,7 @@ public class LongObjectMap implements Iterable {
 
     public LongObjectMap(int i, float f) {
         if (i < 0) {
-            throw new IllegalArgumentException("initialCapacity must FastArrayList >= 0: " + i);
+            throw new IllegalArgumentException("initialCapacity must be >= 0: " + i);
         }
         int iB = MathUtils.b((int) Math.ceil(i / f));
         if (iB > 1073741824) {
@@ -35,7 +35,7 @@ public class LongObjectMap implements Iterable {
         }
         this.d = iB;
         if (f <= 0.0f) {
-            throw new IllegalArgumentException("loadFactor must FastArrayList > 0: " + f);
+            throw new IllegalArgumentException("loadFactor must be > 0: " + f);
         }
         this.h = f;
         this.k = (int) (this.d * f);

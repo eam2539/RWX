@@ -19,7 +19,10 @@ import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.Utility;
 import com.corrodinggames.rts.gameFramework.network.GameInputStream;
 import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
-import com.corrodinggames.rts.gameFramework.utility.*;
+import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
+import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
+import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
+import com.corrodinggames.rts.gameFramework.utility.UnitList;
 import io.github.rwx.geometry.Point;
 import io.github.rwx.geometry.PointF;
 import io.github.rwx.render.canvas.KoolArgbColor;
@@ -149,7 +152,7 @@ public final class AIController extends PlayerTeam {
     /* JADX INFO: renamed from: bd */
     boolean enableNaval;
 
-    /* JADX INFO: renamed from: FastArrayList */
+    /* JADX INFO: renamed from: be */
     boolean enableAirForce;
 
     /* JADX INFO: renamed from: bf */

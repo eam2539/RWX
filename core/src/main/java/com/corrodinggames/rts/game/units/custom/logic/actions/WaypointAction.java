@@ -12,8 +12,8 @@ import com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean;
 import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.GameObject;
 import com.corrodinggames.rts.gameFramework.Utility;
-import com.corrodinggames.rts.gameFramework.utility.IniFile;
 import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
+import com.corrodinggames.rts.gameFramework.utility.IniFile;
 import io.github.rwx.geometry.PointF;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.custom.a.a.b */
@@ -117,22 +117,22 @@ public class WaypointAction extends LogicAction {
         if (logicBoolean != null) {
             z2 = true;
             if (z4 || z5) {
-                throw new RuntimeException("[" + str + "] addWaypoint_target_nearestUnit/randomUnit and addWaypoint_target_fromReference cannot FastArrayList used together");
+                throw new RuntimeException("[" + str + "] addWaypoint_target_nearestUnit/randomUnit and addWaypoint_target_fromReference cannot be used together");
             }
             if (z3) {
-                throw new RuntimeException("[" + str + "] addWaypoint_position_offset* and addWaypoint_target_fromReference cannot FastArrayList used together");
+                throw new RuntimeException("[" + str + "] addWaypoint_position_offset* and addWaypoint_target_fromReference cannot be used together");
             }
             if (zBooleanValue4) {
-                throw new RuntimeException("[" + str + "] addWaypoint_position_fromAction and addWaypoint_target_fromReference cannot FastArrayList used together");
+                throw new RuntimeException("[" + str + "] addWaypoint_position_fromAction and addWaypoint_target_fromReference cannot be used together");
             }
         }
         if (zBooleanValue4) {
             z2 = true;
             if (z4 || z5) {
-                throw new RuntimeException("[" + str + "] addWaypoint_target_* and addWaypoint_position_fromAction cannot FastArrayList used together");
+                throw new RuntimeException("[" + str + "] addWaypoint_target_* and addWaypoint_position_fromAction cannot be used together");
             }
             if (z3) {
-                throw new RuntimeException("[" + str + "] addWaypoint_position_offset* and addWaypoint_position_fromAction cannot FastArrayList used together");
+                throw new RuntimeException("[" + str + "] addWaypoint_position_offset* and addWaypoint_position_fromAction cannot be used together");
             }
         }
         if ((z4 || z5 || z3 || logicBoolean != null) && unitCommandType == null) {
@@ -147,14 +147,14 @@ public class WaypointAction extends LogicAction {
         if (z3) {
             z2 = true;
             if (z4 || z5) {
-                throw new RuntimeException("[" + str + "] addWaypoint_target_* and addWaypoint_position_* cannot FastArrayList used together");
+                throw new RuntimeException("[" + str + "] addWaypoint_target_* and addWaypoint_position_* cannot be used together");
             }
             if (unitCommandType != UnitCommandType.move && unitCommandType != UnitCommandType.attackMove) {
                 throw new RuntimeException("[" + str + "] addWaypoint_position_* only supports position based waypoints (eg: move, attackMove)");
             }
         }
         if (z4 && z5) {
-            throw new RuntimeException("[" + str + "] addWaypoint_target_nearestUnit_* and addWaypoint_target_randomUnit_* cannot FastArrayList used together");
+            throw new RuntimeException("[" + str + "] addWaypoint_target_nearestUnit_* and addWaypoint_target_randomUnit_* cannot be used together");
         }
         if (z2) {
             WaypointAction waypointAction = new WaypointAction();

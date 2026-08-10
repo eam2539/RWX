@@ -120,7 +120,7 @@ public class ModManager {
                 int versionPart5 = parseVersionPart(strCleanVersionString, 2);
                 int versionPart6 = parseVersionPart(strCleanVersionString2, 2);
                 if (versionPart2 < 1) {
-                    throw new ConfigParseException("Min version cannot FastArrayList less than v1.10");
+                    throw new ConfigParseException("Min version cannot be less than v1.10");
                 }
                 if (versionPart2 > versionPart) {
                     throw new ConfigParseException("Requires version: " + strCleanVersionString2 + " or higher. (You have: " + strCleanVersionString + ")");
@@ -129,7 +129,7 @@ public class ModManager {
                     return;
                 }
                 if (versionPart4 < 10 && versionPart2 == 1) {
-                    throw new ConfigParseException("Min version cannot FastArrayList less than v1.10");
+                    throw new ConfigParseException("Min version cannot be less than v1.10");
                 }
                 if (versionPart4 > versionPart3) {
                     throw new ConfigParseException("Requires version: " + strCleanVersionString2 + " or higher. (You have: " + strCleanVersionString + ")");

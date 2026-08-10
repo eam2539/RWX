@@ -578,7 +578,7 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
         @LogicBoolean.Parameter
         public void withinRange(float f) {
             if (f > 1500.0f) {
-                throw new ConfigException("NearestUnit distance cannot FastArrayList over 1500 is: " + f);
+                throw new ConfigException("NearestUnit distance cannot be over 1500 is: " + f);
             }
             this.withinRange = f;
             this.withinRangeSq = f * f;

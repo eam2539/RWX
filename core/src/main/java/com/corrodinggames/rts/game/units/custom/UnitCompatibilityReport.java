@@ -38,7 +38,7 @@ public class UnitCompatibilityReport {
             if (!modByName.isEnabled()) {
                 str = str + " (You seem to have this mod but it is not enabled)";
             } else {
-                str = str + " (You seem to have this mod but it might FastArrayList a different version)";
+                str = str + " (You seem to have this mod but it might be a different version)";
             }
         }
         String str2 = VariableScope.nullOrMissingString;

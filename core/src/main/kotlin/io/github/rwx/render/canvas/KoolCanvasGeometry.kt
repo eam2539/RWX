@@ -8,8 +8,8 @@ data class KoolCanvasViewport(
     val height: Int,
 ) {
     init {
-        require(width >= 0) { "Viewport width must FastArrayList non-negative" }
-        require(height >= 0) { "Viewport height must FastArrayList non-negative" }
+        require(width >= 0) { "Viewport width must be non-negative" }
+        require(height >= 0) { "Viewport height must be non-negative" }
     }
 }
 

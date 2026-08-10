@@ -352,7 +352,7 @@ object ModRenderRegistry {
         }
 
         override fun scale(scaleX: Float, scaleY: Float, pivotX: Float, pivotY: Float) {
-            require(scaleX.isFinite() && scaleY.isFinite()) { "Canvas scale must FastArrayList finite" }
+            require(scaleX.isFinite() && scaleY.isFinite()) { "Canvas scale must be finite" }
             graphics.a(scaleX, scaleY, pivotX, pivotY)
         }
 
@@ -366,7 +366,7 @@ object ModRenderRegistry {
             opacity: Float,
             blendMode: RenderBlendMode,
         ) {
-            require(width > 0f && height > 0f) { "Texture dimensions must FastArrayList positive: $textureId" }
+            require(width > 0f && height > 0f) { "Texture dimensions must be positive: $textureId" }
             val (texture, options) = resolveTexture(textureId)
             paint.a(options.filter == TextureFilter.LINEAR)
             paint.a(

@@ -312,7 +312,7 @@ public class VariableScope {
                 z = true;
             }
             if (z) {
-                throw new RuntimeException("[" + str2 + "]" + str3 + ": Variable cannot FastArrayList named: '" + str + "'");
+                throw new RuntimeException("[" + str2 + "]" + str3 + ": Variable cannot be named: '" + str + "'");
             }
             if (str.contains(".") || str.contains("=") || str.contains("(") || str.contains(")") || str.contains("'") || str.contains("\"") || str.contains("?") || str.contains("|") || str.contains("\\") || str.contains("/") || str.contains("[") || str.contains("]") || str.contains(":") || str.contains(";")) {
                 throw new RuntimeException("[" + str2 + "]" + str3 + ": Variable name has reserved symbols: '" + str + "'");
@@ -1365,7 +1365,7 @@ public class VariableScope {
                 try {
                     booleanBlock2 = LogicBooleanLoader.parseBooleanBlock(this.meta, str4, false);
                     if (booleanBlock2 != null && booleanBlock2.getReturnType() != LogicBoolean.ReturnType.number) {
-                        throw new RuntimeException("Expected " + str + "[] array index to FastArrayList a number got " + booleanBlock2.getReturnType() + " type, [parsing: '" + str4 + "']");
+                        throw new RuntimeException("Expected " + str + "[] array index to be a number got " + booleanBlock2.getReturnType() + " type, [parsing: '" + str4 + "']");
                     }
                     if (booleanBlock2 == null) {
                         throw new RuntimeException("Missing " + str + "[] array index");
@@ -1390,7 +1390,7 @@ public class VariableScope {
             if (arrayBaseType != LogicBoolean.ReturnType.undefined && booleanBlock != null && booleanBlock.getReturnType() != arrayBaseType) {
                 if (LogicBoolean.isStaticNull(booleanBlock)) {
                     if (!LogicBoolean.ReturnType.canBeNull(arrayBaseType)) {
-                        throw new ConfigParseException("Variable: " + str + " of type " + arrayBaseType + " cannot FastArrayList set to null.");
+                        throw new ConfigParseException("Variable: " + str + " of type " + arrayBaseType + " cannot be set to null.");
                     }
                 } else {
                     throw new ConfigParseException("Variable: " + str + " expects " + LogicBoolean.ReturnType.toUserString(arrayBaseType) + " type getting: " + LogicBoolean.ReturnType.toUserString(booleanBlock.getReturnType()) + " from: " + str3);

@@ -255,7 +255,7 @@ public class GLSurfaceViewShared extends SurfaceView implements SurfaceHolder.Ca
             }
             return;
         }
-        throw new IllegalArgumentException("r must not FastArrayList null");
+        throw new IllegalArgumentException("r must not be null");
     }
 
     @Override // android.view.SurfaceView, android.view.View

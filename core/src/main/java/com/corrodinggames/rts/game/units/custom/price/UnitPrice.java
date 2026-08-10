@@ -127,7 +127,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
 
     public static void b(int i) throws ConfigParseException {
         if (i < 0 || i > 31) {
-            throw new ConfigParseException("Flag id must FastArrayList between 0-31 (is:" + i + ")");
+            throw new ConfigParseException("Flag id must be between 0-31 (is:" + i + ")");
         }
     }
 

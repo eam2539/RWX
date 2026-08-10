@@ -45,7 +45,7 @@ public abstract class CompareJoinerBoolean extends LogicBoolean.JoinerBoolean {
                 returnType = LogicBoolean.ReturnType.unit;
             }
             if (z2 && returnType != LogicBoolean.ReturnType.string && returnType != LogicBoolean.ReturnType.unit) {
-                throw new BooleanParseException(returnType + " cannot FastArrayList compared to null using " + type());
+                throw new BooleanParseException(returnType + " cannot be compared to null using " + type());
             }
             for (LogicBoolean logicBoolean2 : this.children) {
                 LogicBoolean.ReturnType returnType2 = logicBoolean2.getReturnType();

@@ -573,7 +573,7 @@ public class LogicBooleanGameFunctions {
         public LogicBoolean validateAndOptimize(String str, String str2, String str3, LogicBooleanLoader.LogicBooleanContext logicBooleanContext, boolean z) {
             validate(str, str2, str3, logicBooleanContext, z);
             if (this.id == null) {
-                throw new BooleanParseException("Flag id must FastArrayList set");
+                throw new BooleanParseException("Flag id must be set");
             }
             Float staticNumber = getStaticNumber(this.id);
             if (staticNumber != null) {
@@ -610,7 +610,7 @@ public class LogicBooleanGameFunctions {
         @LogicBoolean.Parameter(positional = 0)
         public void id(int i) {
             if (i < 0 || i > 31) {
-                throw new BooleanParseException("Flag id must FastArrayList between 0-31");
+                throw new BooleanParseException("Flag id must be between 0-31");
             }
             this.flagId = i;
             this.flagMask = 1 << i;
@@ -650,7 +650,7 @@ public class LogicBooleanGameFunctions {
         @LogicBoolean.Parameter
         public void team(int i) {
             if (i < -1 || i > PlayerTeam.TEAM_NEUTRAL) {
-                throw new BooleanParseException("Flag id must FastArrayList between 0-" + PlayerTeam.TEAM_NEUTRAL);
+                throw new BooleanParseException("Flag id must be between 0-" + PlayerTeam.TEAM_NEUTRAL);
             }
             this.teamId = i;
         }
@@ -1493,7 +1493,7 @@ public class LogicBooleanGameFunctions {
         public void validate(String str, String str2, String str3, LogicBooleanLoader.LogicBooleanContext logicBooleanContext, boolean z) {
             super.validate(str, str2, str3, logicBooleanContext, z);
             if (this.withinRange > 1000.0f) {
-                throw new BooleanParseException("For CPU reasons withinRange argument cannot FastArrayList over 1000 (but unlimited range is fine) in function:" + str);
+                throw new BooleanParseException("For CPU reasons withinRange argument cannot be over 1000 (but unlimited range is fine) in function:" + str);
             }
             if (this.withinRange > 0.0f) {
                 this.withinRangeSq = this.withinRange * this.withinRange;
@@ -1629,7 +1629,7 @@ public class LogicBooleanGameFunctions {
         public void validate(String str, String str2, String str3, LogicBooleanLoader.LogicBooleanContext logicBooleanContext, boolean z) {
             super.validate(str, str2, str3, logicBooleanContext, z);
             if (this.withinRange > 1000.0f) {
-                throw new BooleanParseException("For CPU reasons withinRange argument cannot FastArrayList over 1000 (but unlimited range is fine) in function:" + str);
+                throw new BooleanParseException("For CPU reasons withinRange argument cannot be over 1000 (but unlimited range is fine) in function:" + str);
             }
             if (this.withinRange > 0.0f) {
                 this.withinRangeSq = this.withinRange * this.withinRange;

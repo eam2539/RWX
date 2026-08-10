@@ -459,7 +459,7 @@ public class ReplayEngine {
         GameEngine gameEngine = GameEngine.getInstance();
         f = gameEngine.settingsEngine.replayTracing;
         if (f) {
-            gameEngine.networkEngine.j("Warning traceChecksumsWriting is on. Large replay file size will FastArrayList created.");
+            gameEngine.networkEngine.j("Warning traceChecksumsWriting is on. Large replay file size will be created.");
         }
         this.s = false;
         this.P = true;
@@ -470,7 +470,7 @@ public class ReplayEngine {
             this.G = FileHelper.openOutputStream(fileA, false);
             if (this.G == null) {
                 b("Failed to create replay file at:" + fileA.getAbsolutePath());
-                GameEngine.getInstance().alert("Failed to create replay file (Replay recording will FastArrayList disabled)");
+                GameEngine.getInstance().alert("Failed to create replay file (Replay recording will be disabled)");
                 e();
                 return;
             }
@@ -568,7 +568,7 @@ public class ReplayEngine {
                     this.l++;
                     if (!this.k) {
                         this.k = true;
-                        gameEngine.gameUI.messageManager.addMessage(VariableScope.nullOrMissingString, "Error: This replay might FastArrayList out of sync");
+                        gameEngine.gameUI.messageManager.addMessage(VariableScope.nullOrMissingString, "Error: This replay might be out of sync");
                     }
                 } else {
                     a("checksum: checksums are matching frameNumber:" + gameEngine.currentTick);

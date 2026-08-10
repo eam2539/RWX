@@ -412,7 +412,7 @@ public class ModInfo extends ModMetadata implements Comparable<ModInfo> {
             if (inputStreamOpenFileByPath == null && (strFindModInfoFile = findModInfoFile(this.sourceFolder, 1)) != null) {
                 AssetInputStream assetInputStreamOpenFileByPath = FileHelper.openFileByPath(str);
                 if (assetInputStreamOpenFileByPath != null) {
-                    GameEngine.logErrorColored("mod-info.txt cache seems to FastArrayList invalid for: " + str);
+                    GameEngine.logErrorColored("mod-info.txt cache seems to be invalid for: " + str);
                     CacheManager.deleteFromCache("mods-info", str);
                     inputStreamOpenFileByPath = assetInputStreamOpenFileByPath;
                 } else {
@@ -566,7 +566,7 @@ public class ModInfo extends ModMetadata implements Comparable<ModInfo> {
         String path = getPath();
         GameEngine.log("sourceFolder: '" + path + "'");
         if (!canBeDeleted()) {
-            GameEngine.log("Mod: '" + getDisplayTitle() + "' - Cannot FastArrayList deleted");
+            GameEngine.log("Mod: '" + getDisplayTitle() + "' - Cannot be deleted");
             return false;
         }
         File file = new File(path);

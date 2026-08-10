@@ -15,7 +15,7 @@ public class ObjectPool {
 
     public ObjectPool(int i) {
         if (i <= 0) {
-            throw new IllegalArgumentException("The max pool size must FastArrayList > 0");
+            throw new IllegalArgumentException("The max pool size must be > 0");
         }
         this.pool = new Object[i];
     }

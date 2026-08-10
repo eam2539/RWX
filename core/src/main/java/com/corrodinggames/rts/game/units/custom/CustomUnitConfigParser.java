@@ -335,7 +335,7 @@ public class CustomUnitConfigParser {
         String strTrackImageMemory;
         String str2;
         if (i > 10) {
-            throw new ConfigParseException("copyFrom can only FastArrayList 10 levels deep, maybe you have a loop?");
+            throw new ConfigParseException("copyFrom can only be 10 levels deep, maybe you have a loop?");
         }
         String string = iniFile2.getString("core", "copyFrom", (String) null);
         if (string != null) {
@@ -379,7 +379,7 @@ public class CustomUnitConfigParser {
     /* JADX INFO: renamed from: a */
     public static void readAllCustomUnitConfigs(CustomUnitConfig customUnitConfig, IniFile iniFile, String str, String str2, int i) throws ConfigParseException {
         if (i > 10) {
-            throw new ConfigParseException("@copyFromSection can only FastArrayList 10 levels deep, maybe you have a loop?");
+            throw new ConfigParseException("@copyFromSection can only be 10 levels deep, maybe you have a loop?");
         }
         String string = iniFile.getString(str2, "@copyFromSection", (String) null);
         if (string == null || string.equals(VariableScope.nullOrMissingString)) {
@@ -658,7 +658,7 @@ public class CustomUnitConfigParser {
                                     placeBuildingAction.unitAction = ConfigurableCustomAction.a(customUnitTrigger);
                                 } else if (!z) {
                                     z = true;
-                                    customUnitConfig2.logWarningToMod("builtFrom isLocked currently cannot FastArrayList used when targeting old-style unit:" + unitType.getUnitTypeDescriptionShort());
+                                    customUnitConfig2.logWarningToMod("builtFrom isLocked currently cannot be used when targeting old-style unit:" + unitType.getUnitTypeDescriptionShort());
                                 }
                             }
                             boolean z3 = false;
@@ -1203,10 +1203,10 @@ public class CustomUnitConfigParser {
                 iniFile.trackRead("core", "copyFrom");
                 customUnitConfig.strictLevel = iniFile.getLogicBooleanUnit("core", "strictLevel", (Integer) 0).intValue();
                 if (customUnitConfig.strictLevel < 0) {
-                    throw new ConfigParseException("[core]strictLevel cannot FastArrayList < 0");
+                    throw new ConfigParseException("[core]strictLevel cannot be < 0");
                 }
                 if (customUnitConfig.strictLevel > 1) {
-                    throw new ConfigParseException("[core]strictLevel cannot yet FastArrayList > 1");
+                    throw new ConfigParseException("[core]strictLevel cannot yet be > 1");
                 }
                 customUnitConfig.debugCreditResourceUsage = iniFile.getBoolean("core", "logIfCreditResourceUsed", (Boolean) false).booleanValue();
                 iniFile.trackRead("core", "dont_load");
@@ -1267,7 +1267,7 @@ public class CustomUnitConfigParser {
                                 customUnitConfig.a("1.15p11", 115011, "core", "Memory arrays (in " + str6 + ")");
                             }
                         } else {
-                            throw new ConfigParseException("[core]" + str6 + ": Only a single variable can FastArrayList defined per @memory");
+                            throw new ConfigParseException("[core]" + str6 + ": Only a single variable can be defined per @memory");
                         }
                     }
                 }
@@ -1305,7 +1305,7 @@ public class CustomUnitConfigParser {
                 customUnitConfig.showInEditor = iniFile.getBoolean("core", "showInEditor", (Boolean) true).booleanValue();
                 customUnitConfig.total_frames = iniFile.getLogicBooleanUnit("graphics", "total_frames", (Integer) 1).intValue();
                 if (customUnitConfig.total_frames < 1) {
-                    throw new ConfigParseException("TOTAL_FRAMES cannot FastArrayList: " + customUnitConfig.total_frames + " (must FastArrayList 1 or more)");
+                    throw new ConfigParseException("TOTAL_FRAMES cannot be: " + customUnitConfig.total_frames + " (must be 1 or more)");
                 }
                 customUnitConfig.frame_width = iniFile.getLogicBooleanUnit("graphics", "frame_width", (Integer) (-1)).intValue();
                 customUnitConfig.frame_height = iniFile.getLogicBooleanUnit("graphics", "frame_height", (Integer) (-1)).intValue();
@@ -1346,7 +1346,7 @@ public class CustomUnitConfigParser {
                 customUnitConfig.unitStats.isVisibleToEnemies = iniFile.getBoolean("graphics", "isVisibleToEnemies", (Boolean) true).booleanValue();
                 customUnitConfig.baseTexture = customUnitConfig.a(customUnitConfig.resourceLoadPath, iniFile.getValueStrict("graphics", "image"), customUnitConfig.imageSmoothing, "graphics", "image");
                 if (customUnitConfig.baseTexture == null) {
-                    throw new ConfigParseException("Main unit image must FastArrayList set on custom unit");
+                    throw new ConfigParseException("Main unit image must be set on custom unit");
                 }
                 customUnitConfig.imageFloatingPointSize = iniFile.getBoolean("graphics", "image_floatingPointSize", (Boolean) false).booleanValue();
                 customUnitConfig.frameWidth = customUnitConfig.baseTexture.m() / customUnitConfig.total_frames;
@@ -1477,13 +1477,13 @@ public class CustomUnitConfigParser {
                 AttachmentManagerHook.a(customUnitConfig, iniFile);
                 customUnitConfig.autoTriggerCooldownTime = iniFile.getTime("core", "autoTriggerCooldownTime", Float.valueOf(60.0f)).floatValue();
                 if (customUnitConfig.autoTriggerCooldownTime < 0.0f) {
-                    throw new RuntimeException("autoTriggerCooldownTime cannot FastArrayList < 0");
+                    throw new RuntimeException("autoTriggerCooldownTime cannot be < 0");
                 }
                 if (customUnitConfig.autoTriggerCooldownTime > 120.0f) {
-                    throw new RuntimeException("autoTriggerCooldownTime cannot FastArrayList more than 2 seconds");
+                    throw new RuntimeException("autoTriggerCooldownTime cannot be more than 2 seconds");
                 }
                 if (!iniFile.getBoolean("core", "autoTriggerCooldownTime_allowDangerousHighCPU", (Boolean) false).booleanValue() && customUnitConfig.autoTriggerCooldownTime < 5.0f) {
-                    throw new RuntimeException("autoTriggerCooldownTime cannot FastArrayList this low (without override). Note this cooldown is only applied after triggering an action not for the detection.");
+                    throw new RuntimeException("autoTriggerCooldownTime cannot be this low (without override). Note this cooldown is only applied after triggering an action not for the detection.");
                 }
                 customUnitConfig.autoTriggerCheckRate = (UpdateFrequency) iniFile.getEnum("core", "autoTriggerCheckRate", UpdateFrequency.everyFrame, UpdateFrequency.class);
                 customUnitConfig.autoTriggerCheckWhileNotBuilt = iniFile.getBoolean("core", "autoTriggerCheckWhileNotBuilt", (Boolean) false).booleanValue();
@@ -1497,7 +1497,7 @@ public class CustomUnitConfigParser {
                 boolean zBooleanValue = iniFile.getBoolean("core", "switchPriceWithStreamingCost", (Boolean) false).booleanValue();
                 if (zBooleanValue) {
                     if (customUnitConfig.streamingCost != null) {
-                        throw new RuntimeException("[core]streamingCost and switchPriceWithStreamingCost=true cannot FastArrayList used at the same time");
+                        throw new RuntimeException("[core]streamingCost and switchPriceWithStreamingCost=true cannot be used at the same time");
                     }
                     customUnitConfig.streamingCost = UnitPrice.b(customUnitConfig, iniFile, "core", "price", null);
                     customUnitConfig.price = UnitPrice.a;
@@ -1505,10 +1505,10 @@ public class CustomUnitConfigParser {
                 customUnitConfig.buildSpeed = iniFile.getInvertedTime("core", "buildSpeed", Float.valueOf(1.0f)).floatValue();
                 customUnitConfig.techLevel = iniFile.getLogicBooleanUnit("core", "techLevel", (Integer) 1).intValue();
                 if (customUnitConfig.techLevel > 3) {
-                    throw new RuntimeException("techLevel cannot FastArrayList greater than max tech level of:3");
+                    throw new RuntimeException("techLevel cannot be greater than max tech level of:3");
                 }
                 if (customUnitConfig.techLevel < 1) {
-                    throw new RuntimeException("techLevel cannot FastArrayList less than 1, it is:" + customUnitConfig.techLevel);
+                    throw new RuntimeException("techLevel cannot be less than 1, it is:" + customUnitConfig.techLevel);
                 }
                 customUnitConfig.experimental = iniFile.getBoolean("core", "experimental", (Boolean) false).booleanValue();
                 customUnitConfig.borrowResourcesWhileAlive = UnitPrice.a(customUnitConfig, iniFile, "core", "borrowResourcesWhileAlive", true);
@@ -1523,7 +1523,7 @@ public class CustomUnitConfigParser {
                     customUnitConfig.generationDelay = 1;
                 }
                 if (customUnitConfig.generationDelay < 0) {
-                    throw new RuntimeException("[core]generation_delay cannot FastArrayList < 0");
+                    throw new RuntimeException("[core]generation_delay cannot be < 0");
                 }
                 customUnitConfig.generationRate = 40.0f / customUnitConfig.generationDelay;
                 if (!customUnitConfig.generationTemplate.c()) {
@@ -1546,7 +1546,7 @@ public class CustomUnitConfigParser {
                 customUnitConfig.a(customUnitConfig.generationTemplate);
                 customUnitConfig.resourceRate = iniFile.getFloat("core", "resourceRate", Float.valueOf(0.0f)).floatValue();
                 if (zBooleanValue && customUnitConfig.resourceRate != 0.0f) {
-                    throw new RuntimeException("To avoid mistakes [core]resourceRate cannot FastArrayList used with switchPriceWithStreamingCost=true");
+                    throw new RuntimeException("To avoid mistakes [core]resourceRate cannot be used with switchPriceWithStreamingCost=true");
                 }
                 String string7 = iniFile.getString("core", "updateUnitMemory", (String) null);
                 if (string7 != null) {
@@ -1741,7 +1741,7 @@ public class CustomUnitConfigParser {
                 customUnitConfig.showOnMinimapToEnemies = iniFile.getBoolean("core", "showOnMinimapToEnemies", Boolean.valueOf(customUnitConfig.unitStats.isVisibleToEnemies)).booleanValue();
                 customUnitConfig.deathAnimation = iniFile.getAnimationSet(customUnitConfig, "core", "canOnlyBeAttackedByUnitsWithTags", (AnimationSet) null);
                 if (customUnitConfig.canNotBeDirectlyAttacked && customUnitConfig.deathAnimation != null) {
-                    throw new RuntimeException("canNotBeDirectlyAttacked and canOnlyBeAttackedByUnitsWithTags cannot FastArrayList used at the same time");
+                    throw new RuntimeException("canNotBeDirectlyAttacked and canOnlyBeAttackedByUnitsWithTags cannot be used at the same time");
                 }
                 customUnitConfig.canNotBeGivenOrdersByPlayer = iniFile.getBoolean("core", "canNotBeGivenOrdersByPlayer", (Boolean) false).booleanValue();
                 customUnitConfig.canRepairBuildings = iniFile.getBoolean("core", "canRepairBuildings", (Boolean) false).booleanValue();
@@ -1818,7 +1818,7 @@ public class CustomUnitConfigParser {
                 }
                 customUnitConfig.maxTransportingUnits = iniFile.getLogicBooleanUnit("core", "maxTransportingUnits", (Integer) 0).intValue();
                 if (customUnitConfig.maxTransportingUnits < 0) {
-                    throw new RuntimeException("maxTransportingUnits cannot FastArrayList < 0");
+                    throw new RuntimeException("maxTransportingUnits cannot be < 0");
                 }
                 customUnitConfig.transportUnitsUnloadDelayBetweenEachUnit = iniFile.getTime("core", "transportUnitsUnloadDelayBetweenEachUnit", Float.valueOf(30.0f)).floatValue();
                 customUnitConfig.transportUnitsRequireTag = AnimationTag.a(iniFile.getString("core", "transportUnitsRequireTag", (String) null));
@@ -1976,7 +1976,7 @@ public class CustomUnitConfigParser {
                 }
                 customUnitConfig.moveYAxisScaling = iniFile.getFloat("movement", "moveYAxisScaling", Float.valueOf(1.0f)).floatValue();
                 if (customUnitConfig.moveYAxisScaling <= 0.0f) {
-                    throw new RuntimeException("[movement]moveYAxisScaling must FastArrayList > 0");
+                    throw new RuntimeException("[movement]moveYAxisScaling must be > 0");
                 }
                 customUnitConfig.inverseMoveYAxisScaling = 1.0f / customUnitConfig.moveYAxisScaling;
                 customUnitConfig.reverseSpeedPercentage = iniFile.getFloat("movement", "reverseSpeedPercentage", Float.valueOf(0.6f)).floatValue();
@@ -2053,7 +2053,7 @@ public class CustomUnitConfigParser {
                         customUnitConfig.meleeAttackRange = f6.floatValue();
                     }
                 } else if (f6 != null) {
-                    throw new RuntimeException("[attack]meleeEngangementDistance can only FastArrayList used with isMelee:true");
+                    throw new RuntimeException("[attack]meleeEngangementDistance can only be used with isMelee:true");
                 }
                 recordLoadPhaseTime(jA, LoadPhase.unitParsePartA);
                 for (String str16 : iniFile.getSectionsStartingWith("projectile_")) {
@@ -2125,7 +2125,7 @@ public class CustomUnitConfigParser {
                         if (turretConfig4.parentTurret != null) {
                             turretConfig4.linkedTurretIndex = turretConfig4.parentTurret.turretIndex;
                             if (turretConfig4.parentTurret.parentTurret != null) {
-                                throw new RuntimeException(turretConfig4.name + ": Turret can not FastArrayList attached to turret that is also attached to a turret");
+                                throw new RuntimeException(turretConfig4.name + ": Turret can not be attached to turret that is also attached to a turret");
                             }
                         }
                         if (turretConfig4.childTurret != null) {
@@ -2357,7 +2357,7 @@ public class CustomUnitConfigParser {
                     if (f8.floatValue() >= 0.0f && f8.floatValue() <= 1.0f) {
                         customUnitConfig.aiUpgradePriority = f8.floatValue() * 100.0f;
                     } else {
-                        throw new RuntimeException("[ai]ai_upgradePriority: " + customUnitConfig.aiUpgradePriority + " must FastArrayList between 0-1 or -1 for default");
+                        throw new RuntimeException("[ai]ai_upgradePriority: " + customUnitConfig.aiUpgradePriority + " must be between 0-1 or -1 for default");
                     }
                 }
                 if (customUnitConfig.canAttack) {
@@ -2525,7 +2525,7 @@ public class CustomUnitConfigParser {
         } else if (errorMessage.contains("Error loading core unit")) {
             str2 = errorMessage;
         } else {
-            str2 = "Error loading core unit: " + strApplyCopyFromSectionChain + ": \n" + errorMessage + " (This might FastArrayList from placing a mod in 'assets/', they should go under 'mods/')";
+            str2 = "Error loading core unit: " + strApplyCopyFromSectionChain + ": \n" + errorMessage + " (This might be from placing a mod in 'assets/', they should go under 'mods/')";
         }
         if (exc instanceof ConfigParseException) {
             ConfigParseException configParseException = (ConfigParseException) exc;
@@ -2699,7 +2699,7 @@ public class CustomUnitConfigParser {
                     throw new RuntimeException("[" + str + "]id cannot contain null");
                 }
                 if (customActionDef.name.length() > 15) {
-                    throw new RuntimeException("[" + str + "]id cannot FastArrayList longer than 15 characters");
+                    throw new RuntimeException("[" + str + "]id cannot be longer than 15 characters");
                 }
                 Iterator it = customUnitConfig.customActionDefs.iterator();
                 while (it.hasNext()) {
@@ -2716,7 +2716,7 @@ public class CustomUnitConfigParser {
             customActionDef.streamingCost = UnitPrice.b(customUnitConfig, iniFile, str, str2 + "streamingCost", null);
             if (iniFile.getBoolean(str, str2 + "switchPriceWithStreamingCost", (Boolean) false).booleanValue()) {
                 if (customActionDef.streamingCost != null) {
-                    throw new RuntimeException("[" + str + "]streamingCost and switchPriceWithStreamingCost=true cannot FastArrayList used at the same time");
+                    throw new RuntimeException("[" + str + "]streamingCost and switchPriceWithStreamingCost=true cannot be used at the same time");
                 }
                 customActionDef.streamingCost = UnitPrice.b(customUnitConfig, iniFile, str, str2 + "price", null);
                 customActionDef.price = UnitPrice.a;
@@ -2786,7 +2786,7 @@ public class CustomUnitConfigParser {
             if (customActionDef.guiBuildUnit != null) {
                 customActionDef.queueType = ActionType.placeBuilding;
                 if (string != null) {
-                    throw new RuntimeException("[" + str + "]guiBuildUnit and convertTo cannot currently FastArrayList used the same action");
+                    throw new RuntimeException("[" + str + "]guiBuildUnit and convertTo cannot currently be used the same action");
                 }
             }
             customActionDef.aiConsiderSameAsBuilding = customUnitConfig.reloadAllCustomUnits(iniFile.getString(str, str2 + "ai_considerSameAsBuilding", (String) null), str2 + "ai_considerSameAsBuilding", str);
@@ -2894,7 +2894,7 @@ public class CustomUnitConfigParser {
                 if (customActionDef.fireTurretAtGroundOffset == null) {
                     customActionDef.queueType = ActionType.targetGround;
                     if (customActionDef.guiBuildUnit != null) {
-                        throw new RuntimeException("[" + str + "]guiBuildUnit and fireTurretXAtGround (without withOffset) cannot FastArrayList used in the same action");
+                        throw new RuntimeException("[" + str + "]guiBuildUnit and fireTurretXAtGround (without withOffset) cannot be used in the same action");
                     }
                 }
                 z4 = true;
@@ -2964,10 +2964,10 @@ public class CustomUnitConfigParser {
             Integer logicBooleanUnit = iniFile.getLogicBooleanUnit(str, str2 + "autoTriggerOnEventRecursionLimit", (Integer) null);
             if (logicBooleanUnit != null) {
                 if (logicBooleanUnit.intValue() < 0) {
-                    throw new ConfigParseException("[" + str + "]" + str2 + "autoTriggerOnEventRecursionLimit: Cannot FastArrayList < 0");
+                    throw new ConfigParseException("[" + str + "]" + str2 + "autoTriggerOnEventRecursionLimit: Cannot be < 0");
                 }
                 if (logicBooleanUnit.intValue() > 50) {
-                    throw new ConfigParseException("[" + str + "]" + str2 + "autoTriggerOnEventRecursionLimit: Cannot FastArrayList > 100");
+                    throw new ConfigParseException("[" + str + "]" + str2 + "autoTriggerOnEventRecursionLimit: Cannot be > 100");
                 }
             }
             if (string16 != null && (arrayListCreateLocalizedString = createLocalizedString(str, str2 + "autoTriggerOnEvent", string16)) != null) {

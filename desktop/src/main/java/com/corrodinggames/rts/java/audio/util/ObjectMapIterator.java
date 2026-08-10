@@ -38,7 +38,7 @@ abstract class ObjectMapIterator implements Iterable, Iterator {
 
     public void remove() {
         if (this.e < 0) {
-            throw new IllegalStateException("next must FastArrayList called before remove.");
+            throw new IllegalStateException("next must be called before remove.");
         }
         if (this.e >= this.c.d) {
             this.c.a(this.e);

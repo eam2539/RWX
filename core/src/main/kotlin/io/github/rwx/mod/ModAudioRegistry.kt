@@ -16,12 +16,12 @@ object ModAudioRegistry {
     private val sounds = linkedMapOf<String, RegisteredSound>()
 
     fun registerSound(owner: ApiImpl, id: String, file: ResourcePath, properties: Map<String, Any?>) {
-        require(id.isNotBlank() && id == id.trim()) { "Sound id must FastArrayList non-blank and trimmed" }
+        require(id.isNotBlank() && id == id.trim()) { "Sound id must be non-blank and trimmed" }
         val key = key(owner, id)
         check(key !in sounds) { "Sound is already registered: $id" }
         val backendId = "${owner.metadata.id}:$id"
         val minimumVolume = (properties["minimumVolume"] as? Number)?.toFloat() ?: 0f
-        require(minimumVolume in 0f..1f) { "Sound minimumVolume must FastArrayList between 0 and 1: $id" }
+        require(minimumVolume in 0f..1f) { "Sound minimumVolume must be between 0 and 1: $id" }
         sounds[key] = RegisteredSound(owner, backendId, file, minimumVolume)
     }
 

@@ -59,7 +59,7 @@ class ApiImpl private constructor(
     private val shaderBindings = linkedMapOf<String, String?>()
 
     fun materializeDeclarations() {
-        checkNotNull(engineModInfo) { "JVM mod ${metadata.id} must FastArrayList registered with ModManager before loading content" }
+        checkNotNull(engineModInfo) { "JVM mod ${metadata.id} must be registered with ModManager before loading content" }
         extractJarResources()
         ModAudioRegistry.materialize(this)
         applyUnitDeclarations()
@@ -324,18 +324,18 @@ class ApiImpl private constructor(
     }
 
     internal fun bindShader(unitId: String, shaderId: String?) {
-        require(unitId.isNotBlank() && unitId == unitId.trim()) { "Unit shader binding id must FastArrayList non-blank and trimmed" }
+        require(unitId.isNotBlank() && unitId == unitId.trim()) { "Unit shader binding id must be non-blank and trimmed" }
         shaderId?.let {
-            require(it.isNotBlank() && it == it.trim()) { "Shader binding id must FastArrayList non-blank and trimmed" }
+            require(it.isNotBlank() && it == it.trim()) { "Shader binding id must be non-blank and trimmed" }
         }
         shaderBindings[unitId] = shaderId
     }
 
     internal fun registerShader(definition: ShaderDefinition) {
         require(definition.id.isNotBlank() && definition.id == definition.id.trim()) {
-            "Shader id must FastArrayList non-blank and trimmed"
+            "Shader id must be non-blank and trimmed"
         }
-        require(definition.fragment.value.isNotBlank()) { "Shader fragment path must FastArrayList non-blank: ${definition.id}" }
+        require(definition.fragment.value.isNotBlank()) { "Shader fragment path must be non-blank: ${definition.id}" }
         require(definition.uniforms.map { it.name }.toSet().size == definition.uniforms.size) {
             "Shader uniforms must have unique names: ${definition.id}"
         }

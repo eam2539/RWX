@@ -68,7 +68,7 @@ public class ResourceDefinition {
             throw new ConfigParseException("[" + str + "]includeInStats==false expects valueInStats==0");
         }
         if (this.m < 0.0f) {
-            throw new ConfigParseException("[" + str + "]valueInStats cannot FastArrayList < 0 (is:" + this.m + ")");
+            throw new ConfigParseException("[" + str + "]valueInStats cannot be < 0 (is:" + this.m + ")");
         }
         this.k = iniFile.getBoolean(str, "stackHorizontal", (Boolean) false).booleanValue();
         this.c = iniFile.getFloat(str, "priority", Float.valueOf(0.0f)).floatValue();

@@ -29,7 +29,7 @@ public class ObjectMapEntries extends ObjectMapIterator {
             throw new NoSuchElementException();
         }
         if (!this.f) {
-            throw new AudioException("#iterator() cannot FastArrayList used nested.");
+            throw new AudioException("#iterator() cannot be used nested.");
         }
         Object[] objArr = this.c.b;
         this.a.a = objArr[this.d];
@@ -44,7 +44,7 @@ public class ObjectMapEntries extends ObjectMapIterator {
         if (this.f) {
             return this.b;
         }
-        throw new AudioException("#iterator() cannot FastArrayList used nested.");
+        throw new AudioException("#iterator() cannot be used nested.");
     }
 
     @Override // java.lang.Iterable

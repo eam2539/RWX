@@ -679,9 +679,9 @@ public final class Utility {
             }
             return sb.toString();
         } catch (UnsupportedEncodingException e2) {
-            throw new RuntimeException("UTF-8 should FastArrayList supported", e2);
+            throw new RuntimeException("UTF-8 should be supported", e2);
         } catch (NoSuchAlgorithmException e3) {
-            throw new RuntimeException("MD5 should FastArrayList supported", e3);
+            throw new RuntimeException("MD5 should be supported", e3);
         }
     }
 

@@ -92,10 +92,10 @@ public class TakeResourcesAction extends LogicAction {
         boolean zBooleanValue5 = iniFile.getBoolean(str, str2 + "takeResources_saveFirstUnitToCustomTarget2", (Boolean) false).booleanValue();
         if (!zBooleanValue && !zBooleanValue2 && fFloatValue < 0.0f && logicBoolean == null) {
             if (unitPriceA != null && !unitPriceA.c()) {
-                throw new ConfigParseException("[" + str + "]takeResources requires an include (eg: takeResources_includeUnitsWithinRange, takeResources_includeUnitsInTransport) otherwise no results would FastArrayList found");
+                throw new ConfigParseException("[" + str + "]takeResources requires an include (eg: takeResources_includeUnitsWithinRange, takeResources_includeUnitsInTransport) otherwise no results would be found");
             }
             if (zBooleanValue3) {
-                throw new ConfigParseException("[" + str + "]takeResources_searchOnly requires an include (eg: takeResources_includeUnitsWithinRange) otherwise no results would FastArrayList found");
+                throw new ConfigParseException("[" + str + "]takeResources_searchOnly requires an include (eg: takeResources_includeUnitsWithinRange) otherwise no results would be found");
             }
             return;
         }
@@ -128,7 +128,7 @@ public class TakeResourcesAction extends LogicAction {
         takeResourcesAction.takeResources_discardCollected = iniFile.getBoolean(str, str2 + "takeResources_discardCollected", Boolean.valueOf(takeResourcesAction.takeResources_discardCollected)).booleanValue();
         takeResourcesAction.takeResources_keepResourcesOnTarget = iniFile.getBoolean(str, str2 + "takeResources_keepResourcesOnTarget", Boolean.valueOf(takeResourcesAction.takeResources_keepResourcesOnTarget)).booleanValue();
         if (zBooleanValue3 && (!takeResourcesAction.takeResources_discardCollected || !takeResourcesAction.takeResources_keepResourcesOnTarget)) {
-            throw new ConfigParseException("[" + str + "]takeResources_searchOnly shortcut expects takeResources_discardCollected and takeResources_keepResourcesOnTarget to FastArrayList true");
+            throw new ConfigParseException("[" + str + "]takeResources_searchOnly shortcut expects takeResources_discardCollected and takeResources_keepResourcesOnTarget to be true");
         }
         takeResourcesAction.takeResources_excludeUnitsWithTheseResources = UnitPrice.a(customUnitConfig, iniFile, str, str2 + "takeResources_excludeUnitsWithTheseResources", true);
         if (takeResourcesAction.takeResources_excludeUnitsWithTheseResources != null && takeResourcesAction.takeResources_excludeUnitsWithTheseResources.c()) {

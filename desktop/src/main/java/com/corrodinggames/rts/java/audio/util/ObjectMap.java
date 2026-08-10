@@ -25,7 +25,7 @@ public class ObjectMap implements Iterable {
 
     public ObjectMap(int i, float f) {
         if (i < 0) {
-            throw new IllegalArgumentException("initialCapacity must FastArrayList >= 0: " + i);
+            throw new IllegalArgumentException("initialCapacity must be >= 0: " + i);
         }
         int iB = MathUtils.b((int) Math.ceil(i / f));
         if (iB > 1073741824) {
@@ -33,7 +33,7 @@ public class ObjectMap implements Iterable {
         }
         this.d = iB;
         if (f <= 0.0f) {
-            throw new IllegalArgumentException("loadFactor must FastArrayList > 0: " + f);
+            throw new IllegalArgumentException("loadFactor must be > 0: " + f);
         }
         this.f = f;
         this.i = (int) (this.d * f);
@@ -47,7 +47,7 @@ public class ObjectMap implements Iterable {
 
     public Object a(Object obj, Object obj2) {
         if (obj == null) {
-            throw new IllegalArgumentException("key cannot FastArrayList null.");
+            throw new IllegalArgumentException("key cannot be null.");
         }
         return b(obj, obj2);
     }

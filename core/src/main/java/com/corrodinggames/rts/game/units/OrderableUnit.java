@@ -272,7 +272,7 @@ public abstract class OrderableUnit extends UnitBase {
     /* JADX INFO: renamed from: bd */
     protected static KoolPaint overlayPaint3;
 
-    /* JADX INFO: renamed from: FastArrayList */
+    /* JADX INFO: renamed from: be */
     static final PointF tempPointF1;
     protected static final Vector3D bf;
 

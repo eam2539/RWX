@@ -469,7 +469,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             if (i >= 5 && (b = gameInputStream.readByte()) != 0) {
                 du();
                 if (this.legInstances == null) {
-                    GameEngine.log("readIn: legs==null but leg data found in save, this might FastArrayList due to missing or changed mods");
+                    GameEngine.log("readIn: legs==null but leg data found in save, this might be due to missing or changed mods");
                 }
                 for (int i4 = 0; i4 < b; i4++) {
                     if (this.legInstances == null) {
@@ -1371,7 +1371,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         projectile.az = f4;
         projectile.aT = f4;
         if (baseUnit == null) {
-            throw new RuntimeException("Source cannot FastArrayList null");
+            throw new RuntimeException("Source cannot be null");
         }
         projectile.g = customProjectileTemplate;
         projectile.G = customProjectileTemplate.flameWeapon;
@@ -2879,7 +2879,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             f2 = this.rotationSpeed;
         } else {
             if (z) {
-                throw new RuntimeException("Turret can not FastArrayList attached to turret that is not attached to the body");
+                throw new RuntimeException("Turret can not be attached to turret that is not attached to the body");
             }
             Vector3D vector3DA = a(turretConfig.linkedTurretIndex, true);
             fFastCos = vector3DA.a;
@@ -3031,7 +3031,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 }
                 if (customAction.actionDef.fireTurretAtGroundTerrainFilter != null && GameViewUtils.a(f, f2, customAction.actionDef.fireTurretAtGroundTerrainFilter)) {
                     if (this.team == gameEngine.playerTeam) {
-                        gameEngine.gameUI.showMediumPriorityMessage("Invalid map location (Must FastArrayList passable by " + customAction.actionDef.fireTurretAtGroundTerrainFilter.name() + ")");
+                        gameEngine.gameUI.showMediumPriorityMessage("Invalid map location (Must be passable by " + customAction.actionDef.fireTurretAtGroundTerrainFilter.name() + ")");
                         return false;
                     }
                     return false;

@@ -107,7 +107,7 @@ public class Wav {
                             str = "Unknown";
                             break;
                     }
-                    throw new AudioException("WAV files must FastArrayList PCM, unsupported format: " + str + " (" + i + ")");
+                    throw new AudioException("WAV files must be PCM, unsupported format: " + str + " (" + i + ")");
                 }
                 this.channels = (read() & 255) | ((read() & 255) << 8);
                 if (this.channels != 1 && this.channels != 2) {

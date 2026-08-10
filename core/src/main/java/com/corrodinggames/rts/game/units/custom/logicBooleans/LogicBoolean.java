@@ -650,7 +650,7 @@ public abstract class LogicBoolean implements Cloneable {
         public void validate(String str, String str2, String str3, LogicBooleanLoader.LogicBooleanContext logicBooleanContext, boolean z) {
             super.validate(str, str2, str3, logicBooleanContext, z);
             if (z && this.greaterThan == -1.0f && this.lessThan == -1.0f && !this.full && !this.empty) {
-                throw new BooleanParseException("Expected greaterThan, lessThan, full, and/or empty to FastArrayList set for function:" + str + " to return a boolean");
+                throw new BooleanParseException("Expected greaterThan, lessThan, full, and/or empty to be set for function:" + str + " to return a boolean");
             }
         }
 
@@ -812,7 +812,7 @@ public abstract class LogicBoolean implements Cloneable {
     }
 
     public void throwVoidReturnError(String str) {
-        throw new RuntimeException("Function or object:'" + str + "' cannot FastArrayList returned");
+        throw new RuntimeException("Function or object:'" + str + "' cannot be returned");
     }
 
     public LogicBoolean setChild(LogicBoolean logicBoolean) {

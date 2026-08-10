@@ -6,8 +6,8 @@ import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import com.corrodinggames.rts.gameFramework.utility.IniFile;
 
-/* JADX INFO: renamed from: com.corrodinggames.rts.game.units.custom.FastArrayList */
-/* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/custom/FastArrayList.class */
+/* JADX INFO: renamed from: com.corrodinggames.rts.game.units.custom.be */
+/* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/custom/be.class */
 public final class PlacementRules {
     FastArrayList<AnimationTag> a = new FastArrayList();
     FastArrayList<UnitSearchRule> b = new FastArrayList();

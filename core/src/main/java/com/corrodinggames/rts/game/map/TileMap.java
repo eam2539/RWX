@@ -287,7 +287,7 @@ public final class TileMap {
 
     public static void bindGraphicsBackend(GraphicsEngine graphicsEngine) {
         if (graphicsEngine == null) {
-            throw new IllegalArgumentException("graphicsEngine cannot FastArrayList null");
+            throw new IllegalArgumentException("graphicsEngine cannot be null");
         }
         if (fogGraphicsBackend == graphicsEngine) {
             return;
@@ -307,7 +307,7 @@ public final class TileMap {
 
     public static void buildFogSmoothAtlas(GraphicsEngine graphicsEngine) {
         if (graphicsEngine == null) {
-            throw new IllegalArgumentException("graphicsEngine cannot FastArrayList null");
+            throw new IllegalArgumentException("graphicsEngine cannot be null");
         }
         GameEngine gameEngine = GameEngine.getInstance();
         releaseFogSmoothAtlas();
@@ -1124,7 +1124,7 @@ public final class TileMap {
                 for (int i9 = 0; i9 < this.tileCountX; i9++) {
                     for (int i10 = 0; i10 < this.tileCountY; i10++) {
                         if (this.groundLayer.getTileAt(i9, i10) == null) {
-                            throw new MapLoadException("An empty tile on the Ground layer at " + i9 + "," + i10 + " all tiles must FastArrayList filled");
+                            throw new MapLoadException("An empty tile on the Ground layer at " + i9 + "," + i10 + " all tiles must be filled");
                         }
                     }
                 }
@@ -1721,7 +1721,7 @@ public final class TileMap {
             inputStreamOpenAsset = openAssetStreamFromSuffixSegments(str, str2, 1);
         }
         if (inputStreamOpenAsset == null) {
-            throw new IOException("File could not FastArrayList found:" + str + str2);
+            throw new IOException("File could not be found:" + str + str2);
         }
         return inputStreamOpenAsset;
     }

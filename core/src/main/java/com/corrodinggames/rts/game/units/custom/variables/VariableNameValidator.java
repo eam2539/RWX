@@ -7,7 +7,7 @@ import com.corrodinggames.rts.game.units.custom.ConfigParseException;
 public class VariableNameValidator {
     public static void a(String str) throws ConfigParseException {
         if (str.length() == 0) {
-            throw new ConfigParseException("name cannot FastArrayList empty");
+            throw new ConfigParseException("name cannot be empty");
         }
         if (str.contains(" ") || str.contains("}") || str.contains("$") || str.contains(".") || str.contains("{") || str.contains("-") || str.contains("+") || str.contains(":") || str.contains("(")) {
             throw new ConfigParseException("invalid character in name");

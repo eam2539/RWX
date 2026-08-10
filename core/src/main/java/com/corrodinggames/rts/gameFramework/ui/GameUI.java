@@ -240,7 +240,7 @@ public final class GameUI extends Serializable {
     /* JADX INFO: renamed from: bd */
     boolean isTooltipVisible;
 
-    /* JADX INFO: renamed from: FastArrayList */
+    /* JADX INFO: renamed from: be */
     float tooltipTimer;
 
     /* JADX INFO: renamed from: bf */

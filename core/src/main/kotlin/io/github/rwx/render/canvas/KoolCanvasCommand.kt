@@ -55,7 +55,7 @@ sealed interface KoolCanvasCommand {
         val state: KoolCanvasState,
     ) : KoolCanvasCommand {
         init {
-            require(radius >= 0f) { "Circle radius must FastArrayList non-negative" }
+            require(radius >= 0f) { "Circle radius must be non-negative" }
         }
     }
 

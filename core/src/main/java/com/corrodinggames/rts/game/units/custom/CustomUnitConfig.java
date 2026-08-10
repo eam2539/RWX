@@ -239,7 +239,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: bc */
     public float nanoReclaimSpeed;
 
-    /* JADX INFO: renamed from: FastArrayList */
+    /* JADX INFO: renamed from: be */
     public float nanoUnbuildSpeed;
 
     /* JADX INFO: renamed from: bf */
@@ -1422,7 +1422,7 @@ public final class CustomUnitConfig implements UnitType {
             if (!modByName.isEnabled()) {
                 str6 = str6 + " (You seem to have this mod but it is not enabled)";
             } else {
-                str6 = str6 + " (You seem to have this mod but it might FastArrayList a different version)";
+                str6 = str6 + " (You seem to have this mod but it might be a different version)";
             }
         }
         if (report.clientChecksum == -1) {
@@ -2015,13 +2015,13 @@ public final class CustomUnitConfig implements UnitType {
             return;
         }
         if (this.modInfo.minVersion == null) {
-            throw new ConfigParseException("[" + str2 + "] minVersion of " + str + " is required to FastArrayList set in mod-info.txt at the root of this mod to use " + str3);
+            throw new ConfigParseException("[" + str2 + "] minVersion of " + str + " is required to be set in mod-info.txt at the root of this mod to use " + str3);
         }
         try {
             ModManager.checkVersion(str, this.modInfo.minVersion);
             this.modInfo.customUnitCount = i;
         } catch (ConfigParseException e) {
-            throw new ConfigParseException("[" + str2 + "]" + str3 + " " + e.getMessage() + " to FastArrayList set as minVersion in mod-info.txt");
+            throw new ConfigParseException("[" + str2 + "]" + str3 + " " + e.getMessage() + " to be set as minVersion in mod-info.txt");
         }
     }
 

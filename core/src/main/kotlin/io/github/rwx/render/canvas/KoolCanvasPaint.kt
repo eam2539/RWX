@@ -95,9 +95,9 @@ data class KoolCanvasPaint(
     val typefaceKey: String? = null,
 ) {
     init {
-        require(alphaMultiplier in 0f..1f) { "Alpha multiplier must FastArrayList in 0..1" }
-        require(strokeWidth >= 0f) { "Stroke width must FastArrayList non-negative" }
-        require(textSize >= 0f) { "Text size must FastArrayList non-negative" }
+        require(alphaMultiplier in 0f..1f) { "Alpha multiplier must be in 0..1" }
+        require(strokeWidth >= 0f) { "Stroke width must be non-negative" }
+        require(textSize >= 0f) { "Text size must be non-negative" }
     }
 
     companion object {

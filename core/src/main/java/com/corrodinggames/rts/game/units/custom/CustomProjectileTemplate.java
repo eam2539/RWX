@@ -43,7 +43,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         Integer logicBooleanUnit = iniFile.getLogicBooleanUnit(str, "directDamage", (Integer) null);
         Integer logicBooleanUnit2 = iniFile.getLogicBooleanUnit(str, "areaDamage", (Integer) null);
         if (logicBooleanUnit == null && logicBooleanUnit2 == null) {
-            throw new RuntimeException("[" + str + "]: directDamage or areaDamage must FastArrayList set");
+            throw new RuntimeException("[" + str + "]: directDamage or areaDamage must be set");
         }
         customProjectileTemplate.s = iniFile.getBoolean(str, "targetGround", Boolean.valueOf(customProjectileTemplate.s)).booleanValue();
         customProjectileTemplate.t = iniFile.getBoolean(str, "targetGround_includeTargetHeight", Boolean.valueOf(customProjectileTemplate.t)).booleanValue();
@@ -92,14 +92,14 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             customProjectileTemplate.Y = textureA3;
             customProjectileTemplate.X = true;
             if (textureA3.q < 20 && !GameEngine.isDedicatedServer()) {
-                throw new RuntimeException("beamImage height must currently FastArrayList 20 pixels or greater (performance when tiling)");
+                throw new RuntimeException("beamImage height must currently be 20 pixels or greater (performance when tiling)");
             }
         }
         Texture textureA4 = customUnitConfig.a(iniFile, str, "beamImageStart");
         if (textureA4 != null) {
             customProjectileTemplate.Z = textureA4;
             if (textureA3 == null) {
-                throw new RuntimeException("beamImageStart requires beamImage to FastArrayList set");
+                throw new RuntimeException("beamImageStart requires beamImage to be set");
             }
         }
         customProjectileTemplate.aa = iniFile.getBoolean(str, "beamImageStartRotated", (Boolean) false).booleanValue();
@@ -107,7 +107,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         if (textureA5 != null) {
             customProjectileTemplate.ab = textureA5;
             if (textureA3 == null) {
-                throw new RuntimeException("beamImageEnd requires beamImage to FastArrayList set");
+                throw new RuntimeException("beamImageEnd requires beamImage to be set");
             }
         }
         customProjectileTemplate.ac = iniFile.getBoolean(str, "beamImageEndRotated", (Boolean) false).booleanValue();
@@ -161,7 +161,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         customProjectileTemplate.wobbleAmplitude = iniFile.getFloat(str, "wobbleAmplitude", Float.valueOf(customProjectileTemplate.wobbleAmplitude)).floatValue();
         customProjectileTemplate.wobbleFrequency = iniFile.getTime(str, "wobbleFrequency", Float.valueOf(customProjectileTemplate.wobbleFrequency)).floatValue();
         if (customProjectileTemplate.wobbleFrequency <= 0.0f) {
-            throw new RuntimeException("wobbleFrequency must FastArrayList greater than 0");
+            throw new RuntimeException("wobbleFrequency must be greater than 0");
         }
         customProjectileTemplate.spawnProjectilesOnEndOfLife = UnitSpawnList.a(customUnitConfig, iniFile, str, "spawnProjectilesOnEndOfLife", (UnitSpawnList) null);
         customProjectileTemplate.spawnProjectilesOnExplode = UnitSpawnList.a(customUnitConfig, iniFile, str, "spawnProjectilesOnExplode", (UnitSpawnList) null);
@@ -182,10 +182,10 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             customProjectileTemplate.color = KoolArgbColor.a(80, 255, 0, 0);
         }
         if (customProjectileTemplate.V && customProjectileTemplate.s) {
-            throw new RuntimeException("lightingEffect must FastArrayList targeted, cannot FastArrayList targetGround");
+            throw new RuntimeException("lightingEffect must be targeted, cannot be targetGround");
         }
         if (customProjectileTemplate.W && customProjectileTemplate.s) {
-            throw new RuntimeException("laserEffect must FastArrayList targeted, cannot FastArrayList targetGround");
+            throw new RuntimeException("laserEffect must be targeted, cannot be targetGround");
         }
         customProjectileTemplate.ballisticDelayMoveHeight = iniFile.getFloat(str, "ballistic_delaymove_height", Float.valueOf(customProjectileTemplate.ballisticDelayMoveHeight)).floatValue();
         customProjectileTemplate.ballisticHeight = iniFile.getFloat(str, "ballistic_height", Float.valueOf(customProjectileTemplate.ballisticHeight)).floatValue();
@@ -200,19 +200,19 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         customProjectileTemplate.retargetingInFlightSearchLead = iniFile.getFloat(str, "retargetingInFlightSearchLead", Float.valueOf(customProjectileTemplate.retargetingInFlightSearchLead)).floatValue();
         customProjectileTemplate.retargetingInFlightSearchOnlyTags = iniFile.getAnimationSet(customUnitConfig, str, "retargetingInFlightSearchOnlyTags", (AnimationSet) null);
         if (customProjectileTemplate.autoTargetingOnDeadTargetRange > 1500.0f) {
-            throw new RuntimeException("for performance autoTargetingOnDeadTargetRange cannot FastArrayList >1500");
+            throw new RuntimeException("for performance autoTargetingOnDeadTargetRange cannot be >1500");
         }
         if (customProjectileTemplate.retargetingInFlightSearchRange > 1500.0f) {
-            throw new RuntimeException("for performance retargetingInFlightSearchRange cannot FastArrayList >1500");
+            throw new RuntimeException("for performance retargetingInFlightSearchRange cannot be >1500");
         }
         customProjectileTemplate.color = iniFile.getColorAsInt(str, "color", Integer.valueOf(customProjectileTemplate.color)).intValue();
         customProjectileTemplate.teamColorRatio = iniFile.getFloat(str, "teamColorRatio", Float.valueOf(customProjectileTemplate.teamColorRatio)).floatValue();
         if (customProjectileTemplate.teamColorRatio < 0.0f || customProjectileTemplate.teamColorRatio > 1.0f) {
-            throw new RuntimeException("teamColorRatio should FastArrayList between 0-1 got:" + customProjectileTemplate.teamColorRatio);
+            throw new RuntimeException("teamColorRatio should be between 0-1 got:" + customProjectileTemplate.teamColorRatio);
         }
         customProjectileTemplate.teamColorRatioSourceRatio = iniFile.getFloat(str, "teamColorRatio_sourceRatio", Float.valueOf(1.0f - customProjectileTemplate.teamColorRatio)).floatValue();
         if (customProjectileTemplate.teamColorRatioSourceRatio < 0.0f || customProjectileTemplate.teamColorRatioSourceRatio > 1.0f) {
-            throw new RuntimeException("teamColorRatio_sourceRatio should FastArrayList between 0-1 got:" + customProjectileTemplate.teamColorRatioSourceRatio);
+            throw new RuntimeException("teamColorRatio_sourceRatio should be between 0-1 got:" + customProjectileTemplate.teamColorRatioSourceRatio);
         }
         if (customProjectileTemplate.teamColorRatio == 0.0f && customProjectileTemplate.teamColorRatioSourceRatio != 1.0f) {
             throw new RuntimeException("teamColorRatio_sourceRatio requires teamColorRatio");
@@ -282,7 +282,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             if (unitPriceA2 != null && unitPriceA2.d()) {
                 unitFilter.f = unitPriceA2;
                 if (logicBooleanUnit3 == null) {
-                    throw new RuntimeException("[" + str + "]" + str4 + "addResourcesAreaHit requires areaRadius to FastArrayList set");
+                    throw new RuntimeException("[" + str + "]" + str4 + "addResourcesAreaHit requires areaRadius to be set");
                 }
             }
             String string5 = iniFile.getString(str, str4 + "changedExplodeEffect", (String) null);

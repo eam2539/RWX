@@ -131,7 +131,7 @@ public class UnitStatsAction extends LogicAction {
         }
         float fFloatValue = iniFile.getFloat(str, str2 + "setBuilt", Float.valueOf(-1.0f)).floatValue();
         if (fFloatValue > 1.0f) {
-            throw new ConfigParseException("[" + str + "] setBuilt cannot FastArrayList greater than 1");
+            throw new ConfigParseException("[" + str + "] setBuilt cannot be greater than 1");
         }
         boolean zBooleanValue5 = iniFile.getBoolean(str, str2 + "clearAllActionCooldowns", (Boolean) false).booleanValue();
         float fFloatValue2 = iniFile.getTimeAsFrames(str, str2 + "addAllActionCooldownsTime", Float.valueOf(0.0f)).floatValue();
@@ -145,7 +145,7 @@ public class UnitStatsAction extends LogicAction {
         CustomUnitActionHandler customUnitAction = iniFile.getCustomUnitAction(customUnitConfig, str, str2 + "addActionCooldownApplyToActions", (CustomUnitActionHandler) null);
         Vector3D resourceOrAsset = iniFile.getResourceOrAsset(str, str2 + "offsetSelfAbsolute", (Vector3D) null);
         if (customUnitAction != null && fFloatValue3 <= 0.0f) {
-            throw new ConfigParseException("[" + str + "]addActionCooldownApplyToActions requires addActionCooldownTime to FastArrayList set");
+            throw new ConfigParseException("[" + str + "]addActionCooldownApplyToActions requires addActionCooldownTime to be set");
         }
         boolean zBooleanValue6 = iniFile.getBoolean(str, str2 + "removeAllQueuedItemsWithoutRefund", (Boolean) false).booleanValue();
         boolean zBooleanValue7 = iniFile.getBoolean(str, str2 + "refundAllQueuedItems", (Boolean) false).booleanValue();

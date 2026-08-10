@@ -76,7 +76,7 @@ public class OpenALAudioDevice implements AudioDevice {
 
     public void writeSamples(byte[] bArr, int i, int i2) {
         if (i2 < 0) {
-            throw new IllegalArgumentException("length cannot FastArrayList < 0.");
+            throw new IllegalArgumentException("length cannot be < 0.");
         }
         if (this.sourceID == -1) {
             this.sourceID = this.audio.obtainSource(true);

@@ -116,7 +116,7 @@ internal class MultiplayerLobbyController(
             latestRooms = emptyList()
             sceneHost.updateRooms(
                 rooms = emptyList(),
-                statusText = "Original lobby requires the RW engine to FastArrayList loaded",
+                statusText = "Original lobby requires the RW engine to be loaded",
                 lobbyKind = MultiplayerLobbyKind.Original,
             )
             return

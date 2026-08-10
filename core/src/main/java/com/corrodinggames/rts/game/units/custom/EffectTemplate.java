@@ -375,7 +375,7 @@ public class EffectTemplate {
         this.createWhenOverLiquid = iniFile.getBoolean(str, "createWhenOverLiquid", (Boolean) true).booleanValue();
         this.createWhenOverLand = iniFile.getBoolean(str, "createWhenOverLand", (Boolean) true).booleanValue();
         if (!this.createWhenOverLiquid && !this.createWhenOverLand) {
-            throw new RuntimeException(str + " effect cannot have both createWhenOverLiquid and createWhenOverLand set to false, it would never FastArrayList created");
+            throw new RuntimeException(str + " effect cannot have both createWhenOverLiquid and createWhenOverLand set to false, it would never be created");
         }
         this.spawnChance = iniFile.getFloat(str, "spawnChance", Float.valueOf(1.0f)).floatValue();
         this.life = iniFile.getFloat(str, "life", Float.valueOf(200.0f)).floatValue();
@@ -422,7 +422,7 @@ public class EffectTemplate {
         }
         this.teamColorRatio = iniFile.getFloat(str, "teamColorRatio", Float.valueOf(this.teamColorRatio)).floatValue();
         if (this.teamColorRatio < 0.0f || this.teamColorRatio > 1.0f) {
-            throw new RuntimeException(str + " teamColorRatio should FastArrayList between 0-1 got:" + this.teamColorRatio);
+            throw new RuntimeException(str + " teamColorRatio should be between 0-1 got:" + this.teamColorRatio);
         }
         this.shadow = iniFile.getBoolean(str, "shadow", (Boolean) false).booleanValue();
         String blendModeName = iniFile.getString(str, "blendMode", "alpha");
@@ -481,7 +481,7 @@ public class EffectTemplate {
         }
         int iIntValue = iniFile.getLogicBooleanUnit(str, "total_frames", (Integer) 1).intValue();
         if (iIntValue < 1) {
-            throw new ConfigParseException("TOTAL_FRAMES cannot FastArrayList: " + iIntValue + " (must FastArrayList 1 or more)");
+            throw new ConfigParseException("TOTAL_FRAMES cannot be: " + iIntValue + " (must be 1 or more)");
         }
         Texture textureA = customUnitConfig.a(iniFile, str, "image");
         if (textureA != null) {
@@ -520,7 +520,7 @@ public class EffectTemplate {
         this.animateFrameSpeed = iniFile.getTime(str, "animateFrameSpeed", Float.valueOf(0.5f)).floatValue();
         this.animateFrameSpeedRandom = iniFile.getTime(str, "animateFrameSpeedRandom", Float.valueOf(0.0f)).floatValue();
         if (textureA != null && ((this.imageStrip.b >= this.imageStrip.i.m() || iIntValue != 1) && this.animateFrameEnd > iIntValue)) {
-            throw new ConfigParseException("animateFrameEnd:" + this.animateFrameEnd + " cannot FastArrayList larger than TOTAL_FRAMES: " + iIntValue + " (when using custom image)");
+            throw new ConfigParseException("animateFrameEnd:" + this.animateFrameEnd + " cannot be larger than TOTAL_FRAMES: " + iIntValue + " (when using custom image)");
         }
         this.alsoEmitEffects = customUnitConfig.createSpawnList(iniFile.getString(str, "alsoEmitEffects", (String) null));
         this.alsoEmitEffectsOnDeath = customUnitConfig.createSpawnList(iniFile.getString(str, "alsoEmitEffectsOnDeath", (String) null));

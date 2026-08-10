@@ -25,7 +25,7 @@ public class IntObjectMapEntries extends IntObjectMapIterator implements Iterabl
             throw new NoSuchElementException();
         }
         if (!this.e) {
-            throw new AudioException("#iterator() cannot FastArrayList used nested.");
+            throw new AudioException("#iterator() cannot be used nested.");
         }
         int[] iArr = this.b.b;
         if (this.c == -1) {
@@ -45,7 +45,7 @@ public class IntObjectMapEntries extends IntObjectMapIterator implements Iterabl
         if (this.e) {
             return this.a;
         }
-        throw new AudioException("#iterator() cannot FastArrayList used nested.");
+        throw new AudioException("#iterator() cannot be used nested.");
     }
 
     @Override // java.lang.Iterable

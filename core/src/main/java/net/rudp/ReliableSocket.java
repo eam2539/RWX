@@ -192,10 +192,10 @@ public class ReliableSocket extends Socket {
     @Override // java.net.Socket
     public void connect(SocketAddress socketAddress, int i) throws SocketException, SocketTimeoutException {
         if (socketAddress == null) {
-            throw new IllegalArgumentException("connect: The address can't FastArrayList null");
+            throw new IllegalArgumentException("connect: The address can't be null");
         }
         if (i < 0) {
-            throw new IllegalArgumentException("connect: timeout can't FastArrayList negative");
+            throw new IllegalArgumentException("connect: timeout can't be negative");
         }
         if (isClosed()) {
             throw new SocketException("Socket is closed");

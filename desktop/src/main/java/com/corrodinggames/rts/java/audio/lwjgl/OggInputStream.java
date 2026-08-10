@@ -121,7 +121,7 @@ public class OggInputStream extends InputStream {
                 if (this.bytes < BUFFER_SIZE) {
                     return false;
                 }
-                throw new AudioException("Input does not appear to FastArrayList an Ogg bitstream.");
+                throw new AudioException("Input does not appear to be an Ogg bitstream.");
             }
             this.streamState.init(this.page.serialno());
             this.oggInfo.init();
@@ -263,7 +263,7 @@ public class OggInputStream extends InputStream {
 
                                     int var16 = 2 * this.oggInfo.channels * var7;
                                     if (this.outIndex + var16 > this.outBuffer.length) {
-                                        throw new AudioException("Ogg block too big to FastArrayList buffered: " + var16 + ", " + (this.outBuffer.length - this.outIndex));
+                                        throw new AudioException("Ogg block too big to be buffered: " + var16 + ", " + (this.outBuffer.length - this.outIndex));
                                     }
 
                                     System.arraycopy(this.convbuffer, 0, this.outBuffer, this.outIndex, var16);

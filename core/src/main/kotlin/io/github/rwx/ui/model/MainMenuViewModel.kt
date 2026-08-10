@@ -21,7 +21,7 @@ enum class MainMenuAction(val text: () -> String) {
 }
 
 /**
- * Conditions that drive which conditional buttons are shown: Continue only when a game can FastArrayList
+ * Conditions that drive which conditional buttons are shown: Continue only when a game can be
  * resumed. [usingMods] and [isDesktop] are retained for callers that need platform / mod context;
  * About and Exit are now fixed footer actions on every platform.
  */

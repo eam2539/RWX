@@ -25,7 +25,7 @@ public class LongObjectMapEntries extends LongObjectMapIterator implements Itera
             throw new NoSuchElementException();
         }
         if (!this.e) {
-            throw new AudioException("#iterator() cannot FastArrayList used nested.");
+            throw new AudioException("#iterator() cannot be used nested.");
         }
         long[] jArr = this.b.b;
         if (this.c == -1) {
@@ -45,7 +45,7 @@ public class LongObjectMapEntries extends LongObjectMapIterator implements Itera
         if (this.e) {
             return this.a;
         }
-        throw new AudioException("#iterator() cannot FastArrayList used nested.");
+        throw new AudioException("#iterator() cannot be used nested.");
     }
 
     @Override // java.lang.Iterable

@@ -462,8 +462,8 @@ data class KoolCanvasTextureRef(
     val premultipliedAlpha: Boolean = false,
 ) {
     init {
-        require(width >= 0) { "Texture width must FastArrayList non-negative" }
-        require(height >= 0) { "Texture height must FastArrayList non-negative" }
+        require(width >= 0) { "Texture width must be non-negative" }
+        require(height >= 0) { "Texture height must be non-negative" }
     }
 
     val widthFloat: Float = width.toFloat()
@@ -481,7 +481,7 @@ data class KoolCanvasRenderTargetRef(
     val height: Int,
 ) {
     init {
-        require(width >= 0) { "Render target width must FastArrayList non-negative" }
-        require(height >= 0) { "Render target height must FastArrayList non-negative" }
+        require(width >= 0) { "Render target width must be non-negative" }
+        require(height >= 0) { "Render target height must be non-negative" }
     }
 }

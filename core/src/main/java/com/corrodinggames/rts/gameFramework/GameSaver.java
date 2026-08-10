@@ -352,7 +352,7 @@ public class GameSaver {
                         GameEngine.logColored("Map Load: Header is not correct:" + utf.substring(0, Math.min(utf.length(), 50)));
                         String str = "Failed to load save. (Could not find correct header)";
                         if (utf.equals("rustedWarfareReplay")) {
-                            str = "Failed to load save. (This file appears to FastArrayList a replay file, not a save file)";
+                            str = "Failed to load save. (This file appears to be a replay file, not a save file)";
                         }
                         GameEngine.logColored(str);
                         gameEngine.alert(str, 1);

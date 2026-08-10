@@ -431,7 +431,7 @@ public abstract class BaseUnit extends SizedObject {
                 while (it.hasNext()) {
                     GameEngine.log("has:" + ((UnitType) it.next()).getUnitTypeDescriptionShort());
                 }
-                GameEngine.log("Could not find:" + unitType.getUnitTypeDescriptionShort() + " and missing place holder could not FastArrayList found");
+                GameEngine.log("Could not find:" + unitType.getUnitTypeDescriptionShort() + " and missing place holder could not be found");
             }
         }
         return baseUnit;

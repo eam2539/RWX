@@ -118,7 +118,7 @@ public class Path {
                     int i3 = (b & 3) - 1;
                     int i4 = ((b & 12) >> 2) - 1;
                     if (Utility.abs(i3) > 1 || Utility.abs(i4) > 1) {
-                        GameEngine.log("readInCompressedPath: out of range but shouldn't FastArrayList:" + i3 + "," + i4 + " for: " + ((int) b));
+                        GameEngine.log("readInCompressedPath: out of range but shouldn't be:" + i3 + "," + i4 + " for: " + ((int) b));
                     }
                     shortValue = (short) (shortValue + i3);
                     shortValue2 = (short) (shortValue2 + i4);

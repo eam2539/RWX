@@ -39,7 +39,7 @@ final class ReceiveWorker implements Runnable {
             if (GameEngine.isIOSVersion && (e2 instanceof SocketException) && !this.networkConnection.isDisconnecting) {
                 GameEngine gameEngine = GameEngine.getInstance();
                 if (!gameEngine.networkEngine.isServer && gameEngine.networkEngine.gameHasBeenStarted && (message = e2.getMessage()) != null && message.contains("EBADF")) {
-                    gameEngine.alert("Warning: This disconnect likely due to iOS removing sockets of background apps. Avoid minimising the game in multiplayer. Note: Games can FastArrayList rejoined.");
+                    gameEngine.alert("Warning: This disconnect likely due to iOS removing sockets of background apps. Avoid minimising the game in multiplayer. Note: Games can be rejoined.");
                 }
             }
             this.networkConnection.logInfo("network:ReceiveWorker: " + e2.getMessage());
