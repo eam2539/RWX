@@ -65,46 +65,70 @@ data class UnitDefinition(
     val iniSections: List<IniSpecSection> = emptyList(),
 )
 
+@UnitDsl
 data class UnitExtension(
-    val shaderId: String? = null,
-    val renderBinding: UnitRenderBinding? = null,
-    val damageAvoidChance: Float? = null,
-    val exposureOffsetX: Float? = null,
-    val exposureOffsetY: Float? = null,
-    val exposureWidth: Float? = null,
-    val exposureHeight: Float? = null,
-    val projectiles: Map<String, ProjectileExtension> = emptyMap(),
-    val turrets: Map<String, TurretExtension> = emptyMap(),
-    val effects: Map<String, EffectExtension> = emptyMap(),
-)
+    var shaderId: String? = null,
+    var renderBinding: UnitRenderBinding? = null,
+    var damageAvoidChance: Float? = null,
+    var exposureOffsetX: Float? = null,
+    var exposureOffsetY: Float? = null,
+    var exposureWidth: Float? = null,
+    var exposureHeight: Float? = null,
+    var projectiles: Map<String, ProjectileExtension> = linkedMapOf(),
+    var turrets: Map<String, TurretExtension> = linkedMapOf(),
+    var effects: Map<String, EffectExtension> = linkedMapOf(),
+) {
+    fun projectile(name: String, configure: ProjectileExtension.() -> kotlin.Unit) {
+        projectiles.asMutable().getOrPut(requireExtensionSectionName(name), ::ProjectileExtension).configure()
+    }
 
+    fun turret(name: String, configure: TurretExtension.() -> kotlin.Unit) {
+        turrets.asMutable().getOrPut(requireExtensionSectionName(name), ::TurretExtension).configure()
+    }
+
+    fun effect(name: String, configure: EffectExtension.() -> kotlin.Unit) {
+        effects.asMutable().getOrPut(requireExtensionSectionName(name), ::EffectExtension).configure()
+    }
+}
+
+@UnitDsl
 data class ProjectileExtension(
-    val renderBinding: ProjectileRenderBinding? = null,
-    val observerBinding: ProjectileObserverBinding? = null,
-    val directDamageAmount: Float? = null,
-    val areaDamageAmount: Float? = null,
-    val directDamageHitRateBonus: Float? = null,
-    val areaDamageHitRateBonus: Float? = null,
-    val areaDamageExcludeDirectHit: Boolean? = null,
-    val rayDamage: Boolean? = null,
-    val rayDamageRange: Float? = null,
-    val rayDamageWidth: Float? = null,
-    val rayDamageTargetWidthFactor: Float? = null,
-    val rayDamageHitEffectOffsetFactor: Float? = null,
-    val rayDamageSecondaryTargetTags: List<String>? = null,
-    val directDamageArmourIgnoreAmount: Float? = null,
-    val areaDamageArmourIgnoreAmount: Float? = null,
+    var renderBinding: ProjectileRenderBinding? = null,
+    var observerBinding: ProjectileObserverBinding? = null,
+    var directDamageAmount: Float? = null,
+    var areaDamageAmount: Float? = null,
+    var directDamageHitRateBonus: Float? = null,
+    var areaDamageHitRateBonus: Float? = null,
+    var areaDamageExcludeDirectHit: Boolean? = null,
+    var rayDamage: Boolean? = null,
+    var rayDamageRange: Float? = null,
+    var rayDamageWidth: Float? = null,
+    var rayDamageTargetWidthFactor: Float? = null,
+    var rayDamageHitEffectOffsetFactor: Float? = null,
+    var rayDamageSecondaryTargetTags: List<String>? = null,
+    var directDamageArmourIgnoreAmount: Float? = null,
+    var areaDamageArmourIgnoreAmount: Float? = null,
 )
 
+@UnitDsl
 data class TurretExtension(
-    val preFireDuration: Ticks = Ticks.ZERO,
-    val renderBinding: PreFireRenderBinding? = null,
-    val observerBinding: PreFireObserverBinding? = null,
+    var preFireDuration: Ticks = Ticks.ZERO,
+    var renderBinding: PreFireRenderBinding? = null,
+    var observerBinding: PreFireObserverBinding? = null,
 )
 
+@UnitDsl
 data class EffectExtension(
-    val renderBinding: EffectRenderBinding,
+    var renderBinding: EffectRenderBinding? = null,
 )
+
+private fun requireExtensionSectionName(name: String): String {
+    require(name.matches(Regex("[A-Za-z0-9_.-]+"))) { "Invalid native INI section name: $name" }
+    return name
+}
+
+private fun <V> Map<String, V>.asMutable(): MutableMap<String, V> =
+    this as? MutableMap<String, V> ?: toMutableMap()
 
 private fun requireContentId(value: String, kind: String) {
     require(value.matches(CONTENT_ID_PATTERN)) { "Invalid namespace-qualified $kind id: $value" }

@@ -24,11 +24,11 @@ fun Units.unit(
 
 @UnitDsl
 class UnitBuilder internal constructor(private val id: UnitId) {
-    private val extension = UnitExtensionBuilder()
+    private val extension = UnitExtension()
     private val eventHandlers = linkedMapOf<UnitEventBindingId, UnitEventBinding>()
     private val ini = UnitIniBuilder()
 
-    fun extension(configure: UnitExtensionBuilder.() -> kotlin.Unit) {
+    fun extension(configure: UnitExtension.() -> kotlin.Unit) {
         extension.configure()
     }
 
@@ -99,107 +99,8 @@ class UnitBuilder internal constructor(private val id: UnitId) {
 
     internal fun buildDefinition(): UnitDefinition = UnitDefinition(
         id = id,
-        extension = extension.buildDefinition(),
+        extension = extension,
         eventHandlers = eventHandlers.values.toList(),
         iniSections = ini.build(),
     )
-}
-
-@UnitDsl
-class UnitExtensionBuilder internal constructor() {
-    var shaderId: String? = null
-    var renderBinding: UnitRenderBinding? = null
-    var damageAvoidChance: Float? = null
-    var exposureOffsetX: Float? = null
-    var exposureOffsetY: Float? = null
-    var exposureWidth: Float? = null
-    var exposureHeight: Float? = null
-    private val projectiles = linkedMapOf<String, ProjectileExtensionBuilder>()
-    private val turrets = linkedMapOf<String, TurretExtensionBuilder>()
-    private val effects = linkedMapOf<String, EffectExtensionBuilder>()
-
-    fun projectile(name: String, configure: ProjectileExtensionBuilder.() -> kotlin.Unit) {
-        projectiles.getOrPut(requireExtensionSectionName(name), ::ProjectileExtensionBuilder).configure()
-    }
-
-    fun turret(name: String, configure: TurretExtensionBuilder.() -> kotlin.Unit) {
-        turrets.getOrPut(requireExtensionSectionName(name), ::TurretExtensionBuilder).configure()
-    }
-
-    fun effect(name: String, configure: EffectExtensionBuilder.() -> kotlin.Unit) {
-        effects.getOrPut(requireExtensionSectionName(name), ::EffectExtensionBuilder).configure()
-    }
-
-    internal fun buildDefinition() = UnitExtension(
-        shaderId = shaderId,
-        renderBinding = renderBinding,
-        damageAvoidChance = damageAvoidChance,
-        exposureOffsetX = exposureOffsetX,
-        exposureOffsetY = exposureOffsetY,
-        exposureWidth = exposureWidth,
-        exposureHeight = exposureHeight,
-        projectiles = projectiles.mapValues { it.value.buildDefinition() },
-        turrets = turrets.mapValues { it.value.buildDefinition() },
-        effects = effects.mapValues { it.value.buildDefinition() },
-    )
-}
-
-@UnitDsl
-class ProjectileExtensionBuilder internal constructor() {
-    var renderBinding: ProjectileRenderBinding? = null
-    var observerBinding: ProjectileObserverBinding? = null
-    var directDamageAmount: Float? = null
-    var areaDamageAmount: Float? = null
-    var directDamageHitRateBonus: Float? = null
-    var areaDamageHitRateBonus: Float? = null
-    var areaDamageExcludeDirectHit: Boolean? = null
-    var rayDamage: Boolean? = null
-    var rayDamageRange: Float? = null
-    var rayDamageWidth: Float? = null
-    var rayDamageTargetWidthFactor: Float? = null
-    var rayDamageHitEffectOffsetFactor: Float? = null
-    var rayDamageSecondaryTargetTags: List<String>? = null
-    var directDamageArmourIgnoreAmount: Float? = null
-    var areaDamageArmourIgnoreAmount: Float? = null
-
-    internal fun buildDefinition() = ProjectileExtension(
-        renderBinding = renderBinding,
-        observerBinding = observerBinding,
-        directDamageAmount = directDamageAmount,
-        areaDamageAmount = areaDamageAmount,
-        directDamageHitRateBonus = directDamageHitRateBonus,
-        areaDamageHitRateBonus = areaDamageHitRateBonus,
-        areaDamageExcludeDirectHit = areaDamageExcludeDirectHit,
-        rayDamage = rayDamage,
-        rayDamageRange = rayDamageRange,
-        rayDamageWidth = rayDamageWidth,
-        rayDamageTargetWidthFactor = rayDamageTargetWidthFactor,
-        rayDamageHitEffectOffsetFactor = rayDamageHitEffectOffsetFactor,
-        rayDamageSecondaryTargetTags = rayDamageSecondaryTargetTags,
-        directDamageArmourIgnoreAmount = directDamageArmourIgnoreAmount,
-        areaDamageArmourIgnoreAmount = areaDamageArmourIgnoreAmount,
-    )
-}
-
-@UnitDsl
-class TurretExtensionBuilder internal constructor() {
-    var preFireDuration: Ticks = Ticks.ZERO
-    var renderBinding: PreFireRenderBinding? = null
-    var observerBinding: PreFireObserverBinding? = null
-
-    internal fun buildDefinition() = TurretExtension(preFireDuration, renderBinding, observerBinding)
-}
-
-@UnitDsl
-class EffectExtensionBuilder internal constructor() {
-    var renderBinding: EffectRenderBinding? = null
-
-    internal fun buildDefinition() = EffectExtension(
-        requireNotNull(renderBinding) { "Native effect extension must define renderBinding" },
-    )
-}
-
-private fun requireExtensionSectionName(name: String): String {
-    require(name.matches(Regex("[A-Za-z0-9_.-]+"))) { "Invalid native INI section name: $name" }
-    return name
 }

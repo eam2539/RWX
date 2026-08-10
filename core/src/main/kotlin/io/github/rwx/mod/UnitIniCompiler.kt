@@ -176,7 +176,11 @@ internal object UnitIniCompiler {
             require("effect_$name" in sectionNames) {
                 "Unit ${definition.id.value} extends missing native effect section '$name'"
             }
-            bindings.effects[name] = EffectExtensionBinding(extension.renderBinding)
+            bindings.effects[name] = EffectExtensionBinding(
+                requireNotNull(extension.renderBinding) {
+                    "Unit ${definition.id.value} effect extension '$name' must define renderBinding"
+                },
+            )
         }
     }
 
