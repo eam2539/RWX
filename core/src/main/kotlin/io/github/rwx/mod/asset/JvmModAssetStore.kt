@@ -1,4 +1,4 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.asset
 
 import io.github.rwx.mod.assets.*
 import java.io.Closeable

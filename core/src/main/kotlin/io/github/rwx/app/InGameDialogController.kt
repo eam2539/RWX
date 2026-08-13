@@ -4,7 +4,7 @@ import com.corrodinggames.rts.gameFramework.local.Locale
 import de.fabmax.kool.scene.Scene
 import io.github.rwx.i18n.I18n
 import io.github.rwx.logger
-import io.github.rwx.mod.UiRegistry
+import io.github.rwx.mod.registry.UiRegistry
 import io.github.rwx.render.canvas.KoolCanvasViewport
 import io.github.rwx.session.GameSession
 import io.github.rwx.ui.AppScreen

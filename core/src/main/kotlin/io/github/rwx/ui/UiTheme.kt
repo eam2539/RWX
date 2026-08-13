@@ -437,7 +437,7 @@ object UiTheme {
         val battleRoomMaxPreviewHeight: Dp = Dp(560f)
         val battleRoomPlayersViewportHeight: Dp = Dp(260f)
         val battleRoomMinPlayersViewportHeight: Dp = Dp(180f)
-        val battleRoomMaxPlayersViewportHeight: Dp = Dp(420f)
+        val battleRoomMaxPlayersViewportHeight: Dp = Dp(430f)
         val battleRoomChatViewportHeight: Dp = Dp(160f)
         val battleRoomMinChatViewportHeight: Dp = Dp(96f)
         val battleRoomMaxChatViewportHeight: Dp = Dp(260f)
@@ -455,6 +455,9 @@ object UiTheme {
         val modsMinViewportHeight: Dp = Dp(260f)
         val modsMaxViewportHeight: Dp = Dp(720f)
         val modsCardHeight: Dp = Dp(88f)
+        val modsThumbnailSize: Dp = Dp(68f)
+        val modsCardErrorMaxHeight: Dp = Dp(240f)
+        val modsCardDescriptionMaxHeight: Dp = Dp(45f)
         val modsToggleButtonWidth: Dp = Dp(156f)
         val modsActionButtonWidth: Dp = Dp(210f)
     }

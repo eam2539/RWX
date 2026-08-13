@@ -7,8 +7,8 @@ import de.fabmax.kool.input.KeyEvent
 import de.fabmax.kool.input.Pointer
 import de.fabmax.kool.input.PointerState
 import io.github.rwx.input.KoolKeyCodeMapping
-import io.github.rwx.mod.UiRegistry
 import io.github.rwx.mod.api.WorldPosition
+import io.github.rwx.mod.registry.UiRegistry
 import io.github.rwx.session.GameSession
 
 fun interface KoolScreenScaleProvider {

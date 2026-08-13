@@ -2,7 +2,6 @@ package io.github.rwx.di
 
 import io.github.rwx.PlatformStorage
 import io.github.rwx.PreferenceStorage
-import io.github.rwx.mod.FileSystemModRepository
 import io.github.rwx.mod.ModRepository
 import io.github.rwx.net.ResourceBrowserRepository
 import io.github.rwx.net.UpdateRepository
@@ -19,7 +18,7 @@ val coreModule = module {
         )
     }
     single<ModRepository> {
-        FileSystemModRepository(
+        ModRepository(
             storage = get<PlatformStorage>(),
             preferenceStorage = get<PreferenceStorage>(),
         )
@@ -87,7 +86,7 @@ val coreModule = module {
             onAction = parameters.getOrNull<(SettingsAction) -> Unit>() ?: {},
         )
     }
-    factory { parameters ->
+    single { parameters ->
         DialogSceneHost(
             model = parameters.getOrNull<SettingsModel>() ?: SettingsModel(),
             onVisibilityChanged = parameters.getOrNull<(Boolean) -> Unit>() ?: {},

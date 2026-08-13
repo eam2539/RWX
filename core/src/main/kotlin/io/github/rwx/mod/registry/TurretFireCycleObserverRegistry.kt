@@ -1,8 +1,9 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.registry
 
 import com.corrodinggames.rts.game.units.custom.CustomUnit
 import com.corrodinggames.rts.game.units.custom.TurretConfig
 import io.github.rwx.mod.api.*
+import io.github.rwx.mod.impl.ApiImpl
 
 /**
  * Dispatches the two windows either side of a turret's shot: pre-fire wind-up and

@@ -1,4 +1,4 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.impl
 
 import io.github.rwx.mod.api.*
 

@@ -1,4 +1,4 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.impl
 
 import com.corrodinggames.rts.game.PlayerTeam
 import com.corrodinggames.rts.game.units.BaseUnit
@@ -9,6 +9,7 @@ import com.corrodinggames.rts.game.units.custom.logic.CustomAction
 import com.corrodinggames.rts.game.units.g.SpecialActionBlockEffect
 import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.mod.api.*
+import io.github.rwx.mod.isJvmModSimulationAllowed
 import java.util.*
 
 internal class UnitWorldImpl(

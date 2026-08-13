@@ -3,7 +3,7 @@ package io.github.rwx.app
 import de.fabmax.kool.input.InputStack
 import de.fabmax.kool.input.KeyboardInput
 import de.fabmax.kool.input.PointerInput
-import io.github.rwx.mod.UiRegistry
+import io.github.rwx.mod.registry.UiRegistry
 import io.github.rwx.session.GameSession
 import io.github.rwx.ui.AppScreen
 

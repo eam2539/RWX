@@ -13,6 +13,7 @@ import com.corrodinggames.rts.gameFramework.network.NetworkEngine;
 import com.corrodinggames.rts.gameFramework.ui.LagHidingManager;
 import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 import io.github.rwx.geometry.PointF;
+import io.github.rwx.mod.registry.TeamActionRegistry;
 
 import java.io.IOException;
 import java.util.AbstractList;
@@ -534,12 +535,12 @@ public class Command {
                     gameEngine.networkEngine.quickResyncRequested = true;
                     return;
                 }
-                if (this.systemActionType == io.github.rwx.mod.TeamActionRegistry.SYSTEM_ACTION_TYPE) {
+                if (this.systemActionType == TeamActionRegistry.SYSTEM_ACTION_TYPE) {
                     if (this.team == null || this.actionId == null) {
                         GameEngine.log("mod team action command missing team or action id");
                         return;
                     }
-                    io.github.rwx.mod.TeamActionRegistry.execute(
+                    TeamActionRegistry.execute(
                             this.team,
                             this.actionId.getId(),
                             this.targetPoint,

@@ -1,6 +1,6 @@
 package io.github.rwx.i18n
 
-import java.util.Locale
+import java.util.*
 
 // Auto-generated file - Do not modify
 object I18n {
@@ -227,6 +227,14 @@ object I18n {
             translations = linkedMapOf(
                 "en" to "Cancel",
                 "zh-CN" to "取消",
+            ),
+        )
+
+        val close = entry(
+            key = "common.close",
+            translations = linkedMapOf(
+                "en" to "Close",
+                "zh-CN" to "关闭",
             ),
         )
 
@@ -498,6 +506,14 @@ object I18n {
             ),
         )
 
+        val description = entry(
+            key = "mods.description",
+            translations = linkedMapOf(
+                "en" to "Description",
+                "zh-CN" to "描述",
+            ),
+        )
+
         val disable = entry(
             key = "mods.disable",
             translations = linkedMapOf(
@@ -546,6 +562,14 @@ object I18n {
             ),
         )
 
+        val error = entry(
+            key = "mods.error",
+            translations = linkedMapOf(
+                "en" to "Error",
+                "zh-CN" to "错误",
+            ),
+        )
+
         val filter = entry(
             key = "mods.filter",
             translations = linkedMapOf(
@@ -559,6 +583,14 @@ object I18n {
             translations = linkedMapOf(
                 "en" to "Import",
                 "zh-CN" to "导入",
+            ),
+        )
+
+        val more = entry(
+            key = "mods.more",
+            translations = linkedMapOf(
+                "en" to "More...",
+                "zh-CN" to "更多...",
             ),
         )
 

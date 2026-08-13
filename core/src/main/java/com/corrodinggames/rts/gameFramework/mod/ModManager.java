@@ -13,8 +13,15 @@ import com.corrodinggames.rts.gameFramework.ui.GameUI;
 import com.corrodinggames.rts.gameFramework.utility.FileLoaderFactory;
 import com.corrodinggames.rts.gameFramework.utility.StringUtils;
 import io.github.rwx.LegacyAssetBridge;
-import io.github.rwx.mod.*;
+import io.github.rwx.mod.JvmMod;
+import io.github.rwx.mod.JvmModLoader;
+import io.github.rwx.mod.Mod;
+import io.github.rwx.mod.UnitEventRuntime;
 import io.github.rwx.mod.api.Api;
+import io.github.rwx.mod.impl.ApiImpl;
+import io.github.rwx.mod.impl.ModScheduler;
+import io.github.rwx.mod.registry.ModRegistry;
+import io.github.rwx.mod.registry.UiRegistry;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,6 +56,9 @@ public class ModManager {
     ArrayList<Mod> jvmMods = new ArrayList<>();
     Map<Mod, ModInfo> jvmModInfos = new IdentityHashMap<>();
 
+    public ArrayList<ModInfo> getMods() {
+        return mods;
+    }
     public ModManager() {
         try {
             checkMinVersion(GameEngine.getInstance().getVersion());
@@ -768,7 +778,7 @@ public class ModManager {
         if (!(api instanceof ApiImpl)) {
             return;
         }
-        ModInfo modInfo = getModByUuid(mod.getMetadata().getId());
+        ModInfo modInfo = getModByUuid(mod.getManifest().getId());
         if (modInfo == null) {
             modInfo = new ModInfo();
             modInfo.disabled = true;

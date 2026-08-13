@@ -15,6 +15,7 @@ data class DialogButton(
 data class Dialog(
     val title: String,
     val message: String,
+    val messageLabel: String? = null,
     val buttons: List<DialogButton> = listOf(DialogButton(I18n.common.ok())),
     val infoRows: List<DialogInfoRow> = emptyList(),
     val listItems: List<DialogListItem> = emptyList(),

@@ -5,7 +5,7 @@ import de.fabmax.kool.modules.ui2.UiScene
 import de.fabmax.kool.modules.ui2.mutableStateOf
 import de.fabmax.kool.scene.Scene
 import io.github.rwx.i18n.I18n
-import io.github.rwx.mod.UiRegistry
+import io.github.rwx.mod.registry.UiRegistry
 import io.github.rwx.ui.CoreUiEventQueue
 import io.github.rwx.ui.ResponsiveContentWidth
 import io.github.rwx.ui.component.*

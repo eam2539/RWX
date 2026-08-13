@@ -1,4 +1,4 @@
-package io.github.rwx.render
+package io.github.rwx.mod.registry
 
 import com.corrodinggames.rts.game.Projectile
 import com.corrodinggames.rts.game.ProjectileTemplate
@@ -12,10 +12,8 @@ import com.corrodinggames.rts.gameFramework.graphics.GraphicsEngine
 import com.corrodinggames.rts.gameFramework.graphics.Texture
 import io.github.rwx.geometry.Rect
 import io.github.rwx.geometry.RectF
-import io.github.rwx.mod.ApiImpl
-import io.github.rwx.mod.ModFailureLog
-import io.github.rwx.mod.RegistrationTable
 import io.github.rwx.mod.api.*
+import io.github.rwx.mod.impl.ApiImpl
 import io.github.rwx.render.canvas.KoolCanvasBlendMode
 import io.github.rwx.render.canvas.KoolPaint
 import java.util.*
@@ -23,7 +21,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-object RenderRegistry : io.github.rwx.mod.OwnedRegistry {
+object RenderRegistry : OwnedRegistry {
     private class RegisteredTexture(
         val path: ResourcePath,
         val options: TextureOptions,

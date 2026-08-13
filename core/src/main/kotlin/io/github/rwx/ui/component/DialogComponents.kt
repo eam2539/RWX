@@ -2,19 +2,8 @@ package io.github.rwx.ui.component
 
 import com.corrodinggames.rts.gameFramework.GameEngine
 import de.fabmax.kool.modules.ui2.*
-import io.github.rwx.ui.ColorSchemeDefinition
-import io.github.rwx.ui.model.Dialog
-import io.github.rwx.ui.model.DialogButton
-import io.github.rwx.ui.model.DialogForm
-import io.github.rwx.ui.model.DialogFormField
-import io.github.rwx.ui.model.DialogInfoRow
-import io.github.rwx.ui.model.DialogListItem
-import io.github.rwx.ui.ResponsiveContentWidth
-import io.github.rwx.ui.UiTheme
-import io.github.rwx.ui.fraction
-import io.github.rwx.ui.model.BattleRoomTeamColors
-import io.github.rwx.ui.remainingAfter
-import io.github.rwx.ui.splitEvenly
+import io.github.rwx.ui.*
+import io.github.rwx.ui.model.*
 
 
 fun UiScope.MessageDialog(
@@ -33,6 +22,16 @@ fun UiScope.MessageDialog(
         maxWidth = if (compact) CompactDialogMaxMessageWidth else UiTheme.Layout.dialogMaxMessageWidth,
     )
     DialogHeader(dialog.title, theme, contentWidth, compact)
+    dialog.messageLabel?.takeIf { it.isNotBlank() }?.let { label ->
+        Text(label) {
+            modifier
+                .width(contentWidth)
+                .margin(bottom = UiTheme.Spacing.sm)
+                .font(UiTheme.Fonts.caption)
+                .textAlign(AlignmentX.Start, AlignmentY.Center)
+                .textColor(theme.palette.primary)
+        }
+    }
     if (dialog.message.isNotBlank()) {
         DialogMessage(dialog.message, theme, contentWidth, dialog.scrollableMessage, compact)
     }
@@ -153,9 +152,7 @@ private fun UiScope.DialogHeader(
     }
 }
 
-/**
- * Renders the dialog message body text.
- */
+
 fun UiScope.DialogMessage(
     message: String,
     theme: ColorSchemeDefinition,
@@ -216,6 +213,7 @@ private fun UiScope.ScrollableDialogMessage(
                 modifier
                     .width(Grow.Std)
                     .height(FitContent)
+                    .padding(bottom = UiTheme.Spacing.xl)
                     .font(UiTheme.Fonts.bodySmall)
                     .isWrapText(true)
                     .textColor(theme.palette.textSecondary)

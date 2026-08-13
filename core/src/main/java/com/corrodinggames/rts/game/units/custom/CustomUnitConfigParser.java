@@ -32,12 +32,11 @@ import com.corrodinggames.rts.gameFramework.file.FileHelper;
 import com.corrodinggames.rts.gameFramework.graphics.TeamColorTexture;
 import com.corrodinggames.rts.gameFramework.graphics.Texture;
 import com.corrodinggames.rts.gameFramework.mod.ModInfo;
-import com.corrodinggames.rts.gameFramework.mod.ModManagerAccess;
 import com.corrodinggames.rts.gameFramework.ui.GameUI;
 import com.corrodinggames.rts.gameFramework.utility.*;
 import io.github.rwx.geometry.PointF;
 import io.github.rwx.geometry.Rect;
-import io.github.rwx.mod.JvmModAssetBridge;
+import io.github.rwx.mod.asset.JvmModAssetBridge;
 import io.github.rwx.render.canvas.KoolArgbColor;
 
 import java.io.BufferedInputStream;
@@ -936,7 +935,7 @@ public class CustomUnitConfigParser {
     /* JADX INFO: renamed from: h */
     public static void loadAllCustomUnitsAndMods() {
         final GameEngine instance = GameEngine.getInstance();
-        final ArrayList<ModInfo> loadAllMods = new ArrayList<>(ModManagerAccess.allMods(instance.modManager));
+        final ArrayList<ModInfo> loadAllMods = instance.modManager.loadAllMods();
         CustomUnitConfigParser.imageCacheHitCount = 0;
         CustomUnitConfigParser.imageCacheMissCount = 0;
         CustomUnitConfigParser.oomImageErrorCount = 0;

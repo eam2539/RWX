@@ -1,18 +1,24 @@
 package io.github.rwx.ui.model
 
+import io.github.rwx.mod.JvmModManifest
+import io.github.rwx.mod.ModManifest
 import io.github.rwx.ui.AppScreen
 
 
 data class ModEntry(
-    val id: String,
-    val name: String,
+    val info: ModManifest,
     val isEnabled: Boolean,
-    val description: String = "",
-    /** Human-readable RAM usage, e.g. "1.2 MB"; blank when unknown. */
-    val ramLabel: String = "",
-    /** Load error to surface on the card; null when the mod loaded cleanly. */
     val errorMessage: String? = null,
-)
+    val path: String = "",
+) {
+    val id: String get() = info.id
+    val name: String get() = info.name
+    val author: String? get() = (info as? JvmModManifest)?.author
+    val description: String get() = info.description
+    val version: String? get() = (info as? JvmModManifest)?.version
+    val thumbnail: String? = (info as? JvmModManifest)?.thumbnail
+
+}
 
 
 data class ModsListModel(

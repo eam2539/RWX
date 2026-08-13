@@ -1,4 +1,4 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.impl
 
 import com.corrodinggames.rts.game.PlayerTeam
 import com.corrodinggames.rts.game.units.BaseUnit
@@ -9,6 +9,7 @@ import com.corrodinggames.rts.game.units.actions.ActionId
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig
 import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.geometry.PointF
+import io.github.rwx.mod.CommandQueue
 import io.github.rwx.mod.api.*
 
 internal class UnitCommandsImpl(

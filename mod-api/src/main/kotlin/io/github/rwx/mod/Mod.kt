@@ -1,7 +1,7 @@
 package io.github.rwx.mod
 
 interface Mod {
-    val metadata: ModMetadata
+    val manifest: ModManifest
     val type: ModType
 
     fun init()
@@ -11,17 +11,38 @@ interface Mod {
 
 enum class ModType {
     JVM,
-    INI
+    LEGACY
 }
 
-open class ModMetadata {
+//JVM mod和Legacy mod 共同的语义
+interface ModManifest {
+    val id: String
+    val name: String
+    val minGameVersionName: String
+    var description: String
+}
+
+data class JvmModManifest(
+    override val id: String,
+    override val name: String,
+    override val minGameVersionName: String = DEFAULT_MIN_GAME_VERSION_NAME,
+    override var description: String,
+    val author: String = "",
+    val version: String = "",
+    val dependencies: List<String> = emptyList(),
+    val priority: Int = 0,
+    val thumbnail: String = ""
+) : ModManifest {
+    companion object {
+        const val DEFAULT_MIN_GAME_VERSION_NAME = "1.0.4"
+    }
+}
+
+open class LegacyModManifest : ModManifest {
+    override var id: String = ""
+    override var name: String = ""
+    override var minGameVersionName: String = "1.15"
+    override var description: String = ""
+    open val errorsAndWarnings: String? = null
     open var path: String = ""
-    open var id: String = ""
-    open var name: String = ""
-    var author: String = ""
-    var version: String = ""
-    open var minGameVersionName: String = "1.0.0"
-    open var description: String = ""
-    var dependencies: List<String> = emptyList()
-    var priority: Int = 0
 }

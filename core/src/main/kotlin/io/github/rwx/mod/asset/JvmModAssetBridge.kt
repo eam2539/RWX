@@ -1,9 +1,9 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.asset
 
 import com.corrodinggames.rts.gameFramework.mod.ModInfo
 import com.corrodinggames.rts.gameFramework.utility.AssetInputStream
 import java.io.File
-import java.util.IdentityHashMap
+import java.util.*
 
 object JvmModAssetBridge {
     private data class Mount(

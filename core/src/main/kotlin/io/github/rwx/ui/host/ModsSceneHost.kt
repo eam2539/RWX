@@ -19,6 +19,7 @@ class ModsSceneHost(
     private val mods = mutableStateListOf<ModEntry>()
     private val filter: MutableStateValue<String> = mutableStateOf("")
     private val snackbarSceneHost: SnackbarSceneHost by inject()
+    private val dialogSceneHost: DialogSceneHost by inject()
     fun updateMods(mods: List<ModEntry>, statusText: String = "") {
         this.mods.atomic {
             clear()
@@ -94,10 +95,20 @@ class ModsSceneHost(
                             theme = theme,
                             toggleLabel = if (mod.isEnabled) I18n.mods.disable() else I18n.mods.enable(),
                             deleteLabel = I18n.mods.delete(),
-                            ramText = if (mod.ramLabel.isBlank()) "" else I18n.mods.ramUsed(mod.ramLabel),
                             contentWidth = metrics.contentWidth,
                             onToggle = { toggleEnable(mod.id) },
                             onDelete = { deleteMod(mod.id) },
+                            onShowFullText = { title, sectionLabel, text ->
+                                dialogSceneHost.show(
+                                    Dialog(
+                                        title = title,
+                                        message = text,
+                                        messageLabel = sectionLabel,
+                                        scrollableMessage = true,
+                                        buttons = listOf(DialogButton(I18n.common.close())),
+                                    )
+                                )
+                            },
                         )
                     }
                 }

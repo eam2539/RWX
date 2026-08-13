@@ -1,6 +1,6 @@
 package io.github.rwx.app
 
-import io.github.rwx.mod.UiRegistry
+import io.github.rwx.mod.registry.UiRegistry
 import io.github.rwx.session.GameSession
 import io.github.rwx.settings.GameSettingsRepository
 import io.github.rwx.ui.AppScreen

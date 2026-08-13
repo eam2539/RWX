@@ -3,7 +3,6 @@ package io.github.rwx.ui.model
 import com.corrodinggames.rts.gameFramework.GameEngine
 import com.corrodinggames.rts.gameFramework.GameSaver
 import com.corrodinggames.rts.gameFramework.file.FileHelper
-import com.corrodinggames.rts.gameFramework.mod.ModManagerAccess
 import io.github.rwx.LegacyAssetBridge
 import io.github.rwx.PlatformStorage
 import io.github.rwx.i18n.I18n
@@ -257,7 +256,7 @@ class LevelSelectViewModel(
 
     private fun modMapItems(): List<MapEntry> {
         val manager = GameEngine.getInstance()?.modManager ?: return emptyList()
-        return ModManagerAccess.allMods(manager)
+        return manager.mods
             .asSequence()
             .filter { it.isEnabled && !it.disabled }
             .mapNotNull { mod -> mod.getSourceFolder()?.takeIf { it.isNotBlank() } }

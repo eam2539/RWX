@@ -1,36 +1,24 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.registry
 
-import io.github.rwx.render.RenderRegistry
+import io.github.rwx.mod.CommandQueue
+import io.github.rwx.mod.JvmMod
+import io.github.rwx.mod.Mod
+import io.github.rwx.mod.impl.ApiImpl
 
 object ModRegistry {
     private val mods = mutableListOf<Mod>()
-    private val owned: List<OwnedRegistry> = listOf(
-        RenderRegistry,
-        ProjectileObserverRegistry,
-        TurretFireCycleObserverRegistry,
-        DamageRegistry,
-        AudioRegistry,
-        TeamActionRegistry,
-        UiRegistry,
-    )
     @JvmStatic
     fun register(mod: Mod) {
         mods.add(mod)
     }
     fun release(owner: ApiImpl) {
-        owned.forEach { it.unregister(owner) }
+        OwnedRegistry::class.sealedSubclasses.map { it.objectInstance!! }.forEach { it.unregister(owner) }
     }
     @JvmStatic
     fun unregister(mod: Mod) {
         mods.remove(mod)
         mod.apiImplOrNull()?.let(::release)
     }
-
-    @JvmStatic
-    fun getAll(): List<Mod> = mods.toList()
-
-    @JvmStatic
-    fun getById(id: String): Mod? = mods.find { it.metadata.id == id }
 
     @JvmStatic
     fun clear() {
@@ -40,7 +28,7 @@ object ModRegistry {
     }
 }
 
-interface OwnedRegistry {
+sealed interface OwnedRegistry {
     fun unregister(owner: ApiImpl)
 }
 

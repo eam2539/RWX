@@ -7,6 +7,7 @@ import com.corrodinggames.rts.game.units.custom.logic.CustomActionDef
 import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.logger
 import io.github.rwx.mod.api.*
+import io.github.rwx.mod.impl.ApiImpl
 import java.util.IdentityHashMap
 import kotlin.collections.ArrayDeque
 import kotlin.math.sqrt
@@ -184,7 +185,7 @@ object UnitEventRuntime {
             registration.definition.eventHandlers.forEach { binding ->
                 if (!UnitEventMatcher.matches(binding.event, event.kind, event.payload)) return@forEach
                 if (!UnitConditionEvaluator.evaluate(binding.condition, evaluationContext)) return@forEach
-                val key = BindingKey(registration.api.metadata.id, registration.definition.id, binding.id)
+                val key = BindingKey(registration.api.manifest.id, registration.definition.id, binding.id)
                 val bindingPath = policy.enterBinding(event.path, key, binding.recursionLimit) ?: return@forEach
                 if (!policy.consumeWorkItem()) {
                     reportOverflow()
@@ -267,7 +268,7 @@ object UnitEventRuntime {
             binding.actions.forEach { action -> executeAction(registration, action, event) }
             binding.listener?.handle(context)
         } catch (error: Throwable) {
-            val message = "JVM mod ${registration.api.metadata.id}: unit event binding " +
+            val message = "JVM mod ${registration.api.manifest.id}: unit event binding " +
                     "${registration.definition.id.value}/${binding.id.value} failed"
             logger.error(error) { message }
             if (reportedFailures.add(key)) {

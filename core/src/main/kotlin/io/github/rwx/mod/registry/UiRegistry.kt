@@ -1,10 +1,11 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.registry
 
 import com.corrodinggames.rts.gameFramework.GameEngine
 import de.fabmax.kool.modules.ui2.Dp
 import de.fabmax.kool.modules.ui2.UiScope
 import io.github.rwx.i18n.I18n
 import io.github.rwx.mod.api.*
+import io.github.rwx.mod.impl.ApiImpl
 import io.github.rwx.ui.CoreUiEventQueue
 
 object UiRegistry : OwnedRegistry {

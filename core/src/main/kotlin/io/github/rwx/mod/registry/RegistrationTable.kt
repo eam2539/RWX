@@ -1,16 +1,16 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.registry
 
 import io.github.rwx.logger
+import io.github.rwx.mod.impl.ApiImpl
 
 /**
  * A keyed table of registrations owned by mods.
  *
  * Every mod-facing registry keeps the same thing: entries tagged with the [ApiImpl] that
  * registered them, rejected on duplicate keys, and dropped wholesale when that mod goes away.
- * This holds that logic once so registries only describe what they store.
  *
  * [lock] is supplied by the owning registry rather than created here: registries that keep
- * several tables consistent with each other (see [io.github.rwx.render.RenderRegistry])
+ * several tables consistent with each other (see [RenderRegistry])
  * must guard them all with one monitor, which per-table locks would silently break.
  *
  * Pass an [IdentityHashMap][java.util.IdentityHashMap] as [entries] to key by native object
@@ -21,7 +21,7 @@ class RegistrationTable<K : Any, V : Any>(
     private val lock: Any = Any(),
     private val entries: MutableMap<K, Owned<V>> = LinkedHashMap(),
     private val describeKey: (K) -> String = { it.toString() },
-) : OwnedRegistry {
+) {
 
     /** A [value] together with the mod that registered it. */
     class Owned<V>(val owner: ApiImpl, val value: V)
@@ -72,10 +72,6 @@ class RegistrationTable<K : Any, V : Any>(
             (owned.owner === owner).also { if (it) removed[key] = owned.value }
         }
         removed
-    }
-
-    override fun unregister(owner: ApiImpl) {
-        removeOwned(owner)
     }
 
     fun clear() = synchronized(lock) { entries.clear() }

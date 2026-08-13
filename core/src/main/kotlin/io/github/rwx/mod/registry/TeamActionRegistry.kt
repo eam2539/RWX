@@ -1,22 +1,17 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.registry
 
 import com.corrodinggames.rts.game.PlayerTeam
 import com.corrodinggames.rts.game.units.actions.ActionId
 import com.corrodinggames.rts.game.units.custom.AnimationTag
 import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.geometry.PointF
-import io.github.rwx.mod.TeamActionRegistry.actions
+import io.github.rwx.mod.CommandQueue
 import io.github.rwx.mod.api.*
+import io.github.rwx.mod.impl.ApiImpl
 
 object TeamActionRegistry : OwnedRegistry {
     const val SYSTEM_ACTION_TYPE = 300
 
-    /**
-     * Shared with [actions] so a lookup and the queue write it implies stay atomic against
-     * teardown: otherwise [unregister] could drop an action and cancel its pending commands
-     * between [request] resolving an owner and enqueuing for it, stranding a command that
-     * belongs to a mod that is already gone.
-     */
     private val lock = Any()
     private val actions = RegistrationTable<String, TeamActionHandler>("Team action", lock)
 

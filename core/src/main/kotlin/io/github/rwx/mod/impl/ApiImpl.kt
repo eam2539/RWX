@@ -1,4 +1,4 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.impl
 
 import com.corrodinggames.rts.game.PlayerTeam
 import com.corrodinggames.rts.game.units.UnitTypeEnum
@@ -16,19 +16,26 @@ import de.fabmax.kool.modules.ui2.Dp
 import de.fabmax.kool.modules.ui2.UiScope
 import io.github.rwx.PlatformBridge
 import io.github.rwx.logger
+import io.github.rwx.mod.*
 import io.github.rwx.mod.api.*
+import io.github.rwx.mod.asset.JvmModAssetBridge
+import io.github.rwx.mod.asset.JvmModAssetKeyStore
+import io.github.rwx.mod.asset.JvmModAssetStore
+import io.github.rwx.mod.asset.OnlineAssetRevocationListFetcher
 import io.github.rwx.mod.assets.AssetCredentialResolver
+import io.github.rwx.mod.assets.AssetVaultFormat
 import io.github.rwx.mod.assets.EmptyAssetCredentialResolver
-import io.github.rwx.render.RenderRegistry
+import io.github.rwx.mod.registry.*
 import java.io.File
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Locale
 import java.util.zip.ZipFile
 import kotlin.collections.ArrayDeque
+import io.github.rwx.mod.api.Map as ApiMap
 
 class ApiImpl private constructor(
-    val metadata: ModMetadata,
+    val manifest: ModManifest,
     private val jarFile: File,
     private val workDir: File,
     internal val platformBridge: PlatformBridge?,
@@ -48,7 +55,7 @@ class ApiImpl private constructor(
     override val units: Units = unitApi
     override val unitWorld: UnitWorld = unitWorldApi
     override val commands: UnitCommands = commandApi
-    override val maps: io.github.rwx.mod.api.Map = RecordingMapApi()
+    override val maps: ApiMap = RecordingMapApi()
     override val rules: Rule = RecordingRule()
     override val localization: io.github.rwx.mod.api.Localization = Localization()
     override val audio: Audio = ModAudio(this)
@@ -59,7 +66,7 @@ class ApiImpl private constructor(
     private val shaderBindings = linkedMapOf<String, String?>()
 
     fun materializeDeclarations() {
-        checkNotNull(engineModInfo) { "JVM mod ${metadata.id} must be registered with ModManager before loading content" }
+        checkNotNull(engineModInfo) { "JVM mod ${manifest.id} must be registered with ModManager before loading content" }
         extractJarResources()
         AudioRegistry.materialize(this)
         applyUnitDeclarations()
@@ -67,7 +74,7 @@ class ApiImpl private constructor(
 
     fun verifyUnitDeclarationsActivated() {
         val ownerModInfo = checkNotNull(engineModInfo) {
-            "JVM mod ${metadata.id} is not registered with ModManager"
+            "JVM mod ${manifest.id} is not registered with ModManager"
         }
         val registeredTypes = UnitTypeEnum.ae.toSet()
         val activeByName = CustomUnitConfig.activeConfigs.associateBy { it.name }
@@ -83,11 +90,11 @@ class ApiImpl private constructor(
                 missing += "${definition.id.value} ($engineName)"
             } else {
                 check(nativeType.modInfo === ownerModInfo) {
-                    "JVM mod ${metadata.id}: native unit ${definition.id.value} is not owned by its engine mod"
+                    "JVM mod ${manifest.id}: native unit ${definition.id.value} is not owned by its engine mod"
                 }
                 val probe = nativeType.createCustomUnit(true)
                 check(probe.r() === nativeType) {
-                    "JVM mod ${metadata.id}: native unit factory returned the wrong type for ${definition.id.value}"
+                    "JVM mod ${manifest.id}: native unit factory returned the wrong type for ${definition.id.value}"
                 }
                 val nativeBuildTargets = (1..3)
                     .flatMap { techLevel -> nativeType.a(techLevel) }
@@ -105,7 +112,7 @@ class ApiImpl private constructor(
                     .toSet()
                 check(nativeBuildTargets.containsAll(expectedBuildTargets)) {
                     val unresolved = expectedBuildTargets - nativeBuildTargets
-                    "JVM mod ${metadata.id}: native build links unresolved for ${definition.id.value}: " +
+                    "JVM mod ${manifest.id}: native build links unresolved for ${definition.id.value}: " +
                             unresolved.joinToString()
                 }
                 val isPickableStartingUnit = definition.iniSections
@@ -115,7 +122,7 @@ class ApiImpl private constructor(
                     ?.get("isPickableStartingUnit") == true
                 if (isPickableStartingUnit) {
                     check(nativeType.isPickableStartingUnit && nativeType in CustomUnitConfig.configsById) {
-                        "JVM mod ${metadata.id}: ${definition.id.value} was not registered as a starting unit"
+                        "JVM mod ${manifest.id}: ${definition.id.value} was not registered as a starting unit"
                     }
                     verifiedStartingUnits++
                 }
@@ -125,7 +132,7 @@ class ApiImpl private constructor(
         }
 
         check(missing.isEmpty()) {
-            "JVM mod ${metadata.id}: native unit activation failed for ${missing.joinToString()}"
+            "JVM mod ${manifest.id}: native unit activation failed for ${missing.joinToString()}"
         }
         activeNativeUnits.clear()
         activeNativeUnits.putAll(resolved)
@@ -135,7 +142,7 @@ class ApiImpl private constructor(
         val appliedUnitRenderers = RenderRegistry.activateUnitBindings(this, resolved, unitApi.units())
         val appliedShaders = applyUnitShaderBindings(resolved)
         logger.info {
-            "JVM mod ${metadata.id}: activated and instantiated ${resolved.size} native unit types " +
+            "JVM mod ${manifest.id}: activated and instantiated ${resolved.size} native unit types " +
                     "with $resolvedBuildLinks resolved build links, $verifiedStartingUnits starting units, " +
                     "$appliedExtensionBindings native-object extension bindings, " +
                     "$appliedUnitRenderers unit renderer bindings, and $appliedShaders unit shader bindings"
@@ -154,7 +161,7 @@ class ApiImpl private constructor(
                 generatedDirectory.resolve(compilation.fileName).writeText(compilation.content)
                 unitExtensionBindings[definition.id] = compilation.extensionBindings
                 compilation.warnings.forEach { warning ->
-                    logger.warn { "JVM mod ${metadata.id}: $warning" }
+                    logger.warn { "JVM mod ${manifest.id}: $warning" }
                     engineModInfo?.addWarning(warning)
                 }
                 generatedCount++
@@ -163,11 +170,11 @@ class ApiImpl private constructor(
                     "Failed to compile unit ${definition.id.value}: ${error.message ?: error.javaClass.simpleName}"
                 )
                 logger.error(error) {
-                    "JVM mod ${metadata.id}: failed to compile unit ${definition.id.value} to native RWX content"
+                    "JVM mod ${manifest.id}: failed to compile unit ${definition.id.value} to native RWX content"
                 }
             }
         }
-        logger.info { "JVM mod ${metadata.id}: generated $generatedCount native unit definitions for engine mod loading" }
+        logger.info { "JVM mod ${manifest.id}: generated $generatedCount native unit definitions for engine mod loading" }
     }
 
     private fun applyUnitExtensionBindings(nativeUnits: Map<UnitId, CustomUnitConfig>): Int {
@@ -284,15 +291,13 @@ class ApiImpl private constructor(
 
     fun bindEngineModInfo(modInfo: ModInfo) {
         engineModInfo = modInfo
-        modInfo.uuid = metadata.id
-        modInfo.id = metadata.id
+        modInfo.uuid = manifest.id
         modInfo.dirName = jarFile.name
-        modInfo.shortName = metadata.id
-        modInfo.title = metadata.name
-        modInfo.name = metadata.name
-        modInfo.description = metadata.description
-        modInfo.version = metadata.version
-        modInfo.minVersion = metadata.minGameVersionName
+        modInfo.shortName = manifest.id
+        modInfo.title = manifest.name
+        modInfo.name = manifest.name
+        modInfo.description = manifest.description
+        modInfo.minVersion = manifest.minGameVersionName
         modInfo.path = jarFile.absolutePath
         modInfo.sourceFolder = workDir.absolutePath
         modInfo.found = true
@@ -313,7 +318,7 @@ class ApiImpl private constructor(
                 val name = entry.name
                 if (!name.startsWith("assets/")) continue
                 val normalized = runCatching {
-                    io.github.rwx.mod.assets.AssetVaultFormat.normalizeAssetPath(name)
+                    AssetVaultFormat.normalizeAssetPath(name)
                 }.getOrNull() ?: continue
                 if (!normalized.startsWith("assets/")) continue
                 val outFile = workDir.resolve(normalized).normalize()
@@ -360,7 +365,7 @@ class ApiImpl private constructor(
         requestedBindings.forEach { (unitId, shaderId) ->
             val nativeUnit = nativeUnits.entries.firstOrNull { it.key.value == unitId }?.value
             if (nativeUnit == null) {
-                val message = "JVM mod ${metadata.id}: shader binding references unknown unit $unitId"
+                val message = "JVM mod ${manifest.id}: shader binding references unknown unit $unitId"
                 engineModInfo?.addError(message)
                 logger.error { message }
                 return@forEach
@@ -378,7 +383,7 @@ class ApiImpl private constructor(
                 bindShaderToUnitTextures(nativeUnit, shader)
                 applied++
             }.onFailure { error ->
-                val message = "JVM mod ${metadata.id}: failed to bind shader to $unitId: ${error.message}"
+                val message = "JVM mod ${manifest.id}: failed to bind shader to $unitId: ${error.message}"
                 engineModInfo?.addError(message)
                 logger.error(error) { message }
             }
@@ -452,6 +457,7 @@ class ApiImpl private constructor(
         textures += unit.teamColoredBaseTextures
         textures.forEach { it.a(shader) }
     }
+
     internal fun openPackagedResource(path: ResourcePath): InputStream {
         assetStore.open(path.value)?.let { return it }
         val file = resolvePackagedResourcePath(path)
@@ -479,7 +485,7 @@ class ApiImpl private constructor(
     }
 
     private fun normalizedPackagedPath(path: ResourcePath): String =
-        io.github.rwx.mod.assets.AssetVaultFormat.normalizeAssetPath(path.value).also { normalized ->
+        AssetVaultFormat.normalizeAssetPath(path.value).also { normalized ->
             require(normalized.startsWith("assets/")) {
                 "JVM mod packaged resources must be under assets/: ${path.value}"
             }
@@ -497,23 +503,23 @@ class ApiImpl private constructor(
 
         @JvmStatic
         fun create(
-            metadata: ModMetadata,
+            manifest: ModManifest,
             jarFile: File,
             platformBridge: PlatformBridge? = null,
             assetCredentialResolver: AssetCredentialResolver? = null,
         ): ApiImpl {
-            val root = File(FileHelper.getWorkingDirectory(), "jvm-mod-api/${sanitizePathSegment(metadata.id)}")
+            val root = File(FileHelper.getWorkingDirectory(), "jvm-mod-api/${sanitizePathSegment(manifest.id)}")
             val keyStore = platformBridge?.storage?.let(::JvmModAssetKeyStore)
             val resolver = assetCredentialResolver ?: keyStore ?: EmptyAssetCredentialResolver
             val assetStore = JvmModAssetStore(
                 jarFile,
-                metadata.id,
+                manifest.id,
                 resolver,
                 OnlineAssetRevocationListFetcher,
             )
             return try {
                 assetStore.requireAuthorized()
-                ApiImpl(metadata, jarFile, root, platformBridge, assetStore)
+                ApiImpl(manifest, jarFile, root, platformBridge, assetStore)
             } catch (error: Throwable) {
                 assetStore.close()
                 throw error
@@ -532,7 +538,7 @@ private class GameImpl(private val api: Api) : Game {
     override val tick: Long get() = GameEngine.getInstance().currentTick.toLong()
     override val headless: Boolean get() = false
     override fun log(level: LogLevel, message: String, cause: Throwable?) {
-        val tag = "JVM_MOD:${(api as ApiImpl).metadata.name}"
+        val tag = "JVM_MOD:${(api as ApiImpl).manifest.name}"
         when (level) {
             LogLevel.DEBUG -> logger.debug(tag) { message }
             LogLevel.INFO -> logger.info(tag) { message }
@@ -618,7 +624,7 @@ private class AssetImpl(
     }
 
     private fun normalizedPackagedAssetPathOrNull(path: ResourcePath): String? =
-        runCatching { io.github.rwx.mod.assets.AssetVaultFormat.normalizeAssetPath(path.value) }
+        runCatching { AssetVaultFormat.normalizeAssetPath(path.value) }
             .getOrNull()
             ?.takeIf { it == "assets" || it.startsWith("assets/") }
 
@@ -675,7 +681,7 @@ private class RecordingGraphics(private val api: ApiImpl) : Graphics {
     override fun addRenderPass(definition: RenderPassDefinition) {}
 }
 
-private class RecordingMapApi : io.github.rwx.mod.api.Map {
+private class RecordingMapApi : ApiMap {
     override fun registerMap(definition: MapDefinition) {
         logger.info { "JVM mod map registration recorded: ${definition.id}" }
     }

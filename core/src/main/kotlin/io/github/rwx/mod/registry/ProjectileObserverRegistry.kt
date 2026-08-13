@@ -1,9 +1,10 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.registry
 
 import com.corrodinggames.rts.game.Projectile
 import com.corrodinggames.rts.game.ProjectileTemplate
 import com.corrodinggames.rts.game.units.custom.CustomProjectileTemplate
 import io.github.rwx.mod.api.*
+import io.github.rwx.mod.impl.ApiImpl
 
 object ProjectileObserverRegistry : OwnedRegistry {
     private data class ActiveProjectile(

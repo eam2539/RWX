@@ -1,9 +1,10 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.impl
 
 import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.logger
 import io.github.rwx.mod.api.Api
 import io.github.rwx.mod.api.ModTask
+import io.github.rwx.mod.isJvmModSimulationAllowed
 
 object ModScheduler {
     private val lock = Any()

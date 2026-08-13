@@ -5,7 +5,7 @@ import com.corrodinggames.rts.gameFramework.GameMode;
 import com.corrodinggames.rts.gameFramework.local.Locale;
 import com.corrodinggames.rts.gameFramework.statistics.AndroidMenu;
 import com.corrodinggames.rts.gameFramework.steam.DisabledSteamEngine;
-import io.github.rwx.mod.UiRegistry;
+import io.github.rwx.mod.registry.UiRegistry;
 
 import java.io.IOException;
 

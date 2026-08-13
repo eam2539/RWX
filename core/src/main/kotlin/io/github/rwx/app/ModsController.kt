@@ -7,6 +7,7 @@ import io.github.rwx.logger
 import io.github.rwx.mod.ModRepository
 import io.github.rwx.session.GameSession
 import io.github.rwx.ui.component.Icon
+import io.github.rwx.ui.component.invalidateModThumbnailTextureCache
 import io.github.rwx.ui.host.DialogSceneHost
 import io.github.rwx.ui.host.LoadingDialogSceneHost
 import io.github.rwx.ui.host.ModsSceneHost
@@ -44,6 +45,7 @@ internal class ModsController(
 
     fun reloadAvailableAndRefresh() {
         modRepository.reloadAvailableMods()
+        invalidateModThumbnailTextureCache()
         refresh()
     }
 

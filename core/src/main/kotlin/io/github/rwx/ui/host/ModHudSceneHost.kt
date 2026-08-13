@@ -2,7 +2,7 @@ package io.github.rwx.ui.host
 
 import de.fabmax.kool.modules.ui2.*
 import de.fabmax.kool.scene.Scene
-import io.github.rwx.mod.UiRegistry
+import io.github.rwx.mod.registry.UiRegistry
 
 class ModHudSceneHost {
     fun createScene(): Scene = UiScene(SCENE_NAME) {

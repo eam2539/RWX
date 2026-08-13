@@ -42,11 +42,11 @@ import com.corrodinggames.rts.gameFramework.utility.Vector3D;
 import io.github.rwx.geometry.PointF;
 import io.github.rwx.geometry.Rect;
 import io.github.rwx.geometry.RectF;
-import io.github.rwx.mod.DamageRegistry;
-import io.github.rwx.mod.TurretFireCycleObserverRegistry;
 import io.github.rwx.mod.UnitEventRuntime;
 import io.github.rwx.mod.api.UnitRenderLayer;
-import io.github.rwx.render.RenderRegistry;
+import io.github.rwx.mod.registry.DamageRegistry;
+import io.github.rwx.mod.registry.RenderRegistry;
+import io.github.rwx.mod.registry.TurretFireCycleObserverRegistry;
 import io.github.rwx.render.canvas.KoolArgbColor;
 import io.github.rwx.render.canvas.KoolPaint;
 

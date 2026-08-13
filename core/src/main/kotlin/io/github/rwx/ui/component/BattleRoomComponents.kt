@@ -63,6 +63,27 @@ private fun UiScope.BattleRoomContent(
             BattleRoomChatPanel(model.chatLines, model.players, theme, metrics, actions.onSendChat)
             BattleRoomActionBar(model.isHost, theme, metrics, actions)
         }
+    } else if (metrics.isAndroid) {
+        Column(width = metrics.contentWidth) {
+            modifier.align(AlignmentX.Center, AlignmentY.Top)
+            Row(width = metrics.contentWidth) {
+                BattleRoomInfoPanel(
+                    model,
+                    model.isHost,
+                    theme,
+                    metrics,
+                    actions.onBack,
+                    actions.onSelectMap,
+                    actions.onOpenOptions
+                )
+                Column(width = metrics.playersWidth) {
+                    modifier.margin(start = UiTheme.Spacing.lg, top = UiTheme.Spacing.xs)
+                    BattleRoomPlayersPanel(model, theme, metrics, actions)
+                }
+            }
+            BattleRoomChatPanel(model.chatLines, model.players, theme, metrics, actions.onSendChat)
+            BattleRoomActionBar(model.isHost, theme, metrics, actions)
+        }
     } else {
         Row(width = metrics.contentWidth) {
             modifier.align(AlignmentX.Center, AlignmentY.Top)
@@ -145,6 +166,7 @@ private fun UiScope.BattleRoomInfoPanel(
                     .margin(vertical = Dp(2f))
                     .font(UiTheme.Fonts.caption)
                     .textColor(theme.palette.textSecondary)
+                    .isWrapText(true)
             }
         }
         if (model.isHost)
@@ -524,6 +546,7 @@ private data class BattleRoomLayoutMetrics(
     val actionAreaWidth: Dp,
     val compactActionButtonWidth: Dp,
     val isCompact: Boolean,
+    val isAndroid: Boolean,
     val pageViewportHeight: Dp,
     val isShortLandscape: Boolean,
     val isPageScrollable: Boolean,
@@ -608,9 +631,10 @@ private fun UiScope.battleRoomLayoutMetrics(
         playerTeamWidth = teamWidth,
         playerPingWidth = pingWidth,
         sendButtonWidth = if (isCompact) Dp(96f) else UiTheme.Layout.battleRoomSendButtonWidth,
-        actionAreaWidth = if (isCompact) contentWidth else playersWidth,
+        actionAreaWidth = if (isCompact || isAndroid) contentWidth else playersWidth,
         compactActionButtonWidth = contentWidth.remainingAfter(UiTheme.Spacing.sm, Dp(180f)),
         isCompact = isCompact,
+        isAndroid = isAndroid,
         pageViewportHeight = if (viewportHeightDp > 0f) {
             Dp((viewportHeightDp - pageVerticalChrome.value).coerceAtLeast(240f))
         } else {
@@ -627,7 +651,7 @@ internal fun battleRoomPlayersViewportHeight(
 ): Dp {
     val playerRowsHeight = playerCount
         .coerceIn(1, BATTLE_ROOM_MAX_VISIBLE_PLAYER_ROWS)
-        .times(UiTheme.Layout.battleRoomRowHeight.value)
+        .times(UiTheme.Layout.battleRoomRowHeight.value + UiTheme.Spacing.xs.value)
     return Dp(maxOf(responsiveHeight.value, playerRowsHeight))
 }
 

@@ -1,4 +1,4 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.asset
 
 import io.github.rwx.mod.assets.AssetPkiFiles
 import io.github.rwx.mod.assets.AssetRevocationList
@@ -64,7 +64,7 @@ internal object OnlineAssetRevocationListFetcher : AssetRevocationListFetcher {
         }
     }
 
-    private suspend fun io.ktor.utils.io.ByteReadChannel.readLimited(): ByteArray {
+    private suspend fun ByteReadChannel.readLimited(): ByteArray {
         val output = ByteArrayOutputStream()
         val buffer = ByteArray(BUFFER_SIZE)
         while (!isClosedForRead) {

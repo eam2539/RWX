@@ -3,10 +3,14 @@ package io.github.rwx.mod
 import io.github.rwx.PlatformBridge
 import io.github.rwx.logger
 import io.github.rwx.mod.assets.AssetCredentialResolver
+import io.github.rwx.mod.impl.ApiImpl
+import io.github.rwx.mod.registry.ModRegistry
+import io.github.rwx.mod.registry.apiImplOrNull
 import net.peanuuutz.tomlkt.*
 import org.koin.mp.KoinPlatform.getKoin
 import java.io.Closeable
 import java.io.File
+import java.io.InputStream
 import java.util.zip.ZipFile
 
 class JvmModLoader @JvmOverloads constructor(
@@ -17,21 +21,8 @@ class JvmModLoader @JvmOverloads constructor(
 ) : AutoCloseable {
     val errors: MutableList<Throwable> = mutableListOf()
 
-    private val toml = Toml { ignoreUnknownKeys = true }
     private val discoveredMods = mutableListOf<JvmMod>()
     val loadedMods = mutableListOf<Mod>()
-
-    fun loadMods(handle: File): List<Mod> {
-        return discoverModFiles(listCandidateModFiles(handle)).mapNotNull { mod ->
-            runCatching {
-                initializeMod(mod)
-                mod
-            }.onFailure { e ->
-                errors += e
-                logger.error(e) { "init() failed for mod ${mod.metadata.id}" }
-            }.getOrNull()
-        }
-    }
 
     fun discoverModFiles(files: Iterable<File>): List<JvmMod> {
         val currentBatch = mutableListOf<JvmMod>()
@@ -48,32 +39,12 @@ class JvmModLoader @JvmOverloads constructor(
         return resolveDependencies(currentBatch).filterIsInstance<JvmMod>()
     }
 
-    fun listCandidateModFiles(handle: File): List<File> {
-
-        if (!handle.exists()) return emptyList()
-
-        return handle
-            .listFiles { !it.isDirectory && it.name.endsWith(".jar") }
-            ?.sortedBy { it.path.lowercase() } ?: emptyList()
-    }
-
-    fun loadModFile(jarFile: File): JvmMod? {
-        val mod = discoverModFile(jarFile) ?: return null
-        return runCatching {
-            initializeMod(mod)
-            mod
-        }.onFailure { e ->
-            errors += e
-            logger.error(e) { "init() failed for mod ${mod.metadata.id}" }
-        }.getOrNull()
-    }
-
     private fun discoverModFile(jarFile: File): JvmMod? {
-        val result = peekModToml(jarFile) ?: run {
+        val result = readModToml(jarFile) ?: run {
             logger.warn { "Failed to load JVM mod from ${jarFile.path}" }
             return null
         }
-        val metadata = result.metadata
+        val metadata = result.manifest
         val entryClassName = result.entryClassName
 
         val resolvedPlatformBridge = platformBridge
@@ -96,7 +67,7 @@ class JvmModLoader @JvmOverloads constructor(
         try {
             mod.apply {
                 this.classLoader = classLoader
-                this.metadata = metadata
+                this.manifest = metadata
                 this.api = api
             }
         } catch (error: Throwable) {
@@ -123,56 +94,7 @@ class JvmModLoader @JvmOverloads constructor(
     }
 
 
-    private data class ModTomlResult(val metadata: ModMetadata, val entryClassName: String)
-
-
-    private fun peekModToml(jarFile: File): ModTomlResult? =
-        runCatching {
-            val zip = ZipFile(jarFile)
-            zip.use { zip ->
-                val entry = zip.getEntry("mod.toml") ?: return null
-                val reader = zip.getInputStream(entry).reader(Charsets.UTF_8)
-                val table = reader.use { reader ->
-                    toml.parseToTomlTable(reader).asTomlTable()
-                }
-                ModTomlResult(
-                    entryClassName = runCatching { table.getString("entrypoint") }.getOrElse {
-                        return null
-                    }.takeIf { it.isNotBlank() } ?: run {
-                        return null
-                    },
-                    metadata = ModMetadata().apply {
-                        path = jarFile.path
-                        id = runCatching { table.getString("id") }.getOrElse {
-                            return null
-                        }.takeIf { it.isNotBlank() } ?: run {
-                            return null
-                        }
-                        name = runCatching { table.getString("name") }.getOrElse {
-                            return null
-                        }.takeIf { it.isNotBlank() } ?: run {
-                            return null
-                        }
-                        author = runCatching { table.getString("author") }.getOrDefault(author)
-                        version = runCatching { table.getString("version") }.getOrDefault(version)
-                        minGameVersionName =
-                            runCatching { table.getString("minGameVersion") }.getOrDefault(minGameVersionName)
-                        description = runCatching { table.getString("description") }.getOrDefault(description)
-                        dependencies = table.getArrayOrNull("dependencies")?.let { dependencyArray ->
-                            dependencyArray.mapIndexedNotNull { index, _ ->
-                                runCatching { dependencyArray.getString(index) }
-                                    .getOrNull()
-                                    ?.takeIf { it.isNotBlank() }
-                            }
-                        } ?: dependencies
-                        priority = runCatching { table.getString("priority").toInt() }.getOrDefault(priority)
-                    }
-
-                )
-            }
-        }.onFailure { e ->
-            logger.error(e) { "Error reading mod.toml from ${jarFile.name}" }
-        }.getOrNull()
+    data class ModTomlResult(val manifest: ModManifest, val entryClassName: String)
 
     private fun instantiateMod(
         className: String,
@@ -202,32 +124,31 @@ class JvmModLoader @JvmOverloads constructor(
 
 
     private fun resolveDependencies(mods: List<Mod>): List<Mod> {
-        val modMap = mods.associateBy { it.metadata.id }
+        val modMap = mods.associateBy { it.manifest.id }
         val adjacency = mutableMapOf<String, MutableSet<String>>()
         val inDegree = mutableMapOf<String, Int>().withDefault { 0 }
-
         for (mod in mods) {
-            for (depId in mod.metadata.dependencies) {
+            for (depId in (mod.manifest as JvmModManifest).dependencies) {
                 if (depId !in modMap) {
-                    logger.warn { "Mod ${mod.metadata.id} depends on missing mod $depId; skipping this dependency" }
+                    logger.warn { "Mod ${mod.manifest.id} depends on missing mod $depId; skipping this dependency" }
                     continue
                 }
-                adjacency.getOrPut(depId) { mutableSetOf() }.add(mod.metadata.id)
-                inDegree[mod.metadata.id] = inDegree.getValue(mod.metadata.id) + 1
+                adjacency.getOrPut(depId) { mutableSetOf() }.add(mod.manifest.id)
+                inDegree[mod.manifest.id] = inDegree.getValue(mod.manifest.id) + 1
             }
         }
 
         val queue = mutableListOf<Mod>()
         for (mod in mods) {
-            if (inDegree.getValue(mod.metadata.id) == 0) queue.add(mod)
+            if (inDegree.getValue(mod.manifest.id) == 0) queue.add(mod)
         }
 
         val sorted = mutableListOf<Mod>()
         while (queue.isNotEmpty()) {
-            queue.sortByDescending { it.metadata.priority }
+            queue.sortByDescending { (it.manifest as JvmModManifest).priority }
             val current = queue.removeAt(0)
             sorted.add(current)
-            adjacency[current.metadata.id]?.forEach { dependentId ->
+            adjacency[current.manifest.id]?.forEach { dependentId ->
                 val newDegree = inDegree.getValue(dependentId) - 1
                 inDegree[dependentId] = newDegree
                 if (newDegree == 0) modMap[dependentId]?.let { queue.add(it) }
@@ -235,8 +156,8 @@ class JvmModLoader @JvmOverloads constructor(
         }
 
         if (sorted.size != mods.size) {
-            val remaining = mods.filter { it.metadata.id !in sorted.map { m -> m.metadata.id } }
-            logger.warn { "Cyclic or missing dependencies detected; skipping mods: ${remaining.joinToString { it.metadata.id }}" }
+            val remaining = mods.filter { it.manifest.id !in sorted.map { m -> m.manifest.id } }
+            logger.warn { "Cyclic or missing dependencies detected; skipping mods: ${remaining.joinToString { it.manifest.id }}" }
         }
 
         return sorted
@@ -245,7 +166,7 @@ class JvmModLoader @JvmOverloads constructor(
     override fun close() {
         loadedMods.forEach { mod ->
             runCatching { mod.dispose() }.onFailure { e ->
-                logger.error(e) { "Failed to dispose mod ${mod.metadata.id}" }
+                logger.error(e) { "Failed to dispose mod ${mod.manifest.id}" }
             }
             ModRegistry.unregister(mod)
         }
@@ -253,16 +174,61 @@ class JvmModLoader @JvmOverloads constructor(
             runCatching {
                 mod.apiImplOrNull()?.close()
             }.onFailure { e ->
-                logger.error(e) { "Error closing assets for mod ${mod.metadata.id}" }
+                logger.error(e) { "Error closing assets for mod ${mod.manifest.id}" }
             }
             runCatching {
                 val cl = mod.classLoader
                 if (cl is Closeable) cl.close()
             }.onFailure { e ->
-                logger.error(e) { "Error closing classloader for mod ${mod.metadata.id}" }
+                logger.error(e) { "Error closing classloader for mod ${mod.manifest.id}" }
             }
         }
         loadedMods.clear()
         discoveredMods.clear()
+    }
+
+    companion object {
+        const val JVM_MOD_MANIFEST = "mod.toml"
+        private val toml = Toml { ignoreUnknownKeys = true }
+
+        private fun readModToml(jarFile: File): ModTomlResult? =
+            runCatching {
+                ZipFile(jarFile).use { zip ->
+                    val entry = zip.getEntry(JVM_MOD_MANIFEST) ?: return null
+                    peekModToml(zip.getInputStream(entry))
+                }
+            }.onFailure { e ->
+                logger.error(e) { "Error reading mod.toml from ${jarFile.name}" }
+            }.getOrNull()
+
+        fun peekModToml(input: InputStream): ModTomlResult? =
+            runCatching {
+                val reader = input.reader(Charsets.UTF_8)
+                val table = reader.use { reader ->
+                    toml.parseToTomlTable(reader).asTomlTable()
+                }
+                ModTomlResult(
+                    entryClassName = table.getStringOrNull("entrypoint")?.takeIf { it.isNotBlank() } ?: return null,
+                    manifest = JvmModManifest(
+                        id = table.getStringOrNull("id")?.takeIf { it.isNotBlank() } ?: run {
+                            logger.error { "Failed to essential id from $JVM_MOD_MANIFEST" }
+                            return null
+                        },
+                        name = table.getStringOrNull("name").orEmpty(),
+                        author = table.getStringOrNull("author").orEmpty(),
+                        version = table.getStringOrNull("version").orEmpty(),
+                        minGameVersionName = table.getStringOrNull("minGameVersion")
+                            ?: JvmModManifest.DEFAULT_MIN_GAME_VERSION_NAME,
+                        description = table.getStringOrNull("description").orEmpty(),
+                        thumbnail = table.getStringOrNull("thumbnail").orEmpty(),
+                        dependencies = table.getArrayOrNull("dependencies")?.let { array ->
+                            List(array.size) { array.getStringOrNull(it) }
+                                .filterNotNull()
+                                .filter { it.isNotBlank() }
+                        } ?: emptyList(),
+                        priority = table.getIntegerOrNull("priority")?.toInt() ?: 0,
+                    )
+                )
+            }.getOrThrow()
     }
 }

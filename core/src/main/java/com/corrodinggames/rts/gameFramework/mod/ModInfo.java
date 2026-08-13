@@ -8,7 +8,7 @@ import com.corrodinggames.rts.gameFramework.file.CacheManager;
 import com.corrodinggames.rts.gameFramework.file.FileHelper;
 import com.corrodinggames.rts.gameFramework.utility.AssetInputStream;
 import com.corrodinggames.rts.gameFramework.utility.IniFile;
-import io.github.rwx.mod.ModMetadata;
+import io.github.rwx.mod.LegacyModManifest;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.i.b */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/i/b.class */
-public class ModInfo extends ModMetadata implements Comparable<ModInfo> {
+public class ModInfo extends LegacyModManifest implements Comparable<ModInfo> {
 
     /* JADX INFO: renamed from: a */
     public int tmpId;
@@ -274,6 +274,7 @@ public class ModInfo extends ModMetadata implements Comparable<ModInfo> {
     }
 
     /* JADX INFO: renamed from: l */
+    @Override
     public String getErrorsAndWarnings() {
         String str = this.firstWarning;
         if (this.otherErrors != null) {

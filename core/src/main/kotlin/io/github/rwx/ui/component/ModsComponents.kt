@@ -1,11 +1,21 @@
 package io.github.rwx.ui.component
 
+import de.fabmax.kool.Assets
+import de.fabmax.kool.MimeType
 import de.fabmax.kool.modules.ui2.*
+import de.fabmax.kool.pipeline.BufferedImageData2d
+import de.fabmax.kool.pipeline.ImageData2d
+import de.fabmax.kool.pipeline.TexFormat
+import de.fabmax.kool.pipeline.Texture2d
+import de.fabmax.kool.util.Color
+import de.fabmax.kool.util.Uint8Buffer
+import io.github.rwx.i18n.I18n
 import io.github.rwx.ui.ColorSchemeDefinition
-import io.github.rwx.ui.model.ModEntry
 import io.github.rwx.ui.UiTheme
+import io.github.rwx.ui.model.ModEntry
 import io.github.rwx.ui.remainingAfter
 import io.github.rwx.ui.splitEvenly
+import java.util.zip.ZipFile
 
 /** Labels for the Mods bottom action bar; resolved from [io.github.rwx.i18n.I18n] by the host. */
 data class ModsActionLabels(
@@ -23,10 +33,6 @@ data class ModsActionCallbacks(
     val onApply: () -> Unit,
 )
 
-/**
- * Search field that filters the mod list by name. The MSDF atlas
- * covers Latin + CJK, so CJK input and a translated hint render through the same field font.
- */
 fun UiScope.ModsFilterField(
     filter: String,
     hint: String,
@@ -61,11 +67,6 @@ fun UiScope.ModsFilterField(
     }
 }
 
-/**
- * Centered section header for the Enabled / Disabled groups. Centering
- * (rather than the left-aligned [SectionTitle]) keeps the wide CJK heading glyphs clear of the
- * panel's left edge.
- */
 fun UiScope.ModsSectionHeader(
     text: String,
     theme: ColorSchemeDefinition,
@@ -81,35 +82,109 @@ fun UiScope.ModsSectionHeader(
     }
 }
 
-/**
- * A single mod row: name with an optional RAM / error sub-line on the left, and Enable/Disable plus
- * Delete buttons on the right. Visual structure is expressed with RWX theme
- * tokens. [toggleLabel] is "Enable" or "Disable" depending on the mod's current state (chosen by the
- * caller); [ramText] is pre-formatted and blank when unknown.
- */
+
+/** Height of the fade-out mask behind the "More..." overlay in [ClampedText]. */
+private val MODS_TEXT_FADE_HEIGHT = Dp(16f)
+
+
+private fun UiScope.ClampedText(
+    text: String,
+    maxHeight: Dp,
+    theme: ColorSchemeDefinition,
+    textColor: Color,
+    moreLabel: String,
+    onMore: () -> Unit,
+) {
+    val overflow = remember(false)
+    val isOverflow = overflow.use()
+    val hovered = remember(false)
+    val isHovered = hovered.use()
+
+    Box(width = Grow.Std, height = if (isOverflow) maxHeight else FitContent) {
+        modifier.margin(top = UiTheme.Spacing.xs)
+        Text(text) {
+            modifier
+                .width(Grow.Std)
+                .height(FitContent)
+                .clipToBounds(true)
+                .font(UiTheme.Fonts.caption)
+                .isWrapText(true)
+                .textAlignY(AlignmentY.Top)
+                .textColor(textColor)
+                .onPositioned { node -> overflow.value = node.contentHeightPx > maxHeight.px }
+        }
+        if (isOverflow) {
+            Box(width = Grow.Std, height = MODS_TEXT_FADE_HEIGHT) {
+                modifier
+                    .align(AlignmentX.Start, AlignmentY.Bottom)
+                    .background(
+                        RoundRectGradientBackground(
+                            cornerRadius = Dp.ZERO,
+                            colorA = theme.palette.surfaceSunken,
+                            colorB = Color(0f, 0f, 0f, 0f),
+                            gradientCx = Dp.ZERO,
+                            gradientCy = MODS_TEXT_FADE_HEIGHT,
+                            gradientRx = Dp(1e5f),
+                            gradientRy = MODS_TEXT_FADE_HEIGHT,
+                        )
+                    )
+            }
+            Column(width = FitContent, height = FitContent) {
+                modifier
+                    .align(AlignmentX.End, AlignmentY.Bottom)
+                    .margin(end = UiTheme.Spacing.sm, bottom = UiTheme.Spacing.xs)
+                    .padding(horizontal = UiTheme.Spacing.xs)
+                    .onEnter { hovered.value = true }
+                    .onExit { hovered.value = false }
+                    .onClick { onMore() }
+                Text(moreLabel) {
+                    modifier
+                        .width(FitContent)
+                        .font(UiTheme.Fonts.caption)
+                        .textAlign(AlignmentX.Center, AlignmentY.Center)
+                        .textColor(if (isHovered) theme.palette.secondary else theme.palette.primary)
+                }
+                Box(width = Grow.Std, height = Dp(1f)) {
+                    modifier.background(
+                        RoundRectBackground(
+                            if (isHovered) theme.palette.secondary else theme.palette.primary,
+                            Dp.ZERO
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
 fun UiScope.ModCard(
     mod: ModEntry,
     theme: ColorSchemeDefinition,
     toggleLabel: String,
     deleteLabel: String,
-    ramText: String,
     contentWidth: Dp = UiTheme.Layout.modsContentWidth,
     onToggle: () -> Unit,
     onDelete: () -> Unit,
+    onShowFullText: (title: String, sectionLabel: String, text: String) -> Unit = { _, _, _ -> },
 ) {
     val errorText = mod.errorMessage?.takeIf { it.isNotBlank() }
     val hasError = errorText != null
     val borderColor = if (hasError) theme.palette.danger else theme.palette.borderSubtle
+    val cardHeight: Dimension = if (hasError) FitContent else UiTheme.Layout.modsCardHeight
 
-    Row(width = contentWidth, height = UiTheme.Layout.modsCardHeight) {
+    Row(width = contentWidth, height = cardHeight) {
         modifier
             .margin(UiTheme.Spacing.xs)
             .padding(start = UiTheme.Spacing.md, end = UiTheme.Spacing.sm)
             .background(RoundRectBackground(theme.palette.surfaceSunken, UiTheme.Spacing.xs))
             .border(RoundRectBorder(borderColor, UiTheme.Spacing.xs, Dp(if (hasError) 2f else 1f)))
 
-        Column(width = Grow.Std, height = UiTheme.Layout.modsCardHeight) {
-            modifier.alignY(AlignmentY.Center).padding(vertical = UiTheme.Spacing.xs)
+        if (!mod.thumbnail.isNullOrBlank()) {
+            ModCardThumbnail(mod, theme)
+        }
+
+        Column(width = Grow.Std, height = cardHeight) {
+            modifier.alignY(if (hasError) AlignmentY.Top else AlignmentY.Center).padding(vertical = UiTheme.Spacing.xs)
             Text(mod.name) {
                 modifier
                     .width(Grow.Std)
@@ -117,25 +192,48 @@ fun UiScope.ModCard(
                     .font(UiTheme.Fonts.bodyMedium)
                     .textColor(theme.palette.textPrimary)
             }
-            if (ramText.isNotBlank()) {
-                Text(ramText) {
-                    modifier
+            Row {
+                if (!mod.author.isNullOrBlank()) {
+                    Text("Author:${mod.author}") {
+                        modifier
+                            .width(Grow.Std)
+                            .clipToBounds(true)
+                            .font(UiTheme.Fonts.caption)
+                            .textColor(theme.palette.textSecondary)
+                    }
+                }
+                if (!mod.version.isNullOrBlank()) {
+                    Text("Version:${mod.version}") {
+                        modifier
                         .width(Grow.Std)
-                        .margin(top = UiTheme.Spacing.xs)
+                            .margin(start = UiTheme.Spacing.md)
+                            .padding(end = UiTheme.Spacing.xs)
                         .clipToBounds(true)
                         .font(UiTheme.Fonts.caption)
-                        .textColor(theme.palette.textSecondary)
+                            .textColor(theme.palette.textSecondary)
+                    }
                 }
             }
+
+            if (mod.description.isNotBlank()) {
+                ClampedText(
+                    text = mod.description,
+                    maxHeight = UiTheme.Layout.modsCardDescriptionMaxHeight,
+                    theme = theme,
+                    textColor = theme.palette.textSecondary,
+                    moreLabel = I18n.mods.more(),
+                    onMore = { onShowFullText(mod.name, I18n.mods.description(), mod.description) },
+                )
+            }
             if (errorText != null) {
-                Text(errorText) {
-                    modifier
-                        .width(Grow.Std)
-                        .margin(top = UiTheme.Spacing.xs)
-                        .clipToBounds(true)
-                        .font(UiTheme.Fonts.caption)
-                        .textColor(theme.palette.danger)
-                }
+                ClampedText(
+                    text = errorText,
+                    maxHeight = UiTheme.Layout.modsCardErrorMaxHeight,
+                    theme = theme,
+                    textColor = theme.palette.danger,
+                    moreLabel = I18n.mods.more(),
+                    onMore = { onShowFullText(mod.name, I18n.mods.error(), errorText) },
+                )
             }
         }
 
@@ -147,6 +245,76 @@ fun UiScope.ModCard(
         )
         ModCardButton(deleteLabel, Icon.Delete, theme, onDelete)
     }
+}
+
+/** The mod thumbnail shown on the left side of a card; renders nothing when the mod declares none. */
+private fun UiScope.ModCardThumbnail(
+    mod: ModEntry,
+    theme: ColorSchemeDefinition,
+) {
+    Box(width = UiTheme.Layout.modsThumbnailSize, height = UiTheme.Layout.modsThumbnailSize) {
+        modifier
+            .margin(end = UiTheme.Spacing.sm)
+            .alignY(AlignmentY.Center)
+            .padding(UiTheme.Spacing.xs)
+            .background(RoundRectBackground(theme.palette.surfaceBase, UiTheme.Spacing.xs))
+            .border(RoundRectBorder(theme.palette.borderSubtle, UiTheme.Spacing.xs, Dp(1f)))
+        val texture = ModThumbnailTextureCache.textureFor(mod)
+        if (texture != null) {
+            Image(texture) {
+                modifier
+                    .width(Grow.Std)
+                    .height(Grow.Std)
+                    .imageSize(ImageSize.FitContent)
+            }
+        }
+    }
+}
+
+private object ModThumbnailTextureCache {
+    private val textures = mutableMapOf<String, Texture2d>()
+    private val transparentPlaceholder: ImageData2d = BufferedImageData2d.singleColor(Color(0f, 0f, 0f, 0f))
+
+    fun textureFor(mod: ModEntry): Texture2d? {
+        if (mod.thumbnail.isNullOrBlank()) return null
+        val key = "${mod.path}#${mod.thumbnail}"
+        return textures.getOrPut(key) {
+            Texture2d(name = "mod-thumb:$key") {
+                loadThumbnailImage(mod) ?: transparentPlaceholder
+            }
+        }
+    }
+
+    fun invalidate() {
+        textures.clear()
+    }
+
+    private suspend fun loadThumbnailImage(mod: ModEntry): ImageData2d? {
+        if (mod.thumbnail.isNullOrBlank()) return null
+        val entryName = mod.thumbnail.replace('\\', '/').trimStart('/')
+        val bytes = runCatching {
+            ZipFile(mod.path).use { zip ->
+                zip.getEntry(entryName)?.let { entry ->
+                    zip.getInputStream(entry).use { it.readBytes() }
+                }
+            }
+        }.getOrNull() ?: return null
+        if (bytes.isEmpty()) return null
+        val encoded = Uint8Buffer(bytes.size)
+        bytes.forEachIndexed { index, value -> encoded[index] = value.toUByte() }
+        return runCatching {
+            Assets.loadImageFromBuffer(
+                texData = encoded,
+                mimeType = MimeType.forFileName(entryName),
+                format = TexFormat.RGBA,
+            )
+        }.getOrNull()
+    }
+}
+
+/** Drops all cached mod thumbnails so they are re-read from their archives on next display. */
+fun invalidateModThumbnailTextureCache() {
+    ModThumbnailTextureCache.invalidate()
 }
 
 /** A compact, vertically-centered card button (Enable/Disable, Delete). */

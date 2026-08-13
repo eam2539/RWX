@@ -1,7 +1,8 @@
-package io.github.rwx.mod
+package io.github.rwx.mod.registry
 
 import com.corrodinggames.rts.gameFramework.GameEngine
 import io.github.rwx.mod.api.ResourcePath
+import io.github.rwx.mod.impl.ApiImpl
 import kotlin.math.sqrt
 
 object AudioRegistry : OwnedRegistry {
@@ -20,7 +21,7 @@ object AudioRegistry : OwnedRegistry {
 
     fun registerSound(owner: ApiImpl, id: String, file: ResourcePath, properties: Map<String, Any?>) {
         require(id.isNotBlank() && id == id.trim()) { "Sound id must be non-blank and trimmed" }
-        val backendId = "${owner.metadata.id}:$id"
+        val backendId = "${owner.manifest.id}:$id"
         val minimumVolume = (properties["minimumVolume"] as? Number)?.toFloat() ?: 0f
         require(minimumVolume in 0f..1f) { "Sound minimumVolume must be between 0 and 1: $id" }
         sounds.register(owner, key(owner, id), RegisteredSound(backendId, file, minimumVolume))
@@ -70,7 +71,7 @@ object AudioRegistry : OwnedRegistry {
         sound.loaded = true
     }
 
-    private fun key(owner: ApiImpl, id: String): String = "${owner.metadata.id}$KEY_SEPARATOR$id"
+    private fun key(owner: ApiImpl, id: String): String = "${owner.manifest.id}$KEY_SEPARATOR$id"
 
     /** Separates mod id from sound id; not legal in either, so keys cannot collide. */
     private const val KEY_SEPARATOR = "\u0000"
