@@ -231,8 +231,10 @@ class ApiImpl private constructor(
                 }
                 turret.preFireDuration = binding.preFireDuration.toFloat()
                 turret.postFireDuration = binding.postFireDuration.toFloat()
-                turret.preFireRendererId = binding.renderer?.rendererId?.value
-                turret.preFireRendererVariant = binding.renderer?.variantId?.value
+                turret.preFireRendererId = binding.preFireRenderer?.rendererId?.value
+                turret.preFireRendererVariant = binding.preFireRenderer?.variantId?.value
+                turret.postFireRendererId = binding.postFireRenderer?.rendererId?.value
+                turret.postFireRendererVariant = binding.postFireRenderer?.variantId?.value
                 turret.turretFireCycleObserverId = binding.observer?.observerId?.value
                 turret.turretFireCycleObserverVariant = binding.observer?.variantId?.value
                 applied++
@@ -667,6 +669,9 @@ private class RecordingGraphics(private val api: ApiImpl) : Graphics {
 
     override fun registerPreFireRenderer(id: RendererId, renderer: PreFireRenderer) =
         RenderRegistry.registerPreFireRenderer(api, id, renderer)
+
+    override fun registerPostFireRenderer(id: RendererId, renderer: PostFireRenderer) =
+        RenderRegistry.registerPostFireRenderer(api, id, renderer)
 
     override fun registerEffectRenderer(id: RendererId, renderer: EffectRenderer) =
         RenderRegistry.registerEffectRenderer(api, id, renderer)

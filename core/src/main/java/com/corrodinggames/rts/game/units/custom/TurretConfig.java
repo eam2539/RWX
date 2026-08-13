@@ -74,6 +74,8 @@ public class TurretConfig {
     public float postFireDuration;
     public String preFireRendererId;
     public String preFireRendererVariant;
+    public String postFireRendererId;
+    public String postFireRendererVariant;
     public String turretFireCycleObserverId;
     public String turretFireCycleObserverVariant;
 
@@ -257,6 +259,8 @@ public class TurretConfig {
         this.postFireDuration = turretConfig.postFireDuration;
         this.preFireRendererId = turretConfig.preFireRendererId;
         this.preFireRendererVariant = turretConfig.preFireRendererVariant;
+        this.postFireRendererId = turretConfig.postFireRendererId;
+        this.postFireRendererVariant = turretConfig.postFireRendererVariant;
         this.turretFireCycleObserverId = turretConfig.turretFireCycleObserverId;
         this.turretFireCycleObserverVariant = turretConfig.turretFireCycleObserverVariant;
         this.canAttackFlyingUnits = turretConfig.canAttackFlyingUnits;

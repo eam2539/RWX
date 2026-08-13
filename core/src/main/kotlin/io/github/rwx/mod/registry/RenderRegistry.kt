@@ -42,6 +42,8 @@ object RenderRegistry : OwnedRegistry {
     private val projectileRenderers =
         RegistrationTable<String, ProjectileRenderer>("Projectile renderer", lock)
     private val preFireRenderers = RegistrationTable<String, PreFireRenderer>("Pre-fire renderer", lock)
+    private val postFireRenderers =
+        RegistrationTable<String, PostFireRenderer>("Post-fire renderer", lock)
     private val effectRenderers = RegistrationTable<String, EffectRenderer>("Effect renderer", lock)
     private val unitRenderers = RegistrationTable<String, UnitRenderer>("Unit renderer", lock)
     private val unitBindings = RegistrationTable<CustomUnitConfig, BoundUnitRenderer>(
@@ -61,6 +63,10 @@ object RenderRegistry : OwnedRegistry {
 
     fun registerPreFireRenderer(owner: ApiImpl, id: RendererId, renderer: PreFireRenderer) {
         preFireRenderers.register(owner, id.value, renderer)
+    }
+
+    fun registerPostFireRenderer(owner: ApiImpl, id: RendererId, renderer: PostFireRenderer) {
+        postFireRenderers.register(owner, id.value, renderer)
     }
 
     fun registerEffectRenderer(owner: ApiImpl, id: RendererId, renderer: EffectRenderer) {
@@ -100,6 +106,7 @@ object RenderRegistry : OwnedRegistry {
             textures.removeOwned(owner)
             projectileRenderers.removeOwned(owner)
             preFireRenderers.removeOwned(owner)
+            postFireRenderers.removeOwned(owner)
             effectRenderers.removeOwned(owner)
             unitRenderers.removeOwned(owner)
             unitBindings.removeOwned(owner)
@@ -171,6 +178,60 @@ object RenderRegistry : OwnedRegistry {
                             ageTicks = age.coerceIn(0f, turret.preFireDuration),
                             remainingTicks = (turret.preFireDuration - age).coerceAtLeast(0f),
                             durationTicks = turret.preFireDuration,
+                            variantId = RenderVariantId(variantId),
+                        ),
+                        activeCanvas,
+                    )
+                }
+            }
+        } finally {
+            canvas?.finish()
+        }
+    }
+
+    /**
+     * Draws each turret's recovery (post-fire) window.
+     *
+     * The window and its age come from the same reload counter
+     * [TurretFireCycleObserverRegistry] reads, and the aim point is taken from that registry
+     * rather than recomputed, so a mod's recoil visual lands exactly where its observer was
+     * told the shot went. Recomputing it here would drift the moment the turret re-aims.
+     */
+    @JvmStatic
+    fun drawPostFire(unit: CustomUnit, gameEngine: GameEngine) {
+        var canvas: EngineRenderCanvas? = null
+        try {
+            unit.unitConfig.turrets.forEachIndexed { turretIndex, turret ->
+                val rendererId = turret?.postFireRendererId ?: return@forEachIndexed
+                val variantId = turret.postFireRendererVariant ?: return@forEachIndexed
+                val renderer = postFireRenderers[rendererId] ?: return@forEachIndexed
+                val movement = unit.movementLevels[turretIndex]
+                val age = unit.b(turretIndex) - movement.rotation
+                if (unit.isDestroyed ||
+                    turret.postFireDuration <= 0f ||
+                    movement.rotation <= 0f ||
+                    age < 0f ||
+                    age >= turret.postFireDuration
+                ) {
+                    return@forEachIndexed
+                }
+
+                val muzzle = unit.D(turretIndex)
+                val aim = TurretFireCycleObserverRegistry.aimPointOf(unit.objectId, turretIndex)
+                val activeCanvas = canvas ?: EngineRenderCanvas(gameEngine.renderGraphicsEngine).also { canvas = it }
+                failures.runSafelyOncePerId("post-fire:$rendererId") {
+                    renderer.render(
+                        PostFireRenderContext(
+                            startX = muzzle.a - gameEngine.viewpointXSnapped,
+                            startY = muzzle.b - unit.posZ - muzzle.c - gameEngine.viewpointYSnapped,
+                            // No recorded aim point means the turret fired without ever
+                            // holding a target; collapse the vector onto the muzzle rather
+                            // than inventing a direction.
+                            endX = (aim?.x ?: muzzle.a) - gameEngine.viewpointXSnapped,
+                            endY = (aim?.let { it.y - it.z } ?: muzzle.b) - gameEngine.viewpointYSnapped,
+                            ageTicks = age.coerceIn(0f, turret.postFireDuration),
+                            remainingTicks = (turret.postFireDuration - age).coerceAtLeast(0f),
+                            durationTicks = turret.postFireDuration,
                             variantId = RenderVariantId(variantId),
                         ),
                         activeCanvas,

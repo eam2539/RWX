@@ -44,6 +44,30 @@ object TurretFireCycleObserverRegistry : OwnedRegistry {
     private val generations = mutableMapOf<InstanceKey, Int>()
     private val failures = ModFailureLog("Mod turret fire cycle observer")
 
+    /**
+     * Where each turret was last aiming, in world space.
+     *
+     * Recoil has to play out against the point the shot was taken at, which the turret itself
+     * stops reporting the moment it re-aims or its target dies. Recorded while a target is
+     * live, then read back when the post-fire window opens.
+     *
+     * Concurrent because the simulation writes it while [aimPointOf] is read from the render
+     * pass; every other map here is only ever touched on the simulation thread.
+     */
+    private val aimPoints = java.util.concurrent.ConcurrentHashMap<InstanceKey, AimPoint>()
+
+    /** A world-space aim point, before any per-consumer height or viewpoint adjustment. */
+    data class AimPoint(val x: Float, val y: Float, val z: Float)
+
+    /**
+     * The point [turretIndex] of [sourceObjectId] was aiming at when it last had a target,
+     * or null if it never has. Lets the renderer draw recoil against exactly the point the
+     * observer reports, instead of recomputing it and drifting.
+     */
+    @JvmStatic
+    fun aimPointOf(sourceObjectId: Long, turretIndex: Int): AimPoint? =
+        aimPoints[InstanceKey(sourceObjectId, turretIndex)]
+
     fun register(owner: ApiImpl, id: TurretFireCycleObserverId, observer: TurretFireCycleObserver) {
         observers.register(owner, id.value, observer)
     }
@@ -60,11 +84,20 @@ object TurretFireCycleObserverRegistry : OwnedRegistry {
                 forget(key)
                 return@forEachIndexed
             }
+            rememberAimPoint(unit, turretIndex, key)
             updatePreFire(unit, turret, turretIndex, key, observerId, variantId)
             updatePostFire(unit, turret, turretIndex, key, observerId, variantId)
-            // A destroyed unit never fires again, so its cycle counter can go too.
-            if (unit.isDestroyed) generations.remove(key)
+            // A destroyed unit never fires again, so its cycle state can go too.
+            if (unit.isDestroyed) {
+                generations.remove(key)
+                aimPoints.remove(key)
+            }
         }
+    }
+
+    private fun rememberAimPoint(unit: CustomUnit, turretIndex: Int, key: InstanceKey) {
+        val target = unit.movementLevels[turretIndex].targetUnit ?: return
+        aimPoints[key] = AimPoint(target.posX, target.posY, target.posZ)
     }
 
     /**
@@ -135,6 +168,9 @@ object TurretFireCycleObserverRegistry : OwnedRegistry {
         }
         val muzzle = unit.D(turretIndex)
         val previous = active[key to Window.POST_FIRE]
+        // The aim point the shot was taken against. `movementLevels[i].targetX` is the
+        // turret's facing in degrees, not a world coordinate, so it cannot stand in here.
+        val aim = aimPoints[key]
         advance(
             key = key,
             window = Window.POST_FIRE,
@@ -142,9 +178,9 @@ object TurretFireCycleObserverRegistry : OwnedRegistry {
             variantId = variantId,
             startX = muzzle.a,
             startY = muzzle.b,
-            // Hold the aim point the shot was taken against for the life of the window.
-            endX = previous?.endX ?: movement.targetX,
-            endY = previous?.endY ?: movement.targetY,
+            // Hold the aim point for the life of the window, even if the turret re-aims.
+            endX = previous?.endX ?: aim?.x ?: muzzle.a,
+            endY = previous?.endY ?: aim?.y ?: muzzle.b,
             age = age,
             duration = turret.postFireDuration,
             // Post-fire continues the cycle its pre-fire started; it never opens a new one.
@@ -218,6 +254,7 @@ object TurretFireCycleObserverRegistry : OwnedRegistry {
         // Drop the cycle counters too, so a turret whose mod is reloaded starts from zero
         // rather than resuming a generation the new observer never saw.
         generations.keys.removeAll(orphaned.toSet())
+        aimPoints.keys.removeAll(orphaned.toSet())
     }
 
     /** Forgets a turret's cycle entirely, without dispatching — nobody is listening. */
@@ -225,6 +262,7 @@ object TurretFireCycleObserverRegistry : OwnedRegistry {
         active.remove(key to Window.PRE_FIRE)
         active.remove(key to Window.POST_FIRE)
         generations.remove(key)
+        aimPoints.remove(key)
     }
 
     private fun startPhaseOf(window: Window) = when (window) {

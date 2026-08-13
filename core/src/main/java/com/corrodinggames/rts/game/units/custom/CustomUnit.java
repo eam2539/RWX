@@ -2449,6 +2449,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         RenderRegistry.drawUnit(this, gameEngine, UnitRenderLayer.OVER_UNIT);
         RenderRegistry.drawPreFire(this, gameEngine);
+        RenderRegistry.drawPostFire(this, gameEngine);
         GameViewUtils.a((OrderableUnit) this);
         if (this.legInstances != null && !z && customUnitConfig.energyStartPercentage) {
             CustomUnitLegController.a(this, f, true, false);

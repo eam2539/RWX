@@ -116,7 +116,8 @@ data class TurretExtension(
     var preFireDuration: Ticks = Ticks.ZERO,
     /** Recovery after the shot; zero disables the post-fire window entirely. */
     var postFireDuration: Ticks = Ticks.ZERO,
-    var renderBinding: PreFireRenderBinding? = null,
+    var preFireRenderBinding: PreFireRenderBinding? = null,
+    var postFireRenderBinding: PostFireRenderBinding? = null,
     var observerBinding: TurretFireCycleObserverBinding? = null,
 )
 

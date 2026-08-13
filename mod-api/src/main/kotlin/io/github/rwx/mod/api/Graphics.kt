@@ -7,6 +7,7 @@ interface Graphics {
     fun registerTexture(id: TextureId, file: ResourcePath, options: TextureOptions = TextureOptions())
     fun registerProjectileRenderer(id: RendererId, renderer: ProjectileRenderer)
     fun registerPreFireRenderer(id: RendererId, renderer: PreFireRenderer)
+    fun registerPostFireRenderer(id: RendererId, renderer: PostFireRenderer)
     fun registerEffectRenderer(id: RendererId, renderer: EffectRenderer)
     fun registerUnitRenderer(id: RendererId, renderer: UnitRenderer)
     fun registerAnimation(definition: AnimationDefinition)
@@ -46,6 +47,11 @@ data class PreFireRenderBinding(
     val variantId: RenderVariantId,
 )
 
+data class PostFireRenderBinding(
+    val rendererId: RendererId,
+    val variantId: RenderVariantId,
+)
+
 data class EffectRenderBinding(
     val rendererId: RendererId,
     val variantId: RenderVariantId,
@@ -62,6 +68,10 @@ fun interface ProjectileRenderer {
 
 fun interface PreFireRenderer {
     fun render(context: PreFireRenderContext, canvas: RenderCanvas)
+}
+
+fun interface PostFireRenderer {
+    fun render(context: PostFireRenderContext, canvas: RenderCanvas)
 }
 
 fun interface EffectRenderer {
@@ -84,6 +94,24 @@ data class ProjectileRenderContext(
 )
 
 data class PreFireRenderContext(
+    val startX: Float,
+    val startY: Float,
+    val endX: Float,
+    val endY: Float,
+    val ageTicks: Float,
+    val remainingTicks: Float,
+    val durationTicks: Float,
+    val variantId: RenderVariantId,
+)
+
+/**
+ * One frame of a turret's recovery (post-fire) window.
+ *
+ * Mirrors [PreFireRenderContext], but [endX]/[endY] is the point the shot was actually taken
+ * against, held fixed for the whole window. The turret is free to re-aim during recovery and
+ * its target may die outright; recoil still plays out along the barrel that fired.
+ */
+data class PostFireRenderContext(
     val startX: Float,
     val startY: Float,
     val endX: Float,
