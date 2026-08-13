@@ -289,13 +289,13 @@ class LevelSelectViewModel(
         /** `LevelGroupSelectActivity.customLevelsDir` — the path mod maps get registered against. */
         private const val CUSTOM_LEVELS_DIR: String = "/SD/rusted_warfare_maps"
         private const val MOD_PATH_PREFIX: String = "MOD|"
-        private val playerTagRegex = Regex("""\[(?:[^]]*;)?[po](\d+)]""", RegexOption.IGNORE_CASE)
-        private val playerSuffixRegex = Regex("""\((\d+)p\)""", RegexOption.IGNORE_CASE)
 
+        private val playerCountRegex = Regex("""p(\d+)|(\d+)p""", RegexOption.IGNORE_CASE)
 
         fun playerCount(fileName: String): Int? {
-            playerTagRegex.find(fileName)?.groupValues?.getOrNull(1)?.toIntOrNull()?.let { return it }
-            return playerSuffixRegex.find(fileName)?.groupValues?.getOrNull(1)?.toIntOrNull()
+            val match = playerCountRegex.find(fileName) ?: return null
+            return (match.groupValues.getOrNull(1)?.takeIf { it.isNotEmpty() }
+                ?: match.groupValues.getOrNull(2))?.toIntOrNull()
         }
     }
 }

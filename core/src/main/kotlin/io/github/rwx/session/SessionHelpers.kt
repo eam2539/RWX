@@ -65,12 +65,12 @@ internal fun BattleRoomLaunchConfig.draftBattleRoomPlayers(): List<BattleRoomPla
     }
 }
 
+//TODO 打个标记
 internal fun BattleRoomLaunchConfig.draftTeamColorIndex(playerIndex: Int): Int =
     when (teamLayout) {
-        BattleRoomTeamLayout.TwoSides -> playerIndex % 2
+        BattleRoomTeamLayout.TwoSides, null -> playerIndex % 2
         BattleRoomTeamLayout.ThreeSides -> playerIndex % 3
-        BattleRoomTeamLayout.Ffa,
-        null -> playerIndex
+        BattleRoomTeamLayout.Ffa -> playerIndex
 
         BattleRoomTeamLayout.Spectators -> -1
         BattleRoomTeamLayout.AllVsAi -> if (playerIndex == 0) 0 else 1

@@ -59,9 +59,6 @@ data class EffectSpec(
     // Example: delayedStartTimer: 2s
     /** Hide for x time before showing and updating effect. */
     var delayedStartTimer: Float? = null,
-    // Example: delayedStartTimerRandom: 2
-    /** Random offset delayed start by +/- this value */
-    var delayedStartTimerRandom: Float? = null,
     // Example: liveAfterAttachedDies: false
     /** Defaults false when attachedToUnit is being used */
     var liveAfterAttachedDies: Boolean? = null,
