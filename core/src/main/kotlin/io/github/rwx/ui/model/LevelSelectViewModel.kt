@@ -254,44 +254,23 @@ class LevelSelectViewModel(
             ?: emptyList()
     }
 
+    /**
+     * Maps shipped inside mod packages, listed the way the original engine does it.
+     *
+     * While scanning a mod, `CustomUnitConfigParser.loadOrGetSound` records every `.tmx` it meets
+     * through `ModManager.addInvalidMod`; the level select screen then folds those records into the
+     * custom map list via `ModManager.addExtraMapsForPath` (`LevelSelectActivity.setup`). Entries
+     * come back as `MOD|<uuid>/<path inside the mod>` and are resolved on open by
+     * `FileLoader.applyModPath`, so `.rwmod` archives work without unpacking them here.
+     */
     private fun modMapItems(): List<MapEntry> {
         val manager = GameEngine.getInstance()?.modManager ?: return emptyList()
-        return manager.mods
-            .asSequence()
-            .filter { it.isEnabled && !it.disabled }
-            .mapNotNull { mod -> mod.getSourceFolder()?.takeIf { it.isNotBlank() } }
-            .distinct()
-            .flatMap { sourceFolder -> modMapTmxPaths(sourceFolder, depth = 0).asSequence() }
-            .distinct()
-            .sortedBy { it.substringAfterLast('/').lowercase() }
-            .map { modMapEntry(it) }
-            .toList()
-    }
-
-    /** Recursively lists `.tmx` paths under a mod source folder (bounded depth, matches ModInfo scan). */
-    private fun modMapTmxPaths(folder: String, depth: Int): List<String> {
-        if (depth > MAX_MOD_MAP_SCAN_DEPTH) return emptyList()
-        val entries = runCatching { FileHelper.listFiles(folder) }.getOrNull() ?: return emptyList()
-        val result = mutableListOf<String>()
-        for (entry in entries) {
-            if (entry.startsWith(".")) continue
-            val childPath = "$folder/$entry"
-            if (entry.endsWith(".tmx", ignoreCase = true)) {
-                result += childPath
-            } else if (runCatching { FileHelper.isDirectory(childPath) }.getOrDefault(false)) {
-                result += modMapTmxPaths(childPath, depth + 1)
-            }
-        }
-        return result
-    }
-
-    private fun modMapEntry(mapPath: String): MapEntry {
-        val fileName = mapPath.substringAfterLast('/')
-        return MapEntry(
-            mapAssetPath = mapPath,
-            playerCount = playerCount(fileName),
-            requiredRwxFeatures = MapFeatureDetector.requiredFeaturesForMap(mapPath),
-        )
+        val entries = manager.addExtraMapsForPath(null, CUSTOM_LEVELS_DIR) ?: return emptyList()
+        // On Android the engine also folds the legacy "maps2" folder into this list; our own file
+        // scan above already covers it, so only the mod entries are new here.
+        return entries
+            .filter { it.startsWith(MOD_PATH_PREFIX) }
+            .map { engineCustomMapEntry("$CUSTOM_LEVELS_DIR/$it") }
     }
 
     fun mapEntry(mapAssetPath: String): MapEntry {
@@ -304,9 +283,12 @@ class LevelSelectViewModel(
     }
 
     companion object {
-        private const val MAX_MOD_MAP_SCAN_DEPTH: Int = 4
         private const val MAX_CUSTOM_MAP_SCAN_DEPTH: Int = 8
         private const val ENGINE_CUSTOM_MAP_ROOT: String = "/SD/rustedWarfare/maps"
+
+        /** `LevelGroupSelectActivity.customLevelsDir` — the path mod maps get registered against. */
+        private const val CUSTOM_LEVELS_DIR: String = "/SD/rusted_warfare_maps"
+        private const val MOD_PATH_PREFIX: String = "MOD|"
         private val playerTagRegex = Regex("""\[(?:[^]]*;)?[po](\d+)]""", RegexOption.IGNORE_CASE)
         private val playerSuffixRegex = Regex("""\((\d+)p\)""", RegexOption.IGNORE_CASE)
 
