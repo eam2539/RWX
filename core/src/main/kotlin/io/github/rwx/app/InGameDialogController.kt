@@ -10,6 +10,7 @@ import io.github.rwx.session.GameSession
 import io.github.rwx.ui.AppScreen
 import io.github.rwx.ui.CoreUiEvent
 import io.github.rwx.ui.host.DialogSceneHost
+import io.github.rwx.ui.host.LoadingDialogSceneHost
 import io.github.rwx.ui.model.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -18,6 +19,7 @@ internal class InGameDialogController(
     private val gameSession: GameSession,
     private val koolCanvasScene: Scene,
     private val dialogSceneHost: DialogSceneHost,
+    private val loadingDialogSceneHost: LoadingDialogSceneHost,
     private val currentScreen: () -> AppScreen,
     private val viewport: () -> KoolCanvasViewport,
     private val showUnavailableDialog: (String) -> Unit
@@ -93,6 +95,7 @@ internal class InGameDialogController(
     }
 
     fun showLegacyPasswordDialog(event: CoreUiEvent.PasswordDialogRequested) {
+        val loadingDialogSuspended = loadingDialogSceneHost.temporarilyHide()
         showDialogOverGame(
             Dialog(
                 title = event.title,
@@ -107,6 +110,10 @@ internal class InGameDialogController(
                             }.onFailure { error ->
                                 logger.warn(error) { "Legacy password dialog submit failed" }
                                 showUnavailableDialog("Unable to submit input: ${error.message ?: error.javaClass.simpleName}")
+                            }.also {
+                                if (loadingDialogSuspended) {
+                                    loadingDialogSceneHost.restoreFromTemporaryHide()
+                                }
                             }
                         },
                     ),
@@ -117,6 +124,10 @@ internal class InGameDialogController(
                                 event.handler.cancelPasswordEntry()
                             }.onFailure { error ->
                                 logger.warn(error) { "Legacy password dialog cancel failed" }
+                            }.also {
+                                if (loadingDialogSuspended) {
+                                    loadingDialogSceneHost.restoreFromTemporaryHide()
+                                }
                             }
                         },
                     ),

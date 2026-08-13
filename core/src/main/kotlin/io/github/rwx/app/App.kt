@@ -167,6 +167,7 @@ fun installApp(
         gameSession = gameSession,
         koolCanvasScene = koolCanvasScene,
         dialogSceneHost = dialogSceneHost,
+        loadingDialogSceneHost = loadingDialogSceneHost,
         currentScreen = { navigator.current },
         viewport = ::rwGameViewport,
         showUnavailableDialog = dialogController::showUnavailable
