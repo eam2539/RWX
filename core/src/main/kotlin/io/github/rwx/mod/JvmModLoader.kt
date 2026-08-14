@@ -166,6 +166,27 @@ class JvmModLoader @JvmOverloads constructor(
         return sorted
     }
 
+    fun disposeMod(mod: JvmMod) {
+        if (loadedMods.remove(mod)) {
+            runCatching { mod.dispose() }.onFailure { e ->
+                logger.error(e) { "Failed to dispose mod ${mod.manifest.id}" }
+            }
+            ModRegistry.unregister(mod)
+        }
+        discoveredMods.remove(mod)
+        runCatching {
+            mod.apiImplOrNull()?.close()
+        }.onFailure { e ->
+            logger.error(e) { "Error closing assets for mod ${mod.manifest.id}" }
+        }
+        runCatching {
+            val cl = mod.classLoader
+            if (cl is Closeable) cl.close()
+        }.onFailure { e ->
+            logger.error(e) { "Error closing classloader for mod ${mod.manifest.id}" }
+        }
+    }
+
     override fun close() {
         loadedMods.forEach { mod ->
             runCatching { mod.dispose() }.onFailure { e ->

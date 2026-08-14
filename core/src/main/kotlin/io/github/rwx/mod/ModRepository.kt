@@ -23,8 +23,7 @@ class ModRepository(
         val manager = liveModManager() ?: return emptyList()
         if (manager.mods.isEmpty()) {
             this.runCatching {
-                manager.loadAllMods()
-                manager.loadModSelection()
+                manager.loadAndApply()
             }
         }
         val jvmModManifests = manager.jvmMods.mapNotNull {
@@ -87,7 +86,11 @@ class ModRepository(
     fun toggleEnabled(modId: String) {
         val manager = liveModManager() ?: return
         val mod = manager.mods.firstOrNull { it.uuid == modId } ?: return
+        val enabling = mod.disabled
         mod.disabled = !mod.disabled
+        if (!enabling) {
+            manager.disposeJvmMod(modId)
+        }
     }
 
     fun disableAll() {
@@ -102,10 +105,7 @@ class ModRepository(
     }
 
     fun reloadAvailableMods() {
-        liveModManager()?.let { manager ->
-            manager.loadAllMods()
-            manager.loadModSelection()
-        }
+        liveModManager()?.loadAndApply()
     }
 
     fun reloadAppliedMods() {

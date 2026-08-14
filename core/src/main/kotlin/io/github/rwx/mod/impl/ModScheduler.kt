@@ -24,6 +24,20 @@ object ModScheduler {
     }
 
     @JvmStatic
+    fun cancelFor(api: Api) {
+        synchronized(lock) {
+            val iterator = tasks.iterator()
+            while (iterator.hasNext()) {
+                val task = iterator.next()
+                if (task.api === api) {
+                    task.cancel()
+                    iterator.remove()
+                }
+            }
+        }
+    }
+
+    @JvmStatic
     fun clear() {
         synchronized(lock) {
             generation++

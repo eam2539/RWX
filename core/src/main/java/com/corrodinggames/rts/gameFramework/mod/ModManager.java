@@ -55,6 +55,7 @@ public class ModManager {
     JvmModLoader jvmModLoader;
     ArrayList<Mod> jvmMods = new ArrayList<>();
     Map<Mod, ModInfo> jvmModInfos = new IdentityHashMap<>();
+    String jvmModSourceSignature;
 
     public ArrayList<ModInfo> getMods() {
         return mods;
@@ -679,6 +680,41 @@ public class ModManager {
     }
 
     public void loadJvmMods() {
+        ArrayList<String> modDirs = new ArrayList<>();
+        modDirs.add(CustomUnitConfigParser.getBuiltinModsFolderName());
+        modDirs.add(CustomUnitConfigParser.getBuiltinModsEnabledFolderName());
+        modDirs.add(CustomUnitConfigParser.getDefaultUserModsFolder());
+        ArrayList<String> jarSources = new ArrayList<>();
+        for (String dirPath : modDirs) {
+            String[] entries = FileHelper.listFiles(dirPath);
+            if (entries == null) {
+                continue;
+            }
+            for (String entry : entries) {
+                if (!entry.toLowerCase(Locale.ROOT).endsWith(".jar")) {
+                    continue;
+                }
+                jarSources.add(dirPath + "/" + entry);
+            }
+        }
+        Collections.sort(jarSources);
+        StringBuilder signatureBuilder = new StringBuilder();
+        for (String source : jarSources) {
+            File sourceFile = new File(source);
+            signatureBuilder.append(source).append('|').append(sourceFile.lastModified()).append('|').append(sourceFile.length()).append(';');
+        }
+        String currentSignature = signatureBuilder.toString();
+        if (currentSignature.equals(this.jvmModSourceSignature) && !this.jvmMods.isEmpty()) {
+            for (Mod mod : this.jvmMods) {
+                ModInfo modInfo = this.jvmModInfos.get(mod);
+                if (modInfo != null) {
+                    modInfo.found = true;
+                }
+            }
+            GameEngine.log("JVM mod sources unchanged, keeping " + this.jvmMods.size() + " loaded JVM mods");
+            return;
+        }
+        this.jvmModSourceSignature = currentSignature;
         try {
             this.jvmModLoader.close();
         } catch (Exception e) {
@@ -693,10 +729,6 @@ public class ModManager {
         File stagingDirectory = new File(LegacyAssetBridge.cacheDir(), "jvm-mod-staging");
         clearDirectory(stagingDirectory);
         ArrayList<File> candidateFiles = new ArrayList<>();
-        ArrayList<String> modDirs = new ArrayList<>();
-        modDirs.add(CustomUnitConfigParser.getBuiltinModsFolderName());
-        modDirs.add(CustomUnitConfigParser.getBuiltinModsEnabledFolderName());
-        modDirs.add(CustomUnitConfigParser.getDefaultUserModsFolder());
         for (String dirPath : modDirs) {
             String[] entries = FileHelper.listFiles(dirPath);
             if (entries == null) {
@@ -840,17 +872,37 @@ public class ModManager {
         return this.jvmMods;
     }
 
-    public void disposeJvmMods() {
-        try {
-            this.jvmModLoader.close();
-        } catch (Exception e) {
-            GameEngine.log("Failed to dispose JVM mods: " + e.getMessage());
+    public boolean disposeJvmMod(String modId) {
+        Mod target = null;
+        ModInfo targetInfo = null;
+        for (Mod mod : this.jvmMods) {
+            ModInfo modInfo = this.jvmModInfos.get(mod);
+            if (modInfo != null && modId.equals(modInfo.uuid)) {
+                target = mod;
+                targetInfo = modInfo;
+                break;
+            }
         }
-        this.jvmMods.clear();
-        this.jvmModInfos.clear();
-        ModRegistry.clear();
-        ModScheduler.clear();
-        UiRegistry.clear();
-        UnitEventRuntime.clear();
+        if (!(target instanceof JvmMod)) {
+            return false;
+        }
+        try {
+            this.jvmModLoader.disposeMod((JvmMod) target);
+        } catch (Exception e) {
+            GameEngine.log("Failed to dispose JVM mod " + modId + ": " + e.getMessage());
+        }
+        Api api = ((JvmMod) target).getApi();
+        if (api instanceof ApiImpl) {
+            ModScheduler.cancelFor(api);
+            UnitEventRuntime.unregister((ApiImpl) api);
+        }
+        this.jvmMods.remove(target);
+        this.jvmModInfos.remove(target);
+        if (targetInfo != null) {
+            targetInfo.disabledOrNotLoaded = true;
+        }
+        this.jvmModSourceSignature = null;
+        GameEngine.log("Disposed JVM mod: " + modId);
+        return true;
     }
 }

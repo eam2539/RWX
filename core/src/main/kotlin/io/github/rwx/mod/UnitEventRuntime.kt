@@ -59,6 +59,11 @@ object UnitEventRuntime {
     }
 
     @JvmStatic
+    fun unregister(api: ApiImpl) {
+        registrations.entries.removeIf { it.value.api === api }
+    }
+
+    @JvmStatic
     fun clear() {
         registrations.clear()
         queue.clear()
