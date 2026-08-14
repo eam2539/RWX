@@ -12,6 +12,9 @@ import dalvik.system.DexClassLoader
 import org.apache.http.client.HttpClient
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
+import java.security.MessageDigest
+import java.util.jar.JarFile
 
 class AndroidPlatformBridge(context: Context) : PlatformBridge {
     private val appContext: Context = context.applicationContext
@@ -23,9 +26,73 @@ class AndroidPlatformBridge(context: Context) : PlatformBridge {
     override val isMobilePlatform: Boolean = true
 
     override fun createModClassLoader(modFile: File, parent: ClassLoader): ClassLoader {
-        val optimizedDir = File(this.appContext.codeCacheDir, "mod-dex")
+        val jarFingerprint = sha1Hex(modFile)
+        val extractDir = File(File(this.appContext.filesDir, "mod-dex"), jarFingerprint)
+        val optimizedDir = File(File(this.appContext.codeCacheDir, "mod-odex"), jarFingerprint)
+        val dexFiles = extractDexFiles(modFile, extractDir)
         optimizedDir.mkdirs()
-        return DexClassLoader(modFile.absolutePath, optimizedDir.absolutePath, null, parent)
+        return DexClassLoader(dexFiles.joinToString(File.pathSeparator), optimizedDir.absolutePath, null, parent)
+    }
+
+    override fun cleanupModClassLoaderCache(activeModFiles: Collection<File>) {
+        val activeFingerprints = activeModFiles.mapNotNull { file ->
+            runCatching { sha1Hex(file) }.getOrNull()
+        }.toSet()
+        pruneCacheDir(File(this.appContext.filesDir, "mod-dex"), activeFingerprints)
+        pruneCacheDir(File(this.appContext.codeCacheDir, "mod-odex"), activeFingerprints)
+    }
+
+    private fun pruneCacheDir(root: File, keep: Set<String>) {
+        root.listFiles()?.forEach { child ->
+            if (child.isDirectory) {
+                if (child.name !in keep) child.deleteRecursively()
+            } else {
+                child.delete()
+            }
+        }
+    }
+
+    private fun extractDexFiles(jarFile: File, extractDir: File): List<File> {
+        val alreadyExtracted = extractDir.isDirectory &&
+                extractDir.listFiles()?.any { it.isFile && it.name.endsWith(".dex") } == true
+        if (!alreadyExtracted) {
+            extractDir.mkdirs()
+            JarFile(jarFile).use { jar ->
+                val entries = jar.entries()
+                while (entries.hasMoreElements()) {
+                    val entry = entries.nextElement()
+                    if (!entry.isDirectory && entry.name.startsWith("classes") && entry.name.endsWith(".dex")) {
+                        val target = File(extractDir, entry.name.substringAfterLast('/'))
+                        if (target.exists()) target.setWritable(true)
+                        jar.getInputStream(entry).use { input ->
+                            target.outputStream().use { output -> input.copyTo(output) }
+                        }
+                        // Android 14 (targetSdk 34+) rejects dex files that are still writable
+                        // mark read-only before loading.
+                        target.setReadOnly()
+                    }
+                }
+            }
+        }
+        val dexFiles = extractDir.listFiles()
+            ?.filter { it.isFile && it.name.endsWith(".dex") }
+            ?.filter { it.length() > 0 }
+            ?.sorted()
+        return dexFiles?.takeIf { it.isNotEmpty() }
+            ?: throw IOException("No classes.dex found in ${jarFile.name}")
+    }
+
+    private fun sha1Hex(file: File): String {
+        val digest = MessageDigest.getInstance("SHA-1")
+        file.inputStream().use { input ->
+            val buffer = ByteArray(64 * 1024)
+            while (true) {
+                val read = input.read(buffer)
+                if (read < 0) break
+                digest.update(buffer, 0, read)
+            }
+        }
+        return digest.digest().joinToString("") { "%02x".format(it) }
     }
 
     @Suppress("DEPRECATION")

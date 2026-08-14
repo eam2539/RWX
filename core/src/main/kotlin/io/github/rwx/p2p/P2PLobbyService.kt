@@ -138,10 +138,6 @@ class P2PLobbyService private constructor() {
         connectBootstrapPeers((p2pConfig.libp2pPeers + bootstrapNodeSource.fetchPeers()).distinct())
     }
 
-    fun getSavedPeerConfig(): String {
-        return "P2P config: ${P2PConfigLoader.configPath()}"
-    }
-
     fun leaveLobby() {
         inLobby = false
     }

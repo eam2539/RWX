@@ -25,6 +25,12 @@ interface PlatformBridge {
      */
     fun createModClassLoader(modFile: File, parent: ClassLoader): ClassLoader
 
+    /**
+     * Drop cached classloader artifacts (extracted dex / optimized odex) that do not belong
+     * to any currently loaded mod. No-op by default; Android prunes its private caches.
+     */
+    fun cleanupModClassLoaderCache(activeModFiles: Collection<File>) = Unit
+
     @Suppress("DEPRECATION")
     fun createMasterServerHttpClient(): HttpClient = DefaultHttpClient()
 
@@ -72,8 +78,8 @@ data class AppMetadata(
         const val COMPATIBLE_CORE_VERSION_CODE = 176
     }
 }
-
 interface PlatformStorage {
+
     val rootDir: StorageLocation
     val localDir: StorageLocation
     val cacheDir: StorageLocation

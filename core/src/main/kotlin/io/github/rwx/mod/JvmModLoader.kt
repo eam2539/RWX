@@ -2,12 +2,12 @@ package io.github.rwx.mod
 
 import io.github.rwx.PlatformBridge
 import io.github.rwx.logger
-import io.github.rwx.mod.assets.AssetCredentialResolver
 import io.github.rwx.mod.impl.ApiImpl
 import io.github.rwx.mod.registry.ModRegistry
 import io.github.rwx.mod.registry.apiImplOrNull
 import net.peanuuutz.tomlkt.*
-import org.koin.mp.KoinPlatform.getKoin
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.Closeable
 import java.io.File
 import java.io.InputStream
@@ -16,17 +16,16 @@ import java.util.zip.ZipFile
 class JvmModLoader @JvmOverloads constructor(
     private val platformClassLoader: ClassLoader = JvmModLoader::class.java.classLoader,
     private val createClassLoader: ((File, ClassLoader) -> ClassLoader)? = null,
-    private val platformBridge: PlatformBridge? = null,
-    private val assetCredentialResolver: AssetCredentialResolver? = null,
-) : AutoCloseable {
+) : AutoCloseable, KoinComponent {
     val errors: MutableList<Throwable> = mutableListOf()
-
+    private val platformBridge: PlatformBridge by inject()
     private val discoveredMods = mutableListOf<JvmMod>()
     val loadedMods = mutableListOf<Mod>()
 
     fun discoverModFiles(files: Iterable<File>): List<JvmMod> {
         val currentBatch = mutableListOf<JvmMod>()
-        files.forEach { file ->
+        val candidates = files.toList()
+        candidates.forEach { file ->
             runCatching {
                 discoverModFile(file)?.let { mod ->
                     currentBatch += mod
@@ -36,7 +35,13 @@ class JvmModLoader @JvmOverloads constructor(
                 logger.error(e) { "Failed to load JVM mod from ${file.path}" }
             }
         }
+        pruneClassLoaderCache(candidates)
         return resolveDependencies(currentBatch).filterIsInstance<JvmMod>()
+    }
+
+    private fun pruneClassLoaderCache(candidates: List<File>) {
+        runCatching { platformBridge.cleanupModClassLoaderCache(candidates) }
+            .onFailure { e -> logger.error(e) { "Failed to prune JVM mod classloader cache" } }
     }
 
     private fun discoverModFile(jarFile: File): JvmMod? {
@@ -47,17 +52,15 @@ class JvmModLoader @JvmOverloads constructor(
         val metadata = result.manifest
         val entryClassName = result.entryClassName
 
-        val resolvedPlatformBridge = platformBridge
-            ?: runCatching { getKoin().get<PlatformBridge>() }.getOrNull()
-        val api = ApiImpl.create(metadata, jarFile, resolvedPlatformBridge, assetCredentialResolver)
-        val classLoader = try {
+        val api = ApiImpl.create(metadata, jarFile, platformBridge)
+        val classLoader = runCatching {
             createClassLoader?.invoke(jarFile, platformClassLoader)
-                ?: requireNotNull(resolvedPlatformBridge) { "A PlatformBridge or classloader factory is required" }
+                ?: platformBridge
                     .createModClassLoader(jarFile, platformClassLoader)
-        } catch (error: Throwable) {
+        }.onFailure { e ->
             api.close()
-            throw error
-        }
+            throw e
+        }.getOrThrow()
 
         val mod = instantiateMod(entryClassName, classLoader, jarFile.name) ?: run {
             api.close()

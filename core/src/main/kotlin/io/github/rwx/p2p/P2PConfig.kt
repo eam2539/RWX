@@ -1,10 +1,12 @@
 package io.github.rwx.p2p
 
 import com.corrodinggames.rts.gameFramework.GameEngine
+import io.github.rwx.PlatformStorage
 import kotlinx.serialization.Serializable
 import net.peanuuutz.tomlkt.Toml
 import net.peanuuutz.tomlkt.TomlComment
 import net.peanuuutz.tomlkt.decodeFromString
+import org.koin.mp.KoinPlatform.getKoin
 import java.io.File
 
 @Serializable
@@ -206,7 +208,7 @@ object P2PConfigLoader {
     private val toml = Toml { ignoreUnknownKeys = true }
 
     fun load(): P2PConfig {
-        val file = File(CONFIG_FILE_NAME)
+        val file = File(getKoin().get<PlatformStorage>().rootDir.file, CONFIG_FILE_NAME)
         if (!file.exists()) {
             runCatching { file.writeText(defaultConfigText(), Charsets.UTF_8) }
                 .onFailure { GameEngine.log("Failed to create $CONFIG_FILE_NAME: ${it.message}") }
@@ -216,8 +218,6 @@ object P2PConfigLoader {
             .onFailure { GameEngine.log("Failed to parse $CONFIG_FILE_NAME: ${it.message}") }
             .getOrElse { P2PConfig().normalized() }
     }
-
-    fun configPath(): String = File(CONFIG_FILE_NAME).absolutePath
 
     private fun defaultConfigText(): String {
         return "# RWX P2P configuration\n# Edit this file locally.\n\n" +

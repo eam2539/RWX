@@ -690,7 +690,6 @@ public class ModManager {
         ModScheduler.clear();
         UiRegistry.clear();
         UnitEventRuntime.clear();
-
         File stagingDirectory = new File(LegacyAssetBridge.cacheDir(), "jvm-mod-staging");
         clearDirectory(stagingDirectory);
         ArrayList<File> candidateFiles = new ArrayList<>();

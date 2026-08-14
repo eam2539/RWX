@@ -25,16 +25,21 @@ object MsdfFontBaker {
     private const val TITLE_OUTPUT_PATH: String = "assets/font/ZenDots-Regular"
     private const val TITLE_FONT_NAME: String = "zen-dots"
 
+    private const val CJK_MSDF_GEN_SIZE: Int = 24
+    private const val CJK_PX_RANGE: Double = 6.0
+
     private const val SOLID_MEDIAN_THRESHOLD: Int = 200
     private const val WHITESPACE_CLEAR_MARGIN: Int = 2
 
     @JvmStatic
     fun main(args: Array<String>) = runBlocking {
-        if (args.singleOrNull() == "title") {
-            bakeTitleFont()
-        } else {
-            bakeCjkFont()
-            bakeTitleFont()
+        when (args.singleOrNull()) {
+            "title" -> bakeTitleFont()
+            "cjk" -> bakeCjkFont()
+            else -> {
+                bakeCjkFont()
+                bakeTitleFont()
+            }
         }
     }
 
@@ -46,8 +51,8 @@ object MsdfFontBaker {
             outputMsdfPath = CJK_OUTPUT_PATH,
             fontName = CJK_FONT_NAME,
             glyphsToGenerate = GeneratorGlyphSet.FromString(glyphs),
-            msdfGenSize = 36,
-            pxRange = 8.0,
+            msdfGenSize = CJK_MSDF_GEN_SIZE,
+            pxRange = CJK_PX_RANGE,
             atlasDim = 2048,
         )
         correctAtlasSign(File("$CJK_OUTPUT_PATH.png"), File("$CJK_OUTPUT_PATH.json"))

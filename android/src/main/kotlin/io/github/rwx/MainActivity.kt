@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.PixelFormat
 import android.net.Uri
+import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Build
 import android.os.Bundle
@@ -20,11 +21,7 @@ import de.fabmax.kool.modules.ui2.UiScale
 import de.fabmax.kool.platform.KoolContextAndroid
 import de.fabmax.kool.platform.KoolSurfaceView
 import de.fabmax.kool.util.FrontendScope
-import de.fabmax.kool.util.MsdfFont
-import io.github.rwx.app.AppOptions
-import io.github.rwx.app.AppSession
-import io.github.rwx.app.asyncOnIO
-import io.github.rwx.app.installApp
+import io.github.rwx.app.*
 import io.github.rwx.di.AndroidGameRenderBackend
 import io.github.rwx.di.selectedAndroidGameRenderBackend
 import io.github.rwx.p2p.P2PLobbyService
@@ -48,7 +45,7 @@ import java.io.File
 import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
 
-class MainActivity : Activity(),  PlatformFilePickerHost, KoinComponent {
+class MainActivity : Activity(), PlatformFilePickerHost, KoinComponent {
 
     private var koolContext: KoolContextAndroid? = null
     private var appSession: AppSession? = null
@@ -61,8 +58,8 @@ class MainActivity : Activity(),  PlatformFilePickerHost, KoinComponent {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val bridge=get<PlatformBridge>()
-        bridge.filePickerHost=this
+        val bridge = get<PlatformBridge>()
+        bridge.filePickerHost = this
         UiScale.uiScale.value = ANDROID_UI_SCALE
         val selectedGameSession = get<GameSession>()
         nativeGameSession = selectedGameSession as? AndroidGameSession
@@ -131,12 +128,10 @@ class MainActivity : Activity(),  PlatformFilePickerHost, KoinComponent {
                 )
             }
             loadingHost.update(GameLoadingStatus("Preparing multiplayer", MULTIPLAYER_PROGRESS))
-            withContext(Dispatchers.IO) {
-                runCatching {
-                    P2PLobbyService.getInstance().startIfNeeded()
-                }.onFailure { error ->
-                    logger.warn(error) { "Unable to prewarm RWX P2P during startup" }
-                }
+            launchOnIO(exceptionHandler = { _, error ->
+                logger.warn(error) { "Unable to prewarm RWX P2P during startup" }
+            }) {
+                P2PLobbyService.getInstance().startIfNeeded()
             }
             loadingHost.update(GameLoadingStatus("Preparing UI renderer", UI_RENDERER_PROGRESS))
             loadingHost.showUiTextureWarmup()
@@ -191,8 +186,8 @@ class MainActivity : Activity(),  PlatformFilePickerHost, KoinComponent {
 
     override fun onDestroy() {
         val terminateProcess = applicationExitRequested
-        val bridge=get<PlatformBridge>()
-        bridge.filePickerHost=null
+        val bridge = get<PlatformBridge>()
+        bridge.filePickerHost = null
         pendingStoragePickerResult?.invoke(null)
         pendingStoragePickerResult = null
         pendingFilePickerResult?.invoke(null)
@@ -337,7 +332,7 @@ class MainActivity : Activity(),  PlatformFilePickerHost, KoinComponent {
                 checkNotNull(input) { "Unable to open selected file" }
                 selectedFile.outputStream().buffered().use { output -> input.copyTo(output) }
             }
-           PlatformFileSelection(
+            PlatformFileSelection(
                 path = selectedFile.absolutePath,
                 displayPath = displayPath,
                 release = { selectionDirectory.deleteRecursively() },
@@ -354,8 +349,15 @@ class MainActivity : Activity(),  PlatformFilePickerHost, KoinComponent {
         }
 
     private suspend fun installMsdfFonts() {
-        UiTheme.Fonts.installBaseFont(loadMsdfFont(UiTheme.Fonts.CJK_MSDF_FONT_PATH))
-        UiTheme.Fonts.installTitleFont(loadMsdfFont(UiTheme.Fonts.TITLE_MSDF_FONT_PATH))
+        UiTheme.Fonts.install(maxTextureSize = glMaxTextureSize())
+    }
+
+    private fun glMaxTextureSize(): Int {
+        val query = IntArray(1)
+        GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, query, 0)
+        val reported = query[0]
+        logger.info { "GL_MAX_TEXTURE_SIZE: $reported" }
+        return reported.takeIf { it > 0 } ?: UiTheme.Fonts.PORTABLE_MAX_ATLAS_DIMENSION
     }
 
     private fun createKoolSurface(transparentOverlay: Boolean): KoolSurfaceView =
@@ -374,16 +376,9 @@ class MainActivity : Activity(),  PlatformFilePickerHost, KoinComponent {
             }
         }
 
-    private suspend fun loadMsdfFont(path: String): MsdfFont =
-        MsdfFont(path).getOrElse { error ->
-            throw IllegalStateException("Failed to load required MSDF font: $path", error)
-        }
-
     private fun enterImmersiveMode() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes = window.attributes.apply {
-                layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            }
+        window.attributes = window.attributes.apply {
+            layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.setDecorFitsSystemWindows(false)

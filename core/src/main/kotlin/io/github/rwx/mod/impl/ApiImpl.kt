@@ -22,7 +22,6 @@ import io.github.rwx.mod.asset.JvmModAssetBridge
 import io.github.rwx.mod.asset.JvmModAssetKeyStore
 import io.github.rwx.mod.asset.JvmModAssetStore
 import io.github.rwx.mod.asset.OnlineAssetRevocationListFetcher
-import io.github.rwx.mod.assets.AssetCredentialResolver
 import io.github.rwx.mod.assets.AssetVaultFormat
 import io.github.rwx.mod.assets.EmptyAssetCredentialResolver
 import io.github.rwx.mod.registry.*
@@ -508,11 +507,10 @@ class ApiImpl private constructor(
             manifest: ModManifest,
             jarFile: File,
             platformBridge: PlatformBridge? = null,
-            assetCredentialResolver: AssetCredentialResolver? = null,
         ): ApiImpl {
             val root = File(FileHelper.getWorkingDirectory(), "jvm-mod-api/${sanitizePathSegment(manifest.id)}")
             val keyStore = platformBridge?.storage?.let(::JvmModAssetKeyStore)
-            val resolver = assetCredentialResolver ?: keyStore ?: EmptyAssetCredentialResolver
+            val resolver = keyStore ?: EmptyAssetCredentialResolver
             val assetStore = JvmModAssetStore(
                 jarFile,
                 manifest.id,

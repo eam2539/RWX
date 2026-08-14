@@ -8,30 +8,16 @@ import java.io.InputStream
 class AndroidPlatformStorage(context: Context) : PlatformStorage {
     private val appContext: Context = context.applicationContext
     private val assets = appContext.assets
-    private val externalRoot: File
-    private val localRoot: File
-    override val rootDir: StorageLocation
-    override val localDir: StorageLocation
-    override val cacheDir: StorageLocation
-    override val modsDir: StorageLocation
-    override val unitsDir: StorageLocation
-    override val mapsDir: StorageLocation
-    override val savesDir: StorageLocation
-    override val replaysDir: StorageLocation
-
-    init {
-        val externalFilesDir = appContext.getExternalFilesDir(null)
-        this.externalRoot = externalFilesDir ?: appContext.filesDir
-        this.localRoot = appContext.filesDir
-        this.rootDir = location("/SD/rustedWarfare/", this.externalRoot)
-        this.localDir = location("/LOCAL/", this.localRoot)
-        this.cacheDir = location("/LOCAL/cache/", appContext.externalCacheDir ?: appContext.cacheDir)
-        this.unitsDir = location("/SD/rustedWarfare/units/", File(this.externalRoot, "units"))
-        this.modsDir = this.unitsDir
-        this.mapsDir = location("/SD/rustedWarfare/maps/", File(this.externalRoot, "maps"))
-        this.savesDir = location("/SD/rustedWarfare/saves/", File(this.externalRoot, "saves"))
-        this.replaysDir = location("/SD/rustedWarfare/replays/", File(this.externalRoot, "replays"))
-    }
+    private val externalRoot: File = appContext.getExternalFilesDir(null)!!
+    override val rootDir: StorageLocation = location("/SD/rustedWarfare/", this.externalRoot)
+    override val localDir: StorageLocation = location("/LOCAL/", appContext.filesDir)
+    override val cacheDir: StorageLocation = location("/LOCAL/cache/", appContext.externalCacheDir!!)
+    override val unitsDir: StorageLocation = location("/SD/rustedWarfare/units/", File(this.externalRoot, "units"))
+    override val modsDir: StorageLocation = this.unitsDir
+    override val mapsDir: StorageLocation = location("/SD/rustedWarfare/maps/", File(this.externalRoot, "maps"))
+    override val savesDir: StorageLocation = location("/SD/rustedWarfare/saves/", File(this.externalRoot, "saves"))
+    override val replaysDir: StorageLocation =
+        location("/SD/rustedWarfare/replays/", File(this.externalRoot, "replays"))
 
     override fun location(kind: StorageKind): StorageLocation {
         return when (kind) {

@@ -11,7 +11,6 @@ import de.fabmax.kool.pipeline.backend.BackendProvider
 import de.fabmax.kool.pipeline.backend.gl.RenderBackendGl
 import de.fabmax.kool.pipeline.backend.vk.RenderBackendVk
 import de.fabmax.kool.util.FrontendScope
-import de.fabmax.kool.util.MsdfFont
 import io.github.rwx.app.AppOptions
 import io.github.rwx.app.installApp
 import io.github.rwx.di.coreModule
@@ -112,14 +111,8 @@ object KoolDesktopMain : KoinComponent {
     }
 
     private suspend fun installMsdfFonts() {
-        UiTheme.Fonts.installBaseFont(loadMsdfFont(UiTheme.Fonts.CJK_MSDF_FONT_PATH))
-        UiTheme.Fonts.installTitleFont(loadMsdfFont(UiTheme.Fonts.TITLE_MSDF_FONT_PATH))
+        UiTheme.Fonts.install()
     }
-
-    private suspend fun loadMsdfFont(path: String): MsdfFont =
-        MsdfFont(path).getOrElse { error ->
-            throw IllegalStateException("Failed to load required pre-baked MSDF font: $path", error)
-        }
 
     private fun configureLegacyDesktopPlatform() {
         GameEngine.isMenuBackgroundDisabled = true

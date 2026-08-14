@@ -99,7 +99,11 @@ internal object IniSpecCodec {
         val values = linkedMapOf<String, Any?>()
         type.declaredFields.forEach { field ->
             if (field.isSynthetic || java.lang.reflect.Modifier.isStatic(field.modifiers)) return@forEach
-            field.trySetAccessible()
+            // Android lacks AccessibleObject.trySetAccessible() (Java 9+);
+            @Suppress("DEPRECATION")
+            if (!field.isAccessible) {
+                runCatching { field.setAccessible(true) }
+            }
             val value = field.get(spec)
             val isRequired = includeRequiredDefaults &&
                     field.getAnnotation(RequiredIniKey::class.java) != null
@@ -114,7 +118,8 @@ internal object IniSpecCodec {
             val key = keys[field.name] ?: field.name
             if (value is kotlin.collections.Map<*, *> && '{' in key) {
                 value.forEach { (placeholder, entry) ->
-                    values[key.replace(Regex("\\{[^}]+}"), placeholder.toString())] = entry
+                    // Android's ICU regex engine requires escaping '}' (unlike the JVM).
+                    values[key.replace(Regex("\\{[^}]+\\}"), placeholder.toString())] = entry
                 }
             } else {
                 values[key] = value

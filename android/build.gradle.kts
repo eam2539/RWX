@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.android.webrtc)
     implementation(libs.koin.android)
     implementation(libs.timber)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     testImplementation(kotlin("test-junit5"))
     testRuntimeOnly(libs.junit.platform.launcher)
 }
@@ -103,6 +104,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_25
         targetCompatibility = JavaVersion.VERSION_25
+        isCoreLibraryDesugaringEnabled = true
     }
 
     packaging {

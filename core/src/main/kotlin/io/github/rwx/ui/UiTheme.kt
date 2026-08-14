@@ -466,6 +466,8 @@ object UiTheme {
         const val CJK_MSDF_FONT_PATH: String = "font/NotoSansCJKsc-Regular"
         const val TITLE_MSDF_FONT_PATH: String = "font/ZenDots-Regular"
 
+        const val PORTABLE_MAX_ATLAS_DIMENSION: Int = 4096
+
         @Volatile
         private var installedBase: MsdfFont? = null
 
@@ -486,6 +488,22 @@ object UiTheme {
 
         fun installTitleFont(font: MsdfFont) {
             installedTitleBase = font
+        }
+
+        suspend fun install(maxTextureSize: Int = PORTABLE_MAX_ATLAS_DIMENSION) {
+            installBaseFont(loadAtlas(CJK_MSDF_FONT_PATH, maxTextureSize))
+            installTitleFont(loadAtlas(TITLE_MSDF_FONT_PATH, maxTextureSize))
+        }
+
+        private suspend fun loadAtlas(path: String, maxTextureSize: Int): MsdfFont {
+            val font = MsdfFont(path).getOrElse { error ->
+                throw IllegalStateException("Failed to load required MSDF font: $path", error)
+            }
+            val atlas = font.data.meta.atlas
+            check(atlas.width <= maxTextureSize && atlas.height <= maxTextureSize) {
+                "MSDF atlas $path is ${atlas.width}x${atlas.height}, which exceeds the GPU texture limit of $maxTextureSize."
+            }
+            return font
         }
 
         val caption: Font get() = base.derive(14f)

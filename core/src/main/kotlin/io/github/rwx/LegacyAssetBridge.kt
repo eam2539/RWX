@@ -21,14 +21,14 @@ object LegacyAssetBridge {
                 null
             }
         }
-        val stream = platformStorage()?.openAssetStream(normalized) ?: return null
+        val stream = platformStorage().openAssetStream(normalized) ?: return null
         return AssetInputStream(stream, sourcePath, normalized)
     }
 
     @JvmStatic
     fun listAssets(prefix: String): Array<String> {
         val normalized = prefix.trimAssetPath()
-        val platformAssets = runCatching { platformStorage()?.listAssets(normalized) }
+        val platformAssets = runCatching { platformStorage().listAssets(normalized) }
             .getOrNull()
         if (!platformAssets.isNullOrEmpty()) {
             return platformAssets
@@ -58,23 +58,23 @@ object LegacyAssetBridge {
         if (file.isFile) {
             return file.length()
         }
-        return platformStorage()?.readAssetBytes(normalized)?.size?.toLong() ?: -1L
+        return platformStorage().readAssetBytes(normalized)?.size?.toLong() ?: -1L
     }
 
     @JvmStatic
     fun localDir(): File =
-        (platformStorage()?.localDir?.file ?: File(System.getProperty("user.dir"), "local")).also { it.mkdirs() }
+        platformStorage().localDir.file.also { it.mkdirs() }
 
     @JvmStatic
     fun storageRootDir(): File =
-        (platformStorage()?.rootDir?.file ?: localDir()).also { it.mkdirs() }
+        platformStorage().rootDir.file.also { it.mkdirs() }
 
     @JvmStatic
     fun cacheDir(): File =
-        (platformStorage()?.cacheDir?.file ?: File(localDir(), "cache")).also { it.mkdirs() }
+        platformStorage().cacheDir.file.also { it.mkdirs() }
 
-    private fun platformStorage(): PlatformStorage? =
-        runCatching { getKoin().get<PlatformStorage>() }.getOrNull()
+    private fun platformStorage(): PlatformStorage =
+        getKoin().get<PlatformStorage>()
 
     private fun findProjectAssetRoot(): File {
         val cwd = File(System.getProperty("user.dir")).absoluteFile
