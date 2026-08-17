@@ -147,6 +147,7 @@ application {
     mainClass = "io.github.rwx.KoolDesktopMain"
     applicationDefaultJvmArgs = listOf(
         "-Dorg.lwjgl.opengl.contextAPI=native",
+        "-Dorg.lwjgl.system.stackSize=512",
         "--enable-native-access=ALL-UNNAMED",
         "--sun-misc-unsafe-memory-access=allow",
     )
@@ -350,6 +351,7 @@ val createJpackageImage by tasks.registering(Exec::class) {
             "--main-class", application.mainClass.get(),
             "--java-options", "-Dfile.encoding=UTF-8",
             "--java-options", "-Dorg.lwjgl.opengl.contextAPI=native",
+            "--java-options", "-Dorg.lwjgl.system.stackSize=512",
             "--java-options", "-Dlaunch.dir=\$ROOTDIR"
         )
         val icon = if (targetPlatform.osName == "macos") {
@@ -385,6 +387,7 @@ if (targetPlatform.osName == "windows") {
                 "-Djpackage.app-version=$jpackageVersion",
                 "-Dfile.encoding=UTF-8",
                 "-Dorg.lwjgl.opengl.contextAPI=native",
+                "-Dorg.lwjgl.system.stackSize=512",
             ),
         )
         productName.set(appName)

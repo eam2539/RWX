@@ -37,6 +37,7 @@ object KoolDesktopMain : KoinComponent {
     }
 
     fun run(args: Array<String> = emptyArray()) = runBlocking {
+        configureLwjglMemoryStack()
         configureLegacyDesktopPlatform()
         GlobalContext.startKoin {
             modules(coreModule, desktopModule)
