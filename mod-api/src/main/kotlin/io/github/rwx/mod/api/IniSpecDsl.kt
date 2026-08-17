@@ -19,6 +19,7 @@ internal annotation class RequiredIniKey
 @UnitDsl
 class UnitIniBuilder internal constructor() {
     private val sections = linkedMapOf<String, Any>()
+    private val rawSections = linkedMapOf<String, kotlin.collections.MutableMap<String, Any?>>()
 
     fun core(configure: CoreSpec.() -> Unit) = section("core", ::CoreSpec, configure)
     fun graphics(configure: GraphicsSpec.() -> Unit) = section("graphics", ::GraphicsSpec, configure)
@@ -73,10 +74,32 @@ class UnitIniBuilder internal constructor() {
     fun template(name: String, configure: TemplateSpec.() -> Unit) =
         section(named("template", name), ::TemplateSpec, configure)
 
-    internal fun build(): List<IniSpecSection> = sections.mapNotNull { (name, spec) ->
-        IniSpecCodec.encode(spec, includeRequiredDefaults = true)
-            .takeIf { it.values.isNotEmpty() }
-            ?.let { IniSpecSection(name, it) }
+    /**
+     * Emits an INI section with verbatim native keys, bypassing typed-spec encoding. Values must be
+     * flat basic types, enums, [ResourcePath] or iterables of those (the compiler serializes them
+     * directly to INI values). Repeated calls with the same [name] accumulate entries, matching
+     * typed-DSL merge semantics. Used for `copyFrom` delta sections the typed specs cannot express,
+     * such as `@copyFrom_skipThisSection` markers or `canAttack` overrides on
+     * `@field:RequiredIniKey` fields.
+     */
+    fun rawSection(name: String, values: kotlin.collections.Map<String, Any?>) {
+        require(name.matches(Regex("[A-Za-z0-9_.-]+"))) { "Invalid native INI section name: $name" }
+        rawSections.getOrPut(name) { linkedMapOf() }.putAll(values)
+    }
+
+    internal fun build(): List<IniSpecSection> {
+        val merged = linkedMapOf<String, IniSpecSection>()
+        sections.forEach { (name, spec) ->
+            IniSpecCodec.encode(spec, includeRequiredDefaults = true)
+                .takeIf { it.values.isNotEmpty() }
+                ?.let { merged[name] = IniSpecSection(name, it) }
+        }
+        rawSections.forEach { (name, values) ->
+            if (values.isNotEmpty()) {
+                merged[name] = IniSpecSection(name, IniSpecValues(values.toMap()))
+            }
+        }
+        return merged.values.toList()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -148,9 +171,6 @@ internal object IniSpecCodec {
     private fun legacyKeyWarning(key: String): String? {
         val normalized = key.lowercase()
         return when {
-            "copyfrom" in normalized ->
-                "Native key '$key' uses legacy copy/template preprocessing; prefer explicit Spec composition"
-
             "memory" in normalized ->
                 "Native key '$key' uses legacy untyped memory; prefer synchronized typed extension state"
 

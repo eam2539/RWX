@@ -66,9 +66,15 @@ internal object UnitIniCompiler {
         val document = IniDocumentWriter()
         val warnings = mutableListOf<String>()
         val extensionBindings = MutableUnitExtensionBindings()
-        writeCore(document, definition)
-        writeGraphics(document)
-        writeMovement(document)
+
+        val isDerived = definition.iniSections
+            .firstOrNull { it.name == "core" }
+            ?.values?.values?.containsKey("copyFrom") == true
+        if (!isDerived) {
+            writeCore(document, definition)
+            writeGraphics(document)
+            writeMovement(document)
+        }
         writeNativeExtensionBindings(definition, extensionBindings)
         definition.iniSections.forEach { section ->
             applyIniSpec(document.section(section.name), section.values)

@@ -59,6 +59,7 @@ class UnitBuilder internal constructor(private val id: UnitId) {
     fun animation(name: String, configure: AnimationSpec.() -> kotlin.Unit) = ini.animation(name, configure)
     fun canBuild(name: String, configure: CanBuildSpec.() -> kotlin.Unit) = ini.canBuild(name, configure)
     fun template(name: String, configure: TemplateSpec.() -> kotlin.Unit) = ini.template(name, configure)
+    fun rawSection(name: String, values: kotlin.collections.Map<String, Any?>) = ini.rawSection(name, values)
 
     fun on(
         id: UnitEventBindingId,

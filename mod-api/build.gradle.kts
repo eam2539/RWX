@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     alias(libs.plugins.kotlin.jvm)
+    `maven-publish`
 }
 
 dependencies {
@@ -96,5 +97,18 @@ tasks.named("compileKotlin") {
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(25))
+    }
+    withSourcesJar()
+}
+
+tasks.named<Jar>("sourcesJar") {
+    dependsOn(generateIniSpecMetadata)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
     }
 }
