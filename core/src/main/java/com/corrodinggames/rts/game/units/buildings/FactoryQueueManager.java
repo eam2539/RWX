@@ -161,7 +161,7 @@ public class FactoryQueueManager {
         }
         projectile.a = 1;
         projectile.b = popupQueueAction.K();
-        projectile.c = popupQueueAction.getDisplayText();
+        projectile.c = popupQueueAction.getPrice();
         projectile.d = popupQueueAction.getAdditionalCost();
         projectile.e = popupQueueAction.getAnimationSet();
         projectile.f = popupQueueAction.isHighPriority();
@@ -432,7 +432,7 @@ public class FactoryQueueManager {
             PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
             if (!z) {
                 if (abstractUnitAction.canAfford((BaseUnit) this.a, false) && abstractUnitAction.b(this.a)) {
-                    if ((!popupQueueAction.isHighPriority() || this.a.team.getNonBuildingUnitCountIncludingQueued() < this.a.team.getUnitCap()) && popupQueueAction.getDisplayText().c(this.a)) {
+                    if ((!popupQueueAction.isHighPriority() || this.a.team.getNonBuildingUnitCountIncludingQueued() < this.a.team.getUnitCap()) && popupQueueAction.getPrice().c(this.a)) {
                         return a(popupQueueAction, false, pointF, baseUnit);
                     }
                     return null;
@@ -455,7 +455,7 @@ public class FactoryQueueManager {
             PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
             if (!z) {
                 if (abstractUnitAction.canAfford((BaseUnit) this.a, true)) {
-                    if ((!popupQueueAction.isHighPriority() || this.a.team.getNonBuildingUnitCountIncludingQueued() < this.a.team.getUnitCap()) && popupQueueAction.getDisplayText().b(this.a, abstractUnitAction.usesExtraLagHidingInUI())) {
+                    if ((!popupQueueAction.isHighPriority() || this.a.team.getNonBuildingUnitCountIncludingQueued() < this.a.team.getUnitCap()) && popupQueueAction.getPrice().b(this.a, abstractUnitAction.usesExtraLagHidingInUI())) {
                         a(popupQueueAction, true);
                         return;
                     }
@@ -464,7 +464,7 @@ public class FactoryQueueManager {
                 return;
             }
             if (b(popupQueueAction, true) != null) {
-                popupQueueAction.getDisplayText().e(this.a, abstractUnitAction.usesExtraLagHidingInUI());
+                popupQueueAction.getPrice().e(this.a, abstractUnitAction.usesExtraLagHidingInUI());
             }
         }
     }

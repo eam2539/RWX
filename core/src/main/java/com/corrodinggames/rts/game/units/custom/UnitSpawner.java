@@ -353,7 +353,7 @@ public class UnitSpawner {
                                 }
 
                                 if (var15.gridAlign) {
-                                    var11.tileMap.exportTmxToFile(var35.posX, var35.posY);
+                                    var11.tileMap.updateCursorTileIndexFromWorldPoint(var35.posX, var35.posY);
                                     var35.posX = var11.tileMap.cursorTileX;
                                     var35.posY = var11.tileMap.cursorTileY;
                                     var35.posX = var35.posX + var35.getTileOffsetX();

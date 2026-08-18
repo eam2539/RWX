@@ -73,7 +73,7 @@ public final class PlacementRules {
             return null;
         }
         final TileMap tileMap = GameEngine.getInstance().tileMap;
-        tileMap.exportTmxWithUnits(integer2, integer3);
+        tileMap.setCursorTileIndexFromTileIndexCentered(integer2, integer3);
         return this.b(y, (float) tileMap.cursorTileX, (float) tileMap.cursorTileY);
     }
 

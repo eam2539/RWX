@@ -69,7 +69,7 @@ public abstract class BaseBuilding extends OrderableUnit {
     public static boolean canBuildingBePlacedAt(UnitType unitType, float f, float f2, PlayerTeam playerTeam) {
         GameEngine gameEngine = GameEngine.getInstance();
         OrderableUnit orderableUnit = (OrderableUnit) BaseUnit.findTurretPosition(unitType);
-        gameEngine.tileMap.exportTmxToFile(f, f2);
+        gameEngine.tileMap.updateCursorTileIndexFromWorldPoint(f, f2);
         orderableUnit.posX = gameEngine.tileMap.cursorTileX + orderableUnit.getTileOffsetX();
         orderableUnit.posY = gameEngine.tileMap.cursorTileY + orderableUnit.getTileOffsetX();
         orderableUnit.setUnitTeam(playerTeam);

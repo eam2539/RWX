@@ -775,7 +775,7 @@ public class CustomUnitConfigParser {
                         abstractUnitAction2.unitAction = ((ActionWithCost) abstractUnitAction2.unitAction).wrappedAction;
                     }
                     if (z5) {
-                        UnitPrice displayText = abstractUnitAction2.getDisplayText();
+                        UnitPrice displayText = abstractUnitAction2.getPrice();
                         UnitPrice additionalCost = abstractUnitAction2.getAdditionalCost();
                         if (!displayText.c() && additionalCost == null) {
                             ActionWithCost actionWithCost = new ActionWithCost(abstractUnitAction2.unitAction);

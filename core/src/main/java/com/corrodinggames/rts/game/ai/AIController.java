@@ -1384,7 +1384,7 @@ public final class AIController extends PlayerTeam {
     }
 
     /* JADX INFO: renamed from: a */
-    public void getNodeId(OrderableUnit orderableUnit, ActionId actionId) {
+    public void issueCommand(OrderableUnit orderableUnit, ActionId actionId) {
         Command commandNewCommandForTeam = GameEngine.getInstance().commandController.newCommandForTeam(this);
         commandNewCommandForTeam.addUnitToCommand(orderableUnit);
         commandNewCommandForTeam.setActionId(actionId);
@@ -1403,10 +1403,10 @@ public final class AIController extends PlayerTeam {
                     }
                     boolean z2 = !orderableUnit.Q();
                     if (z && z != z2) {
-                        getNodeId(orderableUnit, AttackSubmarine.j.getActionId());
+                        issueCommand(orderableUnit, AttackSubmarine.j.getActionId());
                     }
                     if (!z && z != z2) {
-                        getNodeId(orderableUnit, AttackSubmarine.k.getActionId());
+                        issueCommand(orderableUnit, AttackSubmarine.k.getActionId());
                     }
                 }
                 if (orderableUnit instanceof AmphibiousJet) {
@@ -1417,10 +1417,10 @@ public final class AIController extends PlayerTeam {
                     }
                     boolean z4 = !orderableUnit.Q();
                     if (z3 && z3 != z4) {
-                        getNodeId(orderableUnit, AmphibiousJet.y.getActionId());
+                        issueCommand(orderableUnit, AmphibiousJet.y.getActionId());
                     }
                     if (!z3 && z3 != z4) {
-                        getNodeId(orderableUnit, AmphibiousJet.z.getActionId());
+                        issueCommand(orderableUnit, AmphibiousJet.z.getActionId());
                     }
                 }
                 if (orderableUnit.be() == UnitBehaviorType.bomber && orderableUnit.hasNoCurrentWaypoint() && orderableUnit.getCommandOrAttackTarget() != null) {
@@ -1716,8 +1716,8 @@ public final class AIController extends PlayerTeam {
                                         z4 = true;
                                     }
                                     if (!z4) {
-                                        getNodeId(orderableUnit5, actionIdCm);
-                                        processAIVariable(orderableUnit5, abstractUnitActionA.getDisplayText(), true);
+                                        issueCommand(orderableUnit5, actionIdCm);
+                                        processAIVariable(orderableUnit5, abstractUnitActionA.getPrice(), true);
                                         this.resourceMultiplierHard = 900.0f;
                                         this.resourceMultiplierInsane = 0.0f;
                                         if (!z3) {

@@ -187,7 +187,7 @@ public class ReliableServerSocket extends ServerSocket {
     /* JADX INFO: renamed from: a */
     public void registerActiveConnection(SocketAddress socketAddress, ReliableSocketConnection reliableSocketConnection) {
         synchronized (this.activeConnectionsMap) {
-            reliableSocketConnection.sendPacket(this.eventListener);
+            reliableSocketConnection.addStateListener(this.eventListener);
             this.activeConnectionsMap.put(socketAddress, reliableSocketConnection);
         }
     }

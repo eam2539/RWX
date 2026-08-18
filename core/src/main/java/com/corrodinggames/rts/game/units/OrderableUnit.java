@@ -4050,7 +4050,7 @@ public abstract class OrderableUnit extends UnitBase {
             this.activePathCount = 0;
             this.au = null;
             float fClampWorldX = tileMap.clampWorldX(f);
-            float fOpenOriginalMapStream = tileMap.openOriginalMapStream(f2);
+            float fOpenOriginalMapStream = tileMap.clampWorldY(f2);
             if (z4) {
                 float angleBetweenPoints = Utility.getAngleBetweenPoints(this.posX, this.posY, fClampWorldX, fOpenOriginalMapStream);
                 float fDistance = Utility.distance(this.posX, this.posY, fClampWorldX, fOpenOriginalMapStream);
@@ -4078,7 +4078,7 @@ public abstract class OrderableUnit extends UnitBase {
             this.activePathCount = 0;
             this.au = null;
             float fClampWorldX2 = tileMap.clampWorldX(f);
-            float fOpenOriginalMapStream2 = tileMap.openOriginalMapStream(f2);
+            float fOpenOriginalMapStream2 = tileMap.clampWorldY(f2);
             float f3 = this.posX;
             float f4 = this.posY;
             float angleBetweenPoints2 = Utility.getAngleBetweenPoints(this.posX, this.posY, fClampWorldX2, fOpenOriginalMapStream2);
@@ -5239,8 +5239,8 @@ public abstract class OrderableUnit extends UnitBase {
             return bn.a();
         }
         BaseUnit baseUnitG = BaseBuilding.g(unitType);
-        if (!UnitPrice.b(unitType.u(), abstractUnitActionFindActionForUnitTypeWithQueueSize.getDisplayText()) || !UnitPrice.b(unitType.B(), abstractUnitActionFindActionForUnitTypeWithQueueSize.getAdditionalCost())) {
-            baseUnitG.unitData1 = abstractUnitActionFindActionForUnitTypeWithQueueSize.getDisplayText();
+        if (!UnitPrice.b(unitType.u(), abstractUnitActionFindActionForUnitTypeWithQueueSize.getPrice()) || !UnitPrice.b(unitType.B(), abstractUnitActionFindActionForUnitTypeWithQueueSize.getAdditionalCost())) {
+            baseUnitG.unitData1 = abstractUnitActionFindActionForUnitTypeWithQueueSize.getPrice();
             baseUnitG.unitData2 = abstractUnitActionFindActionForUnitTypeWithQueueSize.getAdditionalCost();
         }
         if (abstractUnitActionFindActionForUnitTypeWithQueueSize instanceof FilteredUnitAction) {
@@ -5249,7 +5249,7 @@ public abstract class OrderableUnit extends UnitBase {
         }
         baseUnitG.buildProgress = 0.0f;
         baseUnitG.paidBuildProgress = 0.0f;
-        gameEngine.tileMap.exportTmxToFile((f - baseUnitG.getTileOffsetX()) + 1.0f, (f2 - baseUnitG.getTileOffsetY()) + 1.0f);
+        gameEngine.tileMap.updateCursorTileIndexFromWorldPoint((f - baseUnitG.getTileOffsetX()) + 1.0f, (f2 - baseUnitG.getTileOffsetY()) + 1.0f);
         baseUnitG.posX = gameEngine.tileMap.cursorTileX + baseUnitG.getTileOffsetX();
         baseUnitG.posY = gameEngine.tileMap.cursorTileY + baseUnitG.getTileOffsetY();
         baseUnitG.f(this.team);
@@ -5284,7 +5284,7 @@ public abstract class OrderableUnit extends UnitBase {
                 return triggerDebugActionA;
             }
         }
-        UnitPrice displayText = abstractUnitActionFindActionForUnitTypeWithQueueSize.getDisplayText();
+        UnitPrice displayText = abstractUnitActionFindActionForUnitTypeWithQueueSize.getPrice();
         if (unitCommand.isForceMove) {
             displayText = UnitPrice.a;
         }

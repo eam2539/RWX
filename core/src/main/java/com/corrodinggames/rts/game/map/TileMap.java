@@ -631,7 +631,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: b */
-    public void exportTmxWithUnits(int i, int i2) {
+    public void setCursorTileIndexFromTileIndexCentered(int i, int i2) {
         this.cursorTileX = (i * this.tileWorldSizeX) + this.halfTileWorldSizeX;
         this.cursorTileY = (i2 * this.tileWorldSizeY) + this.halfTileWorldSizeY;
     }
@@ -643,7 +643,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: b */
-    public void exportTmxToFile(float f, float f2) {
+    public void updateCursorTileIndexFromWorldPoint(float f, float f2) {
         setCursorTileIndexFromWorldPoint(f, f2);
         setCursorTileIndexFromTileIndex(this.cursorTileX, this.cursorTileY);
     }
@@ -660,7 +660,7 @@ public final class TileMap {
     }
 
     /* JADX INFO: renamed from: b */
-    public float openOriginalMapStream(float f) {
+    public float clampWorldY(float f) {
         if (f < 0.0f) {
             f = 0.0f;
         }

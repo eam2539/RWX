@@ -52,7 +52,7 @@ public class NukeBehavior extends UnitAIBehavior {
     /* JADX WARN: Multi-variable type inference failed */
     public void f(AIController aIController, OrderableUnit orderableUnit) {
         AbstractUnitAction abstractUnitActionA;
-        if ((orderableUnit instanceof FactoryQueueInterface) && ((FactoryQueueInterface) orderableUnit).dy() && (abstractUnitActionA = AIUnitActionUtils.a(aIController, orderableUnit, ActionType.launchAmmo)) != null && aIController.isPathPossibleBetweenPoints(abstractUnitActionA.getDisplayText(), orderableUnit)) {
+        if ((orderableUnit instanceof FactoryQueueInterface) && ((FactoryQueueInterface) orderableUnit).dy() && (abstractUnitActionA = AIUnitActionUtils.a(aIController, orderableUnit, ActionType.launchAmmo)) != null && aIController.isPathPossibleBetweenPoints(abstractUnitActionA.getPrice(), orderableUnit)) {
             aIController.c("ai nuke building");
             aIController.issueUnitAction(orderableUnit, abstractUnitActionA);
         }

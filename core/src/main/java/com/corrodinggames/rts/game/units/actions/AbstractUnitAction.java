@@ -179,7 +179,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: B */
-    public UnitPrice getDisplayText() {
+    public UnitPrice getPrice() {
         UnitPrice unitPriceA = this.unitAction.a();
         if (unitPriceA != null) {
             return unitPriceA;
@@ -243,9 +243,9 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
             return false;
         }
         if (z) {
-            return getDisplayText().c(baseUnit, usesExtraLagHidingInUI());
+            return getPrice().c(baseUnit, usesExtraLagHidingInUI());
         }
-        return getDisplayText().b(baseUnit);
+        return getPrice().b(baseUnit);
     }
 
     /* JADX INFO: renamed from: r */
@@ -384,7 +384,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
             textRenderQueue.a(paint3);
         }
         ActionDisplayType actionDisplayTypeIsAlsoSelected = getActionDisplayType();
-        UnitPrice displayText = getDisplayText();
+        UnitPrice displayText = getPrice();
         if (!displayText.c() && actionDisplayTypeIsAlsoSelected != ActionDisplayType.infoOnlyStockpile) {
             textRenderQueue.b(" (");
             BaseUnit baseUnit2 = null;

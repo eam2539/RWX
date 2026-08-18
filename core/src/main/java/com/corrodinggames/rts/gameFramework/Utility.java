@@ -798,7 +798,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: d */
-    public static String removeEnd(String str, int i2) {
+    public static String repeat(String str, int i2) {
         String str2 = VariableScope.nullOrMissingString;
         for (int i3 = 0; i3 <= i2; i3++) {
             str2 = str2 + str;

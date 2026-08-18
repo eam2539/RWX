@@ -655,7 +655,7 @@ public class ReliableSocket extends Socket {
     }
 
     /* JADX INFO: renamed from: a */
-    public void sendPacket(ReliableSocketListener reliableSocketListener) {
+    public void addStateListener(ReliableSocketListener reliableSocketListener) {
         if (reliableSocketListener == null) {
             throw new NullPointerException("stateListener");
         }
@@ -677,7 +677,7 @@ public class ReliableSocket extends Socket {
         if (DEBUG) {
             a("sent " + segment);
         }
-        handleData(segment);
+        sendDataPacket(segment);
     }
 
     /* JADX INFO: Access modifiers changed from: private */
@@ -1145,7 +1145,7 @@ public class ReliableSocket extends Socket {
     }
 
     /* JADX INFO: renamed from: d */
-    protected void handleData(Segment segment) {
+    protected void sendDataPacket(Segment segment) {
         try {
             this.datagramSocket.send(new DatagramPacket(segment.encodePayload(), segment.length(), this.peerAddress));
         } catch (IOException e) {

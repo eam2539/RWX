@@ -2259,7 +2259,7 @@ public final class GameUI extends Serializable {
         }
         if (this.isBuildingMode && !b12) {
             final OrderableUnit y = (OrderableUnit) baseUnit;
-            instance.tileMap.exportTmxToFile(this.buildingPlaceX / instance.zoom + instance.viewpointXSnapped, this.buildingPlaceY / instance.zoom + instance.viewpointYSnapped);
+            instance.tileMap.updateCursorTileIndexFromWorldPoint(this.buildingPlaceX / instance.zoom + instance.viewpointXSnapped, this.buildingPlaceY / instance.zoom + instance.viewpointYSnapped);
             y.posX = (float) instance.tileMap.cursorTileX;
             y.posY = (float) instance.tileMap.cursorTileY;
             if (unitType.p()) {
@@ -3037,8 +3037,8 @@ public final class GameUI extends Serializable {
             if (baseUnit instanceof OrderableUnit) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
                 if (canControlUnit(orderableUnit) && (abstractUnitActionA = orderableUnit.validateActionId(actionId)) != null) {
-                    if (abstractUnitActionA.getDisplayText() != null && !abstractUnitActionA.getDisplayText().b(orderableUnit)) {
-                        String strA = abstractUnitActionA.getDisplayText().a((BaseUnit) orderableUnit, 4, true);
+                    if (abstractUnitActionA.getPrice() != null && !abstractUnitActionA.getPrice().b(orderableUnit)) {
+                        String strA = abstractUnitActionA.getPrice().a((BaseUnit) orderableUnit, 4, true);
                         if (strA != null) {
                             str = strA;
                         }
@@ -3951,7 +3951,7 @@ public final class GameUI extends Serializable {
             orderableUnit2 = (OrderableUnit) buildingBlockoutUnit;
         }
         boolean z2 = false;
-        gameEngine.tileMap.exportTmxToFile(f, f2);
+        gameEngine.tileMap.updateCursorTileIndexFromWorldPoint(f, f2);
         float f7 = gameEngine.tileMap.cursorTileX;
         float f8 = gameEngine.tileMap.cursorTileY;
         float fCZ = f7 + orderableUnit.getTileOffsetX();
@@ -3965,7 +3965,7 @@ public final class GameUI extends Serializable {
         while (true) {
             float f10 = f9;
             if (f10 <= fDistance) {
-                gameEngine.tileMap.exportTmxToFile((fCZ + (Utility.fastCos(angleBetweenPoints) * f10)) - orderableUnit.getTileOffsetX(), (fDa + (Utility.fastSin(angleBetweenPoints) * f10)) - orderableUnit.getTileOffsetY());
+                gameEngine.tileMap.updateCursorTileIndexFromWorldPoint((fCZ + (Utility.fastCos(angleBetweenPoints) * f10)) - orderableUnit.getTileOffsetX(), (fDa + (Utility.fastSin(angleBetweenPoints) * f10)) - orderableUnit.getTileOffsetY());
                 float f11 = gameEngine.tileMap.cursorTileX;
                 float f12 = gameEngine.tileMap.cursorTileY;
                 float fCZ3 = f11 + orderableUnit.getTileOffsetX();

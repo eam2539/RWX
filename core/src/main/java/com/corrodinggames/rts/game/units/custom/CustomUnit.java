@@ -3301,7 +3301,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                     PlayerTeam.c(this);
                 }
                 z = true;
-                if (!customAction.getDisplayText().c()) {
+                if (!customAction.getPrice().c()) {
                     W();
                 }
             }
