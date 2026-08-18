@@ -279,7 +279,7 @@ public class Resource {
     }
 
     private String a(double d) {
-        return a(Utility.toHexString(d, 1), this.q);
+        return a(Utility.padString(d, 1), this.q);
     }
 
     public String a(double d, boolean z, boolean z2) {

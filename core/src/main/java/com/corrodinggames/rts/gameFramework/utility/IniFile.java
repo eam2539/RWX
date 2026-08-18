@@ -691,7 +691,7 @@ public class IniFile {
     }
 
     /* JADX INFO: renamed from: a */
-    public Vector3D getResourceOrAsset(String str, String str2, Vector3D vector3D) {
+    public Vector3D getVector3D(String str, String str2, Vector3D vector3D) {
         String valueInternal = getValueInternal(str, str2, true, "point3d");
         if (valueInternal == null) {
             return vector3D;

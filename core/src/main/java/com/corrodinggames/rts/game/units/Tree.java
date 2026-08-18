@@ -158,9 +158,9 @@ public class Tree extends NaturalUnit {
             this.j = 0;
             this.k = 30 * i2;
             if (i2 == 0) {
-                this.l = Utility.getRandomIntInRange(1.0f, 1.2f, ((int) this.objectId) + 1);
+                this.l = Utility.getDeterministicRandomFloat(1.0f, 1.2f, ((int) this.objectId) + 1);
             } else {
-                this.l = Utility.getRandomIntInRange(1.0f, 2.0f, ((int) this.objectId) + 1);
+                this.l = Utility.getDeterministicRandomFloat(1.0f, 2.0f, ((int) this.objectId) + 1);
             }
             this.m = true;
             return;

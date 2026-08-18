@@ -109,7 +109,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: b */
-    public static final float clamp(BaseUnit baseUnit, float f2, float f3, int i2) {
+    public static final float getDeterministicRandomFloatForUnit(BaseUnit baseUnit, float f2, float f3, int i2) {
         return getDeterministicRandomInt((GameObject) baseUnit, (int) (f2 * 1000.0f), (int) (f3 * 1000.0f), i2) * 0.001f;
     }
 
@@ -136,12 +136,12 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static final float getRandomIntInRange(float f2, float f3, int i2) {
+    public static final float getDeterministicRandomFloat(float f2, float f3, int i2) {
         return getDeterministicRandomIntInRange((int) (f2 * 100.0f), (int) (f3 * 100.0f), i2) / 100.0f;
     }
 
     /* JADX INFO: renamed from: b */
-    public static final float clamp(float f2, float f3, int i2) {
+    public static final float getRandomFloat(float f2, float f3, int i2) {
         return getDeterministicRandomIntInRange((int) (f2 * 1000.0f), (int) (f3 * 1000.0f), i2) / 1000.0f;
     }
 
@@ -573,7 +573,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String padString(boolean z) {
+    public static String booleanToString(boolean z) {
         return z ? "true" : "false";
     }
 
@@ -607,7 +607,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String toHexString(double d2, int i2) {
+    public static String padString(double d2, int i2) {
         if (d2 == ((int) d2)) {
             return VariableScope.nullOrMissingString + ((int) d2);
         }
@@ -726,7 +726,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: b */
-    public static String formatDouble(byte[] bArr) {
+    public static String sha256HexString(byte[] bArr) {
         return toHexString(sha256Bytes(bArr));
     }
 
@@ -793,7 +793,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static int getRandomIntInRange(int i2, int i3, float f2) {
+    public static int lerpColor(int i2, int i3, float f2) {
         return KoolArgbColor.a((int) lerp(KoolArgbColor.a(i2), KoolArgbColor.a(i3), f2), (int) lerp(KoolArgbColor.b(i2), KoolArgbColor.b(i3), f2), (int) lerp(KoolArgbColor.c(i2), KoolArgbColor.c(i3), f2), (int) lerp(KoolArgbColor.d(i2), KoolArgbColor.d(i3), f2));
     }
 
@@ -807,7 +807,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: e */
-    public static String truncate(String str, int i2) {
+    public static String padRightWithSpaces(String str, int i2) {
         for (int length = str.length(); length < i2; length++) {
             str = str + " ";
         }
@@ -815,7 +815,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: a */
-    public static String replace(String str, int i2, String str2) {
+    public static String padLeft(String str, int i2, String str2) {
         for (int length = str.length(); length < i2; length++) {
             str = str2 + str;
         }
@@ -1136,9 +1136,9 @@ public final class Utility {
         String str;
         int[] timeParts = secondsToTimeParts(j2);
         if (timeParts[0] == 0) {
-            str = replace(VariableScope.nullOrMissingString + timeParts[1], 2, "0") + ":" + replace(VariableScope.nullOrMissingString + timeParts[2], 2, "0");
+            str = padLeft(VariableScope.nullOrMissingString + timeParts[1], 2, "0") + ":" + padLeft(VariableScope.nullOrMissingString + timeParts[2], 2, "0");
         } else {
-            str = replace(VariableScope.nullOrMissingString + timeParts[0], 2, "0") + ":" + replace(VariableScope.nullOrMissingString + timeParts[1], 2, "0") + ":" + replace(VariableScope.nullOrMissingString + timeParts[2], 2, "0");
+            str = padLeft(VariableScope.nullOrMissingString + timeParts[0], 2, "0") + ":" + padLeft(VariableScope.nullOrMissingString + timeParts[1], 2, "0") + ":" + padLeft(VariableScope.nullOrMissingString + timeParts[2], 2, "0");
         }
         return str;
     }

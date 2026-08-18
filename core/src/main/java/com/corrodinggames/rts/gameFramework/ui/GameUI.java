@@ -4303,7 +4303,7 @@ public final class GameUI extends Serializable {
                     } else {
                         integer1 = KoolArgbColor.a(110, 240, 30, 30);
                     }
-                    Utility.getRandomIntInRange(integer1, this.fogOfWarPaint.e(), clampTo255);
+                    Utility.lerpColor(integer1, this.fogOfWarPaint.e(), clampTo255);
                 }
                 float clampTo255 = this.bw.d - 65.0f * float7 / 2.0f + TextUtils.getCharWidth(this.fogOfWarPaint) / 2;
                 if (timerValue > 0.5) {
@@ -4336,7 +4336,7 @@ public final class GameUI extends Serializable {
                 } else {
                     n8 = KoolArgbColor.a(110, 210, 110, 110);
                 }
-                final int n9 = Utility.getRandomIntInRange(n8, paint4.e(), n7);
+                final int n9 = Utility.lerpColor(n8, paint4.e(), n7);
                 paint4 = this.bA;
                 paint4.b(n9);
             }
@@ -4367,7 +4367,7 @@ public final class GameUI extends Serializable {
                 } else {
                     n8 = KoolArgbColor.a(110, 210, 110, 110);
                 }
-                final int n9 = Utility.getRandomIntInRange(n8, paint5.e(), n7);
+                final int n9 = Utility.lerpColor(n8, paint5.e(), n7);
                 paint5 = this.bA;
                 paint5.b(n9);
             }

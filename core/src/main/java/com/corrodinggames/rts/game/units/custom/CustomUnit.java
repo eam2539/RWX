@@ -4020,7 +4020,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                     unitMovementData.k = -Utility.getDeterministicRandomInt(this, 0, (int) turretConfig.idleSweepAddRandomDelay);
                     float fClamp = turretConfig.idleSweepAngle;
                     if (turretConfig.idleSweepAddRandomAngle > 0.0f) {
-                        fClamp += Utility.clamp(this, 0.0f, turretConfig.idleSweepAddRandomAngle, i);
+                        fClamp += Utility.getDeterministicRandomFloatForUnit(this, 0.0f, turretConfig.idleSweepAddRandomAngle, i);
                     }
                     unitMovementData.l = unitMovementData.l > 0.0f ? -fClamp : fClamp;
                     return false;

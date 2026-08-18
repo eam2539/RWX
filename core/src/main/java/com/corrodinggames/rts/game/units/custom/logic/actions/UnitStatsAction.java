@@ -143,7 +143,7 @@ public class UnitStatsAction extends LogicAction {
             fFloatValue3 = iniFile.getTimeAsFrames(str, str2 + "addActionCooldownFor", Float.valueOf(0.0f)).floatValue();
         }
         CustomUnitActionHandler customUnitAction = iniFile.getCustomUnitAction(customUnitConfig, str, str2 + "addActionCooldownApplyToActions", (CustomUnitActionHandler) null);
-        Vector3D resourceOrAsset = iniFile.getResourceOrAsset(str, str2 + "offsetSelfAbsolute", (Vector3D) null);
+        Vector3D resourceOrAsset = iniFile.getVector3D(str, str2 + "offsetSelfAbsolute", (Vector3D) null);
         if (customUnitAction != null && fFloatValue3 <= 0.0f) {
             throw new ConfigParseException("[" + str + "]addActionCooldownApplyToActions requires addActionCooldownTime to be set");
         }

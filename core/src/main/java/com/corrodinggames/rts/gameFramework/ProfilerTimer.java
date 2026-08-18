@@ -49,7 +49,7 @@ public class ProfilerTimer {
             return "{ Not enabled }";
         }
         if (this.b > 0) {
-            str = ((("{ #" + this.b + " = ") + "peak:" + Utility.toHexString(this.d, 2) + "ms ") + "avg:" + Utility.toHexString(this.c / ((double) this.b), 2) + "ms ") + "total:" + Utility.toHexString(this.c, 2) + "ms ";
+            str = ((("{ #" + this.b + " = ") + "peak:" + Utility.padString(this.d, 2) + "ms ") + "avg:" + Utility.padString(this.c / ((double) this.b), 2) + "ms ") + "total:" + Utility.padString(this.c, 2) + "ms ";
         } else {
             str = "{ #0 = NA";
         }

@@ -1511,7 +1511,7 @@ public class GameInterfaceRenderer extends Serializable {
                             } else {
                                 n26 = KoolArgbColor.a(110, 210, 110, 110);
                             }
-                            final int randomIntInRange = Utility.getRandomIntInRange(n26, paint2.e(), n25);
+                            final int randomIntInRange = Utility.lerpColor(n26, paint2.e(), n25);
                             paint2 = this.paintUnitInfo;
                             paint2.b(randomIntInRange);
                         }
