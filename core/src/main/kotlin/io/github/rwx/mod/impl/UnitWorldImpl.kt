@@ -3,6 +3,7 @@ package io.github.rwx.mod.impl
 import com.corrodinggames.rts.game.PlayerTeam
 import com.corrodinggames.rts.game.units.BaseUnit
 import com.corrodinggames.rts.game.units.OrderableUnit
+import com.corrodinggames.rts.game.units.UnitMovementType
 import com.corrodinggames.rts.game.units.custom.CustomUnit
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig
 import com.corrodinggames.rts.game.units.custom.logic.CustomAction
@@ -204,9 +205,9 @@ private class EngineUnitWorldBackend : UnitWorldBackend {
             radius = radius,
             destroyed = isDestroyed,
             orderable = orderableUnit != null,
-            canMove = canMove(),
+            canMove = getMovementType() != UnitMovementType.NONE,
             canAttack = canAttack(),
-            isBuilding = unitType.C(),
+            isBuilding = unitType.isBuildingUnit(),
             isBuilder = availableActions.any(UnitAvailableAction::unitTypeIsBuilding),
             isFactory = availableActions.any { it.unitTypeId != null && !it.unitTypeIsBuilding },
             currentTargetId = attackTargetUnit?.let { UnitInstanceId(it.objectId) },
@@ -231,7 +232,7 @@ private class EngineUnitWorldBackend : UnitWorldBackend {
                 displayName = runCatching { action.getDisplayName() }.getOrNull(),
                 actionType = runCatching { action.getActionType().name }.getOrNull(),
                 unitTypeId = unitType?.v(),
-                unitTypeIsBuilding = unitType?.C() ?: false,
+                unitTypeIsBuilding = unitType?.isBuildingUnit() ?: false,
                 queueSize = action.queueSize,
                 available = cooldownRemainingTicks == 0 && !action.isNotAvailable(this) && action.b(this),
                 queued = action.isQueuable,

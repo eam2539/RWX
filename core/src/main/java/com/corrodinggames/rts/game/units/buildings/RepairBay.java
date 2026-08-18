@@ -38,7 +38,7 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
     PointF[] hiddenPoints;
 
     /* JADX INFO: renamed from: a */
-    static Texture baseTexture = null;
+    static Texture sharedBaseTexture = null;
 
     /* JADX INFO: renamed from: b */
     static Texture[] teamTextures = new Texture[10];
@@ -73,22 +73,14 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
         availableActions.add(new RepairTargetAction());
     }
 
-    /* JADX INFO: renamed from: M */
-    public static void initializeTextures() {
-        GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.repair_bay);
-        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.repair_bay_dead);
-        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
-    }
-
     public RepairBay(boolean z) {
         super(z);
         this.drawRect = new Rect();
         this.tempRect = new Rect();
         this.targetPriorityPoints = new PointF[6];
         this.hiddenPoints = new PointF[this.targetPriorityPoints.length];
-        super.baseTexture = baseTexture;
-        b(baseTexture);
+        super.baseTexture = sharedBaseTexture;
+        b(sharedBaseTexture);
         this.radius = 30.0f;
         this.displayRadius = this.radius;
         this.maxHealth = 1000.0f;
@@ -99,6 +91,14 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
             this.targetPriorityPoints[i] = new PointF();
             this.hiddenPoints[i] = new PointF();
         }
+    }
+
+    /* JADX INFO: renamed from: M */
+    public static void initializeTextures() {
+        GameEngine gameEngine = GameEngine.getInstance();
+        sharedBaseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.repair_bay);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.repair_bay_dead);
+        teamTextures = PlayerTeam.getTeamColorTextures(sharedBaseTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

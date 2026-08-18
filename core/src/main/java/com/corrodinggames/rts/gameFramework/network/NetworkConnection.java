@@ -234,7 +234,7 @@ public class NetworkConnection {
     }
 
     /* JADX INFO: renamed from: a */
-    public void handleRemoteDisconnect(String str) {
+    public void sendPacket(String str) {
         GameOutputStream gameOutputStream = new GameOutputStream();
         if (str == null) {
             str = "NULL";
@@ -251,7 +251,7 @@ public class NetworkConnection {
     /* JADX INFO: Access modifiers changed from: private */
     /* JADX INFO: renamed from: a */
     public synchronized void handleTimeoutDisconnect(boolean z, boolean z2) {
-        sendPacket(z, z2, "Time out");
+        handleRemoteDisconnect(z, z2, "Time out");
     }
 
     /* JADX INFO: renamed from: e */
@@ -304,7 +304,7 @@ public class NetworkConnection {
     }
 
     /* JADX INFO: renamed from: a */
-    public synchronized void sendPacket(boolean z, boolean z2, String str) {
+    public synchronized void handleRemoteDisconnect(boolean z, boolean z2, String str) {
         if (!this.isDisconnecting) {
             logInfo("handleRemoteDisconnect");
             String str2 = null;

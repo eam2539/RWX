@@ -38,7 +38,7 @@ public abstract class HoverLandUnit extends LandUnit {
     }
 
     @Override // com.corrodinggames.rts.game.units.land.LandUnit, com.corrodinggames.rts.game.units.BaseUnit
-    public UnitMovementType h() {
+    public UnitMovementType getMovementType() {
         return UnitMovementType.HOVER;
     }
 

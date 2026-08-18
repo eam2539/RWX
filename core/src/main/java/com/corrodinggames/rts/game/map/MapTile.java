@@ -102,7 +102,7 @@ public final class MapTile {
     public static MapTile createTile(TileMap tileMap, MapLayer mapLayer, Tileset tileset, int i, short s, short s2, boolean z) throws MapLoadException {
         String str;
         PlayerTeam playerTeamK;
-        Properties embeddedPngBase64 = tileset.getEmbeddedPngBase64(tileset.firstGid + i);
+        Properties embeddedPngBase64 = tileset.getPropertiesByTileId(tileset.firstGid + i);
         if (embeddedPngBase64 != null) {
             String property = embeddedPngBase64.getProperty("showFog");
             if (property != null) {
@@ -307,6 +307,6 @@ public final class MapTile {
     /* JADX INFO: renamed from: a */
     public void renderTile(GraphicsEngine graphicsEngine, RectF rectF, float f, KoolPaint paint) {
         Tileset tileset = this.tileset;
-        graphicsEngine.a(tileset.tilesetBitmap, tileset.freeUnusedImages(this.tilesetLocalIndex), rectF, paint);
+        graphicsEngine.a(tileset.tilesetBitmap, tileset.getTileRectCached(this.tilesetLocalIndex), rectF, paint);
     }
 }

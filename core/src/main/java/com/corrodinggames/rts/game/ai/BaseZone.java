@@ -289,7 +289,7 @@ public class BaseZone extends AIStrategyNode {
 
     /* JADX INFO: renamed from: b */
     public boolean canBuild(UnitType unitType) {
-        if ((GameEngine.getInstance().isDemo && !unitType.C()) || unitType.w()) {
+        if ((GameEngine.getInstance().isDemo && !unitType.isAvailableInDemo()) || unitType.w()) {
             return false;
         }
         Object[] objArrA = this.unitTypesInZone.a();
@@ -327,7 +327,7 @@ public class BaseZone extends AIStrategyNode {
         UnitType unitType = null;
         float f = -1.0f;
         for (UnitType unitType2 : UnitTypeEnum.ae) {
-            if (unitType2.j() && canBuild(unitType2)) {
+            if (unitType2.isBuildingUnit() && canBuild(unitType2)) {
                 int iAssignTaskToUnitTypeOnCommand = this.aiController.assignTaskToUnitTypeOnCommand(unitType2, UnitFilterMode.include);
                 int iCountUnitsOfType = countUnitsOfType(unitType2);
                 boolean z = false;
@@ -639,7 +639,7 @@ public class BaseZone extends AIStrategyNode {
         float f = Float.MAX_VALUE;
         OrderableUnit orderableUnit = null;
         GameEngine gameEngine = GameEngine.getInstance();
-        if (unitType != null && ((gameEngine.isDemo && !unitType.C()) || unitType.w())) {
+        if (unitType != null && ((gameEngine.isDemo && !unitType.isAvailableInDemo()) || unitType.w())) {
             return null;
         }
         BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
@@ -1205,7 +1205,7 @@ public class BaseZone extends AIStrategyNode {
                 OrderableUnit orderableUnit = (OrderableUnit) fireUnit;
                 if (a(orderableUnit, false) && fireUnit.isAlive() && this.aiController.isEligibleUnitForRandomSelection(fireUnit) && !fireUnit.u()) {
                     UnitType unitTypeR = fireUnit.r();
-                    if (unitTypeR.j()) {
+                    if (unitTypeR.isBuildingUnit()) {
                         this.numberOfExtractors++;
                     }
                     if (unitTypeR.m()) {

@@ -339,15 +339,200 @@ public final class AIController extends PlayerTeam {
         return false;
     }
 
-    /* JADX INFO: renamed from: a */
-    public boolean isPathPossibleForUnit(BaseUnit baseUnit, float f, float f2) {
-        return isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2, baseUnit.h());
+    public AIController(int i, boolean z) {
+        super(i, z);
+        this.PATHFINDING_OVERLOAD_THRESHOLD = 3000;
+        this.aiFlags = 0;
+        this.resourceMultiplierHard = 0.0f;
+        this.resourceMultiplierInsane = 0.0f;
+        this.enableNaval = true;
+        this.enableAirForce = true;
+        this.enableExperimentalUnits = false;
+        this.strategyNodes = new ConcurrentLinkedQueue();
+        this.activeStrategies = new ArrayList();
+        this.debugPoint = new PointF();
+        this.debugMessages = new ArrayList();
+        this.builderUnitBuildStrategy = new UnitBuildStrategy(this, "attackingUnitsLand") { // from class: com.corrodinggames.rts.game.a.a.1
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                return AIController.this.shouldIssueActionForUnitType(unitType) && matchesMovementType(unitType, UnitMovementType.LAND);
+            }
+        };
+        this.landUnitBuildStrategy = new UnitBuildStrategy(this, "attackingUnitsHover") { // from class: com.corrodinggames.rts.game.a.a.6
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                return AIController.this.shouldIssueActionForUnitType(unitType) && matchesMovementType(unitType, UnitMovementType.HOVER);
+            }
+        };
+        this.airUnitBuildStrategy = new UnitBuildStrategy(this, "attackingUnitsAir") { // from class: com.corrodinggames.rts.game.a.a.7
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                return AIController.this.shouldIssueActionForUnitType(unitType) && matchesMovementType(unitType, UnitMovementType.AIR);
+            }
+        };
+        this.seaUnitBuildStrategy = new UnitBuildStrategy(this, "attackingUnitsWater") { // from class: com.corrodinggames.rts.game.a.a.8
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                return AIController.this.shouldIssueActionForUnitType(unitType) && matchesMovementType(unitType, UnitMovementType.WATER);
+            }
+        };
+        this.experimentalUnitBuildStrategy = new UnitBuildStrategy(this, "buildingUnits") { // from class: com.corrodinggames.rts.game.a.a.9
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                if (BaseUnit.findAttackDamageSource(unitType).bI()) {
+                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
+            }
+        };
+        this.antiNukeUnitBuildStrategy = new UnitBuildStrategy(this, "transportUnits") { // from class: com.corrodinggames.rts.game.a.a.10
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                if (AIController.this.isNonCombatCustomUnit(BaseUnit.findAttackDamageSource(unitType))) {
+                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
+                        return false;
+                    }
+                    if (unitType.o() == UnitMovementType.AIR || unitType.o() == UnitMovementType.HOVER || unitType.o() == UnitMovementType.OVER_CLIFF_WATER) {
+                        return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
+        };
+        this.baseDefenseUnitBuildStrategy = new UnitBuildStrategy(this, "transportUnitsFlying") { // from class: com.corrodinggames.rts.game.a.a.11
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                if (AIController.this.antiNukeUnitBuildStrategy.canBuildUnit(unitType) && unitType.o() == UnitMovementType.AIR) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        this.scoutUnitBuildStrategy = new UnitBuildStrategy(this, "transportUnitsNonFlying") { // from class: com.corrodinggames.rts.game.a.a.12
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                if (AIController.this.antiNukeUnitBuildStrategy.canBuildUnit(unitType) && unitType.o() != UnitMovementType.AIR) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        this.fabricatorUnitBuildStrategy = new UnitBuildStrategy(this, "builderUnits") { // from class: com.corrodinggames.rts.game.a.a.13
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                if (unitType.m()) {
+                    if ((!(unitType instanceof CustomUnitConfig) || !((CustomUnitConfig) unitType).disableUse) && unitType.o() != UnitMovementType.WATER) {
+                        return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
+        };
+        this.extractorUnitBuildStrategy = new UnitBuildStrategy(this, "harvesterUnits") { // from class: com.corrodinggames.rts.game.a.a.2
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                BaseUnit.findAttackDamageSource(unitType);
+                if (unitType.n()) {
+                    if ((!(unitType instanceof CustomUnitConfig) || !((CustomUnitConfig) unitType).disableUse) && unitType.o() != UnitMovementType.WATER) {
+                        return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
+        };
+        this.landFactoryUnitBuildStrategy = new UnitBuildStrategy(this, "extractorUnits") { // from class: com.corrodinggames.rts.game.a.a.3
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                if (BaseUnit.findAttackDamageSource(unitType).bI() && unitType.p()) {
+                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
+            }
+        };
+        this.airFactoryUnitBuildStrategy = new UnitBuildStrategy(this, "buildingFactories") { // from class: com.corrodinggames.rts.game.a.a.4
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                UnitType unitTypeI;
+                BaseUnit baseUnitFindAttackDamageSource = BaseUnit.findAttackDamageSource(unitType);
+                if (baseUnitFindAttackDamageSource.bI()) {
+                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
+                        return false;
+                    }
+                    boolean z2 = false;
+                    for (AbstractUnitAction abstractUnitAction : baseUnitFindAttackDamageSource.getAvailableActions()) {
+                        if (abstractUnitAction != null && (abstractUnitAction instanceof PopupQueueAction)) {
+                            PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
+                            if (!popupQueueAction.getDisplayType() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.isBuildingUnit()) {
+                                z2 = true;
+                            }
+                        }
+                    }
+                    if (z2) {
+                        return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
+        };
+        this.seaFactoryUnitBuildStrategy = new UnitBuildStrategy(this, "buildingFactoriesForBuilders") { // from class: com.corrodinggames.rts.game.a.a.5
+            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
+            /* JADX INFO: renamed from: a */
+            public boolean canBuildUnit(UnitType unitType) {
+                UnitType unitTypeI;
+                BaseUnit baseUnitFindAttackDamageSource = BaseUnit.findAttackDamageSource(unitType);
+                if (baseUnitFindAttackDamageSource.bI()) {
+                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
+                        return false;
+                    }
+                    boolean z2 = false;
+                    for (AbstractUnitAction abstractUnitAction : baseUnitFindAttackDamageSource.getAvailableActions()) {
+                        if (abstractUnitAction != null && (abstractUnitAction instanceof PopupQueueAction)) {
+                            PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
+                            if (!popupQueueAction.getDisplayType() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.isBuildingUnit() && unitTypeI.m()) {
+                                z2 = true;
+                            }
+                        }
+                    }
+                    if (z2) {
+                        return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
+        };
+        this.buildPreferenceCache = new BuildPreferenceCache();
+        this.aiUnitManagementTimer = 0.0f;
+        this.unitsToProcess = new ArrayList();
+        this.aiBehaviors = new FastArrayList();
+        initializeController();
     }
 
-    /* JADX INFO: renamed from: b */
-    public boolean canUnitReachPointWithOffsets(BaseUnit baseUnit, float f, float f2) {
-        UnitMovementType unitMovementTypeH = baseUnit.h();
-        return isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f + 60.0f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f - 60.0f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2 + 60.0f, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2 - 60.0f, unitMovementTypeH);
+    /* JADX INFO: renamed from: a */
+    public boolean isPathPossibleForUnit(BaseUnit baseUnit, float f, float f2) {
+        return isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2, baseUnit.getMovementType());
     }
 
     /* JADX INFO: renamed from: a */
@@ -589,195 +774,10 @@ public final class AIController extends PlayerTeam {
         }
     }
 
-    public AIController(int i, boolean z) {
-        super(i, z);
-        this.PATHFINDING_OVERLOAD_THRESHOLD = 3000;
-        this.aiFlags = 0;
-        this.resourceMultiplierHard = 0.0f;
-        this.resourceMultiplierInsane = 0.0f;
-        this.enableNaval = true;
-        this.enableAirForce = true;
-        this.enableExperimentalUnits = false;
-        this.strategyNodes = new ConcurrentLinkedQueue();
-        this.activeStrategies = new ArrayList();
-        this.debugPoint = new PointF();
-        this.debugMessages = new ArrayList();
-        this.builderUnitBuildStrategy = new UnitBuildStrategy(this, "attackingUnitsLand") { // from class: com.corrodinggames.rts.game.a.a.1
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                return AIController.this.shouldIssueActionForUnitType(unitType) && matchesMovementType(unitType, UnitMovementType.LAND);
-            }
-        };
-        this.landUnitBuildStrategy = new UnitBuildStrategy(this, "attackingUnitsHover") { // from class: com.corrodinggames.rts.game.a.a.6
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                return AIController.this.shouldIssueActionForUnitType(unitType) && matchesMovementType(unitType, UnitMovementType.HOVER);
-            }
-        };
-        this.airUnitBuildStrategy = new UnitBuildStrategy(this, "attackingUnitsAir") { // from class: com.corrodinggames.rts.game.a.a.7
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                return AIController.this.shouldIssueActionForUnitType(unitType) && matchesMovementType(unitType, UnitMovementType.AIR);
-            }
-        };
-        this.seaUnitBuildStrategy = new UnitBuildStrategy(this, "attackingUnitsWater") { // from class: com.corrodinggames.rts.game.a.a.8
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                return AIController.this.shouldIssueActionForUnitType(unitType) && matchesMovementType(unitType, UnitMovementType.WATER);
-            }
-        };
-        this.experimentalUnitBuildStrategy = new UnitBuildStrategy(this, "buildingUnits") { // from class: com.corrodinggames.rts.game.a.a.9
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                if (BaseUnit.findAttackDamageSource(unitType).bI()) {
-                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
-                        return false;
-                    }
-                    return true;
-                }
-                return false;
-            }
-        };
-        this.antiNukeUnitBuildStrategy = new UnitBuildStrategy(this, "transportUnits") { // from class: com.corrodinggames.rts.game.a.a.10
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                if (AIController.this.isNonCombatCustomUnit(BaseUnit.findAttackDamageSource(unitType))) {
-                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
-                        return false;
-                    }
-                    if (unitType.o() == UnitMovementType.AIR || unitType.o() == UnitMovementType.HOVER || unitType.o() == UnitMovementType.OVER_CLIFF_WATER) {
-                        return true;
-                    }
-                    return false;
-                }
-                return false;
-            }
-        };
-        this.baseDefenseUnitBuildStrategy = new UnitBuildStrategy(this, "transportUnitsFlying") { // from class: com.corrodinggames.rts.game.a.a.11
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                if (AIController.this.antiNukeUnitBuildStrategy.canBuildUnit(unitType) && unitType.o() == UnitMovementType.AIR) {
-                    return true;
-                }
-                return false;
-            }
-        };
-        this.scoutUnitBuildStrategy = new UnitBuildStrategy(this, "transportUnitsNonFlying") { // from class: com.corrodinggames.rts.game.a.a.12
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                if (AIController.this.antiNukeUnitBuildStrategy.canBuildUnit(unitType) && unitType.o() != UnitMovementType.AIR) {
-                    return true;
-                }
-                return false;
-            }
-        };
-        this.fabricatorUnitBuildStrategy = new UnitBuildStrategy(this, "builderUnits") { // from class: com.corrodinggames.rts.game.a.a.13
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                if (unitType.m()) {
-                    if ((!(unitType instanceof CustomUnitConfig) || !((CustomUnitConfig) unitType).disableUse) && unitType.o() != UnitMovementType.WATER) {
-                        return true;
-                    }
-                    return false;
-                }
-                return false;
-            }
-        };
-        this.extractorUnitBuildStrategy = new UnitBuildStrategy(this, "harvesterUnits") { // from class: com.corrodinggames.rts.game.a.a.2
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                BaseUnit.findAttackDamageSource(unitType);
-                if (unitType.n()) {
-                    if ((!(unitType instanceof CustomUnitConfig) || !((CustomUnitConfig) unitType).disableUse) && unitType.o() != UnitMovementType.WATER) {
-                        return true;
-                    }
-                    return false;
-                }
-                return false;
-            }
-        };
-        this.landFactoryUnitBuildStrategy = new UnitBuildStrategy(this, "extractorUnits") { // from class: com.corrodinggames.rts.game.a.a.3
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                if (BaseUnit.findAttackDamageSource(unitType).bI() && unitType.p()) {
-                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
-                        return false;
-                    }
-                    return true;
-                }
-                return false;
-            }
-        };
-        this.airFactoryUnitBuildStrategy = new UnitBuildStrategy(this, "buildingFactories") { // from class: com.corrodinggames.rts.game.a.a.4
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                UnitType unitTypeI;
-                BaseUnit baseUnitFindAttackDamageSource = BaseUnit.findAttackDamageSource(unitType);
-                if (baseUnitFindAttackDamageSource.bI()) {
-                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
-                        return false;
-                    }
-                    boolean z2 = false;
-                    for (AbstractUnitAction abstractUnitAction : baseUnitFindAttackDamageSource.getAvailableActions()) {
-                        if (abstractUnitAction != null && (abstractUnitAction instanceof PopupQueueAction)) {
-                            PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
-                            if (!popupQueueAction.getDisplayType() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.j()) {
-                                z2 = true;
-                            }
-                        }
-                    }
-                    if (z2) {
-                        return true;
-                    }
-                    return false;
-                }
-                return false;
-            }
-        };
-        this.seaFactoryUnitBuildStrategy = new UnitBuildStrategy(this, "buildingFactoriesForBuilders") { // from class: com.corrodinggames.rts.game.a.a.5
-            @Override // com.corrodinggames.rts.game.ai.UnitBuildStrategy
-            /* JADX INFO: renamed from: a */
-            public boolean canBuildUnit(UnitType unitType) {
-                UnitType unitTypeI;
-                BaseUnit baseUnitFindAttackDamageSource = BaseUnit.findAttackDamageSource(unitType);
-                if (baseUnitFindAttackDamageSource.bI()) {
-                    if ((unitType instanceof CustomUnitConfig) && ((CustomUnitConfig) unitType).disableUse) {
-                        return false;
-                    }
-                    boolean z2 = false;
-                    for (AbstractUnitAction abstractUnitAction : baseUnitFindAttackDamageSource.getAvailableActions()) {
-                        if (abstractUnitAction != null && (abstractUnitAction instanceof PopupQueueAction)) {
-                            PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
-                            if (!popupQueueAction.getDisplayType() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.j() && unitTypeI.m()) {
-                                z2 = true;
-                            }
-                        }
-                    }
-                    if (z2) {
-                        return true;
-                    }
-                    return false;
-                }
-                return false;
-            }
-        };
-        this.buildPreferenceCache = new BuildPreferenceCache();
-        this.aiUnitManagementTimer = 0.0f;
-        this.unitsToProcess = new ArrayList();
-        this.aiBehaviors = new FastArrayList();
-        initializeController();
+    /* JADX INFO: renamed from: b */
+    public boolean canUnitReachPointWithOffsets(BaseUnit baseUnit, float f, float f2) {
+        UnitMovementType unitMovementTypeH = baseUnit.getMovementType();
+        return isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f + 60.0f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f - 60.0f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2 + 60.0f, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2 - 60.0f, unitMovementTypeH);
     }
 
     public AIController(int i) {
@@ -1000,7 +1000,7 @@ public final class AIController extends PlayerTeam {
     /* JADX WARN: Multi-variable type inference failed */
     /* JADX INFO: renamed from: a */
     public int applyAIBuilder(UnitType unitType, boolean z, UnitFilterMode unitFilterMode) {
-        boolean zJ = unitType.j();
+        boolean zJ = unitType.isBuildingUnit();
         Integer numA = this.buildPreferenceCache.a(zJ, unitType, z);
         if (numA != null) {
             return numA.intValue();
@@ -1154,7 +1154,7 @@ public final class AIController extends PlayerTeam {
                     if (baseZone.lastBuiltCustomUnit2 != null) {
                         str4 = str4 + "\nlastAttemptedBuilding-cannotAffordBy: " + baseZone.lastBuiltCustomUnit2.a(false, true, 4, true);
                     }
-                    String str5 = ((((str4 + "\nlastAttemptedBuildingCount: " + baseZone.numberOfLandUnits) + "\nlastAttemptedBuildingFailed: " + baseZone.numberOfAirUnits) + "\nlastUnitAttempt: " + baseZone.debugText + " (" + baseZone.numberOfWaterUnits + " - " + baseZone.numberOfBuildings + ")") + "\nbuildBuildingDelay: " + baseZone.defensiveScore) + "\ncredits: " + Utility.md5(this.credits) + " (x" + Utility.min(getSpectatorEnergyFactor()) + ")";
+                    String str5 = ((((str4 + "\nlastAttemptedBuildingCount: " + baseZone.numberOfLandUnits) + "\nlastAttemptedBuildingFailed: " + baseZone.numberOfAirUnits) + "\nlastUnitAttempt: " + baseZone.debugText + " (" + baseZone.numberOfWaterUnits + " - " + baseZone.numberOfBuildings + ")") + "\nbuildBuildingDelay: " + baseZone.defensiveScore) + "\ncredits: " + Utility.formatNumberWithTwoDecimals(this.credits) + " (x" + Utility.padString(getSpectatorEnergyFactor()) + ")";
                     if (baseZone.stage == BaseZoneStage.Pre) {
                         str5 = str5 + "\nclaimedBaseTimer: " + baseZone.extractorScore;
                     }
@@ -1600,7 +1600,7 @@ public final class AIController extends PlayerTeam {
                     if (orderableUnit3.aB != null && orderableUnit3.aB.b()) {
                         this.unitCount++;
                     } else if (isCombatCustomUnit(orderableUnit3) && !orderableUnit3.isActive) {
-                        if (orderableUnit3.h() == UnitMovementType.WATER) {
+                        if (orderableUnit3.getMovementType() == UnitMovementType.WATER) {
                             this.buildingCount++;
                         } else {
                             this.unitProductionTimer++;

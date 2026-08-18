@@ -31,7 +31,7 @@ import java.util.ArrayList;
 public class CommandCenter extends FactoryWithQueue {
 
     /* JADX INFO: renamed from: a */
-    static Texture baseTexture = null;
+    static Texture sharedBaseTexture = null;
 
     /* JADX INFO: renamed from: b */
     static Texture[] teamTextures = new Texture[10];
@@ -80,26 +80,11 @@ public class CommandCenter extends FactoryWithQueue {
         super.a(gameInputStream);
     }
 
-    /* JADX INFO: renamed from: b */
-    public static void loadTextures() {
-        GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base);
-        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base_dead);
-        backgroundTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base_back);
-        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
-    }
-
-    @Override // com.corrodinggames.rts.game.units.BaseUnit
-    /* JADX INFO: renamed from: K, reason: merged with bridge method [inline-methods] */
-    public UnitTypeEnum r() {
-        return UnitTypeEnum.commandCenter;
-    }
-
     public CommandCenter(boolean z) {
         super(z);
         this.frameTimer = 20.0f;
         this.frameIndex = 0;
-        super.baseTexture = baseTexture;
+        super.baseTexture = sharedBaseTexture;
         this.overlayTexture = backgroundTexture;
         T(53);
         U(68);
@@ -110,6 +95,21 @@ public class CommandCenter extends FactoryWithQueue {
         S(3);
         this.buildingTargetRect.a(-1, -1, 1, 1);
         this.buildingVelocityRect.a(-1, -1, 1, 2);
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: K, reason: merged with bridge method [inline-methods] */
+    public UnitTypeEnum r() {
+        return UnitTypeEnum.commandCenter;
+    }
+
+    /* JADX INFO: renamed from: b */
+    public static void loadTextures() {
+        GameEngine gameEngine = GameEngine.getInstance();
+        sharedBaseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base_dead);
+        backgroundTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base_back);
+        teamTextures = PlayerTeam.getTeamColorTextures(sharedBaseTexture);
     }
 
     @Override

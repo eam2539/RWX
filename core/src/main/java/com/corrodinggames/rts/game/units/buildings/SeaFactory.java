@@ -25,7 +25,7 @@ public class SeaFactory extends FactoryWithQueue {
     static Texture tier2FactoryTexture = null;
 
     /* JADX INFO: renamed from: c */
-    static Texture shadowTexture = null;
+    static Texture sharedShadowTexture = null;
 
     /* JADX INFO: renamed from: d */
     static Texture[] baseFactoryTeamTextures = new Texture[10];

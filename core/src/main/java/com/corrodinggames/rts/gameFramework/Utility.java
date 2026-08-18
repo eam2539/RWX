@@ -355,7 +355,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: c */
-    public static final float endsWith(float f2, float f3, float f4) {
+    public static final float rotateTowardsAngle(float f2, float f3, float f4) {
         float f5 = (f3 % 360.0f) - (f2 % 360.0f);
         if (f5 > 180.0f) {
             f5 -= 360.0f;
@@ -586,12 +586,12 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: g */
-    public static String min(float f2) {
+    public static String padString(float f2) {
         return padString(f2, 2);
     }
 
     /* JADX INFO: renamed from: c */
-    public static String md5(double d2) {
+    public static String formatNumberWithTwoDecimals(double d2) {
         if (d2 == ((int) d2)) {
             return VariableScope.nullOrMissingString + ((int) d2);
         }
@@ -686,17 +686,17 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: c */
-    public static String md5(String str) {
+    public static String sha256ShortHash(String str) {
         return truncateToLength(toHexString(sha256Bytes(str)), 14);
     }
 
     /* JADX INFO: renamed from: d */
-    public static String abs(String str) {
+    public static String sha256Fingerprint(String str) {
         return truncateToLength(toHexString(sha256Bytes(str)), 4);
     }
 
     /* JADX INFO: renamed from: c */
-    public static String split(String str, int i2) {
+    public static String repeatHash(String str, int i2) {
         String hexString = toHexString(sha256Bytes(str));
         for (int i3 = 0; i3 < i2; i3++) {
             hexString = toHexString(sha256Bytes(hexString));
@@ -705,7 +705,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: e */
-    public static String truncate(String str) {
+    public static String sha256Hex(String str) {
         return toHexString(sha256Bytes(str));
     }
 
@@ -953,7 +953,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: b */
-    public static String endsWith(InputStream inputStream) throws IOException {
+    public static String readStreamToStringUtf8(InputStream inputStream) throws IOException {
         int i2;
         try {
             try {
@@ -1204,7 +1204,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: p */
-    public static String split(String str) {
+    public static String stripQuotes(String str) {
         if (str == null || str.length() < 2) {
             return null;
         }
@@ -1352,7 +1352,7 @@ public final class Utility {
     }
 
     /* JADX INFO: renamed from: d */
-    public static final boolean md5(String str, String str2) {
+    public static final boolean stringsEqual(String str, String str2) {
         if (str == null) {
             return str2 == null;
         }

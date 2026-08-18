@@ -144,7 +144,7 @@ public class TileAtlasCache {
     /* JADX INFO: renamed from: a */
     public int allocateSlotForTile(Tileset tileset, int i) {
         int iAllocateSlotForTile;
-        tileset.getPropertiesByTileId(i, tmpRectA);
+        tileset.getTileRect(i, tmpRectA);
         if (this.allocatedSlotCount >= 400) {
             return -1;
         }

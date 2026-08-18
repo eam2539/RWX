@@ -10,7 +10,7 @@ public class ShieldResource extends AbstractResource {
         this.u = true;
         this.t = true;
         this.b = "shield";
-        this.c = LocaleString.replaceAll("shield");
+        this.c = LocaleString.fromRawText("shield");
     }
 
     @Override // com.corrodinggames.rts.game.units.custom.resources.Resource

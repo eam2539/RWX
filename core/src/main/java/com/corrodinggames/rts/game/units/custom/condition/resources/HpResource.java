@@ -10,7 +10,7 @@ public class HpResource extends AbstractResource {
         this.u = true;
         this.t = true;
         this.b = "hp";
-        this.c = LocaleString.replaceAll("hp");
+        this.c = LocaleString.fromRawText("hp");
     }
 
     @Override // com.corrodinggames.rts.game.units.custom.resources.Resource

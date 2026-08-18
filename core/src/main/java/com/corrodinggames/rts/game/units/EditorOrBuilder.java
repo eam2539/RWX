@@ -2647,7 +2647,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             if (iCompareTo != 0) {
                 return iCompareTo;
             }
-            int iCompareTo2 = Boolean.valueOf(unitType.j()).compareTo(Boolean.valueOf(unitType2.j()));
+            int iCompareTo2 = Boolean.valueOf(unitType.isBuildingUnit()).compareTo(Boolean.valueOf(unitType2.isBuildingUnit()));
             if (iCompareTo2 != 0) {
                 return iCompareTo2;
             }

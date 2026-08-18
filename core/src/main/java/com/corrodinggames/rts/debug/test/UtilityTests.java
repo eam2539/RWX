@@ -190,7 +190,7 @@ public class UtilityTests extends Test {
                                 if (assetInputStreamOpenAssetSteam == null) {
                                     throw new RuntimeException("Null for: /SD/rustedWarfare/testDir/" + str);
                                 }
-                                Assert.assertEqualsDebug(Utility.endsWith(assetInputStreamOpenAssetSteam), "map3");
+                                Assert.assertEqualsDebug(Utility.readStreamToStringUtf8(assetInputStreamOpenAssetSteam), "map3");
                                 GameEngine.log("FileLoaderBackend - clean up");
                                 for (String str2 : file.list()) {
                                     new File(file.getPath(), str2).delete();

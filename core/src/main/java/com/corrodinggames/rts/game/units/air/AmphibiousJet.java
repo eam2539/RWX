@@ -130,7 +130,7 @@ public class AmphibiousJet extends AirUnit {
     }
 
     @Override // com.corrodinggames.rts.game.units.air.AirUnit, com.corrodinggames.rts.game.units.BaseUnit
-    public UnitMovementType h() {
+    public UnitMovementType getMovementType() {
         if (this.isUnitParalyzed) {
             return UnitMovementType.AIR;
         }

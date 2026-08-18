@@ -11,7 +11,7 @@ public class CreditsResource extends AbstractResource {
         this.u = true;
         this.t = true;
         this.b = "credits";
-        this.c = LocaleString.replaceAll("$");
+        this.c = LocaleString.fromRawText("$");
         this.o = true;
         this.q = DigitGroupingStyle.space;
     }

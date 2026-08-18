@@ -2194,14 +2194,14 @@ public class GameInterfaceRenderer extends Serializable {
         if (baseUnit instanceof OrderableUnit) {
             OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
             if (orderableUnit.bd() != 0.0f && !z3) {
-                str2 = str2 + "Energy: " + Utility.min(baseUnit.currentEnergy) + "/" + Utility.min(orderableUnit.bd()) + str;
+                str2 = str2 + "Energy: " + Utility.padString(baseUnit.currentEnergy) + "/" + Utility.padString(orderableUnit.bd()) + str;
             }
             float moveSpeed = orderableUnit.getMoveSpeed();
             if (!orderableUnit.canExecuteMovementCommands()) {
                 moveSpeed = 0.0f;
             }
             if (moveSpeed != 0.0f) {
-                str2 = str2 + "Speed: " + Utility.min(moveSpeed) + str;
+                str2 = str2 + "Speed: " + Utility.padString(moveSpeed) + str;
             }
             if (orderableUnit.canAttack()) {
                 ArrayList<UnitStatistics> arrayListCollectMovementLevelStatistics = orderableUnit.collectMovementLevelStatistics();
@@ -2213,11 +2213,11 @@ public class GameInterfaceRenderer extends Serializable {
                             str3 = str3 + ", ";
                         }
                         z4 = false;
-                        String str4 = str3 + Utility.min(unitStatistics.a);
+                        String str4 = str3 + Utility.padString(unitStatistics.a);
                         if (unitStatistics.d > 1) {
                             str4 = str4 + "x" + unitStatistics.d;
                         }
-                        str3 = str4 + "/" + Utility.min(unitStatistics.a()) + "s";
+                        str3 = str4 + "/" + Utility.padString(unitStatistics.a()) + "s";
                     }
                     str2 = str3 + str;
                 }
@@ -2227,7 +2227,7 @@ public class GameInterfaceRenderer extends Serializable {
                 fM = 0.0f;
             }
             if (fM != 0.0f) {
-                str2 = str2 + "Range: " + Utility.min(fM) + str;
+                str2 = str2 + "Range: " + Utility.padString(fM) + str;
             }
             if (z3 && orderableUnit.isUpgradeable()) {
                 str2 = str2 + "Upgradable" + str;
@@ -2262,16 +2262,16 @@ public class GameInterfaceRenderer extends Serializable {
                 str2 = str2 + "ammo: " + baseUnit.unitLevel + str;
             }
             if (!baseUnit.isUnitParalyzed) {
-                str2 = (str2 + "x: " + Utility.min(baseUnit.posX) + str) + "y: " + Utility.min(baseUnit.posY) + str;
+                str2 = (str2 + "x: " + Utility.padString(baseUnit.posX) + str) + "y: " + Utility.padString(baseUnit.posY) + str;
             }
             if (baseUnit.velocityX != 0.0f || baseUnit.velocityY != 0.0f) {
-                str2 = str2 + "x/y speed: " + Utility.min(baseUnit.velocityX) + ", " + Utility.min(baseUnit.velocityY) + str;
+                str2 = str2 + "x/y speed: " + Utility.padString(baseUnit.velocityX) + ", " + Utility.padString(baseUnit.velocityY) + str;
             }
             if (!baseUnit.isUnitParalyzed) {
-                str2 = (str2 + "height: " + Utility.min(baseUnit.posZ) + str) + "dir: " + Utility.min(baseUnit.rotationSpeed) + str;
+                str2 = (str2 + "height: " + Utility.padString(baseUnit.posZ) + str) + "dir: " + Utility.padString(baseUnit.rotationSpeed) + str;
             }
             if (baseUnit.buildProgress < 1.0f) {
-                str2 = str2 + "built: " + Utility.min(baseUnit.buildProgress) + str;
+                str2 = str2 + "built: " + Utility.padString(baseUnit.buildProgress) + str;
             }
             if (baseUnit instanceof CustomUnit) {
                 CustomUnit customUnit2 = (CustomUnit) baseUnit;

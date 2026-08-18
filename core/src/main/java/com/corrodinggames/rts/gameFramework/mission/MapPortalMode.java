@@ -295,7 +295,7 @@ public class MapPortalMode {
         if (unitType == UnitTypeEnum.editorOrBuilder) {
             return false;
         }
-        return !unitType.j();
+        return !unitType.isBuildingUnit();
     }
 
     public void draw(KoolPaint baseTextPaint) {

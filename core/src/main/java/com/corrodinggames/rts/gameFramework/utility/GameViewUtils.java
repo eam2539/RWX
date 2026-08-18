@@ -194,7 +194,7 @@ public final class GameViewUtils {
     }
 
     public static boolean a(BaseUnit baseUnit, float f2, float f3) {
-        return !a(f2, f3, baseUnit.h());
+        return !a(f2, f3, baseUnit.getMovementType());
     }
 
     public static boolean a(float f2, float f3, UnitMovementType unitMovementType) {
@@ -396,7 +396,7 @@ public final class GameViewUtils {
     }
 
     public static boolean b(BaseUnit baseUnit, float f2, float f3) {
-        return a(baseUnit.posX, baseUnit.posY, f2, f3, baseUnit.h());
+        return a(baseUnit.posX, baseUnit.posY, f2, f3, baseUnit.getMovementType());
     }
 
     public static void a(PlayerTeam playerTeam, PointF pointF) {

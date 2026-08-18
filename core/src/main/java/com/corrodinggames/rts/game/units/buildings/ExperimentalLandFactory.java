@@ -23,7 +23,7 @@ public class ExperimentalLandFactory extends FactoryWithQueue {
     boolean isUpgraded;
 
     /* JADX INFO: renamed from: a */
-    static Texture baseTexture = null;
+    static Texture sharedBaseTexture = null;
 
     /* JADX INFO: renamed from: b */
     static Texture backgroundTexture = null;
@@ -109,23 +109,9 @@ public class ExperimentalLandFactory extends FactoryWithQueue {
         super.a(gameInputStream);
     }
 
-    public static void b() {
-        GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_front);
-        backgroundTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_base);
-        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_dead);
-        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
-    }
-
-    @Override // com.corrodinggames.rts.game.units.BaseUnit
-    /* JADX INFO: renamed from: K, reason: merged with bridge method [inline-methods] */
-    public UnitTypeEnum r() {
-        return UnitTypeEnum.experimentalLandFactory;
-    }
-
     public ExperimentalLandFactory(boolean z) {
         super(z);
-        super.baseTexture = baseTexture;
+        super.baseTexture = sharedBaseTexture;
         this.overlayTexture = backgroundTexture;
         b(super.baseTexture);
         this.radius = 55.0f;
@@ -135,6 +121,20 @@ public class ExperimentalLandFactory extends FactoryWithQueue {
         S(4);
         this.buildingTargetRect.a(-2, -2, 2, 2);
         this.buildingVelocityRect.a(-2, -2, 2, 4);
+    }
+
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: K, reason: merged with bridge method [inline-methods] */
+    public UnitTypeEnum r() {
+        return UnitTypeEnum.experimentalLandFactory;
+    }
+
+    public static void b() {
+        GameEngine gameEngine = GameEngine.getInstance();
+        sharedBaseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_front);
+        backgroundTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_base);
+        deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_dead);
+        teamTextures = PlayerTeam.getTeamColorTextures(sharedBaseTexture);
     }
 
     @Override

@@ -261,7 +261,7 @@ public abstract class BaseBuilding extends OrderableUnit {
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
-    public UnitMovementType h() {
+    public UnitMovementType getMovementType() {
         return UnitMovementType.NONE;
     }
 

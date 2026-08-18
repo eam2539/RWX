@@ -10,8 +10,8 @@ import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.Utility;
 import com.corrodinggames.rts.gameFramework.network.GameInputStream;
 import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
-import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
+import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
 import io.github.rwx.geometry.PointF;
 
 import java.io.IOException;
@@ -209,12 +209,12 @@ public class UnitGroup extends AIUnitGroupBase {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
                 if (!orderableUnit.isActive && !orderableUnit.isAIUnit && orderableUnit.aB == null && this.aiController.isCombatCustomUnit(orderableUnit) && this.aiController.isEligibleUnitForRandomSelection(orderableUnit)) {
                     if (this.B) {
-                        if (baseUnit.h() != UnitMovementType.LAND) {
+                        if (baseUnit.getMovementType() != UnitMovementType.LAND) {
                             if (!this.aiController.isPathPossibleForUnit(orderableUnit, this.posX, this.posY) || (!b() && Utility.getRandomIntInRange(0, 100) <= 2)) {
                                 a(orderableUnit);
                             }
                         }
-                    } else if (baseUnit.h() != UnitMovementType.WATER) {
+                    } else if (baseUnit.getMovementType() != UnitMovementType.WATER) {
                         if (!this.aiController.isPathPossibleForUnit(orderableUnit, this.posX, this.posY)) {
                         }
                         a(orderableUnit);
@@ -436,7 +436,7 @@ public class UnitGroup extends AIUnitGroupBase {
                     z = true;
                 }
                 if (!z) {
-                    BaseZone baseZoneCheckUnitVariableCondition = this.aiController.checkUnitVariableCondition(this.g.h(), this.g.posX, this.g.posY, true);
+                    BaseZone baseZoneCheckUnitVariableCondition = this.aiController.checkUnitVariableCondition(this.g.getMovementType(), this.g.posX, this.g.posY, true);
                     if (baseZoneCheckUnitVariableCondition != null) {
                         this.k = baseZoneCheckUnitVariableCondition;
                     }
@@ -601,10 +601,10 @@ public class UnitGroup extends AIUnitGroupBase {
         boolean z2 = false;
         boolean z3 = false;
         for (OrderableUnit orderableUnit : this.F) {
-            if (orderableUnit.h() == UnitMovementType.LAND) {
+            if (orderableUnit.getMovementType() == UnitMovementType.LAND) {
                 z2 = true;
             }
-            if (orderableUnit.h() == UnitMovementType.WATER) {
+            if (orderableUnit.getMovementType() == UnitMovementType.WATER) {
                 z3 = true;
             }
         }
@@ -631,7 +631,7 @@ public class UnitGroup extends AIUnitGroupBase {
             this.r = true;
             this.G.clear();
             for (OrderableUnit orderableUnit2 : this.F) {
-                if (orderableUnit2.h() != UnitMovementType.WATER && !this.aiController.isPathPossibleForUnit(orderableUnit2, this.posX, this.posY)) {
+                if (orderableUnit2.getMovementType() != UnitMovementType.WATER && !this.aiController.isPathPossibleForUnit(orderableUnit2, this.posX, this.posY)) {
                     this.G.add(orderableUnit2);
                 }
             }
@@ -655,7 +655,7 @@ public class UnitGroup extends AIUnitGroupBase {
             if (!it.hasNext()) {
                 break;
             }
-            if (((OrderableUnit) it.next()).h() != UnitMovementType.AIR) {
+            if (((OrderableUnit) it.next()).getMovementType() != UnitMovementType.AIR) {
                 z = false;
                 break;
             }
@@ -667,7 +667,7 @@ public class UnitGroup extends AIUnitGroupBase {
             boolean z2 = true;
             Iterator it2 = this.F.iterator();
             while (it2.hasNext()) {
-                if (((OrderableUnit) it2.next()).h() == UnitMovementType.WATER) {
+                if (((OrderableUnit) it2.next()).getMovementType() == UnitMovementType.WATER) {
                     z2 = false;
                 }
             }
@@ -679,7 +679,7 @@ public class UnitGroup extends AIUnitGroupBase {
         boolean z3 = true;
         Iterator it3 = this.F.iterator();
         while (it3.hasNext()) {
-            UnitMovementType unitMovementTypeH = ((OrderableUnit) it3.next()).h();
+            UnitMovementType unitMovementTypeH = ((OrderableUnit) it3.next()).getMovementType();
             if (unitMovementTypeH == UnitMovementType.LAND || unitMovementTypeH == UnitMovementType.OVER_CLIFF) {
                 z3 = false;
             }

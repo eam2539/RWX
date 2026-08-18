@@ -1138,13 +1138,13 @@ public final class TileMap {
                 mapObjectLayer.layerIndex = i11;
                 this.objectLayers.add(mapObjectLayer);
             }
-            Tileset.parseTileset();
+            Tileset.markAllDescriptorsUnused();
             for (Tileset tileset3 : this.tilesets) {
                 if (tileset3.usedInFogLayer) {
                     tileset3.initTextureMetrics();
                 }
             }
-            Tileset.getTileRectCached();
+            Tileset.freeUnusedImages();
             rebuildTileAtlases();
             this.objectsLayer = getObjectLayerByName("triggers");
             MapObject mapObjectFindObjectByName = null;

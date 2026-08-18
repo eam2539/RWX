@@ -5,8 +5,8 @@ import com.corrodinggames.rts.game.units.OrderableUnit;
 import com.corrodinggames.rts.game.units.custom.CustomUnitConfig;
 import com.corrodinggames.rts.gameFramework.GameEngine;
 import com.corrodinggames.rts.gameFramework.Utility;
-import com.corrodinggames.rts.gameFramework.utility.StringUtils;
 import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
+import com.corrodinggames.rts.gameFramework.utility.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -194,7 +194,7 @@ public class LogicBooleanLoader {
                 }
                 return LogicBoolean.StaticValueBoolean.getStaticNumber(strC);
             }
-            String strSplit = Utility.split(strBreakOuterLayerBrackets);
+            String strSplit = Utility.stripQuotes(strBreakOuterLayerBrackets);
             if (strSplit != null) {
                 if (z) {
                     throw new RuntimeException("Expected a boolean type here, not string: " + strBreakOuterLayerBrackets);

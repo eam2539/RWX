@@ -84,7 +84,7 @@ public class QueueUnitAction extends PopupQueueAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: n_ */
     public boolean isQueuable() {
-        return !this.a.C();
+        return !this.a.isAvailableInDemo();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction

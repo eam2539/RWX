@@ -32,7 +32,7 @@ class UnitCreatedLogEntry extends WarLogEntry {
     public String a() {
         if (this.g == null) {
             String str = "gui.log.unitCreated";
-            if (this.a.j()) {
+            if (this.a.isBuildingUnit()) {
                 str = "gui.log.buildingConstructed";
             }
             this.g = String.format(Locale.get(str, new Object[0]), this.a.getUnitName(), Integer.valueOf(this.b));

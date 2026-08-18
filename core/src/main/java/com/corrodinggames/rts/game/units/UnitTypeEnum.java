@@ -34,12 +34,12 @@ public enum UnitTypeEnum implements UnitType {
     extractor { // from class: com.corrodinggames.rts.game.units.ar.1
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -93,12 +93,12 @@ public enum UnitTypeEnum implements UnitType {
     landFactory { // from class: com.corrodinggames.rts.game.units.ar.12
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -142,12 +142,12 @@ public enum UnitTypeEnum implements UnitType {
     airFactory { // from class: com.corrodinggames.rts.game.units.ar.23
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -191,12 +191,12 @@ public enum UnitTypeEnum implements UnitType {
     seaFactory { // from class: com.corrodinggames.rts.game.units.ar.34
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -245,12 +245,12 @@ public enum UnitTypeEnum implements UnitType {
     commandCenter { // from class: com.corrodinggames.rts.game.units.ar.45
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -285,12 +285,12 @@ public enum UnitTypeEnum implements UnitType {
     turret { // from class: com.corrodinggames.rts.game.units.ar.50
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -319,12 +319,12 @@ public enum UnitTypeEnum implements UnitType {
     antiAirTurret { // from class: com.corrodinggames.rts.game.units.ar.51
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -353,7 +353,7 @@ public enum UnitTypeEnum implements UnitType {
     builder { // from class: com.corrodinggames.rts.game.units.ar.52
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -404,7 +404,7 @@ public enum UnitTypeEnum implements UnitType {
     tank { // from class: com.corrodinggames.rts.game.units.ar.53
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -433,7 +433,7 @@ public enum UnitTypeEnum implements UnitType {
     hoverTank { // from class: com.corrodinggames.rts.game.units.ar.2
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -462,7 +462,7 @@ public enum UnitTypeEnum implements UnitType {
     artillery { // from class: com.corrodinggames.rts.game.units.ar.3
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -491,7 +491,7 @@ public enum UnitTypeEnum implements UnitType {
     helicopter { // from class: com.corrodinggames.rts.game.units.ar.4
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -520,7 +520,7 @@ public enum UnitTypeEnum implements UnitType {
     airShip { // from class: com.corrodinggames.rts.game.units.ar.5
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -549,7 +549,7 @@ public enum UnitTypeEnum implements UnitType {
     gunShip { // from class: com.corrodinggames.rts.game.units.ar.6
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -583,7 +583,7 @@ public enum UnitTypeEnum implements UnitType {
     missileShip { // from class: com.corrodinggames.rts.game.units.ar.7
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -612,7 +612,7 @@ public enum UnitTypeEnum implements UnitType {
     gunBoat { // from class: com.corrodinggames.rts.game.units.ar.8
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -641,7 +641,7 @@ public enum UnitTypeEnum implements UnitType {
     megaTank { // from class: com.corrodinggames.rts.game.units.ar.9
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -670,7 +670,7 @@ public enum UnitTypeEnum implements UnitType {
     laserTank { // from class: com.corrodinggames.rts.game.units.ar.10
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -704,7 +704,7 @@ public enum UnitTypeEnum implements UnitType {
     hovercraft { // from class: com.corrodinggames.rts.game.units.ar.11
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -733,7 +733,7 @@ public enum UnitTypeEnum implements UnitType {
     ladybug { // from class: com.corrodinggames.rts.game.units.ar.13
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -762,7 +762,7 @@ public enum UnitTypeEnum implements UnitType {
     battleShip { // from class: com.corrodinggames.rts.game.units.ar.14
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -791,7 +791,7 @@ public enum UnitTypeEnum implements UnitType {
     tankDestroyer { // from class: com.corrodinggames.rts.game.units.ar.15
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -820,7 +820,7 @@ public enum UnitTypeEnum implements UnitType {
     heavyTank { // from class: com.corrodinggames.rts.game.units.ar.16
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -854,7 +854,7 @@ public enum UnitTypeEnum implements UnitType {
     heavyHoverTank { // from class: com.corrodinggames.rts.game.units.ar.17
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -888,12 +888,12 @@ public enum UnitTypeEnum implements UnitType {
     laserDefence { // from class: com.corrodinggames.rts.game.units.ar.18
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -931,7 +931,7 @@ public enum UnitTypeEnum implements UnitType {
     dropship { // from class: com.corrodinggames.rts.game.units.ar.19
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -965,7 +965,7 @@ public enum UnitTypeEnum implements UnitType {
     tree { // from class: com.corrodinggames.rts.game.units.ar.20
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -994,12 +994,12 @@ public enum UnitTypeEnum implements UnitType {
     repairbay { // from class: com.corrodinggames.rts.game.units.ar.21
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1028,12 +1028,12 @@ public enum UnitTypeEnum implements UnitType {
     NukeLaucher { // from class: com.corrodinggames.rts.game.units.ar.22
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1062,12 +1062,12 @@ public enum UnitTypeEnum implements UnitType {
     AntiNukeLaucher { // from class: com.corrodinggames.rts.game.units.ar.24
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1096,7 +1096,7 @@ public enum UnitTypeEnum implements UnitType {
     mammothTank { // from class: com.corrodinggames.rts.game.units.ar.25
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1130,7 +1130,7 @@ public enum UnitTypeEnum implements UnitType {
     experimentalTank { // from class: com.corrodinggames.rts.game.units.ar.26
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1164,12 +1164,12 @@ public enum UnitTypeEnum implements UnitType {
     experimentalLandFactory { // from class: com.corrodinggames.rts.game.units.ar.27
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1204,12 +1204,12 @@ public enum UnitTypeEnum implements UnitType {
     crystalResource { // from class: com.corrodinggames.rts.game.units.ar.28
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1238,12 +1238,12 @@ public enum UnitTypeEnum implements UnitType {
     wall_v { // from class: com.corrodinggames.rts.game.units.ar.29
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1272,12 +1272,12 @@ public enum UnitTypeEnum implements UnitType {
     fabricator { // from class: com.corrodinggames.rts.game.units.ar.30
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1318,7 +1318,7 @@ public enum UnitTypeEnum implements UnitType {
     attackSubmarine { // from class: com.corrodinggames.rts.game.units.ar.31
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1347,7 +1347,7 @@ public enum UnitTypeEnum implements UnitType {
     builderShip { // from class: com.corrodinggames.rts.game.units.ar.32
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1392,7 +1392,7 @@ public enum UnitTypeEnum implements UnitType {
     amphibiousJet { // from class: com.corrodinggames.rts.game.units.ar.33
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1426,12 +1426,12 @@ public enum UnitTypeEnum implements UnitType {
     supplyDepot { // from class: com.corrodinggames.rts.game.units.ar.35
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1460,7 +1460,7 @@ public enum UnitTypeEnum implements UnitType {
     experimentalHoverTank { // from class: com.corrodinggames.rts.game.units.ar.36
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1494,12 +1494,12 @@ public enum UnitTypeEnum implements UnitType {
     turret_artillery { // from class: com.corrodinggames.rts.game.units.ar.37
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1529,12 +1529,12 @@ public enum UnitTypeEnum implements UnitType {
     turret_flamethrower { // from class: com.corrodinggames.rts.game.units.ar.38
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1564,7 +1564,7 @@ public enum UnitTypeEnum implements UnitType {
     fogRevealer { // from class: com.corrodinggames.rts.game.units.ar.39
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1593,7 +1593,7 @@ public enum UnitTypeEnum implements UnitType {
     spreadingFire { // from class: com.corrodinggames.rts.game.units.ar.40
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1622,12 +1622,12 @@ public enum UnitTypeEnum implements UnitType {
     antiAirTurretT2 { // from class: com.corrodinggames.rts.game.units.ar.41
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1657,12 +1657,12 @@ public enum UnitTypeEnum implements UnitType {
     turretT2 { // from class: com.corrodinggames.rts.game.units.ar.42
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1692,12 +1692,12 @@ public enum UnitTypeEnum implements UnitType {
     turretT3 { // from class: com.corrodinggames.rts.game.units.ar.43
 
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1733,7 +1733,7 @@ public enum UnitTypeEnum implements UnitType {
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1768,7 +1768,7 @@ public enum UnitTypeEnum implements UnitType {
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1805,7 +1805,7 @@ public enum UnitTypeEnum implements UnitType {
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1872,7 +1872,7 @@ public enum UnitTypeEnum implements UnitType {
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -2003,14 +2003,128 @@ public enum UnitTypeEnum implements UnitType {
         return name();
     }
 
-    @Override // com.corrodinggames.rts.game.units.UnitType
-    public boolean j() {
-        return false;
+    /* JADX INFO: renamed from: a */
+    public static void drawUnitWithBoolean(UnitType unitType, float f, float f2, float f3, float f4, PlayerTeam playerTeam, float f5, float f6, boolean z, boolean z2, int i, boolean z3, BaseUnit baseUnit) {
+        GameEngine gameEngine = GameEngine.getInstance();
+        BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
+        boolean zBI = baseUnitCanAttack.bI();
+        baseUnitCanAttack.setUnitTeam(playerTeam);
+        if (baseUnitCanAttack instanceof OrderableUnit) {
+            ((OrderableUnit) baseUnitCanAttack).a(i);
+        }
+        baseUnitCanAttack.posZ = f4;
+        if (baseUnitCanAttack.getMovementType() == UnitMovementType.HOVER || baseUnitCanAttack.getMovementType() == UnitMovementType.OVER_CLIFF || baseUnitCanAttack.getMovementType() == UnitMovementType.OVER_CLIFF_WATER) {
+            baseUnitCanAttack.posZ += 4.0f;
+        }
+        if (baseUnitCanAttack.getMovementType() == UnitMovementType.AIR) {
+            baseUnitCanAttack.posZ += 10.0f;
+        }
+        if (!zBI) {
+            baseUnitCanAttack.rotationSpeed = f3;
+            if (baseUnitCanAttack instanceof OrderableUnit) {
+                ((OrderableUnit) baseUnitCanAttack).j(f3);
+            }
+        } else {
+            baseUnitCanAttack.rotationSpeed = -90.0f;
+        }
+        boolean z4 = true;
+        boolean z5 = baseUnitCanAttack.isUnitParalyzed;
+        baseUnitCanAttack.isUnitParalyzed = true;
+        baseUnitCanAttack.isUnitDisabled = false;
+        baseUnitCanAttack.isUnitCapturable = false;
+        if (!z3) {
+            baseUnitCanAttack.isUnitCapturable = true;
+        }
+        baseUnitCanAttack.isUnitStunned = false;
+        baseUnitCanAttack.isUnitInvulnerable = false;
+        baseUnitCanAttack.isUnitUntargetable = false;
+        if (z || z2) {
+            baseUnitCanAttack.isUnitInvulnerable = z2;
+            baseUnitCanAttack.isUnitUntargetable = z;
+            z4 = false;
+        } else {
+            baseUnitCanAttack.isUnitStunned = true;
+        }
+        if (!z4) {
+            baseUnitCanAttack.posX = f;
+            baseUnitCanAttack.posY = f2;
+        } else {
+            baseUnitCanAttack.posX = gameEngine.viewpointXSnapped + f;
+            baseUnitCanAttack.posY = gameEngine.viewpointYSnapped + f2;
+        }
+        float f7 = baseUnitCanAttack.radius * 2.0f * 0.8f;
+        if (baseUnitCanAttack instanceof OrderableUnit) {
+            OrderableUnit orderableUnit = (OrderableUnit) baseUnitCanAttack;
+            if (orderableUnit.baseTexture != null) {
+                float fCD = orderableUnit.et * orderableUnit.getRenderScale();
+                if (fCD > f7) {
+                    f7 = fCD;
+                }
+            }
+        }
+        float f8 = 1.0f;
+        if (f7 < f5) {
+            f8 = f5 / f7;
+        }
+        if (f7 > f6) {
+            f8 = f6 / f7;
+        }
+        gameEngine.renderGraphicsEngine.k();
+        if (z4) {
+        }
+        if (f8 != 1.0f) {
+            gameEngine.renderGraphicsEngine.a(f8, f8, f, f2);
+        }
+        if (f8 < 1.0f) {
+            ag = true;
+        } else {
+            ag = false;
+        }
+        if (baseUnit != null) {
+            StoredResources storedResources = baseUnitCanAttack.unitCustomEffects;
+            baseUnitCanAttack.unitCustomEffects = baseUnit.unitCustomEffects;
+            int i2 = baseUnitCanAttack.unitLevel;
+            baseUnitCanAttack.unitLevel = baseUnit.unitLevel;
+            float f9 = baseUnitCanAttack.currentHealth;
+            baseUnitCanAttack.currentHealth = baseUnit.currentHealth;
+            float f10 = baseUnitCanAttack.currentEnergy;
+            baseUnitCanAttack.currentEnergy = baseUnit.currentEnergy;
+            VariableScope variableScope = baseUnitCanAttack.unitVariables;
+            baseUnitCanAttack.unitVariables = baseUnit.unitVariables;
+            baseUnitCanAttack.d(0.0f);
+            baseUnitCanAttack.c(0.0f);
+            baseUnitCanAttack.a(0.0f, false);
+            baseUnitCanAttack.unitCustomEffects = storedResources;
+            baseUnitCanAttack.unitLevel = i2;
+            baseUnitCanAttack.currentHealth = f9;
+            baseUnitCanAttack.currentEnergy = f10;
+            baseUnitCanAttack.unitVariables = variableScope;
+        } else {
+            baseUnitCanAttack.d(0.0f);
+            baseUnitCanAttack.c(0.0f);
+            baseUnitCanAttack.a(0.0f, false);
+        }
+        gameEngine.renderGraphicsEngine.l();
+        baseUnitCanAttack.posZ = 0.0f;
+        if (!zBI) {
+            baseUnitCanAttack.rotationSpeed = 0.0f;
+        } else {
+            baseUnitCanAttack.rotationSpeed = -90.0f;
+        }
+        if (baseUnitCanAttack instanceof OrderableUnit) {
+            OrderableUnit orderableUnit2 = (OrderableUnit) baseUnitCanAttack;
+            orderableUnit2.j(0.0f);
+            orderableUnit2.a(1);
+        }
+        baseUnitCanAttack.isUnitInvulnerable = false;
+        baseUnitCanAttack.isUnitUntargetable = false;
+        baseUnitCanAttack.isUnitParalyzed = z5;
+        baseUnitCanAttack.isUnitStunned = false;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public boolean k() {
-        return j();
+    public boolean isBuildingUnit() {
+        return false;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
@@ -2029,12 +2143,8 @@ public enum UnitTypeEnum implements UnitType {
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public UnitMovementType o() {
-        BaseUnit baseUnitFindTurretPosition = BaseUnit.findTurretPosition(this);
-        if (baseUnitFindTurretPosition == null) {
-            throw new RuntimeException("Shared unit is null for:" + name());
-        }
-        return baseUnitFindTurretPosition.h();
+    public boolean k() {
+        return isBuildingUnit();
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
@@ -2263,123 +2373,13 @@ public enum UnitTypeEnum implements UnitType {
         drawUnitWithBoolean(unitType, f, f2, f3, f4, playerTeam, f5, f6, z, z2, i, true, baseUnit);
     }
 
-    /* JADX INFO: renamed from: a */
-    public static void drawUnitWithBoolean(UnitType unitType, float f, float f2, float f3, float f4, PlayerTeam playerTeam, float f5, float f6, boolean z, boolean z2, int i, boolean z3, BaseUnit baseUnit) {
-        GameEngine gameEngine = GameEngine.getInstance();
-        BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
-        boolean zBI = baseUnitCanAttack.bI();
-        baseUnitCanAttack.setUnitTeam(playerTeam);
-        if (baseUnitCanAttack instanceof OrderableUnit) {
-            ((OrderableUnit) baseUnitCanAttack).a(i);
+    @Override // com.corrodinggames.rts.game.units.UnitType
+    public UnitMovementType o() {
+        BaseUnit baseUnitFindTurretPosition = BaseUnit.findTurretPosition(this);
+        if (baseUnitFindTurretPosition == null) {
+            throw new RuntimeException("Shared unit is null for:" + name());
         }
-        baseUnitCanAttack.posZ = f4;
-        if (baseUnitCanAttack.h() == UnitMovementType.HOVER || baseUnitCanAttack.h() == UnitMovementType.OVER_CLIFF || baseUnitCanAttack.h() == UnitMovementType.OVER_CLIFF_WATER) {
-            baseUnitCanAttack.posZ += 4.0f;
-        }
-        if (baseUnitCanAttack.h() == UnitMovementType.AIR) {
-            baseUnitCanAttack.posZ += 10.0f;
-        }
-        if (!zBI) {
-            baseUnitCanAttack.rotationSpeed = f3;
-            if (baseUnitCanAttack instanceof OrderableUnit) {
-                ((OrderableUnit) baseUnitCanAttack).j(f3);
-            }
-        } else {
-            baseUnitCanAttack.rotationSpeed = -90.0f;
-        }
-        boolean z4 = true;
-        boolean z5 = baseUnitCanAttack.isUnitParalyzed;
-        baseUnitCanAttack.isUnitParalyzed = true;
-        baseUnitCanAttack.isUnitDisabled = false;
-        baseUnitCanAttack.isUnitCapturable = false;
-        if (!z3) {
-            baseUnitCanAttack.isUnitCapturable = true;
-        }
-        baseUnitCanAttack.isUnitStunned = false;
-        baseUnitCanAttack.isUnitInvulnerable = false;
-        baseUnitCanAttack.isUnitUntargetable = false;
-        if (z || z2) {
-            baseUnitCanAttack.isUnitInvulnerable = z2;
-            baseUnitCanAttack.isUnitUntargetable = z;
-            z4 = false;
-        } else {
-            baseUnitCanAttack.isUnitStunned = true;
-        }
-        if (!z4) {
-            baseUnitCanAttack.posX = f;
-            baseUnitCanAttack.posY = f2;
-        } else {
-            baseUnitCanAttack.posX = gameEngine.viewpointXSnapped + f;
-            baseUnitCanAttack.posY = gameEngine.viewpointYSnapped + f2;
-        }
-        float f7 = baseUnitCanAttack.radius * 2.0f * 0.8f;
-        if (baseUnitCanAttack instanceof OrderableUnit) {
-            OrderableUnit orderableUnit = (OrderableUnit) baseUnitCanAttack;
-            if (orderableUnit.baseTexture != null) {
-                float fCD = orderableUnit.et * orderableUnit.getRenderScale();
-                if (fCD > f7) {
-                    f7 = fCD;
-                }
-            }
-        }
-        float f8 = 1.0f;
-        if (f7 < f5) {
-            f8 = f5 / f7;
-        }
-        if (f7 > f6) {
-            f8 = f6 / f7;
-        }
-        gameEngine.renderGraphicsEngine.k();
-        if (z4) {
-        }
-        if (f8 != 1.0f) {
-            gameEngine.renderGraphicsEngine.a(f8, f8, f, f2);
-        }
-        if (f8 < 1.0f) {
-            ag = true;
-        } else {
-            ag = false;
-        }
-        if (baseUnit != null) {
-            StoredResources storedResources = baseUnitCanAttack.unitCustomEffects;
-            baseUnitCanAttack.unitCustomEffects = baseUnit.unitCustomEffects;
-            int i2 = baseUnitCanAttack.unitLevel;
-            baseUnitCanAttack.unitLevel = baseUnit.unitLevel;
-            float f9 = baseUnitCanAttack.currentHealth;
-            baseUnitCanAttack.currentHealth = baseUnit.currentHealth;
-            float f10 = baseUnitCanAttack.currentEnergy;
-            baseUnitCanAttack.currentEnergy = baseUnit.currentEnergy;
-            VariableScope variableScope = baseUnitCanAttack.unitVariables;
-            baseUnitCanAttack.unitVariables = baseUnit.unitVariables;
-            baseUnitCanAttack.d(0.0f);
-            baseUnitCanAttack.c(0.0f);
-            baseUnitCanAttack.a(0.0f, false);
-            baseUnitCanAttack.unitCustomEffects = storedResources;
-            baseUnitCanAttack.unitLevel = i2;
-            baseUnitCanAttack.currentHealth = f9;
-            baseUnitCanAttack.currentEnergy = f10;
-            baseUnitCanAttack.unitVariables = variableScope;
-        } else {
-            baseUnitCanAttack.d(0.0f);
-            baseUnitCanAttack.c(0.0f);
-            baseUnitCanAttack.a(0.0f, false);
-        }
-        gameEngine.renderGraphicsEngine.l();
-        baseUnitCanAttack.posZ = 0.0f;
-        if (!zBI) {
-            baseUnitCanAttack.rotationSpeed = 0.0f;
-        } else {
-            baseUnitCanAttack.rotationSpeed = -90.0f;
-        }
-        if (baseUnitCanAttack instanceof OrderableUnit) {
-            OrderableUnit orderableUnit2 = (OrderableUnit) baseUnitCanAttack;
-            orderableUnit2.j(0.0f);
-            orderableUnit2.a(1);
-        }
-        baseUnitCanAttack.isUnitInvulnerable = false;
-        baseUnitCanAttack.isUnitUntargetable = false;
-        baseUnitCanAttack.isUnitParalyzed = z5;
-        baseUnitCanAttack.isUnitStunned = false;
+        return baseUnitFindTurretPosition.getMovementType();
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType

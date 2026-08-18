@@ -12,7 +12,7 @@ import java.util.ArrayList;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.as */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/as.class */
 public interface UnitType {
-    boolean C();
+    boolean isAvailableInDemo();
 
     boolean w();
 
@@ -38,7 +38,7 @@ public interface UnitType {
 
     int g();
 
-    boolean j();
+    boolean isBuildingUnit();
 
     boolean l();
 

@@ -805,7 +805,7 @@ public class Projectile extends PositionedObject {
             f28 = projectileTemplate.P;
         }
         if (f28 >= 0.0f) {
-            this.az += Utility.endsWith(this.az, angleBetweenPoints, f28 * f2);
+            this.az += Utility.rotateTowardsAngle(this.az, angleBetweenPoints, f28 * f2);
             angleBetweenPoints = this.az;
         } else {
             this.az = angleBetweenPoints;
@@ -1418,7 +1418,7 @@ public class Projectile extends PositionedObject {
             this.aT = f29;
             this.aU = true;
         }
-        this.aT += Utility.endsWith(this.aT, f29, 12.0f * f2);
+        this.aT += Utility.rotateTowardsAngle(this.aT, f29, 12.0f * f2);
     }
 
     public void b(float f2) {

@@ -26,7 +26,10 @@ import com.corrodinggames.rts.gameFramework.mod.ModInfo;
 import com.corrodinggames.rts.gameFramework.mod.ModManager;
 import com.corrodinggames.rts.gameFramework.network.GameInputStream;
 import com.corrodinggames.rts.gameFramework.network.GameOutputStream;
-import com.corrodinggames.rts.gameFramework.utility.*;
+import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
+import com.corrodinggames.rts.gameFramework.utility.GameViewUtils;
+import com.corrodinggames.rts.gameFramework.utility.IniFile;
+import com.corrodinggames.rts.gameFramework.utility.RwmodFileLoader;
 import io.github.rwx.geometry.Point;
 import io.github.rwx.geometry.PointF;
 import io.github.rwx.geometry.Rect;
@@ -1442,7 +1445,7 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public boolean C() {
+    public boolean isAvailableInDemo() {
         return this.availableInDemo;
     }
 
@@ -1478,7 +1481,7 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public boolean j() {
+    public boolean isBuildingUnit() {
         return this.isBuildingUnit;
     }
 
@@ -1588,7 +1591,7 @@ public final class CustomUnitConfig implements UnitType {
     }
 
     /* JADX INFO: renamed from: a */
-    public UnitTypeReference reloadAllCustomUnits(String str, String str2, String str3) {
+    public UnitTypeReference createUnitTypeReference(String str, String str2, String str3) {
         if (str == null) {
             return null;
         }
@@ -1956,7 +1959,7 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: p */
     public void throwConfigError(String str) {
-        CustomUnitConfigParser.validateModFilePath(getUnitTypeDescriptionShort(), new ConfigParseException(str), this);
+        CustomUnitConfigParser.reportUnitLoadErrorForType(getUnitTypeDescriptionShort(), new ConfigParseException(str), this);
     }
 
     /* JADX INFO: renamed from: q */

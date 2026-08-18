@@ -242,7 +242,7 @@ public class FireUnit extends NaturalUnit {
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
-    public UnitMovementType h() {
+    public UnitMovementType getMovementType() {
         return UnitMovementType.NONE;
     }
 

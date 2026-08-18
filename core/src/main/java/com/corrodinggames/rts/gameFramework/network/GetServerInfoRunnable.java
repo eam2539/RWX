@@ -37,7 +37,7 @@ class GetServerInfoRunnable implements Runnable {
         String serverCode = MasterServerClient.formatServerCode(this.serverCode);
         String strSplit = null;
         if (this.password != null) {
-            strSplit = Utility.split(this.gameId + this.password, 3);
+            strSplit = Utility.repeatHash(this.gameId + this.password, 3);
         }
         try {
             ArrayList arrayList = new ArrayList(2);
@@ -84,7 +84,7 @@ class GetServerInfoRunnable implements Runnable {
             if (line3 == null) {
                 throw new IOException("Unexpected end of response");
             }
-            if (!line3.toLowerCase(Locale.ROOT).contains(Utility.md5("game_" + serverCode).toLowerCase(Locale.ROOT))) {
+            if (!line3.toLowerCase(Locale.ROOT).contains(Utility.sha256ShortHash("game_" + serverCode).toLowerCase(Locale.ROOT))) {
                 GameEngine.log("getGameServerInfoFromMasterServerRunnable", "Error bad header returned from the master server: " + line3);
                 this.result.setError("Unexpected return from master server", ConnectionErrorType.unknown, null);
                 return;

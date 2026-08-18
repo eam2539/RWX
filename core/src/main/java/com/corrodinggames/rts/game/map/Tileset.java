@@ -90,27 +90,12 @@ public class Tileset {
     /* JADX INFO: renamed from: w */
     int cachedRectIndex = -1;
 
-    /* JADX INFO: renamed from: a */
-    public String computeTileRect(TileMap tileMap, Element element) {
-        Element element2 = (Element) element.getElementsByTagName("properties").item(0);
-        if (element2 != null) {
-            NodeList elementsByTagName = element2.getElementsByTagName("property");
-            for (int i = 0; i < elementsByTagName.getLength(); i++) {
-                Element element3 = (Element) elementsByTagName.item(i);
-                if (element3.getAttribute("name").equals("embedded_png")) {
-                    String attribute = element3.getAttribute("value");
-                    if (attribute != null && !attribute.equals(VariableScope.nullOrMissingString)) {
-                        return attribute;
-                    }
-                    Node firstChild = element3.getFirstChild();
-                    if (firstChild != null) {
-                        return firstChild.getNodeValue();
-                    }
-                }
-            }
-            return null;
-        }
-        return null;
+    public Tileset(TileMap tileMap, String str, int i) throws MapLoadException {
+        this.tileMap = tileMap;
+        this.firstGid = i;
+        Element elementLoadTilesetTexture = loadTilesetTexture(tileMap, str);
+        this.tilesetSource = str;
+        parseTileset(elementLoadTilesetTexture);
     }
 
     /* JADX INFO: renamed from: a */
@@ -123,14 +108,6 @@ public class Tileset {
         }
     }
 
-    public Tileset(TileMap tileMap, String str, int i) throws MapLoadException {
-        this.tileMap = tileMap;
-        this.firstGid = i;
-        Element elementLoadTilesetTexture = loadTilesetTexture(tileMap, str);
-        this.tilesetSource = str;
-        markAllDescriptorsUnused(elementLoadTilesetTexture);
-    }
-
     public Tileset(TileMap tileMap, Element element) throws MapLoadException {
         this.tileMap = tileMap;
         this.firstGid = Integer.parseInt(element.getAttribute("firstgid"));
@@ -139,57 +116,29 @@ public class Tileset {
             element = loadTilesetTexture(tileMap, attribute);
             this.tilesetSource = attribute;
         }
-        markAllDescriptorsUnused(element);
+        parseTileset(element);
     }
 
     /* JADX INFO: renamed from: a */
-    public void markAllDescriptorsUnused(Element element) throws MapLoadException {
-        NodeList elementsByTagName = element.getElementsByTagName("image");
-        if (elementsByTagName.getLength() > 0) {
-            this.imageKey = GameEngine.getFilename(((Element) elementsByTagName.item(0)).getAttribute("source").trim());
+    public static void markAllDescriptorsUnused() {
+        for (TilesetImageDescriptor imageDescriptor : imageDescriptors) {
+            imageDescriptor.inUse = false;
         }
-        String strComputeTileRect = computeTileRect(this.tileMap, element);
-        if (strComputeTileRect != null) {
-            this.imageKey = registerEmbeddedImage(strComputeTileRect, this.imageKey);
-        }
-        if (this.imageKey == null) {
-            throw new MapLoadException("Map tileset is missing an image tag or embedded image data");
-        }
-        this.tileWidth = this.tileMap.tileWorldSizeX;
-        this.tileHeight = this.tileMap.tileWorldSizeY;
-        if (element.hasAttribute("tilewidth")) {
-            this.tileWidth = Integer.parseInt(element.getAttribute("tilewidth"));
-            this.tileHeight = Integer.parseInt(element.getAttribute("tileheight"));
-        }
-        if (GameEngine.isSpaceGame()) {
-            this.tileWidth = this.tileMap.tileWorldSizeX;
-            this.tileHeight = this.tileMap.tileWorldSizeY;
-        }
-        int i = 0;
-        if (element.hasAttribute("spacing")) {
-            i = Integer.parseInt(element.getAttribute("spacing"));
-        }
-        this.tileStridePixelsX = this.tileWidth + i;
-        this.tileStridePixelsY = this.tileHeight + i;
-        NodeList elementsByTagName2 = element.getElementsByTagName("tile");
-        for (int i2 = 0; i2 < elementsByTagName2.getLength(); i2++) {
-            Element element2 = (Element) elementsByTagName2.item(i2);
-            int i3 = Integer.parseInt(element2.getAttribute("id")) + this.firstGid;
-            Properties properties = new Properties();
-            Element element3 = (Element) element2.getElementsByTagName("properties").item(0);
-            if (element3 != null) {
-                NodeList elementsByTagName3 = element3.getElementsByTagName("property");
-                for (int i4 = 0; i4 < elementsByTagName3.getLength(); i4++) {
-                    Element element4 = (Element) elementsByTagName3.item(i4);
-                    String attribute = element4.getAttribute("name");
-                    String attribute2 = element4.getAttribute("value");
-                    if ("unit".equalsIgnoreCase(attribute) || "customUnit".equalsIgnoreCase(attribute)) {
-                        this.containsUnits = true;
-                    }
-                    properties.setProperty(attribute, attribute2);
+    }
+
+    /* JADX INFO: renamed from: b */
+    public static void freeUnusedImages() {
+        Iterator<TilesetImageDescriptor> it = imageDescriptors.iterator();
+        while (it.hasNext()) {
+            TilesetImageDescriptor tilesetImageDescriptor = it.next();
+            if (!tilesetImageDescriptor.inUse) {
+                if (tilesetImageDescriptor.texture != null) {
+                    tilesetImageDescriptor.texture.o();
+                    tilesetImageDescriptor.texture = null;
                 }
+                tilesetImageDescriptor.embeddedBase64 = null;
+                it.remove();
             }
-            this.propertiesByTileId.put(i3, properties);
         }
     }
 
@@ -275,25 +224,76 @@ public class Tileset {
     }
 
     /* JADX INFO: renamed from: a */
-    public static void parseTileset() {
-        for (TilesetImageDescriptor imageDescriptor : imageDescriptors) {
-            imageDescriptor.inUse = false;
+    public String getEmbeddedPngBase64(TileMap tileMap, Element element) {
+        Element element2 = (Element) element.getElementsByTagName("properties").item(0);
+        if (element2 != null) {
+            NodeList elementsByTagName = element2.getElementsByTagName("property");
+            for (int i = 0; i < elementsByTagName.getLength(); i++) {
+                Element element3 = (Element) elementsByTagName.item(i);
+                if (element3.getAttribute("name").equals("embedded_png")) {
+                    String attribute = element3.getAttribute("value");
+                    if (attribute != null && !attribute.equals(VariableScope.nullOrMissingString)) {
+                        return attribute;
+                    }
+                    Node firstChild = element3.getFirstChild();
+                    if (firstChild != null) {
+                        return firstChild.getNodeValue();
+                    }
+                }
+            }
+            return null;
         }
+        return null;
     }
 
-    /* JADX INFO: renamed from: b */
-    public static void getTileRectCached() {
-        Iterator<TilesetImageDescriptor> it = imageDescriptors.iterator();
-        while (it.hasNext()) {
-            TilesetImageDescriptor tilesetImageDescriptor = it.next();
-            if (!tilesetImageDescriptor.inUse) {
-                if (tilesetImageDescriptor.texture != null) {
-                    tilesetImageDescriptor.texture.o();
-                    tilesetImageDescriptor.texture = null;
+    /* JADX INFO: renamed from: a */
+    public void parseTileset(Element element) throws MapLoadException {
+        NodeList elementsByTagName = element.getElementsByTagName("image");
+        if (elementsByTagName.getLength() > 0) {
+            this.imageKey = GameEngine.getFilename(((Element) elementsByTagName.item(0)).getAttribute("source").trim());
+        }
+        String strComputeTileRect = getEmbeddedPngBase64(this.tileMap, element);
+        if (strComputeTileRect != null) {
+            this.imageKey = registerEmbeddedImage(strComputeTileRect, this.imageKey);
+        }
+        if (this.imageKey == null) {
+            throw new MapLoadException("Map tileset is missing an image tag or embedded image data");
+        }
+        this.tileWidth = this.tileMap.tileWorldSizeX;
+        this.tileHeight = this.tileMap.tileWorldSizeY;
+        if (element.hasAttribute("tilewidth")) {
+            this.tileWidth = Integer.parseInt(element.getAttribute("tilewidth"));
+            this.tileHeight = Integer.parseInt(element.getAttribute("tileheight"));
+        }
+        if (GameEngine.isSpaceGame()) {
+            this.tileWidth = this.tileMap.tileWorldSizeX;
+            this.tileHeight = this.tileMap.tileWorldSizeY;
+        }
+        int i = 0;
+        if (element.hasAttribute("spacing")) {
+            i = Integer.parseInt(element.getAttribute("spacing"));
+        }
+        this.tileStridePixelsX = this.tileWidth + i;
+        this.tileStridePixelsY = this.tileHeight + i;
+        NodeList elementsByTagName2 = element.getElementsByTagName("tile");
+        for (int i2 = 0; i2 < elementsByTagName2.getLength(); i2++) {
+            Element element2 = (Element) elementsByTagName2.item(i2);
+            int i3 = Integer.parseInt(element2.getAttribute("id")) + this.firstGid;
+            Properties properties = new Properties();
+            Element element3 = (Element) element2.getElementsByTagName("properties").item(0);
+            if (element3 != null) {
+                NodeList elementsByTagName3 = element3.getElementsByTagName("property");
+                for (int i4 = 0; i4 < elementsByTagName3.getLength(); i4++) {
+                    Element element4 = (Element) elementsByTagName3.item(i4);
+                    String attribute = element4.getAttribute("name");
+                    String attribute2 = element4.getAttribute("value");
+                    if ("unit".equalsIgnoreCase(attribute) || "customUnit".equalsIgnoreCase(attribute)) {
+                        this.containsUnits = true;
+                    }
+                    properties.setProperty(attribute, attribute2);
                 }
-                tilesetImageDescriptor.embeddedBase64 = null;
-                it.remove();
             }
+            this.propertiesByTileId.put(i3, properties);
         }
     }
 
@@ -308,12 +308,12 @@ public class Tileset {
     }
 
     /* JADX INFO: renamed from: a */
-    public Properties getEmbeddedPngBase64(int i) {
+    public Properties getPropertiesByTileId(int i) {
         return this.propertiesByTileId.get(i);
     }
 
     /* JADX INFO: renamed from: a */
-    public final void getPropertiesByTileId(int i, Rect rect) {
+    public final void getTileRect(int i, Rect rect) {
         int i2 = i % this.columns;
         int i3 = (int) (i * this.invColumns);
         int i4 = this.atlasOriginX + (i2 * this.tileStridePixelsX);
@@ -325,12 +325,12 @@ public class Tileset {
     }
 
     /* JADX INFO: renamed from: b */
-    public final Rect freeUnusedImages(int i) {
+    public final Rect getTileRectCached(int i) {
         if (this.cachedRectIndex == i) {
             return this.cachedRect;
         }
         this.cachedRectIndex = i;
-        getPropertiesByTileId(i, this.cachedRect);
+        getTileRect(i, this.cachedRect);
         return this.cachedRect;
     }
 

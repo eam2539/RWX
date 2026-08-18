@@ -13,7 +13,7 @@ public enum EditorUnitTypeFilter {
                 return false;
             }
             BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
-            return (baseUnitCanAttack.bO() || unitType.j() || baseUnitCanAttack.h() == UnitMovementType.AIR || baseUnitCanAttack.h() == UnitMovementType.WATER) ? false : true;
+            return (baseUnitCanAttack.bO() || unitType.isBuildingUnit() || baseUnitCanAttack.getMovementType() == UnitMovementType.AIR || baseUnitCanAttack.getMovementType() == UnitMovementType.WATER) ? false : true;
         }
     },
     air { // from class: com.corrodinggames.rts.game.units.o.2
@@ -24,7 +24,7 @@ public enum EditorUnitTypeFilter {
                 return false;
             }
             BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
-            return (baseUnitCanAttack.bO() || unitType.j() || baseUnitCanAttack.h() != UnitMovementType.AIR) ? false : true;
+            return (baseUnitCanAttack.bO() || unitType.isBuildingUnit() || baseUnitCanAttack.getMovementType() != UnitMovementType.AIR) ? false : true;
         }
     },
     sea { // from class: com.corrodinggames.rts.game.units.o.3
@@ -35,14 +35,14 @@ public enum EditorUnitTypeFilter {
                 return false;
             }
             BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
-            return (baseUnitCanAttack.bO() || unitType.j() || baseUnitCanAttack.h() != UnitMovementType.WATER) ? false : true;
+            return (baseUnitCanAttack.bO() || unitType.isBuildingUnit() || baseUnitCanAttack.getMovementType() != UnitMovementType.WATER) ? false : true;
         }
     },
     buildings { // from class: com.corrodinggames.rts.game.units.o.4
 
         @Override // com.corrodinggames.rts.game.units.EditorUnitTypeFilter
         public boolean a(UnitType unitType) {
-            return (unitType == null || BaseUnit.canAttack(unitType).bO() || !unitType.j()) ? false : true;
+            return (unitType == null || BaseUnit.canAttack(unitType).bO() || !unitType.isBuildingUnit()) ? false : true;
         }
     },
     bio { // from class: com.corrodinggames.rts.game.units.o.5

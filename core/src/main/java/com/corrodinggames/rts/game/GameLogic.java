@@ -73,7 +73,7 @@ public class GameLogic extends GameEngine {
     public float densityScaleMultiplier;
 
     /* JADX INFO: renamed from: f */
-    public static String safeModeReason = null;
+    public static String safeModeReasonText = null;
 
     /* JADX INFO: renamed from: i */
     public boolean hasStartedBenchmarkTrace;
@@ -1730,8 +1730,8 @@ public class GameLogic extends GameEngine {
             if (includeUi && this.settingsEngine.showFps && this.pauseTransition == 0.0f && !this.isMenuOpen && !this.isPaused) {
                 this.renderGraphicsEngine.a(this.fpsString, 100.0f, 35.0f, this.fpsPaint);
             }
-            if (includeUi && safeModeReason != null) {
-                this.renderGraphicsEngine.a(safeModeReason, 100.0f, 85.0f, this.fpsPaint);
+            if (includeUi && safeModeReasonText != null) {
+                this.renderGraphicsEngine.a(safeModeReasonText, 100.0f, 85.0f, this.fpsPaint);
             }
             if (includeUi && !this.isStopped) {
                 this.gameUI.handleTouchGestures(f, isNativeHudVisible);
@@ -2231,6 +2231,10 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: w */
     public synchronized void synchronizedMethod() {
         this.booleanAC = false;
+        if (this.gameTimer != null) {
+            this.gameTimer.cancel();
+            this.gameTimer = null;
+        }
     }
 
     @Override // com.corrodinggames.rts.gameFramework.GameEngine

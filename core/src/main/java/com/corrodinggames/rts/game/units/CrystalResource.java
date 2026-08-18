@@ -84,7 +84,7 @@ public class CrystalResource extends BaseBuilding {
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.BaseUnit
-    public UnitMovementType h() {
+    public UnitMovementType getMovementType() {
         return UnitMovementType.NONE;
     }
 

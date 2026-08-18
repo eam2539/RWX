@@ -1425,7 +1425,7 @@ public class AreaControlMode {
             if (unit.unitTransportTarget != null || unit.parentEntity != null || unit.team == null) {
                 return false;
             }
-            return isEligibleCaptureTeam(unit.team) && (!this.groundOnly || unit.h() != UnitMovementType.AIR);
+            return isEligibleCaptureTeam(unit.team) && (!this.groundOnly || unit.getMovementType() != UnitMovementType.AIR);
         }
 
         private boolean isEligibleCaptureTeam(PlayerTeam team) {

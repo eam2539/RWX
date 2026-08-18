@@ -134,7 +134,7 @@ public class FormationGroup {
             int size2 = fastArrayList.size();
             for (int i4 = 0; i4 < size2; i4++) {
                 OrderableUnit orderableUnit2 = (OrderableUnit) objArrA[i4];
-                if (!orderableUnit2.ap && orderableUnit2 != orderableUnit && ((z || (orderableUnit2.transportedBy == null && !orderableUnit2.ae)) && orderableUnit2.h() == orderableUnit.h())) {
+                if (!orderableUnit2.ap && orderableUnit2 != orderableUnit && ((z || (orderableUnit2.transportedBy == null && !orderableUnit2.ae)) && orderableUnit2.getMovementType() == orderableUnit.getMovementType())) {
                     float fDistanceSq = Utility.distanceSq(orderableUnit2.posX, orderableUnit2.posY, orderableUnit.posX, orderableUnit.posY);
                     if ((i3 != 0 || fDistanceSq <= 3600.0f) && ((i3 != 1 || fDistanceSq <= 14400.0f) && (((z2 && fDistanceSq < 160000.0f) || (fDistanceSq < 40000.0f && i < 25)) && (z2 || Utility.abs(orderableUnit2.getMoveSpeed() - orderableUnit.getMoveSpeed()) < 0.4f)))) {
                         orderableUnit2.ap = true;
@@ -173,7 +173,7 @@ public class FormationGroup {
             } else {
                 orderableUnit2.af = false;
             }
-            if (orderableUnit2.af && orderableUnit2.ah > 7 && Utility.abs(Utility.endsWith(orderableUnit2.am, angleBetweenPoints, 360.0f)) > 80.0f) {
+            if (orderableUnit2.af && orderableUnit2.ah > 7 && Utility.abs(Utility.rotateTowardsAngle(orderableUnit2.am, angleBetweenPoints, 360.0f)) > 80.0f) {
                 orderableUnit2.af = false;
             }
             orderableUnit2.clearTransportState();
