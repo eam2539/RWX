@@ -240,7 +240,7 @@ public class StatsHistoryChart {
             if (iDistance > 0 && iDistance < str2.length() - 1) {
                 str3 = "_";
             }
-            gameEngine.renderGraphicsEngine.a(str2.substring(0, iDistance) + str3 + Utility.removeEnd(" ", (str2.length() + str3.length()) - iDistance), iD - (8.0f * this.c.k()), screenPixels, this.c);
+            gameEngine.renderGraphicsEngine.a(str2.substring(0, iDistance) + str3 + Utility.repeat(" ", (str2.length() + str3.length()) - iDistance), iD - (8.0f * this.c.k()), screenPixels, this.c);
             gameEngine.renderGraphicsEngine.a(str, iD + (8.0f * this.c.k()), screenPixels, this.d);
             screenPixels = (int) (screenPixels + fC);
         }

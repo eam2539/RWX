@@ -1313,7 +1313,7 @@ public final class CustomUnitConfig implements UnitType {
                     if (spawnPointType == SpawnPointType.mapCenter_asNeutral) {
                         BaseUnit baseUnitA2 = customUnitConfig.a();
                         baseUnitA2.setUnitTeam(PlayerTeam.TEAM_ALL);
-                        gameEngine.tileMap.exportTmxToFile(gameEngine.tileMap.getWorldWidth() / 2.0f, gameEngine.tileMap.getWorldHeight() / 2.0f);
+                        gameEngine.tileMap.updateCursorTileIndexFromWorldPoint(gameEngine.tileMap.getWorldWidth() / 2.0f, gameEngine.tileMap.getWorldHeight() / 2.0f);
                         baseUnitA2.posX = gameEngine.tileMap.cursorTileX;
                         baseUnitA2.posY = gameEngine.tileMap.cursorTileY;
                         baseUnitA2.posX += baseUnitA2.getTileOffsetX();
@@ -1325,7 +1325,7 @@ public final class CustomUnitConfig implements UnitType {
                             if (playerTeam.getUnitCount(true, false) > 0) {
                                 BaseUnit baseUnitA3 = customUnitConfig.a();
                                 baseUnitA3.setUnitTeam(playerTeam);
-                                gameEngine.tileMap.exportTmxToFile(gameEngine.tileMap.getWorldWidth() / 2.0f, gameEngine.tileMap.getWorldHeight() / 2.0f);
+                                gameEngine.tileMap.updateCursorTileIndexFromWorldPoint(gameEngine.tileMap.getWorldWidth() / 2.0f, gameEngine.tileMap.getWorldHeight() / 2.0f);
                                 baseUnitA3.posX = gameEngine.tileMap.cursorTileX;
                                 baseUnitA3.posY = gameEngine.tileMap.cursorTileY;
                                 baseUnitA3.posX += baseUnitA3.getTileOffsetX();
@@ -1341,7 +1341,7 @@ public final class CustomUnitConfig implements UnitType {
                             GameViewUtils.a(playerTeam2, pointF);
                             BaseUnit baseUnitA4 = customUnitConfig.a();
                             baseUnitA4.setUnitTeam(playerTeam2);
-                            gameEngine.tileMap.exportTmxToFile(pointF.x, pointF.y);
+                            gameEngine.tileMap.updateCursorTileIndexFromWorldPoint(pointF.x, pointF.y);
                             baseUnitA4.posX = gameEngine.tileMap.cursorTileX;
                             baseUnitA4.posY = gameEngine.tileMap.cursorTileY;
                             baseUnitA4.posX += baseUnitA4.getTileOffsetX();

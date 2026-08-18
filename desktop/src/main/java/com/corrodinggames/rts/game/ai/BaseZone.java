@@ -769,8 +769,8 @@ public class BaseZone extends AIStrategyNode {
             GameEngine.logColored("buildBuilding: could not find getBuildUnitAction for builder this shouldn't happen:" + unitType.getUnitTypeDescriptionShort());
         }
         if (!abstractUnitActionFindActionForUnitType.b(orderableUnitA) || !abstractUnitActionFindActionForUnitType.canAfford((BaseUnit) orderableUnitA, false)) {
-            if (!this.aiController.isPathPossibleBetweenPoints(abstractUnitActionFindActionForUnitType.getDisplayText(), orderableUnitA)) {
-                this.lastBuiltCustomUnit = abstractUnitActionFindActionForUnitType.getDisplayText();
+            if (!this.aiController.isPathPossibleBetweenPoints(abstractUnitActionFindActionForUnitType.getPrice(), orderableUnitA)) {
+                this.lastBuiltCustomUnit = abstractUnitActionFindActionForUnitType.getPrice();
                 this.lastBuiltCustomUnit2 = this.lastBuiltCustomUnit.i(orderableUnitA);
                 return true;
             }

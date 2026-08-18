@@ -41,12 +41,12 @@ public class QueueUnitAction extends PopupQueueAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
     public int getCostAmount() {
-        return getDisplayText().a();
+        return getPrice().a();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: B */
-    public UnitPrice getDisplayText() {
+    public UnitPrice getPrice() {
         UnitPrice unitPriceA = this.unitAction.a();
         if (unitPriceA != null) {
             return unitPriceA;

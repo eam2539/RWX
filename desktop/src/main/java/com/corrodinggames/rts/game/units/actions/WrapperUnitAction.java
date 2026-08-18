@@ -285,8 +285,8 @@ public class WrapperUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: B */
-    public UnitPrice getDisplayText() {
-        return this.a.getDisplayText();
+    public UnitPrice getPrice() {
+        return this.a.getPrice();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
