@@ -4601,21 +4601,27 @@ CLASS com/corrodinggames/rts/gameFramework/e/a com/corrodinggames/rts/gameFramew
 	METHOD a renameFile (Ljava/io/File;Ljava/io/File;)Z
 	METHOD a openOutputStream (Ljava/io/File;Z)Ljava/io/OutputStream;
 	METHOD a isManagedPath (Ljava/lang/String;)Z
-	METHOD a findFileWithExtension (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-	METHOD a createTempFile (Ljava/lang/String;Ljava/lang/String;Z)Ljava/io/File;
+	METHOD a findFileExtension (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD a getRWFile (Ljava/lang/String;Ljava/lang/String;Z)Ljava/io/File;
+		COMMENT VERIFIED
 	METHOD a listFilesRecursive (Ljava/lang/String;Z)[Ljava/lang/String;
 	METHOD a getFileAccessFlags (Z)Lcom/corrodinggames/rts/gameFramework/e/b;
 	METHOD b initialize ()V
 	METHOD b deleteDirectory (Ljava/io/File;)Z
 	METHOD b renameFileInternal (Ljava/io/File;Ljava/io/File;)Z
-	METHOD b setWritePath (Ljava/lang/String;)V
+	METHOD b setLastError (Ljava/lang/String;)V
+		COMMENT VERIFIED
 	METHOD b openOutputStreamByPath (Ljava/lang/String;Z)Ljava/io/OutputStream;
-	METHOD c getReadPath ()Ljava/lang/String;
+	METHOD c getLastError ()Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD c scanFile (Ljava/io/File;)V
 	METHOD c isAbstractPath (Ljava/lang/String;)Z
-	METHOD d getExternalStoragePath ()Ljava/lang/String;
+	METHOD d getGameDataPath ()Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD d getFileName (Ljava/lang/String;)Ljava/lang/String;
-	METHOD e getWorkingDirectory ()Ljava/lang/String;
+	METHOD e getCachePath ()Ljava/lang/String;
+		COMMENT VERIFIED
 	METHOD e convertAbstractPath (Ljava/lang/String;)Ljava/lang/String;
 	METHOD f isZip ()Z
 	METHOD f isDirectoryNonZip (Ljava/lang/String;)Z
@@ -4624,11 +4630,16 @@ CLASS com/corrodinggames/rts/gameFramework/e/a com/corrodinggames/rts/gameFramew
 	METHOD i fileExists (Ljava/lang/String;)Z
 	METHOD j openAsset (Ljava/lang/String;)Lcom/corrodinggames/rts/gameFramework/utility/j;
 	METHOD k openFileByPath (Ljava/lang/String;)Lcom/corrodinggames/rts/gameFramework/utility/j;
-	METHOD l deleteFile (Ljava/lang/String;)Z
-	METHOD m getFileSize (Ljava/lang/String;)J
-	METHOD n getAbsolutePath (Ljava/lang/String;)Ljava/lang/String;
-	METHOD o mapPath (Ljava/lang/String;)Ljava/lang/String;
-	METHOD p getSourcePath (Ljava/lang/String;)Ljava/lang/String;
+	METHOD l createDirectory (Ljava/lang/String;)Z
+		COMMENT VERIFIED
+	METHOD m getLastModified (Ljava/lang/String;)J
+		COMMENT VERIFIED
+	METHOD n getStorageTypeForPath (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD o fixPath (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD p mapPath (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/e/b com/corrodinggames/rts/gameFramework/file/FileAccessFlags
 	FIELD a useOverriddenExternalPath Z
 	FIELD b useSaf Z
@@ -4676,6 +4687,16 @@ CLASS com/corrodinggames/rts/gameFramework/e/c com/corrodinggames/rts/gameFramew
 	METHOD n fixPath (Ljava/lang/String;)Ljava/lang/String;
 		COMMENT VERIFIED
 	METHOD p isSaf (Ljava/lang/String;)Z
+	METHOD b getGameDataPath ()Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD b listDir (Ljava/lang/String;Z)[Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD d getStorageTypeName ()Ljava/lang/String;
+		COMMENT VERIFIED
+	METHOD e isZip ()Z
+		COMMENT VERIFIED
+	METHOD o mapPath (Ljava/lang/String;)Ljava/lang/String;
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/gameFramework/e/d com/corrodinggames/rts/gameFramework/file/CustomPathFileLoader
 	FIELD g dirPath Ljava/lang/String;
 	FIELD h name Ljava/lang/String;
