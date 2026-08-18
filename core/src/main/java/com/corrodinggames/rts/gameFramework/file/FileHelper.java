@@ -56,7 +56,7 @@ public class FileHelper {
             int i = GameEngine.getInstance().settingsEngine.storageType;
             GameEngine.log("FileLoader: storageBehaviour:" + i);
             FileLoader fileLoaderCreateFileLoader = createFileLoader(i);
-            GameEngine.log("Using file loader: " + fileLoaderCreateFileLoader.d());
+            GameEngine.log("Using file loader: " + fileLoaderCreateFileLoader.getStorageTypeName());
             activeFileLoader = fileLoaderCreateFileLoader;
         }
     }
@@ -151,17 +151,17 @@ public class FileHelper {
     }
 
     /* JADX INFO: renamed from: c */
-    public static String getReadPath() {
+    public static String getLastError() {
         return activeFileLoader.getLastError();
     }
 
     /* JADX INFO: renamed from: b */
-    public static void setWritePath(String str) {
+    public static void setLastError(String str) {
         activeFileLoader.setLastError(str);
     }
 
     /* JADX INFO: renamed from: a */
-    public static String findFileWithExtension(String str, String str2) {
+    public static String findFileExtension(String str, String str2) {
         return activeFileLoader.findFileExtension(str, str2);
     }
 
@@ -192,12 +192,12 @@ public class FileHelper {
 
     /* JADX INFO: renamed from: h */
     public static String[] listFiles(String str) {
-        return activeFileLoader.b(str, false);
+        return activeFileLoader.listDir(str, false);
     }
 
     /* JADX INFO: renamed from: a */
     public static String[] listFilesRecursive(String str, boolean z) {
-        return activeFileLoader.b(str, z);
+        return activeFileLoader.listDir(str, z);
     }
 
     /* JADX INFO: renamed from: i */
@@ -231,22 +231,22 @@ public class FileHelper {
     }
 
     /* JADX INFO: renamed from: l */
-    public static boolean deleteFile(String str) {
+    public static boolean createDirectory(String str) {
         return activeFileLoader.createDirectory(str);
     }
 
     /* JADX INFO: renamed from: d */
-    public static String getExternalStoragePath() {
-        return activeFileLoader.b();
+    public static String getGameDataPath() {
+        return activeFileLoader.getGameDataPath();
     }
 
     /* JADX INFO: renamed from: e */
-    public static String getWorkingDirectory() {
+    public static String getCachePath() {
         return activeFileLoader.getCachePath();
     }
 
     /* JADX INFO: renamed from: m */
-    public static long getFileSize(String str) {
+    public static long getLastModified(String str) {
         return activeFileLoader.getLastModified(str);
     }
 
@@ -255,7 +255,7 @@ public class FileHelper {
     }
 
     /* JADX INFO: renamed from: a */
-    public static File createTempFile(String str, String str2, boolean z) {
+    public static File getRWFile(String str, String str2, boolean z) {
         return activeFileLoader.getRWFile(str, str2, z);
     }
 
@@ -281,23 +281,23 @@ public class FileHelper {
     }
 
     /* JADX INFO: renamed from: n */
-    public static String getAbsolutePath(String str) {
+    public static String getStorageTypeForPath(String str) {
         return activeFileLoader.getStorageTypeForPath(str);
     }
 
     /* JADX INFO: renamed from: f */
     public static boolean isZip() {
-        return activeFileLoader.e();
+        return activeFileLoader.isZip();
     }
 
     /* JADX INFO: renamed from: o */
-    public static String mapPath(String str) {
+    public static String fixPath(String str) {
         return activeFileLoader.fixPath(str);
     }
 
     /* JADX INFO: renamed from: p */
-    public static String getSourcePath(String str) {
-        return activeFileLoader.o(str);
+    public static String mapPath(String str) {
+        return activeFileLoader.mapPath(str);
     }
 
     /* JADX INFO: renamed from: a */

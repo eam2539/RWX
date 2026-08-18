@@ -641,7 +641,7 @@ public class ModManager {
         if (strSubstring.startsWith(str2)) {
             strSubstring = strSubstring.substring(str2.length());
         } else {
-            String strMapPath = FileHelper.mapPath(strSubstring);
+            String strMapPath = FileHelper.fixPath(strSubstring);
             if (strMapPath.startsWith(str2)) {
                 strSubstring = strMapPath.substring(str2.length());
                 GameEngine.log("Mod path:" + modInfo.sourceFolder + " in map path without tag:" + strSubstring);

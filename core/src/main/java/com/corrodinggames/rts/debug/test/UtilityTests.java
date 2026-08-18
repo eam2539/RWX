@@ -176,11 +176,11 @@ public class UtilityTests extends Test {
                                 FileWriter fileWriter2 = new FileWriter(file3);
                                 fileWriter2.write("map3");
                                 fileWriter2.close();
-                                String[] strArrB = customPathFileLoader.b("/SD/rustedWarfare/testDir", false);
+                                String[] strArrB = customPathFileLoader.listDir("/SD/rustedWarfare/testDir", false);
                                 Assert.assertEquals(strArrB.length, 2);
                                 Assert.assertEqualsDebug(strArrB[0], "map1.tmx");
                                 Assert.assertEqualsDebug(strArrB[1], "map2.tmx");
-                                String[] strArrB2 = mergedFileLoader.b("/SD/rustedWarfare/testDir", false);
+                                String[] strArrB2 = mergedFileLoader.listDir("/SD/rustedWarfare/testDir", false);
                                 Assert.assertEquals(strArrB2.length, 3);
                                 Assert.assertEqualsDebug(strArrB2[0], "primary-PATH/map1.tmx");
                                 Assert.assertEqualsDebug(strArrB2[1], "primary-PATH/map2.tmx");

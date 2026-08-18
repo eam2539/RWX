@@ -80,7 +80,7 @@ public class SafFileLoader extends IFileLoader {
     public static String a(String str, boolean z) {
         String link = SafPlatformBridge.registerTree(str);
         if (link == null) {
-            FileHelper.setWritePath("Unable to register SAF folder");
+            FileHelper.setLastError("Unable to register SAF folder");
         }
         return link;
     }

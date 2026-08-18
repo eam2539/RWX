@@ -508,7 +508,7 @@ class ApiImpl private constructor(
             jarFile: File,
             platformBridge: PlatformBridge? = null,
         ): ApiImpl {
-            val root = File(FileHelper.getWorkingDirectory(), "jvm-mod-api/${sanitizePathSegment(manifest.id)}")
+            val root = File(FileHelper.getCachePath(), "jvm-mod-api/${sanitizePathSegment(manifest.id)}")
             val keyStore = platformBridge?.storage?.let(::JvmModAssetKeyStore)
             val resolver = keyStore ?: EmptyAssetCredentialResolver
             val assetStore = JvmModAssetStore(

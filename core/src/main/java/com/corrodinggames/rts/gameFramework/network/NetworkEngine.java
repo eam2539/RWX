@@ -478,7 +478,7 @@ public final class NetworkEngine {
         GameEngine.log("applyProxyControl");
         GameRoomSettings gameRoomSettings2 = this.roomSettings;
         if (!gameRoomSettings2.mapPath.equals(gameRoomSettings.mapPath)) {
-            gameEngine.networkEngine.k("-map '" + FileHelper.mapPath(MapMetadata.getMapName(gameRoomSettings.mapPath)) + "'");
+            gameEngine.networkEngine.k("-map '" + FileHelper.fixPath(MapMetadata.getMapName(gameRoomSettings.mapPath)) + "'");
         }
         if (gameRoomSettings2.revealedMap != gameRoomSettings.revealedMap) {
             gameEngine.networkEngine.k("-revealedmap " + (!gameRoomSettings.revealedMap ? "true" : "false"));
@@ -640,7 +640,7 @@ public final class NetworkEngine {
     }
 
     public String l() {
-        return FileHelper.mapPath(this.selectedMapPath);
+        return FileHelper.fixPath(this.selectedMapPath);
     }
 
     public void m() {
@@ -2108,7 +2108,7 @@ public final class NetworkEngine {
             if (this.chatOnlyMode) {
                 gameOutputStream.writeStringUTF("<CHAT ONLY>");
             } else {
-                gameOutputStream.writeStringUTF(this.roomSettings.mapPath == null ? "<NULL>" : FileHelper.mapPath(this.roomSettings.mapPath));
+                gameOutputStream.writeStringUTF(this.roomSettings.mapPath == null ? "<NULL>" : FileHelper.fixPath(this.roomSettings.mapPath));
             }
             gameOutputStream.writeInt(this.roomSettings.startingCredits);
             gameOutputStream.writeInt(this.roomSettings.fogMode);

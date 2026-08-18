@@ -34,7 +34,7 @@ class ReplaySelectViewModel {
             ?.filter { it.substringAfterLast('/').endsWith(".replay", ignoreCase = true) }
             ?.map { entry ->
                 val replayPath = Utility.joinPath(REPLAY_DIRECTORY, entry)
-                Triple(entry, replayPath, FileHelper.getFileSize(replayPath))
+                Triple(entry, replayPath, FileHelper.getLastModified(replayPath))
             }
             ?.sortedByDescending { (_, _, lastModified) -> lastModified }
             ?.mapIndexed { index, (entry, replayPath, lastModified) ->

@@ -192,7 +192,7 @@ public class FileLoader {
                 if (strSubstring.startsWith("rustedWarfare/")) {
                     strSubstring = strSubstring.substring("rustedWarfare/".length());
                 }
-                return b() + strSubstring;
+                return getGameDataPath() + strSubstring;
             }
             if (isAbsolutePath(strApplyModPath)) {
                 return strApplyModPath;
@@ -204,7 +204,7 @@ public class FileLoader {
             if (strSubstring2.startsWith("rustedWarfare/")) {
                 strSubstring2 = strSubstring2.substring("rustedWarfare/".length());
             }
-            return b() + strSubstring2;
+            return getGameDataPath() + strSubstring2;
         }
         return strApplyModPath;
     }
@@ -325,7 +325,7 @@ public class FileLoader {
         return true;
     }
 
-    public String[] b(String str, boolean z) {
+    public String[] listDir(String str, boolean z) {
         String[] list;
         try {
             String strConvertAbstractPath = convertAbstractPath(str);
@@ -344,13 +344,13 @@ public class FileLoader {
                 if (file == null || !file.exists()) {
                     String str2 = "listDir: path doesn't exist:" + strConvertAbstractPath;
                     GameEngine.logColored(str2);
-                    FileHelper.setWritePath(str2);
+                    FileHelper.setLastError(str2);
                     return null;
                 }
                 list = file.list();
                 if (list == null) {
                     if (file != null && !file.isDirectory()) {
-                        FileHelper.setWritePath("path is not a directory, .rwmod or .zip");
+                        FileHelper.setLastError("path is not a directory, .rwmod or .zip");
                         return null;
                     }
                     return null;
@@ -375,7 +375,7 @@ public class FileLoader {
             Collections.sort(arrayList);
             return (String[]) arrayList.toArray(new String[0]);
         } catch (OutOfMemoryError e) {
-            FileHelper.setWritePath(e.getMessage());
+            FileHelper.setLastError(e.getMessage());
             return null;
         }
     }
@@ -439,7 +439,7 @@ public class FileLoader {
             if (strSubstring2.startsWith("rustedWarfare/")) {
                 strSubstring2 = strSubstring2.substring("rustedWarfare/".length());
             }
-            String str2 = b() + strSubstring2;
+            String str2 = getGameDataPath() + strSubstring2;
             if (this.debug) {
                 GameEngine.log(this.TAG + "openAssetSteam converted:" + strSubstring + " to: " + str2);
             }
@@ -496,7 +496,7 @@ public class FileLoader {
         return zMkdirs;
     }
 
-    public String b() {
+    public String getGameDataPath() {
         if (GameEngine.isNonAndroidVersion) {
             return VariableScope.nullOrMissingString;
         }
@@ -512,7 +512,7 @@ public class FileLoader {
             }
             return absolutePath;
         }
-        String strB = b();
+        String strB = getGameDataPath();
         if (strB.equals(VariableScope.nullOrMissingString)) {
             return "cache/";
         }
@@ -549,12 +549,12 @@ public class FileLoader {
 
     /* JADX INFO: renamed from: a */
     public File getRWFile(String str, String str2, boolean z) {
-        File file = new File(b() + str2 + str);
+        File file = new File(getGameDataPath() + str2 + str);
         if (z) {
             File parentFile = file.getParentFile();
             if (!FileHelper.fileExists(parentFile.getAbsolutePath())) {
                 GameEngine.log("Making missing parent dir: " + parentFile.getAbsolutePath());
-                if (!FileHelper.deleteFile(parentFile.getAbsolutePath())) {
+                if (!FileHelper.createDirectory(parentFile.getAbsolutePath())) {
                     GameEngine.logColored("getRWFile: Could not create parent directory");
                 }
             }
@@ -564,16 +564,16 @@ public class FileLoader {
         return file;
     }
 
-    public String d() {
+    public String getStorageTypeName() {
         return "external";
     }
 
     /* JADX INFO: renamed from: m */
     public String getStorageTypeForPath(String str) {
-        return d();
+        return getStorageTypeName();
     }
 
-    public boolean e() {
+    public boolean isZip() {
         return true;
     }
 
@@ -601,7 +601,7 @@ public class FileLoader {
         return str;
     }
 
-    public String o(String str) {
+    public String mapPath(String str) {
         return str;
     }
 

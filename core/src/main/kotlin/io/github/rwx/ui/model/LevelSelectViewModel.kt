@@ -246,7 +246,7 @@ class LevelSelectViewModel(
                     mapAssetPath = path,
                     playerCount = null,
                     type = LevelSelectMode.SavedGames
-                ) to FileHelper.getFileSize(path)
+                ) to FileHelper.getLastModified(path)
             }
             ?.sortedByDescending { (_, modifiedAt) -> modifiedAt }
             ?.map { (entry, _) -> entry }

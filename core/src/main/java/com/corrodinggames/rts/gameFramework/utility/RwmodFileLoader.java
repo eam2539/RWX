@@ -167,13 +167,13 @@ public class RwmodFileLoader extends IFileLoader {
                             logZipMessage("isDirectory: " + strJ);
                             str2 = "Failed to open .rwmod file (Appears to be a directory!). Please remove .rwmod from any folder names.";
                         }
-                        FileHelper.setWritePath(str2 + VariableScope.nullOrMissingString);
+                        FileHelper.setLastError(str2 + VariableScope.nullOrMissingString);
                         return null;
                     }
                 } catch (IllegalArgumentException e2) {
                     logZipMessage("Failed to open source zip: '" + strConvertAbstractPath + "'");
                     e2.printStackTrace();
-                    FileHelper.setWritePath("Failed to open zip, " + e2.getMessage());
+                    FileHelper.setLastError("Failed to open zip, " + e2.getMessage());
                     return null;
                 }
             }

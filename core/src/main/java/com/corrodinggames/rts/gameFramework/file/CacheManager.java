@@ -45,7 +45,7 @@ public class CacheManager {
 
     /* JADX INFO: renamed from: a */
     public static String getCachePath(String str, String str2, boolean z) {
-        String str3 = FileHelper.getWorkingDirectory() + encodeFileName(str) + ".cachedata";
+        String str3 = FileHelper.getCachePath() + encodeFileName(str) + ".cachedata";
         if (z) {
             File file = new File(str3);
             if (!file.isDirectory() && !file.mkdirs()) {
@@ -133,7 +133,7 @@ public class CacheManager {
         String stringFromCache = readStringFromCache(str, str2 + ".meta");
         if (stringFromCache != null && (strArrB = StringUtils.b(stringFromCache, ":")) != null) {
             Long longOrNull = Utility.parseLongOrNull(strArrB[0]);
-            long fileSize = FileHelper.getFileSize(str2);
+            long fileSize = FileHelper.getLastModified(str2);
             String str5 = strArrB[1];
             if (longOrNull == null) {
                 if (DEBUG) {
@@ -201,7 +201,7 @@ public class CacheManager {
                 GameEngine.log("listDirCached: Listing count: " + strArrListFiles.length);
             }
             str3 = "list";
-            fileSize = FileHelper.getFileSize(str2);
+            fileSize = FileHelper.getLastModified(str2);
             if (fileSize == 0) {
                 if (DEBUG) {
                     GameEngine.log("openAssetCached: Got 0 timestamp for: " + str2 + " cannot cache");
@@ -214,7 +214,7 @@ public class CacheManager {
                 GameEngine.log("listDirCached: Null");
             }
             str3 = "null";
-            fileSize = FileHelper.getFileSize(str2);
+            fileSize = FileHelper.getLastModified(str2);
         }
         saveToCache(str, str5, fileSize + ":" + str3);
         return strArrListFiles;
@@ -239,7 +239,7 @@ public class CacheManager {
                 GameEngine.log("openAssetCached: Reading: " + str2);
             }
             str3 = "data";
-            fileSize = FileHelper.getFileSize(str2);
+            fileSize = FileHelper.getLastModified(str2);
             if (fileSize == 0) {
                 if (DEBUG) {
                     GameEngine.log("openAssetCached: Got 0 timestamp for: " + str2 + " cannot cache");
@@ -253,7 +253,7 @@ public class CacheManager {
                 GameEngine.log("openAssetCached: Got null for: " + str2);
             }
             str3 = "null";
-            fileSize = FileHelper.getFileSize(str2);
+            fileSize = FileHelper.getLastModified(str2);
         }
         saveToCache(str, str5, fileSize + ":" + str3);
         if (assetInputStreamOpenFileByPath == null) {

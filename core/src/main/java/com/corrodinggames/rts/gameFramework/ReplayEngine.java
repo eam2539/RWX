@@ -72,7 +72,7 @@ public class ReplayEngine {
     }
 
     public File a(String str, boolean z) {
-        return FileHelper.createTempFile(str, this.a, z);
+        return FileHelper.getRWFile(str, this.a, z);
     }
 
     public void a() {
@@ -783,7 +783,7 @@ public class ReplayEngine {
 
     public void e(String str) {
         GameEngine.log("ReplayEngine deleteGame: " + str);
-        String strMapPath = FileHelper.mapPath(str);
+        String strMapPath = FileHelper.fixPath(str);
         if (strMapPath.contains("\\") || strMapPath.contains("/")) {
             GameEngine.log("Cannot get replay with path: " + str);
             return;
