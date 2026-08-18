@@ -2641,8 +2641,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 // java.util.Comparator
         /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
         arrayList3.sort((unitType, unitType2) -> {
-            BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
-            BaseUnit baseUnitCanAttack2 = BaseUnit.canAttack(unitType2);
+            BaseUnit baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(unitType);
+            BaseUnit baseUnitCanAttack2 = BaseUnit.getPrototypeForUnitType(unitType2);
             int iCompareTo = Boolean.valueOf(baseUnitCanAttack.bP()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bP()));
             if (iCompareTo != 0) {
                 return iCompareTo;
@@ -2672,7 +2672,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return 0;
         });
         for (UnitType unitType : arrayList3) {
-            if (unitType != UnitTypeEnum.wall_v && !unitType.getUnitTypeDescriptionShort().equals("test_tank") && !unitType.getUnitTypeDescriptionShort().equals("missing") && unitType != UnitTypeEnum.tankDestroyer && unitType != UnitTypeEnum.megaTank && unitType != UnitTypeEnum.fogRevealer && unitType != UnitTypeEnum.crystalResource && unitType != UnitTypeEnum.damagingBorder && unitType != UnitTypeEnum.zoneMarker && unitType != UnitTypeEnum.editorOrBuilder && unitType != UnitTypeEnum.dummyNonUnitWithTeam && unitType != UnitTypeEnum.supplyDepot && (BaseUnit.canAttack(unitType) instanceof OrderableUnit) && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).showInEditor)) {
+            if (unitType != UnitTypeEnum.wall_v && !unitType.getUnitTypeDescriptionShort().equals("test_tank") && !unitType.getUnitTypeDescriptionShort().equals("missing") && unitType != UnitTypeEnum.tankDestroyer && unitType != UnitTypeEnum.megaTank && unitType != UnitTypeEnum.fogRevealer && unitType != UnitTypeEnum.crystalResource && unitType != UnitTypeEnum.damagingBorder && unitType != UnitTypeEnum.zoneMarker && unitType != UnitTypeEnum.editorOrBuilder && unitType != UnitTypeEnum.dummyNonUnitWithTeam && unitType != UnitTypeEnum.supplyDepot && (BaseUnit.getPrototypeForUnitType(unitType) instanceof OrderableUnit) && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).showInEditor)) {
                 FilteredUnitAction filteredUnitAction = new FilteredUnitAction(new PlaceBuildingAction(unitType, 1, null), K);
                 boolean z2 = false;
                 Iterator it2 = D.iterator();

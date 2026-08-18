@@ -151,7 +151,7 @@ public abstract class AIStrategyNode extends Serializable {
                 if (unitTypeEnum != null) {
                     OrderableUnit orderableUnit = null;
                     if (baseUnitCanAttack == null) {
-                        baseUnitCanAttack = BaseUnit.canAttack(unitType);
+                        baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(unitType);
                     }
                     if (baseUnitCanAttack instanceof OrderableUnit) {
                         orderableUnit = (OrderableUnit) baseUnitCanAttack;

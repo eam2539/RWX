@@ -74,7 +74,7 @@ public class PlaceBuildingAction extends AbstractUnitAction {
     /* JADX INFO: renamed from: a */
     public String getDescription() {
         String strF = getUnitType().f();
-        BaseUnit baseUnitCanAttack = BaseUnit.canAttack(getUnitType());
+        BaseUnit baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(getUnitType());
         if (this.b != 1 && (baseUnitCanAttack instanceof OrderableUnit)) {
             ((OrderableUnit) baseUnitCanAttack).a(this.b);
         }

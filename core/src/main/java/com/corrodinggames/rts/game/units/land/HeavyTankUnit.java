@@ -165,7 +165,7 @@ public class HeavyTankUnit extends LandUnit {
         if (!baseUnit.i()) {
             PointF pointFE = E(i);
             Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y);
-            PointF pointFK = getShadowTexture(i);
+            PointF pointFK = getShadowOffsetForLevel(i);
             projectileA.K = pointFK.x;
             projectileA.L = pointFK.y;
             projectileA.ar = KoolArgbColor.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG, 150, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 40);

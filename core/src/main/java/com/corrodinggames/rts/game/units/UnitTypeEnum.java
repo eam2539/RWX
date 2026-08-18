@@ -2006,7 +2006,7 @@ public enum UnitTypeEnum implements UnitType {
     /* JADX INFO: renamed from: a */
     public static void drawUnitWithBoolean(UnitType unitType, float f, float f2, float f3, float f4, PlayerTeam playerTeam, float f5, float f6, boolean z, boolean z2, int i, boolean z3, BaseUnit baseUnit) {
         GameEngine gameEngine = GameEngine.getInstance();
-        BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
+        BaseUnit baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(unitType);
         boolean zBI = baseUnitCanAttack.bI();
         baseUnitCanAttack.setUnitTeam(playerTeam);
         if (baseUnitCanAttack instanceof OrderableUnit) {

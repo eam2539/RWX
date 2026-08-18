@@ -165,8 +165,8 @@ public class FilteredUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public void isWaiting(BaseUnit baseUnit, TextRenderQueue textRenderQueue, KoolPaint paint, KoolPaint paint2) {
-        this.a.isWaiting(baseUnit, textRenderQueue, paint, paint2);
+    public void renderDisplayText(BaseUnit baseUnit, TextRenderQueue textRenderQueue, KoolPaint paint, KoolPaint paint2) {
+        this.a.renderDisplayText(baseUnit, textRenderQueue, paint, paint2);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction

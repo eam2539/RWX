@@ -124,7 +124,7 @@ public class Gunship extends AirUnit {
     public void a(BaseUnit baseUnit, int i) {
         PointF pointFE = E(i);
         Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y, this.posZ, i);
-        PointF pointFK = getShadowTexture(i);
+        PointF pointFK = getShadowOffsetForLevel(i);
         projectileA.K = pointFK.x;
         projectileA.L = pointFK.y;
         projectileA.ar = KoolArgbColor.a(255, 150, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 40);

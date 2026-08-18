@@ -105,7 +105,7 @@ public class PingMapAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: q */
-    public ArrayList isPurchase(BaseUnit baseUnit) {
+    public ArrayList getCandidateActionList(BaseUnit baseUnit) {
         return b;
     }
 

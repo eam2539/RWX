@@ -194,8 +194,8 @@ public class ExperimentalHoverTank extends HoverLandUnit {
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: K */
-    public PointF getShadowTexture(int i) {
-        PointF pointFK = super.getShadowTexture(i);
+    public PointF getShadowOffsetForLevel(int i) {
+        PointF pointFK = super.getShadowOffsetForLevel(i);
         if (this.i != null) {
             pointFK.x += this.i.K;
             pointFK.y += this.i.L;

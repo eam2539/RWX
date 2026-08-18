@@ -1093,7 +1093,7 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
         public BaseUnit getUnitOrSharedUnit(BaseUnit baseUnit) {
             BaseUnit baseUnit2;
             if (this.unitType != null) {
-                return BaseUnit.canAttack(this.unitType.c());
+                return BaseUnit.getPrototypeForUnitType(this.unitType.c());
             }
             if (this.unitReference != null && (baseUnit2 = this.unitReference.get(baseUnit)) != null) {
                 return baseUnit2;

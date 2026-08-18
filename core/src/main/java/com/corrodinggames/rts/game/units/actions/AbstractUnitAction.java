@@ -371,7 +371,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: a */
-    public void isWaiting(BaseUnit baseUnit, TextRenderQueue textRenderQueue, KoolPaint paint, KoolPaint paint2) {
+    public void renderDisplayText(BaseUnit baseUnit, TextRenderQueue textRenderQueue, KoolPaint paint, KoolPaint paint2) {
         String displayTextForUnitWithQueueCount;
         KoolPaint paint3 = textRenderQueue.g;
         if (paint != null) {
@@ -517,12 +517,12 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: q */
-    public ArrayList isPurchase(BaseUnit baseUnit) {
+    public ArrayList getCandidateActionList(BaseUnit baseUnit) {
         return null;
     }
 
     /* JADX INFO: renamed from: M */
-    public KeyBinding isPrimary() {
+    public KeyBinding getPrimaryKeyBinding() {
         return null;
     }
 

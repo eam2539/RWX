@@ -350,7 +350,7 @@ public class AttackSubmarine extends WaterUnit {
         if (!Q()) {
             PointF pointFE = E(i2);
             Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y, this.posZ, i2);
-            PointF pointFK = getShadowTexture(i2);
+            PointF pointFK = getShadowOffsetForLevel(i2);
             projectileA.K = pointFK.x;
             projectileA.L = pointFK.y;
             projectileA.ar = KoolArgbColor.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 50);
@@ -368,7 +368,7 @@ public class AttackSubmarine extends WaterUnit {
         }
         PointF pointFE2 = E(i2);
         Projectile projectileA2 = Projectile.a(this, pointFE2.x, pointFE2.y, this.posZ, i2);
-        PointF pointFK2 = getShadowTexture(i2);
+        PointF pointFK2 = getShadowOffsetForLevel(i2);
         projectileA2.K = pointFK2.x;
         projectileA2.L = pointFK2.y;
         projectileA2.ar = KoolArgbColor.a(255, 30, 30, 150);

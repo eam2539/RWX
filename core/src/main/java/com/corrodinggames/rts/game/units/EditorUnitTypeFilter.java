@@ -12,7 +12,7 @@ public enum EditorUnitTypeFilter {
             if (unitType == null) {
                 return false;
             }
-            BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
+            BaseUnit baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(unitType);
             return (baseUnitCanAttack.bO() || unitType.isBuildingUnit() || baseUnitCanAttack.getMovementType() == UnitMovementType.AIR || baseUnitCanAttack.getMovementType() == UnitMovementType.WATER) ? false : true;
         }
     },
@@ -23,7 +23,7 @@ public enum EditorUnitTypeFilter {
             if (unitType == null) {
                 return false;
             }
-            BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
+            BaseUnit baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(unitType);
             return (baseUnitCanAttack.bO() || unitType.isBuildingUnit() || baseUnitCanAttack.getMovementType() != UnitMovementType.AIR) ? false : true;
         }
     },
@@ -34,7 +34,7 @@ public enum EditorUnitTypeFilter {
             if (unitType == null) {
                 return false;
             }
-            BaseUnit baseUnitCanAttack = BaseUnit.canAttack(unitType);
+            BaseUnit baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(unitType);
             return (baseUnitCanAttack.bO() || unitType.isBuildingUnit() || baseUnitCanAttack.getMovementType() != UnitMovementType.WATER) ? false : true;
         }
     },
@@ -42,7 +42,7 @@ public enum EditorUnitTypeFilter {
 
         @Override // com.corrodinggames.rts.game.units.EditorUnitTypeFilter
         public boolean a(UnitType unitType) {
-            return (unitType == null || BaseUnit.canAttack(unitType).bO() || !unitType.isBuildingUnit()) ? false : true;
+            return (unitType == null || BaseUnit.getPrototypeForUnitType(unitType).bO() || !unitType.isBuildingUnit()) ? false : true;
         }
     },
     bio { // from class: com.corrodinggames.rts.game.units.o.5
@@ -52,7 +52,7 @@ public enum EditorUnitTypeFilter {
             if (unitType == null) {
                 return false;
             }
-            return BaseUnit.canAttack(unitType).bO();
+            return BaseUnit.getPrototypeForUnitType(unitType).bO();
         }
     };
 
