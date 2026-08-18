@@ -755,8 +755,10 @@ CLASS com/corrodinggames/rts/game/a/a com/corrodinggames/rts/game/ai/AIControlle
 	METHOD a addAITask (Lcom/corrodinggames/rts/game/a/d;FFI)I
 	METHOD a shouldWriteForUnitType (Lcom/corrodinggames/rts/game/a/d;Lcom/corrodinggames/rts/game/a/b;)I
 	METHOD a filterUnitAndCommand (Lcom/corrodinggames/rts/game/a/o;)I
-	METHOD a canExecuteCustomUnitAction (Lcom/corrodinggames/rts/game/n;FFF)Lcom/corrodinggames/rts/game/units/am;
-	METHOD a canExecuteCustomUnitActionWithBoolean (Lcom/corrodinggames/rts/game/n;FFFZ)I
+	METHOD a findEnemyUnitInRange (Lcom/corrodinggames/rts/game/n;FFF)Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
+	METHOD a countEnemyUnitsInRangeWithFilter (Lcom/corrodinggames/rts/game/n;FFFZ)I
+		COMMENT VERIFIED
 	METHOD a isPathPossibleForUnit (Lcom/corrodinggames/rts/game/units/am;FF)Z
 	METHOD a isPathPossibleForUnit (Lcom/corrodinggames/rts/game/units/am;FFF)Z
 	METHOD a canUnitReachUnit (Lcom/corrodinggames/rts/game/units/am;Lcom/corrodinggames/rts/game/units/am;)Z
@@ -1722,7 +1724,8 @@ CLASS com/corrodinggames/rts/game/units/a/s com/corrodinggames/rts/game/units/ac
 	METHOD a appendTooltip (Lcom/corrodinggames/rts/game/units/am;Lcom/corrodinggames/rts/game/n;)Z
 	METHOD a onTargetSelected (Lcom/corrodinggames/rts/game/units/am;Lcom/corrodinggames/rts/game/units/am;)V
 	METHOD a onPurchase (Lcom/corrodinggames/rts/game/units/am;Lcom/corrodinggames/rts/gameFramework/f/ae;)V
-	METHOD a isWaiting (Lcom/corrodinggames/rts/game/units/am;Lcom/corrodinggames/rts/gameFramework/f/ae;Landroid/graphics/Paint;Landroid/graphics/Paint;)V
+	METHOD a renderDisplayText (Lcom/corrodinggames/rts/game/units/am;Lcom/corrodinggames/rts/gameFramework/f/ae;Landroid/graphics/Paint;Landroid/graphics/Paint;)V
+		COMMENT VERIFIED
 	METHOD a canAfford (Lcom/corrodinggames/rts/game/units/am;Z)Z
 	METHOD a setActionId (Ljava/lang/String;)V
 	METHOD A usesActionTarget ()Z
@@ -1765,7 +1768,8 @@ CLASS com/corrodinggames/rts/game/units/a/s com/corrodinggames/rts/game/units/ac
 	METHOD l shouldHideQueueInterface (Lcom/corrodinggames/rts/game/units/am;)Z
 	METHOD m getKeyBinding ()I
 	METHOD m isAiDisabled (Lcom/corrodinggames/rts/game/units/am;)Z
-	METHOD M isPrimary ()Lcom/corrodinggames/rts/gameFramework/ad;
+	METHOD M getPrimaryKeyBinding ()Lcom/corrodinggames/rts/gameFramework/ad;
+		COMMENT VERIFIED
 	METHOD m_ getSortOrder ()F
 	METHOD n isAiHighPriority (Lcom/corrodinggames/rts/game/units/am;)Z
 	METHOD N getActionId ()Lcom/corrodinggames/rts/game/units/a/c;
@@ -1777,7 +1781,8 @@ CLASS com/corrodinggames/rts/game/units/a/s com/corrodinggames/rts/game/units/ac
 	METHOD p isInstant ()Z
 	METHOD p getProgress (Lcom/corrodinggames/rts/game/units/am;)F
 	METHOD P getAnimationSet ()Lcom/corrodinggames/rts/game/units/custom/h;
-	METHOD q isPurchase (Lcom/corrodinggames/rts/game/units/am;)Ljava/util/ArrayList;
+	METHOD q getCandidateActionList (Lcom/corrodinggames/rts/game/units/am;)Ljava/util/ArrayList;
+		COMMENT VERIFIED
 	METHOD Q usesExtraLagHidingInUI ()Z
 	METHOD r isAvailable (Lcom/corrodinggames/rts/game/units/am;)Z
 	METHOD r_ getAdditionalCost ()Lcom/corrodinggames/rts/game/units/custom/d/b;
@@ -1964,7 +1969,8 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	METHOD c getUnitShortName ()Ljava/lang/String;
 	METHOD c checkAttackCooldown (FFF)Z
 	METHOD c isUnitArmorEffective (Lcom/corrodinggames/rts/game/units/am;Z)Z
-	METHOD c canAttack (Lcom/corrodinggames/rts/game/units/as;)Lcom/corrodinggames/rts/game/units/am;
+	METHOD c getPrototypeForUnitType (Lcom/corrodinggames/rts/game/units/as;)Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
 	METHOD ca drawRallyPoint ()V
 		COMMENT VERIFIED
 	METHOD cA getGlobalCustomResourceGenerationRates ()Lcom/corrodinggames/rts/game/units/custom/e/f;
@@ -4046,7 +4052,8 @@ CLASS com/corrodinggames/rts/game/units/y com/corrodinggames/rts/game/units/Orde
 	METHOD i addRotation (F)V
 	METHOD i updateRepairOrReclaimCommand (FLcom/corrodinggames/rts/game/units/au;Lcom/corrodinggames/rts/game/units/ad;)V
 	METHOD k updateMovementLogic (F)V
-	METHOD K getShadowTexture (I)Landroid/graphics/PointF;
+	METHOD K getShadowOffsetForLevel (I)Landroid/graphics/PointF;
+		COMMENT VERIFIED
 	METHOD R getSelectionPaint ()Landroid/graphics/Paint;
 	METHOD z getMoveSpeed ()F
 CLASS com/corrodinggames/rts/game/units/z com/corrodinggames/rts/game/units/TriggerDebugAction
