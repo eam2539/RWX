@@ -119,7 +119,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
             if (decalDefinition.j < 0.0f) {
                 throw new ConfigParseException("[" + str2 + "]onlyWithZoomLevelOrMore:" + decalDefinition.j + " cannot be less than zero");
             }
-            Integer logicBooleanUnit = iniFile.getLogicBooleanUnit(str2, "onlyOnBodyFrameOf", (Integer) null);
+            Integer logicBooleanUnit = iniFile.getInt(str2, "onlyOnBodyFrameOf", (Integer) null);
             if (logicBooleanUnit != null) {
                 decalDefinition.o = logicBooleanUnit.intValue();
                 if (decalDefinition.o < 0) {
@@ -142,7 +142,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                 decalDefinition.s = logicBooleanNumber2;
                 decalDefinition.t = logicBooleanNumber3;
             }
-            Integer logicBooleanUnit2 = iniFile.getLogicBooleanUnit(str2, "total_frames", (Integer) null);
+            Integer logicBooleanUnit2 = iniFile.getInt(str2, "total_frames", (Integer) null);
             if (logicBooleanUnit2 != null) {
                 decalDefinition.J = logicBooleanUnit2.intValue();
                 if (decalDefinition.J < 1) {
@@ -150,8 +150,8 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                 }
             }
             decalDefinition.M = iniFile.getBoolean(str2, "frame_verticalOrdering", (Boolean) false).booleanValue();
-            decalDefinition.K = iniFile.getLogicBooleanUnit(str2, "frame_width", (Integer) (-1)).intValue();
-            decalDefinition.L = iniFile.getLogicBooleanUnit(str2, "frame_height", (Integer) (-1)).intValue();
+            decalDefinition.K = iniFile.getInt(str2, "frame_width", (Integer) (-1)).intValue();
+            decalDefinition.L = iniFile.getInt(str2, "frame_height", (Integer) (-1)).intValue();
             if (decalDefinition.K != -1 && decalDefinition.J != -1) {
                 throw new ConfigParseException("[" + str2 + "]TOTAL_FRAMES and frame_width cannot be both set");
             }
@@ -241,7 +241,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                 }
             }
             decalDefinition.x = iniFile.getFloat(str2, "stack_hOffset", Float.valueOf(1.0f)).floatValue();
-            decalDefinition.y = iniFile.getLogicBooleanUnit(str2, "stack_frameOffset", (Integer) 0).intValue();
+            decalDefinition.y = iniFile.getInt(str2, "stack_frameOffset", (Integer) 0).intValue();
             decalDefinition.A = iniFile.getLogicBooleanNumber(customUnitConfig, str2, "stack_indexStart", null);
             decalDefinition.B = iniFile.getLogicBooleanNumber(customUnitConfig, str2, "stack_indexCount", null);
             Boolean bool = iniFile.getBoolean(str2, "stack_drawInReverseOrder", (Boolean) null);
@@ -249,7 +249,7 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
                 decalDefinition.z = true;
             }
             decalDefinition.N = iniFile.getLogicBooleanWithReturnType(customUnitConfig, str2, "frame", (LogicBoolean) null, LogicBoolean.ReturnType.number);
-            decalDefinition.O = iniFile.getLogicBooleanUnit(str2, "addBodyFrameMultipliedBy", (Integer) 0).intValue();
+            decalDefinition.O = iniFile.getInt(str2, "addBodyFrameMultipliedBy", (Integer) 0).intValue();
             decalDefinition.F = iniFile.getLogicBoolean(customUnitConfig, str2, "isVisible", (LogicBoolean) null);
             decalDefinition.R = iniFile.getFloat(str2, "xOffsetRelative", Float.valueOf(0.0f)).floatValue();
             decalDefinition.S = iniFile.getFloat(str2, "yOffsetRelative", Float.valueOf(0.0f)).floatValue();

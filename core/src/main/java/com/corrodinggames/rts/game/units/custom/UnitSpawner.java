@@ -317,7 +317,7 @@ public class UnitSpawner {
                                 }
 
                                 var35.f(var24);
-                                var35.getUnitType(var17);
+                                var35.setCommandTargetUnit(var17);
                                 var35.posX = var18;
                                 var35.posY = var19;
                                 var35.posZ = var20;

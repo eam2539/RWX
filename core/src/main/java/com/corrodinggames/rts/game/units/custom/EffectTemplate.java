@@ -459,8 +459,8 @@ public class EffectTemplate {
         this.fadeOut = iniFile.getBoolean(str, "fadeOut", (Boolean) true).booleanValue();
         this.delayedStartTimer = iniFile.getTime(str, "delayedStartTimer", Float.valueOf(0.0f)).floatValue();
         this.delayedStartTimerRandom = iniFile.getFloat(str, "delayedStartTimerRandom", Float.valueOf(0.0f)).floatValue();
-        this.frameIndex = iniFile.getLogicBooleanUnit(str, "frameIndex", (Integer) 0).intValue();
-        this.frameIndexRandom = iniFile.getLogicBooleanUnit(str, "frameIndexRandom", (Integer) 0).intValue();
+        this.frameIndex = iniFile.getInt(str, "frameIndex", (Integer) 0).intValue();
+        this.frameIndexRandom = iniFile.getInt(str, "frameIndexRandom", (Integer) 0).intValue();
         String string2 = iniFile.getString(str, "stripIndex", "0");
         this.stripIndex = gameEngine.effectManager.findEffectTemplateIndex(string2);
         if (this.stripIndex == -1) {
@@ -479,7 +479,7 @@ public class EffectTemplate {
                 throw new RuntimeException("Unknown priority:" + string3);
             }
         }
-        int iIntValue = iniFile.getLogicBooleanUnit(str, "total_frames", (Integer) 1).intValue();
+        int iIntValue = iniFile.getInt(str, "total_frames", (Integer) 1).intValue();
         if (iIntValue < 1) {
             throw new ConfigParseException("TOTAL_FRAMES cannot be: " + iIntValue + " (must be 1 or more)");
         }
@@ -489,8 +489,8 @@ public class EffectTemplate {
             this.imageStrip.i = textureA;
             this.imageStrip.b = this.imageStrip.i.m() / iIntValue;
             this.imageStrip.c = this.imageStrip.i.l();
-            this.imageStrip.b = iniFile.getLogicBooleanUnit(str, "frame_width", Integer.valueOf(this.imageStrip.b)).intValue();
-            this.imageStrip.c = iniFile.getLogicBooleanUnit(str, "frame_height", Integer.valueOf(this.imageStrip.c)).intValue();
+            this.imageStrip.b = iniFile.getInt(str, "frame_width", Integer.valueOf(this.imageStrip.b)).intValue();
+            this.imageStrip.c = iniFile.getInt(str, "frame_height", Integer.valueOf(this.imageStrip.c)).intValue();
             if (iIntValue == 1 && this.imageStrip.b >= this.imageStrip.i.m()) {
                 this.imageStrip.k = true;
             } else if (this.imageStrip.c < this.imageStrip.i.l()) {
@@ -512,9 +512,9 @@ public class EffectTemplate {
                 throw new ConfigParseException("imageShadow is required if image and shadow:true is used");
             }
         }
-        this.animateFrameStart = iniFile.getLogicBooleanUnit(str, "animateFrameStart", (Integer) 0).intValue();
-        this.animateFrameStartRandomAdd = iniFile.getLogicBooleanUnit(str, "animateFrameStartRandomAdd", (Integer) 0).intValue();
-        this.animateFrameEnd = iniFile.getLogicBooleanUnit(str, "animateFrameEnd", (Integer) 0).intValue();
+        this.animateFrameStart = iniFile.getInt(str, "animateFrameStart", (Integer) 0).intValue();
+        this.animateFrameStartRandomAdd = iniFile.getInt(str, "animateFrameStartRandomAdd", (Integer) 0).intValue();
+        this.animateFrameEnd = iniFile.getInt(str, "animateFrameEnd", (Integer) 0).intValue();
         this.animateFramePingPong = iniFile.getBoolean(str, "animateFramePingPong", (Boolean) false).booleanValue();
         this.animateFrameLooping = iniFile.getBoolean(str, "animateFrameLooping", (Boolean) false).booleanValue();
         this.animateFrameSpeed = iniFile.getTime(str, "animateFrameSpeed", Float.valueOf(0.5f)).floatValue();

@@ -147,7 +147,7 @@ private class EngineUnitWorldBackend : UnitWorldBackend {
         unit.buildProgress = request.constructionProgress
         unit.paidBuildProgress = request.constructionProgress
         unit.setUnitTeam(team)
-        unit.getUnitType(null)
+        unit.setCommandTargetUnit(null)
         if (unit is OrderableUnit) {
             unit.br()
             if (unit.bI()) GameEngine.getInstance().pathfindingEngine.a(unit)

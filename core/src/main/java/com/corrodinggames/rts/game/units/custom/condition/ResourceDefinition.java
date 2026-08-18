@@ -84,7 +84,7 @@ public class ResourceDefinition {
         if (this.q && this.l) {
             throw new ConfigParseException("[" + str + "]displayInHud:true only supported non-hidden resources");
         }
-        this.s = iniFile.getLogicBooleanUnit(str, "displayPos", (Integer) 0).intValue();
+        this.s = iniFile.getInt(str, "displayPos", (Integer) 0).intValue();
         this.r = (DigitGroupingStyle) iniFile.getEnum(str, "displayDigitGrouping", DigitGroupingStyle.none, DigitGroupingStyle.class);
         this.t = CustomUnitConfigParser.getLocaleString(iniFile, str, "displayTextPrefix", (String) null);
         this.u = CustomUnitConfigParser.getLocaleString(iniFile, str, "displayTextPostfix", (String) null);

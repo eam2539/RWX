@@ -44,7 +44,7 @@ public class AttachmentAction extends LogicAction {
 
     public static void a(CustomUnitConfig customUnitConfig, IniFile iniFile, String str, String str2, CustomActionDef customActionDef, String str3, boolean z) throws ConfigParseException {
         UnitSpawner unitSpawnerA = UnitSpawner.a(customUnitConfig, iniFile, str, str2 + "attachments_addNewUnits");
-        int iIntValue = iniFile.getLogicBooleanUnit(str, str2 + "attachments_deleteNumUnits", (Integer) 0).intValue();
+        int iIntValue = iniFile.getInt(str, str2 + "attachments_deleteNumUnits", (Integer) 0).intValue();
         boolean zBooleanValue = iniFile.getBoolean(str, str2 + "attachments_disconnect", (Boolean) false).booleanValue();
         boolean zBooleanValue2 = iniFile.getBoolean(str, str2 + "attachments_unload", (Boolean) false).booleanValue();
         boolean zBooleanValue3 = iniFile.getBoolean(str, str2 + "disconnectFromParent", (Boolean) false).booleanValue();

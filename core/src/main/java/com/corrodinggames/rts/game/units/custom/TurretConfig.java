@@ -373,7 +373,7 @@ public class TurretConfig {
         if (f3 != null) {
             turretConfig.u = f3.floatValue();
         }
-        turretConfig.unloadUnitsAndGiveAttackOrderCount = iniFile.getLogicBooleanUnit(str, "unloadUpToXUnitsAndGiveAttackOrder", Integer.valueOf(turretConfig.unloadUnitsAndGiveAttackOrderCount)).intValue();
+        turretConfig.unloadUnitsAndGiveAttackOrderCount = iniFile.getInt(str, "unloadUpToXUnitsAndGiveAttackOrder", Integer.valueOf(turretConfig.unloadUnitsAndGiveAttackOrderCount)).intValue();
         UnitPrice unitPriceA = UnitPrice.a(customUnitConfig, iniFile, str, "resourceUsage", true);
         if (unitPriceA != null && unitPriceA.d()) {
             turretConfig.resourceUsage = unitPriceA;

@@ -25,8 +25,8 @@ public class CustomUnitDirectionConfig {
         CustomUnitDirectionConfig customUnitDirectionConfig = new CustomUnitDirectionConfig();
         customUnitDirectionConfig.useMainTurret = iniFile.getBoolean(str, str2 + "direction_useMainTurret", (Boolean) false).booleanValue();
         customUnitDirectionConfig.directionUnits = iniFile.getFloat(str, str2 + "direction_units", Float.valueOf(0.0f)).floatValue();
-        customUnitDirectionConfig.strideX = iniFile.getLogicBooleanUnit(str, str2 + "direction_strideX", (Integer) (-1)).intValue();
-        customUnitDirectionConfig.strideY = iniFile.getLogicBooleanUnit(str, str2 + "direction_strideY", (Integer) (-1)).intValue();
+        customUnitDirectionConfig.strideX = iniFile.getInt(str, str2 + "direction_strideX", (Integer) (-1)).intValue();
+        customUnitDirectionConfig.strideY = iniFile.getInt(str, str2 + "direction_strideY", (Integer) (-1)).intValue();
         customUnitDirectionConfig.startingDirection = iniFile.getFloat(str, str2 + "direction_starting", Float.valueOf(0.0f)).floatValue();
         if (customUnitDirectionConfig.directionUnits == 0.0f) {
             return null;

@@ -38,11 +38,11 @@ public class TransportAction extends LogicAction {
 
     public static void a(CustomUnitConfig customUnitConfig, IniFile iniFile, String str, String str2, CustomActionDef customActionDef, String str3, boolean z) throws ConfigParseException {
         UnitSpawner unitSpawnerA = UnitSpawner.a(customUnitConfig, iniFile, str, str2 + "addUnitsIntoTransport");
-        int iIntValue = iniFile.getLogicBooleanUnit(str, str2 + "deleteNumUnitsFromTransport", (Integer) 0).intValue();
+        int iIntValue = iniFile.getInt(str, str2 + "deleteNumUnitsFromTransport", (Integer) 0).intValue();
         AnimationSet animationSetA = AnimationTag.a(iniFile.getString(str, "deleteNumUnitsFromTransport_onlyWithTags", (String) null), (AnimationSet) null);
         boolean zBooleanValue = iniFile.getBoolean(str, str2 + "startUnloadingTransport", (Boolean) false).booleanValue();
         boolean zBooleanValue2 = iniFile.getBoolean(str, str2 + "forceUnloadTransportNow", (Boolean) false).booleanValue();
-        int iIntValue2 = iniFile.getLogicBooleanUnit(str, str2 + "forceUnloadTransportNow_onlyOnSlot", (Integer) (-1)).intValue();
+        int iIntValue2 = iniFile.getInt(str, str2 + "forceUnloadTransportNow_onlyOnSlot", (Integer) (-1)).intValue();
         LogicBoolean logicBoolean = iniFile.getInt(customUnitConfig, str, str2 + "transportTargetNow", null);
         if (iIntValue2 != -1 && !zBooleanValue2) {
             throw new ConfigParseException("forceUnloadTransportNow_onlyOnSlot expects forceUnloadTransportNow");
@@ -97,7 +97,7 @@ public class TransportAction extends LogicAction {
             }
         }
         if (this.startUnloadingTransport) {
-            customUnit.getTransportedUnits();
+            customUnit.startUnloading();
         }
         if (this.forceUnloadTransportNow) {
             for (int size2 = customUnit.transportedUnits.size() - 1; size2 >= 0; size2--) {

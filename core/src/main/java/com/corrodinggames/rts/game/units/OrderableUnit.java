@@ -5253,11 +5253,11 @@ public abstract class OrderableUnit extends UnitBase {
         baseUnitG.posX = gameEngine.tileMap.cursorTileX + baseUnitG.getTileOffsetX();
         baseUnitG.posY = gameEngine.tileMap.cursorTileY + baseUnitG.getTileOffsetY();
         baseUnitG.f(this.team);
-        baseUnitG.getUnitType(this);
+        baseUnitG.setCommandTargetUnit(this);
         if (i != 1 && (baseUnitG instanceof OrderableUnit)) {
             ((OrderableUnit) baseUnitG).a(i);
         }
-        baseUnitG.getUnitCategory();
+        baseUnitG.onUnitSpawned();
         if (baseUnitG instanceof OrderableUnit) {
             OrderableUnit orderableUnit = (OrderableUnit) baseUnitG;
             boolean z = false;

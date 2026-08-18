@@ -100,8 +100,8 @@ public class AnimationConfig {
             }
         }
         this.q = iniFile.getFloat(str, str2 + "onActionsQueuedUnitPlayAt", Float.valueOf(0.0f)).floatValue();
-        this.b = iniFile.getLogicBooleanUnit(str, str2 + "start", (Integer) 0).intValue();
-        this.c = iniFile.getLogicBooleanUnit(str, str2 + "end", (Integer) (-1)).intValue();
+        this.b = iniFile.getInt(str, str2 + "start", (Integer) 0).intValue();
+        this.c = iniFile.getInt(str, str2 + "end", (Integer) (-1)).intValue();
         if (this.c != -1 && this.c < this.b) {
             throw new RuntimeException("animationEnd cannot before animationStart on animation:" + this.animationName);
         }

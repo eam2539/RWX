@@ -2170,7 +2170,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: B */
-    public void getUnitType(BaseUnit baseUnit) {
+    public void setCommandTargetUnit(BaseUnit baseUnit) {
         if (baseUnit instanceof EditorOrBuilder) {
             baseUnit = null;
         }
@@ -2178,7 +2178,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: cP */
-    public void getUnitCategory() {
+    public void onUnitSpawned() {
     }
 
     /* JADX INFO: renamed from: g */

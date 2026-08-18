@@ -367,7 +367,7 @@ public class ReliableSocket extends Socket {
                 case 3:
                 case 4: {
                     this.sendPacket(new FINSegment(this.connectionStats.nextSequenceToSendAndIncrement()));
-                    this.handleSynPacket();
+                    this.performCloseCleanup();
                     break;
                 }
                 case 0: {
@@ -832,7 +832,7 @@ public class ReliableSocket extends Socket {
                     synchronized (this.inputLock) {
                         this.inputLock.notify();
                     }
-                    this.handleSynPacket();
+                    this.performCloseCleanup();
                     break;
                 }
             }
@@ -1179,7 +1179,7 @@ public class ReliableSocket extends Socket {
     }
 
     /* JADX INFO: renamed from: e */
-    protected void handleSynPacket() {
+    protected void performCloseCleanup() {
         this.nullSegmentTimer.cancel();
         this.keepAliveTimer.cancel();
         this.connectionState = 4;
