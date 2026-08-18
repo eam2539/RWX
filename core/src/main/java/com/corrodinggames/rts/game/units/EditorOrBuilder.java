@@ -141,7 +141,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: h */
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -206,7 +206,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: h */
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -268,7 +268,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: h */
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -336,7 +336,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: h */
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -404,7 +404,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: h */
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -472,7 +472,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: h */
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -540,7 +540,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: h */
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -1179,7 +1179,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -1235,7 +1235,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -1291,7 +1291,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -1347,7 +1347,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -1403,7 +1403,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -1459,7 +1459,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -1515,7 +1515,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };
@@ -1571,7 +1571,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
 
         @Override
-        public boolean getIconForUnit() {
+        public boolean alwaysShowsTooltip() {
             return true;
         }
     };

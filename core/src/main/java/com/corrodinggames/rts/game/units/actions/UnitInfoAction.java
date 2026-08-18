@@ -144,7 +144,7 @@ public class UnitInfoAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: C */
-    public boolean getCost() {
+    public boolean selectsUnitOnClick() {
         return true;
     }
 

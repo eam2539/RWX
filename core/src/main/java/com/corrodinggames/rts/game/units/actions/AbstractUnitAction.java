@@ -273,12 +273,12 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: h */
-    public boolean getIconForUnit() {
+    public boolean alwaysShowsTooltip() {
         return false;
     }
 
     /* JADX INFO: renamed from: C */
-    public boolean getCost() {
+    public boolean selectsUnitOnClick() {
         return false;
     }
 
@@ -303,7 +303,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     }
 
     /* JADX INFO: renamed from: F */
-    public boolean getDisplayType() {
+    public boolean isDisplayOnly() {
         return false;
     }
 
