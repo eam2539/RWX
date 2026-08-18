@@ -328,7 +328,7 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
                             legInstance3.d = f11;
                         }
                     }
-                    legInstance3.i += Utility.endsWith(legInstance3.i, f2 + legConfig2.i, legConfig2.u * f);
+                    legInstance3.i += Utility.rotateTowardsAngle(legInstance3.i, f2 + legConfig2.i, legConfig2.u * f);
                     legInstance3.j = false;
                 } else if (legInstance3.e < legConfig2.t) {
                     legInstance3.e += f;

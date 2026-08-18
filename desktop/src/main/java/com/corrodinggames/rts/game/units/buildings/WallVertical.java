@@ -11,7 +11,7 @@ import com.corrodinggames.rts.gameFramework.graphics.Texture;
 public class WallVertical extends FactoryWithQueue {
 
     /* JADX INFO: renamed from: a */
-    static Texture baseTexture = null;
+    static Texture sharedBaseTexture = null;
 
     /* JADX INFO: renamed from: b */
     static Texture[] teamTextures = new Texture[10];
@@ -21,9 +21,9 @@ public class WallVertical extends FactoryWithQueue {
 
     public static void b() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.wall_v);
+        sharedBaseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.wall_v);
         deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.wall_v);
-        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
+        teamTextures = PlayerTeam.getTeamColorTextures(sharedBaseTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -48,12 +48,12 @@ public class WallVertical extends FactoryWithQueue {
 
     public WallVertical(boolean z) {
         super(z);
-        b(baseTexture);
+        b(sharedBaseTexture);
         this.radius = 15.0f;
         this.displayRadius = this.radius;
         this.maxHealth = 700.0f;
         this.currentHealth = this.maxHealth;
-        super.baseTexture = baseTexture;
+        super.baseTexture = sharedBaseTexture;
         this.buildingTargetRect.a(0, 0, 1, 0);
         this.buildingVelocityRect.a(0, 0, 1, 0);
     }

@@ -99,7 +99,7 @@ class MasterServerListParser implements Runnable {
                                     if (str7 != null && str7.startsWith("url:") && Boolean.parseBoolean(str20)) {
                                         strSubstring = str7.substring(4);
                                         str25 = str5;
-                                        if (!Utility.md5(strSubstring + ";" + str25).equals(str8)) {
+                                        if (!Utility.sha256ShortHash(strSubstring + ";" + str25).equals(str8)) {
                                             GameEngine.log("Skipping " + str21);
                                         }
                                     }

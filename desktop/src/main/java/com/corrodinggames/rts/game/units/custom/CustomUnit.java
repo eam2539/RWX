@@ -337,7 +337,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 if (!it.hasNext()) {
                     break;
                 }
-                if (((UnitMovementType) it.next()) == baseUnit.h()) {
+                if (((UnitMovementType) it.next()) == baseUnit.getMovementType()) {
                     z2 = true;
                     break;
                 }
@@ -615,7 +615,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
-    public UnitMovementType h() {
+    public UnitMovementType getMovementType() {
         return this.unitConfig.effectiveMovementType;
     }
 
@@ -632,7 +632,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cv */
     public boolean isWaterUnit() {
-        if (h() == UnitMovementType.WATER) {
+        if (getMovementType() == UnitMovementType.WATER) {
             return true;
         }
         return false;
@@ -641,7 +641,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: ct */
     public boolean isAirborne() {
-        if (h() == UnitMovementType.AIR) {
+        if (getMovementType() == UnitMovementType.AIR) {
             return true;
         }
         return false;
@@ -953,7 +953,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             GameEngine.log("updateAndShouldResetTurret:" + b(i, 0.0f));
             float fC = C(i);
             GameEngine.log("idleDir:" + fC);
-            GameEngine.log("diffDir:" + Utility.endsWith(unitMovementData.targetX, fC, 360.0f));
+            GameEngine.log("diffDir:" + Utility.rotateTowardsAngle(unitMovementData.targetX, fC, 360.0f));
         }
     }
 
@@ -1093,11 +1093,11 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             this.unitData2 = null;
         }
         if (!z) {
-            boolean z4 = this.unitConfig.j() != customUnitConfig2.j();
-            if (this.unitConfig.j()) {
+            boolean z4 = this.unitConfig.isBuildingUnit() != customUnitConfig2.isBuildingUnit();
+            if (this.unitConfig.isBuildingUnit()) {
                 this.velocityY = 0.0f;
                 this.velocityX = 0.0f;
-                if (customUnitConfig2.j() && !this.unitConfig.footprint.equals(customUnitConfig2.footprint)) {
+                if (customUnitConfig2.isBuildingUnit() && !this.unitConfig.footprint.equals(customUnitConfig2.footprint)) {
                     z4 = true;
                 }
             }
@@ -1267,7 +1267,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             } else {
                 f = this.rotationSpeed + turretConfig.idleDir;
             }
-            if (Utility.abs(Utility.endsWith(f, Utility.getAngleBetweenPoints(this.posX, this.posY, baseUnit.posX, baseUnit.posY), 360.0f)) > turretConfig.limitingAngle) {
+            if (Utility.abs(Utility.rotateTowardsAngle(f, Utility.getAngleBetweenPoints(this.posX, this.posY, baseUnit.posX, baseUnit.posY), 360.0f)) > turretConfig.limitingAngle) {
                 return false;
             }
         }

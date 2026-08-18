@@ -23,7 +23,7 @@ public class ExperimentalLandFactory extends FactoryWithQueue {
     boolean isUpgraded;
 
     /* JADX INFO: renamed from: a */
-    static Texture baseTexture = null;
+    static Texture sharedBaseTexture = null;
 
     /* JADX INFO: renamed from: b */
     static Texture backgroundTexture = null;
@@ -109,10 +109,10 @@ public class ExperimentalLandFactory extends FactoryWithQueue {
 
     public static void b() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_front);
+        sharedBaseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_front);
         backgroundTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_base);
         deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.experimental_unit_factory_dead);
-        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
+        teamTextures = PlayerTeam.getTeamColorTextures(sharedBaseTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -123,7 +123,7 @@ public class ExperimentalLandFactory extends FactoryWithQueue {
 
     public ExperimentalLandFactory(boolean z) {
         super(z);
-        super.baseTexture = baseTexture;
+        super.baseTexture = sharedBaseTexture;
         this.overlayTexture = backgroundTexture;
         b(super.baseTexture);
         this.radius = 55.0f;

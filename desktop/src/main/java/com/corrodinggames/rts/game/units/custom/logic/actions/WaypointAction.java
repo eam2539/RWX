@@ -167,7 +167,7 @@ public class WaypointAction extends LogicAction {
             if (unitCommandType != null) {
                 waypointAction.waypointType = unitCommandType;
                 if (waypointAction.waypointType == UnitCommandType.build) {
-                    waypointAction.waypointUnitType = customUnitConfig.reloadAllCustomUnits(iniFile.getString(str, str2 + "addWaypoint_unitType", (String) null), str2 + "addWaypoint_unitType", str);
+                    waypointAction.waypointUnitType = customUnitConfig.createUnitTypeReference(iniFile.getString(str, str2 + "addWaypoint_unitType", (String) null), str2 + "addWaypoint_unitType", str);
                     if (waypointAction.waypointUnitType == null) {
                         throw new RuntimeException("[" + str + "] addWaypoint_type: build requires addWaypoint_unitType");
                     }

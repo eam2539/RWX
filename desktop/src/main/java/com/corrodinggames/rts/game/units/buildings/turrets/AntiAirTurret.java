@@ -32,7 +32,7 @@ public class AntiAirTurret extends TurretFactory {
     static Texture unitIconTexture = null;
 
     /* JADX INFO: renamed from: d */
-    static Texture[] teamIconTextures = new Texture[10];
+    static Texture[] sharedTeamIconTextures = new Texture[10];
 
     /* JADX INFO: renamed from: e */
     public static AbstractUnitAction upgradeToLevel2Action = new PopupQueueAction(102) { // from class: com.corrodinggames.rts.game.units.d.a.a.1
@@ -108,7 +108,7 @@ public class AntiAirTurret extends TurretFactory {
         if (this.team.teamId == -1) {
             return null;
         }
-        return teamIconTextures[this.team.getTeamColorIndex()];
+        return sharedTeamIconTextures[this.team.getTeamColorIndex()];
     }
 
     /* JADX INFO: renamed from: b */
@@ -117,7 +117,7 @@ public class AntiAirTurret extends TurretFactory {
         level1Texture = gameEngine.renderGraphicsEngine.a(R.drawable.anti_air_top);
         level2Texture = gameEngine.renderGraphicsEngine.a(R.drawable.anti_air_top_l2);
         unitIconTexture = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_building_air_turrent);
-        teamIconTextures = PlayerTeam.getTeamColorTextures(unitIconTexture);
+        sharedTeamIconTextures = PlayerTeam.getTeamColorTextures(unitIconTexture);
     }
 
     public AntiAirTurret(boolean z) {

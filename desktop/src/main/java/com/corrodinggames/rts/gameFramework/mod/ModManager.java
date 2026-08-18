@@ -372,7 +372,7 @@ public class ModManager {
         for (String str2 : strArrListFiles) {
             String str3 = str + "/" + str2;
             if (FileHelper.isDirectoryNonZip(str3) || str2.endsWith(".ini")) {
-                String strTruncate = Utility.truncate(str2);
+                String strTruncate = Utility.sha256Hex(str2);
                 String strSubstring = str2;
                 if (strSubstring.contains("/")) {
                     strSubstring = strSubstring.substring(str2.lastIndexOf("/") + 1);

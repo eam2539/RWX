@@ -573,7 +573,7 @@ public abstract class GameEngine {
     public boolean isLookModeEnabled = false;
 
     /* JADX INFO: renamed from: cn */
-    public float gameTimer = 1.0f;
+    public float viewScale = 1.0f;
 
     /* JADX INFO: renamed from: cK */
     public final Rect screenClipRect = new Rect();

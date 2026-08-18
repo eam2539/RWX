@@ -318,7 +318,7 @@ public class MapLayer {
                                 if (mapTile.atlasSlotIndex >= 0) {
                                     graphicsEngine.b(tileAtlasCache.getAtlasTextureForIndex(mapTile.atlasSlotIndex), tileAtlasCache.getRectForIndex(mapTile.atlasSlotIndex), rect, gamePaint6);
                                 } else {
-                                    graphicsEngine.a(tileset.tilesetBitmap, tileset.freeUnusedImages(mapTile.tilesetLocalIndex), rect, gamePaint6);
+                                    graphicsEngine.a(tileset.tilesetBitmap, tileset.getTileRectCached(mapTile.tilesetLocalIndex), rect, gamePaint6);
                                 }
                             }
                         }

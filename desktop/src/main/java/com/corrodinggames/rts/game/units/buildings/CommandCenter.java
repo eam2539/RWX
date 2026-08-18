@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class CommandCenter extends FactoryWithQueue {
 
     /* JADX INFO: renamed from: a */
-    static Texture baseTexture = null;
+    static Texture sharedBaseTexture = null;
 
     /* JADX INFO: renamed from: b */
     static Texture[] teamTextures = new Texture[10];
@@ -80,10 +80,10 @@ public class CommandCenter extends FactoryWithQueue {
     /* JADX INFO: renamed from: b */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base);
+        sharedBaseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base);
         deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base_dead);
         backgroundTexture = gameEngine.renderGraphicsEngine.a(R.drawable.base_back);
-        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
+        teamTextures = PlayerTeam.getTeamColorTextures(sharedBaseTexture);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -96,7 +96,7 @@ public class CommandCenter extends FactoryWithQueue {
         super(z);
         this.frameTimer = 20.0f;
         this.frameIndex = 0;
-        super.baseTexture = baseTexture;
+        super.baseTexture = sharedBaseTexture;
         this.overlayTexture = backgroundTexture;
         T(53);
         U(68);

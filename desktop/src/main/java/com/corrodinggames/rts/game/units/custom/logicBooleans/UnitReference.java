@@ -109,7 +109,7 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
         if (strTrim.toLowerCase(Locale.ROOT).startsWith("unitref ")) {
             return new UnitReferenceOrUnitType(parseUnitReference(customUnitConfig, strTrim, str2, str3, null, true));
         }
-        UnitTypeReference unitTypeReferenceReloadAllCustomUnits = customUnitConfig.reloadAllCustomUnits(strTrim, str3, str2);
+        UnitTypeReference unitTypeReferenceReloadAllCustomUnits = customUnitConfig.createUnitTypeReference(strTrim, str3, str2);
         if (unitTypeReferenceReloadAllCustomUnits != null) {
             unitTypeReferenceReloadAllCustomUnits.f = true;
         }

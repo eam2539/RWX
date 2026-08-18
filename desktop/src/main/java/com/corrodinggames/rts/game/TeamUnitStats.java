@@ -77,7 +77,7 @@ public final class TeamUnitStats {
             if (unitPriceB != null) {
                 iB += unitPriceB.b();
             }
-            if (unitTypeR.j()) {
+            if (unitTypeR.isBuildingUnit()) {
                 this.o += iB;
             } else {
                 this.n += iB;
@@ -128,7 +128,7 @@ public final class TeamUnitStats {
             if (unitPriceB != null) {
                 iB += unitPriceB.b();
             }
-            if (unitTypeR.j()) {
+            if (unitTypeR.isBuildingUnit()) {
                 this.o -= iB;
             } else {
                 this.n -= iB;

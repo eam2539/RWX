@@ -31,7 +31,7 @@ public class SupplyDepot extends FactoryWithQueue {
     int supplyCount;
 
     /* JADX INFO: renamed from: a */
-    static Texture baseTexture = null;
+    static Texture sharedBaseTexture = null;
 
     /* JADX INFO: renamed from: b */
     static Texture tier2Texture = null;
@@ -127,9 +127,9 @@ public class SupplyDepot extends FactoryWithQueue {
 
     public static void K() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.supply_depot);
+        sharedBaseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.supply_depot);
         tier2Texture = gameEngine.renderGraphicsEngine.a(R.drawable.supply_depot_t2);
-        baseTeamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
+        baseTeamTextures = PlayerTeam.getTeamColorTextures(sharedBaseTexture);
         tier2TeamTextures = PlayerTeam.getTeamColorTextures(tier2Texture);
         deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.supply_depot_dead);
     }
@@ -139,7 +139,7 @@ public class SupplyDepot extends FactoryWithQueue {
         this.depotLevel = 1;
         this.animationTimer = 0.0f;
         this.supplyCount = 0;
-        super.baseTexture = baseTexture;
+        super.baseTexture = sharedBaseTexture;
         a(super.baseTexture, 1);
         this.radius = 20.0f;
         this.displayRadius = this.radius;

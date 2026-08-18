@@ -147,7 +147,7 @@ public class PlaceBuildingAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: n_ */
     public boolean isQueuable() {
-        return !getUnitType().C();
+        return !getUnitType().isAvailableInDemo();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction

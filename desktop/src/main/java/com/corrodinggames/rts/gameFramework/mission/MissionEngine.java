@@ -284,7 +284,7 @@ public class MissionEngine extends Serializable {
         }
         this.h = objectByName.createLocaleStringFromProperty("introText", null);
         if (this.h != null) {
-            this.h.wrapSingleText("\\\\n", "\n");
+            this.h.replaceAll("\\\\n", "\n");
             if (this.h.isEmpty()) {
                 this.h = null;
             }

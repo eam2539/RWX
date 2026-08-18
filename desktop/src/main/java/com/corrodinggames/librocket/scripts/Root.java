@@ -1644,7 +1644,7 @@ public class Root extends ScriptContext {
         }
 
         public boolean same(TableRow tableRow, boolean z) {
-            if (!Utility.md5(this.librocketOnClick, tableRow.librocketOnClick) || !Utility.md5(this.extraClasses, tableRow.extraClasses) || this.tableCells.size() != tableRow.tableCells.size()) {
+            if (!Utility.stringsEqual(this.librocketOnClick, tableRow.librocketOnClick) || !Utility.stringsEqual(this.extraClasses, tableRow.extraClasses) || this.tableCells.size() != tableRow.tableCells.size()) {
                 return false;
             }
             for (int i = 0; i < this.tableCells.size(); i++) {
@@ -1680,10 +1680,10 @@ public class Root extends ScriptContext {
         }
 
         public boolean same(TableCell tableCell, boolean z) {
-            if (!Utility.md5(this.classes, tableCell.classes) || !Utility.md5(this.librocketOnClick, tableCell.librocketOnClick) || !Utility.nullableIntegersEqual(this.color, tableCell.color)) {
+            if (!Utility.stringsEqual(this.classes, tableCell.classes) || !Utility.stringsEqual(this.librocketOnClick, tableCell.librocketOnClick) || !Utility.nullableIntegersEqual(this.color, tableCell.color)) {
                 return false;
             }
-            if (!z && !Utility.md5(this.text, tableCell.text)) {
+            if (!z && !Utility.stringsEqual(this.text, tableCell.text)) {
                 return false;
             }
             return true;

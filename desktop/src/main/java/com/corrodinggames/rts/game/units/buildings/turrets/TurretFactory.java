@@ -54,7 +54,7 @@ public class TurretFactory extends FactoryWithQueue {
     Rect drawRect;
 
     /* JADX INFO: renamed from: g */
-    static Texture baseTexture = null;
+    static Texture sharedBaseTexture = null;
 
     /* JADX INFO: renamed from: a */
     static Texture turretTopL1Texture = null;
@@ -481,14 +481,14 @@ public class TurretFactory extends FactoryWithQueue {
     /* JADX INFO: renamed from: dB */
     public static void loadTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_base);
+        sharedBaseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_base);
         deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_base_dead);
         turretTopL1Texture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_top);
         turretTopL2Texture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_top_l2);
         turretTopL3Texture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_top_l3);
         turretTopArtilleryTexture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_top_artillery);
         turretTopFlameTexture = gameEngine.renderGraphicsEngine.a(R.drawable.turret_top_flame);
-        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
+        teamTextures = PlayerTeam.getTeamColorTextures(sharedBaseTexture);
         iconTexture = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_building_turrent);
         teamIconTextures = PlayerTeam.getTeamColorTextures(iconTexture);
     }
@@ -504,7 +504,7 @@ public class TurretFactory extends FactoryWithQueue {
         this.displayRadius = this.radius;
         this.maxHealth = 700.0f;
         this.currentHealth = this.maxHealth;
-        super.baseTexture = baseTexture;
+        super.baseTexture = sharedBaseTexture;
         this.movementLevels[0].targetX = Utility.getDeterministicRandomInt(this, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT);
         this.buildingTargetRect.a(0, 0, 1, 1);
         this.buildingVelocityRect.a(0, 0, 1, 1);

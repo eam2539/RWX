@@ -332,7 +332,7 @@ public abstract class BaseUnit extends SizedObject {
     /* JADX INFO: renamed from: dJ */
     UnitPrice unitCustomData;
 
-    public abstract UnitMovementType h();
+    public abstract UnitMovementType getMovementType();
 
     public abstract boolean i();
 

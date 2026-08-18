@@ -131,7 +131,7 @@ public class Debug extends ScriptContext {
     }
 
     public void enableFeatures(String str) {
-        if (Utility.truncate(str).startsWith("221FC410BD29D786")) {
+        if (Utility.sha256Hex(str).startsWith("221FC410BD29D786")) {
             this.allFeatures = true;
             DebugSocketServer.field_d = true;
             return;

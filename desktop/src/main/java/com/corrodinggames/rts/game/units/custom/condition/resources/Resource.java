@@ -148,7 +148,7 @@ public class Resource {
         if (this.o) {
             strMd5 = VariableScope.nullOrMissingString + ((int) d);
         } else {
-            strMd5 = Utility.md5(d);
+            strMd5 = Utility.formatNumberWithTwoDecimals(d);
         }
         return a(z) + a(strMd5, this.q) + b(z);
     }

@@ -54,19 +54,19 @@ public class MasterServerAuth {
     public void addAuthParams(String str, List list) {
         long currentTimeMillis = GameEngine.getCurrentTimeMillis();
         MasterServerClient.addParam(list, secretB + "1", VariableScope.nullOrMissingString + currentTimeMillis);
-        MasterServerClient.addParam(list, secretA + "2", Utility.abs("_" + str + (saltA + saltB)));
-        MasterServerClient.addParam(list, secretA + "3", Utility.abs("_" + str + (((long) (saltA + saltB)) + currentTimeMillis)));
+        MasterServerClient.addParam(list, secretA + "2", Utility.sha256Fingerprint("_" + str + (saltA + saltB)));
+        MasterServerClient.addParam(list, secretA + "3", Utility.sha256Fingerprint("_" + str + (((long) (saltA + saltB)) + currentTimeMillis)));
     }
 
     /* JADX INFO: renamed from: b */
     public void addTokenHashParam(String str, List list) {
-        MasterServerClient.addParam(list, secretA + "3", Utility.abs("-" + str + (saltC + saltD) + authTokenLength));
+        MasterServerClient.addParam(list, secretA + "3", Utility.sha256Fingerprint("-" + str + (saltC + saltD) + authTokenLength));
     }
 
     /* JADX INFO: renamed from: c */
     public void addOptionalTokenHashParam(String str, List list) {
         if (authTokenLength > 1000) {
-            MasterServerClient.addParam(list, secretA + "4", Utility.abs("+" + str + (saltC + saltD) + authTokenLength));
+            MasterServerClient.addParam(list, secretA + "4", Utility.sha256Fingerprint("+" + str + (saltC + saltD) + authTokenLength));
         }
     }
 

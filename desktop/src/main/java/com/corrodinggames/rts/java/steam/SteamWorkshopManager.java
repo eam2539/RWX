@@ -278,7 +278,7 @@ public class SteamWorkshopManager {
                         str4 = "Steam is downloading files..";
                         final SteamUGC.ItemDownloadInfo itemDownloadInfo = new SteamUGC.ItemDownloadInfo();
                         if (this.d.getItemDownloadInfo(steamPublishedFileID, new SteamUGC.ItemDownloadInfo())) {
-                            str4 = str4 + " " + Utility.md5((itemDownloadInfo.getBytesDownloaded() / (double)itemDownloadInfo.getBytesTotal()) * 100.0d) + "%";
+                            str4 = str4 + " " + Utility.formatNumberWithTwoDecimals((itemDownloadInfo.getBytesDownloaded() / (double)itemDownloadInfo.getBytesTotal()) * 100.0d) + "%";
                         }
                     }
                 }

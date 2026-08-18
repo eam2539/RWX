@@ -146,7 +146,7 @@ public class Command {
                     commandTarget.targetX = targetX;
                     commandTarget.targetY = targetY;
                     commandTarget.createdTick = gameEngine.currentTick;
-                    commandTarget.movementType = orderableUnit.h();
+                    commandTarget.movementType = orderableUnit.getMovementType();
                     commandTarget.path = orderableUnit.createPathToTarget(targetX, targetY, pathingTargetRadiusTiles, true, false, false);
                     commandTarget.path.t = 120.0f;
                     commandTarget.path.s = commandTarget.path.t;

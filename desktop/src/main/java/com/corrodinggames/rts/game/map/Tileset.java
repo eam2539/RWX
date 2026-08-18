@@ -96,7 +96,7 @@ public class Tileset {
     int cachedRectIndex = -1;
 
     /* JADX INFO: renamed from: a */
-    public String computeTileRect(TileMap tileMap, Element element) {
+    public String getEmbeddedPngBase64(TileMap tileMap, Element element) {
         Element element2 = (Element) element.getElementsByTagName("properties").item(0);
         if (element2 != null) {
             NodeList elementsByTagName = element2.getElementsByTagName("property");
@@ -133,7 +133,7 @@ public class Tileset {
         this.firstGid = i;
         Element elementLoadTilesetTexture = loadTilesetTexture(tileMap, str);
         this.tilesetSource = str;
-        markAllDescriptorsUnused(elementLoadTilesetTexture);
+        parseTileset(elementLoadTilesetTexture);
     }
 
     public Tileset(TileMap tileMap, Element element) throws MapLoadException {
@@ -144,16 +144,16 @@ public class Tileset {
             element = loadTilesetTexture(tileMap, attribute);
             this.tilesetSource = attribute;
         }
-        markAllDescriptorsUnused(element);
+        parseTileset(element);
     }
 
     /* JADX INFO: renamed from: a */
-    public void markAllDescriptorsUnused(Element element) throws MapLoadException {
+    public void parseTileset(Element element) throws MapLoadException {
         NodeList elementsByTagName = element.getElementsByTagName("image");
         if (elementsByTagName.getLength() > 0) {
             this.imageKey = GameEngine.getFilename(((Element) elementsByTagName.item(0)).getAttribute("source").trim());
         }
-        String strComputeTileRect = computeTileRect(this.tileMap, element);
+        String strComputeTileRect = getEmbeddedPngBase64(this.tileMap, element);
         if (strComputeTileRect != null) {
             this.imageKey = registerEmbeddedImage(strComputeTileRect, this.imageKey);
         }
@@ -280,14 +280,14 @@ public class Tileset {
     }
 
     /* JADX INFO: renamed from: a */
-    public static void parseTileset() {
+    public static void markAllDescriptorsUnused() {
         for (TilesetImageDescriptor imageDescriptor : imageDescriptors) {
             imageDescriptor.inUse = false;
         }
     }
 
     /* JADX INFO: renamed from: b */
-    public static void getTileRectCached() {
+    public static void freeUnusedImages() {
         Iterator<TilesetImageDescriptor> it = imageDescriptors.iterator();
         while (it.hasNext()) {
             TilesetImageDescriptor tilesetImageDescriptor = it.next();
@@ -313,12 +313,12 @@ public class Tileset {
     }
 
     /* JADX INFO: renamed from: a */
-    public Properties getEmbeddedPngBase64(int i) {
+    public Properties getPropertiesByTileId(int i) {
         return this.propertiesByTileId.get(i);
     }
 
     /* JADX INFO: renamed from: a */
-    public final void getPropertiesByTileId(int i, Rect rect) {
+    public final void getTileRect(int i, Rect rect) {
         int i2 = i % this.columns;
         int i3 = (int) (i * this.invColumns);
         int i4 = this.atlasOriginX + (i2 * this.tileStridePixelsX);
@@ -330,12 +330,12 @@ public class Tileset {
     }
 
     /* JADX INFO: renamed from: b */
-    public final Rect freeUnusedImages(int i) {
+    public final Rect getTileRectCached(int i) {
         if (this.cachedRectIndex == i) {
             return this.cachedRect;
         }
         this.cachedRectIndex = i;
-        getPropertiesByTileId(i, this.cachedRect);
+        getTileRect(i, this.cachedRect);
         return this.cachedRect;
     }
 

@@ -508,19 +508,19 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         }
         if (z2) {
             if (this.c > 0.0f && i3 < i) {
-                textRenderQueue.b(Utility.min(this.c) + " energy" + str);
+                textRenderQueue.b(Utility.padString(this.c) + " energy" + str);
                 i3++;
             }
             if (this.d > 0.0f && i3 < i) {
-                textRenderQueue.b(Utility.min(this.d) + " hp" + str);
+                textRenderQueue.b(Utility.padString(this.d) + " hp" + str);
                 i3++;
             }
             if (this.e > 0.0f && i3 < i) {
-                textRenderQueue.b(Utility.min(this.e) + " shield" + str);
+                textRenderQueue.b(Utility.padString(this.e) + " shield" + str);
                 i3++;
             }
             if (this.f > 0 && i3 < i) {
-                textRenderQueue.b(Utility.min(this.f) + " ammo" + str);
+                textRenderQueue.b(Utility.padString(this.f) + " ammo" + str);
                 i3++;
             }
         }

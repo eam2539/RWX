@@ -10,7 +10,7 @@ public class AmmoResource extends AbstractResource {
         this.u = true;
         this.t = true;
         this.b = "ammo";
-        this.c = LocaleString.replaceAll("ammo");
+        this.c = LocaleString.fromRawText("ammo");
     }
 
     @Override // com.corrodinggames.rts.game.units.custom.resources.Resource

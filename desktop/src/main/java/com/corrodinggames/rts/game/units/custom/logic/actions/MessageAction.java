@@ -35,12 +35,12 @@ public class MessageAction extends LogicAction {
     static final Pattern g = Pattern.compile("%\\{([^\\]]*?)\\}");
 
     public static void a(CustomUnitConfig customUnitConfig, IniFile iniFile, String str, String str2, CustomActionDef customActionDef, String str3, boolean z) throws ConfigParseException {
-        LocalizedText localizedTextLoadUnitConfigFile = CustomUnitConfigParser.loadUnitConfigFile(customUnitConfig, iniFile, str, "showMessageToPlayer", (String) null);
-        LocalizedText localizedTextLoadUnitConfigFile2 = CustomUnitConfigParser.loadUnitConfigFile(customUnitConfig, iniFile, str, "showMessageToAllPlayers", (String) null);
-        LocalizedText localizedTextLoadUnitConfigFile3 = CustomUnitConfigParser.loadUnitConfigFile(customUnitConfig, iniFile, str, "showMessageToAllEnemyPlayers", (String) null);
-        LocalizedText localizedTextLoadUnitConfigFile4 = CustomUnitConfigParser.loadUnitConfigFile(customUnitConfig, iniFile, str, "showQuickWarLogToPlayer", (String) null);
-        LocalizedText localizedTextLoadUnitConfigFile5 = CustomUnitConfigParser.loadUnitConfigFile(customUnitConfig, iniFile, str, "showQuickWarLogToAllPlayers", (String) null);
-        LocalizedText localizedTextLoadUnitConfigFile6 = CustomUnitConfigParser.loadUnitConfigFile(customUnitConfig, iniFile, str, "debugMessage", (String) null);
+        LocalizedText localizedTextLoadUnitConfigFile = CustomUnitConfigParser.getUnitReference(customUnitConfig, iniFile, str, "showMessageToPlayer", (String) null);
+        LocalizedText localizedTextLoadUnitConfigFile2 = CustomUnitConfigParser.getUnitReference(customUnitConfig, iniFile, str, "showMessageToAllPlayers", (String) null);
+        LocalizedText localizedTextLoadUnitConfigFile3 = CustomUnitConfigParser.getUnitReference(customUnitConfig, iniFile, str, "showMessageToAllEnemyPlayers", (String) null);
+        LocalizedText localizedTextLoadUnitConfigFile4 = CustomUnitConfigParser.getUnitReference(customUnitConfig, iniFile, str, "showQuickWarLogToPlayer", (String) null);
+        LocalizedText localizedTextLoadUnitConfigFile5 = CustomUnitConfigParser.getUnitReference(customUnitConfig, iniFile, str, "showQuickWarLogToAllPlayers", (String) null);
+        LocalizedText localizedTextLoadUnitConfigFile6 = CustomUnitConfigParser.getUnitReference(customUnitConfig, iniFile, str, "debugMessage", (String) null);
         if (localizedTextLoadUnitConfigFile != null || localizedTextLoadUnitConfigFile2 != null || localizedTextLoadUnitConfigFile3 != null || localizedTextLoadUnitConfigFile4 != null || localizedTextLoadUnitConfigFile5 != null || localizedTextLoadUnitConfigFile6 != null) {
             MessageAction messageAction = new MessageAction();
             messageAction.showMessageToPlayer = localizedTextLoadUnitConfigFile;

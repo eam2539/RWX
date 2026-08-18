@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class LocaleString {
 
     /* JADX INFO: renamed from: a */
-    public static final LocaleString EMPTY = replaceAll(VariableScope.nullOrMissingString);
+    public static final LocaleString EMPTY = fromRawText(VariableScope.nullOrMissingString);
 
     /* JADX INFO: renamed from: b */
     public LanguagePart[] localizedItems;
@@ -25,7 +25,7 @@ public class LocaleString {
     public String text;
 
     /* JADX INFO: renamed from: a */
-    public static LocaleString replaceAll(String str) {
+    public static LocaleString fromRawText(String str) {
         LocaleString localeString = new LocaleString();
         ArrayList arrayList = new ArrayList();
         LanguagePart languagePart = new LanguagePart();
@@ -66,7 +66,7 @@ public class LocaleString {
     }
 
     /* JADX INFO: renamed from: a */
-    public void wrapSingleText(String str, String str2) {
+    public void replaceAll(String str, String str2) {
         if (this.localizedItems != null) {
             for (LanguagePart languagePart : this.localizedItems) {
                 languagePart.a(str, str2);

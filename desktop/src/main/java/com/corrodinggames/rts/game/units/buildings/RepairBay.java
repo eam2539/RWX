@@ -42,7 +42,7 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
     PointF[] hiddenPoints;
 
     /* JADX INFO: renamed from: a */
-    static Texture baseTexture = null;
+    static Texture sharedBaseTexture = null;
 
     /* JADX INFO: renamed from: b */
     static Texture[] teamTextures = new Texture[10];
@@ -78,9 +78,9 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
     /* JADX INFO: renamed from: M */
     public static void initializeTextures() {
         GameEngine gameEngine = GameEngine.getInstance();
-        baseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.repair_bay);
+        sharedBaseTexture = gameEngine.renderGraphicsEngine.a(R.drawable.repair_bay);
         deadTexture = gameEngine.renderGraphicsEngine.a(R.drawable.repair_bay_dead);
-        teamTextures = PlayerTeam.getTeamColorTextures(baseTexture);
+        teamTextures = PlayerTeam.getTeamColorTextures(sharedBaseTexture);
     }
 
     public RepairBay(boolean z) {
@@ -89,8 +89,8 @@ public class RepairBay extends BaseBuilding implements UnitPathPoints {
         this.tempRect = new Rect();
         this.targetPriorityPoints = new PointF[6];
         this.hiddenPoints = new PointF[this.targetPriorityPoints.length];
-        super.baseTexture = baseTexture;
-        b(baseTexture);
+        super.baseTexture = sharedBaseTexture;
+        b(sharedBaseTexture);
         this.radius = 30.0f;
         this.displayRadius = this.radius;
         this.maxHealth = 1000.0f;

@@ -198,7 +198,7 @@ public class LogicBooleanLoader {
                 }
                 return LogicBoolean.StaticValueBoolean.getStaticNumber(strC);
             }
-            String strSplit = Utility.split(strBreakOuterLayerBrackets);
+            String strSplit = Utility.stripQuotes(strBreakOuterLayerBrackets);
             if (strSplit != null) {
                 if (z) {
                     throw new RuntimeException("Expected a boolean type here, not string: " + strBreakOuterLayerBrackets);

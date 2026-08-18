@@ -45,6 +45,6 @@ public final class UnitSearchRule {
         if (this.m && this.n) {
             throw new ConfigParseException("[" + str + "]: Cannot use aiSuggestionOnly and blocksPlacement at the same time");
         }
-        this.o = CustomUnitConfigParser.handleUnitLoadError(iniFile, str, "cannotPlaceMessage", (String) null);
+        this.o = CustomUnitConfigParser.getLocaleString(iniFile, str, "cannotPlaceMessage", (String) null);
     }
 }

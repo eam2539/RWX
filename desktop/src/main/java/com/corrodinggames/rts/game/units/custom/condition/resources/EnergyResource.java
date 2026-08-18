@@ -10,7 +10,7 @@ public class EnergyResource extends AbstractResource {
         this.u = true;
         this.t = true;
         this.b = "energy";
-        this.c = LocaleString.replaceAll("energy");
+        this.c = LocaleString.fromRawText("energy");
     }
 
     @Override // com.corrodinggames.rts.game.units.custom.resources.Resource

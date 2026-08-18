@@ -738,7 +738,7 @@ public abstract class LogicBoolean implements Cloneable {
         }
 
         private String msToSecondsString(float f) {
-            return Utility.min(f / 1000.0f) + "s";
+            return Utility.padString(f / 1000.0f) + "s";
         }
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean

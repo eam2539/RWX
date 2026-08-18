@@ -1063,13 +1063,13 @@ public final class TileMap {
                 mapObjectLayer.layerIndex = i11;
                 this.objectLayers.add(mapObjectLayer);
             }
-            Tileset.parseTileset();
+            Tileset.markAllDescriptorsUnused();
             for (Tileset tileset3 : this.tilesets) {
                 if (tileset3.usedInFogLayer) {
                     tileset3.initTextureMetrics();
                 }
             }
-            Tileset.getTileRectCached();
+            Tileset.freeUnusedImages();
             int i12 = 0;
             while (i12 <= 1) {
                 for (MapLayer mapLayer3 : this.mapLayers) {

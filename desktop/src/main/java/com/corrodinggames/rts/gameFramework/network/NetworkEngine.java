@@ -1223,7 +1223,7 @@ public final class NetworkEngine {
     private void q(String str) {
         Iterator it = this.sendQueue.iterator();
         while (it.hasNext()) {
-            ((NetworkConnection) it.next()).handleRemoteDisconnect(str);
+            ((NetworkConnection) it.next()).sendPacket(str);
         }
         this.sendQueue.clear();
         this.recvQueue.clear();
@@ -1608,7 +1608,7 @@ public final class NetworkEngine {
                     if (message == null) {
                         message = "IO error";
                     }
-                    networkConnection.handleRemoteDisconnect(message);
+                    networkConnection.sendPacket(message);
                     reportDesync("IO error on processGamePacket for " + networkConnection.getPlayerDisplayName());
                 }
                 GameEngine.log("Error on processGamePacket ip:" + displayIpAddress, (Throwable) e3);
@@ -2604,13 +2604,13 @@ public final class NetworkEngine {
                 }
                 if (utf.length() > 20) {
                     a(networkConnection5, "Your username is too long");
-                    networkConnection5.handleRemoteDisconnect("kicked");
+                    networkConnection5.sendPacket("kicked");
                     return;
                 }
                 String strP = p(utf);
                 if (strP.length() < 2) {
                     a(networkConnection5, "Your username is too short");
-                    networkConnection5.handleRemoteDisconnect("kicked");
+                    networkConnection5.sendPacket("kicked");
                     return;
                 }
                 GameTeam existingGameTeam = null;
@@ -2624,29 +2624,29 @@ public final class NetworkEngine {
                 if (activeBan != null) {
                     GameEngine.log("Connection banned for " + activeBan.b() + " more seconds");
                     a(networkConnection5, activeBan.a());
-                    networkConnection5.handleRemoteDisconnect("kicked");
+                    networkConnection5.sendPacket("kicked");
                     return;
                 }
                 String strA = this.callbacks.a(networkConnection5, strP, i3, i4, networkConnection5.connectionLabel, existingGameTeam);
                 if (strA != null) {
                     a(networkConnection5, strA);
-                    networkConnection5.handleRemoteDisconnect("kicked");
+                    networkConnection5.sendPacket("kicked");
                     return;
                 }
                 if (i3 < this.e && !this.chatOnlyMode) {
                     a(networkConnection5, "Game is out of date, please update to v" + gameEngine.getVersion());
-                    networkConnection5.handleRemoteDisconnect("kicked");
+                    networkConnection5.sendPacket("kicked");
                     return;
                 }
                 if (i3 > this.e && !this.chatOnlyMode) {
                     a(networkConnection5, "Your client is newer then the server. Server is on: v" + gameEngine.getVersion());
-                    networkConnection5.handleRemoteDisconnect("kicked");
+                    networkConnection5.sendPacket("kicked");
                     return;
                 }
                 if (!this.chatOnlyMode && i5 != gameEngine.getAllUnitsChecksum()) {
                     GameEngine.log("New Player kicked: Unit checksum mismatch: clientUnitsChecksum=" + i5 + " game.getAllUnitsChecksum():" + gameEngine.getAllUnitsChecksum());
                     a(networkConnection5, "Your core units are different to the server's core units. Game can not be synchronized");
-                    networkConnection5.handleRemoteDisconnect("kicked");
+                    networkConnection5.sendPacket("kicked");
                     return;
                 }
                 if (!this.chatOnlyMode) {
@@ -2654,21 +2654,21 @@ public final class NetworkEngine {
                     if (!strG.equals(utf3)) {
                         GameEngine.log("New Player kicked: Integrity Check Failed: expectedResponse=" + strG + " clientResponse=" + utf3);
                         a(networkConnection5, "Your 'Rusted Warfare' client is different to the server. Game can not be synchronized.");
-                        networkConnection5.handleRemoteDisconnect("kicked");
+                        networkConnection5.sendPacket("kicked");
                         return;
                     }
                 }
                 if (!this.gameHasBeenStarted && this.roomSettings.roomLock) {
                     a(networkConnection5, "Room is locked. New players cannot join this server.");
-                    networkConnection5.handleRemoteDisconnect("kicked");
+                    networkConnection5.sendPacket("kicked");
                     return;
                 }
                 if (this.gameHasBeenStarted && existingGameTeam == null && !this.s) {
                     a(networkConnection5, "A game has already been started on this server");
-                    networkConnection5.handleRemoteDisconnect("kicked");
+                    networkConnection5.sendPacket("kicked");
                     return;
                 }
-                if (this.roomPassword != null && existingGameTeam == null && !Utility.truncate(this.roomPassword).equals(nullableString2)) {
+                if (this.roomPassword != null && existingGameTeam == null && !Utility.sha256Hex(this.roomPassword).equals(nullableString2)) {
                     if (nullableString2 == null) {
                         GameEngine.log("processSystemPacket", "Player tried to join but needs a password");
                     } else {
@@ -2690,18 +2690,18 @@ public final class NetworkEngine {
                         }
                         if (activeTeamCount == -1 && !this.chatOnlyMode) {
                             a(networkConnection5, "No free slots on server");
-                            networkConnection5.handleRemoteDisconnect("no free slots");
+                            networkConnection5.sendPacket("no free slots");
                             return;
                         }
                         String strA2 = this.callbacks.a(networkConnection5, strP);
                         if (strA2 != null) {
                             a(networkConnection5, strA2);
-                            networkConnection5.handleRemoteDisconnect("kicked");
+                            networkConnection5.sendPacket("kicked");
                         } else {
                             MasterServerAuth.applyHandshakeTimeoutFlag(networkConnection5);
                             if (!this.chatOnlyMode && networkConnection5.O) {
                                 a(networkConnection5, VariableScope.nullOrMissingString);
-                                networkConnection5.handleRemoteDisconnect("kicked");
+                                networkConnection5.sendPacket("kicked");
                                 return;
                             }
                             String str2 = null;
@@ -2784,7 +2784,7 @@ public final class NetworkEngine {
                 }
                 d("Got a disconnect packet:" + utf5);
                 if (networkConnection6 != null) {
-                    networkConnection6.sendPacket(false, false, utf5);
+                    networkConnection6.handleRemoteDisconnect(false, false, utf5);
                 }
                 if (!this.isServer) {
                 }
@@ -3053,10 +3053,10 @@ public final class NetworkEngine {
                     strMd5 = g(MasterServerAuth.minClientVersion);
                 }
                 if (i13 == 3) {
-                    strMd5 = Utility.md5(MasterServerAuth.minClientVersion + "|" + MasterServerAuth.minServerVersion);
+                    strMd5 = Utility.sha256ShortHash(MasterServerAuth.minClientVersion + "|" + MasterServerAuth.minServerVersion);
                 }
                 if (i13 == 4) {
-                    strMd5 = Utility.md5(MasterServerAuth.minClientVersion + "|" + MasterServerAuth.minServerVersion);
+                    strMd5 = Utility.sha256ShortHash(MasterServerAuth.minClientVersion + "|" + MasterServerAuth.minServerVersion);
                 }
                 if (i13 == 5 || i13 == 6) {
                     String utf9 = gameInputStream14.readUTF();
@@ -3070,7 +3070,7 @@ public final class NetworkEngine {
                     } else {
                         strMd5 = "-1";
                         for (int i15 = 0; i15 <= i14; i15++) {
-                            if (Utility.md5(utf10 + i15).equals(utf9)) {
+                            if (Utility.sha256ShortHash(utf10 + i15).equals(utf9)) {
                                 strMd5 = VariableScope.nullOrMissingString + i15;
                                 break;
                             }
@@ -3657,7 +3657,7 @@ public final class NetworkEngine {
         if (this.serverUuid == null) {
             throw new RuntimeException("getOwnClientIdHashed: serverUUID==null");
         }
-        return Utility.truncate(str + this.serverUuid);
+        return Utility.sha256Hex(str + this.serverUuid);
     }
 
     public void regenerateOwnServerId() {
@@ -3743,7 +3743,7 @@ public final class NetworkEngine {
             gameOutputStream.writeStringUTF(this.playerName);
             String strTruncate = null;
             if (this.roomPassword != null) {
-                strTruncate = Utility.truncate(this.roomPassword);
+                strTruncate = Utility.sha256Hex(this.roomPassword);
             }
             gameOutputStream.writeStringNullable(strTruncate);
             gameOutputStream.writeStringUTF(gameEngine.getPackageName());
@@ -4272,7 +4272,7 @@ public final class NetworkEngine {
             e.printStackTrace();
         }
         if (str != null) {
-            return Utility.md5(str);
+            return Utility.sha256ShortHash(str);
         }
         return "[blank]";
     }
@@ -4471,7 +4471,7 @@ public final class NetworkEngine {
                     banConnection(networkConnectionC, "Temporarily banned due to recent kick", i);
                 }
                 a(networkConnectionC, "Kicked by host");
-                networkConnectionC.handleRemoteDisconnect("Kicked by host");
+                networkConnectionC.sendPacket("Kicked by host");
             }
             playerTeam.removeFromTeamRegistry();
         }
@@ -5317,7 +5317,7 @@ public final class NetworkEngine {
     }
 
     public void b(NetworkConnection networkConnection, String str) {
-        networkConnection.sendPacket(false, false, str);
+        networkConnection.handleRemoteDisconnect(false, false, str);
     }
 
     public void c(NetworkConnection networkConnection, String str) {
@@ -5342,7 +5342,7 @@ public final class NetworkEngine {
             return networkConnection2;
         } catch (Exception e) {
             e.printStackTrace();
-            networkConnection2.handleRemoteDisconnect("crash");
+            networkConnection2.sendPacket("crash");
             return null;
         }
     }

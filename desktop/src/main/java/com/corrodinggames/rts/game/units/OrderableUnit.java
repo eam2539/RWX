@@ -862,7 +862,7 @@ public abstract class OrderableUnit extends UnitBase {
                 if (unitMovementData.velocityY == 0.0f) {
                     float fC = C(i);
                     if (b(i, f) && unitMovementData.targetX != fC) {
-                        if (Utility.abs(Utility.endsWith(unitMovementData.targetX, fC, 360.0f)) < 0.5f) {
+                        if (Utility.abs(Utility.rotateTowardsAngle(unitMovementData.targetX, fC, 360.0f)) < 0.5f) {
                             unitMovementData.velocityY = 20.0f;
                             unitMovementData.velocityX = 0.0f;
                         } else {
@@ -968,24 +968,24 @@ public abstract class OrderableUnit extends UnitBase {
         int iMax2 = Utility.max(f7);
         int iMax3 = Utility.max(f8);
         int iMax4 = Utility.max(f9);
-        if ((iMax != iMax3 || iMax2 != iMax4) && this.spawnExitLockTimer == 0.0f && gameEngine.pathfindingEngine.isTileBlockedForMovement(h(), iMax3, iMax4)) {
+        if ((iMax != iMax3 || iMax2 != iMax4) && this.spawnExitLockTimer == 0.0f && gameEngine.pathfindingEngine.isTileBlockedForMovement(getMovementType(), iMax3, iMax4)) {
             if (iMax != iMax3 && iMax2 != iMax4) {
-                boolean zA = gameEngine.pathfindingEngine.isTileBlockedForMovement(h(), iMax, iMax4);
-                boolean zA2 = gameEngine.pathfindingEngine.isTileBlockedForMovement(h(), iMax3, iMax2);
+                boolean zA = gameEngine.pathfindingEngine.isTileBlockedForMovement(getMovementType(), iMax, iMax4);
+                boolean zA2 = gameEngine.pathfindingEngine.isTileBlockedForMovement(getMovementType(), iMax3, iMax2);
                 if (zA && zA2) {
                     z = true;
                     aG.a(f6, f7);
                     pointFA = aG;
                 }
                 if (pointFA == null && zA) {
-                    pointFA = PathfindingUtils.a(h(), f6, f7, f8, f9, iMax, iMax4, false);
+                    pointFA = PathfindingUtils.a(getMovementType(), f6, f7, f8, f9, iMax, iMax4, false);
                 }
                 if (pointFA == null && zA2) {
-                    pointFA = PathfindingUtils.a(h(), f6, f7, f8, f9, iMax3, iMax2, false);
+                    pointFA = PathfindingUtils.a(getMovementType(), f6, f7, f8, f9, iMax3, iMax2, false);
                 }
             }
             if (pointFA == null) {
-                pointFA = PathfindingUtils.a(h(), f6, f7, f8, f9, iMax3, iMax4, false);
+                pointFA = PathfindingUtils.a(getMovementType(), f6, f7, f8, f9, iMax3, iMax4, false);
             }
             if (pointFA == null) {
                 z = true;
@@ -996,7 +996,7 @@ public abstract class OrderableUnit extends UnitBase {
         boolean z2 = false;
         if (pointFA != null) {
             boolean z3 = false;
-            if (gameEngine.pathfindingEngine.isTileBlockedForMovement(h(), iMax, iMax2) && !gameEngine.pathfindingEngine.b(h(), iMax3, iMax4)) {
+            if (gameEngine.pathfindingEngine.isTileBlockedForMovement(getMovementType(), iMax, iMax2) && !gameEngine.pathfindingEngine.b(getMovementType(), iMax3, iMax4)) {
                 z3 = true;
             }
             if (!z3) {
@@ -1268,7 +1268,7 @@ public abstract class OrderableUnit extends UnitBase {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public void h(float f) {
-        float fEndsWith = Utility.endsWith(this.rotationSpeed, f, 360.0f);
+        float fEndsWith = Utility.rotateTowardsAngle(this.rotationSpeed, f, 360.0f);
         if (Utility.abs(fEndsWith) > 0.01d) {
             addRotation(fEndsWith);
         }
@@ -1285,10 +1285,10 @@ public abstract class OrderableUnit extends UnitBase {
             }
             return 0.0f;
         }
-        float fEndsWith = Utility.endsWith(this.rotationSpeed, f2, 360.0f);
+        float fEndsWith = Utility.rotateTowardsAngle(this.rotationSpeed, f2, 360.0f);
         if (z) {
             if (z2 && Utility.abs(fEndsWith) > 100.0f) {
-                fEndsWith = Utility.endsWith(this.rotationSpeed, f2 + 180.0f, 360.0f);
+                fEndsWith = Utility.rotateTowardsAngle(this.rotationSpeed, f2 + 180.0f, 360.0f);
                 if (!this.isRotating) {
                     j(25);
                     this.isRotating = true;
@@ -1365,13 +1365,13 @@ public abstract class OrderableUnit extends UnitBase {
     public float a(float f, float f2, int i) {
         float f3;
         UnitMovementData unitMovementData = this.movementLevels[i];
-        float fEndsWith = Utility.endsWith(unitMovementData.targetX, f2, 360.0f);
+        float fEndsWith = Utility.rotateTowardsAngle(unitMovementData.targetX, f2, 360.0f);
         if (fEndsWith == 0.0f) {
             return fEndsWith;
         }
         float fW = w(i);
         if (fW <= 0.0f) {
-            float fEndsWith2 = Utility.endsWith(unitMovementData.targetX, f2, c(i) * f);
+            float fEndsWith2 = Utility.rotateTowardsAngle(unitMovementData.targetX, f2, c(i) * f);
             a(i, fEndsWith2);
             f3 = fEndsWith - fEndsWith2;
         } else {
@@ -4030,7 +4030,7 @@ public abstract class OrderableUnit extends UnitBase {
         gameEngine.tileMap.setCursorTileIndexFromWorldPoint(this.posX, this.posY);
         int i = gameEngine.tileMap.cursorTileX;
         int i2 = gameEngine.tileMap.cursorTileY;
-        if (gameEngine.pathfindingEngine.isTileBlockedForMovement(h(), i, i2) && !gameEngine.pathfindingEngine.b(h(), i, i2)) {
+        if (gameEngine.pathfindingEngine.isTileBlockedForMovement(getMovementType(), i, i2) && !gameEngine.pathfindingEngine.b(getMovementType(), i, i2)) {
             z = true;
         }
         return z;
@@ -4050,7 +4050,7 @@ public abstract class OrderableUnit extends UnitBase {
         tileMap.setCursorTileIndexFromWorldPoint(this.posX, this.posY);
         int i2 = tileMap.cursorTileX;
         int i3 = tileMap.cursorTileY;
-        if (pathEngine.isTileBlockedForMovement(h(), i2, i3) && !pathEngine.b(h(), i2, i3)) {
+        if (pathEngine.isTileBlockedForMovement(getMovementType(), i2, i3) && !pathEngine.b(getMovementType(), i2, i3)) {
             z3 = true;
             z4 = true;
         }
@@ -4087,7 +4087,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (z) {
             i4 = 3;
         }
-        if (PathfindingUtils.a(h(), this.posX, this.posY, f, f2, 80, i4, 1)) {
+        if (PathfindingUtils.a(getMovementType(), this.posX, this.posY, f, f2, 80, i4, 1)) {
             this.isPathIncomplete = false;
             this.activePathCount = 0;
             this.au = null;
@@ -4144,7 +4144,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (formationGroup != null && formationGroup.commandTargets != null) {
             CommandTarget commandTarget = null;
             for (CommandTarget commandTarget2 : formationGroup.commandTargets) {
-                if (commandTarget2.path != null && commandTarget2.path.a() != null && Utility.abs(commandTarget2.targetX - f) <= 10.0f && Utility.abs(commandTarget2.targetY - f2) <= 10.0f && commandTarget2.createdTick + SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT >= gameEngine.currentTick && commandTarget2.movementType == h() && Utility.distanceSq(this.posX, this.posY, commandTarget2.startX, commandTarget2.startY) < 3600.0f) {
+                if (commandTarget2.path != null && commandTarget2.path.a() != null && Utility.abs(commandTarget2.targetX - f) <= 10.0f && Utility.abs(commandTarget2.targetY - f2) <= 10.0f && commandTarget2.createdTick + SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT >= gameEngine.currentTick && commandTarget2.movementType == getMovementType() && Utility.distanceSq(this.posX, this.posY, commandTarget2.startX, commandTarget2.startY) < 3600.0f) {
                     commandTarget = commandTarget2;
                 }
             }
@@ -4170,7 +4170,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (bb() || this.isRotating) {
             z4 = true;
         }
-        pathA.a(h(), (short) tileMap.cursorTileX, (short) tileMap.cursorTileY, Float.valueOf(this.rotationSpeed), z4);
+        pathA.a(getMovementType(), (short) tileMap.cursorTileX, (short) tileMap.cursorTileY, Float.valueOf(this.rotationSpeed), z4);
         tileMap.setCursorTileIndexFromWorldPoint(f, f2);
         pathA.a((short) tileMap.cursorTileX, (short) tileMap.cursorTileY, (short) i);
         pathA.p = z;

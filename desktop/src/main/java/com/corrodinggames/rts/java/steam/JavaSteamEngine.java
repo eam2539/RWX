@@ -191,7 +191,7 @@ public class JavaSteamEngine extends DisabledSteamEngine {
             return networkConnection;
         } catch (IOException e2) {
             e2.printStackTrace();
-            networkConnection.handleRemoteDisconnect("crash");
+            networkConnection.sendPacket("crash");
             return null;
         }
     }

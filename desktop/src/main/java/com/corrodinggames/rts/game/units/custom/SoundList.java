@@ -95,7 +95,7 @@ public class SoundList {
                     throw new RuntimeException("Failed to parse volume float: '" + strTrim2 + "' of sound: '" + strTrim + "'");
                 }
             }
-            soundEntry.sound = CustomUnitConfigParser.describeModsForUnitList(customUnitConfig.resourceLoadPath, str3 + strTrim3, customUnitConfig);
+            soundEntry.sound = CustomUnitConfigParser.loadSound(customUnitConfig.resourceLoadPath, str3 + strTrim3, customUnitConfig);
             if (soundEntry.sound != null) {
                 this.soundList.add(soundEntry);
             }

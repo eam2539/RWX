@@ -58,7 +58,7 @@ public class LaserDefense extends FactoryWithQueue {
     static Texture iconTexture = null;
 
     /* JADX INFO: renamed from: h */
-    static Texture[] shadowTexture = new Texture[10];
+    static Texture[] sharedShadowTexture = new Texture[10];
 
     /* JADX INFO: renamed from: k */
     static AbstractUnitAction upgradeAction = new PopupQueueAction(102) { // from class: com.corrodinggames.rts.game.units.d.p.1
@@ -154,7 +154,7 @@ public class LaserDefense extends FactoryWithQueue {
         if (this.team.teamId == -1) {
             return null;
         }
-        return shadowTexture[this.team.getTeamColorIndex()];
+        return sharedShadowTexture[this.team.getTeamColorIndex()];
     }
 
     /* JADX INFO: renamed from: b */
@@ -168,7 +168,7 @@ public class LaserDefense extends FactoryWithQueue {
         textureA.n();
         textureA2.n();
         iconTexture = gameEngine.renderGraphicsEngine.a(R.drawable.unit_icon_building_turrent);
-        shadowTexture = PlayerTeam.getTeamColorTextures(iconTexture);
+        sharedShadowTexture = PlayerTeam.getTeamColorTextures(iconTexture);
     }
 
     public LaserDefense(boolean z) {

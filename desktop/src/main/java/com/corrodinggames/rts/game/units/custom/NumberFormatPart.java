@@ -13,6 +13,6 @@ public class NumberFormatPart extends LogicFormatPart {
 
     @Override // com.corrodinggames.rts.game.units.custom.LocalePart
     String a(OrderableUnit orderableUnit) {
-        return Utility.min(this.logicBoolean.readNumber(orderableUnit));
+        return Utility.padString(this.logicBoolean.readNumber(orderableUnit));
     }
 }

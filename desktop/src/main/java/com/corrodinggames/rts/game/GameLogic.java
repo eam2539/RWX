@@ -69,7 +69,7 @@ public class GameLogic extends GameEngine {
     public float densityScaleMultiplier;
 
     /* JADX INFO: renamed from: f */
-    public static String safeModeReason = null;
+    public static String safeModeReasonText = null;
 
     /* JADX INFO: renamed from: g */
     JpegFrameWriterTask[] someKArray;
@@ -1706,7 +1706,7 @@ public class GameLogic extends GameEngine {
             this.renderGraphicsEngine.a("Loading..", this.halfScreenWidth, this.halfScreenHeight, this.loadingPaint);
             return;
         }
-        float f2 = 1.0f;
+        float f2 = this.viewScale;
         if (f2 != 1.0f) {
             this.renderGraphicsEngine.i();
             this.renderGraphicsEngine.a(f2, f2);
@@ -1766,8 +1766,8 @@ public class GameLogic extends GameEngine {
         if (this.settingsEngine.showFps && this.pauseTransition == 0.0f && !this.isMenuOpen && !this.isPaused) {
             this.renderGraphicsEngine.a(this.fpsString, 100.0f, 35.0f, this.fpsPaint);
         }
-        if (safeModeReason != null) {
-            this.renderGraphicsEngine.a(safeModeReason, 100.0f, 85.0f, this.fpsPaint);
+        if (safeModeReasonText != null) {
+            this.renderGraphicsEngine.a(safeModeReasonText, 100.0f, 85.0f, this.fpsPaint);
         }
         if (!this.isStopped && (this.renderGraphicsEngine.d() != null || GameEngine.isPCOrIOSVersion)) {
             this.gameUI.handleTouchGestures(f);
@@ -2117,6 +2117,7 @@ public class GameLogic extends GameEngine {
     public void updateViewpoint(int i, int i2, float f) {
         this.screenWidth = i;
         this.screenHeight = i2;
+        this.viewScale = f;
         updateCameraSystem();
     }
 
@@ -2268,6 +2269,10 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: w */
     public synchronized void synchronizedMethod() {
         this.booleanAC = false;
+        if (this.gameTimer != null) {
+            this.gameTimer.cancel();
+            this.gameTimer = null;
+        }
     }
 
     @Override // com.corrodinggames.rts.gameFramework.GameEngine

@@ -32,12 +32,12 @@ import java.util.Comparator;
 public enum UnitTypeEnum implements UnitType {
     extractor { // from class: com.corrodinggames.rts.game.units.ar.1
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -90,12 +90,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     landFactory { // from class: com.corrodinggames.rts.game.units.ar.12
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -138,12 +138,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     airFactory { // from class: com.corrodinggames.rts.game.units.ar.23
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -186,12 +186,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     seaFactory { // from class: com.corrodinggames.rts.game.units.ar.34
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -239,12 +239,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     commandCenter { // from class: com.corrodinggames.rts.game.units.ar.45
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -278,12 +278,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     turret { // from class: com.corrodinggames.rts.game.units.ar.50
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -311,12 +311,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     antiAirTurret { // from class: com.corrodinggames.rts.game.units.ar.51
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -344,7 +344,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     builder { // from class: com.corrodinggames.rts.game.units.ar.52
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -394,7 +394,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     tank { // from class: com.corrodinggames.rts.game.units.ar.53
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -422,7 +422,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     hoverTank { // from class: com.corrodinggames.rts.game.units.ar.2
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -450,7 +450,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     artillery { // from class: com.corrodinggames.rts.game.units.ar.3
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -478,7 +478,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     helicopter { // from class: com.corrodinggames.rts.game.units.ar.4
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -506,7 +506,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     airShip { // from class: com.corrodinggames.rts.game.units.ar.5
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -534,7 +534,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     gunShip { // from class: com.corrodinggames.rts.game.units.ar.6
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -567,7 +567,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     missileShip { // from class: com.corrodinggames.rts.game.units.ar.7
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -595,7 +595,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     gunBoat { // from class: com.corrodinggames.rts.game.units.ar.8
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -623,7 +623,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     megaTank { // from class: com.corrodinggames.rts.game.units.ar.9
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -651,7 +651,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     laserTank { // from class: com.corrodinggames.rts.game.units.ar.10
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -684,7 +684,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     hovercraft { // from class: com.corrodinggames.rts.game.units.ar.11
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -712,7 +712,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     ladybug { // from class: com.corrodinggames.rts.game.units.ar.13
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -740,7 +740,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     battleShip { // from class: com.corrodinggames.rts.game.units.ar.14
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -768,7 +768,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     tankDestroyer { // from class: com.corrodinggames.rts.game.units.ar.15
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -796,7 +796,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     heavyTank { // from class: com.corrodinggames.rts.game.units.ar.16
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -829,7 +829,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     heavyHoverTank { // from class: com.corrodinggames.rts.game.units.ar.17
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -862,12 +862,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     laserDefence { // from class: com.corrodinggames.rts.game.units.ar.18
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -904,7 +904,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     dropship { // from class: com.corrodinggames.rts.game.units.ar.19
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -937,7 +937,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     tree { // from class: com.corrodinggames.rts.game.units.ar.20
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -965,12 +965,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     repairbay { // from class: com.corrodinggames.rts.game.units.ar.21
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -998,12 +998,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     NukeLaucher { // from class: com.corrodinggames.rts.game.units.ar.22
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1031,12 +1031,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     AntiNukeLaucher { // from class: com.corrodinggames.rts.game.units.ar.24
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1064,7 +1064,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     mammothTank { // from class: com.corrodinggames.rts.game.units.ar.25
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1097,7 +1097,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     experimentalTank { // from class: com.corrodinggames.rts.game.units.ar.26
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1130,12 +1130,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     experimentalLandFactory { // from class: com.corrodinggames.rts.game.units.ar.27
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1169,12 +1169,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     crystalResource { // from class: com.corrodinggames.rts.game.units.ar.28
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1202,12 +1202,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     wall_v { // from class: com.corrodinggames.rts.game.units.ar.29
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1235,12 +1235,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     fabricator { // from class: com.corrodinggames.rts.game.units.ar.30
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1280,7 +1280,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     attackSubmarine { // from class: com.corrodinggames.rts.game.units.ar.31
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1308,7 +1308,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     builderShip { // from class: com.corrodinggames.rts.game.units.ar.32
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1352,7 +1352,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     amphibiousJet { // from class: com.corrodinggames.rts.game.units.ar.33
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1385,12 +1385,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     supplyDepot { // from class: com.corrodinggames.rts.game.units.ar.35
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1418,7 +1418,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     experimentalHoverTank { // from class: com.corrodinggames.rts.game.units.ar.36
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return false;
         }
 
@@ -1451,12 +1451,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     turret_artillery { // from class: com.corrodinggames.rts.game.units.ar.37
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1485,12 +1485,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     turret_flamethrower { // from class: com.corrodinggames.rts.game.units.ar.38
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1519,7 +1519,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     fogRevealer { // from class: com.corrodinggames.rts.game.units.ar.39
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1547,7 +1547,7 @@ public enum UnitTypeEnum implements UnitType {
     },
     spreadingFire { // from class: com.corrodinggames.rts.game.units.ar.40
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1575,12 +1575,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     antiAirTurretT2 { // from class: com.corrodinggames.rts.game.units.ar.41
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1609,12 +1609,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     turretT2 { // from class: com.corrodinggames.rts.game.units.ar.42
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1643,12 +1643,12 @@ public enum UnitTypeEnum implements UnitType {
     },
     turretT3 { // from class: com.corrodinggames.rts.game.units.ar.43
         @Override // com.corrodinggames.rts.game.units.UnitTypeEnum, com.corrodinggames.rts.game.units.UnitType
-        public boolean j() {
+        public boolean isBuildingUnit() {
             return true;
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1683,7 +1683,7 @@ public enum UnitTypeEnum implements UnitType {
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1717,7 +1717,7 @@ public enum UnitTypeEnum implements UnitType {
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1753,7 +1753,7 @@ public enum UnitTypeEnum implements UnitType {
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1819,7 +1819,7 @@ public enum UnitTypeEnum implements UnitType {
         }
 
         @Override // com.corrodinggames.rts.game.units.UnitType
-        public boolean C() {
+        public boolean isAvailableInDemo() {
             return true;
         }
 
@@ -1951,13 +1951,13 @@ public enum UnitTypeEnum implements UnitType {
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
-    public boolean j() {
+    public boolean isBuildingUnit() {
         return false;
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
     public boolean k() {
-        return j();
+        return isBuildingUnit();
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
@@ -1981,7 +1981,7 @@ public enum UnitTypeEnum implements UnitType {
         if (baseUnitFindTurretPosition == null) {
             throw new RuntimeException("Shared unit is null for:" + name());
         }
-        return baseUnitFindTurretPosition.h();
+        return baseUnitFindTurretPosition.getMovementType();
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitType
@@ -2211,10 +2211,10 @@ public enum UnitTypeEnum implements UnitType {
             ((OrderableUnit) baseUnitCanAttack).a(i);
         }
         baseUnitCanAttack.posZ = f4;
-        if (baseUnitCanAttack.h() == UnitMovementType.HOVER || baseUnitCanAttack.h() == UnitMovementType.OVER_CLIFF || baseUnitCanAttack.h() == UnitMovementType.OVER_CLIFF_WATER) {
+        if (baseUnitCanAttack.getMovementType() == UnitMovementType.HOVER || baseUnitCanAttack.getMovementType() == UnitMovementType.OVER_CLIFF || baseUnitCanAttack.getMovementType() == UnitMovementType.OVER_CLIFF_WATER) {
             baseUnitCanAttack.posZ += 4.0f;
         }
-        if (baseUnitCanAttack.h() == UnitMovementType.AIR) {
+        if (baseUnitCanAttack.getMovementType() == UnitMovementType.AIR) {
             baseUnitCanAttack.posZ += 10.0f;
         }
         if (!zBI) {

@@ -47,8 +47,8 @@ public class ResourceDefinition {
 
     public void a(CustomUnitConfig customUnitConfig, IniFile iniFile, String str, String str2) throws ConfigParseException {
         this.a = str2;
-        this.g = CustomUnitConfigParser.handleUnitLoadError(iniFile, str, "displayName", (String) null);
-        this.h = CustomUnitConfigParser.handleUnitLoadError(iniFile, str, "displayNameShort", (String) null);
+        this.g = CustomUnitConfigParser.getLocaleString(iniFile, str, "displayName", (String) null);
+        this.h = CustomUnitConfigParser.getLocaleString(iniFile, str, "displayNameShort", (String) null);
         if (this.h == null) {
             this.h = this.g;
         }
@@ -86,16 +86,16 @@ public class ResourceDefinition {
         }
         this.s = iniFile.getLogicBooleanUnit(str, "displayPos", (Integer) 0).intValue();
         this.r = (DigitGroupingStyle) iniFile.getEnum(str, "displayDigitGrouping", DigitGroupingStyle.none, DigitGroupingStyle.class);
-        this.t = CustomUnitConfigParser.handleUnitLoadError(iniFile, str, "displayTextPrefix", (String) null);
-        this.u = CustomUnitConfigParser.handleUnitLoadError(iniFile, str, "displayTextPostfix", (String) null);
-        LocaleString localeStringHandleUnitLoadError = CustomUnitConfigParser.handleUnitLoadError(iniFile, str, "displayPrefixInHUD", (String) null);
+        this.t = CustomUnitConfigParser.getLocaleString(iniFile, str, "displayTextPrefix", (String) null);
+        this.u = CustomUnitConfigParser.getLocaleString(iniFile, str, "displayTextPostfix", (String) null);
+        LocaleString localeStringHandleUnitLoadError = CustomUnitConfigParser.getLocaleString(iniFile, str, "displayPrefixInHUD", (String) null);
         if (localeStringHandleUnitLoadError != null) {
             if (this.t != null) {
                 throw new ConfigParseException("[" + str + "]displayPrefixInHUD and displayTextPrefix are aliases, don't use both");
             }
             this.t = localeStringHandleUnitLoadError;
         }
-        LocaleString localeStringHandleUnitLoadError2 = CustomUnitConfigParser.handleUnitLoadError(iniFile, str, "displayPostfixInHUD", (String) null);
+        LocaleString localeStringHandleUnitLoadError2 = CustomUnitConfigParser.getLocaleString(iniFile, str, "displayPostfixInHUD", (String) null);
         if (localeStringHandleUnitLoadError2 != null) {
             if (this.u != null) {
                 throw new ConfigParseException("[" + str + "]displayPostfixInHUD and displayTextPostfix are aliases, don't use both");

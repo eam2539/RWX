@@ -341,12 +341,12 @@ public final class AIController extends PlayerTeam {
 
     /* JADX INFO: renamed from: a */
     public boolean isPathPossibleForUnit(BaseUnit baseUnit, float f, float f2) {
-        return isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2, baseUnit.h());
+        return isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2, baseUnit.getMovementType());
     }
 
     /* JADX INFO: renamed from: b */
     public boolean canUnitReachPointWithOffsets(BaseUnit baseUnit, float f, float f2) {
-        UnitMovementType unitMovementTypeH = baseUnit.h();
+        UnitMovementType unitMovementTypeH = baseUnit.getMovementType();
         return isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f + 60.0f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f - 60.0f, f2, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2 + 60.0f, unitMovementTypeH) || isPathPossibleBetweenPoints(baseUnit.posX, baseUnit.posY, f, f2 - 60.0f, unitMovementTypeH);
     }
 
@@ -733,7 +733,7 @@ public final class AIController extends PlayerTeam {
                     for (AbstractUnitAction abstractUnitAction : baseUnitFindAttackDamageSource.getAvailableActions()) {
                         if (abstractUnitAction != null && (abstractUnitAction instanceof PopupQueueAction)) {
                             PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
-                            if (!popupQueueAction.getDisplayType() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.j()) {
+                            if (!popupQueueAction.getDisplayType() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.isBuildingUnit()) {
                                 z2 = true;
                             }
                         }
@@ -760,7 +760,7 @@ public final class AIController extends PlayerTeam {
                     for (AbstractUnitAction abstractUnitAction : baseUnitFindAttackDamageSource.getAvailableActions()) {
                         if (abstractUnitAction != null && (abstractUnitAction instanceof PopupQueueAction)) {
                             PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
-                            if (!popupQueueAction.getDisplayType() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.j() && unitTypeI.m()) {
+                            if (!popupQueueAction.getDisplayType() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.isBuildingUnit() && unitTypeI.m()) {
                                 z2 = true;
                             }
                         }
@@ -1000,7 +1000,7 @@ public final class AIController extends PlayerTeam {
     /* JADX WARN: Multi-variable type inference failed */
     /* JADX INFO: renamed from: a */
     public int applyAIBuilder(UnitType unitType, boolean z, UnitFilterMode unitFilterMode) {
-        boolean zJ = unitType.j();
+        boolean zJ = unitType.isBuildingUnit();
         Integer numA = this.buildPreferenceCache.a(zJ, unitType, z);
         if (numA != null) {
             return numA.intValue();
@@ -1154,7 +1154,7 @@ public final class AIController extends PlayerTeam {
                     if (baseZone.lastBuiltCustomUnit2 != null) {
                         str4 = str4 + "\nlastAttemptedBuilding-cannotAffordBy: " + baseZone.lastBuiltCustomUnit2.a(false, true, 4, true);
                     }
-                    String str5 = ((((str4 + "\nlastAttemptedBuildingCount: " + baseZone.numberOfLandUnits) + "\nlastAttemptedBuildingFailed: " + baseZone.numberOfAirUnits) + "\nlastUnitAttempt: " + baseZone.debugText + " (" + baseZone.numberOfWaterUnits + " - " + baseZone.numberOfBuildings + ")") + "\nbuildBuildingDelay: " + baseZone.defensiveScore) + "\ncredits: " + Utility.md5(this.credits) + " (x" + Utility.min(getSpectatorEnergyFactor()) + ")";
+                    String str5 = ((((str4 + "\nlastAttemptedBuildingCount: " + baseZone.numberOfLandUnits) + "\nlastAttemptedBuildingFailed: " + baseZone.numberOfAirUnits) + "\nlastUnitAttempt: " + baseZone.debugText + " (" + baseZone.numberOfWaterUnits + " - " + baseZone.numberOfBuildings + ")") + "\nbuildBuildingDelay: " + baseZone.defensiveScore) + "\ncredits: " + Utility.formatNumberWithTwoDecimals(this.credits) + " (x" + Utility.padString(getSpectatorEnergyFactor()) + ")";
                     if (baseZone.stage == BaseZoneStage.Pre) {
                         str5 = str5 + "\nclaimedBaseTimer: " + baseZone.extractorScore;
                     }
@@ -1600,7 +1600,7 @@ public final class AIController extends PlayerTeam {
                     if (orderableUnit3.aB != null && orderableUnit3.aB.b()) {
                         this.unitCount++;
                     } else if (isCombatCustomUnit(orderableUnit3) && !orderableUnit3.isActive) {
-                        if (orderableUnit3.h() == UnitMovementType.WATER) {
+                        if (orderableUnit3.getMovementType() == UnitMovementType.WATER) {
                             this.buildingCount++;
                         } else {
                             this.unitProductionTimer++;
