@@ -1738,7 +1738,8 @@ CLASS com/corrodinggames/rts/game/units/a/s com/corrodinggames/rts/game/units/ac
 	METHOD c getCostAmount ()I
 	METHOD c isActionIdSpecified (Lcom/corrodinggames/rts/game/units/a/c;)Z
 	METHOD c onClicked (Lcom/corrodinggames/rts/game/units/am;Z)Z
-	METHOD C getCost ()Z
+	METHOD C selectsUnitOnClick ()Z
+	COMMENT VERIFIED
 	METHOD d matchesActionId (Lcom/corrodinggames/rts/game/units/a/c;)Z
 	METHOD d getDisplayName (Lcom/corrodinggames/rts/game/units/am;)Ljava/lang/String;
 	METHOD d canPlayerCancel (Lcom/corrodinggames/rts/game/units/am;Z)Z
@@ -1751,11 +1752,13 @@ CLASS com/corrodinggames/rts/game/units/a/s com/corrodinggames/rts/game/units/ac
 		COMMENT VERIFIED
 	METHOD f getActionDisplayType ()Lcom/corrodinggames/rts/game/units/a/t;
 	METHOD f onConfirmed (Lcom/corrodinggames/rts/game/units/am;)V
-	METHOD F getDisplayType ()Z
+	METHOD F isDisplayOnly ()Z
+	COMMENT VERIFIED
 	METHOD g isHighPriority ()Z
 	METHOD g isNotAvailable (Lcom/corrodinggames/rts/game/units/am;)Z
 	METHOD G isBuildOption ()Z
-	METHOD h getIconForUnit ()Z
+	METHOD h alwaysShowsTooltip ()Z
+	COMMENT VERIFIED
 	METHOD h getExtraIconTexture (Lcom/corrodinggames/rts/game/units/am;)Lcom/corrodinggames/rts/gameFramework/m/e;
 	METHOD H isHighPriorityQueue ()Z
 	METHOD h_ shouldShowDisplayText ()Z
@@ -2971,8 +2974,10 @@ CLASS com/corrodinggames/rts/game/units/custom/j com/corrodinggames/rts/game/uni
 	METHOD D unloadTransportedUnit (Lcom/corrodinggames/rts/game/units/am;)V
 	METHOD E ejectUnit (Lcom/corrodinggames/rts/game/units/am;)V
 		COMMENT VERIFIED
-	METHOD G getUnitArmor (Lcom/corrodinggames/rts/game/units/am;)Z
-	METHOD H getTransportedUnitCount (Lcom/corrodinggames/rts/game/units/am;)Z
+	METHOD G hasTransportSpaceFor (Lcom/corrodinggames/rts/game/units/am;)Z
+		COMMENT VERIFIED
+	METHOD H canRepairUnit (Lcom/corrodinggames/rts/game/units/am;)Z
+		COMMENT VERIFIED
 	METHOD K initTransportedUnitPoints ()V
 		COMMENT VERIFIED
 	METHOD L startUnloading ()V
