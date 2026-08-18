@@ -44,7 +44,7 @@ public class SpawnUnitAction extends LogicAction {
             FastArrayList<BaseUnit> fastArrayList = new FastArrayList();
             this.produceUnits.a(fastArrayList, customUnit.team, (BaseUnit) customUnit, false);
             for (BaseUnit baseUnit2 : fastArrayList) {
-                customUnit.getAttackDamage(baseUnit2);
+                customUnit.ejectUnit(baseUnit2);
                 customUnit.F(baseUnit2);
             }
         }

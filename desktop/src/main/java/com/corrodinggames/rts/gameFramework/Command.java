@@ -554,11 +554,11 @@ public class Command {
                     } else {
                         baseUnitA.f(PlayerTeam.TEAM_ALL);
                     }
-                    baseUnitA.getUnitType(null);
+                    baseUnitA.setCommandTargetUnit(null);
                     if (buildQueueSize != 1 && (baseUnitA instanceof OrderableUnit)) {
                         ((OrderableUnit) baseUnitA).a(buildQueueSize);
                     }
-                    baseUnitA.getUnitCategory();
+                    baseUnitA.onUnitSpawned();
                     if (baseUnitA instanceof OrderableUnit) {
                         OrderableUnit orderableUnit = (OrderableUnit) baseUnitA;
                         orderableUnit.br();

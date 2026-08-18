@@ -1097,7 +1097,7 @@ public class BaseZone extends AIStrategyNode {
         }
         if (i < 2 && this.landUnitsScore == 0.0f) {
             this.landUnitsScore = 300.0f;
-            int iShouldWriteForUnitType = this.aiController.shouldWriteForUnitType(this.aiController.fabricatorUnitBuildStrategy, UnitFilterMode.include);
+            int iShouldWriteForUnitType = this.aiController.countUnitsForBuildStrategyWithFilter(this.aiController.fabricatorUnitBuildStrategy, UnitFilterMode.include);
             if (!this.isUnderAttack || iShouldWriteForUnitType <= 2) {
                 boolean z = Utility.getRandomIntInRange(0, 100) < 5;
                 if (!z && a(this.aiController.fabricatorUnitBuildStrategy, true)) {
@@ -1384,8 +1384,8 @@ public class BaseZone extends AIStrategyNode {
                 }
             }
             if (this.reclaimScore >= 1.0f && zIsAttackBlockedByConditions && this.lastTimeAttackedByEnemy == 0.0f) {
-                int iShouldWriteForUnitType = this.aiController.shouldWriteForUnitType(this.aiController.baseDefenseUnitBuildStrategy, UnitFilterMode.include);
-                int iShouldWriteForUnitType2 = iShouldWriteForUnitType + this.aiController.shouldWriteForUnitType(this.aiController.scoutUnitBuildStrategy, UnitFilterMode.include);
+                int iShouldWriteForUnitType = this.aiController.countUnitsForBuildStrategyWithFilter(this.aiController.baseDefenseUnitBuildStrategy, UnitFilterMode.include);
+                int iShouldWriteForUnitType2 = iShouldWriteForUnitType + this.aiController.countUnitsForBuildStrategyWithFilter(this.aiController.scoutUnitBuildStrategy, UnitFilterMode.include);
                 int iCountUnitsInGroups = this.aiController.countUnitsInGroups();
                 if ((this.aiController.hasCredits(1700.0d) || iCountUnitsInGroups > 10 || (this.aiController.attackCooldownTimer == 0 && iCountUnitsInGroups >= 1 && iShouldWriteForUnitType == 0)) && (iShouldWriteForUnitType2 < 3 || (iCountUnitsInGroups > 20 && iShouldWriteForUnitType2 < 5))) {
                     if (zShouldLaunchAttack && iShouldWriteForUnitType2 < 2) {

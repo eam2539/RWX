@@ -1797,7 +1797,7 @@ public final class NetworkEngine {
         }
     }
 
-    public synchronized boolean b(PacketData packet) {
+    public synchronized boolean shouldFilterPacket(PacketData packet) {
         NetworkConnection networkConnection;
         if (this.isServer && (networkConnection = packet.connection) != null && !networkConnection.allowLargeIncomingPackets && packet.packetType != 105 && packet.packetType != 110 && packet.packetType != 111 && packet.packetType != 108 && packet.packetType != 160) {
             return true;
@@ -1808,7 +1808,7 @@ public final class NetworkEngine {
     /* JADX INFO: renamed from: a */
     public void processGamePacket(PacketData packet) throws IOException {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (b(packet)) {
+        if (shouldFilterPacket(packet)) {
             d("filtered packet (type:" + packet.packetType + ")");
             return;
         }
@@ -2439,7 +2439,7 @@ public final class NetworkEngine {
         int activeTeamCount;
         String nullableString;
         GameEngine gameEngine = GameEngine.getInstance();
-        if (b(packet)) {
+        if (shouldFilterPacket(packet)) {
             d("filtered packet (type:" + packet.packetType + ")");
             return;
         }

@@ -105,7 +105,7 @@ public class LegConfig {
             legConfig.l = true;
             legConfig.J = false;
         }
-        int iIntValue = iniFile.getLogicBooleanUnit(str, "copyFrom", (Integer) 0).intValue();
+        int iIntValue = iniFile.getInt(str, "copyFrom", (Integer) 0).intValue();
         if (iIntValue != 0) {
             if (iIntValue - 1 >= arrayList.size()) {
                 throw new RuntimeException("copyFrom: Leg/Arm copy target not loaded yet: " + iIntValue);
@@ -222,7 +222,7 @@ public class LegConfig {
         if (f6 != null) {
             legConfig.K = f6.floatValue();
         }
-        legConfig.L = iniFile.getLogicBooleanUnit(str, "holdDisMin_maxMovingLegs", Integer.valueOf(legConfig.L)).intValue();
+        legConfig.L = iniFile.getInt(str, "holdDisMin_maxMovingLegs", Integer.valueOf(legConfig.L)).intValue();
         legConfig.M = iniFile.getBoolean(str, "hold_moveOnlyIfFurthest", Boolean.valueOf(legConfig.M)).booleanValue();
         legConfig.n = iniFile.getBoolean(str, "holdDisMin_checkNeighbours", Boolean.valueOf(legConfig.n)).booleanValue();
         legConfig.o = iniFile.getBoolean(str, "favourOppositeSideNeighbours", Boolean.valueOf(legConfig.o)).booleanValue();

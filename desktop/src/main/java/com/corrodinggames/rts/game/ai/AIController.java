@@ -983,7 +983,7 @@ public final class AIController extends PlayerTeam {
     }
 
     /* JADX INFO: renamed from: a */
-    public int shouldWriteForUnitType(UnitBuildStrategy unitBuildStrategy, UnitFilterMode unitFilterMode) {
+    public int countUnitsForBuildStrategyWithFilter(UnitBuildStrategy unitBuildStrategy, UnitFilterMode unitFilterMode) {
         int iAssignTaskToUnitTypeOnCommand = 0;
         Iterator it = unitBuildStrategy.unitPriorities.iterator();
         while (it.hasNext()) {
@@ -1949,7 +1949,7 @@ public final class AIController extends PlayerTeam {
             }
             if (!this.enableExperimentalUnits) {
                 this.enableExperimentalUnits = true;
-                if (shouldWriteForUnitType(this.landFactoryUnitBuildStrategy, UnitFilterMode.include) >= 1) {
+                if (countUnitsForBuildStrategyWithFilter(this.landFactoryUnitBuildStrategy, UnitFilterMode.include) >= 1) {
                     for (int i4 = 0; i4 < gameEngine.tileMap.unitObjects.size(); i4++) {
                         Point point = (Point) gameEngine.tileMap.unitObjects.get(i4);
                         gameEngine.tileMap.setCursorTileIndexFromTileIndex(point.worldX, point.worldY);

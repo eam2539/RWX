@@ -37,8 +37,8 @@ public final class UnitSearchRule {
         this.h = iniFile.getFloat(str, "searchOffsetY", Float.valueOf(0.0f)).floatValue();
         this.i = iniFile.getBoolean(str, "excludeIncompleteBuildings", (Boolean) false).booleanValue();
         this.j = iniFile.getBoolean(str, "excludeNonBuildings", (Boolean) false).booleanValue();
-        this.k = iniFile.getLogicBooleanUnit(str, "minCount", (Integer) Integer.MIN_VALUE).intValue();
-        this.l = iniFile.getLogicBooleanUnit(str, "maxCount", (Integer) Integer.MAX_VALUE).intValue();
+        this.k = iniFile.getInt(str, "minCount", (Integer) Integer.MIN_VALUE).intValue();
+        this.l = iniFile.getInt(str, "maxCount", (Integer) Integer.MAX_VALUE).intValue();
         this.p = iniFile.getBoolean(str, "checkEachTile", (Boolean) true).booleanValue();
         this.m = iniFile.getBoolean(str, "aiSuggestionOnly", (Boolean) false).booleanValue();
         this.n = iniFile.getBoolean(str, "blocksPlacement", Boolean.valueOf(!this.m)).booleanValue();

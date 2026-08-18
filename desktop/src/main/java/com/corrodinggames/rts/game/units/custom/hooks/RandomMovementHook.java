@@ -29,7 +29,7 @@ public class RandomMovementHook extends CustomUnitRenderHook {
         this.a = iniFile.getLogicBoolean(customUnitConfig, str, "enabled");
         this.b = iniFile.getFloatStrictRaw(str, "speed");
         this.c = iniFile.getFloat(str, "maxSpeed", Float.valueOf(5.0f)).floatValue();
-        this.d = iniFile.getLogicBooleanUnit(str, "awayFromEdge", (Integer) 75).intValue();
+        this.d = iniFile.getInt(str, "awayFromEdge", (Integer) 75).intValue();
     }
 
     @Override // com.corrodinggames.rts.game.units.custom.hooks.CustomUnitRenderHook

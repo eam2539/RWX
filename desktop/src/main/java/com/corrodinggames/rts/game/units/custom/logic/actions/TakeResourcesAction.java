@@ -124,7 +124,7 @@ public class TakeResourcesAction extends LogicAction {
             takeResourcesAction.takeResources_discardCollected = true;
             takeResourcesAction.takeResources_keepResourcesOnTarget = true;
         }
-        takeResourcesAction.takeResources_maxUnits = iniFile.getLogicBooleanUnit(str, str2 + "takeResources_maxUnits", Integer.valueOf(takeResourcesAction.takeResources_maxUnits)).intValue();
+        takeResourcesAction.takeResources_maxUnits = iniFile.getInt(str, str2 + "takeResources_maxUnits", Integer.valueOf(takeResourcesAction.takeResources_maxUnits)).intValue();
         takeResourcesAction.takeResources_triggerActionIfAnyCollected = iniFile.getCustomUnitAction(customUnitConfig, str, str2 + "takeResources_triggerActionIfAnyCollected", (CustomUnitActionHandler) null);
         takeResourcesAction.takeResources_triggerActionIfNoneCollected = iniFile.getCustomUnitAction(customUnitConfig, str, str2 + "takeResources_triggerActionIfNoneCollected", (CustomUnitActionHandler) null);
         takeResourcesAction.takeResources_triggerActionForEach = iniFile.getCustomUnitAction(customUnitConfig, str, str2 + "takeResources_triggerActionForEach", (CustomUnitActionHandler) null);

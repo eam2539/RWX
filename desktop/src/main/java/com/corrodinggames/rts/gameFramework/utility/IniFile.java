@@ -642,7 +642,7 @@ public class IniFile {
     }
 
     /* JADX INFO: renamed from: b */
-    public Integer getLogicBooleanUnit(String str, String str2, Integer num) {
+    public Integer getInt(String str, String str2, Integer num) {
         String valueInternal = getValueInternal(str, str2, true, "int");
         if (valueInternal == null) {
             return num;

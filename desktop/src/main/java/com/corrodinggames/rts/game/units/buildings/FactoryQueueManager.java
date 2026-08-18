@@ -134,7 +134,7 @@ public class FactoryQueueManager {
         baseUnitA.posY = this.a.posY + 5.0f;
         baseUnitA.rotationSpeed = 90.0f + f2;
         baseUnitA.f(this.a.team);
-        baseUnitA.getUnitType(this.a);
+        baseUnitA.setCommandTargetUnit(this.a);
         a(baseUnitA, f, z);
         GameEngine gameEngine = GameEngine.getInstance();
         if (baseUnitA.team == gameEngine.playerTeam) {

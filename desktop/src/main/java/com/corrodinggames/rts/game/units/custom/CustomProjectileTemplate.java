@@ -33,19 +33,19 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
     public CustomUnitConfig customUnitConfig;
 
     public static void a(CustomProjectileTemplate customProjectileTemplate, CustomUnitConfig customUnitConfig, IniFile iniFile, String str) throws ConfigParseException {
-        Integer logicBooleanUnit = iniFile.getLogicBooleanUnit(str, "directDamage", (Integer) null);
-        Integer logicBooleanUnit2 = iniFile.getLogicBooleanUnit(str, "areaDamage", (Integer) null);
+        Integer logicBooleanUnit = iniFile.getInt(str, "directDamage", (Integer) null);
+        Integer logicBooleanUnit2 = iniFile.getInt(str, "areaDamage", (Integer) null);
         if (logicBooleanUnit == null && logicBooleanUnit2 == null) {
             throw new RuntimeException("[" + str + "]: directDamage or areaDamage must be set");
         }
         customProjectileTemplate.s = iniFile.getBoolean(str, "targetGround", Boolean.valueOf(customProjectileTemplate.s)).booleanValue();
         customProjectileTemplate.t = iniFile.getBoolean(str, "targetGround_includeTargetHeight", Boolean.valueOf(customProjectileTemplate.t)).booleanValue();
-        Integer logicBooleanUnit3 = iniFile.getLogicBooleanUnit(str, "areaRadius", (Integer) null);
+        Integer logicBooleanUnit3 = iniFile.getInt(str, "areaRadius", (Integer) null);
         if (logicBooleanUnit3 != null) {
             customProjectileTemplate.i = logicBooleanUnit3.intValue();
         }
-        customProjectileTemplate.b = iniFile.getLogicBooleanUnit(str, "directDamage", Integer.valueOf(customProjectileTemplate.b)).intValue();
-        customProjectileTemplate.c = iniFile.getLogicBooleanUnit(str, "areaDamage", Integer.valueOf(customProjectileTemplate.c)).intValue();
+        customProjectileTemplate.b = iniFile.getInt(str, "directDamage", Integer.valueOf(customProjectileTemplate.b)).intValue();
+        customProjectileTemplate.c = iniFile.getInt(str, "areaDamage", Integer.valueOf(customProjectileTemplate.c)).intValue();
         customProjectileTemplate.d = iniFile.getBoolean(str, "interceptProjectile_removeTargetLifeOnly", Boolean.valueOf(customProjectileTemplate.d)).booleanValue();
         customProjectileTemplate.g = iniFile.getBoolean(str, "areaDamageNoFalloff", Boolean.valueOf(customProjectileTemplate.g)).booleanValue();
         customProjectileTemplate.j = iniFile.getFloat(str, "areaIgnoreUnitsCloserThan", Float.valueOf(customProjectileTemplate.j)).floatValue();
@@ -230,7 +230,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         if (unitSpawnerA != null && !unitSpawnerA.b()) {
             customProjectileTemplate.spawnUnit = unitSpawnerA;
         }
-        customProjectileTemplate.unloadUpToXUnitsFromSource = iniFile.getLogicBooleanUnit(str, "unloadUpToXUnitsFromSource", Integer.valueOf(customProjectileTemplate.unloadUpToXUnitsFromSource)).intValue();
+        customProjectileTemplate.unloadUpToXUnitsFromSource = iniFile.getInt(str, "unloadUpToXUnitsFromSource", Integer.valueOf(customProjectileTemplate.unloadUpToXUnitsFromSource)).intValue();
         customProjectileTemplate.teleportSource = iniFile.getBoolean(str, "teleportSource", Boolean.valueOf(customProjectileTemplate.teleportSource)).booleanValue();
         customProjectileTemplate.convertHitToSourceTeam = iniFile.getBoolean(str, "convertHitToSourceTeam", Boolean.valueOf(customProjectileTemplate.convertHitToSourceTeam)).booleanValue();
         customProjectileTemplate.tags = AnimationTag.a(iniFile.getString(str, "tags", (String) null));

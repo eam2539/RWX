@@ -153,7 +153,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public static FastArrayList dX = new FastArrayList();
 
     /* JADX INFO: renamed from: K */
-    public void getMaxTransportedUnits() {
+    public void initTransportedUnitPoints() {
         this.E = new PointF[6];
         this.F = new PointF[this.E.length];
         for (int i = 0; i < this.E.length; i++) {
@@ -165,7 +165,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.UnitPathPoints
     public PointF[] b() {
         if (this.E == null) {
-            getMaxTransportedUnits();
+            initTransportedUnitPoints();
         }
         return this.E;
     }
@@ -173,7 +173,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.UnitPathPoints
     public PointF[] e_() {
         if (this.E == null) {
-            getMaxTransportedUnits();
+            initTransportedUnitPoints();
         }
         return this.F;
     }
@@ -391,7 +391,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     }
 
     /* JADX INFO: renamed from: L */
-    public void getTransportedUnits() {
+    public void startUnloading() {
         if (this.unitConfig.maxTransportingUnits == 0) {
             return;
         }
@@ -400,7 +400,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     }
 
     /* JADX INFO: renamed from: M */
-    public void getLoadedUnits() {
+    public void finishUnloading() {
         if (this.unitConfig.maxTransportingUnits == 0) {
             return;
         }
@@ -2908,16 +2908,16 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public void a(AbstractUnitAction abstractUnitAction, boolean z, PointF pointF, BaseUnit baseUnit) {
         if (abstractUnitAction == HovercraftUnit.i) {
             if (!z) {
-                getTransportedUnits();
+                startUnloading();
                 return;
             } else {
-                getLoadedUnits();
+                finishUnloading();
                 return;
             }
         }
         if (abstractUnitAction == HovercraftUnit.j) {
             if (!z) {
-                getLoadedUnits();
+                finishUnloading();
                 return;
             }
             return;
@@ -3208,7 +3208,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                         baseUnitA.rotationSpeed = this.rotationSpeed;
                     }
                     baseUnitA.f(this.team);
-                    baseUnitA.getUnitType(null);
+                    baseUnitA.setCommandTargetUnit(null);
                     float f3 = this.maxHealth;
                     float f4 = baseUnitA.maxHealth;
                     if (f3 == 0.0f) {
@@ -3252,7 +3252,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     }
 
     /* JADX INFO: renamed from: E */
-    public void getAttackDamage(BaseUnit baseUnit) {
+    public void ejectUnit(BaseUnit baseUnit) {
         float fFloatValue = 0.0f;
         if (this.unitConfig.isBuildingUnit && this.unitConfig.exit_dirOffset != null) {
             fFloatValue = this.rotationSpeed + this.unitConfig.exit_dirOffset.floatValue() + 90.0f;
@@ -3710,8 +3710,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: B */
-    public void getUnitType(BaseUnit baseUnit) {
-        super.getUnitType(baseUnit);
+    public void setCommandTargetUnit(BaseUnit baseUnit) {
+        super.setCommandTargetUnit(baseUnit);
     }
 
     // com.corrodinggames.rts.game.units.BaseUnit
@@ -3734,7 +3734,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: cP */
-    public void getUnitCategory() {
+    public void onUnitSpawned() {
         if (this.unitConfig.selfBuildRate == 0.0f && getResourceRate() > 0.0f) {
             PlayerTeam.b((BaseUnit) this);
             this.buildProgress = 1.0f;
