@@ -22,17 +22,17 @@ public class CustomPathFileLoader extends FileLoader {
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public String b() {
+    public String getGameDataPath() {
         return this.dirPath;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public String d() {
+    public String getStorageTypeName() {
         return this.name;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public boolean e() {
+    public boolean isZip() {
         return false;
     }
 

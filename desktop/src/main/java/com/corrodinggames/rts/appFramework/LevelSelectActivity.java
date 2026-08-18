@@ -182,7 +182,7 @@ public class LevelSelectActivity extends TaskQueueActivity {
             contextMenu.add(4, view2.getId(), 0, "From Mod: " + linkedModForFile.getPaddedTitle()).setEnabled(false);
         }
         if (linkedModForFile == null && this.showMapDetails) {
-            MenuItem menuItemAdd3 = contextMenu.add(3, view.getId(), 0, "Storage: " + FileHelper.getAbsolutePath(str));
+            MenuItem menuItemAdd3 = contextMenu.add(3, view.getId(), 0, "Storage: " + FileHelper.getStorageTypeForPath(str));
             if (menuItemAdd3 != null) {
                 menuItemAdd3.setEnabled(false);
             }

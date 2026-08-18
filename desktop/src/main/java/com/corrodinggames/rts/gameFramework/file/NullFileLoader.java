@@ -4,22 +4,22 @@ package com.corrodinggames.rts.gameFramework.file;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/e/f.class */
 public class NullFileLoader extends FileLoader {
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public String b() {
+    public String getGameDataPath() {
         return "/[NONE]/";
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public String[] b(String str, boolean z) {
+    public String[] listDir(String str, boolean z) {
         return null;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public boolean e() {
+    public boolean isZip() {
         return false;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public String d() {
+    public String getStorageTypeName() {
         return null;
     }
 }

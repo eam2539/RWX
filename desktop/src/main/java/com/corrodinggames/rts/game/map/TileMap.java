@@ -849,7 +849,7 @@ public final class TileMap {
         String strConvertAbstractPath = FileHelper.convertAbstractPath(str2);
         File parentFile = new File(strConvertAbstractPath).getParentFile();
         if (!FileHelper.fileExists(parentFile.getAbsolutePath())) {
-            FileHelper.deleteFile(parentFile.getAbsolutePath());
+            FileHelper.createDirectory(parentFile.getAbsolutePath());
         }
         if (!FileHelper.isDirectoryNonZip(parentFile.getAbsolutePath())) {
             GameEngine.logColored("Save Map: Could not create parent directory");

@@ -48,7 +48,7 @@ public class ReplayBrowserActivity extends TaskQueueActivity {
         contextMenu.add(1, view.getId(), 0, "Rename");
         contextMenu.add(2, view.getId(), 0, "Delete");
         if (this.replayFiles != null && this.replayFiles.length > 0) {
-            MenuItem menuItemAdd = contextMenu.add(3, view.getId(), 0, "Storage: " + FileHelper.getAbsolutePath(this.replayFiles[view.getId()]));
+            MenuItem menuItemAdd = contextMenu.add(3, view.getId(), 0, "Storage: " + FileHelper.getStorageTypeForPath(this.replayFiles[view.getId()]));
             if (menuItemAdd != null) {
                 menuItemAdd.setEnabled(false);
             }

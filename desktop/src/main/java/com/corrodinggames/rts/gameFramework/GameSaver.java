@@ -52,7 +52,7 @@ public class GameSaver {
 
     /* JADX INFO: renamed from: a */
     public static File getSaveFile(String str, String str2, boolean z) {
-        return FileHelper.createTempFile(str, str2, z);
+        return FileHelper.getRWFile(str, str2, z);
     }
 
     /* JADX INFO: renamed from: b */
@@ -418,7 +418,7 @@ public class GameSaver {
                         gameInputStream.d("gameSetup");
                     }
                     gameEngine.remoteMapStream = null;
-                    gameEngine.currentMapPath = normalizeDemoMapPath(FileHelper.mapPath(gameInputStream.readUTF()));
+                    gameEngine.currentMapPath = normalizeDemoMapPath(FileHelper.fixPath(gameInputStream.readUTF()));
                     boolean z7 = false;
                     if (i >= 72) {
                         z7 = gameInputStream.readBoolean();
@@ -874,7 +874,7 @@ public class GameSaver {
     /* JADX INFO: renamed from: b */
     public boolean deleteSaveGame(String str) {
         GameEngine.log("Deleting: " + str);
-        String strMapPath = FileHelper.mapPath(str);
+        String strMapPath = FileHelper.fixPath(str);
         if (strMapPath.contains("\\") || strMapPath.contains("/")) {
             GameEngine.log("Cannot get save with path: " + str);
             return false;

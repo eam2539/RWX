@@ -1740,7 +1740,7 @@ public abstract class GameEngine {
 
     /* JADX INFO: renamed from: ao */
     public static File getCrashLogFile() {
-        FileHelper.getExternalStoragePath();
+        FileHelper.getGameDataPath();
         String str = "/SD/rustedWarfare/crashes.txt";
         if (isAndroidPlatform()) {
             str = "/SD/rustedWarfare/crashes.txt";

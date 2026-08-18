@@ -62,7 +62,7 @@ public class SafFileLoader extends IFileLoader {
         synchronized (b) {
             SafFileSystem safFileSystem = (SafFileSystem) b.get(strM);
             if (safFileSystem == null) {
-                FileHelper.setWritePath("Folder link no longer open");
+                FileHelper.setLastError("Folder link no longer open");
                 return null;
             }
             return safFileSystem;
@@ -105,7 +105,7 @@ public class SafFileLoader extends IFileLoader {
                 b.put(str, safFileSystem);
             } catch (IOException e) {
                 e.printStackTrace();
-                FileHelper.setWritePath("Failed to list files: " + e.getMessage());
+                FileHelper.setLastError("Failed to list files: " + e.getMessage());
                 return null;
             }
         }
@@ -229,7 +229,7 @@ public class SafFileLoader extends IFileLoader {
             return safFileSystemD.g(n(str));
         } catch (IOException e) {
             e.printStackTrace();
-            FileHelper.setWritePath("Failed to open saf, " + e.getMessage());
+            FileHelper.setLastError("Failed to open saf, " + e.getMessage());
             return null;
         }
     }

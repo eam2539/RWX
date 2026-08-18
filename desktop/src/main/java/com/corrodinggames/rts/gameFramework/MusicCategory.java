@@ -46,7 +46,7 @@ enum MusicCategory {
         GameEngine gameEngine = GameEngine.getInstance();
         ArrayList arrayList = new ArrayList();
         for (String str : this.trackPaths) {
-            String strMapPath = FileHelper.mapPath(str);
+            String strMapPath = FileHelper.fixPath(str);
             if (MusicManager.loadMusic(getFullPath(strMapPath), true) != null) {
                 GameEngine.log("Loaded track:" + strMapPath);
                 arrayList.add(strMapPath);

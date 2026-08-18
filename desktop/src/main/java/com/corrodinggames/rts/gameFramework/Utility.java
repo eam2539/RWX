@@ -856,11 +856,11 @@ public final class Utility {
     public static String getResourcePath(int i2) {
         String strCountChars = getFieldNameByValue(R.drawable.class, i2);
         if (strCountChars != null) {
-            return FileHelper.findFileWithExtension("res/drawable", strCountChars);
+            return FileHelper.findFileExtension("res/drawable", strCountChars);
         }
         String strCountChars2 = getFieldNameByValue(R.raw.class, i2);
         if (strCountChars2 != null) {
-            return FileHelper.findFileWithExtension("res/raw", strCountChars2);
+            return FileHelper.findFileExtension("res/raw", strCountChars2);
         }
         return null;
     }

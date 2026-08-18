@@ -358,9 +358,9 @@ public class MasterServerClient {
         addParam(list, "private_ip", gameEngine.networkEngine.getPrimaryLocalIpAddress());
         addParam(list, "port_number", Integer.toString(gameEngine.networkEngine.m));
         if (gameEngine.networkEngine.u != null) {
-            addParam(list, "game_map", FileHelper.mapPath(gameEngine.networkEngine.u));
+            addParam(list, "game_map", FileHelper.fixPath(gameEngine.networkEngine.u));
         } else {
-            addParam(list, "game_map", FileHelper.mapPath(gameEngine.networkEngine.roomSettings.mapPath));
+            addParam(list, "game_map", FileHelper.fixPath(gameEngine.networkEngine.roomSettings.mapPath));
         }
         GameModeType gameModeType = gameEngine.networkEngine.roomSettings.gameModeType;
         if (gameModeType == null) {

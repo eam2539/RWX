@@ -150,14 +150,14 @@ public class MergedFileLoader extends FileLoader {
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public String[] b(String str, boolean z) {
+    public String[] listDir(String str, boolean z) {
         FileLoader fileLoaderForPath = getFileLoaderForPath(str);
         String strFixPath = fixPath(str);
         if (fileLoaderForPath != null) {
-            return fileLoaderForPath.b(strFixPath, z);
+            return fileLoaderForPath.listDir(strFixPath, z);
         }
-        String[] strArrB = this.fileLoader1.b(strFixPath, z);
-        String[] strArrB2 = this.fileLoader2.b(strFixPath, z);
+        String[] strArrB = this.fileLoader1.listDir(strFixPath, z);
+        String[] strArrB2 = this.fileLoader2.listDir(strFixPath, z);
         if (strArrB == null && strArrB2 == null) {
             return null;
         }
@@ -190,8 +190,8 @@ public class MergedFileLoader extends FileLoader {
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public String b() {
-        return this.fileLoader1.b();
+    public String getGameDataPath() {
+        return this.fileLoader1.getGameDataPath();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
@@ -207,21 +207,21 @@ public class MergedFileLoader extends FileLoader {
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public String d() {
-        String strD = this.fileLoader1.d();
-        if (this.fileLoader2.d() != null) {
-            strD = strD + " and " + this.fileLoader2.d();
+    public String getStorageTypeName() {
+        String strD = this.fileLoader1.getStorageTypeName();
+        if (this.fileLoader2.getStorageTypeName() != null) {
+            strD = strD + " and " + this.fileLoader2.getStorageTypeName();
         }
         return strD;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public boolean e() {
-        return this.fileLoader1.e() || this.fileLoader2.e();
+    public boolean isZip() {
+        return this.fileLoader1.isZip() || this.fileLoader2.isZip();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.file.FileLoader
-    public String o(String str) {
+    public String mapPath(String str) {
         if (str.startsWith("/") && this.tag1.endsWith("/")) {
             return "/" + this.tag1 + str.substring(1);
         }

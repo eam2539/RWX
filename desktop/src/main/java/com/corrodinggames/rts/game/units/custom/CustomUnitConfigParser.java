@@ -994,7 +994,7 @@ public class CustomUnitConfigParser {
         synchronized (CustomUnitConfigParser.iniCache) {
             CustomUnitConfigParser.iniCache.clear();
         }
-        readAllCustomUnitConfigs(FileHelper.getSourcePath("units"), 1, false, null, FileHelper.getSourcePath("units"), null);
+        readAllCustomUnitConfigs(FileHelper.mapPath("units"), 1, false, null, FileHelper.mapPath("units"), null);
         if (!GameEngine.isModsDisabled && !instance.isDemo) {
             final String defaultUserModsFolder = getDefaultUserModsFolder();
             if (!FileHelper.isDirectoryNonZip(defaultUserModsFolder)) {
@@ -1004,7 +1004,7 @@ public class CustomUnitConfigParser {
                 if (!b2.isFromSteam && b2.sourceFolder != null) {
                     String s = b2.getSourceFolderRaw();
                     if (b2.isCoreMod) {
-                        s = FileHelper.getSourcePath(s);
+                        s = FileHelper.mapPath(s);
                     }
                     if (b2.disabled) {
                         GameEngine.log("Disabled mod at:" + s + " (name:" + b2.getDisplayTitle() + ")");
@@ -1067,10 +1067,10 @@ public class CustomUnitConfigParser {
         if (modInfo != null && modInfo.disabled) {
             GameEngine.log("Note: Loading disabled mod: " + str);
         }
-        FileHelper.getReadPath();
+        FileHelper.getLastError();
         String[] strArrListFiles = FileHelper.listFiles(str);
         if (strArrListFiles == null) {
-            String readPath = FileHelper.getReadPath();
+            String readPath = FileHelper.getLastError();
             GameEngine.logColored("readAllCustomUnitConfigs: ERROR");
             GameEngine.logColored("readAllCustomUnitConfigs: Failed to load:" + str);
             if (modInfo != null) {
@@ -2482,8 +2482,8 @@ public class CustomUnitConfigParser {
     /* JADX INFO: renamed from: a */
     public static String getModRelativePath(ModInfo modInfo, String str, boolean z) {
         if (modInfo != null) {
-            String strMapPath = FileHelper.mapPath(modInfo.sourceFolder);
-            str = FileHelper.mapPath(str);
+            String strMapPath = FileHelper.fixPath(modInfo.sourceFolder);
+            str = FileHelper.fixPath(str);
             if (str.startsWith(strMapPath)) {
                 str = str.substring(strMapPath.length());
                 if (str.startsWith("/")) {
