@@ -120,7 +120,7 @@ public class MissileShip extends WaterUnit {
         PointF pointFE = E(i);
         if (!baseUnit.Q()) {
             Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y, this.posZ, i);
-            PointF pointFK = getShadowTexture(i);
+            PointF pointFK = getShadowOffsetForLevel(i);
             projectileA.K = pointFK.x;
             projectileA.L = pointFK.y;
             projectileA.ar = Color.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 50);

@@ -2115,9 +2115,9 @@ public final class GameUI extends Serializable {
         if (GameEngine.isDesktopMouseInput() && instance.settingsEngine.mouseSupport && !instance.screenClipRect.b((int)this.selectionBoxMinWidth, (int)this.selectionBoxMinHeight)) {
             b12 = true;
         }
-        BaseUnit baseUnit = BaseUnit.canAttack(unitType);
+        BaseUnit baseUnit = BaseUnit.getPrototypeForUnitType(unitType);
         if ((baseUnit == null || !(baseUnit instanceof OrderableUnit)) && CustomUnitConfig.instance != null) {
-            baseUnit = BaseUnit.canAttack(CustomUnitConfig.instance);
+            baseUnit = BaseUnit.getPrototypeForUnitType(CustomUnitConfig.instance);
         }
         if (this.isBuildingMode && !b12) {
             final OrderableUnit y = (OrderableUnit)baseUnit;
@@ -4036,7 +4036,7 @@ public final class GameUI extends Serializable {
             effectIconTexture = this.effectIconTexture;
         }
         textRenderQueue.a(true);
-        s.isWaiting(am, textRenderQueue, paint3, effectIconTexture);
+        s.renderDisplayText(am, textRenderQueue, paint3, effectIconTexture);
         if (s2 != null) {
             textRenderQueue.a("\n" + s2, this.effectIconTexture);
         }

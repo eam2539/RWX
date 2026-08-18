@@ -231,7 +231,7 @@ public class CommandCenter extends FactoryWithQueue {
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryWithQueue, com.corrodinggames.rts.game.units.OrderableUnit
     public void a(BaseUnit baseUnit, int i) {
         Projectile projectileA = Projectile.a(this, this.posX, this.posY);
-        PointF pointFK = getShadowTexture(i);
+        PointF pointFK = getShadowOffsetForLevel(i);
         projectileA.K = pointFK.x;
         projectileA.L = pointFK.y;
         projectileA.ar = Color.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 50);

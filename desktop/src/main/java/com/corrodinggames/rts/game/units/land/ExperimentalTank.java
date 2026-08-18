@@ -134,7 +134,7 @@ public class ExperimentalTank extends LandUnit {
         if (!R(i)) {
             PointF pointFE = E(i);
             Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y);
-            PointF pointFK = getShadowTexture(i);
+            PointF pointFK = getShadowOffsetForLevel(i);
             projectileA.K = pointFK.x;
             projectileA.L = pointFK.y;
             projectileA.ar = Color.a(255, 247, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_EISU, 129);

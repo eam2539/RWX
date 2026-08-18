@@ -3181,7 +3181,7 @@ public abstract class OrderableUnit extends UnitBase {
                                 unitMovementData.targetUnit = null;
                             } else {
                                 PointF pointFG = G(i2);
-                                PointF shadowTexture = getShadowTexture(i2);
+                                PointF shadowTexture = getShadowOffsetForLevel(i2);
                                 shadowTexture.x += baseUnit.posX;
                                 shadowTexture.y += baseUnit.posY;
                                 float angleBetweenPoints = Utility.getAngleBetweenPoints(pointFG.x, pointFG.y, shadowTexture.x, shadowTexture.y);
@@ -4809,7 +4809,7 @@ public abstract class OrderableUnit extends UnitBase {
     }
 
     /* JADX INFO: renamed from: K */
-    public PointF getShadowTexture(int i) {
+    public PointF getShadowOffsetForLevel(int i) {
         PointF pointF = tempPointF4;
         pointF.a(0.0f, 0.0f);
         UnitMovementData unitMovementData = this.movementLevels[i];

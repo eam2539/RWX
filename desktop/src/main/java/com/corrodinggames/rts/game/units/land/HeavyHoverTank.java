@@ -107,7 +107,7 @@ public class HeavyHoverTank extends HoverLandUnit {
     public void a(BaseUnit baseUnit, int i) {
         PointF pointFE = E(i);
         Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y, this.posZ, i);
-        PointF pointFK = getShadowTexture(i);
+        PointF pointFK = getShadowOffsetForLevel(i);
         projectileA.K = pointFK.x;
         projectileA.L = pointFK.y;
         projectileA.ar = Color.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 0, 50);

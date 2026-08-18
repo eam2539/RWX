@@ -291,7 +291,7 @@ public class BuildPreview {
                 fFastCos = 1.0f;
             }
         }
-        if (z2 && this.fadeInProgress < 1.0f && (baseUnitCanAttack = BaseUnit.canAttack(this.unitType)) != null && baseUnitCanAttack.bI() && (rectCd = baseUnitCanAttack.cd()) != null) {
+        if (z2 && this.fadeInProgress < 1.0f && (baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(this.unitType)) != null && baseUnitCanAttack.bI() && (rectCd = baseUnitCanAttack.cd()) != null) {
             tempRectF4.a(rectCd);
             tempRectF4.b *= gameEngine.tileMap.tileWorldSizeY;
             tempRectF4.d *= gameEngine.tileMap.tileWorldSizeY;

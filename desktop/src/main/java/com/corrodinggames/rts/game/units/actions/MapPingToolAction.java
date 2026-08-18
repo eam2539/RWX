@@ -32,7 +32,7 @@ public class MapPingToolAction extends CustomUnitToolAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: M */
-    public KeyBinding isPrimary() {
+    public KeyBinding getPrimaryKeyBinding() {
         return GameEngine.getInstance().inputController.v;
     }
 }

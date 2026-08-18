@@ -104,7 +104,7 @@ public class Artillery extends LandUnit {
     public void a(BaseUnit baseUnit, int i) {
         PointF pointFE = E(i);
         Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y);
-        PointF pointFK = getShadowTexture(i);
+        PointF pointFK = getShadowOffsetForLevel(i);
         projectileA.K = pointFK.x;
         projectileA.L = pointFK.y;
         projectileA.h = 150.0f;

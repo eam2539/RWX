@@ -950,7 +950,7 @@ public final class AIController extends PlayerTeam {
 
     /* JADX INFO: renamed from: a */
     private boolean assignTaskToUnitType(PointF pointF) {
-        if (canExecuteCustomUnitAction(this, pointF.x, pointF.y, 290.0f) != null) {
+        if (findEnemyUnitInRange(this, pointF.x, pointF.y, 290.0f) != null) {
             return false;
         }
         BaseZone baseZoneFindNearestZone = findNearestZone(pointF.x, pointF.y);
@@ -976,7 +976,7 @@ public final class AIController extends PlayerTeam {
                 }
             }
         }
-        if (countEnemyUnitsInRange(this, pointF.x, pointF.y, 360.0f) >= 4 || canExecuteCustomUnitActionWithBoolean((PlayerTeam) this, pointF.x, pointF.y, 360.0f, true) >= 2) {
+        if (countEnemyUnitsInRange(this, pointF.x, pointF.y, 360.0f) >= 4 || countEnemyUnitsInRangeWithFilter((PlayerTeam) this, pointF.x, pointF.y, 360.0f, true) >= 2) {
             return false;
         }
         return true;
@@ -2212,7 +2212,7 @@ public final class AIController extends PlayerTeam {
     }
 
     /* JADX INFO: renamed from: a */
-    public static BaseUnit canExecuteCustomUnitAction(PlayerTeam playerTeam, float f, float f2, float f3) {
+    public static BaseUnit findEnemyUnitInRange(PlayerTeam playerTeam, float f, float f2, float f3) {
         BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
@@ -2225,7 +2225,7 @@ public final class AIController extends PlayerTeam {
     }
 
     /* JADX INFO: renamed from: a */
-    public static int canExecuteCustomUnitActionWithBoolean(PlayerTeam playerTeam, float f, float f2, float f3, boolean z) {
+    public static int countEnemyUnitsInRangeWithFilter(PlayerTeam playerTeam, float f, float f2, float f3, boolean z) {
         int i = 0;
         BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
         int size = BaseUnit.bE.size();

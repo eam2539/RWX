@@ -82,7 +82,7 @@ public class GunTurretT2 extends TurretImplementation {
     public void fireProjectile(BaseUnit baseUnit, int i) {
         PointF turretType = getTurretType(i);
         Projectile projectileA = Projectile.a(this.turretFactory, turretType.x, turretType.y);
-        PointF pointFK = this.turretFactory.getShadowTexture(i);
+        PointF pointFK = this.turretFactory.getShadowOffsetForLevel(i);
         projectileA.K = pointFK.x;
         projectileA.L = pointFK.y;
         projectileA.l = baseUnit;

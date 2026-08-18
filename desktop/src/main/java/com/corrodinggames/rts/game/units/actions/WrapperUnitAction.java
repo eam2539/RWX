@@ -177,9 +177,9 @@ public class WrapperUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
-    public void isWaiting(BaseUnit baseUnit, TextRenderQueue textRenderQueue, Paint paint, Paint paint2) {
+    public void renderDisplayText(BaseUnit baseUnit, TextRenderQueue textRenderQueue, Paint paint, Paint paint2) {
         K();
-        this.a.isWaiting(this.b, textRenderQueue, paint, paint2);
+        this.a.renderDisplayText(this.b, textRenderQueue, paint, paint2);
         L();
     }
 
@@ -404,8 +404,8 @@ public class WrapperUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: q */
-    public ArrayList isPurchase(BaseUnit baseUnit) {
-        return this.a.isPurchase(this.b);
+    public ArrayList getCandidateActionList(BaseUnit baseUnit) {
+        return this.a.getCandidateActionList(this.b);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction

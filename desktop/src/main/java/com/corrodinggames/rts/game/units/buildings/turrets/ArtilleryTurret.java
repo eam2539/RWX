@@ -63,7 +63,7 @@ class ArtilleryTurret extends TurretImplementation {
     public void fireProjectile(BaseUnit baseUnit, int i) {
         PointF pointFC = getTurretType(i);
         Projectile projectileA = Projectile.a(this.turretFactory, pointFC.x, pointFC.y);
-        PointF pointFK = this.turretFactory.getShadowTexture(i);
+        PointF pointFK = this.turretFactory.getShadowOffsetForLevel(i);
         projectileA.K = pointFK.x;
         projectileA.L = pointFK.y;
         projectileA.h = 150.0f;

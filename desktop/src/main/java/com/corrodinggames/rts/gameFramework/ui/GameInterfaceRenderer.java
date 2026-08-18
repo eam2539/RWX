@@ -773,8 +773,8 @@ public class GameInterfaceRenderer extends Serializable {
         if (!GameEngine.isPC()) {
             return null;
         }
-        if (abstractUnitAction.isPrimary() != null) {
-            return abstractUnitAction.isPrimary();
+        if (abstractUnitAction.getPrimaryKeyBinding() != null) {
+            return abstractUnitAction.getPrimaryKeyBinding();
         }
         if ((abstractUnitAction instanceof RepairTargetAction) || (abstractUnitAction instanceof AttackModeAction)) {
             return null;
@@ -1193,7 +1193,7 @@ public class GameInterfaceRenderer extends Serializable {
         BaseUnit baseUnit = this.f();
         ArrayList purchase = null;
         if (this.gameUI.currentAction != null) {
-            purchase = this.gameUI.currentAction.isPurchase(baseUnit);
+            purchase = this.gameUI.currentAction.getCandidateActionList(baseUnit);
         }
         ArrayList a;
         if (purchase != null) {
@@ -1205,7 +1205,7 @@ public class GameInterfaceRenderer extends Serializable {
         if (baseUnit == null && a.size() > 0) {
             baseUnit = this.e();
             if (baseUnit == null && CustomUnitConfig.instance != null) {
-                baseUnit = BaseUnit.canAttack(CustomUnitConfig.instance);
+                baseUnit = BaseUnit.getPrototypeForUnitType(CustomUnitConfig.instance);
             }
         }
         this.gameUI.isUIInitialized = false;

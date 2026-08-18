@@ -1515,7 +1515,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         } else {
             customProjectileTemplate2 = customProjectileTemplate;
         }
-        PointF shadowTexture = getShadowTexture(i);
+        PointF shadowTexture = getShadowOffsetForLevel(i);
         Vector3D vector3DD = D(i);
         if (turretConfig.unloadUnitsAndGiveAttackOrderCount > 0) {
             for (int i3 = 0; i3 < turretConfig.unloadUnitsAndGiveAttackOrderCount; i3++) {
@@ -3758,9 +3758,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: K */
-    public PointF getShadowTexture(int i) {
+    public PointF getShadowOffsetForLevel(int i) {
         Projectile projectile;
-        PointF pointFK = super.getShadowTexture(i);
+        PointF pointFK = super.getShadowOffsetForLevel(i);
         if (this.unitConfig.moveYAxisScaleInverted) {
             if (this.unitConfig.projectileTemplatesById[this.unitConfig.turrets[i].a(this)].M && this.G != null && (projectile = this.G[i]) != null && !projectile.isDestroyed) {
                 pointFK.x += projectile.K;

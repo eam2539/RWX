@@ -410,7 +410,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: c */
-    public static BaseUnit canAttack(UnitType unitType) {
+    public static BaseUnit getPrototypeForUnitType(UnitType unitType) {
         BaseUnit baseUnit = (BaseUnit) bG.get(unitType);
         if (baseUnit == null) {
             if (CustomUnitConfig.instance == null) {
@@ -622,7 +622,7 @@ public abstract class BaseUnit extends SizedObject {
 
     /* JADX INFO: renamed from: b */
     public static BaseUnit findAttackDamageSource(UnitType unitType) {
-        return canAttack(unitType);
+        return getPrototypeForUnitType(unitType);
     }
 
     public static int bM() {
