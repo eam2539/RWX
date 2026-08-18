@@ -576,7 +576,7 @@ public class Projectile extends PositionedObject {
         Projectile projectileA = a(baseUnit, f2, f3);
         projectileA.posZ = f4;
         projectileA.k = (short) i;
-        projectileA.I = Utility.clamp(baseUnit, 0.0f, 1.0f, baseUnit.unitFlags4);
+        projectileA.I = Utility.getDeterministicRandomFloatForUnit(baseUnit, 0.0f, 1.0f, baseUnit.unitFlags4);
         baseUnit.unitFlags4++;
         return projectileA;
     }
@@ -1313,7 +1313,7 @@ public class Projectile extends PositionedObject {
                                 }
                             }
                             for (int i8 = 0; i8 < 1; i8++) {
-                                EffectEmitter effectEmitterA = EffectEmitter.a(this.aV + Utility.getRandomIntInRange(-10.0f, 10.0f, (int) this.objectId), this.aW + Utility.getRandomIntInRange(-10.0f, 10.0f, ((int) this.objectId) + i8));
+                                EffectEmitter effectEmitterA = EffectEmitter.a(this.aV + Utility.getDeterministicRandomFloat(-10.0f, 10.0f, (int) this.objectId), this.aW + Utility.getDeterministicRandomFloat(-10.0f, 10.0f, ((int) this.objectId) + i8));
                                 if (effectEmitterA != null) {
                                     effectEmitterA.t = 200 + (i8 * 70);
                                     effectEmitterA.a = 980 + (i8 * 800);

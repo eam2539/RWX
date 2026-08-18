@@ -33,7 +33,7 @@ class CreateServerRunnable implements Runnable {
                 } else {
                     MasterServerClient.addParam(arrayList, "game_version_string", gameEngine.getVersionString());
                 }
-                MasterServerClient.addParam(arrayList, "game_version_beta", Utility.padString(gameEngine.isBetaOrPreview()));
+                MasterServerClient.addParam(arrayList, "game_version_beta", Utility.booleanToString(gameEngine.isBetaOrPreview()));
                 String requiredModsSummary = gameEngine.networkEngine.getRequiredModsSummary();
                 if (requiredModsSummary != null) {
                     MasterServerClient.addParam(arrayList, "game_mods", requiredModsSummary);

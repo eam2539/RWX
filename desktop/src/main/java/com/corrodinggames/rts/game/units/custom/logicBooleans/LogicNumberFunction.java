@@ -501,7 +501,7 @@ public abstract class LogicNumberFunction extends LogicBoolean.LogicNumberOnly {
             if (orderableUnit != null) {
                 i = orderableUnit.unitFlags4;
             }
-            return Utility.clamp(number, number2, this.randomIndex + i);
+            return Utility.getRandomFloat(number, number2, this.randomIndex + i);
         }
     }
 

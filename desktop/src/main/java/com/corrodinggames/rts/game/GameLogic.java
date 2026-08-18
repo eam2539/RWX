@@ -2191,7 +2191,7 @@ public class GameLogic extends GameEngine {
         try {
             Signature[] signatureArr = this.appContext.f().getPackageInfo(this.appContext.h(), 64).signatures;
             if (0 < signatureArr.length) {
-                return Utility.formatDouble(signatureArr[0].toByteArray());
+                return Utility.sha256HexString(signatureArr[0].toByteArray());
             }
             return null;
         } catch (PackageManager.NameNotFoundException e) {

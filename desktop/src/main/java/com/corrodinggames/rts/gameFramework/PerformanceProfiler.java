@@ -43,7 +43,7 @@ public final class PerformanceProfiler {
     }
 
     public static final String a(double d) {
-        return VariableScope.nullOrMissingString + Utility.toHexString(d, 3) + "ms";
+        return VariableScope.nullOrMissingString + Utility.padString(d, 3) + "ms";
     }
 
     public static final String b(double d) {

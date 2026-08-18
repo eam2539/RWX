@@ -353,7 +353,7 @@ public class MasterServerClient {
     static void addServerStatusParams(List list) {
         String str;
         GameEngine gameEngine = GameEngine.getInstance();
-        addParam(list, "password_required", Utility.padString(gameEngine.networkEngine.roomPassword != null));
+        addParam(list, "password_required", Utility.booleanToString(gameEngine.networkEngine.roomPassword != null));
         addParam(list, "created_by", gameEngine.networkEngine.playerName);
         addParam(list, "private_ip", gameEngine.networkEngine.getPrimaryLocalIpAddress());
         addParam(list, "port_number", Integer.toString(gameEngine.networkEngine.m));

@@ -49,8 +49,8 @@ class ErrorReportSender implements Runnable {
                     MasterServerClient.addParam(arrayList, "sdk_version", str);
                     MasterServerClient.addParam(arrayList, "device_model", gameEngine.getPlatformName());
                     MasterServerClient.addParam(arrayList, "build_version", gameEngine.getBuildVersion());
-                    MasterServerClient.addParam(arrayList, "release_version", Utility.padString(GameEngine.isGameBeta));
-                    MasterServerClient.addParam(arrayList, "dedicated_server", Utility.padString(GameEngine.isNonAndroidVersion));
+                    MasterServerClient.addParam(arrayList, "release_version", Utility.booleanToString(GameEngine.isGameBeta));
+                    MasterServerClient.addParam(arrayList, "dedicated_server", Utility.booleanToString(GameEngine.isNonAndroidVersion));
                     String str2 = gameEngine.networkEngine != null ? gameEngine.networkEngine.sessionToken : "NA";
                     MasterServerClient.addParam(arrayList, "private_token", str2);
                     MasterServerClient.addParam(arrayList, "private_token_2", Utility.md5Hex(Utility.md5Hex(str2)));

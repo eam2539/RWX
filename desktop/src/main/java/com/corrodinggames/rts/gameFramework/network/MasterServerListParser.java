@@ -33,7 +33,7 @@ class MasterServerListParser implements Runnable {
             ArrayList arrayList = new ArrayList(2);
             arrayList.add(new BasicNameValuePair("action", "list"));
             arrayList.add(new BasicNameValuePair("game_version", Integer.toString(gameEngine.getVersionCode(true))));
-            arrayList.add(new BasicNameValuePair("game_version_beta", Utility.padString(gameEngine.isBetaOrPreview())));
+            arrayList.add(new BasicNameValuePair("game_version_beta", Utility.booleanToString(gameEngine.isBetaOrPreview())));
             MasterServerClient.startParallelRequests((List) arrayList, false, new ServerResponseHandler() { // from class: com.corrodinggames.rts.gameFramework.j.q.1
                 @Override // com.corrodinggames.rts.gameFramework.network.ServerResponseHandler
                 /* JADX INFO: renamed from: a */

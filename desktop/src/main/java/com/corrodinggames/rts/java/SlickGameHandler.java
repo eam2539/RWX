@@ -571,7 +571,7 @@ public class SlickGameHandler extends BasicGame {
         for (int i = 0; i <= this.L % 4; i++) {
             str = str + ".";
         }
-        String strTruncate = Utility.truncate("    " + str, 17);
+        String strTruncate = Utility.padRightWithSpaces("    " + str, 17);
         int width = graphics.getFont().getWidth(strTruncate);
         int height = Display.getHeight() - 70;
         graphics.setColor(Color.white);
