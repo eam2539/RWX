@@ -1943,7 +1943,7 @@ public class GameInterfaceRenderer extends Serializable {
                         if (unitCommand.getActionType() != ActionType.infoOnly) {
                             throw new RuntimeException("unknown gui action:" + unitCommand.getActionType());
                         }
-                        if (unitCommand.getCost()) {
+                        if (unitCommand.selectsUnitOnClick()) {
                             this.selectedUnit = baseUnit;
                             this.unitCommand = unitCommand;
                             this.commandTimer = n19 + y;
@@ -1969,7 +1969,7 @@ public class GameInterfaceRenderer extends Serializable {
                 if (this.unitCommand.isGuiBlinking()) {
                     b16 = true;
                 }
-                if (GameEngine.isPC() && this.unitCommand.getIconForUnit()) {
+                if (GameEngine.isPC() && this.unitCommand.alwaysShowsTooltip()) {
                     b16 = true;
                 }
                 if (b16) {

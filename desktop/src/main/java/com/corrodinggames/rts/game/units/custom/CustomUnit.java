@@ -321,7 +321,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean d(BaseUnit baseUnit, boolean z) {
-        if (this.unitConfig.maxTransportingUnits == 0 || this.isUnloading || this.buildProgress < 1.0f || !getUnitArmor(baseUnit) || baseUnit == this) {
+        if (this.unitConfig.maxTransportingUnits == 0 || this.isUnloading || this.buildProgress < 1.0f || !hasTransportSpaceFor(baseUnit) || baseUnit == this) {
             return false;
         }
         if (this.team != baseUnit.team && !z && (!this.unitConfig.whileNeutralTransportAnyTeam || this.team != PlayerTeam.TEAM_ALL)) {
@@ -3555,7 +3555,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     }
 
     /* JADX INFO: renamed from: H */
-    private boolean getTransportedUnitCount(BaseUnit baseUnit) {
+    private boolean canRepairUnit(BaseUnit baseUnit) {
         if (baseUnit.q() || baseUnit == this) {
             return false;
         }
@@ -3577,7 +3577,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (this.unitConfig.canRepairUnitsOnlyWithTags != null && !AnimationTag.a(this.unitConfig.canRepairUnitsOnlyWithTags, baseUnit.getTags())) {
             return false;
         }
-        return getTransportedUnitCount(baseUnit);
+        return canRepairUnit(baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -3589,7 +3589,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (this.unitConfig.canReclaimUnitsOnlyWithTags != null && !AnimationTag.a(this.unitConfig.canReclaimUnitsOnlyWithTags, baseUnit.getTags())) {
             return false;
         }
-        return getTransportedUnitCount(baseUnit);
+        return canRepairUnit(baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -4734,7 +4734,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     }
 
     /* JADX INFO: renamed from: G */
-    public boolean getUnitArmor(BaseUnit baseUnit) {
+    public boolean hasTransportSpaceFor(BaseUnit baseUnit) {
         int iDI = dI();
         int unitAIPathfindIterations = baseUnit.getTransportSlotsNeeded();
         if (this.unitConfig.transportUnitsEachUnitAlwaysUsesSingleSlot) {

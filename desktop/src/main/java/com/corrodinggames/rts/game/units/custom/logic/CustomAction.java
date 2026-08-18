@@ -63,7 +63,7 @@ public class CustomAction extends PopupQueueAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: F */
-    public boolean getDisplayType() {
+    public boolean isDisplayOnly() {
         return true;
     }
 

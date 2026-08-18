@@ -134,8 +134,8 @@ public class WrapperUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: h */
-    public boolean getIconForUnit() {
-        return this.a.getIconForUnit();
+    public boolean alwaysShowsTooltip() {
+        return this.a.alwaysShowsTooltip();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -315,8 +315,8 @@ public class WrapperUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: C */
-    public boolean getCost() {
-        return this.a.getCost();
+    public boolean selectsUnitOnClick() {
+        return this.a.selectsUnitOnClick();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -333,8 +333,8 @@ public class WrapperUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: F */
-    public boolean getDisplayType() {
-        return this.a.getDisplayType();
+    public boolean isDisplayOnly() {
+        return this.a.isDisplayOnly();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction

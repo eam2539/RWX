@@ -76,7 +76,7 @@ public class PatrolAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: h */
-    public boolean getIconForUnit() {
+    public boolean alwaysShowsTooltip() {
         return true;
     }
 

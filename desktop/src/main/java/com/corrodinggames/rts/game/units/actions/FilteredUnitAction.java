@@ -125,8 +125,8 @@ public class FilteredUnitAction extends AbstractUnitAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: h */
-    public boolean getIconForUnit() {
-        return this.a.getIconForUnit();
+    public boolean alwaysShowsTooltip() {
+        return this.a.alwaysShowsTooltip();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction

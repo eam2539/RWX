@@ -733,7 +733,7 @@ public final class AIController extends PlayerTeam {
                     for (AbstractUnitAction abstractUnitAction : baseUnitFindAttackDamageSource.getAvailableActions()) {
                         if (abstractUnitAction != null && (abstractUnitAction instanceof PopupQueueAction)) {
                             PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
-                            if (!popupQueueAction.getDisplayType() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.isBuildingUnit()) {
+                            if (!popupQueueAction.isDisplayOnly() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.isBuildingUnit()) {
                                 z2 = true;
                             }
                         }
@@ -760,7 +760,7 @@ public final class AIController extends PlayerTeam {
                     for (AbstractUnitAction abstractUnitAction : baseUnitFindAttackDamageSource.getAvailableActions()) {
                         if (abstractUnitAction != null && (abstractUnitAction instanceof PopupQueueAction)) {
                             PopupQueueAction popupQueueAction = (PopupQueueAction) abstractUnitAction;
-                            if (!popupQueueAction.getDisplayType() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.isBuildingUnit() && unitTypeI.m()) {
+                            if (!popupQueueAction.isDisplayOnly() && (unitTypeI = popupQueueAction.getUnitType()) != null && !unitTypeI.isBuildingUnit() && unitTypeI.m()) {
                                 z2 = true;
                             }
                         }
