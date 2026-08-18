@@ -180,7 +180,8 @@ CLASS a/a/h net/rudp/ReliableSocket
 	METHOD d forceClose ()V
 	METHOD d handleData (La/a/a/h;)V
 	METHOD d getNullPacketTimer (La/a/h;)La/a/a/i;
-	METHOD e handleSynPacket ()V
+	METHOD e performCloseCleanup ()V
+		COMMENT VERIFIED
 	METHOD e closeImpl (La/a/a/h;)V
 	METHOD e processAcknowledgment (La/a/h;)V
 	METHOD f startCongestionControlTimers ()V
@@ -753,7 +754,8 @@ CLASS com/corrodinggames/rts/game/a/a com/corrodinggames/rts/game/ai/AIControlle
 	METHOD a writeToOutputStream (Lcom/corrodinggames/rts/game/a/a;Lcom/corrodinggames/rts/game/units/as;)Z
 	METHOD a addAIBehavior (Lcom/corrodinggames/rts/game/a/a/a;)V
 	METHOD a addAITask (Lcom/corrodinggames/rts/game/a/d;FFI)I
-	METHOD a shouldWriteForUnitType (Lcom/corrodinggames/rts/game/a/d;Lcom/corrodinggames/rts/game/a/b;)I
+	METHOD a countUnitsForBuildStrategyWithFilter (Lcom/corrodinggames/rts/game/a/d;Lcom/corrodinggames/rts/game/a/b;)I
+		COMMENT VERIFIED
 	METHOD a filterUnitAndCommand (Lcom/corrodinggames/rts/game/a/o;)I
 	METHOD a findEnemyUnitInRange (Lcom/corrodinggames/rts/game/n;FFF)Lcom/corrodinggames/rts/game/units/am;
 		COMMENT VERIFIED
@@ -1949,7 +1951,8 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	METHOD b getDistanceToTarget (Lcom/corrodinggames/rts/game/units/am;)F
 	METHOD b calculateTurnSpeed (Lcom/corrodinggames/rts/game/units/am;FLcom/corrodinggames/rts/game/f;)F
 	METHOD b findAttackDamageSource (Lcom/corrodinggames/rts/game/units/as;)Lcom/corrodinggames/rts/game/units/am;
-	METHOD B getUnitType (Lcom/corrodinggames/rts/game/units/am;)V
+	METHOD B setCommandTargetUnit (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD bC updateUnitMovement ()V
 	METHOD bF getGlobalUnitList ()Lcom/corrodinggames/rts/gameFramework/utility/o;
 	METHOD bH loadAllUnits ()V
@@ -2020,7 +2023,8 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 		COMMENT VERIFIED
 	METHOD cp getUnloadActionId ()Lcom/corrodinggames/rts/game/units/a/c;
 		COMMENT VERIFIED
-	METHOD cP getUnitCategory ()V
+	METHOD cP onUnitSpawned ()V
+		COMMENT VERIFIED
 	METHOD cq getAvailableActionCount ()I
 		COMMENT VERIFIED
 	METHOD cQ getMaxConcurrentReclaimers ()I
@@ -2965,12 +2969,16 @@ CLASS com/corrodinggames/rts/game/units/custom/j com/corrodinggames/rts/game/uni
 	METHOD a canAttackTargetUnit (Lcom/corrodinggames/rts/game/units/am;ZZ)Z
 	METHOD C loadTransportedUnit (Lcom/corrodinggames/rts/game/units/am;)V
 	METHOD D unloadTransportedUnit (Lcom/corrodinggames/rts/game/units/am;)V
-	METHOD E getAttackDamage (Lcom/corrodinggames/rts/game/units/am;)V
+	METHOD E ejectUnit (Lcom/corrodinggames/rts/game/units/am;)V
+		COMMENT VERIFIED
 	METHOD G getUnitArmor (Lcom/corrodinggames/rts/game/units/am;)Z
 	METHOD H getTransportedUnitCount (Lcom/corrodinggames/rts/game/units/am;)Z
-	METHOD K getMaxTransportedUnits ()V
-	METHOD L getTransportedUnits ()V
-	METHOD M getLoadedUnits ()V
+	METHOD K initTransportedUnitPoints ()V
+		COMMENT VERIFIED
+	METHOD L startUnloading ()V
+		COMMENT VERIFIED
+	METHOD M finishUnloading ()V
+		COMMENT VERIFIED
 CLASS com/corrodinggames/rts/game/units/custom/k com/corrodinggames/rts/game/units/custom/CustomUnitEventData
 	FIELD a eventInfo Lcom/corrodinggames/rts/game/units/custom/ae;
 	FIELD b customUnit Lcom/corrodinggames/rts/game/units/custom/j;
@@ -5887,7 +5895,8 @@ CLASS com/corrodinggames/rts/gameFramework/j/ad com/corrodinggames/rts/gameFrame
 	METHOD T isUdpMultiplayerEnabled ()Z
 	METHOD U showReconnectDialog ()V
 	METHOD v queueQuickResyncCommand ()V
-	METHOD b (Lcom/corrodinggames/rts/gameFramework/j/au;)Z
+	METHOD b shouldFilterPacket (Lcom/corrodinggames/rts/gameFramework/j/au;)Z
+		COMMENT VERIFIED
 		ARG 1 packet
 	METHOD b disconnectNetworking (Ljava/lang/String;)V
 		COMMENT VERIFIED
@@ -7180,7 +7189,8 @@ CLASS com/corrodinggames/rts/gameFramework/utility/ab com/corrodinggames/rts/gam
 	METHOD b unescape (Ljava/lang/String;)Ljava/lang/String;
 	METHOD b getValue (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 	METHOD b getTime (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Float;)Ljava/lang/Float;
-	METHOD b getLogicBooleanUnit (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)Ljava/lang/Integer;
+	METHOD b getInt (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;)Ljava/lang/Integer;
+		COMMENT VERIFIED
 	METHOD b getString (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 		COMMENT VERIFIED
 	METHOD c getHash ()I
