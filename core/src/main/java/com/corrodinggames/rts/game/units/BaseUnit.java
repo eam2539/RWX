@@ -487,55 +487,55 @@ public abstract class BaseUnit extends SizedObject {
         dk = new KoolPaint();
         cW.a(KoolPaint.Style.STROKE);
         cW.a(2.0f);
-        setPosition(cW);
+        setPaintTransparent(cW);
         cX.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT, 0, 255, 0);
         cX.a(KoolPaint.Style.STROKE);
         cX.a(2.0f);
-        takeDamage(cX, true);
+        setPaintTransparency(cX, true);
         cY.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT, 0, 255, 0);
         cY.a(KoolPaint.Style.STROKE);
         cY.a(2.0f);
-        setPosition(cY);
+        setPaintTransparent(cY);
         cZ.a(130, 0, 255, 0);
         cZ.a(KoolPaint.Style.STROKE);
         cZ.a(2.0f);
-        setPosition(cZ);
+        setPaintTransparent(cZ);
         dd.a(70, 0, 255, 0);
         dd.a(KoolPaint.Style.STROKE);
         dd.a(1.0f);
-        setPosition(dd);
+        setPaintTransparent(dd);
         da.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT, 255, 0, 0);
         da.a(KoolPaint.Style.STROKE);
         da.a(2.0f);
-        setPosition(da);
+        setPaintTransparent(da);
         de.a(70, 255, 0, 0);
         de.a(KoolPaint.Style.STROKE);
         de.a(1.0f);
-        setPosition(de);
+        setPaintTransparent(de);
         dc.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT, 255, 255, 0);
         dc.a(KoolPaint.Style.STROKE);
         dc.a(2.0f);
-        setPosition(dc);
+        setPaintTransparent(dc);
         df.a(70, 255, 255, 0);
         df.a(KoolPaint.Style.STROKE);
         df.a(1.0f);
-        setPosition(df);
+        setPaintTransparent(df);
         db.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT, 255, 255, 255);
         db.a(KoolPaint.Style.STROKE);
         db.a(2.0f);
-        setPosition(db);
+        setPaintTransparent(db);
         dg.a(90, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG);
         dg.a(KoolPaint.Style.STROKE);
         dg.a(1.0f);
-        setPosition(dg);
+        setPaintTransparent(dg);
         dh.a(100, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG);
         dh.a(KoolPaint.Style.STROKE);
         dh.a(2.0f);
-        setPosition(dh);
+        setPaintTransparent(dh);
         di.a(90, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG, 0, 0);
         di.a(KoolPaint.Style.STROKE);
         di.a(1.0f);
-        setPosition(di);
+        setPaintTransparent(di);
         dj.a(KoolPaint.Style.STROKE);
         dk.a(KoolPaint.Style.STROKE);
         dr = new RectF();
@@ -987,12 +987,12 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: a */
-    public static void setPosition(KoolPaint paint) {
-        takeDamage(paint, false);
+    public static void setPaintTransparent(KoolPaint paint) {
+        setPaintTransparency(paint, false);
     }
 
     /* JADX INFO: renamed from: a */
-    public static void takeDamage(KoolPaint paint, boolean z) {
+    public static void setPaintTransparency(KoolPaint paint, boolean z) {
         if (!GameEngine.isPC() && z) {
             paint.a(0.0f);
         }
@@ -1556,7 +1556,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: a */
-    public float setTarget(BaseUnit baseUnit, float f, Projectile projectile) {
+    public float applyDamage(BaseUnit baseUnit, float f, Projectile projectile) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (this.buildProgress < 1.0f) {
             f *= 1.75f;
@@ -1675,7 +1675,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: a */
-    public boolean heal(RectF rectF) {
+    public boolean isWithinRect(RectF rectF) {
         if (this.posX + this.radius > rectF.a && this.posX - this.radius < rectF.c && this.posY + this.radius > rectF.b && this.posY - this.radius < rectF.d) {
             return true;
         }
@@ -1683,7 +1683,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: c */
-    public final boolean checkAttackCooldown(float f, float f2, float f3) {
+    public final boolean isWithinRange(float f, float f2, float f3) {
         float fDistanceSq = Utility.distanceSq(this.posX, this.posY, f, f2);
         float f4 = this.radius + f3;
         if (fDistanceSq < f4 * f4) {

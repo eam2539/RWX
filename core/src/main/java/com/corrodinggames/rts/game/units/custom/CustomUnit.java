@@ -4163,7 +4163,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: a */
-    public float setTarget(BaseUnit baseUnit, float f, Projectile projectile) {
+    public float applyDamage(BaseUnit baseUnit, float f, Projectile projectile) {
         AttachmentSlotDefinition attachmentSlotDefinitionDn = dn();
         if (attachmentSlotDefinitionDn != null && this.parentEntity != null && attachmentSlotDefinitionDn.j) {
             int i = 0;
@@ -4175,7 +4175,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 if (attachmentSlotDefinitionDn.k) {
                     projectileA.am = 0.0f;
                 }
-                f = this.parentEntity.setTarget(baseUnit, f, projectileA);
+                f = this.parentEntity.applyDamage(baseUnit, f, projectileA);
                 if (f < 0.0f) {
                     f = 0.0f;
                 }
@@ -4204,7 +4204,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             UnitEventRuntime.enqueueDamage(this, baseUnit, null, f);
             a(UnitEventType.tookDamage, baseUnit);
         }
-        return super.setTarget(baseUnit, f, projectile);
+        return super.applyDamage(baseUnit, f, projectile);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit

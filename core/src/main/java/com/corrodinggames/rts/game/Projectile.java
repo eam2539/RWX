@@ -241,7 +241,7 @@ public class Projectile extends PositionedObject {
                     projectile.an = DamageRegistry.armourIgnoreAmount(projectile, z, armourIgnoreBefore);
                 }
                 try {
-                    baseUnit2.setTarget(baseUnit, f2, projectile);
+                    baseUnit2.applyDamage(baseUnit, f2, projectile);
                 } finally {
                     if (projectile != null) {
                         projectile.an = armourIgnoreBefore;

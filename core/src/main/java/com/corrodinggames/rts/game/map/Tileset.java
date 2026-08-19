@@ -93,13 +93,13 @@ public class Tileset {
     public Tileset(TileMap tileMap, String str, int i) throws MapLoadException {
         this.tileMap = tileMap;
         this.firstGid = i;
-        Element elementLoadTilesetTexture = loadTilesetTexture(tileMap, str);
+        Element elementLoadTilesetTexture = loadTilesetXml(tileMap, str);
         this.tilesetSource = str;
         parseTileset(elementLoadTilesetTexture);
     }
 
     /* JADX INFO: renamed from: a */
-    public static Element loadTilesetTexture(TileMap tileMap, String str) throws MapLoadException {
+    public static Element loadTilesetXml(TileMap tileMap, String str) throws MapLoadException {
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(tileMap.openAssetStreamFromPair("tilesets/", str)).getDocumentElement();
         } catch (Exception e) {
@@ -113,7 +113,7 @@ public class Tileset {
         this.firstGid = Integer.parseInt(element.getAttribute("firstgid"));
         String attribute = element.getAttribute("source");
         if (attribute != null && !attribute.equals(VariableScope.nullOrMissingString)) {
-            element = loadTilesetTexture(tileMap, attribute);
+            element = loadTilesetXml(tileMap, attribute);
             this.tilesetSource = attribute;
         }
         parseTileset(element);
@@ -162,7 +162,7 @@ public class Tileset {
     }
 
     /* JADX INFO: renamed from: a */
-    public static Texture loadTilesetXml(String str) throws MapLoadException {
+    public static Texture loadTilesetTexture(String str) throws MapLoadException {
         GameEngine gameEngine = GameEngine.getInstance();
         String str2 = "tilesets/bitmaps/";
         if (str.startsWith(EMBED_PREFIX)) {
@@ -299,7 +299,7 @@ public class Tileset {
 
     /* JADX INFO: renamed from: c */
     void initTextureMetrics() throws MapLoadException {
-        this.tilesetBitmap = loadTilesetXml(this.imageKey);
+        this.tilesetBitmap = loadTilesetTexture(this.imageKey);
         this.columns = this.tilesetBitmap.m() / this.tileStridePixelsX;
         if (this.columns == 0) {
             this.columns = 1;

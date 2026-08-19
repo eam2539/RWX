@@ -334,7 +334,7 @@ public class Minimap {
     }
 
     /* JADX INFO: renamed from: d */
-    public float getCameraZoom() {
+    public float getMinimapWidth() {
         return GameEngine.getInstance().sidebarWidth;
     }
 
@@ -362,7 +362,7 @@ public class Minimap {
 
     /* JADX INFO: renamed from: f */
     public void updateDimensions() {
-        this.width = getCameraZoom();
+        this.width = getMinimapWidth();
         this.height = this.width;
         updateMinimapPosition();
     }
@@ -802,7 +802,7 @@ public class Minimap {
         GameEngine gameEngine = GameEngine.getInstance();
         GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
         updateMinimapPosition();
-        if (this.unitsTexture != null && !Utility.isDifferenceWithinTolerance(this.width, getCameraZoom(), 5.0f)) {
+        if (this.unitsTexture != null && !Utility.isDifferenceWithinTolerance(this.width, getMinimapWidth(), 5.0f)) {
             GameEngine.log("minimap", "minimap size has changed, reseting");
             release();
         }

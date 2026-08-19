@@ -2229,7 +2229,7 @@ public class GameLogic extends GameEngine {
     }
 
     /* JADX INFO: renamed from: w */
-    public synchronized void synchronizedMethod() {
+    public synchronized void stopGameTimer() {
         this.booleanAC = false;
         if (this.gameTimer != null) {
             this.gameTimer.cancel();
@@ -2263,7 +2263,7 @@ public class GameLogic extends GameEngine {
             if (this.gameUI != null) {
                 this.gameUI.initializeLocalizedStrings();
             }
-            synchronizedMethod();
+            stopGameTimer();
             startGameThread();
         }
     }

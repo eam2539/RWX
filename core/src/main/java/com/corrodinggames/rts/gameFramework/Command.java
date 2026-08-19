@@ -475,7 +475,7 @@ public class Command {
     }
 
     /* JADX INFO: renamed from: j */
-    public void debugPrintCommand() {
+    public void applyCommandToUnits() {
         if (AbstractUnitAction.isActionIdSpecified(this.actionId)) {
             for (OrderableUnit orderableUnit : this.selectedUnits) {
                 orderableUnit.stopMoving(orderableUnit.validateActionId(this.actionId), this.stopCurrentAction);

@@ -368,7 +368,7 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: a */
-    public float setTarget(BaseUnit baseUnit, float f2, Projectile projectile) {
-        return super.setTarget(baseUnit, 0.0f, projectile);
+    public float applyDamage(BaseUnit baseUnit, float f2, Projectile projectile) {
+        return super.applyDamage(baseUnit, 0.0f, projectile);
     }
 }

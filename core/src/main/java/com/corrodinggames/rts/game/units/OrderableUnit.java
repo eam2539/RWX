@@ -2964,7 +2964,7 @@ public abstract class OrderableUnit extends UnitBase {
             if (z3 && fDistanceSq < 4.0f * 4.0f) {
                 z4 = true;
             }
-            if ((this.lastCollisionTick == gameEngine.currentTick || this.lastCollisionTick == gameEngine.currentTick - 1) && this.lastDamagedBy != null && this.lastDamagedBy.checkAttackCooldown(f2, f3, 2.0f)) {
+            if ((this.lastCollisionTick == gameEngine.currentTick || this.lastCollisionTick == gameEngine.currentTick - 1) && this.lastDamagedBy != null && this.lastDamagedBy.isWithinRange(f2, f3, 2.0f)) {
                 z4 = true;
             }
             if (fBc > 0.0f) {
@@ -4951,7 +4951,7 @@ public abstract class OrderableUnit extends UnitBase {
         rectF.a -= 10.0f;
         rectF.c += 10.0f;
         for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
-            if ((baseUnit instanceof BaseUnit) && baseUnit != this && baseUnit.heal(rectF)) {
+            if ((baseUnit instanceof BaseUnit) && baseUnit != this && baseUnit.isWithinRect(rectF)) {
                 if ((baseUnit instanceof OrderableUnit) && baseUnit.isDead) {
                     baseUnit.remove();
                 }

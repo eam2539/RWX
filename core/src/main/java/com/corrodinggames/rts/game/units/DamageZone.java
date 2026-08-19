@@ -195,7 +195,7 @@ public class DamageZone extends DummyUnit {
             for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
                 if (baseUnit.posX <= f3 || baseUnit.posX >= f4 || baseUnit.posY <= f5 || baseUnit.posY >= f6) {
                     if (Utility.distanceSq(this.posX, this.posY, baseUnit.posX, baseUnit.posY) >= f7 && !baseUnit.isDead && !(baseUnit instanceof Tree) && !baseUnit.u() && baseUnit.unitTransportTarget == null) {
-                        baseUnit.setTarget(this, (0.5f + (baseUnit.currentHealth * 0.002f) + (baseUnit.maxHealth * 0.001f)) * this.h, (Projectile) null);
+                        baseUnit.applyDamage(this, (0.5f + (baseUnit.currentHealth * 0.002f) + (baseUnit.maxHealth * 0.001f)) * this.h, (Projectile) null);
                     }
                 }
             }
