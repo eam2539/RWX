@@ -305,8 +305,8 @@ public class FireUnit extends NaturalUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: a */
-    public float setTarget(BaseUnit baseUnit, float f, Projectile projectile) {
+    public float applyDamage(BaseUnit baseUnit, float f, Projectile projectile) {
         this.o -= f / 100.0f;
-        return super.setTarget(baseUnit, 0.0f, projectile);
+        return super.applyDamage(baseUnit, 0.0f, projectile);
     }
 }

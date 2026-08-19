@@ -1570,7 +1570,7 @@ public final class NetworkEngine {
             if (!gameEngine.commandController.executedCommands.isEmpty()) {
                 for (Command command3 : gameEngine.commandController.executedCommands) {
                     if (!command3.isSystemCommand()) {
-                        command3.debugPrintCommand();
+                        command3.applyCommandToUnits();
                         GameOutputStream gameOutputStream2 = new GameOutputStream();
                         try {
                             command3.serializeCommand(gameOutputStream2);
@@ -1588,7 +1588,7 @@ public final class NetworkEngine {
                     if (!command4.prepareAndValidateCommand()) {
                         reportDesync("Skipped command issued from server");
                     } else {
-                        command4.debugPrintCommand();
+                        command4.applyCommandToUnits();
                         a(command4);
                     }
                 }

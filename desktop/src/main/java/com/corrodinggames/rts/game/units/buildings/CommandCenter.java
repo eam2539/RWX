@@ -289,11 +289,11 @@ public class CommandCenter extends FactoryWithQueue {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: a */
-    public float setTarget(BaseUnit baseUnit, float f, Projectile projectile) {
+    public float applyDamage(BaseUnit baseUnit, float f, Projectile projectile) {
         if (f > 2500.0f) {
             f = 2500.0f;
         }
-        return super.setTarget(baseUnit, f, projectile);
+        return super.applyDamage(baseUnit, f, projectile);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit

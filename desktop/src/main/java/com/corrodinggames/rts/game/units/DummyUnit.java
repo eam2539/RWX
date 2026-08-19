@@ -178,8 +178,8 @@ public abstract class DummyUnit extends OrderableUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: a */
-    public float setTarget(BaseUnit baseUnit, float f, Projectile projectile) {
-        return super.setTarget(baseUnit, 0.0f, projectile);
+    public float applyDamage(BaseUnit baseUnit, float f, Projectile projectile) {
+        return super.applyDamage(baseUnit, 0.0f, projectile);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit

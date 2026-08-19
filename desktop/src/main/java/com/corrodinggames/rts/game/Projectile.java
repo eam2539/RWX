@@ -617,7 +617,7 @@ public class Projectile extends PositionedObject {
                 baseUnit2.calculateTurnSpeed(baseUnit, -f2, projectile);
             } else {
                 boolean z2 = !baseUnit2.isDead && baseUnit2.currentHealth > 0.0f;
-                baseUnit2.setTarget(baseUnit, f2, projectile);
+                baseUnit2.applyDamage(baseUnit, f2, projectile);
                 float f3 = f2;
                 if (baseUnit2.isDamageImmune()) {
                     f3 = 0.0f;

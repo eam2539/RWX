@@ -388,9 +388,9 @@ public class Tree extends NaturalUnit {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: a */
-    public float setTarget(BaseUnit baseUnit, float f, Projectile projectile) {
+    public float applyDamage(BaseUnit baseUnit, float f, Projectile projectile) {
         boolean z = this.isDead;
-        float fA = super.setTarget(baseUnit, f, projectile);
+        float fA = super.applyDamage(baseUnit, f, projectile);
         if (!z && this.isDead && projectile != null) {
             this.rotationSpeed = Utility.getAngleBetweenPoints(this.posX, this.posY, projectile.posX, projectile.posY) + 180.0f;
         }
