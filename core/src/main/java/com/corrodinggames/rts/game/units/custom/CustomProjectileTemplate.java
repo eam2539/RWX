@@ -361,49 +361,49 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
 
     public void a(BaseUnit baseUnit, Projectile projectile, BaseUnit baseUnit2, float f, float f2, float f3) {
         if (baseUnit2 == null) {
-            projectile.aC = true;
-            projectile.n = f;
-            projectile.o = f2;
+            projectile.fliesToPosition = true;
+            projectile.targetX = f;
+            projectile.targetY = f2;
             if (this.targetGroundSpread != 0.0f) {
-                projectile.n += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 2) / 100.0f;
-                baseUnit.unitCounter = (int) (baseUnit.unitCounter + projectile.n);
-                projectile.o += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 3) / 100.0f;
-                baseUnit.unitCounter = (int) (baseUnit.unitCounter + projectile.o);
+                projectile.targetX += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 2) / 100.0f;
+                baseUnit.unitCounter = (int) (baseUnit.unitCounter + projectile.targetX);
+                projectile.targetY += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 3) / 100.0f;
+                baseUnit.unitCounter = (int) (baseUnit.unitCounter + projectile.targetY);
             }
-            projectile.p = 0.0f;
-            projectile.p += this.targetGroundHeightOffset;
+            projectile.targetZ = 0.0f;
+            projectile.targetZ += this.targetGroundHeightOffset;
             return;
         }
-        if (projectile.m) {
-            projectile.aC = true;
+        if (projectile.hasFixedTarget) {
+            projectile.fliesToPosition = true;
             if (!this.J) {
-                float f4 = projectile.t;
+                float f4 = projectile.speed;
                 if (this.targetSpeed != -1.0f) {
                     f4 = this.targetSpeed;
                 }
                 if (this.K >= 0.0f) {
                     f4 = this.K;
                 }
-                PointF pointFA = baseUnit2.a(projectile.posX, projectile.posY, f4, projectile.h, f3);
-                projectile.n = pointFA.x;
-                projectile.o = pointFA.y;
+                PointF pointFA = baseUnit2.a(projectile.posX, projectile.posY, f4, projectile.lifeTimer, f3);
+                projectile.targetX = pointFA.x;
+                projectile.targetY = pointFA.y;
             } else {
-                projectile.n = baseUnit2.posX;
-                projectile.o = baseUnit2.posY;
+                projectile.targetX = baseUnit2.posX;
+                projectile.targetY = baseUnit2.posY;
             }
             if (this.t) {
-                projectile.p = baseUnit2.posZ;
+                projectile.targetZ = baseUnit2.posZ;
             } else {
-                projectile.p = 0.0f;
+                projectile.targetZ = 0.0f;
             }
-            projectile.p += this.targetGroundHeightOffset;
+            projectile.targetZ += this.targetGroundHeightOffset;
             if (this.targetGroundSpread != 0.0f) {
-                projectile.n += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 2) / 100.0f;
-                projectile.o += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 7) / 100.0f;
+                projectile.targetX += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 2) / 100.0f;
+                projectile.targetY += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 7) / 100.0f;
                 return;
             }
             return;
         }
-        projectile.l = baseUnit2;
+        projectile.targetUnit = baseUnit2;
     }
 }

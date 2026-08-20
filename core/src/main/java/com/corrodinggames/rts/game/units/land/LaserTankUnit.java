@@ -116,13 +116,13 @@ public class LaserTankUnit extends LandUnit {
     public void a(BaseUnit baseUnit, int i) {
         PointF pointFE = E(i);
         Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y);
-        projectileA.U = q(i);
-        projectileA.l = baseUnit;
-        projectileA.h = 8.0f;
-        projectileA.B = true;
-        projectileA.A = true;
-        projectileA.aQ = true;
-        projectileA.ar = KoolArgbColor.a(80, 255, 0, 0);
+        projectileA.damage = q(i);
+        projectileA.targetUnit = baseUnit;
+        projectileA.lifeTimer = 8.0f;
+        projectileA.persistsAfterExplosion = true;
+        projectileA.isInstantHit = true;
+        projectileA.isSmallExplosion = true;
+        projectileA.color = KoolArgbColor.a(80, 255, 0, 0);
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.effectManager.createLightEffect(pointFE.x, pointFE.y, this.posZ, -1127220);
         gameEngine.effectManager.createFlameEffect(pointFE.x, pointFE.y, this.posZ, this.movementLevels[i].targetX);

@@ -289,7 +289,7 @@ public class EffectTemplate {
             if (gameObject instanceof BaseUnit) {
                 playerTeam = ((BaseUnit) gameObject).team;
             }
-            if ((gameObject instanceof Projectile) && (baseUnit = ((Projectile) gameObject).j) != null) {
+            if ((gameObject instanceof Projectile) && (baseUnit = ((Projectile) gameObject).sourceUnit) != null) {
                 playerTeam = baseUnit.team;
             }
             if (playerTeam != null) {

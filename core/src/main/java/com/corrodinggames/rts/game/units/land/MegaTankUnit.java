@@ -98,13 +98,13 @@ public class MegaTankUnit extends LandUnit {
         if (!baseUnit.i()) {
             PointF pointFE = E(i);
             Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y);
-            projectileA.ar = KoolArgbColor.a(255, 150, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 40);
-            projectileA.U = 50.0f;
-            projectileA.l = baseUnit;
-            projectileA.h = 60.0f;
-            projectileA.t = 3.0f;
-            projectileA.x = 2.0f;
-            projectileA.aQ = true;
+            projectileA.color = KoolArgbColor.a(255, 150, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 40);
+            projectileA.damage = 50.0f;
+            projectileA.targetUnit = baseUnit;
+            projectileA.lifeTimer = 60.0f;
+            projectileA.speed = 3.0f;
+            projectileA.renderScale = 2.0f;
+            projectileA.isSmallExplosion = true;
             GameEngine gameEngine = GameEngine.getInstance();
             gameEngine.effectManager.createLightEffect(pointFE.x, pointFE.y, this.posZ, -1127220);
             gameEngine.effectManager.createFlameEffect(pointFE.x, pointFE.y, this.posZ, this.movementLevels[i].targetX);
@@ -112,16 +112,16 @@ public class MegaTankUnit extends LandUnit {
             return;
         }
         Projectile projectileA2 = Projectile.a(this, this.posX, this.posY);
-        projectileA2.ar = KoolArgbColor.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 50);
-        projectileA2.U = 40.0f;
-        projectileA2.l = baseUnit;
-        projectileA2.h = 190.0f;
-        projectileA2.t = 4.0f;
-        projectileA2.aH = true;
-        projectileA2.aI = 10.0f;
-        projectileA2.aJ = 15.0f;
-        projectileA2.aM = true;
-        projectileA2.aQ = true;
+        projectileA2.color = KoolArgbColor.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 50);
+        projectileA2.damage = 40.0f;
+        projectileA2.targetUnit = baseUnit;
+        projectileA2.lifeTimer = 190.0f;
+        projectileA2.speed = 4.0f;
+        projectileA2.isBallistic = true;
+        projectileA2.minHeight = 10.0f;
+        projectileA2.maxHeight = 15.0f;
+        projectileA2.hasTrail = true;
+        projectileA2.isSmallExplosion = true;
         GameEngine.getInstance().soundEngine.playSound(SoundEngine.missileFireSound, 0.2f, this.posX, this.posY);
     }
 

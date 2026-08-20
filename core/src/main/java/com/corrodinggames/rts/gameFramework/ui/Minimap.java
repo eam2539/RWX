@@ -849,7 +849,7 @@ public class Minimap {
         Object[] objArrA = Projectile.a.a();
         int i = Projectile.a.size;
         for (int i2 = 0; i2 < i; i2++) {
-            if (((Projectile) objArrA[i2]).D) {
+            if (((Projectile) objArrA[i2]).isNuke) {
                 z3 = true;
                 z2 = true;
             }
@@ -910,13 +910,13 @@ public class Minimap {
         int i3 = Projectile.a.size;
         for (int i4 = 0; i4 < i3; i4++) {
             Projectile projectile = (Projectile) objArrA[i4];
-            if ((projectile.D || (projectile.q != null && projectile.q.D)) && projectile.j != null) {
+            if ((projectile.isNuke || (projectile.parentProjectile != null && projectile.parentProjectile.isNuke)) && projectile.sourceUnit != null) {
                 Point pointWorldToScreen2 = worldToScreen(projectile.posX, projectile.posY);
                 float f3 = 2.0f;
-                if (projectile.D) {
+                if (projectile.isNuke) {
                     f3 = 4.0f;
                 }
-                graphicsEngine.a(pointWorldToScreen2.worldX, pointWorldToScreen2.worldY, f3, projectile.j.team.teamColorPaint);
+                graphicsEngine.a(pointWorldToScreen2.worldX, pointWorldToScreen2.worldY, f3, projectile.sourceUnit.team.teamColorPaint);
             }
         }
         Point pointWorldToScreen3 = worldToScreen(gameEngine.viewpointXSnapped, gameEngine.viewpointYSnapped);

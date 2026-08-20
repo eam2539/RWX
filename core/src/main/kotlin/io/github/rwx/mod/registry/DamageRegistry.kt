@@ -130,7 +130,7 @@ object DamageRegistry : OwnedRegistry {
      */
     @JvmStatic
     fun armourIgnoreAmount(projectile: Projectile?, areaDamage: Boolean, fallback: Float): Float {
-        val damage = damageOf(projectile?.g) ?: return fallback
+        val damage = damageOf(projectile?.template) ?: return fallback
         val override = if (areaDamage) {
             damage.areaDamageArmourIgnoreAmount
         } else {
@@ -145,8 +145,8 @@ object DamageRegistry : OwnedRegistry {
      */
     @JvmStatic
     fun excludesAreaDamage(projectile: Projectile, target: BaseUnit): Boolean {
-        val damage = damageOf(projectile.g) ?: return false
-        return damage.areaDamageExcludeDirectHit && target === projectile.l
+        val damage = damageOf(projectile.template) ?: return false
+        return damage.areaDamageExcludeDirectHit && target === projectile.targetUnit
     }
 
     // ---------------------------------------------------------------- hit-rate rolls
@@ -172,7 +172,7 @@ object DamageRegistry : OwnedRegistry {
         areaDamage: Boolean,
     ): Float {
         if (target == null || projectile == null) return damage
-        val extension = damageOf(projectile.g) ?: return damage
+        val extension = damageOf(projectile.template) ?: return damage
         val hitRateBonus = (
                 if (areaDamage) extension.areaDamageHitRateBonus else extension.directDamageHitRateBonus
                 ) ?: return damage
@@ -233,7 +233,7 @@ object DamageRegistry : OwnedRegistry {
         directionY: Float,
     ): FloatArray? {
         target ?: return null
-        val damage = damageOf(projectile.g)?.takeIf { it.rayDamage } ?: return null
+        val damage = damageOf(projectile.template)?.takeIf { it.rayDamage } ?: return null
         val distance = hitEffectDistance(damage, projectile, target, directionX, directionY)
             ?: return null
         val length = length(directionX, directionY) ?: return null
@@ -256,7 +256,7 @@ object DamageRegistry : OwnedRegistry {
         directionY: Float,
     ): Boolean {
         target ?: return false
-        val damage = damageOf(projectile.g)?.takeIf { it.rayDamage } ?: return false
+        val damage = damageOf(projectile.template)?.takeIf { it.rayDamage } ?: return false
         if (damage.rayDamageHitEffectOffsetFactor == null) return false
         return hitEffectDistance(damage, projectile, target, directionX, directionY) == null
     }
@@ -286,9 +286,9 @@ object DamageRegistry : OwnedRegistry {
         applyDamage: SecondaryDamage,
         emitHitEffect: SecondaryHitEffect,
     ) {
-        val damage = damageOf(projectile.g)?.takeIf { it.rayDamage } ?: return
-        val source = projectile.j ?: return
-        if (projectile.l == null) return
+        val damage = damageOf(projectile.template)?.takeIf { it.rayDamage } ?: return
+        val source = projectile.sourceUnit ?: return
+        if (projectile.targetUnit == null) return
         val length = length(directionX, directionY) ?: return
 
         val units = BaseUnit.bE.a()
@@ -349,7 +349,7 @@ object DamageRegistry : OwnedRegistry {
         source: BaseUnit,
         target: BaseUnit,
     ): Boolean {
-        if (target === projectile.l || target === source) return false
+        if (target === projectile.targetUnit || target === source) return false
         if (target.isDead || !target.isAlive || target.transportContainer != null) return false
         val sourceTeam = source.team ?: return false
         val targetTeam = target.team ?: return false

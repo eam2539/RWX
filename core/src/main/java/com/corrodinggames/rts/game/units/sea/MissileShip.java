@@ -122,30 +122,30 @@ public class MissileShip extends WaterUnit {
         if (!baseUnit.Q()) {
             Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y, this.posZ, i);
             PointF pointFK = getShadowOffsetForLevel(i);
-            projectileA.K = pointFK.x;
-            projectileA.L = pointFK.y;
-            projectileA.ar = KoolArgbColor.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 50);
-            projectileA.U = 62.0f;
-            projectileA.l = baseUnit;
-            projectileA.h = 190.0f;
-            projectileA.t = 2.0f;
-            projectileA.aH = true;
-            projectileA.aM = true;
-            projectileA.aQ = true;
+            projectileA.trackOffsetX = pointFK.x;
+            projectileA.trackOffsetY = pointFK.y;
+            projectileA.color = KoolArgbColor.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 50);
+            projectileA.damage = 62.0f;
+            projectileA.targetUnit = baseUnit;
+            projectileA.lifeTimer = 190.0f;
+            projectileA.speed = 2.0f;
+            projectileA.isBallistic = true;
+            projectileA.hasTrail = true;
+            projectileA.isSmallExplosion = true;
             gameEngine.soundEngine.playSound(SoundEngine.missileFireSound, 0.8f, this.posX, this.posY);
             gameEngine.effectManager.createLightEffect(this.posX, this.posY, this.posZ, -1118720);
             gameEngine.effectManager.createLightEffect(projectileA, -1118720);
             return;
         }
         Projectile projectileA2 = Projectile.a(this, pointFE.x, pointFE.y, this.posZ - 1.0f, i);
-        projectileA2.ar = KoolArgbColor.a(255, 0, 0, 150);
-        projectileA2.x = 1.0f;
-        projectileA2.U = 42.0f;
-        projectileA2.l = baseUnit;
-        projectileA2.h = 220.0f;
-        projectileA2.t = 1.9f;
-        projectileA2.aM = true;
-        projectileA2.aQ = true;
+        projectileA2.color = KoolArgbColor.a(255, 0, 0, 150);
+        projectileA2.renderScale = 1.0f;
+        projectileA2.damage = 42.0f;
+        projectileA2.targetUnit = baseUnit;
+        projectileA2.lifeTimer = 220.0f;
+        projectileA2.speed = 1.9f;
+        projectileA2.hasTrail = true;
+        projectileA2.isSmallExplosion = true;
         gameEngine.soundEngine.playSound(SoundEngine.missileFireSound, 0.8f, this.posX, this.posY);
         gameEngine.effectManager.createLightEffect(this.posX, this.posY, this.posZ, -1118720);
     }

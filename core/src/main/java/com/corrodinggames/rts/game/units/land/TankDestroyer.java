@@ -87,10 +87,10 @@ public class TankDestroyer extends LandUnit {
     public void a(BaseUnit baseUnit, int i) {
         PointF pointFE = E(i);
         Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y);
-        projectileA.U = 35.0f;
-        projectileA.l = baseUnit;
-        projectileA.h = 60.0f;
-        projectileA.t = 3.0f;
+        projectileA.damage = 35.0f;
+        projectileA.targetUnit = baseUnit;
+        projectileA.lifeTimer = 60.0f;
+        projectileA.speed = 3.0f;
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.effectManager.createLightEffect(pointFE.x, pointFE.y, this.posZ, -1127220);
         gameEngine.effectManager.createFlameEffect(pointFE.x, pointFE.y, this.posZ, this.movementLevels[i].targetX);

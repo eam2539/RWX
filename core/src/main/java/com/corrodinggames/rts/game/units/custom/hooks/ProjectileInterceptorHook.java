@@ -52,15 +52,15 @@ public class ProjectileInterceptorHook extends CustomUnitRenderHook {
         int i = Projectile.a.size;
         for (int i2 = 0; i2 < i; i2++) {
             Projectile projectile2 = (Projectile) objArrA[i2];
-            if (projectile2.aE != null && projectile2.posZ > f3 && AnimationTag.a(projectile2.aE, animationSet) && Utility.distanceSq(customUnit.posX, customUnit.posY, projectile2.posX, projectile2.posY) < f2 * f2 && ((Utility.distanceSq(customUnit.posX, customUnit.posY, projectile2.n, projectile2.o) < f * f || f < 0.0f) && ((projectile2.j == null || (!projectile2.j.team.d(customUnit.team) && projectile2.j.team != customUnit.team)) && projectile2.h > 0.0f && !a(projectile2)))) {
+            if (projectile2.animationSet != null && projectile2.posZ > f3 && AnimationTag.a(projectile2.animationSet, animationSet) && Utility.distanceSq(customUnit.posX, customUnit.posY, projectile2.posX, projectile2.posY) < f2 * f2 && ((Utility.distanceSq(customUnit.posX, customUnit.posY, projectile2.targetX, projectile2.targetY) < f * f || f < 0.0f) && ((projectile2.sourceUnit == null || (!projectile2.sourceUnit.team.d(customUnit.team) && projectile2.sourceUnit.team != customUnit.team)) && projectile2.lifeTimer > 0.0f && !a(projectile2)))) {
                 projectile = projectile2;
             }
         }
         if (projectile != null) {
             customUnit.b(turretConfig);
             Projectile projectileA = customUnit.a((BaseUnit) null, projectile.posX, projectile.posY, turretConfig.turretIndex, (CustomProjectileTemplate) null, 0);
-            projectileA.aC = true;
-            projectileA.q = projectile;
+            projectileA.fliesToPosition = true;
+            projectileA.parentProjectile = projectile;
         }
     }
 
@@ -69,7 +69,7 @@ public class ProjectileInterceptorHook extends CustomUnitRenderHook {
         int i = Projectile.a.size;
         for (int i2 = 0; i2 < i; i2++) {
             Projectile projectile2 = (Projectile) objArrA[i2];
-            if (projectile2 != projectile && projectile2.q == projectile) {
+            if (projectile2 != projectile && projectile2.parentProjectile == projectile) {
                 return true;
             }
         }

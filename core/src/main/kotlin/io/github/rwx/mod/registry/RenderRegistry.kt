@@ -258,8 +258,8 @@ object RenderRegistry : OwnedRegistry {
         val renderer = projectileRenderers[rendererId] ?: return false
         val startX = projectile.posX - gameEngine.viewpointXSnapped
         val startY = projectile.posY - gameEngine.viewpointYSnapped - projectile.posZ
-        val endX = targetX - gameEngine.viewpointXSnapped + projectile.K
-        val endY = targetY - targetHeight - gameEngine.viewpointYSnapped + projectile.L
+        val endX = targetX - gameEngine.viewpointXSnapped + projectile.trackOffsetX
+        val endY = targetY - targetHeight - gameEngine.viewpointYSnapped + projectile.trackOffsetY
         val canvas = EngineRenderCanvas(gameEngine.renderGraphicsEngine)
         try {
             failures.runSafelyOncePerId("projectile:$rendererId") {
@@ -269,8 +269,8 @@ object RenderRegistry : OwnedRegistry {
                         startY = startY,
                         endX = endX,
                         endY = endY,
-                        ageTicks = projectile.J.coerceAtLeast(0f),
-                        remainingTicks = projectile.h.coerceAtLeast(0f),
+                        ageTicks = projectile.age.coerceAtLeast(0f),
+                        remainingTicks = projectile.lifeTimer.coerceAtLeast(0f),
                         drawSize = projectileTemplate.drawSize,
                         variantId = RenderVariantId(variantId),
                     ),

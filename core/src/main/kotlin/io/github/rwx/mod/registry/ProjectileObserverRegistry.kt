@@ -33,7 +33,7 @@ object ProjectileObserverRegistry : OwnedRegistry {
         val restarted = previous != null && (
                 previous.observerId != observerId ||
                         previous.variantId != variantId ||
-                        projectile.J + RESTART_EPSILON < previous.lastAge
+                        projectile.age + RESTART_EPSILON < previous.lastAge
                 )
         if (restarted) {
             dispatch(projectile, previous, ProjectileLifecyclePhase.ENDED, observers[previous.observerId])
@@ -43,11 +43,11 @@ object ProjectileObserverRegistry : OwnedRegistry {
                 observerId = observerId,
                 variantId = variantId,
                 generation = (previous?.generation ?: -1) + 1,
-                lastAge = projectile.J,
-                lastRemaining = projectile.h,
+                lastAge = projectile.age,
+                lastRemaining = projectile.lifeTimer,
             )
         } else {
-            previous.copy(lastAge = projectile.J, lastRemaining = projectile.h)
+            previous.copy(lastAge = projectile.age, lastRemaining = projectile.lifeTimer)
         }
         active[projectile.objectId] = current
         dispatch(
@@ -84,9 +84,9 @@ object ProjectileObserverRegistry : OwnedRegistry {
         previousRemaining: Float? = state.lastRemaining,
     ) {
         observer ?: return
-        val target = projectile.l
-        val endX = target?.posX ?: projectile.n
-        val endY = target?.posY ?: projectile.o
+        val target = projectile.targetUnit
+        val endX = target?.posX ?: projectile.targetX
+        val endY = target?.posY ?: projectile.targetY
         failures.runSafely(state.observerId) {
             observer.onLifecycle(
                 ProjectileLifecycleContext(
@@ -96,9 +96,9 @@ object ProjectileObserverRegistry : OwnedRegistry {
                     startY = projectile.posY,
                     endX = endX,
                     endY = endY,
-                    ageTicks = projectile.J.coerceAtLeast(0f),
+                    ageTicks = projectile.age.coerceAtLeast(0f),
                     previousAgeTicks = previousAge,
-                    remainingTicks = projectile.h.coerceAtLeast(0f),
+                    remainingTicks = projectile.lifeTimer.coerceAtLeast(0f),
                     previousRemainingTicks = previousRemaining,
                     variantId = RenderVariantId(state.variantId),
                 )

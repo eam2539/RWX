@@ -268,7 +268,7 @@ public class AntiNukeLauncher extends FactoryWithQueue {
             if (this.scanTimer == 0.0f) {
                 this.scanTimer = 15.0f;
                 for (Projectile projectile2 : Projectile.a) {
-                    if (projectile2.D && projectile2.posZ > 50.0f && Utility.distanceSq(this.posX, this.posY, projectile2.posX, projectile2.posY) < 2200.0f * 2200.0f && Utility.distanceSq(this.posX, this.posY, projectile2.n, projectile2.o) < 1000000.0f && (projectile2.j == null || (!projectile2.j.team.d(this.team) && projectile2.j.team != this.team))) {
+                    if (projectile2.isNuke && projectile2.posZ > 50.0f && Utility.distanceSq(this.posX, this.posY, projectile2.posX, projectile2.posY) < 2200.0f * 2200.0f && Utility.distanceSq(this.posX, this.posY, projectile2.targetX, projectile2.targetY) < 1000000.0f && (projectile2.sourceUnit == null || (!projectile2.sourceUnit.team.d(this.team) && projectile2.sourceUnit.team != this.team))) {
                         if (!isProjectileAlreadyTargeted(projectile2)) {
                             projectile = projectile2;
                         }
@@ -287,7 +287,7 @@ public class AntiNukeLauncher extends FactoryWithQueue {
         int i = Projectile.a.size;
         for (int i2 = 0; i2 < i; i2++) {
             Projectile projectile2 = (Projectile) objArrA[i2];
-            if (projectile2 != projectile && projectile2.q == projectile) {
+            if (projectile2 != projectile && projectile2.parentProjectile == projectile) {
                 return true;
             }
         }
@@ -304,23 +304,23 @@ public class AntiNukeLauncher extends FactoryWithQueue {
         PointF pointFE = E(0);
         Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y);
         projectileA.S(10);
-        projectileA.P = (short) 10;
-        projectileA.R = (short) 0;
-        projectileA.x = 1.0f;
-        projectileA.aC = true;
-        projectileA.q = projectile;
-        projectileA.h = 99999.0f;
-        projectileA.t = 0.2f;
-        projectileA.r = 6.5f;
-        projectileA.ar = KoolArgbColor.a(255, 80, 60, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT);
-        projectileA.U = 600.0f;
-        projectileA.aH = true;
-        projectileA.aM = true;
-        projectileA.aQ = true;
+        projectileA.textureFrame = (short) 10;
+        projectileA.textureType = (short) 0;
+        projectileA.renderScale = 1.0f;
+        projectileA.fliesToPosition = true;
+        projectileA.parentProjectile = projectile;
+        projectileA.lifeTimer = 99999.0f;
+        projectileA.speed = 0.2f;
+        projectileA.targetSpeed = 6.5f;
+        projectileA.color = KoolArgbColor.a(255, 80, 60, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT);
+        projectileA.damage = 600.0f;
+        projectileA.isBallistic = true;
+        projectileA.hasTrail = true;
+        projectileA.isSmallExplosion = true;
         projectileA.C = true;
-        projectileA.aI = 80.0f;
-        projectileA.aJ = 100.0f;
-        projectileA.aL = 2.0f;
+        projectileA.minHeight = 80.0f;
+        projectileA.maxHeight = 100.0f;
+        projectileA.verticalVelocity = 2.0f;
         gameEngine.effectManager.createLightEffect(pointFE.x, pointFE.y, this.posZ, -1127220);
         Effect effectCreateSmallExplosionInternal = gameEngine.effectManager.createSmallExplosionInternal(pointFE.x, pointFE.y, 0.0f, -1);
         if (effectCreateSmallExplosionInternal != null) {
