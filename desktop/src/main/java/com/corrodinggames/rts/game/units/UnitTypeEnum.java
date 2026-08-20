@@ -2127,14 +2127,14 @@ public enum UnitTypeEnum implements UnitType {
                                 orderableUnit.a((BaseUnit) orderableUnit, i2);
                                 if (i3 != Projectile.a.size) {
                                     Projectile projectile = (Projectile) Projectile.a.get(Projectile.a.size - 1);
-                                    if (projectile.U > f) {
-                                        f = projectile.U;
+                                    if (projectile.damage > f) {
+                                        f = projectile.damage;
                                     }
-                                    if (projectile.Y > f2) {
-                                        f2 = projectile.Y;
+                                    if (projectile.splashDamage > f2) {
+                                        f2 = projectile.splashDamage;
                                     }
-                                    f3 += projectile.U;
-                                    f4 += projectile.Y;
+                                    f3 += projectile.damage;
+                                    f4 += projectile.splashDamage;
                                 }
                             }
                             if (f3 != 0.0f) {

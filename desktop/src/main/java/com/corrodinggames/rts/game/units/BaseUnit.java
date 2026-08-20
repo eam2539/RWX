@@ -1515,9 +1515,9 @@ public abstract class BaseUnit extends SizedObject {
         float f4 = 1.0f;
         float f5 = 1.0f;
         if (projectile != null) {
-            f3 = projectile.ak;
-            f4 = projectile.al;
-            f5 = projectile.am;
+            f3 = projectile.targetDamageMultiplier;
+            f4 = projectile.splashDamageMultiplier;
+            f5 = projectile.globalDamageMultiplier;
         }
         if (this.shield < this.unitEnergyMax) {
             float f6 = f2 * f3;
@@ -1558,9 +1558,9 @@ public abstract class BaseUnit extends SizedObject {
         float f3 = 1.0f;
         float f4 = 1.0f;
         if (projectile != null) {
-            f2 = projectile.ak;
-            f3 = projectile.al;
-            f4 = projectile.am;
+            f2 = projectile.targetDamageMultiplier;
+            f3 = projectile.splashDamageMultiplier;
+            f4 = projectile.globalDamageMultiplier;
         }
         float f5 = f;
         float f6 = 0.0f;

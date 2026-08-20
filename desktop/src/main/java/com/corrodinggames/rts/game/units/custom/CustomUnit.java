@@ -807,136 +807,149 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
     }
 
-    @Override // com.corrodinggames.rts.game.units.BaseUnit
-    public boolean e() {
-        PlayerTeam playerTeam;
+    public static void a(Projectile projectile, BaseUnit baseUnit, int i, CustomProjectileTemplate customProjectileTemplate, float f, float f2, float f3, float f4) {
+        Effect effectCreateLightEffect;
         GameEngine gameEngine = GameEngine.getInstance();
-        if (bI()) {
-            gameEngine.pathfindingEngine.a(this);
+        projectile.angle = f4;
+        projectile.renderAngle = f4;
+        if (baseUnit == null) {
+            throw new RuntimeException("Source cannot be null");
         }
-        if (this.buildProgress < 1.0f) {
-            if (this.unitConfig.effectOnDeathIfUnbuilt != null && this.unitConfig.effectOnDeathIfUnbuilt.b()) {
-                this.unitConfig.effectOnDeathIfUnbuilt.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
-                return false;
-            }
-            if (this.unitConfig.effectOnDeath != null && this.unitConfig.effectOnDeath.b()) {
-                this.unitConfig.effectOnDeath.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
-                return false;
-            }
-            a(UnitSize.verysmall);
-            return false;
+        projectile.template = customProjectileTemplate;
+        projectile.spawnEmitterOnHit = customProjectileTemplate.flameWeapon;
+        projectile.playsHitSound = customProjectileTemplate.hitSound;
+        projectile.damage = customProjectileTemplate.b;
+        projectile.splashDamage = customProjectileTemplate.c;
+        if (!customProjectileTemplate.ignoreParentShootDamageMultiplier && (baseUnit instanceof CustomUnit)) {
+            CustomUnit customUnit = (CustomUnit) baseUnit;
+            projectile.damage *= customUnit.y.shootDamageMultiplier;
+            projectile.splashDamage *= customUnit.y.shootDamageMultiplier;
         }
-        if (!this.unitConfig.slowDeathFall) {
-            S(0);
+        projectile.explosionRadius = customProjectileTemplate.i;
+        if (customProjectileTemplate.l) {
+            projectile.damageEnemiesOnly = false;
+            projectile.noFriendlyFire = true;
+        } else {
+            projectile.damageEnemiesOnly = !customProjectileTemplate.k;
         }
-        if (this.unitConfig.effectOnDeath != null && this.unitConfig.effectOnDeath.b()) {
-            this.unitConfig.effectOnDeath.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
+        projectile.canHitSubmerged = customProjectileTemplate.n;
+        if (customProjectileTemplate.m) {
+            projectile.excludesAir = true;
+            projectile.matchesTargetAltitude = false;
         }
-        if (this.unitConfig.fireTurretAtSelfOnDeathIndex != -1) {
-            a((BaseUnit) null, this.posX, this.posY, this.unitConfig.fireTurretAtSelfOnDeathIndex, (CustomProjectileTemplate) null, 0);
+        projectile.isNuke = customProjectileTemplate.p;
+        projectile.revealsFog = customProjectileTemplate.q;
+        projectile.visibilityChecked = customProjectileTemplate.r;
+        if (customProjectileTemplate.o < 0.5d) {
+            projectile.C = true;
+        } else {
+            projectile.damageMultiplier = customProjectileTemplate.o;
         }
-        if (this.unitConfig.unitsSpawnedOnDeath != null) {
-            if (this.unitConfig.unitsSpawnedOnDeath_setToTeamOfLastAttacker && this.unitTarget1 != null && this.unitTarget1.team != null) {
-                playerTeam = this.unitTarget1.team;
+        projectile.lifeTimer = customProjectileTemplate.v;
+        projectile.initialDelay = customProjectileTemplate.u;
+        projectile.speed = customProjectileTemplate.w;
+        if (customProjectileTemplate.speedSpread != 0.0f) {
+            projectile.speed += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-customProjectileTemplate.speedSpread) * 100.0f), (int) (customProjectileTemplate.speedSpread * 100.0f), 1) / 100.0f;
+        }
+        if (customProjectileTemplate.T && i != -1) {
+            projectile.followObject = baseUnit;
+            if (baseUnit instanceof OrderableUnit) {
+                projectile.followNodeIndex = i;
+                Vector3D vector3DD = ((OrderableUnit) baseUnit).D(i);
+                projectile.followLastX = vector3DD.a;
+                projectile.followLastY = vector3DD.b;
+                projectile.followLastZ = baseUnit.posZ + vector3DD.c;
             } else {
-                playerTeam = this.team;
-            }
-            if (!playerTeam.isTeamVictory) {
-                this.unitConfig.unitsSpawnedOnDeath.a(this.posX, this.posY, this.posZ, this.rotationSpeed, playerTeam, this.isSelected, this);
+                projectile.followLastX = baseUnit.posX;
+                projectile.followLastY = baseUnit.posY;
+                projectile.followLastZ = baseUnit.posZ;
             }
         }
-        this.isAlive = false;
-        if (!this.unitConfig.slowDeathFall) {
-            ds();
+        projectile.velocityZ = customProjectileTemplate.D;
+        projectile.velocityX = customProjectileTemplate.E;
+        projectile.velocityY = customProjectileTemplate.F;
+        projectile.explodesOnTimerEnd = customProjectileTemplate.explodeOnEndOfLife;
+        projectile.pushForce = customProjectileTemplate.pushForce;
+        projectile.pushBase = customProjectileTemplate.pushVelocity;
+        projectile.damageToBuildings = customProjectileTemplate.buildingDamageMultiplier;
+        projectile.targetDamageMultiplier = customProjectileTemplate.shieldDamageMultiplier;
+        projectile.splashDamageMultiplier = customProjectileTemplate.shieldDeflectionMultiplier;
+        projectile.globalDamageMultiplier = customProjectileTemplate.hullDamageMultiplier;
+        projectile.armourIgnore = customProjectileTemplate.armourIgnoreAmount;
+        if (customProjectileTemplate.areaExpandTime > 0.0f) {
+            projectile.trackHitUnits = true;
+            projectile.explosionAnimTimer = customProjectileTemplate.areaExpandTime;
+            projectile.explosionAnimDuration = projectile.explosionAnimTimer;
         }
-        if (this.unitConfig.nukeOnDeath) {
+        projectile.color = customProjectileTemplate.color;
+        if (customProjectileTemplate.teamColorRatio != 0.0f) {
+            float f5 = customProjectileTemplate.teamColorRatioSourceRatio;
+            int iA = Color.a(projectile.color);
+            int iB = (int) (Color.b(projectile.color) * f5);
+            int iC = (int) (Color.c(projectile.color) * f5);
+            int iD = (int) (Color.d(projectile.color) * f5);
+            int teamColorArgb = baseUnit.team.getTeamColorArgb();
+            projectile.color = Color.a(iA, Utility.distance((int) (iB + (Color.b(teamColorArgb) * customProjectileTemplate.teamColorRatio)), 0, 255), Utility.distance((int) (iC + (Color.c(teamColorArgb) * customProjectileTemplate.teamColorRatio)), 0, 255), Utility.distance((int) (iD + (Color.d(teamColorArgb) * customProjectileTemplate.teamColorRatio)), 0, 255));
+        }
+        projectile.textureFrame = customProjectileTemplate.x;
+        projectile.textureType = customProjectileTemplate.y;
+        projectile.hasExploded = !customProjectileTemplate.A;
+        projectile.frameIndex = customProjectileTemplate.z;
+        if (customProjectileTemplate.B != null) {
+            projectile.textureFrame = (short) 0;
+            projectile.textureType = (short) 0;
+        }
+        projectile.renderScale = customProjectileTemplate.drawSize;
+        projectile.hasFixedTarget = customProjectileTemplate.s;
+        projectile.isInstantHit = customProjectileTemplate.I;
+        projectile.renderJitter = customProjectileTemplate.V;
+        projectile.persistsAfterExplosion = customProjectileTemplate.W;
+        projectile.isBallistic = customProjectileTemplate.ae;
+        projectile.autoRetarget = customProjectileTemplate.autoTargetingOnDeadTarget;
+        projectile.hasTrail = customProjectileTemplate.af;
+        if (customProjectileTemplate.effectOnCreate != null) {
+            customProjectileTemplate.effectOnCreate.a(projectile.posX, projectile.posY, projectile.posZ, projectile.angle, projectile);
+        }
+        if (customProjectileTemplate.lightColor != -1) {
             boolean z = false;
-            if (this.unitConfig.nukeOnDeathDisableWhenNoNuke && gameEngine.isInGameOrLobby() && gameEngine.networkEngine.roomSettings.noNukes) {
+            Effect effect = projectile.aP;
+            if (effect != null && effect.b == projectile && effect.d && effect != null) {
+                if (effect.V < 150.0f) {
+                    effect.V = 200.0f;
+                }
                 z = true;
             }
-            if (!z) {
-                Projectile projectileA = NukeLauncher.a(this, this.posX, this.posY, this.posX, this.posY);
-                projectileA.aH = false;
-                projectileA.Z = this.unitConfig.nukeOnDeathRange;
-                projectileA.Y = this.unitConfig.nukeOnDeathDamage;
-            }
-        }
-        if (this.unitConfig.fireOnDeath != 0) {
-            FireUnit fireUnit = new FireUnit(false);
-            fireUnit.posX = this.posX;
-            fireUnit.posY = this.posY;
-            fireUnit.setUnitTeam(PlayerTeam.TEAM_UNKNOWN);
-            PlayerTeam.c(fireUnit);
-        }
-        if (this.unitConfig.soundOnDeath != null) {
-            this.unitConfig.soundOnDeath.a(this.posX, this.posY, 1.0f);
-        }
-        if (this.unitConfig.isBio) {
-            if (this.unitConfig.soundOnDeath == null) {
-                gameEngine.soundEngine.playSound(SoundEngine.bugDieSound, 0.8f, this.posX, this.posY);
-            }
-            if (this.unitConfig.explodeOnDeath) {
-                if (!i() && !this.unitConfig.hideScorchMark) {
-                    ScorchMark.a(this, 1);
+            if (!z && (effectCreateLightEffect = gameEngine.effectManager.createLightEffect(projectile, customProjectileTemplate.lightColor, customProjectileTemplate.lightSize)) != null) {
+                if (customProjectileTemplate.lightCastOnGround) {
+                    effectCreateLightEffect.c = true;
                 }
-                if (this.unitConfig.explodeTypeOnDeath != null) {
-                    a(this.unitConfig.explodeTypeOnDeath, true);
-                } else if (this.unitConfig.dieOnAttack) {
-                    a(UnitSize.large);
-                }
-            }
-            if (this.unitConfig.isBug) {
-                for (int i = 0; i < bp(); i++) {
-                    gameEngine.effectManager.createBloodEffect(this.posX, this.posY, this.posZ);
-                }
-            }
-        } else {
-            if (this.legInstances != null) {
-                dv();
-                for (int i2 = 0; i2 < this.legInstances.length; i2++) {
-                    LegInstance legInstance = this.legInstances[i2];
-                    LegConfig legConfig = this.unitConfig.legConfig[i2];
-                    float f = this.posX + legInstance.b;
-                    float f2 = this.posY + legInstance.c;
-                    if (legConfig.J && !legConfig.p && (legConfig.q == null || !legConfig.q.read(this))) {
-                        if (!GameViewUtils.d(f, f2) && !this.unitConfig.hideScorchMark) {
-                            ScorchMark.a(f, f2);
-                        }
-                        gameEngine.effectManager.createSmallExplosion(f, f2, 0.0f);
-                    }
-                }
-            }
-            if (!i()) {
-                if (this.unitConfig.explodeOnDeath) {
-                    if (this.unitConfig.explodeTypeOnDeath != null) {
-                        a(this.unitConfig.explodeTypeOnDeath, true);
-                    } else {
-                        a(UnitSize.small);
-                    }
-                }
-            } else {
-                if (this.unitConfig.explodeOnDeath) {
-                    if (this.unitConfig.explodeTypeOnDeath != null) {
-                        a(this.unitConfig.explodeTypeOnDeath, false);
-                    } else {
-                        gameEngine.effectManager.createSmallExplosion(this.posX, this.posY, this.posZ);
-                    }
-                }
-                for (int i3 = 0; i3 < bp(); i3++) {
-                    gameEngine.effectManager.createBloodEffect2(this.posX, this.posY, this.posZ);
+                if (customProjectileTemplate.L) {
+                    projectile.aP = effectCreateLightEffect;
                 }
             }
         }
-        if (this.unitConfig.slowDeathFall) {
-            return true;
+        projectile.isSmallExplosion = customProjectileTemplate.largeHitEffect;
+        if (customProjectileTemplate.ballisticDelayMoveHeight != -1.0f) {
+            projectile.minHeight = customProjectileTemplate.ballisticDelayMoveHeight;
         }
-        if (this.unitConfig.image_wreak != null) {
-            this.baseTexture = this.unitConfig.image_wreak;
-            this.animationFrameIndex = 0;
-            this.ew = true;
-            return true;
+        if (customProjectileTemplate.ballisticHeight != -1.0f) {
+            projectile.maxHeight = customProjectileTemplate.ballisticHeight;
         }
-        return false;
+        projectile.verticalVelocity = -1.0f;
+        if (customProjectileTemplate.targetSpeed != -1.0f) {
+            projectile.targetSpeed = customProjectileTemplate.targetSpeed;
+        }
+        projectile.acceleration = customProjectileTemplate.targetSpeedAcceleration;
+        if (customProjectileTemplate.spawnUnit != null) {
+        }
+        projectile.animationSet = customProjectileTemplate.tags;
+        projectile.drawLayer = baseUnit.drawLayer;
+        if (projectile.drawLayer < 4 && f3 >= -1.0f) {
+            projectile.drawLayer = 4;
+        }
+        if (customProjectileTemplate.U) {
+            projectile.drawLayer = 1;
+        }
     }
 
     public void a(CustomUnitConfig customUnitConfig, boolean z, boolean z2) {
@@ -1352,149 +1365,136 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         return projectileA;
     }
 
-    public static void a(Projectile projectile, BaseUnit baseUnit, int i, CustomProjectileTemplate customProjectileTemplate, float f, float f2, float f3, float f4) {
-        Effect effectCreateLightEffect;
+    @Override // com.corrodinggames.rts.game.units.BaseUnit
+    public boolean e() {
+        PlayerTeam playerTeam;
         GameEngine gameEngine = GameEngine.getInstance();
-        projectile.az = f4;
-        projectile.aT = f4;
-        if (baseUnit == null) {
-            throw new RuntimeException("Source cannot be null");
+        if (bI()) {
+            gameEngine.pathfindingEngine.a(this);
         }
-        projectile.g = customProjectileTemplate;
-        projectile.G = customProjectileTemplate.flameWeapon;
-        projectile.aR = customProjectileTemplate.hitSound;
-        projectile.U = customProjectileTemplate.b;
-        projectile.Y = customProjectileTemplate.c;
-        if (!customProjectileTemplate.ignoreParentShootDamageMultiplier && (baseUnit instanceof CustomUnit)) {
-            CustomUnit customUnit = (CustomUnit) baseUnit;
-            projectile.U *= customUnit.y.shootDamageMultiplier;
-            projectile.Y *= customUnit.y.shootDamageMultiplier;
+        if (this.buildProgress < 1.0f) {
+            if (this.unitConfig.effectOnDeathIfUnbuilt != null && this.unitConfig.effectOnDeathIfUnbuilt.b()) {
+                this.unitConfig.effectOnDeathIfUnbuilt.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
+                return false;
+            }
+            if (this.unitConfig.effectOnDeath != null && this.unitConfig.effectOnDeath.b()) {
+                this.unitConfig.effectOnDeath.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
+                return false;
+            }
+            a(UnitSize.verysmall);
+            return false;
         }
-        projectile.Z = customProjectileTemplate.i;
-        if (customProjectileTemplate.l) {
-            projectile.aa = false;
-            projectile.ab = true;
-        } else {
-            projectile.aa = !customProjectileTemplate.k;
+        if (!this.unitConfig.slowDeathFall) {
+            S(0);
         }
-        projectile.ac = customProjectileTemplate.n;
-        if (customProjectileTemplate.m) {
-            projectile.ad = true;
-            projectile.ae = false;
+        if (this.unitConfig.effectOnDeath != null && this.unitConfig.effectOnDeath.b()) {
+            this.unitConfig.effectOnDeath.a(this.posX, this.posY, this.posZ, this.rotationSpeed, null);
         }
-        projectile.D = customProjectileTemplate.p;
-        projectile.aY = customProjectileTemplate.q;
-        projectile.aZ = customProjectileTemplate.r;
-        if (customProjectileTemplate.o < 0.5d) {
-            projectile.C = true;
-        } else {
-            projectile.H = customProjectileTemplate.o;
+        if (this.unitConfig.fireTurretAtSelfOnDeathIndex != -1) {
+            a((BaseUnit) null, this.posX, this.posY, this.unitConfig.fireTurretAtSelfOnDeathIndex, (CustomProjectileTemplate) null, 0);
         }
-        projectile.h = customProjectileTemplate.v;
-        projectile.i = customProjectileTemplate.u;
-        projectile.t = customProjectileTemplate.w;
-        if (customProjectileTemplate.speedSpread != 0.0f) {
-            projectile.t += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-customProjectileTemplate.speedSpread) * 100.0f), (int) (customProjectileTemplate.speedSpread * 100.0f), 1) / 100.0f;
-        }
-        if (customProjectileTemplate.T && i != -1) {
-            projectile.au = baseUnit;
-            if (baseUnit instanceof OrderableUnit) {
-                projectile.av = i;
-                Vector3D vector3DD = ((OrderableUnit) baseUnit).D(i);
-                projectile.aw = vector3DD.a;
-                projectile.ax = vector3DD.b;
-                projectile.ay = baseUnit.posZ + vector3DD.c;
+        if (this.unitConfig.unitsSpawnedOnDeath != null) {
+            if (this.unitConfig.unitsSpawnedOnDeath_setToTeamOfLastAttacker && this.unitTarget1 != null && this.unitTarget1.team != null) {
+                playerTeam = this.unitTarget1.team;
             } else {
-                projectile.aw = baseUnit.posX;
-                projectile.ax = baseUnit.posY;
-                projectile.ay = baseUnit.posZ;
+                playerTeam = this.team;
+            }
+            if (!playerTeam.isTeamVictory) {
+                this.unitConfig.unitsSpawnedOnDeath.a(this.posX, this.posY, this.posZ, this.rotationSpeed, playerTeam, this.isSelected, this);
             }
         }
-        projectile.w = customProjectileTemplate.D;
-        projectile.u = customProjectileTemplate.E;
-        projectile.v = customProjectileTemplate.F;
-        projectile.af = customProjectileTemplate.explodeOnEndOfLife;
-        projectile.ag = customProjectileTemplate.pushForce;
-        projectile.ah = customProjectileTemplate.pushVelocity;
-        projectile.ai = customProjectileTemplate.buildingDamageMultiplier;
-        projectile.ak = customProjectileTemplate.shieldDamageMultiplier;
-        projectile.al = customProjectileTemplate.shieldDeflectionMultiplier;
-        projectile.am = customProjectileTemplate.hullDamageMultiplier;
-        projectile.an = customProjectileTemplate.armourIgnoreAmount;
-        if (customProjectileTemplate.areaExpandTime > 0.0f) {
-            projectile.ao = true;
-            projectile.W = customProjectileTemplate.areaExpandTime;
-            projectile.X = projectile.W;
+        this.isAlive = false;
+        if (!this.unitConfig.slowDeathFall) {
+            ds();
         }
-        projectile.ar = customProjectileTemplate.color;
-        if (customProjectileTemplate.teamColorRatio != 0.0f) {
-            float f5 = customProjectileTemplate.teamColorRatioSourceRatio;
-            int iA = Color.a(projectile.ar);
-            int iB = (int) (Color.b(projectile.ar) * f5);
-            int iC = (int) (Color.c(projectile.ar) * f5);
-            int iD = (int) (Color.d(projectile.ar) * f5);
-            int teamColorArgb = baseUnit.team.getTeamColorArgb();
-            projectile.ar = Color.a(iA, Utility.distance((int) (iB + (Color.b(teamColorArgb) * customProjectileTemplate.teamColorRatio)), 0, 255), Utility.distance((int) (iC + (Color.c(teamColorArgb) * customProjectileTemplate.teamColorRatio)), 0, 255), Utility.distance((int) (iD + (Color.d(teamColorArgb) * customProjectileTemplate.teamColorRatio)), 0, 255));
-        }
-        projectile.P = customProjectileTemplate.x;
-        projectile.R = customProjectileTemplate.y;
-        projectile.S = !customProjectileTemplate.A;
-        projectile.Q = customProjectileTemplate.z;
-        if (customProjectileTemplate.B != null) {
-            projectile.P = (short) 0;
-            projectile.R = (short) 0;
-        }
-        projectile.x = customProjectileTemplate.drawSize;
-        projectile.m = customProjectileTemplate.s;
-        projectile.A = customProjectileTemplate.I;
-        projectile.M = customProjectileTemplate.V;
-        projectile.B = customProjectileTemplate.W;
-        projectile.aH = customProjectileTemplate.ae;
-        projectile.aG = customProjectileTemplate.autoTargetingOnDeadTarget;
-        projectile.aM = customProjectileTemplate.af;
-        if (customProjectileTemplate.effectOnCreate != null) {
-            customProjectileTemplate.effectOnCreate.a(projectile.posX, projectile.posY, projectile.posZ, projectile.az, projectile);
-        }
-        if (customProjectileTemplate.lightColor != -1) {
+        if (this.unitConfig.nukeOnDeath) {
             boolean z = false;
-            Effect effect = projectile.aP;
-            if (effect != null && effect.b == projectile && effect.d && effect != null) {
-                if (effect.V < 150.0f) {
-                    effect.V = 200.0f;
-                }
+            if (this.unitConfig.nukeOnDeathDisableWhenNoNuke && gameEngine.isInGameOrLobby() && gameEngine.networkEngine.roomSettings.noNukes) {
                 z = true;
             }
-            if (!z && (effectCreateLightEffect = gameEngine.effectManager.createLightEffect(projectile, customProjectileTemplate.lightColor, customProjectileTemplate.lightSize)) != null) {
-                if (customProjectileTemplate.lightCastOnGround) {
-                    effectCreateLightEffect.c = true;
+            if (!z) {
+                Projectile projectileA = NukeLauncher.a(this, this.posX, this.posY, this.posX, this.posY);
+                projectileA.isBallistic = false;
+                projectileA.explosionRadius = this.unitConfig.nukeOnDeathRange;
+                projectileA.splashDamage = this.unitConfig.nukeOnDeathDamage;
+            }
+        }
+        if (this.unitConfig.fireOnDeath != 0) {
+            FireUnit fireUnit = new FireUnit(false);
+            fireUnit.posX = this.posX;
+            fireUnit.posY = this.posY;
+            fireUnit.setUnitTeam(PlayerTeam.TEAM_UNKNOWN);
+            PlayerTeam.c(fireUnit);
+        }
+        if (this.unitConfig.soundOnDeath != null) {
+            this.unitConfig.soundOnDeath.a(this.posX, this.posY, 1.0f);
+        }
+        if (this.unitConfig.isBio) {
+            if (this.unitConfig.soundOnDeath == null) {
+                gameEngine.soundEngine.playSound(SoundEngine.bugDieSound, 0.8f, this.posX, this.posY);
+            }
+            if (this.unitConfig.explodeOnDeath) {
+                if (!i() && !this.unitConfig.hideScorchMark) {
+                    ScorchMark.a(this, 1);
                 }
-                if (customProjectileTemplate.L) {
-                    projectile.aP = effectCreateLightEffect;
+                if (this.unitConfig.explodeTypeOnDeath != null) {
+                    a(this.unitConfig.explodeTypeOnDeath, true);
+                } else if (this.unitConfig.dieOnAttack) {
+                    a(UnitSize.large);
+                }
+            }
+            if (this.unitConfig.isBug) {
+                for (int i = 0; i < bp(); i++) {
+                    gameEngine.effectManager.createBloodEffect(this.posX, this.posY, this.posZ);
+                }
+            }
+        } else {
+            if (this.legInstances != null) {
+                dv();
+                for (int i2 = 0; i2 < this.legInstances.length; i2++) {
+                    LegInstance legInstance = this.legInstances[i2];
+                    LegConfig legConfig = this.unitConfig.legConfig[i2];
+                    float f = this.posX + legInstance.b;
+                    float f2 = this.posY + legInstance.c;
+                    if (legConfig.J && !legConfig.p && (legConfig.q == null || !legConfig.q.read(this))) {
+                        if (!GameViewUtils.d(f, f2) && !this.unitConfig.hideScorchMark) {
+                            ScorchMark.a(f, f2);
+                        }
+                        gameEngine.effectManager.createSmallExplosion(f, f2, 0.0f);
+                    }
+                }
+            }
+            if (!i()) {
+                if (this.unitConfig.explodeOnDeath) {
+                    if (this.unitConfig.explodeTypeOnDeath != null) {
+                        a(this.unitConfig.explodeTypeOnDeath, true);
+                    } else {
+                        a(UnitSize.small);
+                    }
+                }
+            } else {
+                if (this.unitConfig.explodeOnDeath) {
+                    if (this.unitConfig.explodeTypeOnDeath != null) {
+                        a(this.unitConfig.explodeTypeOnDeath, false);
+                    } else {
+                        gameEngine.effectManager.createSmallExplosion(this.posX, this.posY, this.posZ);
+                    }
+                }
+                for (int i3 = 0; i3 < bp(); i3++) {
+                    gameEngine.effectManager.createBloodEffect2(this.posX, this.posY, this.posZ);
                 }
             }
         }
-        projectile.aQ = customProjectileTemplate.largeHitEffect;
-        if (customProjectileTemplate.ballisticDelayMoveHeight != -1.0f) {
-            projectile.aI = customProjectileTemplate.ballisticDelayMoveHeight;
+        if (this.unitConfig.slowDeathFall) {
+            return true;
         }
-        if (customProjectileTemplate.ballisticHeight != -1.0f) {
-            projectile.aJ = customProjectileTemplate.ballisticHeight;
+        if (this.unitConfig.image_wreak != null) {
+            this.baseTexture = this.unitConfig.image_wreak;
+            this.animationFrameIndex = 0;
+            this.ew = true;
+            return true;
         }
-        projectile.aL = -1.0f;
-        if (customProjectileTemplate.targetSpeed != -1.0f) {
-            projectile.r = customProjectileTemplate.targetSpeed;
-        }
-        projectile.s = customProjectileTemplate.targetSpeedAcceleration;
-        if (customProjectileTemplate.spawnUnit != null) {
-        }
-        projectile.aE = customProjectileTemplate.tags;
-        projectile.drawLayer = baseUnit.drawLayer;
-        if (projectile.drawLayer < 4 && f3 >= -1.0f) {
-            projectile.drawLayer = 4;
-        }
-        if (customProjectileTemplate.U) {
-            projectile.drawLayer = 1;
-        }
+        return false;
     }
 
     public Projectile a(BaseUnit baseUnit, float f, float f2, int i, CustomProjectileTemplate customProjectileTemplate, int i2) {
@@ -1546,8 +1546,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             if (this.G[i] != null && !this.G[i].isDestroyed) {
                 projectileA = this.G[i];
                 projectileA.a(this, vector3DD.a, vector3DD.b, this.posZ + vector3DD.c);
-                if (!customProjectileTemplate2.N && projectileA.ap != null) {
-                    projectileA.ap.clear();
+                if (!customProjectileTemplate2.N && projectileA.hitUnits != null) {
+                    projectileA.hitUnits.clear();
                 }
             }
         }
@@ -1560,14 +1560,14 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 this.G[i] = projectileA;
             }
         } else {
-            projectileA.g = customProjectileTemplate2;
+            projectileA.template = customProjectileTemplate2;
             z = true;
         }
         a(projectileA, this, i, customProjectileTemplate2, vector3DD.a, vector3DD.b, this.posZ + vector3DD.c, f3);
         customProjectileTemplate2.a(this, projectileA, baseUnit, f, f2, m());
         if (!z && customProjectileTemplate2.R == 0.0f && customProjectileTemplate2.S == 0.0f) {
-            projectileA.K = shadowTexture.x;
-            projectileA.L = shadowTexture.y;
+            projectileA.trackOffsetX = shadowTexture.x;
+            projectileA.trackOffsetY = shadowTexture.y;
         }
         if (turretConfig.shootLightColor != null) {
             gameEngine.effectManager.createLightEffect(vector3DD.a, vector3DD.b, this.posZ + vector3DD.c, turretConfig.shootLightColor.intValue());
@@ -3763,8 +3763,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         PointF pointFK = super.getShadowOffsetForLevel(i);
         if (this.unitConfig.moveYAxisScaleInverted) {
             if (this.unitConfig.projectileTemplatesById[this.unitConfig.turrets[i].a(this)].M && this.G != null && (projectile = this.G[i]) != null && !projectile.isDestroyed) {
-                pointFK.x += projectile.K;
-                pointFK.y += projectile.L;
+                pointFK.x += projectile.trackOffsetX;
+                pointFK.y += projectile.trackOffsetY;
             }
         }
         return pointFK;
@@ -4096,12 +4096,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (attachmentSlotDefinitionDn != null && this.parentEntity != null && attachmentSlotDefinitionDn.j) {
             int i = 0;
             if (projectile != null) {
-                i = projectile.aD;
+                i = projectile.depth;
             }
             if (i >= 0) {
                 Projectile projectileA = Projectile.a(projectile);
                 if (attachmentSlotDefinitionDn.k) {
-                    projectileA.am = 0.0f;
+                    projectileA.globalDamageMultiplier = 0.0f;
                 }
                 f = this.parentEntity.applyDamage(baseUnit, f, projectileA);
                 if (f < 0.0f) {
@@ -4115,7 +4115,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (this.y.armour > 0.0f && f > this.unitConfig.armourMinDamageToKeep) {
             float f2 = this.y.armour;
             if (projectile != null) {
-                f2 -= projectile.an;
+                f2 -= projectile.armourIgnore;
             }
             if (f2 < 0.0f) {
                 f2 = 0.0f;
@@ -4126,7 +4126,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             }
         }
         if (projectile != null) {
-            a(UnitEventType.tookDamage, baseUnit, projectile.aE, (VariableScope) null);
+            a(UnitEventType.tookDamage, baseUnit, projectile.animationSet, (VariableScope) null);
         } else {
             a(UnitEventType.tookDamage, baseUnit);
         }

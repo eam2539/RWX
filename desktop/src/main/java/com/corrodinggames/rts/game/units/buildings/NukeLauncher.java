@@ -328,6 +328,50 @@ public class NukeLauncher extends FactoryWithQueue {
         return super.bV();
     }
 
+    public static Projectile a(BaseUnit baseUnit, float f, float f2, float f3, float f4) {
+        Projectile projectileA = Projectile.a(baseUnit, f, f2);
+        projectileA.S(10);
+        projectileA.textureFrame = (short) 0;
+        projectileA.frameIndex = (short) 1;
+        projectileA.textureType = (short) 1;
+        projectileA.renderScale = 1.0f;
+        projectileA.fliesToPosition = true;
+        projectileA.hasFixedTarget = true;
+        projectileA.targetX = f3;
+        projectileA.targetY = f4;
+        projectileA.lifeTimer = 99999.0f;
+        projectileA.speed = 0.1f;
+        projectileA.targetSpeed = 2.7f;
+        projectileA.color = Color.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PAIRING, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PAIRING, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PAIRING);
+        projectileA.damage = 300.0f;
+        projectileA.isBallistic = true;
+        projectileA.hasTrail = true;
+        projectileA.isSmallExplosion = true;
+        projectileA.C = true;
+        projectileA.isNuke = true;
+        projectileA.minHeight = 80.0f;
+        projectileA.maxHeight = 100.0f;
+        projectileA.verticalVelocity = 1.1f;
+        projectileA.splashDamage = 5400.0f;
+        projectileA.explosionRadius = 250.0f;
+        projectileA.excludesAir = true;
+        projectileA.matchesTargetAltitude = false;
+        projectileA.trackHitUnits = true;
+        projectileA.explosionAnimTimer = 75.0f;
+        projectileA.explosionAnimDuration = projectileA.explosionAnimTimer;
+        projectileA.revealsFog = true;
+        GameEngine gameEngine = GameEngine.getInstance();
+        gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
+        Effect effectCreateLightEffect = gameEngine.effectManager.createLightEffect(projectileA, -1118720);
+        if (effectCreateLightEffect != null) {
+            effectCreateLightEffect.V = 1300.0f;
+            effectCreateLightEffect.W = effectCreateLightEffect.V;
+            effectCreateLightEffect.E = 0.2f;
+            effectCreateLightEffect.G = 1.0f;
+        }
+        return projectileA;
+    }
+
     public void a(float f, float f2) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (this.nukeCount <= 0) {
@@ -342,7 +386,7 @@ public class NukeLauncher extends FactoryWithQueue {
         }
         this.nukeCount--;
         PointF pointFE = E(0);
-        a(this, pointFE.x, pointFE.y, f, f2).i = 5.0f;
+        a(this, pointFE.x, pointFE.y, f, f2).initialDelay = 5.0f;
         Effect effectCreateLightEffect = gameEngine.effectManager.createLightEffect(pointFE.x, pointFE.y, this.posZ, -1127220);
         if (effectCreateLightEffect != null) {
             effectCreateLightEffect.U = 5.0f;
@@ -365,50 +409,6 @@ public class NukeLauncher extends FactoryWithQueue {
             effectCreateSmallExplosionInternal.U = 5.0f + 20.0f;
         }
         gameEngine.soundEngine.playSoundAt(SoundEngine.nukeLaunchSound, 0.27f, 0.8f, pointFE.x, pointFE.y);
-    }
-
-    public static Projectile a(BaseUnit baseUnit, float f, float f2, float f3, float f4) {
-        Projectile projectileA = Projectile.a(baseUnit, f, f2);
-        projectileA.S(10);
-        projectileA.P = (short) 0;
-        projectileA.Q = (short) 1;
-        projectileA.R = (short) 1;
-        projectileA.x = 1.0f;
-        projectileA.aC = true;
-        projectileA.m = true;
-        projectileA.n = f3;
-        projectileA.o = f4;
-        projectileA.h = 99999.0f;
-        projectileA.t = 0.1f;
-        projectileA.r = 2.7f;
-        projectileA.ar = Color.a(255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PAIRING, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PAIRING, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PAIRING);
-        projectileA.U = 300.0f;
-        projectileA.aH = true;
-        projectileA.aM = true;
-        projectileA.aQ = true;
-        projectileA.C = true;
-        projectileA.D = true;
-        projectileA.aI = 80.0f;
-        projectileA.aJ = 100.0f;
-        projectileA.aL = 1.1f;
-        projectileA.Y = 5400.0f;
-        projectileA.Z = 250.0f;
-        projectileA.ad = true;
-        projectileA.ae = false;
-        projectileA.ao = true;
-        projectileA.W = 75.0f;
-        projectileA.X = projectileA.W;
-        projectileA.aY = true;
-        GameEngine gameEngine = GameEngine.getInstance();
-        gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
-        Effect effectCreateLightEffect = gameEngine.effectManager.createLightEffect(projectileA, -1118720);
-        if (effectCreateLightEffect != null) {
-            effectCreateLightEffect.V = 1300.0f;
-            effectCreateLightEffect.W = effectCreateLightEffect.V;
-            effectCreateLightEffect.E = 0.2f;
-            effectCreateLightEffect.G = 1.0f;
-        }
-        return projectileA;
     }
 
     /* JADX INFO: renamed from: M */

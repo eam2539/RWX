@@ -171,9 +171,9 @@ public class UnitSpawnList {
                             fCopyStream2 += (fFastSin * f7) + (fFastCos * f6);
                         }
                         Projectile projectileA = CustomUnit.a(baseUnit, -1, customProjectileTemplateF, fCopyStream, fCopyStream2, f5, fCopyStream3);
-                        projectileA.aD = i;
+                        projectileA.depth = i;
                         if (projectile != null && baseUnit != null) {
-                            customProjectileTemplateF.a(baseUnit, projectileA, projectile.l, projectile.n, projectile.o, -1.0f);
+                            customProjectileTemplateF.a(baseUnit, projectileA, projectile.targetUnit, projectile.targetX, projectile.targetY, -1.0f);
                         }
                         a(projectileA, unitSpawnEntry, baseUnit, projectile, baseUnit2);
                         i2++;

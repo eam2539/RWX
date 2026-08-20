@@ -300,12 +300,12 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
     public void a(BaseUnit baseUnit, int i) {
         PointF pointFE = E(i);
         Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y, this.posZ, i);
-        projectileA.ar = Color.a(255, 150, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 40);
-        projectileA.U = 35.0f;
-        projectileA.l = baseUnit;
-        projectileA.h = 80.0f;
-        projectileA.t = 4.0f;
-        projectileA.x = 2.0f;
+        projectileA.color = Color.a(255, 150, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, 40);
+        projectileA.damage = 35.0f;
+        projectileA.targetUnit = baseUnit;
+        projectileA.lifeTimer = 80.0f;
+        projectileA.speed = 4.0f;
+        projectileA.renderScale = 2.0f;
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.effectManager.createLightEffect(pointFE.x, pointFE.y, this.posZ, -1127220);
         gameEngine.effectManager.createFlameEffect(pointFE.x, pointFE.y, this.posZ, this.movementLevels[i].targetX);

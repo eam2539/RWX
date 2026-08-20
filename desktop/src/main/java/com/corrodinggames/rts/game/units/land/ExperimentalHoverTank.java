@@ -193,8 +193,8 @@ public class ExperimentalHoverTank extends HoverLandUnit {
     public PointF getShadowOffsetForLevel(int i) {
         PointF pointFK = super.getShadowOffsetForLevel(i);
         if (this.i != null) {
-            pointFK.x += this.i.K;
-            pointFK.y += this.i.L;
+            pointFK.x += this.i.trackOffsetX;
+            pointFK.y += this.i.trackOffsetY;
         }
         return pointFK;
     }
@@ -213,7 +213,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
             if (this.i.isDestroyed) {
                 z = true;
             }
-            if (this.i.l != baseUnit) {
+            if (this.i.targetUnit != baseUnit) {
                 z = true;
             }
             if (z) {
@@ -222,20 +222,20 @@ public class ExperimentalHoverTank extends HoverLandUnit {
         }
         float fB = b(i) + e(i) + 5.0f;
         if (this.i != null) {
-            this.i.h = fB;
+            this.i.lifeTimer = fB;
             return;
         }
         Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y);
-        projectileA.U = 380.0f;
-        projectileA.l = baseUnit;
-        projectileA.h = fB;
-        projectileA.B = true;
-        projectileA.A = true;
-        projectileA.aQ = true;
-        projectileA.E = true;
-        projectileA.J = 70.0f;
-        projectileA.F = 230.0f;
-        projectileA.ak = 0.75f;
+        projectileA.damage = 380.0f;
+        projectileA.targetUnit = baseUnit;
+        projectileA.lifeTimer = fB;
+        projectileA.persistsAfterExplosion = true;
+        projectileA.isInstantHit = true;
+        projectileA.isSmallExplosion = true;
+        projectileA.isBeam = true;
+        projectileA.age = 70.0f;
+        projectileA.maxLifeTime = 230.0f;
+        projectileA.targetDamageMultiplier = 0.75f;
         projectileA.drawLayer = this.drawLayer;
         this.i = projectileA;
     }

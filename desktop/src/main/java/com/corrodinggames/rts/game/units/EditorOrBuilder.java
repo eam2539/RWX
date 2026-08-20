@@ -1719,7 +1719,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             Projectile projectileA = NukeLauncher.a(this, pointF.x, pointF.y, pointF.x, pointF.y);
             if (projectileA != null) {
                 projectileA.posZ = 100.0f;
-                projectileA.j = null;
+                projectileA.sourceUnit = null;
             }
         }
         if (abstractUnitAction == editorIconTexture5) {

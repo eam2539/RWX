@@ -265,12 +265,12 @@ public class LaserDefense extends FactoryWithQueue {
         int i = Projectile.a.size;
         for (int i2 = 0; i2 < i; i2++) {
             Projectile projectile = (Projectile) objArrA[i2];
-            if (!projectile.A && !projectile.C && ((projectile.J > 7.0f || (projectile.J > 2.0f && projectile.t > 8.0f)) && !projectile.aS && ((projectile.posX - f) * (projectile.posX - f)) + ((projectile.posY - f2) * (projectile.posY - f2)) < f6 && projectile.posZ >= -1.0f)) {
+            if (!projectile.isInstantHit && !projectile.C && ((projectile.age > 7.0f || (projectile.age > 2.0f && projectile.speed > 8.0f)) && !projectile.removeRequested && ((projectile.posX - f) * (projectile.posX - f)) + ((projectile.posY - f2) * (projectile.posY - f2)) < f6 && projectile.posZ >= -1.0f)) {
                 boolean z = false;
-                if (projectile.l != null && orderableUnit.team.d(projectile.l.team)) {
+                if (projectile.targetUnit != null && orderableUnit.team.d(projectile.targetUnit.team)) {
                     z = true;
                 }
-                if (!z && projectile.j != null && orderableUnit.team.c(projectile.j.team)) {
+                if (!z && projectile.sourceUnit != null && orderableUnit.team.c(projectile.sourceUnit.team)) {
                     z = true;
                 }
                 if (z) {
@@ -291,8 +291,8 @@ public class LaserDefense extends FactoryWithQueue {
                         effectCreateEffectInternal.G = 1.1f;
                         effectCreateEffectInternal.F = 0.7f;
                     }
-                    projectile.H -= 1.01f;
-                    if (projectile.H <= 0.0f) {
+                    projectile.damageMultiplier -= 1.01f;
+                    if (projectile.damageMultiplier <= 0.0f) {
                         projectile.d();
                         Effect effectCreateEffectInternal2 = gameEngine.effectManager.createEffectInternal(projectile.posX, projectile.posY, projectile.posZ, EffectType.custom, false, EffectQuality.high);
                         if (effectCreateEffectInternal2 != null) {
