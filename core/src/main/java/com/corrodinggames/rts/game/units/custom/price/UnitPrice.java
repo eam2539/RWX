@@ -247,7 +247,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
             iMin = Utility.min(iMin, (int) (baseUnit.shield / this.e));
         }
         if (this.f > 0) {
-            iMin = Utility.min(iMin, baseUnit.unitLevel / this.f);
+            iMin = Utility.min(iMin, baseUnit.ammo / this.f);
         }
         if (!this.k.c()) {
             iMin = Utility.min(iMin, StoredResources.a(this.k, baseUnit));
@@ -272,7 +272,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         if (this.e > 0.0f && baseUnit.shield < ((double) this.e) * d) {
             return false;
         }
-        if ((this.f > 0 && baseUnit.unitLevel < ((double) this.f) * d) || !f(baseUnit)) {
+        if ((this.f > 0 && baseUnit.ammo < ((double) this.f) * d) || !f(baseUnit)) {
             return false;
         }
         if (!this.k.c() && !StoredResources.a(this.k, baseUnit, d)) {
@@ -295,7 +295,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         if (this.e > 0.0f && baseUnit.shield < this.e) {
             return false;
         }
-        if ((this.f > 0 && baseUnit.unitLevel < this.f) || !f(baseUnit)) {
+        if ((this.f > 0 && baseUnit.ammo < this.f) || !f(baseUnit)) {
             return false;
         }
         if (!this.k.c() && !StoredResources.b(this.k, baseUnit)) {
@@ -328,17 +328,17 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         if (baseUnit.currentHealth > baseUnit.maxHealth) {
             baseUnit.currentHealth = baseUnit.maxHealth;
         }
-        if (baseUnit.unitLevel < 0) {
-            baseUnit.unitLevel = 0;
+        if (baseUnit.ammo < 0) {
+            baseUnit.ammo = 0;
         }
     }
 
     public void e(BaseUnit baseUnit) {
         if (this.h != 0) {
-            baseUnit.unitExperience &= this.h ^ (-1);
+            baseUnit.unitFlags &= this.h ^ (-1);
         }
         if (this.g != 0) {
-            baseUnit.unitExperience |= this.g;
+            baseUnit.unitFlags |= this.g;
         }
     }
 
@@ -357,10 +357,10 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
     }
 
     public boolean f(BaseUnit baseUnit) {
-        if (this.i != 0 && !b(baseUnit.unitExperience, this.i)) {
+        if (this.i != 0 && !b(baseUnit.unitFlags, this.i)) {
             return false;
         }
-        if (this.j != 0 && c(baseUnit.unitExperience, this.j)) {
+        if (this.j != 0 && c(baseUnit.unitFlags, this.j)) {
             return false;
         }
         return true;
@@ -380,7 +380,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         baseUnit.currentEnergy -= this.c;
         baseUnit.currentHealth -= this.d;
         baseUnit.shield -= this.e;
-        baseUnit.unitLevel -= this.f;
+        baseUnit.ammo -= this.f;
         e(baseUnit);
         if (!this.k.c()) {
             StoredResources.c(this.k, baseUnit);
@@ -394,7 +394,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         baseUnit.currentEnergy = (float) (((double) baseUnit.currentEnergy) - (((double) this.c) * d));
         baseUnit.currentHealth = (float) (((double) baseUnit.currentHealth) - (((double) this.d) * d));
         baseUnit.shield = (float) (((double) baseUnit.shield) - (((double) this.e) * d));
-        baseUnit.unitLevel = (int) (((double) baseUnit.unitLevel) - (((double) this.f) * d));
+        baseUnit.ammo = (int) (((double) baseUnit.ammo) - (((double) this.f) * d));
         e(baseUnit);
         if (!this.k.c()) {
             StoredResources.b(this.k, baseUnit, d);
@@ -411,7 +411,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         baseUnit.currentEnergy += this.c;
         baseUnit.currentHealth += this.d;
         baseUnit.shield += this.e;
-        baseUnit.unitLevel += this.f;
+        baseUnit.ammo += this.f;
         e(baseUnit);
         if (!this.k.c()) {
             StoredResources.d(this.k, baseUnit);
@@ -424,7 +424,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         baseUnit.currentEnergy += this.c;
         baseUnit.currentHealth += this.d;
         baseUnit.shield += this.e;
-        baseUnit.unitLevel += this.f;
+        baseUnit.ammo += this.f;
         e(baseUnit);
         if (!this.k.c()) {
             StoredResources.d(this.k, baseUnit);
@@ -439,7 +439,7 @@ public class UnitPrice extends PriceCondition implements Comparable<UnitPrice> {
         baseUnit.currentEnergy = (float) (((double) baseUnit.currentEnergy) + (((double) this.c) * d));
         baseUnit.currentHealth = (float) (((double) baseUnit.currentHealth) + (((double) this.d) * d));
         baseUnit.shield = (float) (((double) baseUnit.shield) + (((double) this.e) * d));
-        baseUnit.unitLevel = (int) (((double) baseUnit.unitLevel) + (((double) this.f) * d));
+        baseUnit.ammo = (int) (((double) baseUnit.ammo) + (((double) this.f) * d));
         e(baseUnit);
         if (!this.k.c()) {
             StoredResources.c(this.k, baseUnit, d);

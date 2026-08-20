@@ -286,7 +286,7 @@ public final class UnitSpatialIndex {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit.isDead || ((int) (baseUnit.posX * f)) != baseUnit.unitAnimationFrame || ((int) (baseUnit.posY * f2)) != baseUnit.unitAnimationSpeed || baseUnit.team == null || baseUnit.unitAnimationType != baseUnit.team.teamId) {
+            if (baseUnit.isDead || ((int) (baseUnit.posX * f)) != baseUnit.spatialIndexTileX || ((int) (baseUnit.posY * f2)) != baseUnit.spatialIndexTileY || baseUnit.team == null || baseUnit.spatialIndexTeamId != baseUnit.team.teamId) {
                 a(baseUnit);
             }
         }
@@ -297,15 +297,15 @@ public final class UnitSpatialIndex {
             if (GameEngine.getInstance().currentTick != 0) {
                 GameEngine.logColored("updateUnitGeoIndex: areaList not active");
             }
-            baseUnit.unitAnimationFrame = -1;
-            baseUnit.unitAnimationSpeed = -1;
+            baseUnit.spatialIndexTileX = -1;
+            baseUnit.spatialIndexTileY = -1;
             return;
         }
         if (baseUnit.isDead) {
-            if (baseUnit.unitAnimationFrame != -1 && baseUnit.unitAnimationSpeed != -1) {
-                this.e[baseUnit.unitAnimationFrame][baseUnit.unitAnimationSpeed].b(baseUnit);
-                baseUnit.unitAnimationFrame = -1;
-                baseUnit.unitAnimationSpeed = -1;
+            if (baseUnit.spatialIndexTileX != -1 && baseUnit.spatialIndexTileY != -1) {
+                this.e[baseUnit.spatialIndexTileX][baseUnit.spatialIndexTileY].b(baseUnit);
+                baseUnit.spatialIndexTileX = -1;
+                baseUnit.spatialIndexTileY = -1;
                 return;
             }
             return;
@@ -316,19 +316,19 @@ public final class UnitSpatialIndex {
         if (baseUnit.team != null) {
             i = baseUnit.team.teamId;
         }
-        if (baseUnit.unitAnimationFrame == iA && baseUnit.unitAnimationSpeed == iB && baseUnit.unitAnimationType == i) {
+        if (baseUnit.spatialIndexTileX == iA && baseUnit.spatialIndexTileY == iB && baseUnit.spatialIndexTeamId == i) {
             return;
         }
-        if (baseUnit.unitAnimationFrame != -1 && baseUnit.unitAnimationSpeed != -1) {
-            this.e[baseUnit.unitAnimationFrame][baseUnit.unitAnimationSpeed].b(baseUnit);
+        if (baseUnit.spatialIndexTileX != -1 && baseUnit.spatialIndexTileY != -1) {
+            this.e[baseUnit.spatialIndexTileX][baseUnit.spatialIndexTileY].b(baseUnit);
         }
-        baseUnit.unitAnimationFrame = iA;
-        baseUnit.unitAnimationSpeed = iB;
-        baseUnit.unitAnimationType = i;
+        baseUnit.spatialIndexTileX = iA;
+        baseUnit.spatialIndexTileY = iB;
+        baseUnit.spatialIndexTeamId = i;
         if (i > this.m && this.m < PlayerTeam.TEAM_NEUTRAL) {
             this.m = i;
         }
-        this.e[baseUnit.unitAnimationFrame][baseUnit.unitAnimationSpeed].a(baseUnit);
+        this.e[baseUnit.spatialIndexTileX][baseUnit.spatialIndexTileY].a(baseUnit);
     }
 
     public void a(TileMap tileMap) {

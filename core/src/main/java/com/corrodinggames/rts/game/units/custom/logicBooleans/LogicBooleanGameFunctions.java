@@ -588,7 +588,7 @@ public class LogicBooleanGameFunctions {
         public boolean read(OrderableUnit orderableUnit) {
             int number = (int) this.id.readNumber(getParameterContext(orderableUnit));
             if (number >= 0 && number <= 31) {
-                if (HasFlagBoolean.isFlagSet(orderableUnit.unitExperience, 1 << number)) {
+                if (HasFlagBoolean.isFlagSet(orderableUnit.unitFlags, 1 << number)) {
                     return true;
                 }
                 return false;
@@ -636,7 +636,7 @@ public class LogicBooleanGameFunctions {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean
         public boolean read(OrderableUnit orderableUnit) {
             boolean z = true;
-            if (this.flagMask != 0 && !isFlagSet(orderableUnit.unitExperience, this.flagMask)) {
+            if (this.flagMask != 0 && !isFlagSet(orderableUnit.unitFlags, this.flagMask)) {
                 z = false;
             }
             return z;
@@ -1188,7 +1188,7 @@ public class LogicBooleanGameFunctions {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
         public float getValue(OrderableUnit orderableUnit) {
-            return orderableUnit.unitLevel;
+            return orderableUnit.ammo;
         }
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
@@ -1768,7 +1768,7 @@ public class LogicBooleanGameFunctions {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
         public float getValue(OrderableUnit orderableUnit) {
-            return orderableUnit.unitLevel + orderableUnit.by().f;
+            return orderableUnit.ammo + orderableUnit.by().f;
         }
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean

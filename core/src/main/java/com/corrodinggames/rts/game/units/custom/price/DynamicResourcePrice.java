@@ -186,18 +186,18 @@ public class DynamicResourcePrice extends PriceCondition {
 
     public void f(BaseUnit baseUnit) {
         if (this.d != 0) {
-            baseUnit.unitExperience &= this.d ^ (-1);
+            baseUnit.unitFlags &= this.d ^ (-1);
         }
         if (this.c != 0) {
-            baseUnit.unitExperience |= this.c;
+            baseUnit.unitFlags |= this.c;
         }
     }
 
     public boolean g(BaseUnit baseUnit) {
-        if (this.e != 0 && !a(baseUnit.unitExperience, this.e)) {
+        if (this.e != 0 && !a(baseUnit.unitFlags, this.e)) {
             return false;
         }
-        if (this.f != 0 && b(baseUnit.unitExperience, this.f)) {
+        if (this.f != 0 && b(baseUnit.unitFlags, this.f)) {
             return false;
         }
         return true;

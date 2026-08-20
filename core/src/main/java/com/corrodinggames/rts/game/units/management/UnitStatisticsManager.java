@@ -20,7 +20,7 @@ public class UnitStatisticsManager {
 
     public void a(BaseUnit baseUnit) {
         this.a.a(baseUnit);
-        int i = baseUnit.unitAnimationType;
+        int i = baseUnit.spatialIndexTeamId;
         if (i >= 0) {
             this.b[i].a(baseUnit);
         } else if (i == -1) {
@@ -35,7 +35,7 @@ public class UnitStatisticsManager {
 
     public void b(BaseUnit baseUnit) {
         this.a.b(baseUnit);
-        int i = baseUnit.unitAnimationType;
+        int i = baseUnit.spatialIndexTeamId;
         if (i >= 0) {
             this.b[i].b(baseUnit);
         } else if (i == -1) {

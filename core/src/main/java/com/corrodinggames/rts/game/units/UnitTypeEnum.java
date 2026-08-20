@@ -2083,8 +2083,8 @@ public enum UnitTypeEnum implements UnitType {
         if (baseUnit != null) {
             StoredResources storedResources = baseUnitCanAttack.unitCustomEffects;
             baseUnitCanAttack.unitCustomEffects = baseUnit.unitCustomEffects;
-            int i2 = baseUnitCanAttack.unitLevel;
-            baseUnitCanAttack.unitLevel = baseUnit.unitLevel;
+            int i2 = baseUnitCanAttack.ammo;
+            baseUnitCanAttack.ammo = baseUnit.ammo;
             float f9 = baseUnitCanAttack.currentHealth;
             baseUnitCanAttack.currentHealth = baseUnit.currentHealth;
             float f10 = baseUnitCanAttack.currentEnergy;
@@ -2095,7 +2095,7 @@ public enum UnitTypeEnum implements UnitType {
             baseUnitCanAttack.c(0.0f);
             baseUnitCanAttack.a(0.0f, false);
             baseUnitCanAttack.unitCustomEffects = storedResources;
-            baseUnitCanAttack.unitLevel = i2;
+            baseUnitCanAttack.ammo = i2;
             baseUnitCanAttack.currentHealth = f9;
             baseUnitCanAttack.currentEnergy = f10;
             baseUnitCanAttack.unitVariables = variableScope;
