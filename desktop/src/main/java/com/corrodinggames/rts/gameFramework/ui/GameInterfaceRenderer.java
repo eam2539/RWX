@@ -822,10 +822,10 @@ public class GameInterfaceRenderer extends Serializable {
             if (baseUnit.objectId != 0) {
                 str2 = str2 + "id: " + baseUnit.objectId + str;
             }
-            if (baseUnit.unitExperience != 0) {
+            if (baseUnit.unitFlags != 0) {
                 String str5 = VariableScope.nullOrMissingString;
                 for (int i = 0; i < 32; i++) {
-                    if (UnitPrice.a(baseUnit.unitExperience, i)) {
+                    if (UnitPrice.a(baseUnit.unitFlags, i)) {
                         if (str5.length() > 0) {
                             str5 = str5 + ",";
                         }
@@ -834,8 +834,8 @@ public class GameInterfaceRenderer extends Serializable {
                 }
                 str2 = str2 + "flags: " + str5 + str;
             }
-            if (baseUnit.unitLevel != 0) {
-                str2 = str2 + "ammo: " + baseUnit.unitLevel + str;
+            if (baseUnit.ammo != 0) {
+                str2 = str2 + "ammo: " + baseUnit.ammo + str;
             }
             if (!baseUnit.isUnitParalyzed) {
                 str2 = (str2 + "x: " + Utility.padString(baseUnit.posX) + str) + "y: " + Utility.padString(baseUnit.posY) + str;

@@ -211,16 +211,16 @@ public abstract class BaseUnit extends SizedObject {
 
     /* JADX INFO: renamed from: cB */
     public float currentEnergy;
-    public float cC;
+    public float accumulatedHpChange;
 
     /* JADX INFO: renamed from: cD */
-    public float unitDefenseMultiplier;
+    public float hpChangeDecayRate;
 
     /* JADX INFO: renamed from: cE */
-    public int unitLevel;
+    public int ammo;
 
     /* JADX INFO: renamed from: cF */
-    public int unitExperience;
+    public int unitFlags;
 
     /* JADX INFO: renamed from: cG */
     public boolean isSelected;
@@ -286,13 +286,13 @@ public abstract class BaseUnit extends SizedObject {
     public static final Paint dk;
 
     /* JADX INFO: renamed from: dl */
-    public int unitAnimationFrame;
+    public int spatialIndexTileX;
 
     /* JADX INFO: renamed from: dm */
-    public int unitAnimationSpeed;
+    public int spatialIndexTileY;
 
     /* JADX INFO: renamed from: dn */
-    public int unitAnimationType;
+    public int spatialIndexTeamId;
 
     /* JADX INFO: renamed from: do */
     public float unitAnimationOffset;
@@ -392,9 +392,9 @@ public abstract class BaseUnit extends SizedObject {
         this.parentEntity = null;
         this.attachmentData = null;
         this.attachmentStartTimeMillis = -9999;
-        this.unitAnimationFrame = -1;
-        this.unitAnimationSpeed = -1;
-        this.unitAnimationType = -99;
+        this.spatialIndexTileX = -1;
+        this.spatialIndexTileY = -1;
+        this.spatialIndexTeamId = -99;
         this.unitAnimationRotation = 70.0f;
         this.unitCustomEffects = new StoredResources();
         this.unitCustomComponents = new AnimationTrackingManager();
@@ -717,8 +717,8 @@ public abstract class BaseUnit extends SizedObject {
         }
         gameOutputStream.writeFloat(this.unitArmor);
         gameOutputStream.writeUnitIdIfAlive(this.unitTarget1);
-        gameOutputStream.writeInt(this.unitLevel);
-        gameOutputStream.writeInt(this.unitExperience);
+        gameOutputStream.writeInt(this.ammo);
+        gameOutputStream.writeInt(this.unitFlags);
         gameOutputStream.writeInt(this.timeAliveStamp);
         gameOutputStream.writeInt(this.customTimerStamp);
         gameOutputStream.writeInt(this.lastConvertedStamp);
@@ -840,8 +840,8 @@ public abstract class BaseUnit extends SizedObject {
             this.unitTarget1 = gameInputStream.readBaseUnit();
         }
         if (b >= 15) {
-            this.unitLevel = gameInputStream.readInt();
-            this.unitExperience = gameInputStream.readInt();
+            this.ammo = gameInputStream.readInt();
+            this.unitFlags = gameInputStream.readInt();
         }
         if (b >= 16) {
             this.timeAliveStamp = gameInputStream.readInt();
@@ -1121,9 +1121,9 @@ public abstract class BaseUnit extends SizedObject {
                     gameEngine.renderGraphicsEngine.a(dr, paintA);
                     dr.a(f4 - f3, f5 + f6, (f4 - f3) + f7, f5 + f6 + i2);
                     gameEngine.renderGraphicsEngine.a(dr, paintA2);
-                    if (this.cC != 0.0f && bU() && gameEngine.settingsEngine.showHpChanges) {
+                    if (this.accumulatedHpChange != 0.0f && bU() && gameEngine.settingsEngine.showHpChanges) {
                         float fX = x();
-                        float f9 = fX + ((-this.cC) / this.maxHealth);
+                        float f9 = fX + ((-this.accumulatedHpChange) / this.maxHealth);
                         if (f9 < 0.0f) {
                             f9 = 0.0f;
                         }
@@ -1496,11 +1496,11 @@ public abstract class BaseUnit extends SizedObject {
         } else if (this.unitAnimationScale != 0.0f) {
             this.unitAnimationScale = 0.0f;
         }
-        if (this.cC != 0.0f) {
-            this.cC = Utility.moveTowardsZero(this.cC, this.maxHealth * this.unitDefenseMultiplier * 0.005f * f);
-            this.unitDefenseMultiplier += f + (0.2f * this.unitDefenseMultiplier * f);
-            if (this.cC == 0.0f) {
-                this.unitDefenseMultiplier = 0.0f;
+        if (this.accumulatedHpChange != 0.0f) {
+            this.accumulatedHpChange = Utility.moveTowardsZero(this.accumulatedHpChange, this.maxHealth * this.hpChangeDecayRate * 0.005f * f);
+            this.hpChangeDecayRate += f + (0.2f * this.hpChangeDecayRate * f);
+            if (this.accumulatedHpChange == 0.0f) {
+                this.hpChangeDecayRate = 0.0f;
             }
         }
         if (this.currentHealth <= 0.0f) {
@@ -1584,12 +1584,12 @@ public abstract class BaseUnit extends SizedObject {
                 f5 -= this.currentHealth;
                 float f9 = f6 + this.currentHealth;
                 o(0.0f);
-                this.cC += this.currentHealth;
+                this.accumulatedHpChange += this.currentHealth;
             } else {
                 o(this.currentHealth - f8);
                 float f10 = f6 + f8;
                 f5 -= f8;
-                this.cC -= f8;
+                this.accumulatedHpChange -= f8;
             }
         }
         this.bs = gameEngine.gameTimeMillis;

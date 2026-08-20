@@ -32,8 +32,8 @@ public class LagHidingManager {
         if (unitSnapshotA == null) {
             unitSnapshotA = new UnitSnapshot();
             unitSnapshotA.a = baseUnit.objectId;
-            unitSnapshotA.b = baseUnit.unitLevel;
-            unitSnapshotA.c = baseUnit.unitExperience;
+            unitSnapshotA.b = baseUnit.ammo;
+            unitSnapshotA.c = baseUnit.unitFlags;
             unitSnapshotA.d = GameEngine.getInstance().networkEngine.nextBlockingFrame;
             a.add(unitSnapshotA);
         }
@@ -70,8 +70,8 @@ public class LagHidingManager {
         UnitSnapshot unitSnapshotA = a(baseUnit.objectId);
         if (unitSnapshotA != null) {
             b.team = baseUnit.team;
-            b.unitLevel = unitSnapshotA.b;
-            b.unitExperience = unitSnapshotA.c;
+            b.ammo = unitSnapshotA.b;
+            b.unitFlags = unitSnapshotA.c;
             StoredResources unitAICombatRange = b.getCustomResources();
             b.a(unitSnapshotA.e);
             boolean zB = unitPrice.b(b);
@@ -84,13 +84,13 @@ public class LagHidingManager {
     public static boolean a(LogicBoolean logicBoolean, OrderableUnit orderableUnit) {
         UnitSnapshot unitSnapshotA = a(orderableUnit.objectId);
         if (unitSnapshotA != null) {
-            int i = orderableUnit.unitLevel;
-            int i2 = orderableUnit.unitExperience;
-            orderableUnit.unitLevel = unitSnapshotA.b;
-            orderableUnit.unitExperience = unitSnapshotA.c;
+            int i = orderableUnit.ammo;
+            int i2 = orderableUnit.unitFlags;
+            orderableUnit.ammo = unitSnapshotA.b;
+            orderableUnit.unitFlags = unitSnapshotA.c;
             boolean z = logicBoolean.read(orderableUnit);
-            orderableUnit.unitLevel = i;
-            orderableUnit.unitExperience = i2;
+            orderableUnit.ammo = i;
+            orderableUnit.unitFlags = i2;
             return z;
         }
         return logicBoolean.read(orderableUnit);

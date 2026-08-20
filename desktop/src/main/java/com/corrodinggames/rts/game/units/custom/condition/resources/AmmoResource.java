@@ -15,16 +15,16 @@ public class AmmoResource extends AbstractResource {
 
     @Override // com.corrodinggames.rts.game.units.custom.resources.Resource
     public double a(BaseUnit baseUnit) {
-        return baseUnit.unitLevel;
+        return baseUnit.ammo;
     }
 
     @Override // com.corrodinggames.rts.game.units.custom.resources.Resource
     public void a(BaseUnit baseUnit, double d) {
-        baseUnit.unitLevel = (int) d;
+        baseUnit.ammo = (int) d;
     }
 
     @Override // com.corrodinggames.rts.game.units.custom.resources.Resource
     public void b(BaseUnit baseUnit, double d) {
-        baseUnit.unitLevel = (int) (((double) baseUnit.unitLevel) + d);
+        baseUnit.ammo = (int) (((double) baseUnit.ammo) + d);
     }
 }
