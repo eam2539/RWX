@@ -2524,25 +2524,39 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	FIELD bC unitCounter I
 		COMMENT VERIFIED
 	FIELD bD isVisible Z
+		COMMENT VERIFIED
 	FIELD bK selectedUnitColorFilter Landroid/graphics/LightingColorFilter;
 	FIELD bL isHighlighted Z
+		COMMENT VERIFIED
 	FIELD bM isActive Z
+		COMMENT VERIFIED
 	FIELD bN isAIUnit Z
+		COMMENT VERIFIED
 	FIELD bO changeTeam Z
+		COMMENT VERIFIED
 	FIELD bP isTargetable Z
+		COMMENT VERIFIED
 	FIELD bQ targetUnit Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
 	FIELD bR attackTargetUnit Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
 	FIELD bt unitTarget1 Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
 	FIELD bT isAlive Z
 	FIELD bu unitTarget2 Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
 	FIELD bU collisionGroup I
 	FIELD bv unitTarget3 Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
 	FIELD bV isDead Z
 	FIELD bw unitVariables Lcom/corrodinggames/rts/game/units/custom/logicBooleans/VariableScope;
+		COMMENT VERIFIED
 	FIELD bW unitCreationTime J
+		COMMENT VERIFIED
 	FIELD bx price Lcom/corrodinggames/rts/game/units/custom/d/b;
 		COMMENT VERIFIED
 	FIELD bX team Lcom/corrodinggames/rts/game/n;
+		COMMENT VERIFIED
 	FIELD by additionalCost Lcom/corrodinggames/rts/game/units/custom/d/b;
 		COMMENT VERIFIED
 	FIELD bY isHidden Z
@@ -2552,23 +2566,31 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	FIELD ca worldY F
 	FIELD cA unitEnergyMax F
 	FIELD cb collisionActive Z
+		COMMENT VERIFIED
 	FIELD cB currentEnergy F
+	FIELD cC accumulatedHpChange F
 	FIELD cc velocityX F
 	FIELD cd velocityY F
-	FIELD cD unitDefenseMultiplier F
+	FIELD cD hpChangeDecayRate F
+		COMMENT VERIFIED
 	FIELD ce direction F
-	FIELD cE unitLevel I
+		COMMENT VERIFIED
+	FIELD cE ammo I
 	FIELD cf rotation F
-	FIELD cF unitExperience I
+	FIELD cF unitFlags I
 	FIELD cg rotationSpeed F
+		COMMENT VERIFIED
 	FIELD cG isSelected Z
 	FIELD ch targetRotation F
 	FIELD cH lastSelectedTick I
 	FIELD ci isRotating Z
+		COMMENT VERIFIED
 	FIELD cI wasSelectedBeforeDrag Z
 	FIELD cj radius F
 	FIELD cJ selectionFlashTimer F
+		COMMENT VERIFIED
 	FIELD ck displayRadius F
+		COMMENT VERIFIED
 	FIELD cK isMoving Z
 	FIELD cl spawnExitLockTimer F
 	FIELD cL movementLevels [Lcom/corrodinggames/rts/game/units/ap;
@@ -2579,18 +2601,23 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 		COMMENT VERIFIED
 	FIELD co isUnitStunned Z
 	FIELD cO parentEntity Lcom/corrodinggames/rts/game/units/y;
+		COMMENT VERIFIED
 	FIELD cp isUnitParalyzed Z
 	FIELD cP attachmentData Lcom/corrodinggames/rts/game/units/custom/b/n;
+		COMMENT VERIFIED
 	FIELD cq isUnitInvulnerable Z
 	FIELD cQ attachmentStartTimeMillis I
 		COMMENT VERIFIED
 	FIELD cr isUnitUntargetable Z
+		COMMENT VERIFIED
 	FIELD cR hasMinimapPosition Z
 		COMMENT VERIFIED
 	FIELD cs isUnitDisabled Z
+		COMMENT VERIFIED
 	FIELD cS minimapScreenX I
 		COMMENT VERIFIED
 	FIELD ct isUnitCapturable Z
+		COMMENT VERIFIED
 	FIELD cT minimapScreenY I
 		COMMENT VERIFIED
 	FIELD cu currentHealth F
@@ -2604,16 +2631,27 @@ CLASS com/corrodinggames/rts/game/units/am com/corrodinggames/rts/game/units/Bas
 	FIELD cy unitShieldMax F
 	FIELD cz energy F
 	FIELD dF unitEffects [Lcom/corrodinggames/rts/game/units/an;
+		COMMENT VERIFIED
 	FIELD dH unitCustomEffects Lcom/corrodinggames/rts/game/units/custom/e/f;
+		COMMENT VERIFIED
 	FIELD dI unitCustomComponents Lcom/corrodinggames/rts/game/units/custom/c/c;
+		COMMENT VERIFIED
 	FIELD dJ unitCustomData Lcom/corrodinggames/rts/game/units/custom/d/b;
-	FIELD dl unitAnimationFrame I
-	FIELD dm unitAnimationSpeed I
-	FIELD dn unitAnimationType I
+		COMMENT VERIFIED
+	FIELD dl spatialIndexTileX I
+		COMMENT VERIFIED
+	FIELD dm spatialIndexTileY I
+		COMMENT VERIFIED
+	FIELD dn spatialIndexTeamId I
+		COMMENT VERIFIED
 	FIELD do unitAnimationOffset F
+		COMMENT VERIFIED
 	FIELD dp unitAnimationScale F
+		COMMENT VERIFIED
 	FIELD dq unitAnimationRotation F
+		COMMENT VERIFIED
 	FIELD dz unitType Lcom/corrodinggames/rts/game/units/as;
+		COMMENT VERIFIED
 	METHOD a setPaintTransparent (Landroid/graphics/Paint;)V
 		COMMENT VERIFIED
 	METHOD a setPaintTransparency (Landroid/graphics/Paint;Z)V
@@ -4772,6 +4810,7 @@ CLASS com/corrodinggames/rts/game/units/w com/corrodinggames/rts/game/units/Mova
 CLASS com/corrodinggames/rts/game/units/x com/corrodinggames/rts/game/units/DummyUnit
 CLASS com/corrodinggames/rts/game/units/y com/corrodinggames/rts/game/units/OrderableUnit
 	FIELD a blockedRecoveryMisses I
+		COMMENT VERIFIED
 	FIELD A cachedSelectedPaintColor I
 	FIELD ad transportedBy Lcom/corrodinggames/rts/game/units/y;
 	FIELD aE defaultTeamPaint Lcom/corrodinggames/rts/gameFramework/m/ag;
@@ -4781,11 +4820,14 @@ CLASS com/corrodinggames/rts/game/units/y com/corrodinggames/rts/game/units/Orde
 	FIELD aK nearbyUnitDistances [F
 	FIELD aL nextCollisionQueryTick I
 	FIELD av pathPositions [Lcom/corrodinggames/rts/game/units/af;
+		COMMENT VERIFIED
 	FIELD aw activePathCount I
+		COMMENT VERIFIED
 	FIELD aX overlayFilterLightGreen Landroid/graphics/PorterDuffColorFilter;
 	FIELD aY overlayFilterGreen Landroid/graphics/PorterDuffColorFilter;
 	FIELD aZ overlayFilterRed Landroid/graphics/PorterDuffColorFilter;
 	FIELD b blockedRecoveryTime F
+		COMMENT VERIFIED
 	FIELD B paralyzedOverlayPaint Landroid/graphics/Paint;
 	FIELD ba overlayFilterBlue Landroid/graphics/PorterDuffColorFilter;
 	FIELD bb overlayPaint1 Landroid/graphics/Paint;
@@ -4798,47 +4840,77 @@ CLASS com/corrodinggames/rts/game/units/y com/corrodinggames/rts/game/units/Orde
 	FIELD bk tempPoint1 Landroid/graphics/Point;
 	FIELD bl tempPoint2 Landroid/graphics/Point;
 	FIELD c moveThrottle F
+		COMMENT VERIFIED
 	FIELD d transportRecoveryTime F
+		COMMENT VERIFIED
 	FIELD D baseTeamTint Lcom/corrodinggames/rts/gameFramework/m/ag;
 	FIELD e transportRecoveryDelay F
+		COMMENT VERIFIED
 	FIELD E selectedTeamTint Lcom/corrodinggames/rts/gameFramework/m/ag;
 	FIELD f waypointCount I
+		COMMENT VERIFIED
 	FIELD g waypoints [Lcom/corrodinggames/rts/game/units/au;
+		COMMENT VERIFIED
 	FIELD h isActing Z
 	FIELD i lastReclaimSearchTick I
+		COMMENT VERIFIED
 	FIELD j canAttack Z
+		COMMENT VERIFIED
 	FIELD k isPathingActive Z
+		COMMENT VERIFIED
 	FIELD l pathTargetX F
+		COMMENT VERIFIED
 	FIELD m pathTargetY F
+		COMMENT VERIFIED
 	FIELD M baseTexture Lcom/corrodinggames/rts/gameFramework/m/e;
+		COMMENT VERIFIED
 	FIELD n pathTargetRadius I
+		COMMENT VERIFIED
 	FIELD N shadowTexture Lcom/corrodinggames/rts/gameFramework/m/e;
+		COMMENT VERIFIED
 	FIELD o lastPathTargetX F
+		COMMENT VERIFIED
 	FIELD p lastPathTargetY F
+		COMMENT VERIFIED
 	FIELD P attackMode Lcom/corrodinggames/rts/game/units/a;
+		COMMENT VERIFIED
 	FIELD q pathRetryCount B
+		COMMENT VERIFIED
 	FIELD Q lastAttackTick I
+		COMMENT VERIFIED
 	FIELD r repathDistanceThreshold I
+		COMMENT VERIFIED
 	FIELD R attackTarget Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
 	FIELD S turretRotation F
+		COMMENT VERIFIED
 	FIELD s repathCooldown F
 		COMMENT VERIFIED
 	FIELD t isLowPriority Z
+		COMMENT VERIFIED
 	FIELD T targetTurretRotation F
+		COMMENT VERIFIED
 	FIELD u isPathIncomplete Z
+		COMMENT VERIFIED
 	FIELD U turretTurnSpeed F
+		COMMENT VERIFIED
 	FIELD V wayPointTimer F
+		COMMENT VERIFIED
 	FIELD v totalPathPositions I
 		COMMENT VERIFIED
 	FIELD W pathRetryTimer F
+		COMMENT VERIFIED
 	FIELD w longRangePathing I
 		COMMENT VERIFIED
 	FIELD x cachedBasePaint Lcom/corrodinggames/rts/gameFramework/m/ag;
 	FIELD X previousPathRetryTimer F
+		COMMENT VERIFIED
 	FIELD y cachedBasePaintColor I
 	FIELD Y waypointDwellTimer F
+		COMMENT VERIFIED
 	FIELD z cachedSelectedPaint Lcom/corrodinggames/rts/gameFramework/m/ag;
 	FIELD Z lastDamagedBy Lcom/corrodinggames/rts/game/units/am;
+		COMMENT VERIFIED
 	FIELD ab pendingCredits F
 		COMMENT VERIFIED
 	FIELD ae isTransportAttached Z
