@@ -281,7 +281,7 @@ public class Tree extends NaturalUnit {
             }
             this.currentHealth -= (((baseUnit.getPushMass() / 3000.0f) * this.maxHealth) * 0.06f) * f;
             this.i = 1.0f;
-            this.unitAnimationScale = 1000.0f;
+            this.damageEffectDurationTimer = 1000.0f;
             if (this.currentHealth <= 0.0f) {
                 this.rotationSpeed = Utility.getAngleBetweenPoints(this.posX, this.posY, baseUnit.posX, baseUnit.posY) + 180.0f;
                 k();

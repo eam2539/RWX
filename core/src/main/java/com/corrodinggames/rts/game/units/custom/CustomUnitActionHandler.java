@@ -70,7 +70,7 @@ public class CustomUnitActionHandler {
         }
         Iterator it = this.actions.iterator();
         while (it.hasNext()) {
-            customUnit.unitEffectManager.a((PopupQueueAction) ((AbstractUnitAction) it.next()), false, pointF, baseUnit);
+            customUnit.factoryQueueManager.a((PopupQueueAction) ((AbstractUnitAction) it.next()), false, pointF, baseUnit);
         }
     }
 }

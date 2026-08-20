@@ -167,7 +167,7 @@ public class AttachmentAction extends LogicAction {
                             }
                         }
                     } else {
-                        Iterator it4 = customUnit.unitConfig.energyCanTransferToOtherUnits.iterator();
+                        Iterator it4 = customUnit.unitConfig.attachmentSlotDefinitions.iterator();
                         while (true) {
                             if (!it4.hasNext()) {
                                 break;

@@ -54,7 +54,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     PointF[] targetPoints;
 
     /* JADX INFO: renamed from: c */
-    boolean controlPointPaints;
+    boolean freezeAllAIs;
 
     /* JADX INFO: renamed from: d */
     static KoolPaint targetPointPaints;
@@ -63,13 +63,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     static KoolPaint editorSelectionPaint;
 
     /* JADX INFO: renamed from: f */
-    static KoolPaint editorSelectionTexture;
+    static KoolPaint editorSearchPaint;
 
     /* JADX INFO: renamed from: g */
     static Texture editorSelectionTexture2;
 
     /* JADX INFO: renamed from: r */
-    String editorIconTexture10;
+    String lastSavedReplayPath;
     static ArrayList D;
     ModInfo E;
     EditorUnitTypeFilter F;
@@ -82,7 +82,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     private static final float DEFAULT_RECT_ZONE_HEIGHT = 260.0f;
 
     /* JADX INFO: renamed from: h */
-    static AbstractUnitAction editorSelectionTexture3 = new AbstractUnitAction("reloadUnits") { // from class: com.corrodinggames.rts.game.units.h.1
+    static AbstractUnitAction reloadUnitsAction = new AbstractUnitAction("reloadUnits") { // from class: com.corrodinggames.rts.game.units.h.1
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
@@ -147,7 +147,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     };
 
     /* JADX INFO: renamed from: i */
-    static AbstractUnitAction editorIconTexture = new AbstractUnitAction("reloadOnlyActiveUnits") { // from class: com.corrodinggames.rts.game.units.h.12
+    static AbstractUnitAction reloadOnlyActiveUnitsAction = new AbstractUnitAction("reloadOnlyActiveUnits") { // from class: com.corrodinggames.rts.game.units.h.12
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
@@ -212,7 +212,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     };
 
     /* JADX INFO: renamed from: j */
-    static AbstractUnitAction editorIconTexture2 = new AbstractUnitAction("unitClone") { // from class: com.corrodinggames.rts.game.units.h.17
+    static AbstractUnitAction unitCloneAction = new AbstractUnitAction("unitClone") { // from class: com.corrodinggames.rts.game.units.h.17
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -274,7 +274,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     };
 
     /* JADX INFO: renamed from: k */
-    static AbstractUnitAction editorIconTexture3 = new AbstractUnitAction("removeUnits") { // from class: com.corrodinggames.rts.game.units.h.18
+    static AbstractUnitAction removeUnitsAction = new AbstractUnitAction("removeUnits") { // from class: com.corrodinggames.rts.game.units.h.18
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -342,7 +342,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     };
 
     /* JADX INFO: renamed from: l */
-    static AbstractUnitAction editorIconTexture4 = new AbstractUnitAction("killUnits") { // from class: com.corrodinggames.rts.game.units.h.19
+    static AbstractUnitAction killUnitsAction = new AbstractUnitAction("killUnits") { // from class: com.corrodinggames.rts.game.units.h.19
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -410,7 +410,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     };
 
     /* JADX INFO: renamed from: m */
-    static AbstractUnitAction editorIconTexture5 = new AbstractUnitAction("finishQueue") { // from class: com.corrodinggames.rts.game.units.h.20
+    static AbstractUnitAction finishQueueAction = new AbstractUnitAction("finishQueue") { // from class: com.corrodinggames.rts.game.units.h.20
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -478,7 +478,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     };
 
     /* JADX INFO: renamed from: n */
-    static AbstractUnitAction editorIconTexture6 = new AbstractUnitAction("nukeAt") { // from class: com.corrodinggames.rts.game.units.h.21
+    static AbstractUnitAction nukeAtAction = new AbstractUnitAction("nukeAt") { // from class: com.corrodinggames.rts.game.units.h.21
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -546,7 +546,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     };
 
     /* JADX INFO: renamed from: o */
-    static AbstractUnitAction editorIconTexture7 = new NoneAction("freezeAI") { // from class: com.corrodinggames.rts.game.units.h.22
+    static AbstractUnitAction freezeAIAction = new NoneAction("freezeAI") { // from class: com.corrodinggames.rts.game.units.h.22
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -584,7 +584,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     };
 
     /* JADX INFO: renamed from: p */
-    static AbstractUnitAction editorIconTexture8 = new NoneAction("changeAlliance") { // from class: com.corrodinggames.rts.game.units.h.23
+    static AbstractUnitAction changeAllianceAction = new NoneAction("changeAlliance") { // from class: com.corrodinggames.rts.game.units.h.23
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -615,7 +615,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     };
 
     /* JADX INFO: renamed from: q */
-    static AbstractUnitAction editorIconTexture9 = new NoneAction("startRecording") { // from class: com.corrodinggames.rts.game.units.h.2
+    static AbstractUnitAction startRecordingAction = new NoneAction("startRecording") { // from class: com.corrodinggames.rts.game.units.h.2
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -689,7 +689,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                         EditorOrBuilder editorOrBuilderL2 = EditorOrBuilder.L();
                         if (editorOrBuilderL2 != null && editorOrBuilderL != null) {
                             editorOrBuilderL2.a(editorOrBuilderL);
-                            editorOrBuilderL2.editorIconTexture10 = str;
+                            editorOrBuilderL2.lastSavedReplayPath = str;
                             return;
                         } else {
                             GameEngine.logColored("Failed copySettingsFromAnotherEditor");
@@ -731,13 +731,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             boolean zK = GameEngine.getInstance().replayEngine.k();
             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
-            return (editorOrBuilderL == null || editorOrBuilderL.editorIconTexture10 == null || zK) ? false : true;
+            return (editorOrBuilderL == null || editorOrBuilderL.lastSavedReplayPath == null || zK) ? false : true;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean b(BaseUnit baseUnit) {
             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
-            return (editorOrBuilderL == null || editorOrBuilderL.editorIconTexture10 == null) ? false : true;
+            return (editorOrBuilderL == null || editorOrBuilderL.lastSavedReplayPath == null) ? false : true;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -750,7 +750,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         /* JADX INFO: renamed from: c */
         public boolean onClicked(BaseUnit baseUnit, boolean z2) {
             final GameEngine gameEngine = GameEngine.getInstance();
-            final String str = EditorOrBuilder.L().editorIconTexture10;
+            final String str = EditorOrBuilder.L().lastSavedReplayPath;
             if (str == null) {
                 gameEngine.alert("No last replay found");
                 return false;
@@ -863,7 +863,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         public String d() {
             String str = "Freeze AI";
             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
-            if (editorOrBuilderL != null && editorOrBuilderL.controlPointPaints) {
+            if (editorOrBuilderL != null && editorOrBuilderL.freezeAllAIs) {
                 str = "Unfreeze AIs";
             }
             return str;
@@ -1608,10 +1608,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             if (editorTab == EditorTab.all && EditorOrBuilder.a(abstractUnitAction, baseUnit)) {
                 return false;
             }
-            if (editorTab == EditorTab.modded && abstractUnitAction == EditorOrBuilder.editorSelectionTexture3) {
+            if (editorTab == EditorTab.modded && abstractUnitAction == EditorOrBuilder.reloadUnitsAction) {
                 return true;
             }
-            if (editorTab == EditorTab.modded && abstractUnitAction == EditorOrBuilder.editorIconTexture) {
+            if (editorTab == EditorTab.modded && abstractUnitAction == EditorOrBuilder.reloadOnlyActiveUnitsAction) {
                 return true;
             }
             if (editorTab == EditorTab.search && abstractUnitAction == EditorOrBuilder.y) {
@@ -1701,8 +1701,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         editorSelectionPaint = new KoolPaint();
         editorSelectionPaint.a(targetPointPaints);
         editorSelectionPaint.a(55, 255, 60, 60);
-        editorSelectionTexture = new KoolPaint();
-        editorSelectionTexture.a(60, 255, 255, 255);
+        editorSearchPaint = new KoolPaint();
+        editorSearchPaint.a(60, 255, 255, 255);
         this.E = null;
         this.F = EditorUnitTypeFilter.land;
         this.G = EditorTab.all;
@@ -1941,7 +1941,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                         playerTeamK.teamColorId = 1;
                         playerTeamK.isTeamDefeatedTech = true;
                         playerTeamK.isTeamWipedOut = true;
-                        if (!this.controlPointPaints) {
+                        if (!this.freezeAllAIs) {
                             aIController.aiUnitManagementTimer = 0.0f;
                         } else {
                             aIController.aiUnitManagementTimer = Float.MAX_VALUE;
@@ -2558,7 +2558,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         if (abstractUnitAction instanceof FilteredUnitAction) {
             abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
         }
-        if (abstractUnitAction == editorIconTexture7 || abstractUnitAction == w || abstractUnitAction == x || abstractUnitAction == editorIconTexture5 || abstractUnitAction == editorIconTexture3 || abstractUnitAction == editorIconTexture2 || abstractUnitAction == z || abstractUnitAction == editorIconTexture8 || abstractUnitAction == editorIconTexture9 || abstractUnitAction == s || abstractUnitAction == t || abstractUnitAction == B || abstractUnitAction == C || abstractUnitAction == addCircleZoneAction || abstractUnitAction == addRectangleZoneAction || abstractUnitAction == editZoneAction || abstractUnitAction == deleteZoneAction || abstractUnitAction == addCircleMapPortalAction || abstractUnitAction == addRectangleMapPortalAction || abstractUnitAction == editMapPortalAction || abstractUnitAction == deleteMapPortalAction || abstractUnitAction == saveAreaMapAction) {
+        if (abstractUnitAction == freezeAIAction || abstractUnitAction == w || abstractUnitAction == x || abstractUnitAction == finishQueueAction || abstractUnitAction == removeUnitsAction || abstractUnitAction == unitCloneAction || abstractUnitAction == z || abstractUnitAction == changeAllianceAction || abstractUnitAction == startRecordingAction || abstractUnitAction == s || abstractUnitAction == t || abstractUnitAction == B || abstractUnitAction == C || abstractUnitAction == addCircleZoneAction || abstractUnitAction == addRectangleZoneAction || abstractUnitAction == editZoneAction || abstractUnitAction == deleteZoneAction || abstractUnitAction == addCircleMapPortalAction || abstractUnitAction == addRectangleMapPortalAction || abstractUnitAction == editMapPortalAction || abstractUnitAction == deleteMapPortalAction || abstractUnitAction == saveAreaMapAction) {
             return true;
         }
         return false;
@@ -2568,7 +2568,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
             if (playerTeam instanceof AIController) {
                 AIController aIController = (AIController) playerTeam;
-                if (!this.controlPointPaints) {
+                if (!this.freezeAllAIs) {
                     aIController.aiUnitManagementTimer = 0.0f;
                 } else {
                     aIController.aiUnitManagementTimer = Float.MAX_VALUE;
@@ -2610,20 +2610,20 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         arrayList2.add(editMapPortalAction);
         arrayList2.add(deleteMapPortalAction);
         arrayList2.add(saveAreaMapAction);
-        arrayList2.add(editorSelectionTexture3);
-        arrayList2.add(editorIconTexture);
-        arrayList2.add(editorIconTexture3);
-        arrayList2.add(editorIconTexture2);
-        arrayList2.add(editorIconTexture4);
-        arrayList2.add(editorIconTexture6);
-        arrayList2.add(editorIconTexture5);
+        arrayList2.add(reloadUnitsAction);
+        arrayList2.add(reloadOnlyActiveUnitsAction);
+        arrayList2.add(removeUnitsAction);
+        arrayList2.add(unitCloneAction);
+        arrayList2.add(killUnitsAction);
+        arrayList2.add(nukeAtAction);
+        arrayList2.add(finishQueueAction);
         arrayList2.add(u);
         arrayList2.add(v);
         arrayList2.add(w);
         arrayList2.add(x);
         arrayList2.add(z);
-        arrayList2.add(editorIconTexture8);
-        arrayList2.add(editorIconTexture9);
+        arrayList2.add(changeAllianceAction);
+        arrayList2.add(startRecordingAction);
         arrayList2.add(s);
         arrayList2.add(t);
         if (GameEngine.isTestingBuild) {
@@ -2779,7 +2779,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             requestSaveAreaMapDialog();
             return;
         }
-        if (abstractUnitAction == editorSelectionTexture3) {
+        if (abstractUnitAction == reloadUnitsAction) {
             if (w()) {
                 GameEngine.logColored("Not reloading units: Need to keep network sync");
                 gameEngine.gameUI.showMediumPriorityMessage("Not reloading units: Need to keep network sync");
@@ -2801,7 +2801,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             gameEngine.gameUI.showMediumPriorityMessage("All custom unit files reloaded");
         }
-        if (abstractUnitAction == editorIconTexture) {
+        if (abstractUnitAction == reloadOnlyActiveUnitsAction) {
             if (w()) {
                 GameEngine.logColored("Not reloading units: Need to keep network sync");
                 return;
@@ -2829,25 +2829,25 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             gameEngine.gameUI.showInfoMessageWithPriority(str, i2);
         }
-        if (abstractUnitAction == editorIconTexture3 || abstractUnitAction == editorIconTexture4 || abstractUnitAction == editorIconTexture2) {
+        if (abstractUnitAction == removeUnitsAction || abstractUnitAction == killUnitsAction || abstractUnitAction == unitCloneAction) {
             int i3 = 0;
             if (z2) {
                 return;
             }
             for (BaseUnit baseUnit2 : BaseUnit.getGlobalUnitList()) {
                 if ((baseUnit2 instanceof BaseUnit) && Utility.distanceSq(baseUnit2.posX, baseUnit2.posY, pointF.x, pointF.y) < 2500.0f) {
-                    if (abstractUnitAction == editorIconTexture3) {
+                    if (abstractUnitAction == removeUnitsAction) {
                         if (baseUnit2.transportContainer == null && baseUnit2.parentEntity == null) {
                             baseUnit2.removeFromGame();
                             if ((baseUnit2 instanceof OrderableUnit) && baseUnit2.bI()) {
                                 gameEngine.pathfindingEngine.a((OrderableUnit) baseUnit2);
                             }
                         }
-                    } else if (abstractUnitAction == editorIconTexture4) {
+                    } else if (abstractUnitAction == killUnitsAction) {
                         if (baseUnit2.transportContainer == null && baseUnit2.parentEntity == null) {
                             baseUnit2.currentHealth = -1.0f;
                         }
-                    } else if (abstractUnitAction != editorIconTexture2) {
+                    } else if (abstractUnitAction != unitCloneAction) {
                         continue;
                     } else if (i3 <= 4) {
                         if (!baseUnit2.bI() && !(baseUnit2 instanceof Tree) && !baseUnit2.isDead && baseUnit2.transportContainer == null && baseUnit2.parentEntity == null) {
@@ -2872,7 +2872,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             return;
         }
-        if (abstractUnitAction == editorIconTexture6) {
+        if (abstractUnitAction == nukeAtAction) {
             if (z2) {
                 return;
             }
@@ -2882,7 +2882,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                 projectileA.sourceUnit = null;
             }
         }
-        if (abstractUnitAction == editorIconTexture5) {
+        if (abstractUnitAction == finishQueueAction) {
             if (z2) {
                 return;
             }
@@ -2893,7 +2893,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             return;
         }
-        if (abstractUnitAction == editorIconTexture7) {
+        if (abstractUnitAction == freezeAIAction) {
             PlayerTeam playerTeam3 = this.team;
             if (playerTeam3 instanceof AIController) {
                 AIController aIController = (AIController) playerTeam3;
@@ -2904,7 +2904,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                 }
             }
         }
-        if (abstractUnitAction == editorIconTexture8) {
+        if (abstractUnitAction == changeAllianceAction) {
             PlayerTeam playerTeam4 = this.team;
             playerTeam4.teamColorId++;
             if (playerTeam4.teamColorId > 4) {
@@ -2924,9 +2924,9 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             boolean z5 = !z3;
             if (!z4) {
-                z5 = !this.controlPointPaints;
+                z5 = !this.freezeAllAIs;
             }
-            this.controlPointPaints = z5;
+            this.freezeAllAIs = z5;
             M();
         }
         if (abstractUnitAction == v) {
@@ -3025,8 +3025,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     }
 
     public void a(EditorOrBuilder editorOrBuilder) {
-        this.editorIconTexture10 = editorOrBuilder.editorIconTexture10;
-        this.controlPointPaints = editorOrBuilder.controlPointPaints;
+        this.lastSavedReplayPath = editorOrBuilder.lastSavedReplayPath;
+        this.freezeAllAIs = editorOrBuilder.freezeAllAIs;
     }
 
     @Override

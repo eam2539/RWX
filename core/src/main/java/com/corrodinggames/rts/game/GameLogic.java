@@ -86,20 +86,16 @@ public class GameLogic extends GameEngine {
 
     public transient Runnable worldFrameRenderedListener;
 
-    /* JADX INFO: renamed from: l */
-    KoolPaint paintL;
+    KoolPaint l;
 
     /* JADX INFO: renamed from: m */
     KoolPaint fpsPaint;
 
-    /* JADX INFO: renamed from: n */
-    KoolPaint paintN;
+    KoolPaint n;
 
-    /* JADX INFO: renamed from: o */
-    KoolPaint paintO;
+    KoolPaint o;
 
-    /* JADX INFO: renamed from: p */
-    KoolPaint paintP;
+    KoolPaint p;
 
     /* JADX INFO: renamed from: q */
     int fpsAccumulator;
@@ -116,23 +112,17 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: u */
     public String fpsString;
 
-    /* JADX INFO: renamed from: v */
-    Rect rectV;
+    Rect v;
 
-    /* JADX INFO: renamed from: w */
-    public ArrayList arrayListW;
+    public ArrayList w;
 
-    /* JADX INFO: renamed from: x */
-    KoolPaint paintX;
+    KoolPaint x;
 
-    /* JADX INFO: renamed from: y */
-    KoolPaint paintY;
+    KoolPaint y;
 
-    /* JADX INFO: renamed from: z */
-    KoolPaint paintZ;
+    KoolPaint z;
 
-    /* JADX INFO: renamed from: A */
-    public KoolPaint paintA;
+    public KoolPaint A;
 
     /* JADX INFO: renamed from: B */
     public GameStateData gameStateData;
@@ -143,8 +133,7 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: D */
     public CloudRenderer cloudRenderer;
 
-    /* JADX INFO: renamed from: E */
-    GameObject gameObjectE;
+    GameObject E;
 
     /* JADX INFO: renamed from: F */
     boolean hasCheckedSafeMode;
@@ -155,8 +144,7 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: H */
     public float speedMultiplier;
 
-    /* JADX INFO: renamed from: I */
-    public float floatI;
+    public float I;
 
     /* JADX INFO: renamed from: J */
     public float lastDelta;
@@ -193,11 +181,9 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: T */
     RectF waterRectF;
 
-    /* JADX INFO: renamed from: U */
-    public Texture textureU;
+    public Texture U;
 
-    /* JADX INFO: renamed from: V */
-    public Texture textureV;
+    public Texture V;
 
     /* JADX INFO: renamed from: W */
     GameObjectArrayList renderList;
@@ -205,17 +191,14 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: X */
     GameObjectArrayList renderListBuffer;
 
-    /* JADX INFO: renamed from: Z */
-    public ArrayList arrayListZ;
+    public ArrayList Z;
 
-    /* JADX INFO: renamed from: aa */
-    public ArrayList arrayListAA;
+    public ArrayList aa;
 
     /* JADX INFO: renamed from: ab */
     Timer gameTimer;
 
-    /* JADX INFO: renamed from: ac */
-    boolean booleanAC;
+    boolean ac;
 
     /* JADX INFO: renamed from: ad */
     Object initLock;
@@ -246,21 +229,21 @@ public class GameLogic extends GameEngine {
         this.fps = 0;
         this.averageFrameTime = 16.0f;
         this.fpsString = "0fps";
-        this.rectV = new Rect();
-        this.arrayListW = new ArrayList();
-        this.paintA = new KoolPaint();
+        this.v = new Rect();
+        this.w = new ArrayList();
+        this.A = new KoolPaint();
         this.cloudRenderer = new CloudRenderer();
         this.accumulator = 0.0f;
         this.speedMultiplier = 1.0f;
         this.waterAnimationTimer = 0.0f;
         this.waterRect = new Rect();
         this.waterRectF = new RectF();
-        this.textureU = null;
-        this.textureV = null;
+        this.U = null;
+        this.V = null;
         this.renderList = new GameObjectArrayList("allOnScreenObjects");
         this.renderListBuffer = new GameObjectArrayList("allOnScreenObjectsDirty");
-        this.arrayListZ = new ArrayList();
-        this.arrayListAA = new ArrayList();
+        this.Z = new ArrayList();
+        this.aa = new ArrayList();
         this.initLock = new Object();
         this.menuLoadFailureCount = 0;
     }
@@ -417,21 +400,21 @@ public class GameLogic extends GameEngine {
         Locale.initialize();
         PerformanceProfiler.a("Locale.init took:", jA2);
         PlayerTeam.loadTeamColorSettings();
-        this.paintL = new KoolPaint();
+        this.l = new KoolPaint();
         this.fpsPaint = new KoolPaint();
         this.fpsPaint.a(255, 255, 255, 255);
         this.fpsPaint.a(true);
         updatePaintTextSize(this.fpsPaint, 16.0f);
-        this.paintN = new KoolPaint();
-        this.paintN.a(255, 255, 255, 255);
-        this.paintN.a(true);
-        updatePaintTextSize(this.paintN, 16.0f);
-        this.paintO = new KoolPaint();
-        this.paintO.a(100, 255, 0, 0);
-        updatePaintTextSize(this.paintO, 16.0f);
-        this.paintP = new KoolPaint();
-        this.paintP.a(100, 0, 255, 0);
-        updatePaintTextSize(this.paintP, 16.0f);
+        this.n = new KoolPaint();
+        this.n.a(255, 255, 255, 255);
+        this.n.a(true);
+        updatePaintTextSize(this.n, 16.0f);
+        this.o = new KoolPaint();
+        this.o.a(100, 255, 0, 0);
+        updatePaintTextSize(this.o, 16.0f);
+        this.p = new KoolPaint();
+        this.p.a(100, 0, 255, 0);
+        updatePaintTextSize(this.p, 16.0f);
         this.teamInfoPaint = new KoolPaint();
         this.centeredPaint = new KoolPaint();
         this.centeredPaint.a(KoolPaint.Align.CENTER);
@@ -443,14 +426,14 @@ public class GameLogic extends GameEngine {
         this.loadingPaint.a(true);
         this.loadingPaint.a(KoolPaint.Align.CENTER);
         updatePaintTextSize(this.loadingPaint, 18.0f);
-        this.paintX = new KoolPaint();
-        this.paintX.b(-1);
-        this.paintX.c(100);
-        this.paintY = new KoolPaint();
-        this.paintY.b(-7829368);
-        this.paintY.c(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_SATELLITE_SERVICE);
-        this.paintY.a(KoolPaint.Style.STROKE);
-        this.paintY.a(1.0f);
+        this.x = new KoolPaint();
+        this.x.b(-1);
+        this.x.c(100);
+        this.y = new KoolPaint();
+        this.y.b(-7829368);
+        this.y.c(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_SATELLITE_SERVICE);
+        this.y.a(KoolPaint.Style.STROKE);
+        this.y.a(1.0f);
         long jA3 = PerformanceProfiler.a();
         loadLevel("AudioEngine");
         SoundEngine.noop();
@@ -542,8 +525,8 @@ public class GameLogic extends GameEngine {
         long jA6 = PerformanceProfiler.a();
         this.allUnitsChecksum = BaseUnit.bM();
         PerformanceProfiler.a("allUnitsChecksum took:", jA6);
-        this.paintZ = new KoolPaint();
-        this.paintZ.a(50, 255, 255, 255);
+        this.z = new KoolPaint();
+        this.z.a(50, 255, 255, 255);
         onInitialContentLoaded();
         System.gc();
         this.isInitialized = true;
@@ -800,7 +783,7 @@ public class GameLogic extends GameEngine {
                             }
                             for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
                                 if ((baseUnit instanceof BaseUnit) && !baseUnit.isDead && baseUnit.team == playerTeamK3) {
-                                    if (baseUnit.changeTeam && !z3) {
+                                    if (baseUnit.isBuilder && !z3) {
                                         z3 = true;
                                         fValueOf = Float.valueOf(baseUnit.posX);
                                         fValueOf2 = Float.valueOf(baseUnit.posY);
@@ -1493,7 +1476,7 @@ public class GameLogic extends GameEngine {
             deltaSpeed *= this.gameSpeed;
         }
         float f = deltaSpeed * this.speedMultiplier;
-        this.floatI = f + 2.0f;
+        this.I = f + 2.0f;
         this.lastDelta = f;
         this.networkEngine.update(f);
         this.gameTimeMillis = (int) (this.gameTimeMillis + (f * 16.666666f));
@@ -2230,7 +2213,7 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: w */
     public synchronized void stopGameTimer() {
-        this.booleanAC = false;
+        this.ac = false;
         if (this.gameTimer != null) {
             this.gameTimer.cancel();
             this.gameTimer = null;

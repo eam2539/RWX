@@ -83,10 +83,10 @@ public class TurretConfig {
     public Integer shootLightColor;
 
     /* JADX INFO: renamed from: H */
-    public boolean canSpawn;
+    public boolean hasAttackRestrictions;
 
     /* JADX INFO: renamed from: I */
-    public boolean canSpawn2;
+    public boolean hasRangeRestrictions;
 
     /* JADX INFO: renamed from: J */
     public LogicBoolean canAttackFlyingUnits;
@@ -157,8 +157,7 @@ public class TurretConfig {
     /* JADX INFO: renamed from: ay */
     public boolean clearTurretTargetAfterFiring;
 
-    /* JADX INFO: renamed from: az */
-    public int rotationSpeed4;
+    public int az;
 
     /* JADX INFO: renamed from: aA */
     public CustomUnitAnimationReference onShootPlayAnimation;
@@ -187,38 +186,60 @@ public class TurretConfig {
     /* JADX INFO: renamed from: aI */
     public int unloadUnitsAndGiveAttackOrderCount;
 
-    /* JADX INFO: renamed from: aJ */
-    public AnimationSet animationSet4;
+    public AnimationSet aJ;
     public float i = 1.0f;
     public float m = -1.0f;
+    /* JADX INFO: renamed from: n */
     public float warmup = 0.0f;
+    /* JADX INFO: renamed from: o */
     public float warmupCallDownRate = 4.0f;
     public float p = 0.0f;
     public float q = 4.0f;
     public float r = 7.0f;
+    /* JADX INFO: renamed from: s */
     public boolean warmupNoReset = false;
     public float u = 0.0f;
+    /* JADX INFO: renamed from: w */
     public int linkedTurretIndex = -1;
     public int x = -1;
+    /* JADX INFO: renamed from: B */
     public boolean canShoot = true;
+    /* JADX INFO: renamed from: Q */
     public float canAttackMaxAngle = 5.0f;
+    /* JADX INFO: renamed from: R */
     public int projectileId = 0;
+    /* JADX INFO: renamed from: S */
     public int altProjectileId = -1;
+    /* JADX INFO: renamed from: V */
     public float turnSpeedAcceleration = -1.0f;
+    /* JADX INFO: renamed from: W */
     public float turnSpeedDeceleration = -1.0f;
+    /* JADX INFO: renamed from: Z */
     public float barrelOffsetXOnOddShots = 0.0f;
+    /* JADX INFO: renamed from: ab */
     public float limitingRange = 99999.0f;
+    /* JADX INFO: renamed from: ag */
     public float limitingMinRange = -1.0f;
+    /* JADX INFO: renamed from: ah */
     public float limitingMinRangeSquared = -1.0f;
+    /* JADX INFO: renamed from: ai */
     public float limitingAngle = -1.0f;
+    /* JADX INFO: renamed from: al */
     public float interceptProjectilesAndTargetingGroundUnderDistance = -1.0f;
+    /* JADX INFO: renamed from: am */
     public float interceptProjectilesAndUnderDistance = 2000.0f;
+    /* JADX INFO: renamed from: an */
     public float interceptProjectilesAndOverHeight = -999.0f;
     public int ap = -1;
+    /* JADX INFO: renamed from: aq */
     public boolean shouldResetTurret = true;
+    /* JADX INFO: renamed from: ar */
     public float idleSpin = 0.0f;
+    /* JADX INFO: renamed from: as */
     public float idleSweepAngle = 0.0f;
+    /* JADX INFO: renamed from: at */
     public float idleSweepDelay = 10.0f;
+    /* JADX INFO: renamed from: aw */
     public float idleSweepAddRandomDelay = -1.0f;
 
     public int a(CustomUnit customUnit) {
@@ -241,7 +262,7 @@ public class TurretConfig {
         this.u = turretConfig.u;
         this.resourceUsage = turretConfig.resourceUsage;
         this.unloadUnitsAndGiveAttackOrderCount = turretConfig.unloadUnitsAndGiveAttackOrderCount;
-        this.animationSet4 = turretConfig.animationSet4;
+        this.aJ = turretConfig.aJ;
         this.warmupNoReset = turretConfig.warmupNoReset;
         this.warmupShootDelayTransfer = turretConfig.warmupShootDelayTransfer;
         this.p = turretConfig.p;
@@ -297,7 +318,7 @@ public class TurretConfig {
         this.limitingAngle = turretConfig.limitingAngle;
         this.aimOffsetSpread = turretConfig.aimOffsetSpread;
         this.clearTurretTargetAfterFiring = turretConfig.clearTurretTargetAfterFiring;
-        this.rotationSpeed4 = turretConfig.rotationSpeed4;
+        this.az = turretConfig.az;
         this.interceptProjectilesWithTags = turretConfig.interceptProjectilesWithTags;
         this.interceptProjectilesAndTargetingGroundUnderDistance = turretConfig.interceptProjectilesAndTargetingGroundUnderDistance;
         this.interceptProjectilesAndUnderDistance = turretConfig.interceptProjectilesAndUnderDistance;
@@ -577,14 +598,14 @@ public class TurretConfig {
         turretConfig.canAttackNotTouchingWaterUnits = LogicBoolean.convertAlwaysTrueToNull(turretConfig.canAttackNotTouchingWaterUnits);
         turretConfig.canAttackCondition = LogicBoolean.convertAlwaysTrueToNull(turretConfig.canAttackCondition);
         if (turretConfig.limitingAngle != -1.0f || turretConfig.canAttackFlyingUnits != null || turretConfig.canAttackLandUnits != null || turretConfig.canAttackUnderwaterUnits != null || turretConfig.canAttackNotTouchingWaterUnits != null || turretConfig.canAttackCondition != null) {
-            turretConfig.canSpawn = true;
+            turretConfig.hasAttackRestrictions = true;
         }
         if (turretConfig.limitingRange < 99999.0f || turretConfig.limitingMinRange > 0.0f) {
-            turretConfig.canSpawn = true;
-            turretConfig.canSpawn2 = true;
+            turretConfig.hasAttackRestrictions = true;
+            turretConfig.hasRangeRestrictions = true;
         }
         if (turretConfig.canOnlyAttackUnitsWithTags != null || turretConfig.canOnlyAttackUnitsWithoutTags != null) {
-            turretConfig.canSpawn = true;
+            turretConfig.hasAttackRestrictions = true;
         }
         turretConfig.canRotate = true;
     }

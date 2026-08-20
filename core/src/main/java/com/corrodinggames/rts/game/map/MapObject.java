@@ -213,7 +213,7 @@ public class MapObject {
                     if (properties.getProperty("randomRotate") != null && !baseUnitA.bI()) {
                         baseUnitA.h(Utility.getDeterministicRandomInt(baseUnitA, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT));
                     }
-                    baseUnitA.changeTeam = "builder".equalsIgnoreCase(property) || "builder".equalsIgnoreCase(property2);
+                    baseUnitA.isBuilder = "builder".equalsIgnoreCase(property) || "builder".equalsIgnoreCase(property2);
                     baseUnitA.isTargetable = "commandCenter".equalsIgnoreCase(property) || "commandCenter".equalsIgnoreCase(property2);
                     baseUnitA.isActive = true;
                     baseUnitA.n();

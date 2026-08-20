@@ -41,8 +41,7 @@ public class GameRoomSettings implements Cloneable {
     /* JADX INFO: renamed from: i */
     public boolean noNukes = false;
 
-    /* JADX INFO: renamed from: j */
-    public boolean unknown = false;
+    public boolean j = false;
 
     /* JADX INFO: renamed from: k */
     public boolean useDisplayedCostAsResourceCost = false;
@@ -89,7 +88,7 @@ public class GameRoomSettings implements Cloneable {
         gos.writeInt(this.startingUnits);
         gos.writeFloat(this.incomeMultiplier);
         gos.writeBoolean(this.noNukes);
-        gos.writeBoolean(this.unknown);
+        gos.writeBoolean(this.j);
         gos.writeBoolean(this.sharedControl);
         gos.writeBoolean(this.teamLock);
         gos.writeBoolean(this.fixedAllyTeams);
@@ -108,7 +107,7 @@ public class GameRoomSettings implements Cloneable {
         this.startingUnits = gis.readInt();
         this.incomeMultiplier = gis.readFloat();
         this.noNukes = gis.readBoolean();
-        this.unknown = gis.readBoolean();
+        this.j = gis.readBoolean();
         this.sharedControl = gis.readBoolean();
         if (b >= 1) {
             this.teamLock = gis.readBoolean();

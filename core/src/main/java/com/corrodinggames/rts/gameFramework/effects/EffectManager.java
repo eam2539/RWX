@@ -28,16 +28,16 @@ public final class EffectManager {
     /* JADX INFO: renamed from: j */
     public int maxParticlesLow;
 
-    /* JADX INFO: renamed from: k */
     public static KoolDisplacementEffect displacementEffect;
 
+    /* JADX INFO: renamed from: k */
     public static ShaderProgram shader;
 
     /* JADX INFO: renamed from: l */
     public Texture texture;
 
     /* JADX INFO: renamed from: m */
-    public Texture texture2;
+    public Texture shockwaveTexture;
 
     /* JADX INFO: renamed from: s */
     public static SpriteSheet[] effectTemplates;
@@ -54,14 +54,12 @@ public final class EffectManager {
     /* JADX INFO: renamed from: o */
     public static final Rect rect = new Rect();
 
-    /* JADX INFO: renamed from: p */
-    public static final Rect rect2 = new Rect();
+    public static final Rect p = new Rect();
 
     /* JADX INFO: renamed from: q */
     public static final KoolPaint paint = new KoolPaint();
 
-    /* JADX INFO: renamed from: r */
-    public static final KoolPaint paint2 = new KoolPaint();
+    public static final KoolPaint r = new KoolPaint();
 
     /* JADX INFO: renamed from: a */
     public int activeEffectsCount = 0;

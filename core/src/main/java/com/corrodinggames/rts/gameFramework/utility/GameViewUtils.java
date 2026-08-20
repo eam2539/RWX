@@ -404,7 +404,7 @@ public final class GameViewUtils {
         for (int i = 0; i <= 2; i++) {
             for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
                 if ((baseUnit instanceof BaseUnit) && !baseUnit.isDead && baseUnit.team == playerTeam) {
-                    if (i == 0 && baseUnit.changeTeam) {
+                    if (i == 0 && baseUnit.isBuilder) {
                         pointF.a(baseUnit.posX, baseUnit.posY);
                         return;
                     } else if (i == 1 && baseUnit.isTargetable) {

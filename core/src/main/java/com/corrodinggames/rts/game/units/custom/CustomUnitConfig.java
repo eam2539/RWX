@@ -108,7 +108,7 @@ public final class CustomUnitConfig implements UnitType {
     public AnimationSet tags;
 
     /* JADX INFO: renamed from: P */
-    public AnimationSet tag2;
+    public AnimationSet trackingTags;
 
     /* JADX INFO: renamed from: Q */
     public String image_shadow;
@@ -116,8 +116,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: R */
     public int strictLevel;
 
-    /* JADX INFO: renamed from: S */
-    public int number;
+    public int S;
 
     /* JADX INFO: renamed from: T */
     public SpawnPointType onNewMapSpawn;
@@ -841,13 +840,13 @@ public final class CustomUnitConfig implements UnitType {
     public boolean disableLowHpSmoke = false;
 
     /* JADX INFO: renamed from: ay */
-    public boolean energyStartPercentage = false;
+    public boolean drawLegsOverBody = false;
 
     /* JADX INFO: renamed from: az */
-    public boolean energyCanBeRecievedFromInAnotherUnit = false;
+    public boolean drawLegsUnderAllUnits = false;
 
     /* JADX INFO: renamed from: aA */
-    public final FastArrayList<AttachmentSlotDefinition> energyCanTransferToOtherUnits = new FastArrayList();
+    public final FastArrayList<AttachmentSlotDefinition> attachmentSlotDefinitions = new FastArrayList();
     /* JADX INFO: renamed from: eM */
     public int maxTransportingUnits = 0;
     /* JADX INFO: renamed from: eQ */
@@ -938,8 +937,7 @@ public final class CustomUnitConfig implements UnitType {
     /* JADX INFO: renamed from: du */
     AnimationConfig attackAnimation = new AnimationConfig("attack");
 
-    /* JADX INFO: renamed from: fe */
-    public boolean f18fe = true;
+    public boolean fe = true;
 
     /* JADX INFO: renamed from: fK */
     public float aiUpgradePriority = -1.0f;
@@ -1727,7 +1725,7 @@ public final class CustomUnitConfig implements UnitType {
 
     /* JADX INFO: renamed from: i */
     public AttachmentSlotDefinition findEnergyTransferRuleByName(String str) {
-        for (AttachmentSlotDefinition attachmentSlotDefinition : this.energyCanTransferToOtherUnits) {
+        for (AttachmentSlotDefinition attachmentSlotDefinition : this.attachmentSlotDefinitions) {
             if (attachmentSlotDefinition.b().equalsIgnoreCase(str)) {
                 return attachmentSlotDefinition;
             }

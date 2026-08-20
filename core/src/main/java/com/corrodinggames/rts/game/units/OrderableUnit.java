@@ -133,6 +133,7 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: r */
     private int repathDistanceThreshold;
+    /* JADX INFO: renamed from: s */
     private float repathCooldown;
 
     /* JADX INFO: renamed from: t */
@@ -143,6 +144,7 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: aa */
     public int lastCollisionTick;
+    /* JADX INFO: renamed from: ab */
     public float pendingCredits;
 
     /* JADX INFO: renamed from: ac */
@@ -150,15 +152,19 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: ad */
     public OrderableUnit transportedBy;
+    /* JADX INFO: renamed from: ae */
     public boolean isTransportAttached;
+    /* JADX INFO: renamed from: af */
     public boolean shouldMaintainFormation;
 
     /* JADX INFO: renamed from: ag */
     public int transportedUnitCount;
+    /* JADX INFO: renamed from: ah */
     public short formationSlotIndex;
 
     /* JADX INFO: renamed from: ai */
     public float transportAttackAssistTimer;
+    /* JADX INFO: renamed from: aj */
     public boolean inFormation;
 
     /* JADX INFO: renamed from: ak */
@@ -166,15 +172,22 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: al */
     public float transportOffsetY;
+    /* JADX INFO: renamed from: am */
     public float formationSlotAngle;
 
     /* JADX INFO: renamed from: an */
     public int lastTransportPathUpdateTick;
+    /* JADX INFO: renamed from: ao */
     public float formationSlotDistanceSq;
+    /* JADX INFO: renamed from: ap */
     public boolean isFormationMember;
+    /* JADX INFO: renamed from: aq */
     public float navigationAngle;
+    /* JADX INFO: renamed from: ar */
     public boolean isSecondaryRecharging;
+    /* JADX INFO: renamed from: as */
     public boolean isTargetSearchPending;
+    /* JADX INFO: renamed from: au */
     public PathPositionProvider pathPositionProvider;
 
     /* JADX INFO: renamed from: av */
@@ -185,8 +198,11 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: u */
     public boolean isPathIncomplete;
+    /* JADX INFO: renamed from: v */
     private int totalPathPositions;
+    /* JADX INFO: renamed from: w */
     private int longRangePathing;
+    /* JADX INFO: renamed from: ax */
     public boolean needsRecalculation;
 
     /* JADX INFO: renamed from: ay */
@@ -2401,7 +2417,7 @@ public abstract class OrderableUnit extends UnitBase {
                         } else {
                             baseUnit.currentHealth -= f6;
                         }
-                        baseUnit.unitAnimationScale = 1000.0f;
+                        baseUnit.damageEffectDurationTimer = 1000.0f;
                         if (zY) {
                             float f7 = f6 / baseUnit.maxHealth;
                             UnitPrice unitDescription = baseUnit.getBuildPrice();

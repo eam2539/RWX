@@ -257,10 +257,10 @@ public class GameInterfaceRenderer extends Serializable {
     UnitInfoAction ar = new UnitInfoAction(false);
 
     /* JADX INFO: renamed from: as */
-    UnitInfoAction commandY2 = new UnitInfoAction(true);
+    UnitInfoAction unitInfoAction = new UnitInfoAction(true);
 
     /* JADX INFO: renamed from: at */
-    AttackModeAction commandD = new AttackModeAction();
+    AttackModeAction attackModeAction = new AttackModeAction();
 
     /* JADX INFO: renamed from: au */
     ArrayList unitList2 = new ArrayList();
@@ -279,7 +279,7 @@ public class GameInterfaceRenderer extends Serializable {
     HashMap az = new HashMap();
 
     /* JADX INFO: renamed from: aA */
-    ArrayList arrayList = new ArrayList();
+    ArrayList unitGroupMarkers = new ArrayList();
 
     /* JADX INFO: renamed from: aB */
     Rect rect = new Rect();
@@ -331,10 +331,10 @@ public class GameInterfaceRenderer extends Serializable {
         this.buildActionIconPaint = new GamePaint();
         this.buildActionIconPaint.b(KoolArgbColor.a(133, 255, 255, 255));
         this.buildActionIconPaint.o();
-        this.arrayList.clear();
+        this.unitGroupMarkers.clear();
         int i = 0;
         while (i < 10) {
-            this.arrayList.add(new UnitGroupMarker(this, i < 3));
+            this.unitGroupMarkers.add(new UnitGroupMarker(this, i < 3));
             i++;
         }
     }
@@ -849,7 +849,7 @@ public class GameInterfaceRenderer extends Serializable {
         }
         if (GameUI.bO && baseUnit != null && !(baseUnit instanceof EditorOrBuilder)) {
             this.unitList.add(this.ar);
-            this.unitList.add(this.commandY2);
+            this.unitList.add(this.unitInfoAction);
         }
         if (baseUnit == null) {
         }
@@ -2308,14 +2308,14 @@ public class GameInterfaceRenderer extends Serializable {
     }
 
     void j() {
-        Iterator it = this.arrayList.iterator();
+        Iterator it = this.unitGroupMarkers.iterator();
         while (it.hasNext()) {
             ((UnitGroupMarker) it.next()).h = true;
         }
     }
 
     void k() {
-        Iterator it = this.arrayList.iterator();
+        Iterator it = this.unitGroupMarkers.iterator();
         while (it.hasNext()) {
             ((UnitGroupMarker) it.next()).b();
         }
@@ -2553,8 +2553,8 @@ public class GameInterfaceRenderer extends Serializable {
         int i2 = (int) ((this.gameEngine.screenWidth - this.gameEngine.sidebarWidth) + 10.0f);
         int i3 = ((int) (this.gameEngine.sidebarWidth - 20.0f)) / 3;
         int i4 = i3 - 5;
-        for (int i5 = 0; i5 < this.arrayList.size(); i5++) {
-            UnitGroupMarker unitGroupMarker = (UnitGroupMarker) this.arrayList.get(i5);
+        for (int i5 = 0; i5 < this.unitGroupMarkers.size(); i5++) {
+            UnitGroupMarker unitGroupMarker = (UnitGroupMarker) this.unitGroupMarkers.get(i5);
             if (unitGroupMarker.h) {
                 unitGroupMarker.e();
                 unitGroupMarker.h = false;
@@ -2645,8 +2645,8 @@ public class GameInterfaceRenderer extends Serializable {
 
     @Override // com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
-        gameOutputStream.writeInt(this.arrayList.size());
-        Iterator it = this.arrayList.iterator();
+        gameOutputStream.writeInt(this.unitGroupMarkers.size());
+        Iterator it = this.unitGroupMarkers.iterator();
         while (it.hasNext()) {
             ((UnitGroupMarker) it.next()).a(gameOutputStream);
         }
@@ -2655,7 +2655,7 @@ public class GameInterfaceRenderer extends Serializable {
 
     public void a(GameInputStream gameInputStream, boolean z) throws IOException {
         if (!z) {
-            this.arrayList.clear();
+            this.unitGroupMarkers.clear();
         }
         int i = gameInputStream.readInt();
         int i2 = 0;
@@ -2663,7 +2663,7 @@ public class GameInterfaceRenderer extends Serializable {
             UnitGroupMarker unitGroupMarker = new UnitGroupMarker(this, i2 < 3);
             unitGroupMarker.a(gameInputStream);
             if (!z) {
-                this.arrayList.add(unitGroupMarker);
+                this.unitGroupMarkers.add(unitGroupMarker);
             }
             i2++;
         }

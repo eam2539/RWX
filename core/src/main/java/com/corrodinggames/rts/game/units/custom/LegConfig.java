@@ -237,11 +237,11 @@ public class LegConfig {
         }
         legConfig.P = iniFile.getBoolean(str, "drawOverBody", Boolean.valueOf(legConfig.P)).booleanValue();
         if (legConfig.P) {
-            customUnitConfig.energyStartPercentage = true;
+            customUnitConfig.drawLegsOverBody = true;
         }
         legConfig.Q = iniFile.getBoolean(str, "drawUnderAllUnits", Boolean.valueOf(legConfig.Q)).booleanValue();
         if (legConfig.Q) {
-            customUnitConfig.energyCanBeRecievedFromInAnotherUnit = true;
+            customUnitConfig.drawLegsUnderAllUnits = true;
         }
         if (legConfig.Q && legConfig.P) {
             throw new RuntimeException("Both drawUnderAllUnits and drawOverBody can not be set true at the same time in leg/arm");

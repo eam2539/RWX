@@ -31,103 +31,197 @@ import java.io.IOException;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.f */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/f.class */
 public class Projectile extends PositionedObject {
+    /* JADX INFO: renamed from: g */
     public ProjectileTemplate template;
+    /* JADX INFO: renamed from: h */
     public float lifeTimer;
+    /* JADX INFO: renamed from: i */
     public float initialDelay;
+    /* JADX INFO: renamed from: j */
     public BaseUnit sourceUnit;
+    /* JADX INFO: renamed from: k */
     public short techLevel;
+    /* JADX INFO: renamed from: l */
     public BaseUnit targetUnit;
+    /* JADX INFO: renamed from: m */
     public boolean hasFixedTarget;
+    /* JADX INFO: renamed from: n */
     public float targetX;
+    /* JADX INFO: renamed from: o */
     public float targetY;
+    /* JADX INFO: renamed from: p */
     public float targetZ;
+    /* JADX INFO: renamed from: q */
     public Projectile parentProjectile;
+    /* JADX INFO: renamed from: r */
     public float targetSpeed;
+    /* JADX INFO: renamed from: s */
     public float acceleration;
+    /* JADX INFO: renamed from: t */
     public float speed;
+    /* JADX INFO: renamed from: u */
     public float velocityX;
+    /* JADX INFO: renamed from: v */
     public float velocityY;
+    /* JADX INFO: renamed from: w */
     public float velocityZ;
+    /* JADX INFO: renamed from: x */
     public float renderScale;
+    /* JADX INFO: renamed from: y */
     public float glowScale;
+    /* JADX INFO: renamed from: z */
     public boolean renderShadow;
+    /* JADX INFO: renamed from: A */
     public boolean isInstantHit;
+    /* JADX INFO: renamed from: B */
     public boolean persistsAfterExplosion;
     public boolean C;
+    /* JADX INFO: renamed from: D */
     public boolean isNuke;
+    /* JADX INFO: renamed from: E */
     public boolean isBeam;
+    /* JADX INFO: renamed from: F */
     public float maxLifeTime;
+    /* JADX INFO: renamed from: G */
     public boolean spawnEmitterOnHit;
+    /* JADX INFO: renamed from: H */
     public float damageMultiplier;
+    /* JADX INFO: renamed from: I */
     public float randomSeed;
+    /* JADX INFO: renamed from: J */
     public float age;
+    /* JADX INFO: renamed from: K */
     public float trackOffsetX;
+    /* JADX INFO: renamed from: L */
     public float trackOffsetY;
+    /* JADX INFO: renamed from: M */
     public boolean renderJitter;
+    /* JADX INFO: renamed from: N */
     public float jitterTimer;
+    /* JADX INFO: renamed from: O */
     public float[] jitterOffsets;
+    /* JADX INFO: renamed from: P */
     public short textureFrame;
+    /* JADX INFO: renamed from: Q */
     public short frameIndex;
+    /* JADX INFO: renamed from: R */
     public short textureType;
+    /* JADX INFO: renamed from: S */
     public boolean hasExploded;
     public boolean T;
+    /* JADX INFO: renamed from: U */
     public float damage;
+    /* JADX INFO: renamed from: V */
     public boolean removalComplete;
+    /* JADX INFO: renamed from: W */
     public float explosionAnimTimer;
+    /* JADX INFO: renamed from: X */
     public float explosionAnimDuration;
+    /* JADX INFO: renamed from: Y */
     public float splashDamage;
+    /* JADX INFO: renamed from: Z */
     public float explosionRadius;
+    /* JADX INFO: renamed from: aa */
     public boolean damageEnemiesOnly;
+    /* JADX INFO: renamed from: ab */
     public boolean noFriendlyFire;
+    /* JADX INFO: renamed from: ac */
     public boolean canHitSubmerged;
+    /* JADX INFO: renamed from: ad */
     public boolean excludesAir;
+    /* JADX INFO: renamed from: ae */
     public boolean matchesTargetAltitude;
+    /* JADX INFO: renamed from: af */
     public boolean explodesOnTimerEnd;
+    /* JADX INFO: renamed from: ag */
     public float pushForce;
+    /* JADX INFO: renamed from: ah */
     public float pushBase;
+    /* JADX INFO: renamed from: ai */
     public float damageToBuildings;
+    /* JADX INFO: renamed from: aj */
     public float damageToAir;
+    /* JADX INFO: renamed from: ak */
     public float targetDamageMultiplier;
+    /* JADX INFO: renamed from: al */
     public float splashDamageMultiplier;
+    /* JADX INFO: renamed from: am */
     public float globalDamageMultiplier;
+    /* JADX INFO: renamed from: an */
     public float armourIgnore;
+    /* JADX INFO: renamed from: ao */
     public boolean trackHitUnits;
+    /* JADX INFO: renamed from: ap */
     public FastArrayList hitUnits;
+    /* JADX INFO: renamed from: ar */
     public int color;
+    /* JADX INFO: renamed from: as */
     public boolean isAreaDamage;
+    /* JADX INFO: renamed from: at */
     public boolean collidesWithTerrain;
+    /* JADX INFO: renamed from: au */
     public GameObject followObject;
+    /* JADX INFO: renamed from: av */
     public int followNodeIndex;
+    /* JADX INFO: renamed from: aw */
     public float followLastX;
+    /* JADX INFO: renamed from: ax */
     public float followLastY;
+    /* JADX INFO: renamed from: ay */
     public float followLastZ;
+    /* JADX INFO: renamed from: az */
     public float angle;
+    /* JADX INFO: renamed from: aA */
     public float explosionSearchRadius;
     public boolean aB;
+    /* JADX INFO: renamed from: aC */
     public boolean fliesToPosition;
+    /* JADX INFO: renamed from: aD */
     public int depth;
+    /* JADX INFO: renamed from: aE */
     public AnimationSet animationSet;
+    /* JADX INFO: renamed from: aF */
     public float retargetTimer;
+    /* JADX INFO: renamed from: aG */
     public boolean autoRetarget;
+    /* JADX INFO: renamed from: aH */
     public boolean isBallistic;
+    /* JADX INFO: renamed from: aI */
     public float minHeight;
+    /* JADX INFO: renamed from: aJ */
     public float maxHeight;
+    /* JADX INFO: renamed from: aK */
     public boolean reachedApex;
+    /* JADX INFO: renamed from: aL */
     public float verticalVelocity;
+    /* JADX INFO: renamed from: aM */
     public boolean hasTrail;
+    /* JADX INFO: renamed from: aN */
     public float trailTimer;
+    /* JADX INFO: renamed from: aO */
     public float explosionParticleTimer;
     public Effect aP;
+    /* JADX INFO: renamed from: aQ */
     public boolean isSmallExplosion;
+    /* JADX INFO: renamed from: aR */
     public boolean playsHitSound;
+    /* JADX INFO: renamed from: bn */
     private boolean hasHit;
+    /* JADX INFO: renamed from: aS */
     public boolean removeRequested;
+    /* JADX INFO: renamed from: aT */
     public float renderAngle;
+    /* JADX INFO: renamed from: aU */
     public boolean angleInitialized;
+    /* JADX INFO: renamed from: aV */
     float hitX;
+    /* JADX INFO: renamed from: aW */
     float hitY;
+    /* JADX INFO: renamed from: aX */
     float hitZ;
+    /* JADX INFO: renamed from: aY */
     public boolean revealsFog;
+    /* JADX INFO: renamed from: aZ */
     public boolean visibilityChecked;
     public static final UnitList bi;
     public GamePaint bj;
@@ -1364,16 +1458,16 @@ public class Projectile extends PositionedObject {
                                 ScorchMark.a(this.hitX, this.hitY, ExplosionType.nuke);
                             }
                             if (GameEngine.isFancyWaterSupported()) {
-                                if (gameEngine.effectManager.texture2 == null) {
-                                    gameEngine.effectManager.texture2 = gameEngine.renderGraphicsEngine.a(com.corrodinggames.rts.R.drawable.shockwave_normal_256, true);
+                                if (gameEngine.effectManager.shockwaveTexture == null) {
+                                    gameEngine.effectManager.shockwaveTexture = gameEngine.renderGraphicsEngine.a(com.corrodinggames.rts.R.drawable.shockwave_normal_256, true);
                                 }
                                 gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
                                 Effect effectCreateLightEffect13 = gameEngine.effectManager.createLightEffect(this.hitX, this.hitY, this.posZ, -1);
-                                if (effectCreateLightEffect13 != null && gameEngine.effectManager.texture2 != null) {
+                                if (effectCreateLightEffect13 != null && gameEngine.effectManager.shockwaveTexture != null) {
                                     effectCreateLightEffect13.a = new EffectTemplate((BuiltInEffectType) null);
                                     effectCreateLightEffect13.a.imageStrip = new SpriteSheet();
                                     effectCreateLightEffect13.a.imageStrip.k = true;
-                                    effectCreateLightEffect13.a.imageStrip.i = gameEngine.effectManager.texture2;
+                                    effectCreateLightEffect13.a.imageStrip.i = gameEngine.effectManager.shockwaveTexture;
                                     effectCreateLightEffect13.a.imageStrip.b = effectCreateLightEffect13.a.imageStrip.i.m();
                                     effectCreateLightEffect13.a.imageStrip.c = effectCreateLightEffect13.a.imageStrip.i.l();
                                     effectCreateLightEffect13.ar = (short) 3;

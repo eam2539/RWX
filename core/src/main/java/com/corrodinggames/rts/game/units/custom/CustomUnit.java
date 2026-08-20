@@ -130,7 +130,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     KoolPaint J;
 
     /* JADX INFO: renamed from: dL */
-    final FactoryQueueManager unitEffectManager;
+    final FactoryQueueManager factoryQueueManager;
     public static PointF dM;
     public static BaseUnit dN;
     public static int dO;
@@ -221,7 +221,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 gameOutputStream.writeBoolean(legInstance.n);
             }
         }
-        this.unitEffectManager.a(gameOutputStream);
+        this.factoryQueueManager.a(gameOutputStream);
         gameOutputStream.writeUnitTypeId(this.factoryUnitConfig);
         gameOutputStream.writeBoolean(this.frameAnimationReverse);
         gameOutputStream.writeBoolean(this.frameAnimationPlaying);
@@ -493,7 +493,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 }
             }
             if (i >= 6) {
-                this.unitEffectManager.a(gameInputStream);
+                this.factoryQueueManager.a(gameInputStream);
             }
             if (i >= 7 && (unitTypeQ = gameInputStream.q()) != null) {
                 if (unitTypeQ instanceof CustomUnitConfig) {
@@ -584,7 +584,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             ((CustomUnitRenderHook) objArrA[i]).c(this);
         }
         PlayerTeam.a((BaseUnit) this);
-        this.unitEffectManager.a(true);
+        this.factoryQueueManager.a(true);
         super.remove();
     }
 
@@ -1145,7 +1145,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         if (!z) {
             if (!this.unitConfig.hasSetRallyAction) {
-                this.unitEffectManager.b = null;
+                this.factoryQueueManager.b = null;
             }
             if (this.unitConfig.movementType != customUnitConfig2.movementType) {
                 clearPathData();
@@ -1190,7 +1190,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         this.C = null;
         this.E = null;
         this.F = null;
-        this.unitEffectManager = new FactoryQueueManager(this);
+        this.factoryQueueManager = new FactoryQueueManager(this);
         this.legInstances = null;
         this.eg = new FastArrayList();
         a(customUnitConfig, true, false);
@@ -1265,13 +1265,13 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     public final boolean a(TurretConfig turretConfig, int i, BaseUnit baseUnit, boolean z, boolean z2) {
         float f;
-        if (!z && (turretConfig.canSpawn2 || z2)) {
+        if (!z && (turretConfig.hasRangeRestrictions || z2)) {
             float fDistanceSq = Utility.distanceSq(this.posX, this.posY, baseUnit.posX, baseUnit.posY);
             if (fDistanceSq > turretConfig.effectiveRangeSquared || fDistanceSq < turretConfig.limitingMinRangeSquared) {
                 return false;
             }
         }
-        if (!turretConfig.canSpawn) {
+        if (!turretConfig.hasAttackRestrictions) {
             return true;
         }
         if (turretConfig.limitingAngle != -1.0f) {
@@ -1679,10 +1679,10 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                     this.posY += pointFN.y;
                     if (customUnitConfig.movementType == UnitMovementType.AIR) {
                         GameEngine gameEngine = GameEngine.getInstance();
-                        this.unitAnimationRotation += f;
-                        this.unitAnimationOffset += f;
-                        if (customUnitConfig.slowDeathFallSmoke && this.unitAnimationRotation > 9.0f) {
-                            this.unitAnimationRotation = Utility.randomFloatInRange(1.0f, 3.0f);
+                        this.damageEffectTimer2 += f;
+                        this.damageEffectTimer += f;
+                        if (customUnitConfig.slowDeathFallSmoke && this.damageEffectTimer2 > 9.0f) {
+                            this.damageEffectTimer2 = Utility.randomFloatInRange(1.0f, 3.0f);
                             Effect effectCreateEffectInternal = gameEngine.effectManager.createEffectInternal(this.posX, this.posY, this.posZ, EffectType.custom, false, EffectQuality.low);
                             if (effectCreateEffectInternal != null) {
                                 effectCreateEffectInternal.aq = 0;
@@ -1699,8 +1699,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                                 effectCreateEffectInternal.Q = 0.0f;
                             }
                         }
-                        if (this.unitAnimationOffset > 7.0f) {
-                            this.unitAnimationOffset = 0.0f;
+                        if (this.damageEffectTimer > 7.0f) {
+                            this.damageEffectTimer = 0.0f;
                             Effect effectCreateEffectInternal2 = gameEngine.effectManager.createEffectInternal(this.posX, this.posY, this.posZ, EffectType.custom, false, EffectQuality.verylow);
                             if (effectCreateEffectInternal2 != null) {
                                 EffectEmitter.b(effectCreateEffectInternal2, true);
@@ -1863,7 +1863,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 }
             }
         }
-        this.unitEffectManager.a(f);
+        this.factoryQueueManager.a(f);
         CustomUnitConfig customUnitConfig3 = this.unitConfig;
         if (customUnitConfig3.isBuilder) {
             BuilderUnit.updateTargetPriorityPoints(f, this);
@@ -2059,9 +2059,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                     }
                     this.posZ -= this.frameAnimationDelay * f;
                     if (this.frameAnimationDelay > 1.5d) {
-                        this.unitAnimationRotation += f;
-                        if (this.unitAnimationRotation > 0.5d) {
-                            this.unitAnimationRotation = 0.0f;
+                        this.damageEffectTimer2 += f;
+                        if (this.damageEffectTimer2 > 0.5d) {
+                            this.damageEffectTimer2 = 0.0f;
                             Effect effectCreateEffectInternal3 = gameEngine2.effectManager.createEffectInternal(this.posX + Utility.randomFloatInRange(-this.radius, this.radius), this.posY + Utility.randomFloatInRange(-this.radius, this.radius), this.posZ, EffectType.custom, false, EffectQuality.high);
                             if (effectCreateEffectInternal3 != null) {
                                 effectCreateEffectInternal3.aq = 0;
@@ -2117,7 +2117,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             z7 = true;
         }
         if (z7) {
-            AbstractUnitAction abstractUnitActionD = this.unitEffectManager.d();
+            AbstractUnitAction abstractUnitActionD = this.factoryQueueManager.d();
             boolean zL = false;
             if (abstractUnitActionD != null) {
                 if (abstractUnitActionD instanceof CustomAction) {
@@ -2149,7 +2149,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                         if (customActionDef.whenBuildingRotateToAimAtActionTarget) {
                             float f10 = this.posX;
                             float f11 = this.posY;
-                            com.corrodinggames.rts.game.units.buildings.Projectile projectileB = this.unitEffectManager.b();
+                            com.corrodinggames.rts.game.units.buildings.Projectile projectileB = this.factoryQueueManager.b();
                             if (projectileB != null) {
                                 float f12 = Float.MIN_VALUE;
                                 float f13 = Float.MIN_VALUE;
@@ -2182,10 +2182,10 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                         this.animationController.a(customActionDef.whenBuildingPlayAnimation.b(), 10);
                     }
                     if (z8) {
-                        this.unitEffectManager.e = 0.0f;
+                        this.factoryQueueManager.e = 0.0f;
                     }
                 }
-                if (customUnitConfig3.queuedUnitsAnimation != null && abstractUnitActionD.getUnitType() != null && this.unitEffectManager.e >= customUnitConfig3.queuedUnitsAnimation.q) {
+                if (customUnitConfig3.queuedUnitsAnimation != null && abstractUnitActionD.getUnitType() != null && this.factoryQueueManager.e >= customUnitConfig3.queuedUnitsAnimation.q) {
                     this.animationController.a(customUnitConfig3.queuedUnitsAnimation, 5);
                 }
             }
@@ -2451,7 +2451,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         RenderRegistry.drawPreFire(this, gameEngine);
         RenderRegistry.drawPostFire(this, gameEngine);
         GameViewUtils.a((OrderableUnit) this);
-        if (this.legInstances != null && !z && customUnitConfig.energyStartPercentage) {
+        if (this.legInstances != null && !z && customUnitConfig.drawLegsOverBody) {
             CustomUnitLegController.a(this, f, true, false);
         }
         if (canMove() && customUnitConfig.mainNanoTurret != null && !z) {
@@ -2946,7 +2946,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: e */
     public AbstractUnitAction getUnitAction(UnitType unitType) {
-        return this.unitEffectManager.b(unitType);
+        return this.factoryQueueManager.b(unitType);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -2987,7 +2987,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (z && (abstractUnitAction instanceof CustomAction) && !((CustomAction) abstractUnitAction).actionDef.canPlayerCancel) {
             return;
         }
-        com.corrodinggames.rts.game.units.buildings.Projectile projectileA = this.unitEffectManager.a(abstractUnitAction, z, pointF, baseUnit);
+        com.corrodinggames.rts.game.units.buildings.Projectile projectileA = this.factoryQueueManager.a(abstractUnitAction, z, pointF, baseUnit);
         if (!z) {
             if (projectileA != null) {
                 a(UnitEventType.queueItemAdded, (BaseUnit) null, abstractUnitAction.getAnimationSet(), (VariableScope) null);
@@ -3009,12 +3009,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: b */
     public void stopMoving(AbstractUnitAction abstractUnitAction, boolean z) {
-        this.unitEffectManager.a(abstractUnitAction, z);
+        this.factoryQueueManager.a(abstractUnitAction, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public void a(AbstractUnitAction abstractUnitAction) {
-        this.unitEffectManager.a(abstractUnitAction);
+        this.factoryQueueManager.a(abstractUnitAction);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -3118,7 +3118,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     }
 
     public void i(boolean z) {
-        this.unitEffectManager.a(z);
+        this.factoryQueueManager.a(z);
     }
 
     public boolean a(AbstractUnitAction abstractUnitAction, PointF pointF, BaseUnit baseUnit, int i) {
@@ -3296,7 +3296,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                         a(unitCombatAnimation, true);
                     }
                     S();
-                    this.unitEffectManager.e();
+                    this.factoryQueueManager.e();
                     this.lastConvertedStamp = GameEngine.getInstance().gameTimeMillis;
                     PlayerTeam.c(this);
                 }
@@ -3333,7 +3333,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (this.unitConfig.exit_moveAwayAmount != null) {
             fFloatValue2 = this.unitConfig.exit_moveAwayAmount.floatValue();
         }
-        this.unitEffectManager.a(baseUnit, fFloatValue2, this.r);
+        this.factoryQueueManager.a(baseUnit, fFloatValue2, this.r);
     }
 
     public void F(BaseUnit baseUnit) {
@@ -3365,7 +3365,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public UnitPrice by() {
-        FastArrayList fastArrayListG = this.unitEffectManager.g();
+        FastArrayList fastArrayListG = this.factoryQueueManager.g();
         int size = fastArrayListG.size();
         if (size == 0) {
             return UnitPrice.a;
@@ -3403,54 +3403,54 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public int h(UnitType unitType) {
-        return this.unitEffectManager.a(unitType);
+        return this.factoryQueueManager.a(unitType);
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public int f(boolean z) {
-        return this.unitEffectManager.a(AbstractUnitAction.NONE_ACTION_ID, z, true);
+        return this.factoryQueueManager.a(AbstractUnitAction.NONE_ACTION_ID, z, true);
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public int a(ActionId actionId, boolean z) {
-        return this.unitEffectManager.a(actionId, z);
+        return this.factoryQueueManager.a(actionId, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public com.corrodinggames.rts.game.units.buildings.Projectile dw() {
-        return this.unitEffectManager.b();
+        return this.factoryQueueManager.b();
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: bD */
     public UnitPrice getQueuedActionPriceDelta() {
-        return this.unitEffectManager.c();
+        return this.factoryQueueManager.c();
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public FastArrayList dx() {
-        return this.unitEffectManager.c;
+        return this.factoryQueueManager.c;
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public void dz() {
-        this.unitEffectManager.e = 1.0f;
+        this.factoryQueueManager.e = 1.0f;
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public boolean dy() {
-        return this.unitEffectManager.a();
+        return this.factoryQueueManager.a();
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public int a(AnimationTag animationTag) {
-        return this.unitEffectManager.a(animationTag);
+        return this.factoryQueueManager.a(animationTag);
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public void a(PointF pointF) {
         if (this.unitConfig.hasSetRallyAction) {
-            this.unitEffectManager.b = pointF;
+            this.factoryQueueManager.b = pointF;
         }
     }
 
@@ -3469,8 +3469,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public float bV() {
-        if (isAlive() && !this.unitEffectManager.a() && this.unitConfig.showQueueBar) {
-            return this.unitEffectManager.e;
+        if (isAlive() && !this.factoryQueueManager.a() && this.unitConfig.showQueueBar) {
+            return this.factoryQueueManager.e;
         }
         return super.bV();
     }
@@ -3520,9 +3520,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: ca */
     public void drawRallyPoint() {
-        if (this.unitEffectManager.b != null) {
+        if (this.factoryQueueManager.b != null) {
             final GameEngine instance = GameEngine.getInstance();
-            instance.renderGraphicsEngine.a((float) (int) (this.posX - instance.viewpointXSnapped), (float) (int) (this.posY - instance.viewpointYSnapped), (float) (int) (this.unitEffectManager.b.x - instance.viewpointXSnapped), (float) (int) (this.unitEffectManager.b.y - instance.viewpointYSnapped), FactoryWithQueue.y);
+            instance.renderGraphicsEngine.a((float) (int) (this.posX - instance.viewpointXSnapped), (float) (int) (this.posY - instance.viewpointYSnapped), (float) (int) (this.factoryQueueManager.b.x - instance.viewpointXSnapped), (float) (int) (this.factoryQueueManager.b.y - instance.viewpointYSnapped), FactoryWithQueue.y);
         }
     }
 
@@ -3538,7 +3538,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         if (!this.unitConfig.customArms.isEmpty()) {
             for (Object object : this.unitConfig.customArms) {
-                GameViewUtils.a((BaseUnit) this, ((CustomLimitedRange) object).value, true);
+                GameViewUtils.a((BaseUnit) this, ((CustomLimitedRange) object).rangeValue, true);
                 z = true;
             }
         }
@@ -3590,7 +3590,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 gameEngine.renderGraphicsEngine.l();
             }
         }
-        if (this.unitConfig.energyCanBeRecievedFromInAnotherUnit && this.legInstances != null && !this.isDead) {
+        if (this.unitConfig.drawLegsUnderAllUnits && this.legInstances != null && !this.isDead) {
             CustomUnitLegController.a(this, f, false, true);
         }
     }
@@ -4103,7 +4103,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit
     public void bv() {
         PlayerTeam.a((BaseUnit) this);
-        this.unitEffectManager.a(true);
+        this.factoryQueueManager.a(true);
         super.bv();
     }
 
@@ -4303,12 +4303,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         }
         if (this.unitConfig.exit_moveAwayAmount != null) {
             fFloatValue = this.unitConfig.exit_moveAwayAmount.floatValue();
-        } else if (this.unitEffectManager.b != null) {
+        } else if (this.factoryQueueManager.b != null) {
             fFloatValue = this.radius * 3.0f;
         } else {
             fFloatValue = this.radius * 2.0f;
         }
-        BaseUnit baseUnitA = this.unitEffectManager.a(projectile, fFloatValue, this.r, fFloatValue2);
+        BaseUnit baseUnitA = this.factoryQueueManager.a(projectile, fFloatValue, this.r, fFloatValue2);
         if (baseUnitA != null) {
             F(baseUnitA);
             PlayerTeam.c(baseUnitA);
@@ -4617,7 +4617,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: dh */
     public AnimationSet getTrackingTags() {
-        return this.unitConfig.tag2;
+        return this.unitConfig.trackingTags;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -4885,7 +4885,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public FastArrayList e(boolean z) {
         this.eg.clear();
-        if (this.unitConfig.energyCanTransferToOtherUnits.size > 0) {
+        if (this.unitConfig.attachmentSlotDefinitions.size > 0) {
             AttachmentManagerHook.a(this, this.eg, z);
         }
         if (this.eg.size > 0) {

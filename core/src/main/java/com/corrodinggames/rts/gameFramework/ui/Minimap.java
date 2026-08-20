@@ -174,11 +174,9 @@ public class Minimap {
     /* JADX INFO: renamed from: Q */
     public float fogRefreshProgress = 0.0f;
 
-    /* JADX INFO: renamed from: R */
-    int field_R = 30;
+    int R = 30;
 
-    /* JADX INFO: renamed from: S */
-    int field_S = -1;
+    int S = -1;
 
     /* JADX INFO: renamed from: V */
     final Rect tempDrawRect = new Rect();
