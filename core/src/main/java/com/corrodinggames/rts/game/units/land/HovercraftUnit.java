@@ -192,7 +192,7 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
     /* JADX INFO: renamed from: f */
     public void releaseAllUnits(boolean z) {
         for (BaseUnit baseUnit : this.transportedUnits) {
-            baseUnit.unitTransportTarget = null;
+            baseUnit.transportContainer = null;
             baseUnit.posX = this.posX + (Utility.fastCos(this.rotationSpeed) * (-9.0f));
             baseUnit.posY = this.posY + (Utility.fastSin(this.rotationSpeed) * (-9.0f));
             if (z) {
@@ -265,7 +265,7 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
         if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
             return false;
         }
-        baseUnit2.unitTransportTarget = null;
+        baseUnit2.transportContainer = null;
         baseUnit2.posX = fFastCos2;
         baseUnit2.posY = fFastSin2;
         baseUnit2.worldX += 0.1f;
@@ -403,16 +403,16 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
     }
 
     public void C(BaseUnit baseUnit) {
-        baseUnit.unitTransportTarget = this;
+        baseUnit.transportContainer = this;
         this.transportedUnits.add(baseUnit);
         GameEngine.getInstance().gameUI.deselectUnit(baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.TransportUnitInterface
     public void e(BaseUnit baseUnit) {
-        if (baseUnit.unitTransportTarget == this) {
+        if (baseUnit.transportContainer == this) {
             this.transportedUnits.remove(baseUnit);
-            baseUnit.unitTransportTarget = null;
+            baseUnit.transportContainer = null;
         } else {
             GameEngine.logWarningAndStack("Unit is not being transported");
         }

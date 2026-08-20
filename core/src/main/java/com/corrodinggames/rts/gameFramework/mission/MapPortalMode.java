@@ -285,7 +285,7 @@ public class MapPortalMode {
     }
 
     private boolean isTransferableUnit(BaseUnit unit) {
-        if (unit == null || unit.isDead || unit.team == null || unit.unitTransportTarget != null || unit.parentEntity != null) {
+        if (unit == null || unit.isDead || unit.team == null || unit.transportContainer != null || unit.parentEntity != null) {
             return false;
         }
         if (!(unit instanceof OrderableUnit)) {

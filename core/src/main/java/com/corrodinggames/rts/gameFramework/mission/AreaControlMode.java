@@ -1422,7 +1422,7 @@ public class AreaControlMode {
             if (!(unit instanceof OrderableUnit) || unit.isDead || !unit.isAlive() || unit.isExcludedFromDefeatCheck()) {
                 return false;
             }
-            if (unit.unitTransportTarget != null || unit.parentEntity != null || unit.team == null) {
+            if (unit.transportContainer != null || unit.parentEntity != null || unit.team == null) {
                 return false;
             }
             return isEligibleCaptureTeam(unit.team) && (!this.groundOnly || unit.getMovementType() != UnitMovementType.AIR);

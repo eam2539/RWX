@@ -139,7 +139,7 @@ public class CustomUnitLegController extends CustomUnitRenderHook {
         if (attachmentSlotDefinitionDn != null && attachmentSlotDefinitionDn.t) {
             return;
         }
-        if (customUnit.unitTransportTarget != null && attachmentSlotDefinitionDn == null) {
+        if (customUnit.transportContainer != null && attachmentSlotDefinitionDn == null) {
             for (LegInstance legInstance : legInstanceArr) {
                 legInstance.m = true;
             }

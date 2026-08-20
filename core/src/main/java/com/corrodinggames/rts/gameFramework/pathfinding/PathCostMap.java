@@ -442,7 +442,7 @@ public final class PathCostMap {
         final BaseUnit[] a = BaseUnit.bE.a();
         for (int i = 0; i < BaseUnit.bE.size(); ++i) {
             final BaseUnit baseUnit = a[i];
-            if (baseUnit.isAlive && !baseUnit.bI() && !baseUnit.isMoving && !(baseUnit instanceof Tree) && !baseUnit.isDead && !baseUnit.i() && baseUnit.unitTransportTarget == null && !baseUnit.Q()) {
+            if (baseUnit.isAlive && !baseUnit.bI() && !baseUnit.isMoving && !(baseUnit instanceof Tree) && !baseUnit.isDead && !baseUnit.i() && baseUnit.transportContainer == null && !baseUnit.Q()) {
                 int n = 2;
                 q.setCursorTileIndexFromWorldPoint(baseUnit.posX, baseUnit.posY);
                 final int cursorTileX = q.cursorTileX;

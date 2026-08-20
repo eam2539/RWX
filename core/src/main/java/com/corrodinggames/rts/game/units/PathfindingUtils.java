@@ -146,7 +146,7 @@ public final class PathfindingUtils {
     }
 
     public static boolean a(OrderableUnit orderableUnit, BaseUnit baseUnit) {
-        if (baseUnit.unitTransportTarget != null || !orderableUnit.canAttackUnitType(baseUnit) || !baseUnit.d((BaseUnit) orderableUnit)) {
+        if (baseUnit.transportContainer != null || !orderableUnit.canAttackUnitType(baseUnit) || !baseUnit.d((BaseUnit) orderableUnit)) {
             return false;
         }
         return true;

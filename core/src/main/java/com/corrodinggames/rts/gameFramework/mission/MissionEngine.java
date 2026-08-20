@@ -540,7 +540,7 @@ public class MissionEngine extends Serializable {
             }
         }
         for (final BaseUnit baseUnit : BaseUnit.bE) {
-            if (!baseUnit.u() && !(baseUnit instanceof Tree) && !baseUnit.bI() && baseUnit.unitTransportTarget == null && baseUnit.parentEntity == null) {
+            if (!baseUnit.u() && !(baseUnit instanceof Tree) && !baseUnit.bI() && baseUnit.transportContainer == null && baseUnit.parentEntity == null) {
                 BaseUnit baseUnit2 = null;
                 float float1 = 4900.0f;
                 for (final BaseUnit baseUnit3 : BaseUnit.bE) {

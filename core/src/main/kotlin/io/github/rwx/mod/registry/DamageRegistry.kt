@@ -179,7 +179,7 @@ object DamageRegistry : OwnedRegistry {
         val avoidChance = damageOf(target)?.avoidChance ?: 0f
         if (avoidChance <= 0f) return damage
         val roll = Utility.getDeterministicRandomFloat(target, 0f, 1f, AVOID_ROLL_SALT)
-        target.unitFlags4++
+        target.unitCounter++
         return if (roll < avoidChance - hitRateBonus) 0f else damage
     }
 
@@ -350,7 +350,7 @@ object DamageRegistry : OwnedRegistry {
         target: BaseUnit,
     ): Boolean {
         if (target === projectile.l || target === source) return false
-        if (target.isDead || !target.isAlive || target.unitTransportTarget != null) return false
+        if (target.isDead || !target.isAlive || target.transportContainer != null) return false
         val sourceTeam = source.team ?: return false
         val targetTeam = target.team ?: return false
         if (!sourceTeam.c(targetTeam)) return false

@@ -252,7 +252,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
                     if (!GameViewUtils.a(baseUnit, fFastCos2, fFastSin)) {
                         this.o.add(baseUnit);
                     } else {
-                        baseUnit.unitTransportTarget = null;
+                        baseUnit.transportContainer = null;
                         baseUnit.posX = fFastCos2;
                         baseUnit.posY = fFastSin;
                         baseUnit.worldX += 0.1f;
@@ -381,7 +381,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
 
     public void f(boolean z) {
         for (BaseUnit baseUnit : this.o) {
-            baseUnit.unitTransportTarget = null;
+            baseUnit.transportContainer = null;
             baseUnit.posX = this.posX + (Utility.fastCos(this.rotationSpeed) * (-9.0f));
             baseUnit.posY = this.posY + (Utility.fastSin(this.rotationSpeed) * (-9.0f));
             if (z) {
@@ -434,16 +434,16 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
     }
 
     public void C(BaseUnit baseUnit) {
-        baseUnit.unitTransportTarget = this;
+        baseUnit.transportContainer = this;
         this.o.add(baseUnit);
         GameEngine.getInstance().gameUI.deselectUnit(baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.TransportUnitInterface
     public void e(BaseUnit baseUnit) {
-        if (baseUnit.unitTransportTarget == this) {
+        if (baseUnit.transportContainer == this) {
             this.o.remove(baseUnit);
-            baseUnit.unitTransportTarget = null;
+            baseUnit.transportContainer = null;
         } else {
             GameEngine.logWarningAndStack("Unit is not being transported");
         }

@@ -722,7 +722,7 @@ public class GameInterfaceRenderer extends Serializable {
     }
 
     private boolean a(UnitBase unitBase) {
-        if (!unitBase.isDead && unitBase.unitTransportTarget == null) {
+        if (!unitBase.isDead && unitBase.transportContainer == null) {
             float f = unitBase.posX;
             float f2 = unitBase.posY - unitBase.posZ;
             if (f2 <= 0.0f) {
@@ -2233,8 +2233,8 @@ public class GameInterfaceRenderer extends Serializable {
                 str2 = str2 + "Upgradable" + str;
             }
         }
-        if (!z3 && baseUnit.unitCargoType > 0) {
-            str2 = str2 + "Kills: " + baseUnit.unitCargoType + str;
+        if (!z3 && baseUnit.killCount > 0) {
+            str2 = str2 + "Kills: " + baseUnit.killCount + str;
         }
         boolean z5 = false;
         if (GameEngine.getInstance().isDebugTempMode) {
@@ -2288,8 +2288,8 @@ public class GameInterfaceRenderer extends Serializable {
                 if (customUnit2.unitTarget3 != null && !customUnit2.unitTarget3.isDead) {
                     str2 = str2 + "customTarget2: " + customUnit2.unitTarget3.getUnitDebugName() + str;
                 }
-                if (customUnit2.unitFlags2 != -9999) {
-                    str2 = str2 + "customTimer: " + Utility.formatSeconds(customUnit2.unitFlags2 / 1000.0f) + str;
+                if (customUnit2.customTimerStamp != -9999) {
+                    str2 = str2 + "customTimer: " + Utility.formatSeconds(customUnit2.customTimerStamp / 1000.0f) + str;
                 }
                 if (customUnit2.unitVariables != null && !customUnit2.unitVariables.isEmpty()) {
                     str2 = str2 + "-- memory --: " + str + customUnit2.unitVariables.debugMemory(true, true) + str;

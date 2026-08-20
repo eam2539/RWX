@@ -1779,7 +1779,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         if (f < 0.3f) {
             f = 0.3f;
         }
-        if (this.ax && this.team.isSpectatorTeamColor()) {
+        if (this.needsRecalculation && this.team.isSpectatorTeamColor()) {
             int i = 0;
             while (true) {
                 if (i < PlayerTeam.TEAM_NEUTRAL) {
@@ -2837,20 +2837,20 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             for (BaseUnit baseUnit2 : BaseUnit.getGlobalUnitList()) {
                 if ((baseUnit2 instanceof BaseUnit) && Utility.distanceSq(baseUnit2.posX, baseUnit2.posY, pointF.x, pointF.y) < 2500.0f) {
                     if (abstractUnitAction == editorIconTexture3) {
-                        if (baseUnit2.unitTransportTarget == null && baseUnit2.parentEntity == null) {
+                        if (baseUnit2.transportContainer == null && baseUnit2.parentEntity == null) {
                             baseUnit2.removeFromGame();
                             if ((baseUnit2 instanceof OrderableUnit) && baseUnit2.bI()) {
                                 gameEngine.pathfindingEngine.a((OrderableUnit) baseUnit2);
                             }
                         }
                     } else if (abstractUnitAction == editorIconTexture4) {
-                        if (baseUnit2.unitTransportTarget == null && baseUnit2.parentEntity == null) {
+                        if (baseUnit2.transportContainer == null && baseUnit2.parentEntity == null) {
                             baseUnit2.currentHealth = -1.0f;
                         }
                     } else if (abstractUnitAction != editorIconTexture2) {
                         continue;
                     } else if (i3 <= 4) {
-                        if (!baseUnit2.bI() && !(baseUnit2 instanceof Tree) && !baseUnit2.isDead && baseUnit2.unitTransportTarget == null && baseUnit2.parentEntity == null) {
+                        if (!baseUnit2.bI() && !(baseUnit2 instanceof Tree) && !baseUnit2.isDead && baseUnit2.transportContainer == null && baseUnit2.parentEntity == null) {
                             i3++;
                             UnitType unitTypeR = baseUnit2.r();
                             for (int i4 = -25; i4 < 25; i4++) {

@@ -161,7 +161,7 @@ public class AttachmentAction extends LogicAction {
                             }
                             AttachmentSlotDefinition attachmentSlotDefinition = (AttachmentSlotDefinition) it3.next();
                             if (customUnit.a(attachmentSlotDefinition) == null && customUnit.a(orderableUnit2, attachmentSlotDefinition)) {
-                                orderableUnit2.unitTransportCapacity = -9999;
+                                orderableUnit2.attachmentStartTimeMillis = -9999;
                                 z3 = true;
                                 break;
                             }
@@ -174,7 +174,7 @@ public class AttachmentAction extends LogicAction {
                             }
                             AttachmentSlotDefinition attachmentSlotDefinition2 = (AttachmentSlotDefinition) it4.next();
                             if (customUnit.a(attachmentSlotDefinition2) == null && customUnit.a(orderableUnit2, attachmentSlotDefinition2)) {
-                                orderableUnit2.unitTransportCapacity = -9999;
+                                orderableUnit2.attachmentStartTimeMillis = -9999;
                                 z3 = true;
                                 break;
                             }
@@ -190,13 +190,13 @@ public class AttachmentAction extends LogicAction {
             if (customUnit.parentEntity != null) {
                 customUnit.bx();
             }
-            if (customUnit.unitTransportTarget != null) {
-                if (customUnit.unitTransportTarget instanceof TransportUnitInterface) {
-                    ((TransportUnitInterface) customUnit.unitTransportTarget).e(customUnit);
+            if (customUnit.transportContainer != null) {
+                if (customUnit.transportContainer instanceof TransportUnitInterface) {
+                    ((TransportUnitInterface) customUnit.transportContainer).e(customUnit);
                     return true;
                 }
                 GameEngine.logWarningAndStack("transportedBy is not a TransportInterface");
-                customUnit.unitTransportTarget = null;
+                customUnit.transportContainer = null;
                 return true;
             }
             return true;

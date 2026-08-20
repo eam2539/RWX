@@ -90,9 +90,9 @@ public class FormationGroup {
         Iterator it = fastArrayList.iterator();
         while (it.hasNext()) {
             OrderableUnit orderableUnit2 = (OrderableUnit) it.next();
-            if (z || (orderableUnit2.transportedBy == null && !orderableUnit2.ae)) {
+            if (z || (orderableUnit2.transportedBy == null && !orderableUnit2.isTransportAttached)) {
                 float fDistance = Utility.distance(f, f2, orderableUnit2.posX, orderableUnit2.posY);
-                if (orderableUnit2.af) {
+                if (orderableUnit2.shouldMaintainFormation) {
                     fDistance -= 160.0f;
                 }
                 if (f3 == -1.0f || fDistance < f3) {
@@ -128,16 +128,16 @@ public class FormationGroup {
         Object[] objArrA = fastArrayList.a();
         int size = fastArrayList.size();
         for (int i2 = 0; i2 < size; i2++) {
-            ((OrderableUnit) objArrA[i2]).ap = false;
+            ((OrderableUnit) objArrA[i2]).isFormationMember = false;
         }
         for (int i3 = 0; i3 <= 2; i3++) {
             int size2 = fastArrayList.size();
             for (int i4 = 0; i4 < size2; i4++) {
                 OrderableUnit orderableUnit2 = (OrderableUnit) objArrA[i4];
-                if (!orderableUnit2.ap && orderableUnit2 != orderableUnit && ((z || (orderableUnit2.transportedBy == null && !orderableUnit2.ae)) && orderableUnit2.getMovementType() == orderableUnit.getMovementType())) {
+                if (!orderableUnit2.isFormationMember && orderableUnit2 != orderableUnit && ((z || (orderableUnit2.transportedBy == null && !orderableUnit2.isTransportAttached)) && orderableUnit2.getMovementType() == orderableUnit.getMovementType())) {
                     float fDistanceSq = Utility.distanceSq(orderableUnit2.posX, orderableUnit2.posY, orderableUnit.posX, orderableUnit.posY);
                     if ((i3 != 0 || fDistanceSq <= 3600.0f) && ((i3 != 1 || fDistanceSq <= 14400.0f) && (((z2 && fDistanceSq < 160000.0f) || (fDistanceSq < 40000.0f && i < 25)) && (z2 || Utility.abs(orderableUnit2.getMoveSpeed() - orderableUnit.getMoveSpeed()) < 0.4f)))) {
-                        orderableUnit2.ap = true;
+                        orderableUnit2.isFormationMember = true;
                         fastArrayList2.add(orderableUnit2);
                         i++;
                     }
@@ -168,16 +168,16 @@ public class FormationGroup {
         this.formationEngine.b.a(this.formationEngine.b.x / this.units.size(), this.formationEngine.b.y / this.units.size());
         float angleBetweenPoints = Utility.getAngleBetweenPoints(this.formationEngine.b.x, this.formationEngine.b.y, this.targetX, this.targetY);
         for (OrderableUnit orderableUnit2 : this.units) {
-            if (orderableUnit2.ah > 1) {
-                orderableUnit2.af = orderableUnit2.ae;
+            if (orderableUnit2.formationSlotIndex > 1) {
+                orderableUnit2.shouldMaintainFormation = orderableUnit2.isTransportAttached;
             } else {
-                orderableUnit2.af = false;
+                orderableUnit2.shouldMaintainFormation = false;
             }
-            if (orderableUnit2.af && orderableUnit2.ah > 7 && Utility.abs(Utility.rotateTowardsAngle(orderableUnit2.am, angleBetweenPoints, 360.0f)) > 80.0f) {
-                orderableUnit2.af = false;
+            if (orderableUnit2.shouldMaintainFormation && orderableUnit2.formationSlotIndex > 7 && Utility.abs(Utility.rotateTowardsAngle(orderableUnit2.formationSlotAngle, angleBetweenPoints, 360.0f)) > 80.0f) {
+                orderableUnit2.shouldMaintainFormation = false;
             }
             orderableUnit2.clearTransportState();
-            orderableUnit2.ah = (short) 0;
+            orderableUnit2.formationSlotIndex = (short) 0;
             orderableUnit2.lastTransportPathUpdateTick = gameEngine.gameTimeMillis;
             orderableUnit2.waypointSyncGroupId = this.formationId;
         }
@@ -188,7 +188,7 @@ public class FormationGroup {
             if (orderableUnitA == null) {
                 return;
             }
-            orderableUnitA.ae = true;
+            orderableUnitA.isTransportAttached = true;
             FormationGroup formationGroupB = null;
             if (i > 0) {
                 formationGroupB = this.formationEngine.b();
@@ -210,7 +210,7 @@ public class FormationGroup {
                 i2++;
             }
             if (orderableUnitA != null) {
-                orderableUnitA.ah = (short) (i2 + 1);
+                orderableUnitA.formationSlotIndex = (short) (i2 + 1);
             }
             FastArrayList fastArrayList = new FastArrayList();
             Object[] objArrA = this.units.a();

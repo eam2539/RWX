@@ -82,7 +82,7 @@ public class UnitCountCondition extends TriggerCondition {
         int size = BaseUnit.bE.size();
         for (int i2 = 0; i2 < size; i2++) {
             BaseUnit baseUnit = baseUnitArrA[i2];
-            if ((this.c == null || baseUnit.team == this.c) && (baseUnit instanceof OrderableUnit) && baseUnit.unitTransportTarget == null && mapTrigger.a(baseUnit) && (this.d == null || baseUnit.r() == this.d)) {
+            if ((this.c == null || baseUnit.team == this.c) && (baseUnit instanceof OrderableUnit) && baseUnit.transportContainer == null && mapTrigger.a(baseUnit) && (this.d == null || baseUnit.r() == this.d)) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
                 if ((this.p || baseUnit.isAlive()) && ((!this.l || baseUnit.canAttack()) && ((!this.m || (baseUnit.canAttack() && orderableUnit.canAttackFlyingUnits())) && ((!this.e || baseUnit.bI()) && ((!this.g || (baseUnit.bI() && baseUnit.bJ())) && ((!this.h || baseUnit.r().p()) && ((!this.j || baseUnit.canMove()) && ((!this.f || orderableUnit.hasNoCurrentWaypoint()) && ((!this.i || orderableUnit.a((AnimationTag) null) <= 0) && ((this.k == -1 || baseUnit.getUpgradeLevel() == this.k) && ((this.o == null || AnimationTag.a(this.o, baseUnit.getTags())) && (!this.n || orderableUnit.getTransportedUnitCount() <= 0)))))))))))) {
                     i++;

@@ -33,7 +33,7 @@ public class UnitGroupMarker extends Serializable {
     public void a() {
         BaseUnit baseUnit = null;
         for (BaseUnit baseUnit2 : this.a) {
-            if (!baseUnit2.isDead && baseUnit2.unitTransportTarget == null && this.i.gameUI.selectUnit(baseUnit2) && baseUnit2.isVisibleToLocalPlayer()) {
+            if (!baseUnit2.isDead && baseUnit2.transportContainer == null && this.i.gameUI.selectUnit(baseUnit2) && baseUnit2.isVisibleToLocalPlayer()) {
                 baseUnit = baseUnit2;
             }
         }

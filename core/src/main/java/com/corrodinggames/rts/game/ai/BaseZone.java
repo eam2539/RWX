@@ -646,7 +646,7 @@ public class BaseZone extends AIStrategyNode {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (baseUnit.team == this.aiController && countUnitsForStrategy(baseUnit) && baseUnit.unitTransportTarget == null && baseUnit.canUnitAttack() && (baseUnit instanceof OrderableUnit) && this.aiController.isEligibleUnitForRandomSelection(baseUnit)) {
+            if (baseUnit.team == this.aiController && countUnitsForStrategy(baseUnit) && baseUnit.transportContainer == null && baseUnit.canUnitAttack() && (baseUnit instanceof OrderableUnit) && this.aiController.isEligibleUnitForRandomSelection(baseUnit)) {
                 OrderableUnit orderableUnit2 = (OrderableUnit) baseUnit;
                 if (AIUnitActionUtils.a(orderableUnit2) && (!z || orderableUnit2.I())) {
                     this.lastTimeBuilt++;
@@ -692,7 +692,7 @@ public class BaseZone extends AIStrategyNode {
 
             for (int var9 = this.unitsInZone.size(); var8 < var9; var8++) {
                 BaseUnit var10 = var7[var8];
-                if (var10.team == this.aiController && this.countUnitsForStrategy(var10) && var10.unitTransportTarget == null) {
+                if (var10.team == this.aiController && this.countUnitsForStrategy(var10) && var10.transportContainer == null) {
                     UnitType var11 = var10.r();
                     if (var11.n() && var10 instanceof OrderableUnit && this.aiController.isEligibleUnitForRandomSelection(var10)) {
                         OrderableUnit var12 = (OrderableUnit) var10;
@@ -996,7 +996,7 @@ public class BaseZone extends AIStrategyNode {
 
                 for (int var8 = BaseUnit.bE.size(); var7 < var8; var7++) {
                     BaseUnit var9 = var6[var7];
-                    if (var9.team == this.aiController && var9.unitTransportTarget == null && var9 instanceof OrderableUnit && this.aiController.isEligibleUnitForRandomSelection(var9)) {
+                    if (var9.team == this.aiController && var9.transportContainer == null && var9 instanceof OrderableUnit && this.aiController.isEligibleUnitForRandomSelection(var9)) {
                         OrderableUnit var10 = (OrderableUnit) var9;
                         UnitType var11 = var9.r();
                         if (var5 ? var11.n() : var11 == var2 || var2.relatedUnits.contains(var11)) {
@@ -1037,7 +1037,7 @@ public class BaseZone extends AIStrategyNode {
             int size = this.unitsInZone.size();
             for (int i = 0; i < size; i++) {
                 BaseUnit baseUnit = baseUnitArrA[i];
-                if (baseUnit.team == this.aiController && countUnitsForStrategy(baseUnit) && baseUnit.unitTransportTarget == null && baseUnit.r().n() && (baseUnit instanceof OrderableUnit) && this.aiController.isEligibleUnitForRandomSelection(baseUnit) && Utility.randomFloatInRange(0.0f, 1.0f) <= 0.3d && (currentWaypoint = (orderableUnit = (OrderableUnit) baseUnit).getCurrentWaypoint()) != null && currentWaypoint.getCommandType() == UnitCommandType.reclaim && (targetUnit = currentWaypoint.getTargetUnit()) != null && targetUnit.getResourceRate() > 0.0f && !this.lastBuiltCustomUnit2.c(targetUnit.getBuildPrice())) {
+                if (baseUnit.team == this.aiController && countUnitsForStrategy(baseUnit) && baseUnit.transportContainer == null && baseUnit.r().n() && (baseUnit instanceof OrderableUnit) && this.aiController.isEligibleUnitForRandomSelection(baseUnit) && Utility.randomFloatInRange(0.0f, 1.0f) <= 0.3d && (currentWaypoint = (orderableUnit = (OrderableUnit) baseUnit).getCurrentWaypoint()) != null && currentWaypoint.getCommandType() == UnitCommandType.reclaim && (targetUnit = currentWaypoint.getTargetUnit()) != null && targetUnit.getResourceRate() > 0.0f && !this.lastBuiltCustomUnit2.c(targetUnit.getBuildPrice())) {
                     a(orderableUnit, r());
                     return;
                 }

@@ -163,7 +163,7 @@ public class TakeResourcesAction extends LogicAction {
                 }
             }
         }
-        if (this.takeResources_includeParent && (customUnit.parentEntity != null || customUnit.unitTransportTarget != null)) {
+        if (this.takeResources_includeParent && (customUnit.parentEntity != null || customUnit.transportContainer != null)) {
             fastArrayList.add(customUnit.parentEntity);
         }
         if (this.takeResources_includeReference != null && (unit = this.takeResources_includeReference.readUnit(customUnit)) != null && !unit.isDead) {

@@ -133,7 +133,7 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: r */
     private int repathDistanceThreshold;
-    private float s;
+    private float repathCooldown;
 
     /* JADX INFO: renamed from: t */
     private boolean isLowPriority;
@@ -143,39 +143,39 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: aa */
     public int lastCollisionTick;
-    public float ab;
+    public float pendingCredits;
 
     /* JADX INFO: renamed from: ac */
     public int waypointSyncGroupId;
 
     /* JADX INFO: renamed from: ad */
     public OrderableUnit transportedBy;
-    public boolean ae;
-    public boolean af;
+    public boolean isTransportAttached;
+    public boolean shouldMaintainFormation;
 
     /* JADX INFO: renamed from: ag */
     public int transportedUnitCount;
-    public short ah;
+    public short formationSlotIndex;
 
     /* JADX INFO: renamed from: ai */
     public float transportAttackAssistTimer;
-    public boolean aj;
+    public boolean inFormation;
 
     /* JADX INFO: renamed from: ak */
     public float transportOffsetX;
 
     /* JADX INFO: renamed from: al */
     public float transportOffsetY;
-    public float am;
+    public float formationSlotAngle;
 
     /* JADX INFO: renamed from: an */
     public int lastTransportPathUpdateTick;
-    public float ao;
-    public boolean ap;
-    public float aq;
-    public boolean ar;
-    public boolean as;
-    public PathPositionProvider au;
+    public float formationSlotDistanceSq;
+    public boolean isFormationMember;
+    public float navigationAngle;
+    public boolean isSecondaryRecharging;
+    public boolean isTargetSearchPending;
+    public PathPositionProvider pathPositionProvider;
 
     /* JADX INFO: renamed from: av */
     protected PositionData[] pathPositions;
@@ -185,9 +185,9 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: u */
     public boolean isPathIncomplete;
-    private int v;
-    private int w;
-    public boolean ax;
+    private int totalPathPositions;
+    private int longRangePathing;
+    public boolean needsRecalculation;
 
     /* JADX INFO: renamed from: ay */
     public boolean movementActiveThisFrame;
@@ -427,19 +427,19 @@ public abstract class OrderableUnit extends UnitBase {
         this.lastReclaimSearchTick = -9999;
         this.pathTargetX = 3.0f;
         this.pathTargetY = 3.0f;
-        this.aj = false;
+        this.inFormation = false;
         this.transportOffsetX = 0.0f;
         this.transportOffsetY = 0.0f;
-        this.am = 0.0f;
+        this.formationSlotAngle = 0.0f;
         this.lastTransportPathUpdateTick = 0;
-        this.ao = 0.0f;
-        this.aq = -999.0f;
-        this.ar = false;
-        this.as = false;
+        this.formationSlotDistanceSq = 0.0f;
+        this.navigationAngle = -999.0f;
+        this.isSecondaryRecharging = false;
+        this.isTargetSearchPending = false;
         this.pathPositions = at;
         this.activePathCount = 0;
-        this.v = 0;
-        this.ax = true;
+        this.totalPathPositions = 0;
+        this.needsRecalculation = true;
         this.cachedBasePaint = null;
         this.cachedSelectedPaint = null;
         this.nearbyCollisionSize = (byte) 0;
@@ -485,7 +485,7 @@ public abstract class OrderableUnit extends UnitBase {
                     for (int i5 = 0; i5 < i4; i5++) {
                         orderableUnit.resolveSoftCollisionWithUnit(baseUnitArrA2[i5], f, true);
                     }
-                    if (orderableUnit.nearbyCollisionSize > 9 && orderableUnit.unitFlags1 > i - 400) {
+                    if (orderableUnit.nearbyCollisionSize > 9 && orderableUnit.timeAliveStamp > i - 400) {
                         orderableUnit.nextCollisionQueryTick = gameEngine.gameTimeMillis + 5 + (i3 % 5);
                         orderableUnit.collisionActive = true;
                     }
@@ -624,14 +624,14 @@ public abstract class OrderableUnit extends UnitBase {
         gameOutputStream.writeBoolean(this.isPathingActive);
         gameOutputStream.writeFloat(this.pathTargetX);
         gameOutputStream.writeFloat(this.pathTargetY);
-        gameOutputStream.writeFloat(this.s);
+        gameOutputStream.writeFloat(this.repathCooldown);
         gameOutputStream.writeOrderableUnit(this.transportedBy);
-        gameOutputStream.writeBoolean(this.ae);
-        gameOutputStream.writeBoolean(this.af);
-        gameOutputStream.writeBoolean(this.aj);
+        gameOutputStream.writeBoolean(this.isTransportAttached);
+        gameOutputStream.writeBoolean(this.shouldMaintainFormation);
+        gameOutputStream.writeBoolean(this.inFormation);
         gameOutputStream.writeFloat(this.transportOffsetX);
         gameOutputStream.writeFloat(this.transportOffsetY);
-        gameOutputStream.writeFloat(this.am);
+        gameOutputStream.writeFloat(this.formationSlotAngle);
         gameOutputStream.writeInt(this.lastTransportPathUpdateTick);
         gameOutputStream.writeInt(this.waypointSyncGroupId);
         gameOutputStream.writeDebugMessage("activePathCount:");
@@ -640,7 +640,7 @@ public abstract class OrderableUnit extends UnitBase {
             this.pathPositions[i3].a(gameOutputStream);
         }
         gameOutputStream.writeInt(this.activePathCount);
-        gameOutputStream.writeInt(this.v);
+        gameOutputStream.writeInt(this.totalPathPositions);
         if (gameOutputStream.isDebugStream()) {
         }
         gameOutputStream.writeByte(12);
@@ -652,12 +652,12 @@ public abstract class OrderableUnit extends UnitBase {
         gameOutputStream.writeFloat(this.transportAttackAssistTimer);
         gameOutputStream.writeInt(this.pathTargetRadius);
         gameOutputStream.writeFloat(this.pathRetryTimer);
-        gameOutputStream.writeFloat(this.aq);
-        gameOutputStream.writeBoolean(this.ar);
-        gameOutputStream.writeBoolean(this.as);
-        gameOutputStream.writeShort(this.ah);
-        gameOutputStream.writeFloat(this.ab);
-        gameOutputStream.writeInt(this.w);
+        gameOutputStream.writeFloat(this.navigationAngle);
+        gameOutputStream.writeBoolean(this.isSecondaryRecharging);
+        gameOutputStream.writeBoolean(this.isTargetSearchPending);
+        gameOutputStream.writeShort(this.formationSlotIndex);
+        gameOutputStream.writeFloat(this.pendingCredits);
+        gameOutputStream.writeInt(this.longRangePathing);
         gameOutputStream.writeFloat(this.previousPathRetryTimer);
         gameOutputStream.writeFloat(this.bodyMovementFreezeTimer);
         gameOutputStream.writeFloat(this.legacyMovementTimer);
@@ -714,14 +714,14 @@ public abstract class OrderableUnit extends UnitBase {
         this.isPathingActive = gameInputStream.readBoolean();
         this.pathTargetX = gameInputStream.readFloat();
         this.pathTargetY = gameInputStream.readFloat();
-        this.s = gameInputStream.readFloat();
+        this.repathCooldown = gameInputStream.readFloat();
         setTransportParent(gameInputStream.readOrderableUnit());
-        this.ae = gameInputStream.readBoolean();
-        this.af = gameInputStream.readBoolean();
-        this.aj = gameInputStream.readBoolean();
+        this.isTransportAttached = gameInputStream.readBoolean();
+        this.shouldMaintainFormation = gameInputStream.readBoolean();
+        this.inFormation = gameInputStream.readBoolean();
         this.transportOffsetX = gameInputStream.readFloat();
         this.transportOffsetY = gameInputStream.readFloat();
-        this.am = gameInputStream.readFloat();
+        this.formationSlotAngle = gameInputStream.readFloat();
         this.lastTransportPathUpdateTick = gameInputStream.readInt();
         if (gameInputStream.getProtocolVersion() >= 18) {
             this.waypointSyncGroupId = gameInputStream.readInt();
@@ -745,7 +745,7 @@ public abstract class OrderableUnit extends UnitBase {
             }
         }
         this.activePathCount = gameInputStream.readInt();
-        this.v = gameInputStream.readInt();
+        this.totalPathPositions = gameInputStream.readInt();
         byte b = gameInputStream.readByte();
         if (b >= 1) {
             this.lastPathTargetX = gameInputStream.readFloat();
@@ -766,18 +766,18 @@ public abstract class OrderableUnit extends UnitBase {
             this.pathRetryTimer = gameInputStream.readFloat();
         }
         if (b >= 6) {
-            this.aq = gameInputStream.readFloat();
-            this.ar = gameInputStream.readBoolean();
-            this.as = gameInputStream.readBoolean();
+            this.navigationAngle = gameInputStream.readFloat();
+            this.isSecondaryRecharging = gameInputStream.readBoolean();
+            this.isTargetSearchPending = gameInputStream.readBoolean();
         }
         if (b >= 7) {
-            this.ah = gameInputStream.readShortValue();
+            this.formationSlotIndex = gameInputStream.readShortValue();
         }
         if (b >= 8) {
-            this.ab = gameInputStream.readFloat();
+            this.pendingCredits = gameInputStream.readFloat();
         }
         if (b >= 9) {
-            this.w = gameInputStream.readInt();
+            this.longRangePathing = gameInputStream.readInt();
         }
         if (b >= 10) {
             this.previousPathRetryTimer = gameInputStream.readFloat();
@@ -931,8 +931,8 @@ public abstract class OrderableUnit extends UnitBase {
             if (this.movementActiveThisFrame && I() && this.parentEntity == null) {
                 applyPositionChange(f, gameEngine, fFastCos2, moveYAxisScaling);
             }
-            if (this.ax) {
-                this.ax = false;
+            if (this.needsRecalculation) {
+                this.needsRecalculation = false;
                 c(false);
                 this.movementActiveThisFrame = true;
             }
@@ -1156,9 +1156,9 @@ public abstract class OrderableUnit extends UnitBase {
                         z2 = true;
                     }
                     if (!z2) {
-                        if (this.ae && orderableUnit3.transportedBy != null) {
+                        if (this.isTransportAttached && orderableUnit3.transportedBy != null) {
                             fBN *= f11;
-                        } else if (orderableUnit3.ae && this.transportedBy != null) {
+                        } else if (orderableUnit3.isTransportAttached && this.transportedBy != null) {
                             pushMass *= f11;
                         } else if (this.moveThrottle == 0.0f && orderableUnit3.moveThrottle != 0.0f) {
                             fBN *= f11;
@@ -1480,15 +1480,15 @@ public abstract class OrderableUnit extends UnitBase {
                 this.pathTargetX = targetX;
                 this.pathTargetY = targetY;
                 this.pathTargetRadius = 2;
-                if (this.s > 90.0f) {
-                    this.s = 90.0f;
+                if (this.repathCooldown > 90.0f) {
+                    this.repathCooldown = 90.0f;
                 }
                 this.repathDistanceThreshold = 18;
                 if (this.transportedBy != null && !this.transportedBy.isAlive()) {
                     unitStateTracker.isReset = false;
                 }
             } else {
-                this.w = 0;
+                this.longRangePathing = 0;
             }
             unitStateTracker.isReset = false;
             if (0 == 0 && this.attackTarget != null && !this.attackTarget.isDead) {
@@ -1508,24 +1508,24 @@ public abstract class OrderableUnit extends UnitBase {
                         z6 = false;
                     }
                     if (fDistanceSq < 22500.0f) {
-                        this.w = 0;
+                        this.longRangePathing = 0;
                     }
-                    if (!z6 && (this.w == 1 || fDistanceSq > 122500.0f)) {
+                    if (!z6 && (this.longRangePathing == 1 || fDistanceSq > 122500.0f)) {
                         z5 = true;
-                        this.w = 1;
+                        this.longRangePathing = 1;
                     }
-                    if (fDistanceSq > 302500.0f || (this.w == 1 && fDistanceSq > 202500.0f)) {
+                    if (fDistanceSq > 302500.0f || (this.longRangePathing == 1 && fDistanceSq > 202500.0f)) {
                         z5 = true;
-                        this.w = 1;
+                        this.longRangePathing = 1;
                     }
                     if (!z5) {
                         z3 = true;
-                        this.w = 0;
+                        this.longRangePathing = 0;
                         if (z6) {
                             this.isPathingActive = false;
                         } else {
-                            if (this.s > 90.0f) {
-                                this.s = 90.0f;
+                            if (this.repathCooldown > 90.0f) {
+                                this.repathCooldown = 90.0f;
                             }
                             this.isPathingActive = true;
                             this.pathTargetX = this.attackTarget.posX;
@@ -1541,7 +1541,7 @@ public abstract class OrderableUnit extends UnitBase {
                 if (baseUnitQ != null && !b(baseUnitQ, true)) {
                     baseUnitQ = null;
                 }
-                if (baseUnitQ == null && this.w != 1) {
+                if (baseUnitQ == null && this.longRangePathing != 1) {
                     baseUnitQ = q(2.0f);
                     if (baseUnitQ != null && !b(baseUnitQ, true)) {
                         baseUnitQ = null;
@@ -1549,8 +1549,8 @@ public abstract class OrderableUnit extends UnitBase {
                 }
                 if (baseUnitQ != null) {
                     z3 = true;
-                    if (this.s > 90.0f) {
-                        this.s = 90.0f;
+                    if (this.repathCooldown > 90.0f) {
+                        this.repathCooldown = 90.0f;
                     }
                     this.isPathingActive = true;
                     this.pathTargetX = baseUnitQ.posX;
@@ -1563,15 +1563,15 @@ public abstract class OrderableUnit extends UnitBase {
                 unitCommandQueueNextWaypoint2.setRepairCommand(baseUnit);
                 unitCommandQueueNextWaypoint2.isRepeating = true;
                 z3 = true;
-                if (this.s > 20.0f) {
-                    this.s = 20.0f;
+                if (this.repathCooldown > 20.0f) {
+                    this.repathCooldown = 20.0f;
                 }
             }
             if (z2 && !z3 && canMove() && (baseUnit instanceof OrderableUnit) && (currentRepairOrReclaimTarget = ((OrderableUnit) baseUnit).getCurrentRepairOrReclaimTarget()) != null && canRepairTarget(currentRepairOrReclaimTarget) && (unitCommandQueueNextWaypoint = queueNextWaypoint()) != null) {
                 unitCommandQueueNextWaypoint.setRepairCommand(currentRepairOrReclaimTarget);
                 unitCommandQueueNextWaypoint.isRepeating = true;
-                if (this.s > 20.0f) {
-                    this.s = 20.0f;
+                if (this.repathCooldown > 20.0f) {
+                    this.repathCooldown = 20.0f;
                 }
             }
         }
@@ -1620,13 +1620,13 @@ public abstract class OrderableUnit extends UnitBase {
                     Rect rectCc = unitCommand.targetUnit.cc();
                     this.pathTargetRadius = Utility.min(rectCc.c() / 2, rectCc.b() / 2) + 1;
                 }
-                if (this.s > 90.0f) {
-                    this.s = 90.0f;
+                if (this.repathCooldown > 90.0f) {
+                    this.repathCooldown = 90.0f;
                 }
                 this.repathDistanceThreshold = 18;
                 if (fDistanceSq < 48400.0f) {
                     unitStateTracker.isReset = false;
-                    if (this.s > 0.0f && getCurrentPathPosition() == null) {
+                    if (this.repathCooldown > 0.0f && getCurrentPathPosition() == null) {
                         this.canAttack = true;
                     }
                 }
@@ -1660,13 +1660,13 @@ public abstract class OrderableUnit extends UnitBase {
                 this.isPathingActive = true;
                 this.pathTargetX = targetX;
                 this.pathTargetY = targetY;
-                if (this.s > 90.0f) {
-                    this.s = 90.0f;
+                if (this.repathCooldown > 90.0f) {
+                    this.repathCooldown = 90.0f;
                 }
                 this.repathDistanceThreshold = 18;
                 if (fDistanceSq < 72900.0f) {
                     unitStateTracker.isReset = false;
-                    if (this.s > 0.0f && this.aU == null) {
+                    if (this.repathCooldown > 0.0f && this.aU == null) {
                         this.canAttack = true;
                     }
                 }
@@ -1770,8 +1770,8 @@ public abstract class OrderableUnit extends UnitBase {
             }
             if (unitCommand.commandType == UnitCommandType.patrol) {
                 if (this.attackTarget == null && (baseUnitQ = q(3.0f)) != null && b(baseUnitQ, true)) {
-                    if (this.s > 90.0f) {
-                        this.s = 90.0f;
+                    if (this.repathCooldown > 90.0f) {
+                        this.repathCooldown = 90.0f;
                     }
                     this.isPathingActive = true;
                     this.pathTargetX = baseUnitQ.posX;
@@ -1836,8 +1836,8 @@ public abstract class OrderableUnit extends UnitBase {
                 if (f2 > 58.0f) {
                     this.pathTargetRadius = (int) ((f2 - 41.0f) / (gameEngine.tileMap.tileWorldSizeX * 1.414f));
                 }
-                if (this.s > 90.0f) {
-                    this.s = 90.0f;
+                if (this.repathCooldown > 90.0f) {
+                    this.repathCooldown = 90.0f;
                 }
                 if (this.pathRetryCount > 3) {
                     advanceWaypoint();
@@ -1955,15 +1955,15 @@ public abstract class OrderableUnit extends UnitBase {
                 navigateToPosition(fDistanceSq, f2, f3);
             }
             this.pathTargetRadius = getPathingTargetRadiusTiles(baseUnit);
-            if (this.s > 90.0f) {
-                this.s = 90.0f;
+            if (this.repathCooldown > 90.0f) {
+                this.repathCooldown = 90.0f;
             }
             if (fDistanceSq < 810000.0f) {
                 if (isAirborne() || useVelocityExtendedRange()) {
                     this.canAttack = true;
                 }
                 if (!unitStateTracker.isReset && this.transportAttackAssistTimer < 120.0f) {
-                    this.s = 0.1f;
+                    this.repathCooldown = 0.1f;
                     this.canAttack = true;
                 }
             }
@@ -1974,7 +1974,7 @@ public abstract class OrderableUnit extends UnitBase {
     private void updateAttackCommand(float f, UnitCommand unitCommand, UnitStateTracker unitStateTracker) {
         GameEngine gameEngine = GameEngine.getInstance();
         if (be() == UnitBehaviorType.bomber) {
-            if (unitCommand != null && ((unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.team == this.team) && !this.as)) {
+            if (unitCommand != null && ((unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.team == this.team) && !this.isTargetSearchPending)) {
                 if (this.attackTarget != null && this.attackTarget.isDead) {
                     this.attackTarget = null;
                 }
@@ -1984,11 +1984,11 @@ public abstract class OrderableUnit extends UnitBase {
                     clearTransportState();
                     clearPathData();
                 } else {
-                    this.as = true;
-                    this.ar = true;
+                    this.isTargetSearchPending = true;
+                    this.isSecondaryRecharging = true;
                 }
             }
-            if (unitCommand != null && ((unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.team == this.team) && (unitCommand.targetUnit == null || !this.ar))) {
+            if (unitCommand != null && ((unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.team == this.team) && (unitCommand.targetUnit == null || !this.isSecondaryRecharging))) {
                 advanceWaypoint();
                 unitCommand = null;
             }
@@ -2071,13 +2071,13 @@ public abstract class OrderableUnit extends UnitBase {
                 this.isPathingActive = true;
                 this.pathTargetX = targetX;
                 this.pathTargetY = targetY;
-                if (this.s > 90.0f) {
-                    this.s = 90.0f;
+                if (this.repathCooldown > 90.0f) {
+                    this.repathCooldown = 90.0f;
                 }
                 this.repathDistanceThreshold = 18;
                 if (fDistanceSq < 48400.0f) {
                     unitStateTracker.isReset = false;
-                    if (this.s > 0.0f && this.aU == null) {
+                    if (this.repathCooldown > 0.0f && this.aU == null) {
                         this.canAttack = true;
                     }
                 }
@@ -2111,8 +2111,8 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: g */
     public UnitPrice getRepairOrReclaimPrice(BaseUnit baseUnit) {
-        if (baseUnit.unitData2 != null) {
-            return baseUnit.unitData2;
+        if (baseUnit.additionalCost != null) {
+            return baseUnit.additionalCost;
         }
         return baseUnit.r().B();
     }
@@ -2133,7 +2133,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (unitCommand != null && unitCommand.commandType == UnitCommandType.reclaim && unitCommand.targetUnit != null && unitCommand.targetUnit.getResourceRate() > 0.0f) {
             z2 = true;
         }
-        if (unitCommand != null && (unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.unitTransportTarget != null)) {
+        if (unitCommand != null && (unitCommand.targetUnit == null || unitCommand.targetUnit.isDead || unitCommand.targetUnit.transportContainer != null)) {
             if (z2) {
                 z = true;
             } else {
@@ -2264,13 +2264,13 @@ public abstract class OrderableUnit extends UnitBase {
                         this.canAttack = true;
                     }
                     float f3 = iU + 14;
-                    if (fDistanceSq < f3 * f3 && this.s > 0.0f && this.aU == null) {
+                    if (fDistanceSq < f3 * f3 && this.repathCooldown > 0.0f && this.aU == null) {
                         this.canAttack = true;
                     }
                 }
                 this.repathDistanceThreshold = this.pathTargetRadius;
-                if (this.s > 90.0f) {
-                    this.s = 90.0f;
+                if (this.repathCooldown > 90.0f) {
+                    this.repathCooldown = 90.0f;
                     return;
                 }
                 return;
@@ -2412,10 +2412,10 @@ public abstract class OrderableUnit extends UnitBase {
                             if (z12 || repairOrReclaimPrice2 != null) {
                             }
                             if (unitDescription.a() > 0) {
-                                this.ab += f7 * unitDescription.a();
-                                if (this.ab > 1.0f) {
-                                    this.team.credits += (double) ((int) this.ab);
-                                    this.ab -= (int) this.ab;
+                                this.pendingCredits += f7 * unitDescription.a();
+                                if (this.pendingCredits > 1.0f) {
+                                    this.team.credits += (double) ((int) this.pendingCredits);
+                                    this.pendingCredits -= (int) this.pendingCredits;
                                 }
                                 unitDescription.a((BaseUnit) this, f7, false);
                             } else {
@@ -2435,8 +2435,8 @@ public abstract class OrderableUnit extends UnitBase {
                             unitDisplayName2.a((BaseUnit) this, 1.0d, true);
                         } else {
                             UnitPrice unitDescription2 = baseUnit.getBuildPrice();
-                            if (baseUnit.unitData1 != null) {
-                                unitDescription2 = baseUnit.unitData1;
+                            if (baseUnit.price != null) {
+                                unitDescription2 = baseUnit.price;
                                 GameEngine.log("refund==null overridePriceBuildCost: " + unitDescription2.a(false, true, 10, true));
                             }
                             unitDescription2.a((BaseUnit) this, 0.800000011920929d, true);
@@ -2469,8 +2469,8 @@ public abstract class OrderableUnit extends UnitBase {
                 this.attackTargetUnit = null;
             }
         }
-        if (this.s != 0.0f) {
-            this.s = Utility.moveTowardsZero(this.s, f);
+        if (this.repathCooldown != 0.0f) {
+            this.repathCooldown = Utility.moveTowardsZero(this.repathCooldown, f);
         }
         if (this.rotation != 0.0f) {
             this.moveThrottle = Utility.moveTowardsZero(this.moveThrottle, f);
@@ -2544,19 +2544,19 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: a */
     private void navigateToPosition(float f, float f2, float f3) {
-        if (this.aq < -900.0f) {
-            this.aq = Utility.getAngleBetweenPoints(this.posX, this.posY, f2, f3);
+        if (this.navigationAngle < -900.0f) {
+            this.navigationAngle = Utility.getAngleBetweenPoints(this.posX, this.posY, f2, f3);
         }
         if (f < 10000.0f && isSecondaryBarRecharging()) {
-            this.ar = true;
+            this.isSecondaryRecharging = true;
         }
-        if (this.ar) {
+        if (this.isSecondaryRecharging) {
             if (this.currentEnergy < ((double) bd()) * 0.6d || (f < 40000.0f && this.currentEnergy < bd())) {
-                this.pathTargetX += Utility.fastCos(this.aq + 180.0f) * 600.0f;
-                this.pathTargetY += Utility.fastSin(this.aq + 180.0f) * 600.0f;
+                this.pathTargetX += Utility.fastCos(this.navigationAngle + 180.0f) * 600.0f;
+                this.pathTargetY += Utility.fastSin(this.navigationAngle + 180.0f) * 600.0f;
             } else {
-                this.ar = false;
-                this.aq = -999.0f;
+                this.isSecondaryRecharging = false;
+                this.navigationAngle = -999.0f;
                 clearPathData();
             }
         }
@@ -2601,10 +2601,10 @@ public abstract class OrderableUnit extends UnitBase {
             unitStateTracker.stateValue1 = f5;
             unitStateTracker.stateValue2 = f6;
             PositionData pathPositionAt3 = null;
-            if (i < 3000 && 0 == 0 && orderableUnit.v > 2 && orderableUnit.v - orderableUnit.activePathCount <= 2) {
+            if (i < 3000 && 0 == 0 && orderableUnit.totalPathPositions > 2 && orderableUnit.totalPathPositions - orderableUnit.activePathCount <= 2) {
                 pathPositionAt3 = orderableUnit.getPathPositionAt(2);
             }
-            if (i < 1500 && pathPositionAt3 == null && orderableUnit.v > 0 && orderableUnit.activePathCount + 0 >= orderableUnit.v) {
+            if (i < 1500 && pathPositionAt3 == null && orderableUnit.totalPathPositions > 0 && orderableUnit.activePathCount + 0 >= orderableUnit.totalPathPositions) {
                 PositionData pathPositionAt4 = orderableUnit.getPathPositionAt(0);
                 pathPositionAt3 = aW;
                 float angleBetweenPoints = Utility.getAngleBetweenPoints(orderableUnit.posX, orderableUnit.posY, pathPositionAt4.posX, pathPositionAt4.posY);
@@ -2619,7 +2619,7 @@ public abstract class OrderableUnit extends UnitBase {
                 unitStateTracker.stateFlag3 = true;
                 unitStateTracker.stateValue1 = pathPositionAt3.posX + this.transportOffsetX;
                 unitStateTracker.stateValue2 = pathPositionAt3.posY + this.transportOffsetY;
-            } else if (orderableUnit.v >= 2 && orderableUnit.activePathCount >= 1) {
+            } else if (orderableUnit.totalPathPositions >= 2 && orderableUnit.activePathCount >= 1) {
                 if (orderableUnit.activePathCount >= 2) {
                     pathPositionAt = orderableUnit.getPathPositionAt(0);
                     pathPositionAt2 = orderableUnit.getPathPositionAt(1);
@@ -2701,7 +2701,7 @@ public abstract class OrderableUnit extends UnitBase {
                 if (0 != 0) {
                     z4 = true;
                 }
-                if (z4 && Utility.abs(faceTowardPosition(f, this.am)) < 3.0f && unitCommand != null) {
+                if (z4 && Utility.abs(faceTowardPosition(f, this.formationSlotAngle)) < 3.0f && unitCommand != null) {
                     if (unitCommand.commandType == UnitCommandType.move || unitCommand.commandType == UnitCommandType.attackMove) {
                         advanceWaypoint();
                         if (orderableUnit != null) {
@@ -2730,7 +2730,7 @@ public abstract class OrderableUnit extends UnitBase {
             return;
         }
         PositionData pathPositionAt6 = null;
-        if (0 == 0 && orderableUnit.v > 2 && 8 < orderableUnit.activePathCount) {
+        if (0 == 0 && orderableUnit.totalPathPositions > 2 && 8 < orderableUnit.activePathCount) {
             pathPositionAt6 = orderableUnit.getPathPositionAt(8);
         }
         if (pathPositionAt6 == null) {
@@ -2746,11 +2746,11 @@ public abstract class OrderableUnit extends UnitBase {
             this.moveThrottle = 0.0f;
         } else if (fDistanceSq2 < f14 * f14) {
         }
-        if (this.aU == null && positionData != null && ((Utility.abs(this.lastPathTargetX - pathPositionAt6.posX) > 300.0f || Utility.abs(this.lastPathTargetY - pathPositionAt6.posY) > 300.0f) && this.s > 30.0f)) {
-            this.s = 30.0f;
+        if (this.aU == null && positionData != null && ((Utility.abs(this.lastPathTargetX - pathPositionAt6.posX) > 300.0f || Utility.abs(this.lastPathTargetY - pathPositionAt6.posY) > 300.0f) && this.repathCooldown > 30.0f)) {
+            this.repathCooldown = 30.0f;
         }
-        if (this.s == 0.0f && this.aU == null) {
-            this.s = 700.0f;
+        if (this.repathCooldown == 0.0f && this.aU == null) {
+            this.repathCooldown = 700.0f;
             requestPathToTarget(pathPositionAt6.posX, pathPositionAt6.posY, 0, false, false);
         }
         if (positionData != null) {
@@ -2781,7 +2781,7 @@ public abstract class OrderableUnit extends UnitBase {
             if (L) {
                 unitStateTracker.isReset = false;
             }
-            if (this.ae && this.transportedUnitCount > 0 && aG()) {
+            if (this.isTransportAttached && this.transportedUnitCount > 0 && aG()) {
                 this.lastTransportPathUpdateTick = gameEngine.gameTimeMillis;
             }
             if (currentWaypoint2 != null && this.transportedBy != null && unitStateTracker.isReset && (currentWaypoint = this.transportedBy.getCurrentWaypoint()) != null && !currentWaypoint.isSameCommand(currentWaypoint2)) {
@@ -2797,39 +2797,39 @@ public abstract class OrderableUnit extends UnitBase {
                 boolean z = false;
                 if (this.aU == null) {
                     if (currentPathPosition == null) {
-                        if (this.isPathIncomplete && this.s < 450.0f && this.aU == null) {
+                        if (this.isPathIncomplete && this.repathCooldown < 450.0f && this.aU == null) {
                             z = true;
                         }
-                        if (this.s == 0.0f) {
+                        if (this.repathCooldown == 0.0f) {
                             z = true;
                         }
                     }
-                    if (this.s == 0.0f && (isAirborne() || useVelocityExtendedRange())) {
+                    if (this.repathCooldown == 0.0f && (isAirborne() || useVelocityExtendedRange())) {
                         float fM = m() - 1.0f;
                         if (Utility.abs(this.lastPathTargetX - this.pathTargetX) > fM || Utility.abs(this.lastPathTargetY - this.pathTargetY) > fM) {
                             z = true;
                         }
                     }
-                    if (unitCommand != null && this.s == 0.0f && ((unitCommand.commandType == UnitCommandType.loadInto || unitCommand.commandType == UnitCommandType.loadUp) && (Utility.abs(this.lastPathTargetX - this.pathTargetX) > 12.0f || Utility.abs(this.lastPathTargetY - this.pathTargetY) > 12.0f))) {
+                    if (unitCommand != null && this.repathCooldown == 0.0f && ((unitCommand.commandType == UnitCommandType.loadInto || unitCommand.commandType == UnitCommandType.loadUp) && (Utility.abs(this.lastPathTargetX - this.pathTargetX) > 12.0f || Utility.abs(this.lastPathTargetY - this.pathTargetY) > 12.0f))) {
                         z = true;
                     }
                     if (unitCommand != null) {
                         float f2 = this.repathDistanceThreshold;
                         if (Utility.abs(this.lastPathTargetX - this.pathTargetX) > f2 || Utility.abs(this.lastPathTargetY - this.pathTargetY) > f2) {
-                            if (this.s > 30.0f) {
-                                this.s = 30.0f;
+                            if (this.repathCooldown > 30.0f) {
+                                this.repathCooldown = 30.0f;
                             }
-                            if (this.s == 0.0f) {
+                            if (this.repathCooldown == 0.0f) {
                                 z = true;
                             }
                         }
                     }
                 }
                 if (z) {
-                    this.s = 500.0f;
-                    requestPathToTarget(this.pathTargetX, this.pathTargetY, this.pathTargetRadius, this.ae && this.ah > 1, this.isLowPriority);
+                    this.repathCooldown = 500.0f;
+                    requestPathToTarget(this.pathTargetX, this.pathTargetY, this.pathTargetRadius, this.isTransportAttached && this.formationSlotIndex > 1, this.isLowPriority);
                 }
-                if (currentPathPosition != null && this.au == null && this.activePathCount >= 2 && getMoveSpeed() > 5.0f) {
+                if (currentPathPosition != null && this.pathPositionProvider == null && this.activePathCount >= 2 && getMoveSpeed() > 5.0f) {
                     PositionData positionData = this.pathPositions[1];
                     float fDistanceSq = Utility.distanceSq(this.posX, this.posY, currentPathPosition.posX, currentPathPosition.posY);
                     float fDistanceSq2 = Utility.distanceSq(this.posX, this.posY, positionData.posX, positionData.posY);
@@ -2867,14 +2867,14 @@ public abstract class OrderableUnit extends UnitBase {
             if (fBc2 > 0.95f) {
                 z2 = true;
             } else if (fBc2 > 0.87d) {
-                if (this.ah <= 1 && this.activePathCount > 0 && this.activePathCount <= 9 && this.ae && fDistanceSq < 250000.0f) {
+                if (this.formationSlotIndex <= 1 && this.activePathCount > 0 && this.activePathCount <= 9 && this.isTransportAttached && fDistanceSq < 250000.0f) {
                     z2 = true;
                 }
             } else if (fBc2 > 0.7d) {
-                if (this.ah <= 1 && this.activePathCount > 0 && this.activePathCount <= 4 && this.ae && fDistanceSq < 40000.0f) {
+                if (this.formationSlotIndex <= 1 && this.activePathCount > 0 && this.activePathCount <= 4 && this.isTransportAttached && fDistanceSq < 40000.0f) {
                     z2 = true;
                 }
-            } else if (fBc2 > 0.4d && this.ah <= 1 && this.activePathCount > 0 && this.activePathCount <= 2 && this.ae && fDistanceSq < 10000.0f) {
+            } else if (fBc2 > 0.4d && this.formationSlotIndex <= 1 && this.activePathCount > 0 && this.activePathCount <= 2 && this.isTransportAttached && fDistanceSq < 10000.0f) {
                 z2 = true;
             }
             float fRotateToward = 179.0f;
@@ -2907,7 +2907,7 @@ public abstract class OrderableUnit extends UnitBase {
             if (this.rotation > 0.4d && fDistanceSq > 16900.0f) {
                 f4 = 180.0f;
             }
-            if (aY() && this.v == this.activePathCount) {
+            if (aY() && this.totalPathPositions == this.activePathCount) {
                 f4 = 1.0f;
             }
             if (isIgnoreMoveOrders()) {
@@ -2974,13 +2974,13 @@ public abstract class OrderableUnit extends UnitBase {
                     advancePathPosition();
                     this.pathRetryTimer = f5;
                 }
-                if (this.pathRetryTimer > 600.0f && this.activePathCount >= 2 && this.au == null) {
+                if (this.pathRetryTimer > 600.0f && this.activePathCount >= 2 && this.pathPositionProvider == null) {
                     clearPathData();
                 }
                 if (this.pathRetryTimer > 80.0f && this.blockedRecoveryTime > 30.0f) {
                     clearPathData();
                 }
-                if (this.pathRetryTimer > 40.0f && this.activePathCount >= 2 && this.au == null) {
+                if (this.pathRetryTimer > 40.0f && this.activePathCount >= 2 && this.pathPositionProvider == null) {
                     PositionData positionData = this.pathPositions[1];
                     if (Utility.distanceSq(this.posX, this.posY, positionData.posX, positionData.posY) < fDistanceSq) {
                         float f6 = this.pathRetryTimer;
@@ -3440,7 +3440,7 @@ public abstract class OrderableUnit extends UnitBase {
     }
 
     public final boolean a(BaseUnit baseUnit, boolean z) {
-        if (this.team == baseUnit.team || baseUnit.isDead || !this.team.c(baseUnit.team) || this.attackMode == AttackMode.holdFire || this.attackMode == AttackMode.returnFire || baseUnit.unitTransportTarget != null || !canAttackUnitType(baseUnit) || !baseUnit.d((BaseUnit) this)) {
+        if (this.team == baseUnit.team || baseUnit.isDead || !this.team.c(baseUnit.team) || this.attackMode == AttackMode.holdFire || this.attackMode == AttackMode.returnFire || baseUnit.transportContainer != null || !canAttackUnitType(baseUnit) || !baseUnit.d((BaseUnit) this)) {
             return false;
         }
         if (!z) {
@@ -3760,10 +3760,10 @@ public abstract class OrderableUnit extends UnitBase {
         this.wayPointTimer = 0.0f;
         this.waypointDwellTimer = 0.0f;
         this.pathRetryTimer = 0.0f;
-        this.ar = false;
-        this.aq = -999.0f;
-        this.as = false;
-        this.w = 0;
+        this.isSecondaryRecharging = false;
+        this.navigationAngle = -999.0f;
+        this.isTargetSearchPending = false;
+        this.longRangePathing = 0;
         if (this.waypointCount == 0) {
             clearPathData();
             this.transportRecoveryDelay = 0.0f;
@@ -3806,9 +3806,9 @@ public abstract class OrderableUnit extends UnitBase {
         }
         this.wayPointTimer = 0.0f;
         this.waypointDwellTimer = 0.0f;
-        this.ar = false;
-        this.aq = -999.0f;
-        this.as = false;
+        this.isSecondaryRecharging = false;
+        this.navigationAngle = -999.0f;
+        this.isTargetSearchPending = false;
         this.waypointCount = 0;
         clearPathData();
         detachTransportedUnits();
@@ -3816,7 +3816,7 @@ public abstract class OrderableUnit extends UnitBase {
         this.transportRecoveryDelay = 0.0f;
         this.transportRecoveryTime = 0.0f;
         this.moveThrottle = 0.0f;
-        this.w = 0;
+        this.longRangePathing = 0;
         if (i > 0) {
             onCurrentWaypointChanged((UnitCommand) null);
         }
@@ -3846,8 +3846,8 @@ public abstract class OrderableUnit extends UnitBase {
     /* JADX INFO: renamed from: aB */
     public void clearTransportState() {
         setTransportParent((OrderableUnit) null);
-        this.ae = false;
-        this.aj = false;
+        this.isTransportAttached = false;
+        this.inFormation = false;
         this.transportOffsetX = 0.0f;
         this.transportOffsetY = 0.0f;
         this.waypointSyncGroupId = 0;
@@ -3920,8 +3920,8 @@ public abstract class OrderableUnit extends UnitBase {
         if (this.activePathCount == 0) {
             return null;
         }
-        if (this.au != null) {
-            return this.au.a(this);
+        if (this.pathPositionProvider != null) {
+            return this.pathPositionProvider.a(this);
         }
         return this.pathPositions[0];
     }
@@ -3931,8 +3931,8 @@ public abstract class OrderableUnit extends UnitBase {
         if (this.activePathCount < 2) {
             return null;
         }
-        if (this.au != null) {
-            return this.au.b(this);
+        if (this.pathPositionProvider != null) {
+            return this.pathPositionProvider.b(this);
         }
         return this.pathPositions[1];
     }
@@ -3948,7 +3948,7 @@ public abstract class OrderableUnit extends UnitBase {
     }
 
     public boolean aG() {
-        if (this.au != null || this.activePathCount < 2) {
+        if (this.pathPositionProvider != null || this.activePathCount < 2) {
             return false;
         }
         if (getMoveSpeed() > 0.5d) {
@@ -3967,8 +3967,8 @@ public abstract class OrderableUnit extends UnitBase {
     public void clearPathData() {
         this.activePathCount = 0;
         this.isPathIncomplete = false;
-        this.v = 0;
-        this.s = 0.0f;
+        this.totalPathPositions = 0;
+        this.repathCooldown = 0.0f;
         this.pathRetryTimer = 0.0f;
         this.previousPathRetryTimer = 0.0f;
         this.pathRetryCount = (byte) 0;
@@ -3987,8 +3987,8 @@ public abstract class OrderableUnit extends UnitBase {
     public void advancePathPosition() {
         this.previousPathRetryTimer = this.pathRetryTimer;
         this.pathRetryTimer = 0.0f;
-        if (this.au != null) {
-            this.au.c(this);
+        if (this.pathPositionProvider != null) {
+            this.pathPositionProvider.c(this);
             return;
         }
         if (this.activePathCount == 0) {
@@ -4048,7 +4048,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (z3) {
             this.isPathIncomplete = false;
             this.activePathCount = 0;
-            this.au = null;
+            this.pathPositionProvider = null;
             float fClampWorldX = tileMap.clampWorldX(f);
             float fOpenOriginalMapStream = tileMap.clampWorldY(f2);
             if (z4) {
@@ -4057,8 +4057,8 @@ public abstract class OrderableUnit extends UnitBase {
                 if (fDistance > 60.0f) {
                     fDistance = 60.0f;
                     this.isPathIncomplete = true;
-                    if (this.s > 10.0f) {
-                        this.s = 10.0f;
+                    if (this.repathCooldown > 10.0f) {
+                        this.repathCooldown = 10.0f;
                     }
                 }
                 fClampWorldX = this.posX + (Utility.fastCos(angleBetweenPoints) * fDistance);
@@ -4066,7 +4066,7 @@ public abstract class OrderableUnit extends UnitBase {
             }
             setPathPosition(this.activePathCount, fClampWorldX, fOpenOriginalMapStream);
             this.activePathCount++;
-            this.v = this.activePathCount;
+            this.totalPathPositions = this.activePathCount;
             return;
         }
         int i4 = 0;
@@ -4076,7 +4076,7 @@ public abstract class OrderableUnit extends UnitBase {
         if (PathfindingUtils.a(getMovementType(), this.posX, this.posY, f, f2, 80, i4, 1)) {
             this.isPathIncomplete = false;
             this.activePathCount = 0;
-            this.au = null;
+            this.pathPositionProvider = null;
             float fClampWorldX2 = tileMap.clampWorldX(f);
             float fOpenOriginalMapStream2 = tileMap.clampWorldY(f2);
             float f3 = this.posX;
@@ -4117,7 +4117,7 @@ public abstract class OrderableUnit extends UnitBase {
                     this.isPathIncomplete = true;
                 }
             }
-            this.v = this.activePathCount;
+            this.totalPathPositions = this.activePathCount;
             return;
         }
         FormationGroup formationGroup = null;
@@ -4189,7 +4189,7 @@ public abstract class OrderableUnit extends UnitBase {
             TileMap tileMap = gameEngine.tileMap;
             LinkedList linkedListA = this.aU.a();
             if (linkedListA != null) {
-                this.au = this.aU.a(this);
+                this.pathPositionProvider = this.aU.a(this);
                 Path path = this.aU;
                 this.activePathCount = 0;
                 this.isPathIncomplete = false;
@@ -4235,7 +4235,7 @@ public abstract class OrderableUnit extends UnitBase {
                     GameEngine.logColored("activePathCount>maxPathNodes: activePathCount:" + this.activePathCount);
                     this.activePathCount = 120;
                 }
-                this.v = this.activePathCount;
+                this.totalPathPositions = this.activePathCount;
             }
         }
     }
@@ -4254,7 +4254,7 @@ public abstract class OrderableUnit extends UnitBase {
 
     /* JADX INFO: renamed from: o */
     PositionData getPathPositionAt(int i) {
-        if (this.au != null) {
+        if (this.pathPositionProvider != null) {
             if (i == 0) {
                 return getCurrentPathPosition();
             }
@@ -4931,7 +4931,7 @@ public abstract class OrderableUnit extends UnitBase {
     public void c(boolean z) {
         int iS;
         GameEngine gameEngine = GameEngine.getInstance();
-        if (this.unitTransportTarget == null && this.parentEntity == null && (iS = s()) > 0) {
+        if (this.transportContainer == null && this.parentEntity == null && (iS = s()) > 0) {
             gameEngine.tileMap.updateFogVisibilityForTeamsAtWorldPoint(this.posX, this.posY, iS, this.team, z);
         }
     }
@@ -5240,12 +5240,12 @@ public abstract class OrderableUnit extends UnitBase {
         }
         BaseUnit baseUnitG = BaseBuilding.g(unitType);
         if (!UnitPrice.b(unitType.u(), abstractUnitActionFindActionForUnitTypeWithQueueSize.getPrice()) || !UnitPrice.b(unitType.B(), abstractUnitActionFindActionForUnitTypeWithQueueSize.getAdditionalCost())) {
-            baseUnitG.unitData1 = abstractUnitActionFindActionForUnitTypeWithQueueSize.getPrice();
-            baseUnitG.unitData2 = abstractUnitActionFindActionForUnitTypeWithQueueSize.getAdditionalCost();
+            baseUnitG.price = abstractUnitActionFindActionForUnitTypeWithQueueSize.getPrice();
+            baseUnitG.additionalCost = abstractUnitActionFindActionForUnitTypeWithQueueSize.getAdditionalCost();
         }
         if (abstractUnitActionFindActionForUnitTypeWithQueueSize instanceof FilteredUnitAction) {
-            baseUnitG.unitData1 = null;
-            baseUnitG.unitData2 = null;
+            baseUnitG.price = null;
+            baseUnitG.additionalCost = null;
         }
         baseUnitG.buildProgress = 0.0f;
         baseUnitG.paidBuildProgress = 0.0f;

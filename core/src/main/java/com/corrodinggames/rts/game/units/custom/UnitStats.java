@@ -314,7 +314,7 @@ public class UnitStats implements Cloneable {
             public void a(CustomUnit customUnit, double d) {
                 int iS = customUnit.s();
                 super.a(customUnit, d);
-                if (customUnit.s() > iS && !customUnit.ax) {
+                if (customUnit.s() > iS && !customUnit.needsRecalculation) {
                     customUnit.c(false);
                 }
             }
