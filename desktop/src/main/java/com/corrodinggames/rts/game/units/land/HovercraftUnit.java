@@ -185,17 +185,43 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
         super.remove();
     }
 
-    /* JADX INFO: renamed from: f */
-    public void releaseAllUnits(boolean z) {
-        for (BaseUnit baseUnit : this.transportedUnits) {
-            baseUnit.unitTransportTarget = null;
-            baseUnit.posX = this.posX + (Utility.fastCos(this.rotationSpeed) * (-9.0f));
-            baseUnit.posY = this.posY + (Utility.fastSin(this.rotationSpeed) * (-9.0f));
-            if (z) {
-                baseUnit.markForDeath();
-            }
+    public static boolean a(BaseUnit baseUnit, BaseUnit baseUnit2, boolean z, float f, float f2, float f3, float f4, float f5) {
+        float fFastCos = (baseUnit.posX + (Utility.fastCos(baseUnit.rotationSpeed + f2) * f5)) - (Utility.fastSin(baseUnit.rotationSpeed + f2) * f4);
+        float fFastSin = baseUnit.posY + (Utility.fastSin(baseUnit.rotationSpeed + f2) * f5) + (Utility.fastCos(baseUnit.rotationSpeed + f2) * f4);
+        float fFastCos2 = fFastCos + (Utility.fastCos(baseUnit.rotationSpeed + 90.0f) * (z ? -f : f));
+        float fFastSin2 = fFastSin + (Utility.fastSin(baseUnit.rotationSpeed + 90.0f) * (z ? -f : f));
+        if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
+            fFastCos2 += 10.0f;
         }
-        this.transportedUnits.clear();
+        if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
+            fFastCos2 -= 20.0f;
+        }
+        if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
+            fFastCos2 -= 10.0f;
+            fFastSin2 += 10.0f;
+        }
+        if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
+            fFastSin2 -= 20.0f;
+        }
+        if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
+            return false;
+        }
+        baseUnit2.transportContainer = null;
+        baseUnit2.posX = fFastCos2;
+        baseUnit2.posY = fFastSin2;
+        baseUnit2.worldX += 0.1f;
+        baseUnit2.rotationSpeed = baseUnit.rotationSpeed + f2;
+        baseUnit2.attackTargetUnit = baseUnit;
+        baseUnit2.bS = 45.0f;
+        if (baseUnit2 instanceof OrderableUnit) {
+            OrderableUnit orderableUnit = (OrderableUnit) baseUnit2;
+            orderableUnit.j(baseUnit2.rotationSpeed);
+            orderableUnit.clearAllWaypoints();
+            orderableUnit.appendMoveWaypoint(baseUnit2.posX + (Utility.fastCos(baseUnit2.rotationSpeed + (z ? -f : f)) * f3), baseUnit2.posY + (Utility.fastSin(baseUnit2.rotationSpeed + (z ? -f : f)) * f3));
+            orderableUnit.waypointSyncGroupId = 0;
+            return true;
+        }
+        return true;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -240,43 +266,17 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
         return a(baseUnit, baseUnit2, z, 9.0f, -180.0f, 70.0f, 0.0f, 7.0f);
     }
 
-    public static boolean a(BaseUnit baseUnit, BaseUnit baseUnit2, boolean z, float f, float f2, float f3, float f4, float f5) {
-        float fFastCos = (baseUnit.posX + (Utility.fastCos(baseUnit.rotationSpeed + f2) * f5)) - (Utility.fastSin(baseUnit.rotationSpeed + f2) * f4);
-        float fFastSin = baseUnit.posY + (Utility.fastSin(baseUnit.rotationSpeed + f2) * f5) + (Utility.fastCos(baseUnit.rotationSpeed + f2) * f4);
-        float fFastCos2 = fFastCos + (Utility.fastCos(baseUnit.rotationSpeed + 90.0f) * (z ? -f : f));
-        float fFastSin2 = fFastSin + (Utility.fastSin(baseUnit.rotationSpeed + 90.0f) * (z ? -f : f));
-        if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
-            fFastCos2 += 10.0f;
+    /* JADX INFO: renamed from: f */
+    public void releaseAllUnits(boolean z) {
+        for (BaseUnit baseUnit : this.transportedUnits) {
+            baseUnit.transportContainer = null;
+            baseUnit.posX = this.posX + (Utility.fastCos(this.rotationSpeed) * (-9.0f));
+            baseUnit.posY = this.posY + (Utility.fastSin(this.rotationSpeed) * (-9.0f));
+            if (z) {
+                baseUnit.markForDeath();
+            }
         }
-        if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
-            fFastCos2 -= 20.0f;
-        }
-        if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
-            fFastCos2 -= 10.0f;
-            fFastSin2 += 10.0f;
-        }
-        if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
-            fFastSin2 -= 20.0f;
-        }
-        if (!GameViewUtils.a(baseUnit2, fFastCos2, fFastSin2)) {
-            return false;
-        }
-        baseUnit2.unitTransportTarget = null;
-        baseUnit2.posX = fFastCos2;
-        baseUnit2.posY = fFastSin2;
-        baseUnit2.worldX += 0.1f;
-        baseUnit2.rotationSpeed = baseUnit.rotationSpeed + f2;
-        baseUnit2.attackTargetUnit = baseUnit;
-        baseUnit2.bS = 45.0f;
-        if (baseUnit2 instanceof OrderableUnit) {
-            OrderableUnit orderableUnit = (OrderableUnit) baseUnit2;
-            orderableUnit.j(baseUnit2.rotationSpeed);
-            orderableUnit.clearAllWaypoints();
-            orderableUnit.appendMoveWaypoint(baseUnit2.posX + (Utility.fastCos(baseUnit2.rotationSpeed + (z ? -f : f)) * f3), baseUnit2.posY + (Utility.fastSin(baseUnit2.rotationSpeed + (z ? -f : f)) * f3));
-            orderableUnit.waypointSyncGroupId = 0;
-            return true;
-        }
-        return true;
+        this.transportedUnits.clear();
     }
 
     @Override // com.corrodinggames.rts.game.units.land.HoverLandUnit, com.corrodinggames.rts.game.units.land.LandUnit, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
@@ -398,16 +398,16 @@ public class HovercraftUnit extends HoverLandUnit implements TransportUnitInterf
     }
 
     public void C(BaseUnit baseUnit) {
-        baseUnit.unitTransportTarget = this;
+        baseUnit.transportContainer = this;
         this.transportedUnits.add(baseUnit);
         GameEngine.getInstance().gameUI.deselectUnit(baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.TransportUnitInterface
     public void e(BaseUnit baseUnit) {
-        if (baseUnit.unitTransportTarget == this) {
+        if (baseUnit.transportContainer == this) {
             this.transportedUnits.remove(baseUnit);
-            baseUnit.unitTransportTarget = null;
+            baseUnit.transportContainer = null;
         } else {
             GameEngine.logWarningAndStack("Unit is not being transported");
         }

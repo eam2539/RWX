@@ -314,7 +314,7 @@ public class WaypointAction extends LogicAction {
                 }
                 FastArrayList fastArrayList = w.collectedUnits;
                 int deterministicRandomInt3 = Utility.getDeterministicRandomInt((GameObject) customUnit, 0, fastArrayList.size(), 0);
-                customUnit.unitFlags4++;
+                customUnit.unitCounter++;
                 if (deterministicRandomInt3 > fastArrayList.size() - 1) {
                     deterministicRandomInt3 = fastArrayList.size() - 1;
                 }

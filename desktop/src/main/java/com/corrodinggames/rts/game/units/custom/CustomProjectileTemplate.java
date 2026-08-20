@@ -351,9 +351,9 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             projectile.o = f2;
             if (this.targetGroundSpread != 0.0f) {
                 projectile.n += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 2) / 100.0f;
-                baseUnit.unitFlags4 = (int) (baseUnit.unitFlags4 + projectile.n);
+                baseUnit.unitCounter = (int) (baseUnit.unitCounter + projectile.n);
                 projectile.o += Utility.getDeterministicRandomInt((GameObject) baseUnit, (int) ((-this.targetGroundSpread) * 100.0f), (int) (this.targetGroundSpread * 100.0f), 3) / 100.0f;
-                baseUnit.unitFlags4 = (int) (baseUnit.unitFlags4 + projectile.o);
+                baseUnit.unitCounter = (int) (baseUnit.unitCounter + projectile.o);
             }
             projectile.p = 0.0f;
             projectile.p += this.targetGroundHeightOffset;

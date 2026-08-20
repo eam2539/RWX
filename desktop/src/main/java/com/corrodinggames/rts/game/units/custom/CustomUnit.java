@@ -360,7 +360,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     /* JADX INFO: renamed from: C */
     public void loadTransportedUnit(BaseUnit baseUnit) {
-        baseUnit.unitTransportTarget = this;
+        baseUnit.transportContainer = this;
         this.transportedUnits.add(baseUnit);
         if (this.unitConfig.whileNeutralConvertToTransportedTeam && this.team == PlayerTeam.TEAM_ALL) {
             changeTeam(baseUnit.team);
@@ -381,9 +381,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.TransportUnitInterface
     public void e(BaseUnit baseUnit) {
-        if (baseUnit.unitTransportTarget == this) {
+        if (baseUnit.transportContainer == this) {
             this.transportedUnits.remove(baseUnit);
-            baseUnit.unitTransportTarget = null;
+            baseUnit.transportContainer = null;
             unloadTransportedUnit(baseUnit);
             return;
         }
@@ -540,7 +540,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     public void h(boolean z) {
         for (BaseUnit baseUnit : this.transportedUnits) {
-            baseUnit.unitTransportTarget = null;
+            baseUnit.transportContainer = null;
             baseUnit.posX = this.posX + (Utility.fastCos(this.rotationSpeed) * (-9.0f));
             baseUnit.posY = this.posY + (Utility.fastSin(this.rotationSpeed) * (-9.0f));
             if (z) {
@@ -1088,9 +1088,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             this.rotationSpeed = -90.0f;
         }
         f_();
-        if (!z && ((this.unitData1 != null || this.unitData2 != null) && (!UnitPrice.b(this.unitConfig.price, customUnitConfig2.price) || !UnitPrice.b(this.unitConfig.streamingCost, customUnitConfig2.streamingCost)))) {
-            this.unitData1 = null;
-            this.unitData2 = null;
+        if (!z && ((this.price != null || this.additionalCost != null) && (!UnitPrice.b(this.unitConfig.price, customUnitConfig2.price) || !UnitPrice.b(this.unitConfig.streamingCost, customUnitConfig2.streamingCost)))) {
+            this.price = null;
+            this.additionalCost = null;
         }
         if (!z) {
             boolean z4 = this.unitConfig.isBuildingUnit() != customUnitConfig2.isBuildingUnit();
@@ -1551,7 +1551,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 }
             }
         }
-        this.unitFlags4 = (int) (((long) this.unitFlags4) + 1 + this.objectId);
+        this.unitCounter = (int) (((long) this.unitCounter) + 1 + this.objectId);
         float f3 = this.movementLevels[i].targetX;
         boolean z = false;
         if (projectileA == null) {
@@ -1760,7 +1760,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 ((CustomUnitRenderHook) objArrA2[i2]).a(this, f);
             }
             boolean z2 = true;
-            if ((this.buildProgress < 1.0f && !customUnitConfig.autoTriggerCheckWhileNotBuilt) || (this.unitTransportTarget != null && !customUnitConfig.canBeBuiltBy)) {
+            if ((this.buildProgress < 1.0f && !customUnitConfig.autoTriggerCheckWhileNotBuilt) || (this.transportContainer != null && !customUnitConfig.canBeBuiltBy)) {
                 z2 = false;
             }
             if (z2) {
@@ -3104,7 +3104,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             }
             if (customActionDef.resetCustomTimer != null) {
                 if (customActionDef.resetCustomTimer.read(this)) {
-                    this.unitFlags2 = gameEngine.gameTimeMillis;
+                    this.customTimerStamp = gameEngine.gameTimeMillis;
                 }
                 z = true;
             }
@@ -3234,7 +3234,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                     }
                     S();
                     this.unitEffectManager.e();
-                    this.unitFlags3 = GameEngine.getInstance().gameTimeMillis;
+                    this.lastConvertedStamp = GameEngine.getInstance().gameTimeMillis;
                     PlayerTeam.c(this);
                 }
                 z = true;
@@ -3889,7 +3889,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public void c(boolean z) {
         CustomUnitConfig customUnitConfig = this.unitConfig;
         GameEngine gameEngine = GameEngine.getInstance();
-        if (this.unitTransportTarget != null || this.parentEntity != null) {
+        if (this.transportContainer != null || this.parentEntity != null) {
             return;
         }
         int i = this.y.fogOfWarSightRange;
@@ -4577,7 +4577,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 return false;
             }
         }
-        if (this.unitTransportTarget != null) {
+        if (this.transportContainer != null) {
             return false;
         }
         if ((this.attachmentData != null && this.attachmentData.I) || !d(gameEngine.playerTeam) || !dG()) {
@@ -4613,7 +4613,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         AttachmentManagerHook.a(this, attachmentSlotDefinition, orderableUnit);
         orderableUnit.parentEntity = this;
         orderableUnit.attachmentData = attachmentSlotDefinition;
-        orderableUnit.unitTransportCapacity = gameEngine.gameTimeMillis;
+        orderableUnit.attachmentStartTimeMillis = gameEngine.gameTimeMillis;
         orderableUnit.isAlive = false;
         return true;
     }

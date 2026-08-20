@@ -122,7 +122,7 @@ public final class GameViewUtils {
         if ((z && ((baseUnit instanceof AirUnit) || (baseUnit instanceof WaterUnit))) || baseUnit.bI()) {
             return false;
         }
-        if ((z && (baseUnit.isWaterUnit() || baseUnit.isAirborne())) || baseUnit.P() || baseUnit.unitTransportTarget != null || baseUnit.parentEntity != null) {
+        if ((z && (baseUnit.isWaterUnit() || baseUnit.isAirborne())) || baseUnit.P() || baseUnit.transportContainer != null || baseUnit.parentEntity != null) {
             return false;
         }
         return true;
@@ -420,7 +420,7 @@ public final class GameViewUtils {
     }
 
     public static void a(BaseUnit baseUnit, OrderableUnit orderableUnit) {
-        baseUnit.unitTransportTarget = null;
+        baseUnit.transportContainer = null;
         if (baseUnit instanceof OrderableUnit) {
             OrderableUnit orderableUnit2 = (OrderableUnit) baseUnit;
             if (orderableUnit2.parentEntity == orderableUnit) {

@@ -63,7 +63,7 @@ public class NearestUnitFinder extends FilteredUnitCallback {
             if (this.animationSetFilter != null && !AnimationTag.a(this.animationSetFilter, baseUnit.getTags())) {
                 return;
             }
-            if ((this.checkLineOfSight && !orderableUnit.g(baseUnit, true)) || baseUnit.unitTransportTarget != null) {
+            if ((this.checkLineOfSight && !orderableUnit.g(baseUnit, true)) || baseUnit.transportContainer != null) {
                 return;
             }
             this.nearestUnit = baseUnit;

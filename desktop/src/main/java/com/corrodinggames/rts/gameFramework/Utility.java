@@ -134,7 +134,7 @@ public final class Utility {
         int i5 = gameEngine.currentTick + 1;
         int i6 = (int) (((int) (((int) (((int) (((int) (((long) gameEngine.globalSeed) + (gameObject.objectId * 1313))) + (gameObject.posX * 13.0f))) + (gameObject.posY * 13.0f))) + (gameObject.posX * 130.0f))) + (gameObject.posY * 130.0f));
         if (gameObject instanceof BaseUnit) {
-            int i7 = ((BaseUnit) gameObject).unitFlags4;
+            int i7 = ((BaseUnit) gameObject).unitCounter;
             i6 = i6 + (i7 * 13131) + (i7 * i5);
         }
         int i8 = ((((int) (((long) (i6 + ((i4 * 133) * i3))) + ((((long) i4) * gameObject.objectId) + ((long) i4)))) + (i4 * (i5 * 1313))) + ((i5 * 13) + (i5 % 10))) % (i3 - i2);

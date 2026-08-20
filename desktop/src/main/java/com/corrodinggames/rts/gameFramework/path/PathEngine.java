@@ -433,8 +433,8 @@ public final class PathEngine {
                 BaseUnit baseUnitA = gameEngine.gameUI.selectedUnitsList.get(0);
                 if (baseUnitA instanceof OrderableUnit) {
                     OrderableUnit orderableUnit = (OrderableUnit) baseUnitA;
-                    if (orderableUnit.au != null) {
-                        orderableUnit.au.d(orderableUnit);
+                    if (orderableUnit.pathPositionProvider != null) {
+                        orderableUnit.pathPositionProvider.d(orderableUnit);
                         z = false;
                     }
                 }

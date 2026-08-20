@@ -499,7 +499,7 @@ public abstract class LogicNumberFunction extends LogicBoolean.LogicNumberOnly {
             float number2 = this.max.readNumber(orderableUnit);
             int i = 0;
             if (orderableUnit != null) {
-                i = orderableUnit.unitFlags4;
+                i = orderableUnit.unitCounter;
             }
             return Utility.getRandomFloat(number, number2, this.randomIndex + i);
         }

@@ -717,22 +717,170 @@ public class GameInterfaceRenderer extends Serializable {
         }
     }
 
-    private boolean a(UnitBase unitBase) {
-        if (!unitBase.isDead && unitBase.unitTransportTarget == null) {
-            float f = unitBase.posX;
-            float f2 = unitBase.posY - unitBase.posZ;
-            if (f2 <= 0.0f) {
-                f2 += unitBase.posZ;
-            }
-            if (this.selectionRectF3.b(f, f2)) {
-                if ((this.gameUI.canControlUnit(unitBase) || this.gameEngine.playerTeam.isSpectatorTeamColor()) && !unitBase.t()) {
-                    return true;
-                }
-                return false;
-            }
-            return false;
+    public static String a(BaseUnit baseUnit, boolean z, boolean z2, boolean z3) {
+        String str;
+        ModInfo modInfo;
+        if (z2) {
+            str = "\n";
+        } else {
+            str = " | ";
         }
-        return false;
+        String str2 = VariableScope.nullOrMissingString;
+        CustomUnit customUnit = null;
+        CustomUnitConfig customUnitConfig = null;
+        if (baseUnit instanceof CustomUnit) {
+            customUnit = (CustomUnit) baseUnit;
+            customUnitConfig = customUnit.unitConfig;
+        }
+        if (z) {
+            str2 = str2 + baseUnit.r().getUnitName() + str;
+        }
+        if (customUnitConfig == null || !customUnitConfig.canNotBeDirectlyAttacked) {
+            if (!z3) {
+                str2 = str2 + "HP: " + ((int) Math.ceil(baseUnit.currentHealth)) + "/" + ((int) baseUnit.maxHealth) + str;
+            } else {
+                str2 = str2 + "HP: " + ((int) baseUnit.maxHealth) + str;
+            }
+        }
+        if (baseUnit.unitEnergyMax != 0.0f) {
+            if (!z3) {
+                str2 = str2 + "Shield: " + ((int) baseUnit.shield) + "/" + ((int) baseUnit.unitEnergyMax) + str;
+            } else {
+                str2 = str2 + "Shield: " + ((int) baseUnit.unitEnergyMax) + str;
+            }
+        }
+        if (customUnit != null) {
+            float f = customUnit.y.armour;
+            if (f >= 1.0f) {
+                str2 = str2 + "Armour: " + ((int) f) + str;
+            }
+        }
+        UnitPrice unitPriceDq = baseUnit.dq();
+        float fCy = baseUnit.getCreditIncomeRate();
+        if (unitPriceDq != null) {
+            fCy += unitPriceDq.a();
+        }
+        if (fCy != 0.0f) {
+            if (fCy < 0.0f) {
+                str2 = str2 + "Income: -$" + Utility.padString(-fCy, 1) + str;
+            } else {
+                str2 = str2 + "Income: +$" + Utility.padString(fCy, 1) + str;
+            }
+        }
+        if (baseUnit instanceof OrderableUnit) {
+            OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
+            if (orderableUnit.bd() != 0.0f && !z3) {
+                str2 = str2 + "Energy: " + Utility.padString(baseUnit.currentEnergy) + "/" + Utility.padString(orderableUnit.bd()) + str;
+            }
+            float moveSpeed = orderableUnit.getMoveSpeed();
+            if (!orderableUnit.canExecuteMovementCommands()) {
+                moveSpeed = 0.0f;
+            }
+            if (moveSpeed != 0.0f) {
+                str2 = str2 + "Speed: " + Utility.padString(moveSpeed) + str;
+            }
+            if (orderableUnit.canAttack()) {
+                ArrayList<UnitStatistics> arrayListCollectMovementLevelStatistics = orderableUnit.collectMovementLevelStatistics();
+                if (arrayListCollectMovementLevelStatistics.size() > 0) {
+                    String str3 = str2 + "Attack: ";
+                    boolean z4 = true;
+                    for (UnitStatistics unitStatistics : arrayListCollectMovementLevelStatistics) {
+                        if (!z4) {
+                            str3 = str3 + ", ";
+                        }
+                        z4 = false;
+                        String str4 = str3 + Utility.padString(unitStatistics.a);
+                        if (unitStatistics.d > 1) {
+                            str4 = str4 + "x" + unitStatistics.d;
+                        }
+                        str3 = str4 + "/" + Utility.padString(unitStatistics.a()) + "s";
+                    }
+                    str2 = str3 + str;
+                }
+            }
+            float fM = orderableUnit.m();
+            if (!orderableUnit.canAttack()) {
+                fM = 0.0f;
+            }
+            if (fM != 0.0f) {
+                str2 = str2 + "Range: " + Utility.padString(fM) + str;
+            }
+            if (z3 && orderableUnit.isUpgradeable()) {
+                str2 = str2 + "Upgradable" + str;
+            }
+        }
+        if (!z3 && baseUnit.killCount > 0) {
+            str2 = str2 + "Kills: " + baseUnit.killCount + str;
+        }
+        boolean z5 = false;
+        if (GameEngine.getInstance().isDebugTempMode) {
+            UnitType unitTypeR = baseUnit.r();
+            str2 = ((str2 + "\n") + "--Debug--" + str) + "name: " + unitTypeR.getUnitTypeDescriptionShort() + str;
+            if ((unitTypeR instanceof CustomUnitConfig) && (modInfo = ((CustomUnitConfig) unitTypeR).modInfo) != null) {
+                str2 = str2 + "(mod: " + Utility.truncateToLength(modInfo.getDisplayTitle(), 30) + ")" + str;
+            }
+            if (baseUnit.objectId != 0) {
+                str2 = str2 + "id: " + baseUnit.objectId + str;
+            }
+            if (baseUnit.unitExperience != 0) {
+                String str5 = VariableScope.nullOrMissingString;
+                for (int i = 0; i < 32; i++) {
+                    if (UnitPrice.a(baseUnit.unitExperience, i)) {
+                        if (str5.length() > 0) {
+                            str5 = str5 + ",";
+                        }
+                        str5 = str5 + i;
+                    }
+                }
+                str2 = str2 + "flags: " + str5 + str;
+            }
+            if (baseUnit.unitLevel != 0) {
+                str2 = str2 + "ammo: " + baseUnit.unitLevel + str;
+            }
+            if (!baseUnit.isUnitParalyzed) {
+                str2 = (str2 + "x: " + Utility.padString(baseUnit.posX) + str) + "y: " + Utility.padString(baseUnit.posY) + str;
+            }
+            if (baseUnit.velocityX != 0.0f || baseUnit.velocityY != 0.0f) {
+                str2 = str2 + "x/y speed: " + Utility.padString(baseUnit.velocityX) + ", " + Utility.padString(baseUnit.velocityY) + str;
+            }
+            if (!baseUnit.isUnitParalyzed) {
+                str2 = (str2 + "height: " + Utility.padString(baseUnit.posZ) + str) + "dir: " + Utility.padString(baseUnit.rotationSpeed) + str;
+            }
+            if (baseUnit.buildProgress < 1.0f) {
+                str2 = str2 + "built: " + Utility.padString(baseUnit.buildProgress) + str;
+            }
+            if (baseUnit instanceof CustomUnit) {
+                CustomUnit customUnit2 = (CustomUnit) baseUnit;
+                str2 = (str2 + "frame: " + customUnit2.animationFrameIndex + str) + "drawLayer: " + customUnit2.drawLayer + str;
+                if (customUnit2.getTags() != null) {
+                    str2 = str2 + "tags: " + customUnit2.getTags() + str;
+                }
+                if (customUnit2.parentEntity != null) {
+                    str2 = str2 + "attachedTo: " + customUnit2.parentEntity.getUnitDebugName() + str;
+                }
+                if (customUnit2.unitTarget2 != null && !customUnit2.unitTarget2.isDead) {
+                    str2 = str2 + "customTarget1: " + customUnit2.unitTarget2.getUnitDebugName() + str;
+                }
+                if (customUnit2.unitTarget3 != null && !customUnit2.unitTarget3.isDead) {
+                    str2 = str2 + "customTarget2: " + customUnit2.unitTarget3.getUnitDebugName() + str;
+                }
+                if (customUnit2.customTimerStamp != -9999) {
+                    str2 = str2 + "customTimer: " + Utility.formatSeconds(customUnit2.customTimerStamp / 1000.0f) + str;
+                }
+                if (customUnit2.unitVariables != null && !customUnit2.unitVariables.isEmpty()) {
+                    str2 = str2 + "-- memory --: " + str + customUnit2.unitVariables.debugMemory(true, true) + str;
+                }
+            }
+            z5 = true;
+        }
+        StoredResources unitAICombatRange = baseUnit.getCustomResources();
+        if (unitAICombatRange != null && !unitAICombatRange.c()) {
+            String strA = unitAICombatRange.a(z2, true, 10, z5, false);
+            if (!strA.equals(VariableScope.nullOrMissingString)) {
+                str2 = str2 + strA + str;
+            }
+        }
+        return Utility.removeSuffix(str2, str);
     }
 
     public void a(String str, int i) {
@@ -2172,170 +2320,22 @@ public class GameInterfaceRenderer extends Serializable {
         return Utility.removeSuffix(str2, str);
     }
 
-    public static String a(BaseUnit baseUnit, boolean z, boolean z2, boolean z3) {
-        String str;
-        ModInfo modInfo;
-        if (z2) {
-            str = "\n";
-        } else {
-            str = " | ";
-        }
-        String str2 = VariableScope.nullOrMissingString;
-        CustomUnit customUnit = null;
-        CustomUnitConfig customUnitConfig = null;
-        if (baseUnit instanceof CustomUnit) {
-            customUnit = (CustomUnit) baseUnit;
-            customUnitConfig = customUnit.unitConfig;
-        }
-        if (z) {
-            str2 = str2 + baseUnit.r().getUnitName() + str;
-        }
-        if (customUnitConfig == null || !customUnitConfig.canNotBeDirectlyAttacked) {
-            if (!z3) {
-                str2 = str2 + "HP: " + ((int) Math.ceil(baseUnit.currentHealth)) + "/" + ((int) baseUnit.maxHealth) + str;
-            } else {
-                str2 = str2 + "HP: " + ((int) baseUnit.maxHealth) + str;
+    private boolean a(UnitBase unitBase) {
+        if (!unitBase.isDead && unitBase.transportContainer == null) {
+            float f = unitBase.posX;
+            float f2 = unitBase.posY - unitBase.posZ;
+            if (f2 <= 0.0f) {
+                f2 += unitBase.posZ;
             }
-        }
-        if (baseUnit.unitEnergyMax != 0.0f) {
-            if (!z3) {
-                str2 = str2 + "Shield: " + ((int) baseUnit.shield) + "/" + ((int) baseUnit.unitEnergyMax) + str;
-            } else {
-                str2 = str2 + "Shield: " + ((int) baseUnit.unitEnergyMax) + str;
-            }
-        }
-        if (customUnit != null) {
-            float f = customUnit.y.armour;
-            if (f >= 1.0f) {
-                str2 = str2 + "Armour: " + ((int) f) + str;
-            }
-        }
-        UnitPrice unitPriceDq = baseUnit.dq();
-        float fCy = baseUnit.getCreditIncomeRate();
-        if (unitPriceDq != null) {
-            fCy += unitPriceDq.a();
-        }
-        if (fCy != 0.0f) {
-            if (fCy < 0.0f) {
-                str2 = str2 + "Income: -$" + Utility.padString(-fCy, 1) + str;
-            } else {
-                str2 = str2 + "Income: +$" + Utility.padString(fCy, 1) + str;
-            }
-        }
-        if (baseUnit instanceof OrderableUnit) {
-            OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
-            if (orderableUnit.bd() != 0.0f && !z3) {
-                str2 = str2 + "Energy: " + Utility.padString(baseUnit.currentEnergy) + "/" + Utility.padString(orderableUnit.bd()) + str;
-            }
-            float moveSpeed = orderableUnit.getMoveSpeed();
-            if (!orderableUnit.canExecuteMovementCommands()) {
-                moveSpeed = 0.0f;
-            }
-            if (moveSpeed != 0.0f) {
-                str2 = str2 + "Speed: " + Utility.padString(moveSpeed) + str;
-            }
-            if (orderableUnit.canAttack()) {
-                ArrayList<UnitStatistics> arrayListCollectMovementLevelStatistics = orderableUnit.collectMovementLevelStatistics();
-                if (arrayListCollectMovementLevelStatistics.size() > 0) {
-                    String str3 = str2 + "Attack: ";
-                    boolean z4 = true;
-                    for (UnitStatistics unitStatistics : arrayListCollectMovementLevelStatistics) {
-                        if (!z4) {
-                            str3 = str3 + ", ";
-                        }
-                        z4 = false;
-                        String str4 = str3 + Utility.padString(unitStatistics.a);
-                        if (unitStatistics.d > 1) {
-                            str4 = str4 + "x" + unitStatistics.d;
-                        }
-                        str3 = str4 + "/" + Utility.padString(unitStatistics.a()) + "s";
-                    }
-                    str2 = str3 + str;
+            if (this.selectionRectF3.b(f, f2)) {
+                if ((this.gameUI.canControlUnit(unitBase) || this.gameEngine.playerTeam.isSpectatorTeamColor()) && !unitBase.t()) {
+                    return true;
                 }
+                return false;
             }
-            float fM = orderableUnit.m();
-            if (!orderableUnit.canAttack()) {
-                fM = 0.0f;
-            }
-            if (fM != 0.0f) {
-                str2 = str2 + "Range: " + Utility.padString(fM) + str;
-            }
-            if (z3 && orderableUnit.isUpgradeable()) {
-                str2 = str2 + "Upgradable" + str;
-            }
+            return false;
         }
-        if (!z3 && baseUnit.unitCargoType > 0) {
-            str2 = str2 + "Kills: " + baseUnit.unitCargoType + str;
-        }
-        boolean z5 = false;
-        if (GameEngine.getInstance().isDebugTempMode) {
-            UnitType unitTypeR = baseUnit.r();
-            str2 = ((str2 + "\n") + "--Debug--" + str) + "name: " + unitTypeR.getUnitTypeDescriptionShort() + str;
-            if ((unitTypeR instanceof CustomUnitConfig) && (modInfo = ((CustomUnitConfig) unitTypeR).modInfo) != null) {
-                str2 = str2 + "(mod: " + Utility.truncateToLength(modInfo.getDisplayTitle(), 30) + ")" + str;
-            }
-            if (baseUnit.objectId != 0) {
-                str2 = str2 + "id: " + baseUnit.objectId + str;
-            }
-            if (baseUnit.unitExperience != 0) {
-                String str5 = VariableScope.nullOrMissingString;
-                for (int i = 0; i < 32; i++) {
-                    if (UnitPrice.a(baseUnit.unitExperience, i)) {
-                        if (str5.length() > 0) {
-                            str5 = str5 + ",";
-                        }
-                        str5 = str5 + i;
-                    }
-                }
-                str2 = str2 + "flags: " + str5 + str;
-            }
-            if (baseUnit.unitLevel != 0) {
-                str2 = str2 + "ammo: " + baseUnit.unitLevel + str;
-            }
-            if (!baseUnit.isUnitParalyzed) {
-                str2 = (str2 + "x: " + Utility.padString(baseUnit.posX) + str) + "y: " + Utility.padString(baseUnit.posY) + str;
-            }
-            if (baseUnit.velocityX != 0.0f || baseUnit.velocityY != 0.0f) {
-                str2 = str2 + "x/y speed: " + Utility.padString(baseUnit.velocityX) + ", " + Utility.padString(baseUnit.velocityY) + str;
-            }
-            if (!baseUnit.isUnitParalyzed) {
-                str2 = (str2 + "height: " + Utility.padString(baseUnit.posZ) + str) + "dir: " + Utility.padString(baseUnit.rotationSpeed) + str;
-            }
-            if (baseUnit.buildProgress < 1.0f) {
-                str2 = str2 + "built: " + Utility.padString(baseUnit.buildProgress) + str;
-            }
-            if (baseUnit instanceof CustomUnit) {
-                CustomUnit customUnit2 = (CustomUnit) baseUnit;
-                str2 = (str2 + "frame: " + customUnit2.animationFrameIndex + str) + "drawLayer: " + customUnit2.drawLayer + str;
-                if (customUnit2.getTags() != null) {
-                    str2 = str2 + "tags: " + customUnit2.getTags() + str;
-                }
-                if (customUnit2.parentEntity != null) {
-                    str2 = str2 + "attachedTo: " + customUnit2.parentEntity.getUnitDebugName() + str;
-                }
-                if (customUnit2.unitTarget2 != null && !customUnit2.unitTarget2.isDead) {
-                    str2 = str2 + "customTarget1: " + customUnit2.unitTarget2.getUnitDebugName() + str;
-                }
-                if (customUnit2.unitTarget3 != null && !customUnit2.unitTarget3.isDead) {
-                    str2 = str2 + "customTarget2: " + customUnit2.unitTarget3.getUnitDebugName() + str;
-                }
-                if (customUnit2.unitFlags2 != -9999) {
-                    str2 = str2 + "customTimer: " + Utility.formatSeconds(customUnit2.unitFlags2 / 1000.0f) + str;
-                }
-                if (customUnit2.unitVariables != null && !customUnit2.unitVariables.isEmpty()) {
-                    str2 = str2 + "-- memory --: " + str + customUnit2.unitVariables.debugMemory(true, true) + str;
-                }
-            }
-            z5 = true;
-        }
-        StoredResources unitAICombatRange = baseUnit.getCustomResources();
-        if (unitAICombatRange != null && !unitAICombatRange.c()) {
-            String strA = unitAICombatRange.a(z2, true, 10, z5, false);
-            if (!strA.equals(VariableScope.nullOrMissingString)) {
-                str2 = str2 + strA + str;
-            }
-        }
-        return Utility.removeSuffix(str2, str);
+        return false;
     }
 
     void j() {

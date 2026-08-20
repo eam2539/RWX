@@ -68,7 +68,7 @@ public class RallyGroup extends AIUnitGroupBase {
         Iterator it = this.F.iterator();
         while (it.hasNext()) {
             OrderableUnit orderableUnit = (OrderableUnit) it.next();
-            if (getDistanceSqToUnit((BaseUnit) orderableUnit) < 3600.0f && orderableUnit.unitTransportTarget == null) {
+            if (getDistanceSqToUnit((BaseUnit) orderableUnit) < 3600.0f && orderableUnit.transportContainer == null) {
                 if (orderableUnit.aB == this) {
                     orderableUnit.aB = null;
                 }

@@ -631,7 +631,7 @@ public class Command {
             while (i <= 1) {
                 boolean z2 = i == 1;
                 for (OrderableUnit orderableUnit5 : this.selectedUnits) {
-                    if (orderableUnit5.ae == z2) {
+                    if (orderableUnit5.isTransportAttached == z2) {
                         if (this.isInstantCommand) {
                             orderableUnit5.removeNonBuildRepairWaypoints();
                         } else if (!this.isQueued) {

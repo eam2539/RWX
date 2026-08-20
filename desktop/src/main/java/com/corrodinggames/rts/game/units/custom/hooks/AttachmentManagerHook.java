@@ -138,7 +138,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                     while (it.hasNext()) {
                         BaseUnit baseUnit = (BaseUnit) it.next();
                         if ((baseUnit instanceof OrderableUnit) && baseUnit.parentEntity == null && customUnit.a((OrderableUnit) baseUnit, attachmentSlotDefinition)) {
-                            baseUnit.unitTransportTarget = null;
+                            baseUnit.transportContainer = null;
                             break;
                         }
                     }
@@ -159,13 +159,13 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                     orderableUnit.bx();
                     objArrA2[i2] = null;
                 } else {
-                    if (customUnit.unitTransportTarget != null) {
-                        if (orderableUnit.unitTransportTarget == null) {
-                            orderableUnit.unitTransportTarget = customUnit.unitTransportTarget;
+                    if (customUnit.transportContainer != null) {
+                        if (orderableUnit.transportContainer == null) {
+                            orderableUnit.transportContainer = customUnit.transportContainer;
                             gameEngine.gameUI.deselectUnit(orderableUnit);
                         }
-                    } else if (orderableUnit.unitTransportTarget != null && orderableUnit.unitTransportTarget != customUnit) {
-                        orderableUnit.unitTransportTarget = null;
+                    } else if (orderableUnit.transportContainer != null && orderableUnit.transportContainer != customUnit) {
+                        orderableUnit.transportContainer = null;
                     }
                     AttachmentSlotDefinition attachmentSlotDefinition2 = (AttachmentSlotDefinition) fastArrayList.get(i2);
                     float fFastCos = Utility.fastCos(customUnit.rotationSpeed);
@@ -175,7 +175,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                     float f6 = f4 + customUnit.posX;
                     float f7 = f5 + customUnit.posY;
                     float f8 = customUnit.posZ + attachmentSlotDefinition2.e;
-                    if (GameViewUtils.b(orderableUnit.unitTransportCapacity, (int) attachmentSlotDefinition2.G)) {
+                    if (GameViewUtils.b(orderableUnit.attachmentStartTimeMillis, (int) attachmentSlotDefinition2.G)) {
                         orderableUnit.posX += (f6 - orderableUnit.posX) * 0.05f;
                         orderableUnit.posY += (f7 - orderableUnit.posY) * 0.05f;
                         orderableUnit.posZ += (f8 - orderableUnit.posZ) * 0.05f;
@@ -317,7 +317,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                     } else {
                         OrderableUnit var10 = (OrderableUnit) var11;
                         if (j.a(var10, var6)) {
-                            var10.unitTransportCapacity = -9999;
+                            var10.attachmentStartTimeMillis = -9999;
                             if (j.buildProgress < 1.0F && var6.x) {
                                 var10.r(j.buildProgress);
                                 var10.paidBuildProgress = j.buildProgress;

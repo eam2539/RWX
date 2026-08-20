@@ -13,7 +13,7 @@ abstract class UnitSelectionFilter {
     static UnitSelectionFilter a = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.1
         @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
-            if (orderableUnit.canUnitAttack() && !orderableUnit.u() && orderableUnit.unitTransportTarget == null && orderableUnit.hasNoCurrentWaypoint()) {
+            if (orderableUnit.canUnitAttack() && !orderableUnit.u() && orderableUnit.transportContainer == null && orderableUnit.hasNoCurrentWaypoint()) {
                 return true;
             }
             return false;
@@ -22,7 +22,7 @@ abstract class UnitSelectionFilter {
     static UnitSelectionFilter b = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.2
         @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
-            if (orderableUnit.canUnitAttack() && !orderableUnit.u() && orderableUnit.unitTransportTarget == null) {
+            if (orderableUnit.canUnitAttack() && !orderableUnit.u() && orderableUnit.transportContainer == null) {
                 return true;
             }
             return false;
@@ -31,7 +31,7 @@ abstract class UnitSelectionFilter {
     static UnitSelectionFilter c = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.3
         @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
-            if (orderableUnit.r() != null && orderableUnit.r().p() && orderableUnit.unitTransportTarget == null) {
+            if (orderableUnit.r() != null && orderableUnit.r().p() && orderableUnit.transportContainer == null) {
                 return true;
             }
             return false;
@@ -40,7 +40,7 @@ abstract class UnitSelectionFilter {
     static UnitSelectionFilter d = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.4
         @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
-            if (orderableUnit.r() == UnitTypeEnum.fabricator && orderableUnit.getUpgradeLevel() < 3 && orderableUnit.unitTransportTarget == null) {
+            if (orderableUnit.r() == UnitTypeEnum.fabricator && orderableUnit.getUpgradeLevel() < 3 && orderableUnit.transportContainer == null) {
                 return true;
             }
             return false;
@@ -49,7 +49,7 @@ abstract class UnitSelectionFilter {
     static UnitSelectionFilter e = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.5
         @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
-            if (orderableUnit.r() == UnitTypeEnum.landFactory && orderableUnit.unitTransportTarget == null) {
+            if (orderableUnit.r() == UnitTypeEnum.landFactory && orderableUnit.transportContainer == null) {
                 return true;
             }
             return false;
@@ -58,7 +58,7 @@ abstract class UnitSelectionFilter {
     static UnitSelectionFilter f = new UnitSelectionFilter() { // from class: com.corrodinggames.rts.gameFramework.f.al.6
         @Override // com.corrodinggames.rts.gameFramework.ui.UnitSelectionFilter
         public boolean a(OrderableUnit orderableUnit) {
-            if (orderableUnit.r() == UnitTypeEnum.airFactory && orderableUnit.unitTransportTarget == null) {
+            if (orderableUnit.r() == UnitTypeEnum.airFactory && orderableUnit.transportContainer == null) {
                 return true;
             }
             return false;

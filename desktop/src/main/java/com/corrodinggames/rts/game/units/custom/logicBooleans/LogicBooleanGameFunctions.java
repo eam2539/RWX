@@ -1441,7 +1441,7 @@ public class LogicBooleanGameFunctions {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
         public float getValue(OrderableUnit orderableUnit) {
-            return orderableUnit.unitCargoType;
+            return orderableUnit.killCount;
         }
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.AbstractNumberBoolean
@@ -1806,7 +1806,7 @@ public class LogicBooleanGameFunctions {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.TimeBoolean
         public int getTime(OrderableUnit orderableUnit) {
-            return orderableUnit.unitFlags1;
+            return orderableUnit.timeAliveStamp;
         }
     }
 
@@ -1819,7 +1819,7 @@ public class LogicBooleanGameFunctions {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.TimeBoolean
         public int getTime(OrderableUnit orderableUnit) {
-            return orderableUnit.unitFlags3;
+            return orderableUnit.lastConvertedStamp;
         }
     }
 
@@ -1832,7 +1832,7 @@ public class LogicBooleanGameFunctions {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.TimeBoolean
         public int getTime(OrderableUnit orderableUnit) {
-            return orderableUnit.unitFlags2;
+            return orderableUnit.customTimerStamp;
         }
     }
 

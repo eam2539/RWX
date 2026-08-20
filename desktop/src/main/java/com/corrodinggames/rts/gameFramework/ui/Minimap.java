@@ -585,7 +585,7 @@ public class Minimap {
                     int size = BaseUnit.bE.size();
                     for (int i14 = 0; i14 < size; i14++) {
                         BaseUnit baseUnit = baseUnitArrA[i14];
-                        if (baseUnit.team == playerTeamK && baseUnit.isUnitFull) {
+                        if (baseUnit.team == playerTeamK && baseUnit.hasMinimapPosition) {
                             i13++;
                         }
                     }
@@ -598,8 +598,8 @@ public class Minimap {
                     int size2 = BaseUnit.bE.size();
                     for (int i15 = 0; i15 < size2; i15++) {
                         BaseUnit baseUnit2 = baseUnitArrA2[i15];
-                        if (baseUnit2.team == playerTeamK && baseUnit2.isUnitFull) {
-                            lineDrawer.addPoint(baseUnit2.unitCargoCount, baseUnit2.unitCargoMax);
+                        if (baseUnit2.team == playerTeamK && baseUnit2.hasMinimapPosition) {
+                            lineDrawer.addPoint(baseUnit2.minimapScreenX, baseUnit2.minimapScreenY);
                         }
                     }
                     if (lineDrawer.vertexIndex != 0) {
@@ -668,13 +668,13 @@ public class Minimap {
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
             BaseUnit baseUnit = baseUnitArrA[i];
-            if (!baseUnit.isDead && baseUnit.unitTransportTarget == null && baseUnit.isVisibleToLocalPlayer() && baseUnit.c_() && !baseUnit.u()) {
+            if (!baseUnit.isDead && baseUnit.transportContainer == null && baseUnit.isVisibleToLocalPlayer() && baseUnit.c_() && !baseUnit.u()) {
                 Point pointWorldToScreen = worldToScreen(baseUnit.posX, baseUnit.posY);
-                baseUnit.unitCargoCount = pointWorldToScreen.worldX;
-                baseUnit.unitCargoMax = pointWorldToScreen.worldY;
-                baseUnit.isUnitFull = true;
+                baseUnit.minimapScreenX = pointWorldToScreen.worldX;
+                baseUnit.minimapScreenY = pointWorldToScreen.worldY;
+                baseUnit.hasMinimapPosition = true;
             } else {
-                baseUnit.isUnitFull = false;
+                baseUnit.hasMinimapPosition = false;
             }
         }
         Object[] objArrB = BuildPreview.activePreviews.b();

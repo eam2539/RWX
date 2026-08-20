@@ -57,22 +57,22 @@ public abstract class BaseUnit extends SizedObject {
     public VariableScope unitVariables;
 
     /* JADX INFO: renamed from: bx */
-    public UnitPrice unitData1;
+    public UnitPrice price;
 
     /* JADX INFO: renamed from: by */
-    public UnitPrice unitData2;
+    public UnitPrice additionalCost;
 
     /* JADX INFO: renamed from: bz */
-    public int unitFlags1;
+    public int timeAliveStamp;
 
     /* JADX INFO: renamed from: bA */
-    public int unitFlags2;
+    public int customTimerStamp;
 
     /* JADX INFO: renamed from: bB */
-    public int unitFlags3;
+    public int lastConvertedStamp;
 
     /* JADX INFO: renamed from: bC */
-    public int unitFlags4;
+    public int unitCounter;
 
     /* JADX INFO: renamed from: bD */
     public boolean isVisible;
@@ -244,7 +244,7 @@ public abstract class BaseUnit extends SizedObject {
     public boolean isUnitTransporting;
 
     /* JADX INFO: renamed from: cN */
-    public BaseUnit unitTransportTarget;
+    public BaseUnit transportContainer;
 
     /* JADX INFO: renamed from: cO */
     public OrderableUnit parentEntity;
@@ -253,22 +253,22 @@ public abstract class BaseUnit extends SizedObject {
     public AttachmentSlotDefinition attachmentData;
 
     /* JADX INFO: renamed from: cQ */
-    public int unitTransportCapacity;
+    public int attachmentStartTimeMillis;
 
     /* JADX INFO: renamed from: cR */
-    public boolean isUnitFull;
+    public boolean hasMinimapPosition;
 
     /* JADX INFO: renamed from: cS */
-    public int unitCargoCount;
+    public int minimapScreenX;
 
     /* JADX INFO: renamed from: cT */
-    public int unitCargoMax;
+    public int minimapScreenY;
 
     /* JADX INFO: renamed from: cU */
-    public int unitCargoType;
+    public int killCount;
 
     /* JADX INFO: renamed from: cV */
-    public float unitCargoMass;
+    public float totalDamageDealt;
     public static final Paint cW;
     public static final Paint cX;
     public static final Paint cY;
@@ -358,9 +358,9 @@ public abstract class BaseUnit extends SizedObject {
         this.unitTarget1 = null;
         this.unitTarget2 = null;
         this.unitTarget3 = null;
-        this.unitFlags1 = -9999;
-        this.unitFlags2 = -9999;
-        this.unitFlags3 = -9999;
+        this.timeAliveStamp = -9999;
+        this.customTimerStamp = -9999;
+        this.lastConvertedStamp = -9999;
         this.isActive = false;
         this.isAIUnit = false;
         this.changeTeam = false;
@@ -388,10 +388,10 @@ public abstract class BaseUnit extends SizedObject {
         this.lastSelectedTick = -9999;
         this.selectionFlashTimer = 0.0f;
         this.isMoving = true;
-        this.unitTransportTarget = null;
+        this.transportContainer = null;
         this.parentEntity = null;
         this.attachmentData = null;
-        this.unitTransportCapacity = -9999;
+        this.attachmentStartTimeMillis = -9999;
         this.unitAnimationFrame = -1;
         this.unitAnimationSpeed = -1;
         this.unitAnimationType = -99;
@@ -405,7 +405,7 @@ public abstract class BaseUnit extends SizedObject {
             bE.add(this);
             a.a(this);
         }
-        this.unitFlags1 = GameEngine.getInstance().gameTimeMillis;
+        this.timeAliveStamp = GameEngine.getInstance().gameTimeMillis;
         this.unitType = r();
     }
 
@@ -671,10 +671,10 @@ public abstract class BaseUnit extends SizedObject {
         gameOutputStream.writeBoolean(this.isMoving);
         gameOutputStream.writeFloat(this.movementLevels[0].targetX);
         gameOutputStream.writeFloat(this.movementLevels[0].velocityY);
-        gameOutputStream.writeUnitIdOrNullBaseUnit(this.unitTransportTarget);
+        gameOutputStream.writeUnitIdOrNullBaseUnit(this.transportContainer);
         gameOutputStream.writeByte(26);
-        gameOutputStream.writeInt(this.unitCargoType);
-        gameOutputStream.writeFloat(this.unitCargoMass);
+        gameOutputStream.writeInt(this.killCount);
+        gameOutputStream.writeFloat(this.totalDamageDealt);
         gameOutputStream.writeFloat(this.direction);
         gameOutputStream.writeFloat(this.targetRotation);
         int techLevel = getTechLevel();
@@ -719,10 +719,10 @@ public abstract class BaseUnit extends SizedObject {
         gameOutputStream.writeUnitIdIfAlive(this.unitTarget1);
         gameOutputStream.writeInt(this.unitLevel);
         gameOutputStream.writeInt(this.unitExperience);
-        gameOutputStream.writeInt(this.unitFlags1);
-        gameOutputStream.writeInt(this.unitFlags2);
-        gameOutputStream.writeInt(this.unitFlags3);
-        gameOutputStream.writeInt(this.unitFlags4);
+        gameOutputStream.writeInt(this.timeAliveStamp);
+        gameOutputStream.writeInt(this.customTimerStamp);
+        gameOutputStream.writeInt(this.lastConvertedStamp);
+        gameOutputStream.writeInt(this.unitCounter);
         gameOutputStream.writeBoolean(this.changeTeam);
         gameOutputStream.writeBoolean(this.isTargetable);
         this.unitCustomEffects.a(gameOutputStream);
@@ -733,12 +733,12 @@ public abstract class BaseUnit extends SizedObject {
             sA = this.attachmentData.a();
         }
         gameOutputStream.writeShort(sA);
-        gameOutputStream.writeInt(this.unitTransportCapacity);
+        gameOutputStream.writeInt(this.attachmentStartTimeMillis);
         VariableScope.writeOutUnitOrPlaceholder(gameOutputStream, this.unitTarget2);
         VariableScope.writeOutUnitOrPlaceholder(gameOutputStream, this.unitTarget3);
         VariableScope.writeOut(gameOutputStream, this.unitVariables);
-        UnitPrice.a(gameOutputStream, this.unitData1);
-        UnitPrice.a(gameOutputStream, this.unitData2);
+        UnitPrice.a(gameOutputStream, this.price);
+        UnitPrice.a(gameOutputStream, this.additionalCost);
         gameOutputStream.writeFloat(this.paidBuildProgress);
         super.a(gameOutputStream);
     }
@@ -771,11 +771,11 @@ public abstract class BaseUnit extends SizedObject {
         this.isMoving = gameInputStream.readBoolean();
         this.movementLevels[0].targetX = gameInputStream.readFloat();
         this.movementLevels[0].velocityY = gameInputStream.readFloat();
-        this.unitTransportTarget = gameInputStream.readBaseUnit();
+        this.transportContainer = gameInputStream.readBaseUnit();
         byte b = gameInputStream.readByte();
         if (b >= 1) {
-            this.unitCargoType = gameInputStream.readInt();
-            this.unitCargoMass = gameInputStream.readFloat();
+            this.killCount = gameInputStream.readInt();
+            this.totalDamageDealt = gameInputStream.readFloat();
         }
         if (b >= 2) {
             this.direction = gameInputStream.readFloat();
@@ -844,12 +844,12 @@ public abstract class BaseUnit extends SizedObject {
             this.unitExperience = gameInputStream.readInt();
         }
         if (b >= 16) {
-            this.unitFlags1 = gameInputStream.readInt();
-            this.unitFlags2 = gameInputStream.readInt();
-            this.unitFlags3 = gameInputStream.readInt();
+            this.timeAliveStamp = gameInputStream.readInt();
+            this.customTimerStamp = gameInputStream.readInt();
+            this.lastConvertedStamp = gameInputStream.readInt();
         }
         if (b >= 17) {
-            this.unitFlags4 = gameInputStream.readInt();
+            this.unitCounter = gameInputStream.readInt();
         }
         if (b >= 18) {
             this.changeTeam = gameInputStream.readBoolean();
@@ -873,7 +873,7 @@ public abstract class BaseUnit extends SizedObject {
             }
         }
         if (b >= 21) {
-            this.unitTransportCapacity = gameInputStream.readInt();
+            this.attachmentStartTimeMillis = gameInputStream.readInt();
         }
         if (b >= 22) {
             if (b < 24) {
@@ -886,8 +886,8 @@ public abstract class BaseUnit extends SizedObject {
             this.unitVariables = VariableScope.readIn(gameInputStream);
         }
         if (b >= 25) {
-            this.unitData1 = UnitPrice.a(gameInputStream);
-            this.unitData2 = UnitPrice.a(gameInputStream);
+            this.price = UnitPrice.a(gameInputStream);
+            this.additionalCost = UnitPrice.a(gameInputStream);
         }
         if (b >= 26) {
             this.paidBuildProgress = gameInputStream.readFloat();
@@ -941,7 +941,7 @@ public abstract class BaseUnit extends SizedObject {
         } else if (Q()) {
             i = 2;
         }
-        if (this.unitTransportTarget != null) {
+        if (this.transportContainer != null) {
             i = -1;
         }
         if (!this.isAlive) {
@@ -998,7 +998,7 @@ public abstract class BaseUnit extends SizedObject {
 
     /* JADX INFO: renamed from: bT */
     public final boolean isAlive() {
-        return this.unitTransportTarget == null && this.buildProgress >= 1.0f;
+        return this.transportContainer == null && this.buildProgress >= 1.0f;
     }
 
     public float x() {
@@ -1049,7 +1049,7 @@ public abstract class BaseUnit extends SizedObject {
         int iLongToIntArray2;
         int iLongToIntArray3;
         int iLongToIntArray4;
-        if (this.isDead || this.unitTransportTarget != null) {
+        if (this.isDead || this.transportContainer != null) {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
@@ -1195,7 +1195,7 @@ public abstract class BaseUnit extends SizedObject {
 
     @Override // com.corrodinggames.rts.gameFramework.GameObject
     public void p(float f) {
-        if (!this.isDead && this.unitTransportTarget == null && this.isSelected) {
+        if (!this.isDead && this.transportContainer == null && this.isSelected) {
             GameEngine gameEngine = GameEngine.getInstance();
             if (this.team == gameEngine.playerTeam || gameEngine.gameUI.canControlUnit(this)) {
                 if (gameEngine.settingsEngine.showUnitWaypoints && gameEngine.selectedWaypointDrawCount <= 40) {
@@ -1402,7 +1402,7 @@ public abstract class BaseUnit extends SizedObject {
 
     @Override // com.corrodinggames.rts.gameFramework.GameObject
     public boolean a(GameEngine gameEngine) {
-        if (!gameEngine.bufferedVisibleWorldRectF.b(this.posX, this.posY) || this.unitTransportTarget != null) {
+        if (!gameEngine.bufferedVisibleWorldRectF.b(this.posX, this.posY) || this.transportContainer != null) {
             return false;
         }
         if ((this.attachmentData != null && (this.attachmentData.I || this.attachmentData.C)) || !d(gameEngine.playerTeam)) {
@@ -1833,12 +1833,12 @@ public abstract class BaseUnit extends SizedObject {
 
     /* JADX INFO: renamed from: c */
     public boolean isUnitArmorEffective(BaseUnit baseUnit, boolean z) {
-        BaseUnit baseUnit2 = baseUnit.unitTransportTarget;
+        BaseUnit baseUnit2 = baseUnit.transportContainer;
         OrderableUnit orderableUnit = baseUnit.parentEntity;
-        baseUnit.unitTransportTarget = null;
+        baseUnit.transportContainer = null;
         baseUnit.parentEntity = null;
         boolean zD = d(baseUnit, z);
-        baseUnit.unitTransportTarget = baseUnit2;
+        baseUnit.transportContainer = baseUnit2;
         baseUnit.parentEntity = orderableUnit;
         return zD;
     }
@@ -2496,8 +2496,8 @@ public abstract class BaseUnit extends SizedObject {
 
     public final BaseUnit dr() {
         BaseUnit baseUnit = this.parentEntity;
-        if (baseUnit == null && this.unitTransportTarget != null) {
-            baseUnit = this.unitTransportTarget;
+        if (baseUnit == null && this.transportContainer != null) {
+            baseUnit = this.transportContainer;
         }
         return baseUnit;
     }

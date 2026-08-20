@@ -58,7 +58,7 @@ public class FormationEngine extends Serializable {
             int size = fastArrayList.size();
             for (int i4 = 0; i4 < size; i4++) {
                 OrderableUnit orderableUnit3 = (OrderableUnit) objArrA2[i4];
-                if (orderableUnit3.transportedBy == orderableUnit && !orderableUnit3.aj) {
+                if (orderableUnit3.transportedBy == orderableUnit && !orderableUnit3.inFormation) {
                     float f3 = -1.0f;
                     PointF pointF2 = null;
                     int i5 = -1;
@@ -81,12 +81,12 @@ public class FormationEngine extends Serializable {
             }
             if (orderableUnit2 != null) {
                 i2++;
-                orderableUnit2.aj = true;
+                orderableUnit2.inFormation = true;
                 orderableUnit2.transportOffsetX = pointF.x;
                 orderableUnit2.transportOffsetY = pointF.y;
-                orderableUnit2.am = f;
-                orderableUnit2.ao = f2;
-                orderableUnit2.ah = (short) (i + 1);
+                orderableUnit2.formationSlotAngle = f;
+                orderableUnit2.formationSlotDistanceSq = f2;
+                orderableUnit2.formationSlotIndex = (short) (i + 1);
                 fastArrayList2.remove(i3);
             } else {
                 return;
@@ -100,23 +100,23 @@ public class FormationEngine extends Serializable {
             Iterator it = fastArrayList.iterator();
             while (it.hasNext()) {
                 OrderableUnit orderableUnit3 = (OrderableUnit) it.next();
-                if (orderableUnit3.transportedBy == orderableUnit && orderableUnit3.ao > 0.0f && (orderableUnit2 == null || orderableUnit3.ao > orderableUnit2.ao)) {
-                    if (orderableUnit3.aj && orderableUnit3.ao > 100.0f) {
+                if (orderableUnit3.transportedBy == orderableUnit && orderableUnit3.formationSlotDistanceSq > 0.0f && (orderableUnit2 == null || orderableUnit3.formationSlotDistanceSq > orderableUnit2.formationSlotDistanceSq)) {
+                    if (orderableUnit3.inFormation && orderableUnit3.formationSlotDistanceSq > 100.0f) {
                         orderableUnit2 = orderableUnit3;
                     }
                 }
             }
             if (orderableUnit2 != null) {
-                orderableUnit2.aj = false;
+                orderableUnit2.inFormation = false;
                 OrderableUnit orderableUnit4 = null;
                 float f = 0.0f;
                 OrderableUnit orderableUnit5 = orderableUnit2;
-                int iSqrt = Utility.fastSquareRootInt((int) orderableUnit5.ao);
+                int iSqrt = Utility.fastSquareRootInt((int) orderableUnit5.formationSlotDistanceSq);
                 Iterator it2 = fastArrayList.iterator();
                 while (it2.hasNext()) {
                     OrderableUnit orderableUnit6 = (OrderableUnit) it2.next();
-                    if (orderableUnit6.transportedBy == orderableUnit && orderableUnit6.ao > 0.0f && orderableUnit6 != orderableUnit5) {
-                        float fDistanceInt = ((0 + Utility.distanceInt(orderableUnit5.posX, orderableUnit5.posY, orderableUnit.posX + orderableUnit6.transportOffsetX, orderableUnit.posY + orderableUnit6.transportOffsetY)) + Utility.distanceInt(orderableUnit6.posX, orderableUnit6.posY, orderableUnit.posX + orderableUnit5.transportOffsetX, orderableUnit.posY + orderableUnit5.transportOffsetY)) - (Utility.fastSquareRootInt((int) orderableUnit6.ao) + iSqrt);
+                    if (orderableUnit6.transportedBy == orderableUnit && orderableUnit6.formationSlotDistanceSq > 0.0f && orderableUnit6 != orderableUnit5) {
+                        float fDistanceInt = ((0 + Utility.distanceInt(orderableUnit5.posX, orderableUnit5.posY, orderableUnit.posX + orderableUnit6.transportOffsetX, orderableUnit.posY + orderableUnit6.transportOffsetY)) + Utility.distanceInt(orderableUnit6.posX, orderableUnit6.posY, orderableUnit.posX + orderableUnit5.transportOffsetX, orderableUnit.posY + orderableUnit5.transportOffsetY)) - (Utility.fastSquareRootInt((int) orderableUnit6.formationSlotDistanceSq) + iSqrt);
                         if (fDistanceInt < f) {
                             f = fDistanceInt;
                             orderableUnit4 = orderableUnit6;
@@ -128,10 +128,10 @@ public class FormationEngine extends Serializable {
                     float f3 = orderableUnit5.transportOffsetY;
                     orderableUnit5.transportOffsetX = orderableUnit4.transportOffsetX;
                     orderableUnit5.transportOffsetY = orderableUnit4.transportOffsetY;
-                    orderableUnit5.ao = Utility.distanceSq(orderableUnit5.posX, orderableUnit5.posY, orderableUnit.posX + orderableUnit5.transportOffsetX, orderableUnit.posY + orderableUnit5.transportOffsetY);
+                    orderableUnit5.formationSlotDistanceSq = Utility.distanceSq(orderableUnit5.posX, orderableUnit5.posY, orderableUnit.posX + orderableUnit5.transportOffsetX, orderableUnit.posY + orderableUnit5.transportOffsetY);
                     orderableUnit4.transportOffsetX = f2;
                     orderableUnit4.transportOffsetY = f3;
-                    orderableUnit4.ao = Utility.distanceSq(orderableUnit4.posX, orderableUnit4.posY, orderableUnit.posX + orderableUnit4.transportOffsetX, orderableUnit.posY + orderableUnit4.transportOffsetY);
+                    orderableUnit4.formationSlotDistanceSq = Utility.distanceSq(orderableUnit4.posX, orderableUnit4.posY, orderableUnit.posX + orderableUnit4.transportOffsetX, orderableUnit.posY + orderableUnit4.transportOffsetY);
                 }
             } else {
                 return;

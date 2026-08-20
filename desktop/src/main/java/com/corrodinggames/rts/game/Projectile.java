@@ -576,8 +576,8 @@ public class Projectile extends PositionedObject {
         Projectile projectileA = a(baseUnit, f2, f3);
         projectileA.posZ = f4;
         projectileA.k = (short) i;
-        projectileA.I = Utility.getDeterministicRandomFloatForUnit(baseUnit, 0.0f, 1.0f, baseUnit.unitFlags4);
-        baseUnit.unitFlags4++;
+        projectileA.I = Utility.getDeterministicRandomFloatForUnit(baseUnit, 0.0f, 1.0f, baseUnit.unitCounter);
+        baseUnit.unitCounter++;
         return projectileA;
     }
 
@@ -626,9 +626,9 @@ public class Projectile extends PositionedObject {
                     gameEngine.gameStatistics.a(baseUnit, baseUnit2, f3);
                 }
                 if (baseUnit != null) {
-                    baseUnit.unitCargoMass += f3;
+                    baseUnit.totalDamageDealt += f3;
                     if (z2 && (baseUnit2.isDead || baseUnit2.currentHealth < 0.0f)) {
-                        baseUnit.unitCargoType++;
+                        baseUnit.killCount++;
                         baseUnit.a(UnitEventType.killedAnyUnit, baseUnit2);
                     }
                 }
@@ -985,7 +985,7 @@ public class Projectile extends PositionedObject {
                 int size = BaseUnit.bE.size();
                 for (int i = 0; i < size; i++) {
                     BaseUnit baseUnit2 = baseUnitArrA[i];
-                    if (baseUnit2.posX + f35 > this.posX && baseUnit2.posX - f35 < this.posX && baseUnit2.posY + f35 > this.posY && baseUnit2.posY - f35 < this.posY && baseUnit2.isAlive && false == baseUnit2.i() && baseUnit2.unitTransportTarget == null) {
+                    if (baseUnit2.posX + f35 > this.posX && baseUnit2.posX - f35 < this.posX && baseUnit2.posY + f35 > this.posY && baseUnit2.posY - f35 < this.posY && baseUnit2.isAlive && false == baseUnit2.i() && baseUnit2.transportContainer == null) {
                         float fDistanceSq2 = Utility.distanceSq(this.posX, this.posY, baseUnit2.posX, baseUnit2.posY);
                         float f36 = this.aA + baseUnit2.radius;
                         if (fDistanceSq2 < f36 * f36) {
@@ -1416,7 +1416,7 @@ public class Projectile extends PositionedObject {
     }
 
     public void b(BaseUnit baseUnit, float f2, float f3) {
-        if (baseUnit.unitTransportTarget != null) {
+        if (baseUnit.transportContainer != null) {
             return;
         }
         if (this.ap != null && this.ap.contains(baseUnit)) {

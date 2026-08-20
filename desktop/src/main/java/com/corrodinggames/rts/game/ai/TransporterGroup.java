@@ -185,13 +185,13 @@ public class TransporterGroup extends AIUnitGroupBase {
         if (!this.q) {
             if (this.m != null) {
                 ArrayList<OrderableUnit> arrayList = this.m.G;
-                if (this.n != null && (this.n.isDead || this.n.unitTransportTarget != null || this.n.parentEntity != null)) {
+                if (this.n != null && (this.n.isDead || this.n.transportContainer != null || this.n.parentEntity != null)) {
                     arrayList.remove(this.n);
                     this.n = null;
                 }
                 if (this.n == null) {
                     for (OrderableUnit orderableUnit2 : arrayList) {
-                        if (orderableUnit2.unitTransportTarget == null) {
+                        if (orderableUnit2.transportContainer == null) {
                             Iterator it = this.F.iterator();
                             while (true) {
                                 if (it.hasNext()) {

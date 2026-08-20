@@ -72,7 +72,7 @@ public class AutoRepairCallback extends FilteredUnitCallback {
         if (orderableUnit == baseUnit) {
             return;
         }
-        if ((baseUnit.currentHealth < baseUnit.maxHealth || baseUnit.buildProgress < 1.0f) && !baseUnit.isDead && baseUnit.unitTransportTarget == null && this.searcherTeam.d(baseUnit.team) && orderableUnit.canRepairTarget(baseUnit)) {
+        if ((baseUnit.currentHealth < baseUnit.maxHealth || baseUnit.buildProgress < 1.0f) && !baseUnit.isDead && baseUnit.transportContainer == null && this.searcherTeam.d(baseUnit.team) && orderableUnit.canRepairTarget(baseUnit)) {
             float fDistanceSq = Utility.distanceSq(orderableUnit.posX, orderableUnit.posY, baseUnit.posX, baseUnit.posY);
             if (fDistanceSq < this.searchRangeSquared) {
                 if (baseUnit.buildProgress < 1.0f && orderableUnit.getRepairOrReclaimPrice(baseUnit) != null) {
