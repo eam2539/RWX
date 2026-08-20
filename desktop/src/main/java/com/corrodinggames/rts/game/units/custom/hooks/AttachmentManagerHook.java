@@ -35,7 +35,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                 attachmentSlotDefinition.b = strSubstring;
                 attachmentSlotDefinition.a = s;
                 s = (short) (s + 1);
-                customUnitConfig.energyCanTransferToOtherUnits.add(attachmentSlotDefinition);
+                customUnitConfig.attachmentSlotDefinitions.add(attachmentSlotDefinition);
             }
         }
     }
@@ -120,12 +120,54 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
         b(customUnit, f);
     }
 
+    public static AttachmentSlotDefinition a(CustomUnit customUnit, short s) {
+        FastArrayList fastArrayList = customUnit.unitConfig.attachmentSlotDefinitions;
+        if (fastArrayList.size <= s) {
+            return null;
+        }
+        return (AttachmentSlotDefinition) fastArrayList.get(s);
+    }
+
+    public static boolean a(CustomUnit customUnit, AttachmentSlotDefinition attachmentSlotDefinition, OrderableUnit orderableUnit) {
+        CustomUnitConfig customUnitConfig = customUnit.unitConfig;
+        short s = attachmentSlotDefinition.a;
+        if (customUnitConfig.attachmentSlotDefinitions.size <= s && orderableUnit != null) {
+            GameEngine.logColored("setAttachedUnitLookup: slot:" + ((int) s) + " larger than max slot size:" + customUnitConfig.attachmentSlotDefinitions.size);
+            return false;
+        }
+        if (customUnit.C == null) {
+            customUnit.C = new FastArrayList();
+        }
+        FastArrayList fastArrayList = customUnit.C;
+        if (fastArrayList.size() == 0) {
+            customUnit.D = customUnit.rotationSpeed;
+        }
+        if (orderableUnit == null && s >= fastArrayList.size()) {
+            return true;
+        }
+        while (fastArrayList.size() <= s) {
+            fastArrayList.add(null);
+        }
+        fastArrayList.set(s, orderableUnit);
+        return true;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.custom.hooks.CustomUnitRenderHook
+    public void b(CustomUnit customUnit) {
+        a(customUnit, true);
+    }
+
+    @Override // com.corrodinggames.rts.game.units.custom.hooks.CustomUnitRenderHook
+    public void c(CustomUnit customUnit) {
+        a(customUnit, true);
+    }
+
     @Override // com.corrodinggames.rts.game.units.custom.hooks.CustomUnitRenderHook
     public void b(CustomUnit customUnit, float f) {
         float f2;
         GameEngine gameEngine = GameEngine.getInstance();
         CustomUnitConfig customUnitConfig = customUnit.unitConfig;
-        FastArrayList fastArrayList = customUnitConfig.energyCanTransferToOtherUnits;
+        FastArrayList fastArrayList = customUnitConfig.attachmentSlotDefinitions;
         if (fastArrayList.size == 0) {
             return;
         }
@@ -253,7 +295,7 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
         if (fastArrayList == null) {
             return;
         }
-        FastArrayList fastArrayList2 = customUnit.unitConfig.energyCanTransferToOtherUnits;
+        FastArrayList fastArrayList2 = customUnit.unitConfig.attachmentSlotDefinitions;
         Object[] objArrA = fastArrayList.a();
         for (int i = fastArrayList.size - 1; i >= 0; i--) {
             OrderableUnit orderableUnit = (OrderableUnit) objArrA[i];
@@ -268,21 +310,10 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
         }
     }
 
-    @Override // com.corrodinggames.rts.game.units.custom.hooks.CustomUnitRenderHook
-    public void b(CustomUnit customUnit) {
-        a(customUnit, true);
-    }
-
-    @Override // com.corrodinggames.rts.game.units.custom.hooks.CustomUnitRenderHook
-    public void c(CustomUnit customUnit) {
-        a(customUnit, true);
-    }
-
-
     @Override
     public void a(CustomUnit j) {
         boolean var2 = false;
-        FastArrayList var3 = j.unitConfig.energyCanTransferToOtherUnits;
+        FastArrayList var3 = j.unitConfig.attachmentSlotDefinitions;
         Object[] var4 = var3.a();
 
         for (int var5 = var3.size - 1; var5 >= 0; var5--) {
@@ -335,10 +366,19 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
         }
     }
 
+    public static OrderableUnit a(CustomUnit customUnit, AttachmentSlotDefinition attachmentSlotDefinition) {
+        short s;
+        FastArrayList fastArrayList = customUnit.C;
+        if (fastArrayList == null || fastArrayList.size <= (s = attachmentSlotDefinition.a)) {
+            return null;
+        }
+        return (OrderableUnit) fastArrayList.get(s);
+    }
+
     @Override // com.corrodinggames.rts.game.units.custom.hooks.CustomUnitRenderHook
     public void a(CustomUnit customUnit, CustomUnitConfig customUnitConfig) {
         FastArrayList fastArrayList = customUnit.C;
-        FastArrayList fastArrayList2 = customUnit.unitConfig.energyCanTransferToOtherUnits;
+        FastArrayList fastArrayList2 = customUnit.unitConfig.attachmentSlotDefinitions;
         if (fastArrayList2.size() == 0) {
             customUnit.C = null;
             return;
@@ -359,47 +399,6 @@ public final class AttachmentManagerHook extends CustomUnitRenderHook {
                 orderableUnit2.attachmentData = (AttachmentSlotDefinition) fastArrayList2.get(size2);
             }
         }
-    }
-
-    public static AttachmentSlotDefinition a(CustomUnit customUnit, short s) {
-        FastArrayList fastArrayList = customUnit.unitConfig.energyCanTransferToOtherUnits;
-        if (fastArrayList.size <= s) {
-            return null;
-        }
-        return (AttachmentSlotDefinition) fastArrayList.get(s);
-    }
-
-    public static OrderableUnit a(CustomUnit customUnit, AttachmentSlotDefinition attachmentSlotDefinition) {
-        short s;
-        FastArrayList fastArrayList = customUnit.C;
-        if (fastArrayList == null || fastArrayList.size <= (s = attachmentSlotDefinition.a)) {
-            return null;
-        }
-        return (OrderableUnit) fastArrayList.get(s);
-    }
-
-    public static boolean a(CustomUnit customUnit, AttachmentSlotDefinition attachmentSlotDefinition, OrderableUnit orderableUnit) {
-        CustomUnitConfig customUnitConfig = customUnit.unitConfig;
-        short s = attachmentSlotDefinition.a;
-        if (customUnitConfig.energyCanTransferToOtherUnits.size <= s && orderableUnit != null) {
-            GameEngine.logColored("setAttachedUnitLookup: slot:" + ((int) s) + " larger than max slot size:" + customUnitConfig.energyCanTransferToOtherUnits.size);
-            return false;
-        }
-        if (customUnit.C == null) {
-            customUnit.C = new FastArrayList();
-        }
-        FastArrayList fastArrayList = customUnit.C;
-        if (fastArrayList.size() == 0) {
-            customUnit.D = customUnit.rotationSpeed;
-        }
-        if (orderableUnit == null && s >= fastArrayList.size()) {
-            return true;
-        }
-        while (fastArrayList.size() <= s) {
-            fastArrayList.add(null);
-        }
-        fastArrayList.set(s, orderableUnit);
-        return true;
     }
 
     public static void a(CustomUnit customUnit, FastArrayList fastArrayList, boolean z) {

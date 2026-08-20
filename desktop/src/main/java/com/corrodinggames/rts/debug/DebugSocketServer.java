@@ -24,8 +24,7 @@ public class DebugSocketServer implements Runnable {
     /* JADX INFO: renamed from: c */
     public static boolean enabled = false;
 
-    /* JADX INFO: renamed from: d */
-    public static boolean field_d = false;
+    public static boolean d = false;
 
     /* JADX INFO: renamed from: e */
     static ArrayList<String> scriptsToRun = new ArrayList();

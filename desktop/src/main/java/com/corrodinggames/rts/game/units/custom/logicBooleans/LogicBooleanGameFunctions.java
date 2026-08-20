@@ -759,8 +759,8 @@ public class LogicBooleanGameFunctions {
             boolean z = true;
             if (this.includesTag != null) {
                 AnimationSet animationSet = null;
-                if (LogicBoolean.currentEventContext != null) {
-                    animationSet = LogicBoolean.currentEventContext.animationSet;
+                if (LogicBoolean.activeEvent != null) {
+                    animationSet = LogicBoolean.activeEvent.animationSet;
                 }
                 if (animationSet == null || !AnimationTag.a(this.includesTag, animationSet)) {
                     z = false;

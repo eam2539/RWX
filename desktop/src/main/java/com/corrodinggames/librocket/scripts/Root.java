@@ -233,7 +233,7 @@ public class Root extends ScriptContext {
     }
 
     public void joinServer(String str) {
-        if (ScriptEngine.inDebugScript && !DebugSocketServer.field_d) {
+        if (ScriptEngine.inDebugScript && !DebugSocketServer.d) {
             return;
         }
         logDebug("joinAddress=" + str);

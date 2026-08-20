@@ -23,17 +23,13 @@ import java.util.regex.Pattern;
 public class LogicBooleanLoader {
     public static final boolean TRACE = false;
 
-    /* JADX INFO: renamed from: patternSingleQuote */
-    static Pattern singleQuotePattern = Pattern.compile("'(.*)'");
+    static Pattern patternSingleQuote = Pattern.compile("'(.*)'");
 
-    /* JADX INFO: renamed from: patternDoubleQuote */
-    static Pattern doubleQuotePattern = Pattern.compile("\"(.*)\"");
+    static Pattern patternDoubleQuote = Pattern.compile("\"(.*)\"");
 
-    /* JADX INFO: renamed from: patternInteger */
-    static Pattern integerPattern = Pattern.compile("(-?\\d*)");
+    static Pattern patternInteger = Pattern.compile("(-?\\d*)");
 
-    /* JADX INFO: renamed from: patternFloat */
-    static Pattern floatPattern = Pattern.compile("(-?\\d*\\.\\d*)");
+    static Pattern patternFloat = Pattern.compile("(-?\\d*\\.\\d*)");
     static final LogicBooleanContext defaultContextReader = new DefaultContextReader();
     static final LogicBooleanContext voidContextReader = new VoidContextReader(null);
     static final LogicBooleanContext voidNumberContextReader = new VoidContextReader("Number");
@@ -585,22 +581,22 @@ public class LogicBooleanLoader {
         if ("true".equals(lowerCase)) {
             return Boolean.TRUE;
         }
-        Matcher matcherMatch = match(singleQuotePattern, strTrim);
+        Matcher matcherMatch = match(patternSingleQuote, strTrim);
         if (matcherMatch != null) {
             return Utility.removeEscapeCharacters(matcherMatch.group(1));
         }
-        Matcher matcherMatch2 = match(doubleQuotePattern, strTrim);
+        Matcher matcherMatch2 = match(patternDoubleQuote, strTrim);
         if (matcherMatch2 != null) {
             return Utility.removeEscapeCharacters(matcherMatch2.group(1));
         }
-        Matcher matcherMatch3 = match(integerPattern, strTrim);
+        Matcher matcherMatch3 = match(patternInteger, strTrim);
         if (matcherMatch3 != null) {
             if (cls == String.class) {
                 return matcherMatch3.group(1);
             }
             return Integer.valueOf(Integer.parseInt(matcherMatch3.group(1)));
         }
-        Matcher matcherMatch4 = match(floatPattern, strTrim);
+        Matcher matcherMatch4 = match(patternFloat, strTrim);
         if (matcherMatch4 != null) {
             if (cls == String.class) {
                 return matcherMatch4.group(1);
@@ -675,7 +671,7 @@ public class LogicBooleanLoader {
     public abstract static class LogicBooleanContextWithDefault implements LogicBooleanContext {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBooleanLoader.LogicBooleanContext
         public LogicBoolean parseNextElementInChain(String str, CustomUnitConfig customUnitConfig, String str2, boolean z, String str3, String str4, LogicBoolean logicBoolean) {
-            return defaultParseNextElementInChain(this, str, customUnitConfig, str2, z, str3, str4, logicBoolean, LogicBoolean.booleanRegistry);
+            return defaultParseNextElementInChain(this, str, customUnitConfig, str2, z, str3, str4, logicBoolean, LogicBoolean.booleans);
         }
 
         public static LogicBoolean defaultParseNextElementInChain(LogicBooleanContext logicBooleanContext, String str, CustomUnitConfig customUnitConfig, String str2, boolean z, String str3, String str4, LogicBoolean logicBoolean, HashMap<String,LogicBoolean> map) {

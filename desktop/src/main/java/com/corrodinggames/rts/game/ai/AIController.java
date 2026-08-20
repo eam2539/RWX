@@ -1234,7 +1234,7 @@ public final class AIController extends PlayerTeam {
             }
         }
         for (BaseUnit baseUnit2 : BaseUnit.bE) {
-            if (baseUnit2.team == playerTeam && baseUnit2.changeTeam) {
+            if (baseUnit2.team == playerTeam && baseUnit2.isBuilder) {
                 return baseUnit2;
             }
         }

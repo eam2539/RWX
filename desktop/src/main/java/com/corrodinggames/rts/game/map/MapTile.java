@@ -179,7 +179,7 @@ public final class MapTile {
                     if (embeddedPngBase64.getProperty("randomRotate") != null) {
                         missileShip.rotationSpeed = Utility.getDeterministicRandomInt(missileShip, -180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT);
                     }
-                    missileShip.changeTeam = "builder".equalsIgnoreCase(property2) || "builder".equalsIgnoreCase(property3);
+                    missileShip.isBuilder = "builder".equalsIgnoreCase(property2) || "builder".equalsIgnoreCase(property3);
                     missileShip.isTargetable = "commandCenter".equalsIgnoreCase(property2) || "commandCenter".equalsIgnoreCase(property3);
                     missileShip.isActive = true;
                     missileShip.n();

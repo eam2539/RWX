@@ -45,31 +45,57 @@ public class ProjectileTemplate {
     public boolean aa;
     public Texture ab;
     public boolean ac;
+    /* JADX INFO: renamed from: ad */
     public float beamImageOffsetRate;
+    /* JADX INFO: renamed from: ah */
     public CustomUnitSpawnList trailEffect;
+    /* JADX INFO: renamed from: ai */
     public CustomUnitSpawnList effectOnCreate;
+    /* JADX INFO: renamed from: aj */
     public UnitSpawnList spawnProjectilesOnExplode;
+    /* JADX INFO: renamed from: ak */
     public UnitSpawnList spawnProjectilesOnEndOfLife;
+    /* JADX INFO: renamed from: al */
     public UnitSpawnList spawnProjectilesOnCreate;
+    /* JADX INFO: renamed from: am */
     public float wobbleAmplitude;
+    /* JADX INFO: renamed from: aq */
     public boolean lightCastOnGround;
+    /* JADX INFO: renamed from: az */
     public boolean retargetingInFlight;
+    /* JADX INFO: renamed from: aD */
     public AnimationSet retargetingInFlightSearchOnlyTags;
+    /* JADX INFO: renamed from: aI */
     public boolean flameWeapon;
+    /* JADX INFO: renamed from: aK */
     public float targetGroundSpread;
+    /* JADX INFO: renamed from: aL */
     public float targetGroundHeightOffset;
+    /* JADX INFO: renamed from: aM */
     public float speedSpread;
+    /* JADX INFO: renamed from: aN */
     public boolean ignoreParentShootDamageMultiplier;
+    /* JADX INFO: renamed from: aO */
     public boolean explodeOnEndOfLife;
+    /* JADX INFO: renamed from: aP */
     public float pushForce;
+    /* JADX INFO: renamed from: aQ */
     public float pushVelocity;
+    /* JADX INFO: renamed from: aV */
     public float armourIgnoreAmount;
+    /* JADX INFO: renamed from: aX */
     public CustomUnitSpawnList explodeEffect;
+    /* JADX INFO: renamed from: aY */
     public CustomUnitSpawnList explodeEffectOnShield;
+    /* JADX INFO: renamed from: aZ */
     public UnitSpawner spawnUnit;
+    /* JADX INFO: renamed from: ba */
     public int unloadUpToXUnitsFromSource;
+    /* JADX INFO: renamed from: bb */
     public boolean teleportSource;
+    /* JADX INFO: renamed from: bc */
     public boolean convertHitToSourceTeam;
+    /* JADX INFO: renamed from: bd */
     public AnimationSet tags;
     public int i = 35;
     public float j = -1.0f;
@@ -101,29 +127,53 @@ public class ProjectileTemplate {
     public boolean ae = false;
     public boolean af = false;
     public float ag = 3.0f;
+    /* JADX INFO: renamed from: an */
     public float wobbleFrequency = 5.0f;
+    /* JADX INFO: renamed from: ao */
     public int lightColor = -1;
+    /* JADX INFO: renamed from: ap */
     public float lightSize = 0.5f;
+    /* JADX INFO: renamed from: ar */
     public boolean largeHitEffect = false;
+    /* JADX INFO: renamed from: as */
     public float ballisticDelayMoveHeight = -1.0f;
+    /* JADX INFO: renamed from: at */
     public float ballisticHeight = -1.0f;
+    /* JADX INFO: renamed from: au */
     public float targetSpeed = -1.0f;
+    /* JADX INFO: renamed from: av */
     public float targetSpeedAcceleration = 0.1f;
+    /* JADX INFO: renamed from: aw */
     public boolean autoTargetingOnDeadTarget = false;
+    /* JADX INFO: renamed from: ax */
     public float autoTargetingOnDeadTargetRange = 120.0f;
+    /* JADX INFO: renamed from: ay */
     public float autoTargetingOnDeadTargetLead = 15.0f;
+    /* JADX INFO: renamed from: aA */
     public float retargetingInFlightSearchDelay = 5.0f;
+    /* JADX INFO: renamed from: aB */
     public float retargetingInFlightSearchRange = 120.0f;
+    /* JADX INFO: renamed from: aC */
     public float retargetingInFlightSearchLead = 15.0f;
+    /* JADX INFO: renamed from: aE */
     public int color = Color.a(255, 255, 255, 255);
+    /* JADX INFO: renamed from: aF */
     public float drawSize = 1.0f;
+    /* JADX INFO: renamed from: aG */
     public float teamColorRatio = 0.0f;
+    /* JADX INFO: renamed from: aH */
     public float teamColorRatioSourceRatio = 1.0f;
+    /* JADX INFO: renamed from: aJ */
     public boolean hitSound = true;
+    /* JADX INFO: renamed from: aR */
     public float buildingDamageMultiplier = 1.0f;
+    /* JADX INFO: renamed from: aS */
     public float shieldDamageMultiplier = 1.0f;
+    /* JADX INFO: renamed from: aT */
     public float shieldDeflectionMultiplier = 1.0f;
+    /* JADX INFO: renamed from: aU */
     public float hullDamageMultiplier = 1.0f;
+    /* JADX INFO: renamed from: aW */
     public float areaExpandTime = -1.0f;
     public FastArrayList be = null;
     public FastArrayList bf = null;

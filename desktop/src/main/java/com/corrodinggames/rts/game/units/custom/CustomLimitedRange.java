@@ -5,5 +5,5 @@ package com.corrodinggames.rts.game.units.custom;
 public class CustomLimitedRange {
 
     /* JADX INFO: renamed from: a */
-    float value;
+    float rangeValue;
 }

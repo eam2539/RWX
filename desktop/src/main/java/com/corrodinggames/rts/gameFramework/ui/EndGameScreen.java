@@ -75,8 +75,7 @@ public class EndGameScreen {
     /* JADX INFO: renamed from: s */
     boolean showRateGamePopup = false;
 
-    /* JADX INFO: renamed from: t */
-    float field_t = 0.0f;
+    float t = 0.0f;
 
     public EndGameScreen() {
         GameEngine gameEngine = GameEngine.getInstance();

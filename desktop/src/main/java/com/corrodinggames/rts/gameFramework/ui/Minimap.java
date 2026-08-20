@@ -172,11 +172,9 @@ public class Minimap {
     /* JADX INFO: renamed from: Q */
     public float fogRefreshProgress = 0.0f;
 
-    /* JADX INFO: renamed from: R */
-    int field_R = 30;
+    int R = 30;
 
-    /* JADX INFO: renamed from: S */
-    int field_S = -1;
+    int S = -1;
 
     /* JADX INFO: renamed from: V */
     final Rect tempDrawRect = new Rect();
@@ -205,7 +203,7 @@ public class Minimap {
     };
 
     /* JADX INFO: renamed from: af */
-    ArrayList _graphicsOperations = new ArrayList();
+    ArrayList trackedUnits = new ArrayList();
 
     /* JADX INFO: renamed from: a */
     public void ping(int i, int i2, float f, BaseUnit baseUnit) {
@@ -278,7 +276,7 @@ public class Minimap {
 
     /* JADX INFO: renamed from: a */
     public void reset(TileMap tileMap, boolean z) {
-        this._graphicsOperations.clear();
+        this.trackedUnits.clear();
         if (z) {
             this.elementPositionsDirty = true;
             return;
@@ -881,8 +879,8 @@ public class Minimap {
             }
         }
         drawUnitsAndBuildings(graphicsEngine, 0, 0, 0.0f, 1.0f);
-        if (this._graphicsOperations.size() != 0) {
-            Iterator it = this._graphicsOperations.iterator();
+        if (this.trackedUnits.size() != 0) {
+            Iterator it = this.trackedUnits.iterator();
             while (it.hasNext()) {
                 MinimapGraphicsOperation minimapGraphicsOperation = (MinimapGraphicsOperation) it.next();
                 if (minimapGraphicsOperation.unit.isDead) {
@@ -971,11 +969,11 @@ public class Minimap {
 
     /* JADX INFO: renamed from: a */
     public void addGraphicsOperation(BaseUnit baseUnit) {
-        if (this._graphicsOperations.contains(baseUnit)) {
+        if (this.trackedUnits.contains(baseUnit)) {
             return;
         }
         MinimapGraphicsOperation minimapGraphicsOperation = new MinimapGraphicsOperation(this);
         minimapGraphicsOperation.unit = baseUnit;
-        this._graphicsOperations.add(minimapGraphicsOperation);
+        this.trackedUnits.add(minimapGraphicsOperation);
     }
 }

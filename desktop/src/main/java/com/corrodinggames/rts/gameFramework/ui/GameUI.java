@@ -214,13 +214,13 @@ public final class GameUI extends Serializable {
     Paint minimapViewportBorderPaint;
 
     /* JADX INFO: renamed from: aQ */
-    GamePaint unitIconTexture;
+    GamePaint unitIconPaint;
 
     /* JADX INFO: renamed from: aR */
-    GamePaint buildingIconTexture;
+    GamePaint buildingIconPaint;
 
     /* JADX INFO: renamed from: aS */
-    GamePaint effectIconTexture;
+    GamePaint effectIconPaint;
 
     /* JADX INFO: renamed from: aT */
     public float tooltipDelay;
@@ -290,7 +290,7 @@ public final class GameUI extends Serializable {
     private float ci;
 
     /* JADX INFO: renamed from: cj */
-    private int privateInt4;
+    private int highlightOffsetX;
     private int ck;
     private int cl;
     public static boolean bR;
@@ -750,20 +750,20 @@ public final class GameUI extends Serializable {
         this.unitPathBorderPaint.a(125, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_DATA_SERVICE);
         this.unitPathBorderPaint.a(Paint.Align.CENTER);
         GamePaint.b(this.unitPathBorderPaint);
-        this.unitIconTexture = new GamePaint();
-        this.unitIconTexture.b(-16777216);
-        this.unitIconTexture.a(true);
-        this.unitIconTexture.c(true);
-        this.unitIconTexture.a(Typeface.a(Typeface.c, 0));
-        gameEngine.updatePaintTextSize(this.unitIconTexture, 14.0f);
-        this.buildingIconTexture = new GamePaint();
-        this.buildingIconTexture.a(this.unitIconTexture);
-        this.buildingIconTexture.a(Typeface.a(Typeface.c, 1));
-        gameEngine.updatePaintTextSize(this.buildingIconTexture, 16.0f);
-        this.effectIconTexture = new GamePaint();
-        this.effectIconTexture.a(this.buildingIconTexture);
-        this.effectIconTexture.b(Color.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_RADIO_SERVICE, 63, 80));
-        gameEngine.updatePaintTextSize(this.effectIconTexture, 16.0f);
+        this.unitIconPaint = new GamePaint();
+        this.unitIconPaint.b(-16777216);
+        this.unitIconPaint.a(true);
+        this.unitIconPaint.c(true);
+        this.unitIconPaint.a(Typeface.a(Typeface.c, 0));
+        gameEngine.updatePaintTextSize(this.unitIconPaint, 14.0f);
+        this.buildingIconPaint = new GamePaint();
+        this.buildingIconPaint.a(this.unitIconPaint);
+        this.buildingIconPaint.a(Typeface.a(Typeface.c, 1));
+        gameEngine.updatePaintTextSize(this.buildingIconPaint, 16.0f);
+        this.effectIconPaint = new GamePaint();
+        this.effectIconPaint.a(this.buildingIconPaint);
+        this.effectIconPaint.b(Color.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_RADIO_SERVICE, 63, 80));
+        gameEngine.updatePaintTextSize(this.effectIconPaint, 16.0f);
         this.fogOfWarPaint = new GamePaint();
         this.fogOfWarPaint.b(-16777216);
         this.fogOfWarPaint.a(Paint.Align.CENTER);
@@ -1414,7 +1414,7 @@ public final class GameUI extends Serializable {
     /* JADX INFO: renamed from: a */
     public boolean highlightRect(final GameEngine l, final PlayerTeam n, final boolean boolean3, final Resource a4, final double double5, final StoredResources f, final int integer, final Resource a8) {
         if (integer == 0) {
-            this.privateInt4 = 0;
+            this.highlightOffsetX = 0;
         }
         boolean b = false;
         if (integer < 6 && f != null) {
@@ -1442,7 +1442,7 @@ public final class GameUI extends Serializable {
             }
         }
         int n3 = (int)(l.screenWidth - l.sidebarWidth);
-        n3 -= this.privateInt4;
+        n3 -= this.highlightOffsetX;
         Paint paint4 = this.unitHealthBarBackgroundPaint;
         if (boolean3) {
             paint4 = this.unitShieldBarPaint;
@@ -1487,8 +1487,8 @@ public final class GameUI extends Serializable {
             b4 = true;
             this.cf += (int)this.ci;
             n6 = this.cf;
-            n3 += this.privateInt4;
-            this.privateInt4 = 0;
+            n3 += this.highlightOffsetX;
+            this.highlightOffsetX = 0;
         }
         if (ch != 0) {
             n7 = 0;
@@ -1533,7 +1533,7 @@ public final class GameUI extends Serializable {
                 ++this.ch;
             }
         }
-        this.privateInt4 += (int)(n4 + n9 + n8 + b3);
+        this.highlightOffsetX += (int)(n4 + n9 + n8 + b3);
         return true;
     }
 
@@ -4028,23 +4028,23 @@ public final class GameUI extends Serializable {
             s2 = this.notEnoughResourcesText.resolveText();
         }
         final TextRenderQueue textRenderQueue = new TextRenderQueue();
-        textRenderQueue.d = this.unitIconTexture;
-        textRenderQueue.e = this.buildingIconTexture;
+        textRenderQueue.d = this.unitIconPaint;
+        textRenderQueue.e = this.buildingIconPaint;
         final Paint paint3 = null;
         Paint effectIconTexture = null;
         if (b6) {
-            effectIconTexture = this.effectIconTexture;
+            effectIconTexture = this.effectIconPaint;
         }
         textRenderQueue.a(true);
         s.renderDisplayText(am, textRenderQueue, paint3, effectIconTexture);
         if (s2 != null) {
-            textRenderQueue.a("\n" + s2, this.effectIconTexture);
+            textRenderQueue.a("\n" + s2, this.effectIconPaint);
         }
         textRenderQueue.a(false);
         s.onPurchase(am, textRenderQueue);
         if (b4) {
             textRenderQueue.b();
-            textRenderQueue.a(this.notAvailableInDemoText, this.buildingIconTexture);
+            textRenderQueue.a(this.notAvailableInDemoText, this.buildingIconPaint);
         }
         final int a = 20;
         this.bv.a = a;
@@ -4087,9 +4087,9 @@ public final class GameUI extends Serializable {
         }
         if (!GameEngine.isPC() || boolean2 || !shouldShowActionInfoHoverNearMouse || !boolean5) {}
         if (s2 != null) {}
-        final GamePaint buildingIconTexture = this.buildingIconTexture;
+        final GamePaint buildingIconTexture = this.buildingIconPaint;
         if (boolean4) {
-            final GamePaint effectIconTexture2 = this.effectIconTexture;
+            final GamePaint effectIconTexture2 = this.effectIconPaint;
         }
         final TextRenderLayout a2 = textRenderQueue.a(this.bv.b(), boolean8);
         final float n2 = (float)this.bv.d();

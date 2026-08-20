@@ -49,10 +49,13 @@ public final class NetworkEngine {
     public float j;
     public float k;
     public int m;
-    public String roomPassword;
-    public boolean requireActiveMods;
+    /* JADX INFO: renamed from: as */
+    public static boolean forceIgnoreDesync;
+    /* JADX INFO: renamed from: bl */
+    public final Object queuedDisconnectLock = new Object();
     public boolean p;
-    public boolean publishToMasterServer;
+    /* JADX INFO: renamed from: n */
+    public String roomPassword;
     public boolean useMasterServer = true;
     public boolean s;
     public String u;
@@ -73,24 +76,39 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: H */
     public boolean isProxyController;
+    /* JADX INFO: renamed from: o */
+    public boolean requireActiveMods;
+    /* JADX INFO: renamed from: q */
+    public boolean publishToMasterServer;
+    /* JADX INFO: renamed from: K */
     public Float forcedStepRateOverride;
+    /* JADX INFO: renamed from: L */
     public String connectionQueryString;
+    /* JADX INFO: renamed from: N */
     public boolean quickResyncRequested;
+    /* JADX INFO: renamed from: O */
     public int stepRateSampleCount;
+    /* JADX INFO: renamed from: P */
     public int slowStepRateSampleCount;
-    public int commandFrameInterval;
-    public int commandFrameSendAhead;
 
     /* JADX INFO: renamed from: S */
     public String serverUuid;
+    /* JADX INFO: renamed from: Q */
+    public int commandFrameInterval;
+    /* JADX INFO: renamed from: R */
+    public int commandFrameSendAhead;
+    /* JADX INFO: renamed from: Y */
     public boolean frameUpdateBlocked;
+    /* JADX INFO: renamed from: Z */
     public float allPlayersReadyCountdown;
-    boolean allPlayersReady;
+    /* JADX INFO: renamed from: ab */
     public float allPlayersReadyWaitTimer;
+    /* JADX INFO: renamed from: ac */
     public float allPlayersReadyReminderTimer;
+    /* JADX INFO: renamed from: ad */
     public boolean catchupSpeedupActive;
+    /* JADX INFO: renamed from: ae */
     public float catchupSpeedupTimer;
-    public boolean catchupFastForwardActive;
     public boolean ag;
 
     /* JADX INFO: renamed from: aj */
@@ -104,14 +122,22 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: an */
     public boolean syncChecksumSentForFrame;
+    /* JADX INFO: renamed from: af */
+    public boolean catchupFastForwardActive;
+    /* JADX INFO: renamed from: ap */
     public int desyncCount;
+    /* JADX INFO: renamed from: aq */
     public int desyncPassCount;
+    /* JADX INFO: renamed from: ar */
     public int resyncSendOrReceiveCount;
-    public static boolean forceIgnoreDesync;
-    long playerUpdatePendingTimestamp;
+    /* JADX INFO: renamed from: av */
     public boolean gameSetupReceived;
+    /* JADX INFO: renamed from: aA */
     public GameInputStream receivedSaveGameStream;
+    /* JADX INFO: renamed from: aB */
     public GameInputStream receivedCustomMapStream;
+    /* JADX INFO: renamed from: bb */
+    public boolean freeForAllMode;
 
     /* JADX INFO: renamed from: aD */
     Thread connectionAcceptorThread1;
@@ -155,29 +181,40 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: ba */
     public float returnToBattleroomDelaySeconds;
-    public boolean freeForAllMode;
+    /* JADX INFO: renamed from: bc */
     public boolean startGameFailed;
-    public boolean bd;
+    /* JADX INFO: renamed from: be */
     public boolean gameEndedByServer;
+    public boolean bd;
+    /* JADX INFO: renamed from: bj */
+    public GameTeam spectatorGameTeam;
     public boolean bf;
     public String bg;
-    public GameTeam spectatorGameTeam;
+    /* JADX INFO: renamed from: bk */
     public GameTeam adminGameTeam;
-    float timeSinceLastResync;
-    float resyncDelayTimer;
-    int resyncAttemptCount;
-    int lastResyncTick;
+    /* JADX INFO: renamed from: bx */
+    public boolean reconnectDialogShown;
+    /* JADX INFO: renamed from: v */
+    public boolean chatOnlyMode = false;
+    /* JADX INFO: renamed from: B */
+    public volatile boolean networkGameActive = false;
+    /* JADX INFO: renamed from: F */
+    public boolean singleplayerServer = false;
+    /* JADX INFO: renamed from: X */
+    public int nextBlockingFrame = 0;
 
     /* JADX INFO: renamed from: bs */
     public long totalBytesSent;
 
     /* JADX INFO: renamed from: bt */
     public long totalBytesReceived;
-    public boolean reconnectDialogShown;
+    /* JADX INFO: renamed from: ai */
+    public int checksumIntervalFrames = 300;
 
     /* JADX INFO: renamed from: bA */
     static ArrayList engineInstances;
-    Timer masterServerUpdateTimer;
+    /* JADX INFO: renamed from: ao */
+    public boolean desyncReportingEnabled = true;
 
     /* JADX INFO: renamed from: bF */
     SocketConnector socketConnector;
@@ -196,14 +233,17 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: t */
     public int udpPort = 5005;
-    public boolean chatOnlyMode = false;
+    /* JADX INFO: renamed from: aw */
+    public int currentUnitCap = 5;
 
     /* JADX INFO: renamed from: w */
     public long nextUnitId = 1;
     public boolean x = false;
     private boolean bH = false;
-    public volatile boolean networkGameActive = false;
-    public boolean singleplayerServer = false;
+    /* JADX INFO: renamed from: ax */
+    public int maxUnitCap = 5;
+    /* JADX INFO: renamed from: az */
+    public String selectedMapPath = null;
     public int I = 0;
 
     /* JADX INFO: renamed from: bI */
@@ -216,22 +256,28 @@ public final class NetworkEngine {
     public int U = -1;
     public int V = -1;
     public int W = Utility.getRandomIntInRange(1, 9000000);
-    public int nextBlockingFrame = 0;
+    /* JADX INFO: renamed from: aX */
+    public boolean freeForAllModeChecked = false;
 
     /* JADX INFO: renamed from: ah */
     public int lastSyncedTick = -1;
-    public int checksumIntervalFrames = 300;
+    /* JADX INFO: renamed from: bm */
+    public boolean queuedDisconnectRequested = false;
 
     /* JADX INFO: renamed from: am */
     public GameStateChecksum stateChecksum = new GameStateChecksum();
-    public boolean desyncReportingEnabled = true;
+    /* JADX INFO: renamed from: aa */
+    boolean allPlayersReady;
     float at = 0.0f;
-    public int currentUnitCap = 5;
-    public int maxUnitCap = 5;
+    /* JADX INFO: renamed from: au */
+    long playerUpdatePendingTimestamp;
+    /* JADX INFO: renamed from: bn */
+    float timeSinceLastResync;
 
     /* JADX INFO: renamed from: ay */
     public GameRoomSettings roomSettings = new GameRoomSettings();
-    public String selectedMapPath = null;
+    /* JADX INFO: renamed from: bo */
+    float resyncDelayTimer;
 
     /* JADX INFO: renamed from: aC */
     public ChatLog chatLog = new ChatLog();
@@ -241,11 +287,13 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: aN */
     ConcurrentLinkedQueue recvQueue = new ConcurrentLinkedQueue();
-    volatile int nextConnectionId = 1;
+    /* JADX INFO: renamed from: bp */
+    int resyncAttemptCount;
 
     /* JADX INFO: renamed from: aQ */
     Object sessionLock = new Object();
-    public boolean freeForAllModeChecked = false;
+    /* JADX INFO: renamed from: bq */
+    int lastResyncTick;
 
     /* JADX INFO: renamed from: aY */
     boolean returnToBattleroomPending = false;
@@ -258,9 +306,13 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: bi */
     public ConcurrentLinkedQueue<ServerInfo> discoveredServerList = new ConcurrentLinkedQueue();
-    public final Object queuedDisconnectLock = new Object();
-    public boolean queuedDisconnectRequested = false;
+    /* JADX INFO: renamed from: bD */
+    Timer masterServerUpdateTimer;
+    /* JADX INFO: renamed from: aP */
+    volatile int nextConnectionId = 1;
+    /* JADX INFO: renamed from: br */
     boolean quickResyncCommandPending = false;
+    /* JADX INFO: renamed from: bu */
     boolean pathfindingPauseActive = false;
 
     /* JADX INFO: renamed from: bv */
@@ -268,10 +320,12 @@ public final class NetworkEngine {
 
     /* JADX INFO: renamed from: bw */
     public String serverAddress = null;
+    /* JADX INFO: renamed from: by */
     boolean networkClientIdMachineKeyChecked = false;
 
     /* JADX INFO: renamed from: bz */
     boolean registerConnectionSent = false;
+    /* JADX INFO: renamed from: bB */
     boolean pendingMultiplayerChatNotification = false;
 
     /* JADX INFO: renamed from: bC */
@@ -981,7 +1035,7 @@ public final class NetworkEngine {
         this.roomSettings.startingUnits = 1;
         this.roomSettings.incomeMultiplier = 1.0f;
         this.roomSettings.noNukes = false;
-        this.roomSettings.unknown = false;
+        this.roomSettings.j = false;
         this.roomSettings.sharedControl = false;
         this.roomSettings.startingCredits = 0;
         this.roomSettings.teamLock = false;
@@ -2123,7 +2177,7 @@ public final class NetworkEngine {
             gameOutputStream.writeInt(this.roomSettings.startingUnits);
             gameOutputStream.writeFloat(this.roomSettings.incomeMultiplier);
             gameOutputStream.writeBoolean(this.roomSettings.noNukes);
-            gameOutputStream.writeBoolean(this.roomSettings.unknown);
+            gameOutputStream.writeBoolean(this.roomSettings.j);
             if (this.chatOnlyMode) {
                 gameOutputStream.writeBoolean(false);
             } else {
@@ -2373,7 +2427,7 @@ public final class NetworkEngine {
                     gameOutputStream.writeInt(this.roomSettings.startingUnits);
                     gameOutputStream.writeFloat(this.roomSettings.incomeMultiplier);
                     gameOutputStream.writeBoolean(this.roomSettings.noNukes);
-                    gameOutputStream.writeBoolean(this.roomSettings.unknown);
+                    gameOutputStream.writeBoolean(this.roomSettings.j);
                     gameOutputStream.writeBoolean(false);
                     gameOutputStream.writeBoolean(this.roomSettings.sharedControl);
                     gameOutputStream.writeBoolean(this.gamePaused);
@@ -2485,7 +2539,7 @@ public final class NetworkEngine {
                     this.roomSettings.startingUnits = gameInputStream2.readInt();
                     this.roomSettings.incomeMultiplier = gameInputStream2.readFloat();
                     this.roomSettings.noNukes = gameInputStream2.readBoolean();
-                    this.roomSettings.unknown = gameInputStream2.readBoolean();
+                    this.roomSettings.j = gameInputStream2.readBoolean();
                 }
                 if (b2 >= 3 && gameInputStream2.readBoolean()) {
                     try {
@@ -2879,7 +2933,7 @@ public final class NetworkEngine {
                     this.roomSettings.startingUnits = gameInputStream8.readInt();
                     this.roomSettings.incomeMultiplier = gameInputStream8.readFloat();
                     this.roomSettings.noNukes = gameInputStream8.readBoolean();
-                    this.roomSettings.unknown = gameInputStream8.readBoolean();
+                    this.roomSettings.j = gameInputStream8.readBoolean();
                 }
                 if (b4 >= 3 && gameInputStream8.readBoolean()) {
                     try {

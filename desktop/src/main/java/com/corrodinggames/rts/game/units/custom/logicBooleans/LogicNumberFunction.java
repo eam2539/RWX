@@ -484,8 +484,8 @@ public abstract class LogicNumberFunction extends LogicBoolean.LogicNumberOnly {
             if (customUnitConfig == null) {
                 throw new ConfigException("FunctionRnd requires metadata");
             }
-            customUnitConfig.number++;
-            this.randomIndex = customUnitConfig.number;
+            customUnitConfig.S++;
+            this.randomIndex = customUnitConfig.S;
         }
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.LogicBoolean.LogicNumberOnly

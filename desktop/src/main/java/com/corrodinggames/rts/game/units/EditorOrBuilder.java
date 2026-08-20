@@ -47,33 +47,16 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     /* JADX INFO: renamed from: b */
     PointF[] targetPoints;
 
-    /* JADX INFO: renamed from: c */
-    boolean controlPointPaints;
+    /* JADX INFO: renamed from: f */
+    static Paint editorSearchPaint;
 
     /* JADX INFO: renamed from: d */
     static Paint targetPointPaints;
 
     /* JADX INFO: renamed from: e */
     static Paint editorSelectionPaint;
-
-    /* JADX INFO: renamed from: f */
-    static Paint editorSelectionTexture;
-
-    /* JADX INFO: renamed from: g */
-    static Texture editorSelectionTexture2;
-
-    /* JADX INFO: renamed from: r */
-    String editorIconTexture10;
-    static ArrayList D;
-    ModInfo E;
-    EditorUnitTypeFilter F;
-    EditorTab G;
-    String H;
-    boolean I;
-    String J;
-
     /* JADX INFO: renamed from: h */
-    static AbstractUnitAction editorSelectionTexture3 = new AbstractUnitAction("reloadUnits") { // from class: com.corrodinggames.rts.game.units.h.1
+    static AbstractUnitAction reloadUnitsAction = new AbstractUnitAction("reloadUnits") { // from class: com.corrodinggames.rts.game.units.h.1
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
@@ -137,8 +120,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
     };
 
+    /* JADX INFO: renamed from: g */
+    static Texture editorSelectionTexture2;
     /* JADX INFO: renamed from: i */
-    static AbstractUnitAction editorIconTexture = new AbstractUnitAction("reloadOnlyActiveUnits") { // from class: com.corrodinggames.rts.game.units.h.12
+    static AbstractUnitAction reloadOnlyActiveUnitsAction = new AbstractUnitAction("reloadOnlyActiveUnits") { // from class: com.corrodinggames.rts.game.units.h.12
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
@@ -201,9 +186,15 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-
+    static ArrayList D;
+    ModInfo E;
+    EditorUnitTypeFilter F;
+    EditorTab G;
+    String H;
+    boolean I;
+    String J;
     /* JADX INFO: renamed from: j */
-    static AbstractUnitAction editorIconTexture2 = new AbstractUnitAction("unitClone") { // from class: com.corrodinggames.rts.game.units.h.17
+    static AbstractUnitAction unitCloneAction = new AbstractUnitAction("unitClone") { // from class: com.corrodinggames.rts.game.units.h.17
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -263,9 +254,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-
     /* JADX INFO: renamed from: k */
-    static AbstractUnitAction editorIconTexture3 = new AbstractUnitAction("removeUnits") { // from class: com.corrodinggames.rts.game.units.h.18
+    static AbstractUnitAction removeUnitsAction = new AbstractUnitAction("removeUnits") { // from class: com.corrodinggames.rts.game.units.h.18
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -331,9 +321,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-
     /* JADX INFO: renamed from: l */
-    static AbstractUnitAction editorIconTexture4 = new AbstractUnitAction("killUnits") { // from class: com.corrodinggames.rts.game.units.h.19
+    static AbstractUnitAction killUnitsAction = new AbstractUnitAction("killUnits") { // from class: com.corrodinggames.rts.game.units.h.19
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -399,9 +388,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-
     /* JADX INFO: renamed from: m */
-    static AbstractUnitAction editorIconTexture5 = new AbstractUnitAction("finishQueue") { // from class: com.corrodinggames.rts.game.units.h.20
+    static AbstractUnitAction finishQueueAction = new AbstractUnitAction("finishQueue") { // from class: com.corrodinggames.rts.game.units.h.20
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -467,9 +455,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-
     /* JADX INFO: renamed from: n */
-    static AbstractUnitAction editorIconTexture6 = new AbstractUnitAction("nukeAt") { // from class: com.corrodinggames.rts.game.units.h.21
+    static AbstractUnitAction nukeAtAction = new AbstractUnitAction("nukeAt") { // from class: com.corrodinggames.rts.game.units.h.21
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -535,9 +522,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-
     /* JADX INFO: renamed from: o */
-    static AbstractUnitAction editorIconTexture7 = new NoneAction("freezeAI") { // from class: com.corrodinggames.rts.game.units.h.22
+    static AbstractUnitAction freezeAIAction = new NoneAction("freezeAI") { // from class: com.corrodinggames.rts.game.units.h.22
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -573,9 +559,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return baseUnit.team instanceof AIController;
         }
     };
-
     /* JADX INFO: renamed from: p */
-    static AbstractUnitAction editorIconTexture8 = new NoneAction("changeAlliance") { // from class: com.corrodinggames.rts.game.units.h.23
+    static AbstractUnitAction changeAllianceAction = new NoneAction("changeAlliance") { // from class: com.corrodinggames.rts.game.units.h.23
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -604,9 +589,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return true;
         }
     };
-
     /* JADX INFO: renamed from: q */
-    static AbstractUnitAction editorIconTexture9 = new NoneAction("startRecording") { // from class: com.corrodinggames.rts.game.units.h.2
+    static AbstractUnitAction startRecordingAction = new NoneAction("startRecording") { // from class: com.corrodinggames.rts.game.units.h.2
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public String getDescription() {
@@ -680,7 +664,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                         EditorOrBuilder editorOrBuilderL2 = EditorOrBuilder.L();
                         if (editorOrBuilderL2 != null && editorOrBuilderL != null) {
                             editorOrBuilderL2.a(editorOrBuilderL);
-                            editorOrBuilderL2.editorIconTexture10 = str;
+                            editorOrBuilderL2.lastSavedReplayPath = str;
                             return;
                         } else {
                             GameEngine.logColored("Failed copySettingsFromAnotherEditor");
@@ -722,13 +706,13 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
             boolean zK = GameEngine.getInstance().replayEngine.k();
             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
-            return (editorOrBuilderL == null || editorOrBuilderL.editorIconTexture10 == null || zK) ? false : true;
+            return (editorOrBuilderL == null || editorOrBuilderL.lastSavedReplayPath == null || zK) ? false : true;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         public boolean b(BaseUnit baseUnit) {
             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
-            return (editorOrBuilderL == null || editorOrBuilderL.editorIconTexture10 == null) ? false : true;
+            return (editorOrBuilderL == null || editorOrBuilderL.lastSavedReplayPath == null) ? false : true;
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -741,7 +725,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         /* JADX INFO: renamed from: c */
         public boolean onClicked(BaseUnit baseUnit, boolean z2) {
             final GameEngine gameEngine = GameEngine.getInstance();
-            final String str = EditorOrBuilder.L().editorIconTexture10;
+            final String str = EditorOrBuilder.L().lastSavedReplayPath;
             if (str == null) {
                 gameEngine.alert("No last replay found");
                 return false;
@@ -813,6 +797,70 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return false;
         }
     };
+    static AbstractUnitAction u = new NoneAction("freezeAllAI") { // from class: com.corrodinggames.rts.game.units.h.5
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public String getDescription() {
+            return "Freeze full high level logic for all AI forever";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: b */
+        public String getDisplayName() {
+            return "Freeze AI";
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        public String d() {
+            String str = "Freeze AI";
+            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+            if (editorOrBuilderL != null && editorOrBuilderL.freezeAllAIs) {
+                str = "Unfreeze AIs";
+            }
+            return str;
+        }
+
+        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+        /* JADX INFO: renamed from: a */
+        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
+            return true;
+        }
+    };
+    static ActionFilter K = new ActionFilter() { // from class: com.corrodinggames.rts.game.units.h.16
+        @Override // com.corrodinggames.rts.game.units.actions.ActionFilter
+        public boolean isAvailable(AbstractUnitAction abstractUnitAction, BaseUnit baseUnit) {
+            if (abstractUnitAction instanceof FilteredUnitAction) {
+                abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
+            }
+            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
+            if (editorOrBuilderL == null) {
+                return true;
+            }
+            EditorTab editorTab = editorOrBuilderL.G;
+            if (editorTab == null) {
+                editorTab = EditorTab.all;
+            }
+            if (editorTab == EditorTab.all && EditorOrBuilder.a(abstractUnitAction, baseUnit)) {
+                return false;
+            }
+            if (editorTab == EditorTab.modded && abstractUnitAction == EditorOrBuilder.reloadUnitsAction) {
+                return true;
+            }
+            if (editorTab == EditorTab.modded && abstractUnitAction == EditorOrBuilder.reloadOnlyActiveUnitsAction) {
+                return true;
+            }
+            if (editorTab == EditorTab.search && abstractUnitAction == EditorOrBuilder.y) {
+                return true;
+            }
+            if (abstractUnitAction == EditorOrBuilder.B && !EditorOrBuilder.B.b(baseUnit)) {
+                return false;
+            }
+            if (abstractUnitAction == EditorOrBuilder.C && !EditorOrBuilder.C.b(baseUnit)) {
+                return false;
+            }
+            return editorTab.a(abstractUnitAction.getUnitType());
+        }
+    };
     static AbstractUnitAction t = new NoneAction("hideInterface") { // from class: com.corrodinggames.rts.game.units.h.4
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
@@ -837,35 +885,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return false;
         }
     };
-    static AbstractUnitAction u = new NoneAction("freezeAllAI") { // from class: com.corrodinggames.rts.game.units.h.5
-        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        /* JADX INFO: renamed from: a */
-        public String getDescription() {
-            return "Freeze full high level logic for all AI forever";
-        }
-
-        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        /* JADX INFO: renamed from: b */
-        public String getDisplayName() {
-            return "Freeze AI";
-        }
-
-        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        public String d() {
-            String str = "Freeze AI";
-            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
-            if (editorOrBuilderL != null && editorOrBuilderL.controlPointPaints) {
-                str = "Unfreeze AIs";
-            }
-            return str;
-        }
-
-        @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-        /* JADX INFO: renamed from: a */
-        public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return true;
-        }
-    };
+    /* JADX INFO: renamed from: c */
+    boolean freezeAllAIs;
     static AbstractUnitAction v = new NoneAction("pauseGame") { // from class: com.corrodinggames.rts.game.units.h.6
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
@@ -1118,41 +1139,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             return GameEngine.getInstance().isDebugTempMode;
         }
     };
-    static ActionFilter K = new ActionFilter() { // from class: com.corrodinggames.rts.game.units.h.16
-        @Override // com.corrodinggames.rts.game.units.actions.ActionFilter
-        public boolean isAvailable(AbstractUnitAction abstractUnitAction, BaseUnit baseUnit) {
-            if (abstractUnitAction instanceof FilteredUnitAction) {
-                abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
-            }
-            EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
-            if (editorOrBuilderL == null) {
-                return true;
-            }
-            EditorTab editorTab = editorOrBuilderL.G;
-            if (editorTab == null) {
-                editorTab = EditorTab.all;
-            }
-            if (editorTab == EditorTab.all && EditorOrBuilder.a(abstractUnitAction, baseUnit)) {
-                return false;
-            }
-            if (editorTab == EditorTab.modded && abstractUnitAction == EditorOrBuilder.editorSelectionTexture3) {
-                return true;
-            }
-            if (editorTab == EditorTab.modded && abstractUnitAction == EditorOrBuilder.editorIconTexture) {
-                return true;
-            }
-            if (editorTab == EditorTab.search && abstractUnitAction == EditorOrBuilder.y) {
-                return true;
-            }
-            if (abstractUnitAction == EditorOrBuilder.B && !EditorOrBuilder.B.b(baseUnit)) {
-                return false;
-            }
-            if (abstractUnitAction == EditorOrBuilder.C && !EditorOrBuilder.C.b(baseUnit)) {
-                return false;
-            }
-            return editorTab.a(abstractUnitAction.getUnitType());
-        }
-    };
+    /* JADX INFO: renamed from: r */
+    String lastSavedReplayPath;
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: f, reason: merged with bridge method [inline-methods] */
@@ -1225,8 +1213,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         editorSelectionPaint = new Paint();
         editorSelectionPaint.a(targetPointPaints);
         editorSelectionPaint.a(55, 255, 60, 60);
-        editorSelectionTexture = new Paint();
-        editorSelectionTexture.a(60, 255, 255, 255);
+        editorSearchPaint = new Paint();
+        editorSearchPaint.a(60, 255, 255, 255);
         this.E = null;
         this.F = EditorUnitTypeFilter.land;
         this.G = EditorTab.all;
@@ -1425,6 +1413,122 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         return 0.1f;
     }
 
+    public static boolean a(AbstractUnitAction abstractUnitAction, BaseUnit baseUnit) {
+        if (abstractUnitAction instanceof FilteredUnitAction) {
+            abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
+        }
+        if (abstractUnitAction == freezeAIAction || abstractUnitAction == w || abstractUnitAction == x || abstractUnitAction == finishQueueAction || abstractUnitAction == removeUnitsAction || abstractUnitAction == unitCloneAction || abstractUnitAction == z || abstractUnitAction == changeAllianceAction || abstractUnitAction == startRecordingAction || abstractUnitAction == s || abstractUnitAction == t || abstractUnitAction == B || abstractUnitAction == C) {
+            return true;
+        }
+        return false;
+    }
+
+    static EditorOrBuilder L() {
+        return GameEngine.getInstance().gameUI.getEditorOrBuilder();
+    }
+
+    public static void a(ArrayList arrayList, int i) {
+        if (i != 1) {
+            return;
+        }
+        D = new ArrayList();
+        D.add(new TeamChangeAction(true, false));
+        D.add(new TeamChangeAction(true, true));
+        D.add(new TeamChangeAction(false, false));
+        D.add(new ChangeEditorTabAction(true, false));
+        D.add(new ChangeEditorTabAction(true, true));
+        D.add(new ChangeEditorTabAction(false, false));
+        D.add(new ModFilterAction(true, false));
+        D.add(new ModFilterAction(true, true));
+        D.add(new ModFilterAction(false, false));
+        D.add(new ChangeTypeFilterAction(true, false));
+        D.add(new ChangeTypeFilterAction(true, true));
+        D.add(new ChangeTypeFilterAction(false, false));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.grass));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.sea));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.sand));
+        D.add(new SetTerrainTypeAction(EditorTerrainType.dust));
+        ArrayList arrayList2 = new ArrayList();
+        arrayList2.add(new AddCreditsAction());
+        arrayList2.add(y);
+        arrayList2.add(reloadUnitsAction);
+        arrayList2.add(reloadOnlyActiveUnitsAction);
+        arrayList2.add(removeUnitsAction);
+        arrayList2.add(unitCloneAction);
+        arrayList2.add(killUnitsAction);
+        arrayList2.add(nukeAtAction);
+        arrayList2.add(finishQueueAction);
+        arrayList2.add(u);
+        arrayList2.add(v);
+        arrayList2.add(w);
+        arrayList2.add(x);
+        arrayList2.add(z);
+        arrayList2.add(changeAllianceAction);
+        arrayList2.add(startRecordingAction);
+        arrayList2.add(s);
+        arrayList2.add(t);
+        if (GameEngine.isTestingBuild) {
+            arrayList2.add(A);
+        }
+        arrayList2.add(B);
+        arrayList2.add(C);
+        Iterator it = arrayList2.iterator();
+        while (it.hasNext()) {
+            D.add(new FilteredUnitAction((AbstractUnitAction) it.next(), K, true));
+        }
+        ArrayList<UnitType> arrayList3 = new ArrayList();
+        arrayList3.addAll(UnitTypeEnum.ae);
+        // from class: com.corrodinggames.rts.game.units.h.15
+// java.util.Comparator
+        /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
+        arrayList3.sort((unitType, unitType2) -> {
+            BaseUnit baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(unitType);
+            BaseUnit baseUnitCanAttack2 = BaseUnit.getPrototypeForUnitType(unitType2);
+            int iCompareTo = Boolean.valueOf(baseUnitCanAttack.bP()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bP()));
+            if (iCompareTo != 0) {
+                return iCompareTo;
+            }
+            int iCompareTo2 = Boolean.valueOf(unitType.isBuildingUnit()).compareTo(Boolean.valueOf(unitType2.isBuildingUnit()));
+            if (iCompareTo2 != 0) {
+                return iCompareTo2;
+            }
+            int iCompareTo3 = Boolean.valueOf(baseUnitCanAttack.bO()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bO()));
+            if (iCompareTo3 != 0) {
+                return iCompareTo3;
+            }
+            UnitPrice unitPriceU = unitType.u();
+            UnitPrice unitPriceU2 = unitType2.u();
+            UnitPrice unitPriceB = unitType.B();
+            UnitPrice unitPriceB2 = unitType2.B();
+            if (unitPriceB != null) {
+                unitPriceU = UnitPrice.a(unitPriceU, unitPriceB);
+            }
+            if (unitPriceB2 != null) {
+                unitPriceU2 = UnitPrice.a(unitPriceU2, unitPriceB2);
+            }
+            int iCompareTo4 = unitPriceU.compareTo(unitPriceU2);
+            if (iCompareTo4 != 0) {
+                return iCompareTo4;
+            }
+            return 0;
+        });
+        for (UnitType unitType : arrayList3) {
+            if (unitType != UnitTypeEnum.wall_v && !unitType.getUnitTypeDescriptionShort().equals("test_tank") && !unitType.getUnitTypeDescriptionShort().equals("missing") && unitType != UnitTypeEnum.tankDestroyer && unitType != UnitTypeEnum.megaTank && unitType != UnitTypeEnum.fogRevealer && unitType != UnitTypeEnum.crystalResource && unitType != UnitTypeEnum.damagingBorder && unitType != UnitTypeEnum.zoneMarker && unitType != UnitTypeEnum.editorOrBuilder && unitType != UnitTypeEnum.dummyNonUnitWithTeam && unitType != UnitTypeEnum.supplyDepot && (BaseUnit.getPrototypeForUnitType(unitType) instanceof OrderableUnit) && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).showInEditor)) {
+                FilteredUnitAction filteredUnitAction = new FilteredUnitAction(new PlaceBuildingAction(unitType, 1, null), K);
+                boolean z2 = false;
+                Iterator it2 = D.iterator();
+                while (it2.hasNext()) {
+                    if (((AbstractUnitAction) it2.next()).equals(filteredUnitAction)) {
+                        z2 = true;
+                    }
+                }
+                if (!z2) {
+                    D.add(filteredUnitAction);
+                }
+            }
+        }
+    }
+
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: a */
     public void performUnitAction(AbstractUnitAction abstractUnitAction, boolean z2) {
@@ -1463,7 +1567,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                         playerTeamK.teamColorId = 1;
                         playerTeamK.isTeamDefeatedTech = true;
                         playerTeamK.isTeamWipedOut = true;
-                        if (!this.controlPointPaints) {
+                        if (!this.freezeAllAIs) {
                             aIController.aiUnitManagementTimer = 0.0f;
                         } else {
                             aIController.aiUnitManagementTimer = Float.MAX_VALUE;
@@ -1608,10 +1712,6 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         }
     }
 
-    static EditorOrBuilder L() {
-        return GameEngine.getInstance().gameUI.getEditorOrBuilder();
-    }
-
     /* JADX WARN: Multi-variable type inference failed */
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public void a(AbstractUnitAction abstractUnitAction, boolean z2, PointF pointF, BaseUnit baseUnit) {
@@ -1619,7 +1719,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         if (abstractUnitAction instanceof FilteredUnitAction) {
             abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
         }
-        if (abstractUnitAction == editorSelectionTexture3) {
+        if (abstractUnitAction == reloadUnitsAction) {
             if (w()) {
                 GameEngine.logColored("Not reloading units: Need to keep network sync");
                 gameEngine.gameUI.showMediumPriorityMessage("Not reloading units: Need to keep network sync");
@@ -1641,7 +1741,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             gameEngine.gameUI.showMediumPriorityMessage("All custom unit files reloaded");
         }
-        if (abstractUnitAction == editorIconTexture) {
+        if (abstractUnitAction == reloadOnlyActiveUnitsAction) {
             if (w()) {
                 GameEngine.logColored("Not reloading units: Need to keep network sync");
                 return;
@@ -1669,25 +1769,25 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             gameEngine.gameUI.showInfoMessageWithPriority(str, i2);
         }
-        if (abstractUnitAction == editorIconTexture3 || abstractUnitAction == editorIconTexture4 || abstractUnitAction == editorIconTexture2) {
+        if (abstractUnitAction == removeUnitsAction || abstractUnitAction == killUnitsAction || abstractUnitAction == unitCloneAction) {
             int i3 = 0;
             if (z2) {
                 return;
             }
             for (BaseUnit baseUnit2 : BaseUnit.getGlobalUnitList()) {
                 if ((baseUnit2 instanceof BaseUnit) && Utility.distanceSq(baseUnit2.posX, baseUnit2.posY, pointF.x, pointF.y) < 2500.0f) {
-                    if (abstractUnitAction == editorIconTexture3) {
+                    if (abstractUnitAction == removeUnitsAction) {
                         if (baseUnit2.transportContainer == null && baseUnit2.parentEntity == null) {
                             baseUnit2.removeFromGame();
                             if ((baseUnit2 instanceof OrderableUnit) && baseUnit2.bI()) {
                                 gameEngine.pathfindingEngine.a((OrderableUnit) baseUnit2);
                             }
                         }
-                    } else if (abstractUnitAction == editorIconTexture4) {
+                    } else if (abstractUnitAction == killUnitsAction) {
                         if (baseUnit2.transportContainer == null && baseUnit2.parentEntity == null) {
                             baseUnit2.currentHealth = -1.0f;
                         }
-                    } else if (abstractUnitAction != editorIconTexture2) {
+                    } else if (abstractUnitAction != unitCloneAction) {
                         continue;
                     } else if (i3 <= 4) {
                         if (!baseUnit2.bI() && !(baseUnit2 instanceof Tree) && !baseUnit2.isDead && baseUnit2.transportContainer == null && baseUnit2.parentEntity == null) {
@@ -1712,7 +1812,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             return;
         }
-        if (abstractUnitAction == editorIconTexture6) {
+        if (abstractUnitAction == nukeAtAction) {
             if (z2) {
                 return;
             }
@@ -1722,7 +1822,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                 projectileA.sourceUnit = null;
             }
         }
-        if (abstractUnitAction == editorIconTexture5) {
+        if (abstractUnitAction == finishQueueAction) {
             if (z2) {
                 return;
             }
@@ -1733,7 +1833,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             return;
         }
-        if (abstractUnitAction == editorIconTexture7) {
+        if (abstractUnitAction == freezeAIAction) {
             PlayerTeam playerTeam3 = this.team;
             if (playerTeam3 instanceof AIController) {
                 AIController aIController = (AIController) playerTeam3;
@@ -1744,7 +1844,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
                 }
             }
         }
-        if (abstractUnitAction == editorIconTexture8) {
+        if (abstractUnitAction == changeAllianceAction) {
             PlayerTeam playerTeam4 = this.team;
             playerTeam4.teamColorId++;
             if (playerTeam4.teamColorId > 4) {
@@ -1764,9 +1864,9 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             }
             boolean z5 = !z3;
             if (!z4) {
-                z5 = !this.controlPointPaints;
+                z5 = !this.freezeAllAIs;
             }
-            this.controlPointPaints = z5;
+            this.freezeAllAIs = z5;
             M();
         }
         if (abstractUnitAction == v) {
@@ -1797,122 +1897,10 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
         for (PlayerTeam playerTeam : PlayerTeam.getTeams()) {
             if (playerTeam instanceof AIController) {
                 AIController aIController = (AIController) playerTeam;
-                if (!this.controlPointPaints) {
+                if (!this.freezeAllAIs) {
                     aIController.aiUnitManagementTimer = 0.0f;
                 } else {
                     aIController.aiUnitManagementTimer = Float.MAX_VALUE;
-                }
-            }
-        }
-    }
-
-    public static boolean a(AbstractUnitAction abstractUnitAction, BaseUnit baseUnit) {
-        if (abstractUnitAction instanceof FilteredUnitAction) {
-            abstractUnitAction = ((FilteredUnitAction) abstractUnitAction).q_();
-        }
-        if (abstractUnitAction == editorIconTexture7 || abstractUnitAction == w || abstractUnitAction == x || abstractUnitAction == editorIconTexture5 || abstractUnitAction == editorIconTexture3 || abstractUnitAction == editorIconTexture2 || abstractUnitAction == z || abstractUnitAction == editorIconTexture8 || abstractUnitAction == editorIconTexture9 || abstractUnitAction == s || abstractUnitAction == t || abstractUnitAction == B || abstractUnitAction == C) {
-            return true;
-        }
-        return false;
-    }
-
-    public static void a(ArrayList arrayList, int i) {
-        if (i != 1) {
-            return;
-        }
-        D = new ArrayList();
-        D.add(new TeamChangeAction(true, false));
-        D.add(new TeamChangeAction(true, true));
-        D.add(new TeamChangeAction(false, false));
-        D.add(new ChangeEditorTabAction(true, false));
-        D.add(new ChangeEditorTabAction(true, true));
-        D.add(new ChangeEditorTabAction(false, false));
-        D.add(new ModFilterAction(true, false));
-        D.add(new ModFilterAction(true, true));
-        D.add(new ModFilterAction(false, false));
-        D.add(new ChangeTypeFilterAction(true, false));
-        D.add(new ChangeTypeFilterAction(true, true));
-        D.add(new ChangeTypeFilterAction(false, false));
-        D.add(new SetTerrainTypeAction(EditorTerrainType.grass));
-        D.add(new SetTerrainTypeAction(EditorTerrainType.sea));
-        D.add(new SetTerrainTypeAction(EditorTerrainType.sand));
-        D.add(new SetTerrainTypeAction(EditorTerrainType.dust));
-        ArrayList arrayList2 = new ArrayList();
-        arrayList2.add(new AddCreditsAction());
-        arrayList2.add(y);
-        arrayList2.add(editorSelectionTexture3);
-        arrayList2.add(editorIconTexture);
-        arrayList2.add(editorIconTexture3);
-        arrayList2.add(editorIconTexture2);
-        arrayList2.add(editorIconTexture4);
-        arrayList2.add(editorIconTexture6);
-        arrayList2.add(editorIconTexture5);
-        arrayList2.add(u);
-        arrayList2.add(v);
-        arrayList2.add(w);
-        arrayList2.add(x);
-        arrayList2.add(z);
-        arrayList2.add(editorIconTexture8);
-        arrayList2.add(editorIconTexture9);
-        arrayList2.add(s);
-        arrayList2.add(t);
-        if (GameEngine.isTestingBuild) {
-            arrayList2.add(A);
-        }
-        arrayList2.add(B);
-        arrayList2.add(C);
-        Iterator it = arrayList2.iterator();
-        while (it.hasNext()) {
-            D.add(new FilteredUnitAction((AbstractUnitAction) it.next(), K, true));
-        }
-        ArrayList<UnitType> arrayList3 = new ArrayList();
-        arrayList3.addAll(UnitTypeEnum.ae);
-        // from class: com.corrodinggames.rts.game.units.h.15
-// java.util.Comparator
-        /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
-        arrayList3.sort((unitType, unitType2) -> {
-            BaseUnit baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(unitType);
-            BaseUnit baseUnitCanAttack2 = BaseUnit.getPrototypeForUnitType(unitType2);
-            int iCompareTo = Boolean.valueOf(baseUnitCanAttack.bP()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bP()));
-            if (iCompareTo != 0) {
-                return iCompareTo;
-            }
-            int iCompareTo2 = Boolean.valueOf(unitType.isBuildingUnit()).compareTo(Boolean.valueOf(unitType2.isBuildingUnit()));
-            if (iCompareTo2 != 0) {
-                return iCompareTo2;
-            }
-            int iCompareTo3 = Boolean.valueOf(baseUnitCanAttack.bO()).compareTo(Boolean.valueOf(baseUnitCanAttack2.bO()));
-            if (iCompareTo3 != 0) {
-                return iCompareTo3;
-            }
-            UnitPrice unitPriceU = unitType.u();
-            UnitPrice unitPriceU2 = unitType2.u();
-            UnitPrice unitPriceB = unitType.B();
-            UnitPrice unitPriceB2 = unitType2.B();
-            if (unitPriceB != null) {
-                unitPriceU = UnitPrice.a(unitPriceU, unitPriceB);
-            }
-            if (unitPriceB2 != null) {
-                unitPriceU2 = UnitPrice.a(unitPriceU2, unitPriceB2);
-            }
-            int iCompareTo4 = unitPriceU.compareTo(unitPriceU2);
-            if (iCompareTo4 != 0) {
-                return iCompareTo4;
-            }
-            return 0;
-        });
-        for (UnitType unitType : arrayList3) {
-            if (unitType != UnitTypeEnum.wall_v && !unitType.getUnitTypeDescriptionShort().equals("test_tank") && !unitType.getUnitTypeDescriptionShort().equals("missing") && unitType != UnitTypeEnum.tankDestroyer && unitType != UnitTypeEnum.megaTank && unitType != UnitTypeEnum.fogRevealer && unitType != UnitTypeEnum.crystalResource && unitType != UnitTypeEnum.damagingBorder && unitType != UnitTypeEnum.zoneMarker && unitType != UnitTypeEnum.editorOrBuilder && unitType != UnitTypeEnum.dummyNonUnitWithTeam && unitType != UnitTypeEnum.supplyDepot && (BaseUnit.getPrototypeForUnitType(unitType) instanceof OrderableUnit) && (!(unitType instanceof CustomUnitConfig) || ((CustomUnitConfig) unitType).showInEditor)) {
-                FilteredUnitAction filteredUnitAction = new FilteredUnitAction(new PlaceBuildingAction(unitType, 1, null), K);
-                boolean z2 = false;
-                Iterator it2 = D.iterator();
-                while (it2.hasNext()) {
-                    if (((AbstractUnitAction) it2.next()).equals(filteredUnitAction)) {
-                        z2 = true;
-                    }
-                }
-                if (!z2) {
-                    D.add(filteredUnitAction);
                 }
             }
         }
@@ -1990,8 +1978,8 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
     }
 
     public void a(EditorOrBuilder editorOrBuilder) {
-        this.editorIconTexture10 = editorOrBuilder.editorIconTexture10;
-        this.controlPointPaints = editorOrBuilder.controlPointPaints;
+        this.lastSavedReplayPath = editorOrBuilder.lastSavedReplayPath;
+        this.freezeAllAIs = editorOrBuilder.freezeAllAIs;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable

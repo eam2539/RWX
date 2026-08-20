@@ -16,21 +16,14 @@ import java.util.Locale;
 public abstract class LogicBoolean implements Cloneable {
     public static final boolean not = false;
 
-    /* JADX INFO: renamed from: activeEvent */
-    static CustomUnitEventData currentEventContext;
-
-    /* JADX INFO: renamed from: outerUnitParameterContext */
-    static OrderableUnit externalUnitContext;
+    static final HashMap parameterMappings = new HashMap();
+    static CustomUnitEventData activeEvent;
     public static final StaticBoolean trueBoolean = new StaticBooleanTrue();
     public static final StaticBoolean falseBoolean = new StaticBooleanFalse();
     static CallContext_self callContext_self = new CallContext_self();
     static CallContext_selfAndTarget callContext_selfAndTarget = new CallContext_selfAndTarget();
-
-    /* JADX INFO: renamed from: parameterMappings */
-    static final HashMap parameterCache = new HashMap();
-
-    /* JADX INFO: renamed from: booleans */
-    static HashMap booleanRegistry = new HashMap();
+    static OrderableUnit outerUnitParameterContext;
+    static HashMap booleans = new HashMap();
 
     /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/custom/logicBooleans/LogicBoolean$CallContext.class */
     public static class CallContext {
@@ -167,7 +160,7 @@ public abstract class LogicBoolean implements Cloneable {
     }
 
     public static final OrderableUnit getParameterContext(OrderableUnit orderableUnit) {
-        OrderableUnit orderableUnit2 = externalUnitContext;
+        OrderableUnit orderableUnit2 = outerUnitParameterContext;
         if (orderableUnit2 != null) {
             return orderableUnit2;
         }
@@ -175,31 +168,31 @@ public abstract class LogicBoolean implements Cloneable {
     }
 
     public static final void setOuterUnitParameterContext(OrderableUnit orderableUnit) {
-        externalUnitContext = orderableUnit;
+        outerUnitParameterContext = orderableUnit;
     }
 
     public static final void clearOuterUnitParameterContext() {
-        externalUnitContext = null;
+        outerUnitParameterContext = null;
     }
 
     public static void enableContextEventSource() {
     }
 
     public static void setContextEventSource(CustomUnitEventData customUnitEventData) {
-        currentEventContext = customUnitEventData;
+        activeEvent = customUnitEventData;
     }
 
     public static void clearContext() {
-        currentEventContext = null;
+        activeEvent = null;
     }
 
     static void addBooleanType(LogicBoolean logicBoolean, String... strArr) {
         for (String str : strArr) {
             String lowerCase = str.toLowerCase(Locale.ROOT);
-            if (booleanRegistry.get(lowerCase) != null) {
+            if (booleans.get(lowerCase) != null) {
                 throw new RuntimeException("logicBoolean: " + lowerCase + " already exists");
             }
-            booleanRegistry.put(lowerCase, logicBoolean);
+            booleans.put(lowerCase, logicBoolean);
         }
     }
 
@@ -208,10 +201,10 @@ public abstract class LogicBoolean implements Cloneable {
     }
 
     public LogicBooleanLoader.ParameterMapping getParameters() {
-        LogicBooleanLoader.ParameterMapping parameterMapping = (LogicBooleanLoader.ParameterMapping) parameterCache.get(getClass());
+        LogicBooleanLoader.ParameterMapping parameterMapping = (LogicBooleanLoader.ParameterMapping) parameterMappings.get(getClass());
         if (parameterMapping == null) {
             parameterMapping = new LogicBooleanLoader.ParameterMapping(getClass());
-            parameterCache.put(parameterMapping.type, parameterMapping);
+            parameterMappings.put(parameterMapping.type, parameterMapping);
         }
         return parameterMapping;
     }

@@ -2167,7 +2167,7 @@ public class CustomUnitConfigParser {
                                 boolean z5 = false;
                                 Iterator it4 = customUnitConfig.customArms.iterator();
                                 while (it4.hasNext()) {
-                                    if (Utility.abs(turretConfig5.limitingRange - ((CustomLimitedRange) it4.next()).value) < 5.0f) {
+                                    if (Utility.abs(turretConfig5.limitingRange - ((CustomLimitedRange) it4.next()).rangeValue) < 5.0f) {
                                         z5 = true;
                                     }
                                 }
@@ -2182,7 +2182,7 @@ public class CustomUnitConfigParser {
                     }
                     if (zBooleanValue2) {
                         CustomLimitedRange customLimitedRange = new CustomLimitedRange();
-                        customLimitedRange.value = turretConfig5.limitingRange;
+                        customLimitedRange.rangeValue = turretConfig5.limitingRange;
                         customUnitConfig.customArms.add(customLimitedRange);
                     }
                 }

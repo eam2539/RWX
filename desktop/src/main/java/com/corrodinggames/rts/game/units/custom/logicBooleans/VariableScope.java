@@ -1052,7 +1052,7 @@ public class VariableScope {
     public static class ReadEventMemoryLogicBoolean extends ReadUnitMemoryLogicBoolean {
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.VariableScope.ReadUnitMemoryLogicBoolean
         public LogicBoolean getUnitMemory(OrderableUnit orderableUnit) {
-            CustomUnitEventData customUnitEventData = LogicBoolean.currentEventContext;
+            CustomUnitEventData customUnitEventData = LogicBoolean.activeEvent;
             VariableScope variableScope = null;
             if (customUnitEventData != null) {
                 variableScope = customUnitEventData.variableScope;

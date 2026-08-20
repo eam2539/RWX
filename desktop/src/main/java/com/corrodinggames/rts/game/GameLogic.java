@@ -71,11 +71,8 @@ public class GameLogic extends GameEngine {
     /* JADX INFO: renamed from: f */
     public static String safeModeReasonText = null;
 
-    /* JADX INFO: renamed from: g */
-    JpegFrameWriterTask[] someKArray;
-
-    /* JADX INFO: renamed from: h */
-    String someString;
+    public ArrayList w;
+    public Paint A;
 
     /* JADX INFO: renamed from: i */
     public boolean hasStartedBenchmarkTrace;
@@ -85,21 +82,13 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: k */
     public ConcurrentLinkedQueue gameThreadRunnableQueue;
-
-    /* JADX INFO: renamed from: l */
-    Paint paintL;
+    public float I;
 
     /* JADX INFO: renamed from: m */
     Paint fpsPaint;
-
-    /* JADX INFO: renamed from: n */
-    Paint paintN;
-
-    /* JADX INFO: renamed from: o */
-    Paint paintO;
-
-    /* JADX INFO: renamed from: p */
-    Paint paintP;
+    public Texture U;
+    public Texture V;
+    public ArrayList Z;
 
     /* JADX INFO: renamed from: q */
     int fpsAccumulator;
@@ -115,24 +104,14 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: u */
     public String fpsString;
-
-    /* JADX INFO: renamed from: v */
-    Rect rectV;
-
-    /* JADX INFO: renamed from: w */
-    public ArrayList arrayListW;
-
-    /* JADX INFO: renamed from: x */
-    Paint paintX;
-
-    /* JADX INFO: renamed from: y */
-    Paint paintY;
-
-    /* JADX INFO: renamed from: z */
-    Paint paintZ;
-
-    /* JADX INFO: renamed from: A */
-    public Paint paintA;
+    public ArrayList aa;
+    /* JADX INFO: renamed from: g */
+    JpegFrameWriterTask[] frameWriterTasks;
+    /* JADX INFO: renamed from: h */
+    String frameWriteDirectoryPath;
+    Paint l;
+    Paint n;
+    Paint o;
 
     /* JADX INFO: renamed from: B */
     public GameStateData gameStateData;
@@ -142,9 +121,7 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: D */
     public CloudRenderer cloudRenderer;
-
-    /* JADX INFO: renamed from: E */
-    GameObject gameObjectE;
+    Paint p;
 
     /* JADX INFO: renamed from: F */
     boolean hasCheckedSafeMode;
@@ -154,18 +131,12 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: H */
     public float speedMultiplier;
-
-    /* JADX INFO: renamed from: I */
-    public float floatI;
+    Rect v;
 
     /* JADX INFO: renamed from: J */
     public float lastDelta;
-
-    /* JADX INFO: renamed from: K */
-    FrameBufferHelper postBaseShader;
-
-    /* JADX INFO: renamed from: L */
-    FrameBufferHelper postDisplacementShader;
+    Paint x;
+    Paint y;
 
     /* JADX INFO: renamed from: M */
     boolean postProcessingFailed;
@@ -190,12 +161,8 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: T */
     RectF waterRectF;
-
-    /* JADX INFO: renamed from: U */
-    public Texture textureU;
-
-    /* JADX INFO: renamed from: V */
-    public Texture textureV;
+    Paint z;
+    GameObject E;
 
     /* JADX INFO: renamed from: W */
     GameObjectArrayList renderList;
@@ -205,18 +172,14 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: Y */
     Matrix matrixY;
-
-    /* JADX INFO: renamed from: Z */
-    public ArrayList arrayListZ;
-
-    /* JADX INFO: renamed from: aa */
-    public ArrayList arrayListAA;
+    /* JADX INFO: renamed from: K */
+    FrameBufferHelper postBaseBuffer;
+    /* JADX INFO: renamed from: L */
+    FrameBufferHelper postDisplacementBuffer;
 
     /* JADX INFO: renamed from: ab */
     Timer gameTimer;
-
-    /* JADX INFO: renamed from: ac */
-    boolean booleanAC;
+    boolean ac;
 
     /* JADX INFO: renamed from: ad */
     Object initLock;
@@ -239,7 +202,7 @@ public class GameLogic extends GameEngine {
     public GameLogic(Context context) {
         super(context);
         this.densityScaleMultiplier = 1.0f;
-        this.someKArray = new JpegFrameWriterTask[6];
+        this.frameWriterTasks = new JpegFrameWriterTask[6];
         this.hasStartedBenchmarkTrace = false;
         this.cleanupCounter = 0;
         this.gameThreadRunnableQueue = new ConcurrentLinkedQueue();
@@ -248,22 +211,22 @@ public class GameLogic extends GameEngine {
         this.fps = 0;
         this.averageFrameTime = 16.0f;
         this.fpsString = "0fps";
-        this.rectV = new Rect();
-        this.arrayListW = new ArrayList();
-        this.paintA = new Paint();
+        this.v = new Rect();
+        this.w = new ArrayList();
+        this.A = new Paint();
         this.cloudRenderer = new CloudRenderer();
         this.accumulator = 0.0f;
         this.speedMultiplier = 1.0f;
         this.waterAnimationTimer = 0.0f;
         this.waterRect = new Rect();
         this.waterRectF = new RectF();
-        this.textureU = null;
-        this.textureV = null;
+        this.U = null;
+        this.V = null;
         this.renderList = new GameObjectArrayList("allOnScreenObjects");
         this.renderListBuffer = new GameObjectArrayList("allOnScreenObjectsDirty");
         this.matrixY = new Matrix();
-        this.arrayListZ = new ArrayList();
-        this.arrayListAA = new ArrayList();
+        this.Z = new ArrayList();
+        this.aa = new ArrayList();
         this.initLock = new Object();
         this.menuLoadFailureCount = 0;
     }
@@ -417,21 +380,21 @@ public class GameLogic extends GameEngine {
         Locale.initialize();
         PerformanceProfiler.a("Locale.init took:", jA2);
         PlayerTeam.loadTeamColorSettings();
-        this.paintL = new Paint();
+        this.l = new Paint();
         this.fpsPaint = new Paint();
         this.fpsPaint.a(255, 255, 255, 255);
         this.fpsPaint.a(true);
         updatePaintTextSize(this.fpsPaint, 16.0f);
-        this.paintN = new Paint();
-        this.paintN.a(255, 255, 255, 255);
-        this.paintN.a(true);
-        updatePaintTextSize(this.paintN, 16.0f);
-        this.paintO = new Paint();
-        this.paintO.a(100, 255, 0, 0);
-        updatePaintTextSize(this.paintO, 16.0f);
-        this.paintP = new Paint();
-        this.paintP.a(100, 0, 255, 0);
-        updatePaintTextSize(this.paintP, 16.0f);
+        this.n = new Paint();
+        this.n.a(255, 255, 255, 255);
+        this.n.a(true);
+        updatePaintTextSize(this.n, 16.0f);
+        this.o = new Paint();
+        this.o.a(100, 255, 0, 0);
+        updatePaintTextSize(this.o, 16.0f);
+        this.p = new Paint();
+        this.p.a(100, 0, 255, 0);
+        updatePaintTextSize(this.p, 16.0f);
         this.teamInfoPaint = new Paint();
         this.centeredPaint = new Paint();
         this.centeredPaint.a(Paint.Align.CENTER);
@@ -443,14 +406,14 @@ public class GameLogic extends GameEngine {
         this.loadingPaint.a(true);
         this.loadingPaint.a(Paint.Align.CENTER);
         updatePaintTextSize(this.loadingPaint, 18.0f);
-        this.paintX = new Paint();
-        this.paintX.b(-1);
-        this.paintX.c(100);
-        this.paintY = new Paint();
-        this.paintY.b(-7829368);
-        this.paintY.c(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_SATELLITE_SERVICE);
-        this.paintY.a(Paint.Style.STROKE);
-        this.paintY.a(1.0f);
+        this.x = new Paint();
+        this.x.b(-1);
+        this.x.c(100);
+        this.y = new Paint();
+        this.y.b(-7829368);
+        this.y.c(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_SATELLITE_SERVICE);
+        this.y.a(Paint.Style.STROKE);
+        this.y.a(1.0f);
         long jA3 = PerformanceProfiler.a();
         loadLevel("AudioEngine");
         SoundEngine.noop();
@@ -554,8 +517,8 @@ public class GameLogic extends GameEngine {
         long jA6 = PerformanceProfiler.a();
         this.allUnitsChecksum = BaseUnit.bM();
         PerformanceProfiler.a("allUnitsChecksum took:", jA6);
-        this.paintZ = new Paint();
-        this.paintZ.a(50, 255, 255, 255);
+        this.z = new Paint();
+        this.z.a(50, 255, 255, 255);
         onInitialContentLoaded();
         System.gc();
         this.isInitialized = true;
@@ -806,7 +769,7 @@ public class GameLogic extends GameEngine {
                             }
                             for (BaseUnit baseUnit : BaseUnit.getGlobalUnitList()) {
                                 if ((baseUnit instanceof BaseUnit) && !baseUnit.isDead && baseUnit.team == playerTeamK3) {
-                                    if (baseUnit.changeTeam && !z3) {
+                                    if (baseUnit.isBuilder && !z3) {
                                         z3 = true;
                                         fValueOf = Float.valueOf(baseUnit.posX);
                                         fValueOf2 = Float.valueOf(baseUnit.posY);
@@ -1548,7 +1511,7 @@ public class GameLogic extends GameEngine {
             deltaSpeed *= this.gameSpeed;
         }
         float f = deltaSpeed * this.speedMultiplier;
-        this.floatI = f + 2.0f;
+        this.I = f + 2.0f;
         this.lastDelta = f;
         this.networkEngine.update(f);
         this.gameTimeMillis = (int) (this.gameTimeMillis + (f * 16.666666f));
@@ -1644,15 +1607,15 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: i */
     public boolean setupPostProcessing() {
-        if (this.postBaseShader == null) {
-            this.postBaseShader = new FrameBufferHelper("assets/shaders/post_base.frag");
+        if (this.postBaseBuffer == null) {
+            this.postBaseBuffer = new FrameBufferHelper("assets/shaders/post_base.frag");
         }
-        if (this.postDisplacementShader == null) {
-            this.postDisplacementShader = new FrameBufferHelper("assets/shaders/post_displacement.frag");
+        if (this.postDisplacementBuffer == null) {
+            this.postDisplacementBuffer = new FrameBufferHelper("assets/shaders/post_displacement.frag");
         }
-        this.postBaseShader.a(this.renderGraphicsEngine);
-        this.postDisplacementShader.a(this.renderGraphicsEngine);
-        if (this.postBaseShader.g || this.postDisplacementShader.g) {
+        this.postBaseBuffer.a(this.renderGraphicsEngine);
+        this.postDisplacementBuffer.a(this.renderGraphicsEngine);
+        if (this.postBaseBuffer.g || this.postDisplacementBuffer.g) {
             if (!this.postProcessingFailed) {
                 this.postProcessingFailed = true;
                 GameEngine.log("setupPostprocessing: failed");
@@ -1719,38 +1682,38 @@ public class GameLogic extends GameEngine {
             zIsPostProcessingSupported = false;
         }
         if (zIsPostProcessingSupported) {
-            beginPostProcessing(this.postBaseShader);
+            beginPostProcessing(this.postBaseBuffer);
             try {
                 this.renderGraphicsEngine.b(Color.a(0, 0, 0));
                 this.performanceProfiler.a(ProfilerSection.draw_game);
                 drawGame((GraphicsInterface) null, f);
                 this.performanceProfiler.b(ProfilerSection.draw_game);
-                endPostProcessing(this.postBaseShader);
-                this.postBaseShader.b();
-                if (!this.postDisplacementShader.a()) {
-                    beginPostProcessing(this.postDisplacementShader);
+                endPostProcessing(this.postBaseBuffer);
+                this.postBaseBuffer.b();
+                if (!this.postDisplacementBuffer.a()) {
+                    beginPostProcessing(this.postDisplacementBuffer);
                     try {
                         this.renderGraphicsEngine.b(Color.a(128, 128, 255));
                         applyZoomTransform();
                         int iDrawEffect = this.effectManager.drawEffect(f, 3);
                         this.effectManager.texture = null;
-                        endPostProcessing(this.postDisplacementShader);
+                        endPostProcessing(this.postDisplacementBuffer);
                         if (iDrawEffect > 0) {
                             float fS = this.renderGraphicsEngine.s();
-                            this.postDisplacementShader.d.a("screenBase", this.postBaseShader.a);
-                            this.postDisplacementShader.d.b("screenBaseSize", this.postBaseShader.a);
-                            this.postDisplacementShader.d.a("u_resolution", this.screenWidth, this.screenHeight);
-                            this.postDisplacementShader.d.a("u_offsetBy", 0.2f * this.zoom);
-                            this.postDisplacementShader.d.a("u_uiScaling", fS);
-                            this.postDisplacementShader.b();
+                            this.postDisplacementBuffer.d.a("screenBase", this.postBaseBuffer.a);
+                            this.postDisplacementBuffer.d.b("screenBaseSize", this.postBaseBuffer.a);
+                            this.postDisplacementBuffer.d.a("u_resolution", this.screenWidth, this.screenHeight);
+                            this.postDisplacementBuffer.d.a("u_offsetBy", 0.2f * this.zoom);
+                            this.postDisplacementBuffer.d.a("u_uiScaling", fS);
+                            this.postDisplacementBuffer.b();
                         }
                     } catch (Throwable th) {
-                        endPostProcessing(this.postDisplacementShader);
+                        endPostProcessing(this.postDisplacementBuffer);
                         throw th;
                     }
                 }
             } catch (Throwable th2) {
-                endPostProcessing(this.postBaseShader);
+                endPostProcessing(this.postBaseBuffer);
                 throw th2;
             }
         } else {
@@ -2268,7 +2231,7 @@ public class GameLogic extends GameEngine {
 
     /* JADX INFO: renamed from: w */
     public synchronized void stopGameTimer() {
-        this.booleanAC = false;
+        this.ac = false;
         if (this.gameTimer != null) {
             this.gameTimer.cancel();
             this.gameTimer = null;

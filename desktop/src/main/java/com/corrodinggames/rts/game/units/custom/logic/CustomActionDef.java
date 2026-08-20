@@ -279,9 +279,13 @@ public class CustomActionDef {
 
     /* JADX INFO: renamed from: U */
     public boolean whenBuildingCannotMove = false;
+    /* JADX INFO: renamed from: ac */
     public FastArrayList logicActions = new FastArrayList();
+    /* JADX INFO: renamed from: aG */
     public ActionDisplayType displayType = ActionDisplayType.queueUnit;
+    /* JADX INFO: renamed from: aM */
     public BuildType actionType = BuildType.build;
+    /* JADX INFO: renamed from: aN */
     public com.corrodinggames.rts.game.units.custom.logic.ActionType aiUse = com.corrodinggames.rts.game.units.custom.logic.ActionType.auto;
 
     public String a() {

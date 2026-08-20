@@ -270,14 +270,14 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
         public BaseUnit getSingleRaw(OrderableUnit orderableUnit) {
             UnitReference[] unitReferenceArr = this.chain;
             BaseUnit baseUnit = orderableUnit;
-            LogicBoolean.externalUnitContext = orderableUnit;
+            LogicBoolean.outerUnitParameterContext = orderableUnit;
             for (UnitReference unitReference : unitReferenceArr) {
                 baseUnit = unitReference.get(baseUnit);
                 if (baseUnit == null) {
                     return null;
                 }
             }
-            LogicBoolean.externalUnitContext = null;
+            LogicBoolean.outerUnitParameterContext = null;
             return baseUnit;
         }
 
@@ -286,7 +286,7 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
             UnitReference[] unitReferenceArr = this.chain;
             BaseUnit baseUnit = orderableUnit;
             if (baseUnit instanceof OrderableUnit) {
-                LogicBoolean.externalUnitContext = (OrderableUnit) baseUnit;
+                LogicBoolean.outerUnitParameterContext = (OrderableUnit) baseUnit;
             }
             String str = VariableScope.nullOrMissingString + "[";
             int i = 0;
@@ -306,7 +306,7 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
                     break;
                 }
             }
-            LogicBoolean.externalUnitContext = null;
+            LogicBoolean.outerUnitParameterContext = null;
             return str + "]";
         }
     }
@@ -904,7 +904,7 @@ public abstract class UnitReference extends LogicBoolean implements Cloneable {
 
         @Override // com.corrodinggames.rts.game.units.custom.logicBooleans.UnitReference
         public BaseUnit getSingleRaw(OrderableUnit orderableUnit) {
-            CustomUnitEventData customUnitEventData = LogicBoolean.currentEventContext;
+            CustomUnitEventData customUnitEventData = LogicBoolean.activeEvent;
             if (customUnitEventData == null) {
                 return null;
             }

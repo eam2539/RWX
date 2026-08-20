@@ -15,7 +15,7 @@ class JpegFrameWriterTask implements Runnable {
     public void run() {
         synchronized (this) {
             try {
-                FileOutputStream fileOutputStream = new FileOutputStream(new File(this.c.someString + "image_" + String.format("%07d", Integer.valueOf(this.b)) + ".jpg"));
+                FileOutputStream fileOutputStream = new FileOutputStream(new File(this.c.frameWriteDirectoryPath + "image_" + String.format("%07d", Integer.valueOf(this.b)) + ".jpg"));
                 this.a.a(Bitmap.CompressFormat.JPEG, 85, fileOutputStream);
                 fileOutputStream.close();
             } catch (Exception e) {

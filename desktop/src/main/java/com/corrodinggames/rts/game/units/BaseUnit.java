@@ -83,6 +83,7 @@ public abstract class BaseUnit extends SizedObject {
     public static HashMap bH = new HashMap();
     public static final Paint bI = new GamePaint();
     public static final Paint bJ;
+    /* JADX INFO: renamed from: bK */
     static final LightingColorFilter selectedUnitColorFilter;
 
     /* JADX INFO: renamed from: bL */
@@ -95,7 +96,7 @@ public abstract class BaseUnit extends SizedObject {
     public boolean isAIUnit;
 
     /* JADX INFO: renamed from: bO */
-    public boolean changeTeam;
+    public boolean isBuilder;
 
     /* JADX INFO: renamed from: bP */
     public boolean isTargetable;
@@ -211,6 +212,7 @@ public abstract class BaseUnit extends SizedObject {
 
     /* JADX INFO: renamed from: cB */
     public float currentEnergy;
+    /* JADX INFO: renamed from: cC */
     public float accumulatedHpChange;
 
     /* JADX INFO: renamed from: cD */
@@ -295,13 +297,13 @@ public abstract class BaseUnit extends SizedObject {
     public int spatialIndexTeamId;
 
     /* JADX INFO: renamed from: do */
-    public float unitAnimationOffset;
+    public float damageEffectTimer;
 
     /* JADX INFO: renamed from: dp */
-    public float unitAnimationScale;
+    public float damageEffectDurationTimer;
 
     /* JADX INFO: renamed from: dq */
-    public float unitAnimationRotation;
+    public float damageEffectTimer2;
     static final RectF dr;
     static Paint ds;
     static Paint dt;
@@ -363,7 +365,7 @@ public abstract class BaseUnit extends SizedObject {
         this.lastConvertedStamp = -9999;
         this.isActive = false;
         this.isAIUnit = false;
-        this.changeTeam = false;
+        this.isBuilder = false;
         this.isTargetable = false;
         this.targetUnit = null;
         this.isAlive = true;
@@ -395,7 +397,7 @@ public abstract class BaseUnit extends SizedObject {
         this.spatialIndexTileX = -1;
         this.spatialIndexTileY = -1;
         this.spatialIndexTeamId = -99;
-        this.unitAnimationRotation = 70.0f;
+        this.damageEffectTimer2 = 70.0f;
         this.unitCustomEffects = new StoredResources();
         this.unitCustomComponents = new AnimationTrackingManager();
         this.unitCustomData = null;
@@ -723,7 +725,7 @@ public abstract class BaseUnit extends SizedObject {
         gameOutputStream.writeInt(this.customTimerStamp);
         gameOutputStream.writeInt(this.lastConvertedStamp);
         gameOutputStream.writeInt(this.unitCounter);
-        gameOutputStream.writeBoolean(this.changeTeam);
+        gameOutputStream.writeBoolean(this.isBuilder);
         gameOutputStream.writeBoolean(this.isTargetable);
         this.unitCustomEffects.a(gameOutputStream);
         this.unitCustomComponents.a(gameOutputStream);
@@ -852,7 +854,7 @@ public abstract class BaseUnit extends SizedObject {
             this.unitCounter = gameInputStream.readInt();
         }
         if (b >= 18) {
-            this.changeTeam = gameInputStream.readBoolean();
+            this.isBuilder = gameInputStream.readBoolean();
             this.isTargetable = gameInputStream.readBoolean();
         }
         if (b >= 19) {
@@ -1462,11 +1464,11 @@ public abstract class BaseUnit extends SizedObject {
         }
         if (this.currentHealth < this.maxHealth * 0.33f && this.posZ > -1.0f) {
             GameEngine gameEngine = GameEngine.getInstance();
-            this.unitAnimationOffset += f;
-            this.unitAnimationScale += f;
-            this.unitAnimationRotation += f;
-            if (this.unitAnimationOffset > 10.0f && this.unitAnimationScale < 300.0f && !dl()) {
-                this.unitAnimationOffset = 0.0f;
+            this.damageEffectTimer += f;
+            this.damageEffectDurationTimer += f;
+            this.damageEffectTimer2 += f;
+            if (this.damageEffectTimer > 10.0f && this.damageEffectDurationTimer < 300.0f && !dl()) {
+                this.damageEffectTimer = 0.0f;
                 if (this.shouldDraw && gameEngine.shouldDrawMediumDetailEffects && (effectCreateEffectInternal = gameEngine.effectManager.createEffectInternal(this.posX, this.posY, this.posZ, EffectType.custom, false, EffectQuality.verylow)) != null) {
                     EffectEmitter.b(effectCreateEffectInternal, true);
                     effectCreateEffectInternal.I = this.posX;
@@ -1478,8 +1480,8 @@ public abstract class BaseUnit extends SizedObject {
                     effectCreateEffectInternal.J += Utility.randomFloatInRange(-4.0f, 4.0f);
                 }
             }
-            if (this.unitAnimationRotation > 30.0f && this.unitAnimationScale < 600.0f && !dm()) {
-                this.unitAnimationRotation = 0.0f;
+            if (this.damageEffectTimer2 > 30.0f && this.damageEffectDurationTimer < 600.0f && !dm()) {
+                this.damageEffectTimer2 = 0.0f;
                 gameEngine.effectManager.setOnlyOnScreen();
                 Effect effectCreateEffectInternal2 = gameEngine.effectManager.createEffectInternal(this.posX, this.posY, this.posZ, EffectType.custom, false, EffectQuality.verylow);
                 if (effectCreateEffectInternal2 != null) {
@@ -1493,8 +1495,8 @@ public abstract class BaseUnit extends SizedObject {
                     effectCreateEffectInternal2.J += Utility.randomFloatInRange(-4.0f, 4.0f);
                 }
             }
-        } else if (this.unitAnimationScale != 0.0f) {
-            this.unitAnimationScale = 0.0f;
+        } else if (this.damageEffectDurationTimer != 0.0f) {
+            this.damageEffectDurationTimer = 0.0f;
         }
         if (this.accumulatedHpChange != 0.0f) {
             this.accumulatedHpChange = Utility.moveTowardsZero(this.accumulatedHpChange, this.maxHealth * this.hpChangeDecayRate * 0.005f * f);
