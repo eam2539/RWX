@@ -2230,7 +2230,7 @@ public abstract class OrderableUnit extends UnitBase {
                 iU = v(unitCommand.targetUnit);
                 zX = w(unitCommand.targetUnit);
             } else {
-                iU = setHeight(unitCommand.targetUnit);
+                iU = getRepairRange(unitCommand.targetUnit);
                 zX = x(unitCommand.targetUnit);
             }
             if (this.transportedBy != null) {
@@ -3293,7 +3293,7 @@ public abstract class OrderableUnit extends UnitBase {
                 }
                 a(baseUnit, i);
                 M(i);
-                unitMovementData.m = !unitMovementData.m;
+                unitMovementData.isOddShot = !unitMovementData.isOddShot;
                 return true;
             }
             return false;
@@ -4184,7 +4184,7 @@ public abstract class OrderableUnit extends UnitBase {
             Iterator it = aV.iterator();
             while (it.hasNext()) {
                 Path path = (Path) it.next();
-                if (path.g + 60 < gameEngine.currentTick) {
+                if (path.creationTick + 60 < gameEngine.currentTick) {
                     it.remove();
                 } else if (path.a(pathA)) {
                     return path;
@@ -4215,7 +4215,7 @@ public abstract class OrderableUnit extends UnitBase {
                         break;
                     }
                     PathPoint pathPoint = (PathPoint) it.next();
-                    tileMap.setCursorTileIndexFromTileIndex((int) pathPoint.a, (int) pathPoint.b);
+                    tileMap.setCursorTileIndexFromTileIndex((int) pathPoint.tileX, (int) pathPoint.tileY);
                     setPathPosition(this.activePathCount, tileMap.cursorTileX + tileMap.halfTileWorldSizeX, tileMap.cursorTileY + tileMap.halfTileWorldSizeY);
                     this.activePathCount++;
                     if (this.activePathCount >= 120) {
@@ -4229,7 +4229,7 @@ public abstract class OrderableUnit extends UnitBase {
                 boolean z = false;
                 if (linkedListA.size() != 0) {
                     tileMap.setCursorTileIndexFromWorldPoint(this.lastPathTargetX, this.lastPathTargetY);
-                    if (!this.isPathIncomplete && ((PathPoint) linkedListA.getLast()).a == tileMap.cursorTileX && ((PathPoint) linkedListA.getLast()).b == tileMap.cursorTileY) {
+                    if (!this.isPathIncomplete && ((PathPoint) linkedListA.getLast()).tileX == tileMap.cursorTileX && ((PathPoint) linkedListA.getLast()).tileY == tileMap.cursorTileY) {
                         z = true;
                     }
                 }
@@ -4771,7 +4771,7 @@ public abstract class OrderableUnit extends UnitBase {
 
     public Vector3D F(int i) {
         bi.a(G(i));
-        bi.c = 0.0f;
+        bi.z = 0.0f;
         return bi;
     }
 
@@ -4816,8 +4816,8 @@ public abstract class OrderableUnit extends UnitBase {
         PointF pointF = tempPointF4;
         pointF.a(0.0f, 0.0f);
         UnitMovementData unitMovementData = this.movementLevels[i];
-        pointF.x += unitMovementData.h;
-        pointF.y += unitMovementData.i;
+        pointF.x += unitMovementData.shadowOffsetX;
+        pointF.y += unitMovementData.shadowOffsetY;
         return pointF;
     }
 
@@ -4834,12 +4834,12 @@ public abstract class OrderableUnit extends UnitBase {
             return;
         }
         UnitMovementData unitMovementData = this.movementLevels[i];
-        unitMovementData.h = 0.0f;
-        unitMovementData.i = 0.0f;
+        unitMovementData.shadowOffsetX = 0.0f;
+        unitMovementData.shadowOffsetY = 0.0f;
         if (this.attackTarget != null && L(i) != 0.0f) {
             float fL = this.attackTarget.radius * L(i);
-            unitMovementData.h += Utility.getDeterministicRandomInt((GameObject) this, (int) (-fL), (int) fL, 1 + i);
-            unitMovementData.i += Utility.getDeterministicRandomInt((GameObject) this, (int) (-fL), (int) fL, 2 + i);
+            unitMovementData.shadowOffsetX += Utility.getDeterministicRandomInt((GameObject) this, (int) (-fL), (int) fL, 1 + i);
+            unitMovementData.shadowOffsetY += Utility.getDeterministicRandomInt((GameObject) this, (int) (-fL), (int) fL, 2 + i);
         }
     }
 
@@ -5089,7 +5089,7 @@ public abstract class OrderableUnit extends UnitBase {
     public OrderableUnit findNearbySameTypeUnitForPlacement() {
         for (BaseUnit baseUnit : BaseUnit.bE) {
             if (baseUnit != this && (baseUnit instanceof OrderableUnit orderableUnit)) {
-                if (!orderableUnit.isDead && orderableUnit.team == this.team && orderableUnit.r() == r() && setWidth(orderableUnit)) {
+                if (!orderableUnit.isDead && orderableUnit.team == this.team && orderableUnit.r() == r() && isCollidingWith(orderableUnit)) {
                     return orderableUnit;
                 }
             }
@@ -5183,9 +5183,9 @@ public abstract class OrderableUnit extends UnitBase {
             this.turretTurnSpeed = 5.0f;
             if (isVisibleOnScreen()) {
                 Vector3D vector3DBn = bn();
-                Effect effectCreateEffectInternal = GameEngine.getInstance().effectManager.createEffectInternal(vector3DBn.a, vector3DBn.b, this.posZ + vector3DBn.c, EffectType.custom, false, EffectQuality.low);
+                Effect effectCreateEffectInternal = GameEngine.getInstance().effectManager.createEffectInternal(vector3DBn.x, vector3DBn.y, this.posZ + vector3DBn.z, EffectType.custom, false, EffectQuality.low);
                 if (effectCreateEffectInternal != null) {
-                    float angleBetweenPoints = Utility.getAngleBetweenPoints(vector3DBn.a, vector3DBn.b, (float) (((double) baseUnit.posX) + (-8.0d) + (Math.random() * 16.0d)), (float) (((double) baseUnit.posY) + (-8.0d) + (Math.random() * 16.0d)));
+                    float angleBetweenPoints = Utility.getAngleBetweenPoints(vector3DBn.x, vector3DBn.y, (float) (((double) baseUnit.posX) + (-8.0d) + (Math.random() * 16.0d)), (float) (((double) baseUnit.posY) + (-8.0d) + (Math.random() * 16.0d)));
                     effectCreateEffectInternal.P = Utility.fastCos(angleBetweenPoints) * Utility.randomFloatInRange(2.0f, 4.0f);
                     effectCreateEffectInternal.Q = Utility.fastSin(angleBetweenPoints) * Utility.randomFloatInRange(2.0f, 4.0f);
                     effectCreateEffectInternal.ap = 6;

@@ -29,16 +29,16 @@ public class ChatLog {
         int i2 = networkConnection.connectionId;
         int i3 = 0;
         for (ChatMessage chatMessage : this.a) {
-            if (chatMessage.d == i2 && Utility.elapsedMilliseconds(chatMessage.e, System.nanoTime()) < i && !chatMessage.c.startsWith("-i ") && !chatMessage.c.startsWith("-qc ")) {
+            if (chatMessage.connectionId == i2 && Utility.elapsedMilliseconds(chatMessage.timestampNano, System.nanoTime()) < i && !chatMessage.message.startsWith("-i ") && !chatMessage.message.startsWith("-qc ")) {
                 i3++;
-                if (chatMessage.c != null) {
-                    if (Utility.countOccurrences(chatMessage.c, '\n') >= 3) {
+                if (chatMessage.message != null) {
+                    if (Utility.countOccurrences(chatMessage.message, '\n') >= 3) {
                         i3 += 2;
                     }
-                    if (Utility.countOccurrences(chatMessage.c, '\n') >= 6) {
+                    if (Utility.countOccurrences(chatMessage.message, '\n') >= 6) {
                         i3 += 2;
                     }
-                    if (Utility.countOccurrences(chatMessage.c, '\n') >= 9) {
+                    if (Utility.countOccurrences(chatMessage.message, '\n') >= 9) {
                         i3 += 2;
                     }
                 }

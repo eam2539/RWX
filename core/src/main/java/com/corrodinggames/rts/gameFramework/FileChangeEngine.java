@@ -7,21 +7,25 @@ import java.util.concurrent.ConcurrentHashMap;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.j */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/j.class */
 public class FileChangeEngine {
-    static ConcurrentHashMap a = new ConcurrentHashMap();
-    static FileChangeThread b;
+
+    /* JADX INFO: renamed from: a */
+    static ConcurrentHashMap fileTimestamps = new ConcurrentHashMap();
+
+    /* JADX INFO: renamed from: b */
+    static FileChangeThread watchThread;
 
     public static long a(String str, boolean z) {
         if (str == null) {
             return 0L;
         }
-        Long l = (Long) a.get(str);
+        Long l = (Long) fileTimestamps.get(str);
         if (l != null) {
             return l.longValue();
         }
         Long lValueOf = Long.valueOf(a(str));
         if (!z) {
-            a.put(str, lValueOf);
-            if (b == null) {
+            fileTimestamps.put(str, lValueOf);
+            if (watchThread == null) {
             }
         }
         return lValueOf.longValue();
@@ -40,34 +44,34 @@ public class FileChangeEngine {
             return;
         }
         if (z) {
-            if (b != null) {
+            if (watchThread != null) {
                 GameEngine.log("FileChangeEngine: Already running");
                 return;
             }
             GameEngine.log("FileChangeEngine: Starting");
-            b = new FileChangeThread();
-            b.start();
+            watchThread = new FileChangeThread();
+            watchThread.start();
             return;
         }
-        if (b != null) {
-            b.a = false;
-            b = null;
+        if (watchThread != null) {
+            watchThread.a = false;
+            watchThread = null;
         }
     }
 
     public static void b() {
         int i = 0;
-        Enumeration enumerationKeys = a.keys();
+        Enumeration enumerationKeys = fileTimestamps.keys();
         while (enumerationKeys.hasMoreElements()) {
             String str = (String) enumerationKeys.nextElement();
             long jA = a(str);
-            Long l = (Long) a.get(str);
+            Long l = (Long) fileTimestamps.get(str);
             if (l == null) {
                 GameEngine.log("FileChangeEngine: old lastModified null for " + str);
             } else if (l.longValue() != jA) {
                 GameEngine.log("FileChangeEngine: Detected change to:" + str + " now " + jA);
             }
-            a.put(str, Long.valueOf(jA));
+            fileTimestamps.put(str, Long.valueOf(jA));
             i++;
             if (i > 50) {
                 i = 0;

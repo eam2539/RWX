@@ -18,27 +18,40 @@ import java.util.LinkedList;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/k/k.class */
 public class Path {
     private PathEngine a;
-    public int e;
-    protected static int f;
-    public int g;
-    public short h;
-    public short i;
+    /* JADX INFO: renamed from: e */
+    public int pathId;
+    /* JADX INFO: renamed from: f */
+    protected static int nextPathId;
+    /* JADX INFO: renamed from: g */
+    public int creationTick;
+    /* JADX INFO: renamed from: h */
+    public short startTileX;
+    /* JADX INFO: renamed from: i */
+    public short startTileY;
     protected Float j;
     protected boolean k;
-    public short l;
-    public short m;
+    /* JADX INFO: renamed from: l */
+    public short endTileX;
+    /* JADX INFO: renamed from: m */
+    public short endTileY;
     protected short n;
-    public UnitMovementType o;
+    /* JADX INFO: renamed from: o */
+    public UnitMovementType movementType;
     public boolean p;
     public int q;
     /* JADX INFO: renamed from: r */
     public boolean isLowPriority;
-    public float s;
-    public float t;
-    public boolean u;
-    public boolean v;
+    /* JADX INFO: renamed from: s */
+    public float allowedDelayMs;
+    /* JADX INFO: renamed from: t */
+    public float remainingTimeMs;
+    /* JADX INFO: renamed from: u */
+    public boolean isTimedOut;
+    /* JADX INFO: renamed from: v */
+    public boolean isSolved;
     public boolean w;
-    protected LinkedList x;
+    /* JADX INFO: renamed from: x */
+    protected LinkedList pathPoints;
     public byte[] y;
     public byte[] z;
     public byte[] A;
@@ -48,30 +61,30 @@ public class Path {
     public Path(PathEngine pathEngine, boolean z) {
         this.a = pathEngine;
         if (z) {
-            int i = f;
-            f = i + 1;
-            this.e = i;
+            int i = nextPathId;
+            nextPathId = i + 1;
+            this.pathId = i;
         }
-        this.g = GameEngine.getInstance().currentTick;
+        this.creationTick = GameEngine.getInstance().currentTick;
     }
 
     public void a(GameOutputStream gameOutputStream) throws IOException {
         int i;
-        if (this.x == null) {
+        if (this.pathPoints == null) {
             gameOutputStream.writeBoolean(false);
             return;
         }
         gameOutputStream.writeBoolean(true);
         gameOutputStream.beginBlockInternal("p", true);
-        gameOutputStream.writeInt(this.x.size());
-        if (this.x.size() != 0) {
-            PathPoint pathPoint = (PathPoint) this.x.get(0);
-            gameOutputStream.writeShort(pathPoint.a);
-            gameOutputStream.writeShort(pathPoint.b);
-            for (int i2 = 1; i2 < this.x.size(); i2++) {
-                PathPoint pathPoint2 = (PathPoint) this.x.get(i2);
-                int i3 = pathPoint2.a - pathPoint.a;
-                int i4 = pathPoint2.b - pathPoint.b;
+        gameOutputStream.writeInt(this.pathPoints.size());
+        if (this.pathPoints.size() != 0) {
+            PathPoint pathPoint = (PathPoint) this.pathPoints.get(0);
+            gameOutputStream.writeShort(pathPoint.tileX);
+            gameOutputStream.writeShort(pathPoint.tileY);
+            for (int i2 = 1; i2 < this.pathPoints.size(); i2++) {
+                PathPoint pathPoint2 = (PathPoint) this.pathPoints.get(i2);
+                int i3 = pathPoint2.tileX - pathPoint.tileX;
+                int i4 = pathPoint2.tileY - pathPoint.tileY;
                 boolean z = Utility.abs(i3) > 1 || Utility.abs(i4) > 1;
                 if (z) {
                     GameEngine.log("writeOutCompressedPath: out of range:" + i3 + "," + i4);
@@ -81,8 +94,8 @@ public class Path {
                 }
                 gameOutputStream.writeByte(i);
                 if (z) {
-                    gameOutputStream.writeShort(pathPoint2.a);
-                    gameOutputStream.writeShort(pathPoint2.b);
+                    gameOutputStream.writeShort(pathPoint2.tileX);
+                    gameOutputStream.writeShort(pathPoint2.tileY);
                 }
                 pathPoint = pathPoint2;
             }
@@ -92,7 +105,7 @@ public class Path {
 
     public void a(GameInputStream gameInputStream) throws IOException {
         if (!gameInputStream.readBoolean()) {
-            this.x = null;
+            this.pathPoints = null;
             return;
         }
         gameInputStream.a("p", true);
@@ -102,16 +115,16 @@ public class Path {
             i = -1;
         }
         if (i != -1) {
-            this.u = true;
-            if (this.x == null) {
-                this.x = new LinkedList();
+            this.isTimedOut = true;
+            if (this.pathPoints == null) {
+                this.pathPoints = new LinkedList();
             }
-            this.x.clear();
+            this.pathPoints.clear();
         }
         if (i > 0) {
             short shortValue = gameInputStream.readShortValue();
             short shortValue2 = gameInputStream.readShortValue();
-            this.x.add(new PathPoint(shortValue, shortValue2));
+            this.pathPoints.add(new PathPoint(shortValue, shortValue2));
             for (int i2 = 1; i2 < i; i2++) {
                 byte b = gameInputStream.readByte();
                 if (b < 128) {
@@ -122,12 +135,12 @@ public class Path {
                     }
                     shortValue = (short) (shortValue + i3);
                     shortValue2 = (short) (shortValue2 + i4);
-                    this.x.add(new PathPoint(shortValue, shortValue2));
+                    this.pathPoints.add(new PathPoint(shortValue, shortValue2));
                 } else {
                     GameEngine.log("readInCompressedPath: out of range unpack:" + ((int) shortValue) + "," + ((int) shortValue2));
                     shortValue = gameInputStream.readShortValue();
                     shortValue2 = gameInputStream.readShortValue();
-                    this.x.add(new PathPoint(shortValue, shortValue2));
+                    this.pathPoints.add(new PathPoint(shortValue, shortValue2));
                 }
             }
         }
@@ -135,9 +148,9 @@ public class Path {
     }
 
     public void e() {
-        PathCostMap pathCostMapA = this.a.a(this.o);
+        PathCostMap pathCostMapA = this.a.a(this.movementType);
         if (pathCostMapA == null) {
-            throw new RuntimeException("Could not get costs for:" + this.o.toString());
+            throw new RuntimeException("Could not get costs for:" + this.movementType.toString());
         }
         this.y = pathCostMapA.d;
         this.z = pathCostMapA.e;
@@ -158,22 +171,22 @@ public class Path {
         if (unitMovementType == null) {
             throw new RuntimeException("MovementType is null");
         }
-        this.o = unitMovementType;
-        this.h = s;
-        this.i = s2;
+        this.movementType = unitMovementType;
+        this.startTileX = s;
+        this.startTileY = s2;
         this.j = f2;
         this.k = z;
-        if (this.h < 0) {
-            this.h = (short) 0;
+        if (this.startTileX < 0) {
+            this.startTileX = (short) 0;
         }
-        if (this.i < 0) {
-            this.i = (short) 0;
+        if (this.startTileY < 0) {
+            this.startTileY = (short) 0;
         }
-        if (this.h > this.a.s - 1) {
-            this.h = (short) (this.a.s - 1);
+        if (this.startTileX > this.a.s - 1) {
+            this.startTileX = (short) (this.a.s - 1);
         }
-        if (this.i > this.a.t - 1) {
-            this.i = (short) (this.a.t - 1);
+        if (this.startTileY > this.a.t - 1) {
+            this.startTileY = (short) (this.a.t - 1);
         }
         if (this.a.a(unitMovementType) == null) {
             throw new RuntimeException("Could not get costs for:" + unitMovementType.toString());
@@ -193,8 +206,8 @@ public class Path {
         if (s2 > this.a.t - 1) {
             s2 = (short) (this.a.t - 1);
         }
-        this.l = s;
-        this.m = s2;
+        this.endTileX = s;
+        this.endTileY = s2;
         this.n = s3;
     }
 
@@ -213,21 +226,21 @@ public class Path {
     public LinkedList a() {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.networkEngine.networkGameActive || gameEngine.replayEngine.i()) {
-            if (this.u) {
-                return this.x;
+            if (this.isTimedOut) {
+                return this.pathPoints;
             }
             return null;
         }
-        return this.x;
+        return this.pathPoints;
     }
 
     /* JADX INFO: Access modifiers changed from: protected */
     public boolean c() {
-        return this.x != null;
+        return this.pathPoints != null;
     }
 
     protected void a(LinkedList linkedList) {
-        this.x = linkedList;
+        this.pathPoints = linkedList;
     }
 
     public void g() {
@@ -236,23 +249,23 @@ public class Path {
         KoolPaint paint = new KoolPaint();
         paint.a(2.0f);
         paint.a(100, 0, 100, 0);
-        gameEngine.renderGraphicsEngine.a(((this.l * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((this.m * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, this.n * tileMap.tileWorldSizeX, paint);
+        gameEngine.renderGraphicsEngine.a(((this.endTileX * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((this.endTileY * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, this.n * tileMap.tileWorldSizeX, paint);
         paint.a(SlickToAndroidKeycodes.AndroidCodes.KEYCODE_PAIRING, 0, 0, 255);
-        gameEngine.renderGraphicsEngine.a(((this.h * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((this.i * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, ((this.l * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((this.m * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, paint);
+        gameEngine.renderGraphicsEngine.a(((this.startTileX * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((this.startTileY * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, ((this.endTileX * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((this.endTileY * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, paint);
     }
 
     public void h() {
-        if (this.x != null) {
+        if (this.pathPoints != null) {
             GameEngine gameEngine = GameEngine.getInstance();
             TileMap tileMap = gameEngine.tileMap;
-            if (this.x.size() >= 1) {
-                for (int i = 1; i < this.x.size(); i++) {
-                    PathPoint pathPoint = (PathPoint) this.x.get(i);
-                    PathPoint pathPoint2 = (PathPoint) this.x.get(i - 1);
+            if (this.pathPoints.size() >= 1) {
+                for (int i = 1; i < this.pathPoints.size(); i++) {
+                    PathPoint pathPoint = (PathPoint) this.pathPoints.get(i);
+                    PathPoint pathPoint2 = (PathPoint) this.pathPoints.get(i - 1);
                     KoolPaint paint = new KoolPaint();
                     paint.a(255, 0, 255, 0);
                     paint.a(2.0f);
-                    gameEngine.renderGraphicsEngine.a(((pathPoint.a * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((pathPoint.b * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, ((pathPoint2.a * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((pathPoint2.b * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, paint);
+                    gameEngine.renderGraphicsEngine.a(((pathPoint.tileX * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((pathPoint.tileY * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, ((pathPoint2.tileX * tileMap.tileWorldSizeX) + tileMap.halfTileWorldSizeX) - GameEngine.getInstance().viewpointXInt, ((pathPoint2.tileY * tileMap.tileWorldSizeY) + tileMap.halfTileWorldSizeY) - GameEngine.getInstance().viewpointYInt, paint);
                 }
             }
         }

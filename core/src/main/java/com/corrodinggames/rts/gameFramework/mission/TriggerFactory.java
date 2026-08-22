@@ -38,44 +38,44 @@ public class TriggerFactory {
                     return null;
                 }
                 MapTrigger mapTrigger = new MapTrigger();
-                mapTrigger.t = mapObject;
-                mapTrigger.g = triggerTypeA;
-                mapTrigger.b = strTrim;
+                mapTrigger.mapObject = mapObject;
+                mapTrigger.triggerType = triggerTypeA;
+                mapTrigger.rawId = strTrim;
                 int i = 0;
                 Iterator it = missionEngine.J.iterator();
                 while (it.hasNext()) {
-                    if (((MapTrigger) it.next()).b.equalsIgnoreCase(mapTrigger.b)) {
+                    if (((MapTrigger) it.next()).rawId.equalsIgnoreCase(mapTrigger.rawId)) {
                         i++;
                     }
                 }
-                mapTrigger.c = mapTrigger.b;
+                mapTrigger.uniqueId = mapTrigger.rawId;
                 if (i != 0) {
-                    mapTrigger.c += "_" + i;
+                    mapTrigger.uniqueId += "_" + i;
                 }
-                mapTrigger.a = mapObject.name;
+                mapTrigger.name = mapObject.name;
                 Integer numD = mapTrigger.d("team");
                 if (numD != null) {
-                    mapTrigger.y = PlayerTeam.k(numD.intValue());
-                    if (mapTrigger.y == null) {
+                    mapTrigger.team = PlayerTeam.k(numD.intValue());
+                    if (mapTrigger.team == null) {
                         mapTrigger.g("Cannot find team:" + numD);
                         return null;
                     }
                 }
                 mapTrigger.r = mapTrigger.b("delay", mapTrigger.r);
-                mapTrigger.p = mapTrigger.b("repeatDelay", mapTrigger.p);
+                mapTrigger.repeatDelay = mapTrigger.b("repeatDelay", mapTrigger.repeatDelay);
                 mapTrigger.o = mapTrigger.a("repeatCount", mapTrigger.o);
                 mapTrigger.q = mapTrigger.b("resetActivationAfter", mapTrigger.q);
-                mapTrigger.h = mapTrigger.a("allToActivate", false);
-                mapTrigger.d.b = mapTrigger.h;
+                mapTrigger.allToActivate = mapTrigger.a("allToActivate", false);
+                mapTrigger.d.requireAll = mapTrigger.allToActivate;
                 mapTrigger.s = mapTrigger.b("warmup", mapTrigger.s);
                 mapTrigger.A = mapTrigger.a("globalMessage", (LocaleString) null);
-                mapTrigger.w = mapTrigger.a("textOffsetX", 0.0f);
-                mapTrigger.x = mapTrigger.a("textOffsetY", 0.0f);
-                if (mapTrigger.g == TriggerType.mapText || mapTrigger.g == TriggerType.objective) {
-                    mapTrigger.z = mapTrigger.a("text", (LocaleString) null);
+                mapTrigger.textOffsetX = mapTrigger.a("textOffsetX", 0.0f);
+                mapTrigger.textOffsetY = mapTrigger.a("textOffsetY", 0.0f);
+                if (mapTrigger.triggerType == TriggerType.mapText || mapTrigger.triggerType == TriggerType.objective) {
+                    mapTrigger.text = mapTrigger.a("text", (LocaleString) null);
                 }
-                if (mapTrigger.g == TriggerType.mapText) {
-                    missionEngine.i = true;
+                if (mapTrigger.triggerType == TriggerType.mapText) {
+                    missionEngine.hasMapText = true;
                     mapTrigger.B = new KoolPaint();
                     mapTrigger.B.a(true);
                     mapTrigger.B.a(KoolPaint.Align.CENTER);
@@ -94,7 +94,7 @@ public class TriggerFactory {
                         }
                     }
                 }
-                if (mapTrigger.g == TriggerType.event_unitAdd) {
+                if (mapTrigger.triggerType == TriggerType.event_unitAdd) {
                     try {
                         mapTrigger.v = UnitSpawner.a(mapTrigger.b("spawnUnits"), "<unitAdd>", "spawnUnits");
                         if (mapTrigger.a() == null) {
@@ -105,18 +105,18 @@ public class TriggerFactory {
                         return null;
                     }
                 }
-                if (mapTrigger.g == TriggerType.event_teamTags) {
+                if (mapTrigger.triggerType == TriggerType.event_teamTags) {
                     mapTrigger.a("addTeamTags");
                     mapTrigger.a("removeTeamTags");
                 }
-                if (mapTrigger.g == TriggerType.event_changeCredits) {
+                if (mapTrigger.triggerType == TriggerType.event_changeCredits) {
                     mapTrigger.a("add");
                     mapTrigger.a("set");
                 }
-                if (mapTrigger.g == TriggerType.trigger_unitDetect) {
+                if (mapTrigger.triggerType == TriggerType.trigger_unitDetect) {
                     mapTrigger.a(UnitCountCondition.d(mapTrigger));
                 }
-                if (mapTrigger.g == TriggerType.trigger_teamTagDetect) {
+                if (mapTrigger.triggerType == TriggerType.trigger_teamTagDetect) {
                     mapTrigger.a(TeamTagDetectCondition.d(mapTrigger));
                 }
                 mapTrigger.a("comment");
@@ -129,10 +129,10 @@ public class TriggerFactory {
                 mapTrigger.a("text");
                 mapTrigger.a("target");
                 mapTrigger.a("onlyIfEmpty");
-                if (mapTrigger.g == TriggerType.event_move) {
+                if (mapTrigger.triggerType == TriggerType.event_move) {
                     mapTrigger.a("unload");
                 }
-                if (mapTrigger.g == TriggerType.event_unitRemove) {
+                if (mapTrigger.triggerType == TriggerType.event_unitRemove) {
                     mapTrigger.a("onlyIfEmpty");
                 }
                 return mapTrigger;

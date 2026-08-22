@@ -20,7 +20,7 @@ public class LagHidingManager {
         Object[] objArrA = a.a();
         for (int i = a.size - 1; i >= 0; i--) {
             UnitSnapshot unitSnapshot = (UnitSnapshot) objArrA[i];
-            if (unitSnapshot.a == j) {
+            if (unitSnapshot.unitId == j) {
                 return unitSnapshot;
             }
         }
@@ -31,10 +31,10 @@ public class LagHidingManager {
         UnitSnapshot unitSnapshotA = a(baseUnit.objectId);
         if (unitSnapshotA == null) {
             unitSnapshotA = new UnitSnapshot();
-            unitSnapshotA.a = baseUnit.objectId;
-            unitSnapshotA.b = baseUnit.ammo;
-            unitSnapshotA.c = baseUnit.unitFlags;
-            unitSnapshotA.d = GameEngine.getInstance().networkEngine.nextBlockingFrame;
+            unitSnapshotA.unitId = baseUnit.objectId;
+            unitSnapshotA.ammo = baseUnit.ammo;
+            unitSnapshotA.unitFlags = baseUnit.unitFlags;
+            unitSnapshotA.blockingFrame = GameEngine.getInstance().networkEngine.nextBlockingFrame;
             a.add(unitSnapshotA);
         }
         return unitSnapshotA;
@@ -45,10 +45,10 @@ public class LagHidingManager {
             return;
         }
         UnitSnapshot unitSnapshotA = a(baseUnit);
-        unitSnapshotA.b += unitPrice.f;
-        unitSnapshotA.c = unitPrice.c(unitSnapshotA.c);
+        unitSnapshotA.ammo += unitPrice.f;
+        unitSnapshotA.unitFlags = unitPrice.c(unitSnapshotA.unitFlags);
         if (!unitPrice.k.c()) {
-            unitSnapshotA.e = StoredResources.b(unitSnapshotA.e, unitPrice.k);
+            unitSnapshotA.resources = StoredResources.b(unitSnapshotA.resources, unitPrice.k);
         }
     }
 
@@ -57,10 +57,10 @@ public class LagHidingManager {
             return;
         }
         UnitSnapshot unitSnapshotA = a(baseUnit);
-        unitSnapshotA.b -= unitPrice.f;
-        unitSnapshotA.c = unitPrice.c(unitSnapshotA.c);
+        unitSnapshotA.ammo -= unitPrice.f;
+        unitSnapshotA.unitFlags = unitPrice.c(unitSnapshotA.unitFlags);
         if (!unitPrice.k.c()) {
-            unitSnapshotA.e = StoredResources.a(unitSnapshotA.e, unitPrice.k);
+            unitSnapshotA.resources = StoredResources.a(unitSnapshotA.resources, unitPrice.k);
         }
         if (a.size > 0) {
         }
@@ -70,10 +70,10 @@ public class LagHidingManager {
         UnitSnapshot unitSnapshotA = a(baseUnit.objectId);
         if (unitSnapshotA != null) {
             b.team = baseUnit.team;
-            b.ammo = unitSnapshotA.b;
-            b.unitFlags = unitSnapshotA.c;
+            b.ammo = unitSnapshotA.ammo;
+            b.unitFlags = unitSnapshotA.unitFlags;
             StoredResources unitAICombatRange = b.getCustomResources();
-            b.a(unitSnapshotA.e);
+            b.a(unitSnapshotA.resources);
             boolean zB = unitPrice.b(b);
             b.a(unitAICombatRange);
             return zB;
@@ -86,8 +86,8 @@ public class LagHidingManager {
         if (unitSnapshotA != null) {
             int i = orderableUnit.ammo;
             int i2 = orderableUnit.unitFlags;
-            orderableUnit.ammo = unitSnapshotA.b;
-            orderableUnit.unitFlags = unitSnapshotA.c;
+            orderableUnit.ammo = unitSnapshotA.ammo;
+            orderableUnit.unitFlags = unitSnapshotA.unitFlags;
             boolean z = logicBoolean.read(orderableUnit);
             orderableUnit.ammo = i;
             orderableUnit.unitFlags = i2;
@@ -110,11 +110,11 @@ public class LagHidingManager {
         int i = GameEngine.getInstance().networkEngine.nextBlockingFrame;
         for (int size = a.size() - 1; size >= 0; size--) {
             UnitSnapshot unitSnapshot = (UnitSnapshot) a.get(size);
-            if (unitSnapshot.a == orderableUnit.objectId) {
+            if (unitSnapshot.unitId == orderableUnit.objectId) {
                 a.remove(size);
                 return;
             } else {
-                if (unitSnapshot.d < i + 80) {
+                if (unitSnapshot.blockingFrame < i + 80) {
                     a.remove(size);
                     return;
                 }

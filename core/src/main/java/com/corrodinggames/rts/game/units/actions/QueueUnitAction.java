@@ -9,7 +9,9 @@ import com.corrodinggames.rts.gameFramework.ui.GameInterfaceRenderer;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.a.l */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/a/l.class */
 public class QueueUnitAction extends PopupQueueAction {
-    UnitType a;
+
+    /* JADX INFO: renamed from: a */
+    UnitType unitType;
 
     public QueueUnitAction(UnitType unitType) {
         this(unitType, -999.0f);
@@ -23,19 +25,19 @@ public class QueueUnitAction extends PopupQueueAction {
             setActionId("u_" + unitType.v());
         }
         this.sortOrder = f;
-        this.a = unitType;
+        this.unitType = unitType;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public String getDescription() {
-        return this.a.f() + "\n\n" + GameInterfaceRenderer.a(BaseUnit.getPrototypeForUnitType(this.a), false, false, true);
+        return this.unitType.f() + "\n\n" + GameInterfaceRenderer.a(BaseUnit.getPrototypeForUnitType(this.unitType), false, false, true);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
     public String getDisplayName() {
-        return this.a.getUnitName();
+        return this.unitType.getUnitName();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -51,7 +53,7 @@ public class QueueUnitAction extends PopupQueueAction {
         if (unitPriceA != null) {
             return unitPriceA;
         }
-        return this.a.u();
+        return this.unitType.u();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -61,18 +63,18 @@ public class QueueUnitAction extends PopupQueueAction {
         if (unitPriceB != null) {
             return unitPriceB;
         }
-        return this.a.B();
+        return this.unitType.B();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: i */
     public UnitType getUnitType() {
-        return this.a;
+        return this.unitType;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.PopupQueueAction
     public float K() {
-        return this.a.D();
+        return this.unitType.D();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -84,7 +86,7 @@ public class QueueUnitAction extends PopupQueueAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: n_ */
     public boolean isQueuable() {
-        return !this.a.isAvailableInDemo();
+        return !this.unitType.isAvailableInDemo();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction

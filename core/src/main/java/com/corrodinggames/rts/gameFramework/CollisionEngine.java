@@ -76,12 +76,12 @@ public class CollisionEngine {
 
     public CommandGroup a(byte b) {
         for (CommandGroup commandGroup : this.n) {
-            if (commandGroup.a == b) {
+            if (commandGroup.groupId == b) {
                 return commandGroup;
             }
         }
         CommandGroup commandGroup2 = new CommandGroup();
-        commandGroup2.a = b;
+        commandGroup2.groupId = b;
         this.n.add(commandGroup2);
         return commandGroup2;
     }

@@ -2,7 +2,11 @@ package com.corrodinggames.rts.gameFramework;
 
 /* Core music track retained for legacy callers. */
 public class AndroidMusicTrack extends MusicTrack {
+
+    /* JADX INFO: renamed from: a */
     AndroidMusic music;
+
+    /* JADX INFO: renamed from: b */
     AndroidMusicFactory factory;
     boolean playing;
     float volume;

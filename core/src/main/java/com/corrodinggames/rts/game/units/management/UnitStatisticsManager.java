@@ -10,7 +10,8 @@ public class UnitStatisticsManager {
     public final UnitList[] b = new UnitList[PlayerTeam.TEAM_ALLIES];
     public final UnitList c = new UnitList();
     public final UnitList d = new UnitList();
-    float e;
+    /* JADX INFO: renamed from: e */
+    float maxUnitRadius;
 
     public UnitStatisticsManager() {
         for (int i = 0; i < this.b.length; i++) {
@@ -28,8 +29,8 @@ public class UnitStatisticsManager {
         } else if (i == -2) {
             this.c.a(baseUnit);
         }
-        if (baseUnit.radius > this.e) {
-            this.e = baseUnit.radius;
+        if (baseUnit.radius > this.maxUnitRadius) {
+            this.maxUnitRadius = baseUnit.radius;
         }
     }
 
@@ -43,8 +44,8 @@ public class UnitStatisticsManager {
         } else if (i == -2) {
             this.c.b(baseUnit);
         }
-        if (this.a.b == 0) {
-            this.e = 0.0f;
+        if (this.a.size == 0) {
+            this.maxUnitRadius = 0.0f;
         }
     }
 }

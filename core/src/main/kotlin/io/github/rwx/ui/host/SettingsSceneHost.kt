@@ -172,7 +172,7 @@ class SettingsSceneHost(
                 val controller = keyBindingController()
                 keyBindingRows(controller, activeCapture).forEach { row ->
                     if (row.keyBinding.d()) {
-                        rows.add(SettingsScrollRow.SectionTitle(row.keyBinding.a))
+                        rows.add(SettingsScrollRow.SectionTitle(row.keyBinding.name))
                     } else {
                         rows.add(SettingsScrollRow.KeyBinding(row))
                     }
@@ -281,7 +281,7 @@ class SettingsSceneHost(
         activeCapture: KeyBindingCaptureTarget?,
     ): List<SettingKeyBindingRow> {
         return controller.al.mapIndexedNotNull { index, keyBinding ->
-            if (!keyBinding.b) return@mapIndexedNotNull null
+            if (!keyBinding.isDefault) return@mapIndexedNotNull null
             SettingKeyBindingRow(
                 index = index,
                 keyBinding = keyBinding,
@@ -303,7 +303,7 @@ class SettingsSceneHost(
         if (binding.d()) return false
         for (other in controller.al) {
             if (other === keyBinding) continue
-            for (otherBinding in other.c) {
+            for (otherBinding in other.bindings) {
                 if (!otherBinding.d() && binding.a(otherBinding)) {
                     return true
                 }

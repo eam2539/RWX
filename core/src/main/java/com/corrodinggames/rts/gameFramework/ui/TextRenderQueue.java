@@ -16,11 +16,21 @@ public class TextRenderQueue {
     static GamePaint a = new GamePaint();
     static GamePaint b = new GamePaint();
     static GamePaint c = new GamePaint();
-    static KoolPaint f = new KoolPaint();
-    public KoolPaint d = a;
-    public KoolPaint e = a;
-    public KoolPaint g = this.d;
-    FastArrayList<RenderElement> i = new FastArrayList();
+
+    /* JADX INFO: renamed from: f */
+    static KoolPaint coloredTextPaint = new KoolPaint();
+
+    /* JADX INFO: renamed from: d */
+    public KoolPaint defaultPaint = a;
+
+    /* JADX INFO: renamed from: e */
+    public KoolPaint highlightPaint = a;
+
+    /* JADX INFO: renamed from: g */
+    public KoolPaint currentPaint = this.defaultPaint;
+
+    /* JADX INFO: renamed from: i */
+    FastArrayList<RenderElement> elements = new FastArrayList();
 
     static {
         c.a(true);
@@ -31,55 +41,55 @@ public class TextRenderQueue {
 
     public void a(KoolPaint paint) {
         if (paint == null) {
-            this.g = this.d;
+            this.currentPaint = this.defaultPaint;
         } else {
-            this.g = paint;
+            this.currentPaint = paint;
         }
     }
 
     public void a(boolean z) {
         if (z) {
-            this.g = this.e;
+            this.currentPaint = this.highlightPaint;
         } else {
-            this.g = this.d;
+            this.currentPaint = this.defaultPaint;
         }
     }
 
     public String a() {
         StringBuilder sb = new StringBuilder();
-        for (RenderElement renderElement : this.i) {
+        for (RenderElement renderElement : this.elements) {
             if (renderElement instanceof TextRenderer) {
-                sb.append(((TextRenderer) renderElement).d);
+                sb.append(((TextRenderer) renderElement).text);
             }
         }
         return sb.toString();
     }
 
     public void a(String str) {
-        if (this.i.size() > 0) {
-            int size = this.i.size() - 1;
-            RenderElement renderElement = (RenderElement) this.i.get(size);
+        if (this.elements.size() > 0) {
+            int size = this.elements.size() - 1;
+            RenderElement renderElement = (RenderElement) this.elements.get(size);
             if (renderElement instanceof TextRenderer) {
                 TextRenderer textRenderer = (TextRenderer) renderElement;
-                String strBooleanToString = Utility.removeSuffix(textRenderer.d, str);
-                if (!textRenderer.d.equals(strBooleanToString)) {
-                    this.i.set(size, textRenderer.b(strBooleanToString));
+                String strBooleanToString = Utility.removeSuffix(textRenderer.text, str);
+                if (!textRenderer.text.equals(strBooleanToString)) {
+                    this.elements.set(size, textRenderer.b(strBooleanToString));
                 }
             }
         }
     }
 
     public void b() {
-        this.i.clear();
+        this.elements.clear();
     }
 
     public void a(RenderElement renderElement) {
-        this.i.add(renderElement);
+        this.elements.add(renderElement);
     }
 
     public void b(String str) {
-        if (this.g != null && this.g != this.d) {
-            a(str, this.g);
+        if (this.currentPaint != null && this.currentPaint != this.defaultPaint) {
+            a(str, this.currentPaint);
         } else {
             a(new TextRenderer(this, str));
         }
@@ -90,33 +100,33 @@ public class TextRenderQueue {
     }
 
     public void a(String str, int i) {
-        if (this.g != null && this.g != this.d) {
-            a(new ColoredTextRenderer(this, str, this.g, i));
+        if (this.currentPaint != null && this.currentPaint != this.defaultPaint) {
+            a(new ColoredTextRenderer(this, str, this.currentPaint, i));
         } else {
             a(new ColoredTextRenderer(this, str, null, i));
         }
     }
 
     public void a(String str, int i, boolean z) {
-        KoolPaint paint = this.d;
+        KoolPaint paint = this.defaultPaint;
         if (z) {
-            paint = this.e;
+            paint = this.highlightPaint;
         }
         a(new ColoredTextRenderer(this, str, paint, i));
     }
 
     public void a(Texture texture, int i, int i2) {
         TextureRenderer textureRenderer = new TextureRenderer(this);
-        textureRenderer.a = texture;
+        textureRenderer.texture = texture;
         float scale = TextUtils.getScale(texture, i, i2);
-        textureRenderer.c = (int) (texture.p * scale);
-        textureRenderer.d = (int) (texture.q * scale);
-        textureRenderer.b = scale;
-        this.i.add(textureRenderer);
+        textureRenderer.width = (int) (texture.p * scale);
+        textureRenderer.height = (int) (texture.q * scale);
+        textureRenderer.scale = scale;
+        this.elements.add(textureRenderer);
     }
 
     public int c() {
-        return GameEngine.getInstance().renderGraphicsEngine.a("A", this.g);
+        return GameEngine.getInstance().renderGraphicsEngine.a("A", this.currentPaint);
     }
 
     /* JADX WARN: Type inference fix 'apply assigned field type' failed
@@ -135,21 +145,21 @@ public class TextRenderQueue {
         Rect rect = new Rect((-i) / 2, 0, i / 2, 10);
         FastArrayList<TextRenderLine> fastArrayList = new FastArrayList();
         TextRenderLine textRenderLine = new TextRenderLine();
-        KoolPaint paint = this.d;
+        KoolPaint paint = this.defaultPaint;
         int i2 = i - 5;
-        for (RenderElement renderElement : this.i) {
+        for (RenderElement renderElement : this.elements) {
             if (textRenderLine.b >= i2 - 5) {
-                if (textRenderLine.a.size() > 0) {
+                if (textRenderLine.elements.size() > 0) {
                     fastArrayList.add(textRenderLine);
                 }
                 textRenderLine = new TextRenderLine();
             }
             if (!(renderElement instanceof TextRenderer)) {
                 textRenderLine.a(renderElement);
-                textRenderLine.b += renderElement.a(this.d);
+                textRenderLine.b += renderElement.a(this.defaultPaint);
             } else {
                 TextRenderer textRenderer = (TextRenderer) renderElement;
-                String str = textRenderer.d;
+                String str = textRenderer.text;
                 int i3 = 0;
                 while (i3 < str.length()) {
                     if (str.charAt(i3) == '\n') {
@@ -179,13 +189,13 @@ public class TextRenderQueue {
                         }
                         TextRenderer textRendererB = textRenderer.b(strSubstring);
                         textRenderLine.a(textRendererB);
-                        textRenderLine.b += textRendererB.a(this.d);
+                        textRenderLine.b += textRendererB.a(this.defaultPaint);
                         i3 += iA;
                         if (i3 < str.length() && str.charAt(i3) == '\n') {
                             i3++;
                         }
                         if (z2 || textRenderLine.b >= i2 - 5) {
-                            if (textRenderLine.a.size() > 0) {
+                            if (textRenderLine.elements.size() > 0) {
                                 fastArrayList.add(textRenderLine);
                             }
                             textRenderLine = new TextRenderLine();
@@ -194,10 +204,10 @@ public class TextRenderQueue {
                 }
             }
         }
-        if (textRenderLine.a.size() > 0) {
+        if (textRenderLine.elements.size() > 0) {
             fastArrayList.add(textRenderLine);
         }
-        if (fastArrayList.size() > 0 && ((TextRenderLine) fastArrayList.get(fastArrayList.size() - 1)).a.size() == 0) {
+        if (fastArrayList.size() > 0 && ((TextRenderLine) fastArrayList.get(fastArrayList.size() - 1)).elements.size() == 0) {
             fastArrayList.remove(fastArrayList.size() - 1);
         }
         rect.d = rect.b + (fastArrayList.size() * TextUtils.getLineHeight(paint));
@@ -216,10 +226,10 @@ public class TextRenderQueue {
             }
         }
         TextRenderLayout textRenderLayout = new TextRenderLayout();
-        textRenderLayout.a = fastArrayList;
-        textRenderLayout.b = rect;
-        textRenderLayout.c = this.d;
-        textRenderLayout.d = this.e;
+        textRenderLayout.lines = fastArrayList;
+        textRenderLayout.rect = rect;
+        textRenderLayout.defaultPaint = this.defaultPaint;
+        textRenderLayout.highlightPaint = this.highlightPaint;
         return textRenderLayout;
     }
 }

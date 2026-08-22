@@ -10,13 +10,14 @@ public enum StatisticType {
     buildingValue(StatType.buildingValue),
     totalValue(StatType.totalValue);
 
-    final StatType e;
+    /* JADX INFO: renamed from: e */
+    final StatType statType;
 
     StatisticType(StatType statType) {
-        this.e = statType;
+        this.statType = statType;
     }
 
     public StatType a() {
-        return this.e;
+        return this.statType;
     }
 }

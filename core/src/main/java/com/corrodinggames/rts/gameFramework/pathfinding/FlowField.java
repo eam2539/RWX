@@ -3,26 +3,35 @@ package com.corrodinggames.rts.gameFramework.pathfinding;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.k.g */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/k/g.class */
 public class FlowField {
-    int a;
-    int b;
+
+    /* JADX INFO: renamed from: a */
+    int width;
+
+    /* JADX INFO: renamed from: b */
+    int height;
+
     int c;
     int d;
-    byte[] e;
-    byte[] f;
+
+    /* JADX INFO: renamed from: e */
+    byte[] flowDirections;
+
+    /* JADX INFO: renamed from: f */
+    byte[] flags;
 
     public FlowField(int i, int i2) {
-        this.a = i;
-        this.b = i2;
-        this.e = new byte[i * i2];
-        this.f = new byte[i * i2];
+        this.width = i;
+        this.height = i2;
+        this.flowDirections = new byte[i * i2];
+        this.flags = new byte[i * i2];
     }
 
     public final byte a(int i, int i2) {
-        return this.e[(i * this.b) + i2];
+        return this.flowDirections[(i * this.height) + i2];
     }
 
     public final byte a(PathPoint pathPoint) {
-        return this.e[(pathPoint.a * this.b) + pathPoint.b];
+        return this.flowDirections[(pathPoint.tileX * this.height) + pathPoint.tileY];
     }
 
     public boolean b(PathPoint pathPoint) {
@@ -30,14 +39,14 @@ public class FlowField {
     }
 
     public void a(PathPoint pathPoint, byte b) {
-        this.e[(pathPoint.a * this.b) + pathPoint.b] = b;
+        this.flowDirections[(pathPoint.tileX * this.height) + pathPoint.tileY] = b;
     }
 
     public void a(PathPoint pathPoint, boolean z) {
-        this.f[(pathPoint.a * this.b) + pathPoint.b] = (byte) (z ? 1 : 0);
+        this.flags[(pathPoint.tileX * this.height) + pathPoint.tileY] = (byte) (z ? 1 : 0);
     }
 
     public boolean c(PathPoint pathPoint) {
-        return this.f[(pathPoint.a * this.b) + pathPoint.b] == 1;
+        return this.flags[(pathPoint.tileX * this.height) + pathPoint.tileY] == 1;
     }
 }

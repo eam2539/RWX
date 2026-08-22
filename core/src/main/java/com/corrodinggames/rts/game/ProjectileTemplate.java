@@ -17,11 +17,16 @@ public class ProjectileTemplate {
     public static final ProjectileTemplate a = new ProjectileTemplate();
     public int b;
     public int c;
-    public boolean d;
-    public boolean e;
-    public boolean f;
-    public boolean g;
-    public boolean h;
+    /* JADX INFO: renamed from: d */
+    public boolean killParentOnHit;
+    /* JADX INFO: renamed from: e */
+    public boolean hasSplashDamage;
+    /* JADX INFO: renamed from: f */
+    public boolean noExplosion;
+    /* JADX INFO: renamed from: g */
+    public boolean fullSplashDamage;
+    /* JADX INFO: renamed from: h */
+    public boolean splashRadiusBonus;
     public float u;
     public float v;
     public short y;

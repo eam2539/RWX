@@ -4154,8 +4154,8 @@ public final class GameUI extends Serializable {
             s2 = this.notEnoughResourcesText.resolveText();
         }
         final TextRenderQueue textRenderQueue = new TextRenderQueue();
-        textRenderQueue.d = this.unitIconPaint;
-        textRenderQueue.e = this.buildingIconPaint;
+        textRenderQueue.defaultPaint = this.unitIconPaint;
+        textRenderQueue.highlightPaint = this.buildingIconPaint;
         final KoolPaint paint3 = null;
         KoolPaint effectIconTexture = null;
         if (b6) {
@@ -4218,9 +4218,9 @@ public final class GameUI extends Serializable {
         }
         final TextRenderLayout a2 = textRenderQueue.a(this.bv.b(), boolean8);
         final float n2 = (float) this.bv.d();
-        this.bv.a = (int) (n2 - a2.b.b() / 2);
-        this.bv.c = (int) (n2 + a2.b.b() / 2);
-        this.bv.d = this.bv.b + a2.b.c();
+        this.bv.a = (int) (n2 - a2.rect.b() / 2);
+        this.bv.c = (int) (n2 + a2.rect.b() / 2);
+        this.bv.d = this.bv.b + a2.rect.c();
         if (boolean8) {
             final Rect bv = this.bv;
             bv.a -= (int) (n * instance.screenScale);

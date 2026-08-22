@@ -24,14 +24,24 @@ public final class UnitMovementData {
 
     /* JADX INFO: renamed from: g */
     public boolean isActive;
-    public float h;
-    public float i;
+
+    /* JADX INFO: renamed from: h */
+    public float shadowOffsetX;
+
+    /* JADX INFO: renamed from: i */
+    public float shadowOffsetY;
 
     /* JADX INFO: renamed from: j */
     public BaseUnit targetUnit;
-    public float k;
-    public float l;
-    public boolean m;
+
+    /* JADX INFO: renamed from: k */
+    public float idleSweepTimer;
+
+    /* JADX INFO: renamed from: l */
+    public float idleSweepAngle;
+
+    /* JADX INFO: renamed from: m */
+    public boolean isOddShot;
 
     public void a(float f) {
         this.targetX = f;
@@ -41,12 +51,12 @@ public final class UnitMovementData {
         this.rotation = 0.0f;
         this.speed = 0.0f;
         this.isActive = false;
-        this.h = 0.0f;
-        this.i = 0.0f;
+        this.shadowOffsetX = 0.0f;
+        this.shadowOffsetY = 0.0f;
         this.targetUnit = null;
-        this.k = 0.0f;
-        this.l = 0.0f;
-        this.m = false;
+        this.idleSweepTimer = 0.0f;
+        this.idleSweepAngle = 0.0f;
+        this.isOddShot = false;
     }
 
     public final void a(int i) {

@@ -12,22 +12,25 @@ import java.util.Iterator;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.aa */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/aa.class */
 public class FormationEngine extends Serializable {
-    int a;
+
+    /* JADX INFO: renamed from: a */
+    int nextFormationId;
+
     PointF b = new PointF();
 
     public void a() {
-        this.a = 1;
+        this.nextFormationId = 1;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
         gameOutputStream.writeInt(0);
-        gameOutputStream.writeInt(this.a);
+        gameOutputStream.writeInt(this.nextFormationId);
     }
 
     public void a(GameInputStream gameInputStream) throws IOException {
         gameInputStream.readInt();
-        this.a = gameInputStream.readInt();
+        this.nextFormationId = gameInputStream.readInt();
     }
 
     public void a(float f) {
@@ -35,8 +38,8 @@ public class FormationEngine extends Serializable {
 
     public FormationGroup b() {
         FormationGroup formationGroup = new FormationGroup(this);
-        formationGroup.formationId = this.a;
-        this.a++;
+        formationGroup.formationId = this.nextFormationId;
+        this.nextFormationId++;
         return formationGroup;
     }
 

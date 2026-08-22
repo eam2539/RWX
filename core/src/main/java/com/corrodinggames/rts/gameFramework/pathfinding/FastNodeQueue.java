@@ -39,7 +39,7 @@ public final class FastNodeQueue extends NodeQueue {
         PathOpenListNode[] pathOpenListNodeArr = this.o;
         if (this.j == -2) {
             for (int i3 = 0; i3 <= i2; i3++) {
-                int i4 = pathOpenListNodeArr[i3].c;
+                int i4 = pathOpenListNodeArr[i3].score;
                 if (this.k == i4) {
                     this.j = i3;
                     this.k = i4;
@@ -50,7 +50,7 @@ public final class FastNodeQueue extends NodeQueue {
         int i5 = -1;
         int i6 = Integer.MAX_VALUE;
         for (int i7 = 0; i7 <= i2; i7++) {
-            int i8 = pathOpenListNodeArr[i7].c;
+            int i8 = pathOpenListNodeArr[i7].score;
             if (i6 > i8) {
                 i5 = i7;
                 i6 = i8;
@@ -65,7 +65,7 @@ public final class FastNodeQueue extends NodeQueue {
 
     private void a(int i2, PathOpenListNode pathOpenListNode) {
         this.o[i2] = pathOpenListNode;
-        int i3 = pathOpenListNode.c;
+        int i3 = pathOpenListNode.score;
         if (this.j == -1 || this.k >= i3) {
             if (this.k > i3) {
             }
@@ -93,7 +93,7 @@ public final class FastNodeQueue extends NodeQueue {
                 GameEngine.log("lowestBufferLastIndex:" + this.n);
                 throw new RuntimeException("null with n:" + i2 + ", lowestBufferLastIndex:" + this.n);
             }
-            int i3 = pathOpenListNode.c;
+            int i3 = pathOpenListNode.score;
             if (this.k > i3) {
                 this.j = i2;
                 this.k = i3;
@@ -113,7 +113,7 @@ public final class FastNodeQueue extends NodeQueue {
             }
             PathOpenListNode pathOpenListNode2 = (PathOpenListNode) this.q.peek();
             if (pathOpenListNode2 != null) {
-                this.s = pathOpenListNode2.c;
+                this.s = pathOpenListNode2.score;
                 return;
             }
             return;
@@ -121,7 +121,7 @@ public final class FastNodeQueue extends NodeQueue {
         this.s = Integer.MAX_VALUE;
         PathOpenListNode pathOpenListNode3 = (PathOpenListNode) this.q.peek();
         if (pathOpenListNode3 != null) {
-            this.s = pathOpenListNode3.c;
+            this.s = pathOpenListNode3.score;
         }
     }
 
@@ -139,8 +139,8 @@ public final class FastNodeQueue extends NodeQueue {
 
     private void c(PathOpenListNode pathOpenListNode) {
         this.q.offer(pathOpenListNode);
-        if (pathOpenListNode.c < this.s) {
-            this.s = pathOpenListNode.c;
+        if (pathOpenListNode.score < this.s) {
+            this.s = pathOpenListNode.score;
         }
         if (this.q.size() > b) {
             b = this.q.size();
@@ -155,7 +155,7 @@ public final class FastNodeQueue extends NodeQueue {
             z = true;
         }
         if (z) {
-            if (pathOpenListNode.c <= this.s) {
+            if (pathOpenListNode.score <= this.s) {
                 b(pathOpenListNode);
                 return;
             } else {
@@ -163,7 +163,7 @@ public final class FastNodeQueue extends NodeQueue {
                 return;
             }
         }
-        if (pathOpenListNode.c < this.m) {
+        if (pathOpenListNode.score < this.m) {
             PathOpenListNode pathOpenListNode2 = this.o[this.l];
             this.o[this.l] = pathOpenListNode;
             d();

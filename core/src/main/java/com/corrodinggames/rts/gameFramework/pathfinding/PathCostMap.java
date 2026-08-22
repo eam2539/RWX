@@ -271,8 +271,8 @@ public final class PathCostMap {
         circularDeque.add(new ShortPair(s, s2));
         while (!circularDeque.isEmpty()) {
             ShortPair shortPair = (ShortPair) circularDeque.a();
-            short s4 = shortPair.a;
-            short s5 = shortPair.b;
+            short s4 = shortPair.x;
+            short s5 = shortPair.y;
             if (tileMap.isInBounds((int) s4, (int) s5)) {
                 int i3 = (s4 * i) + s5;
                 if (sArr[i3] == 0 && bArr[i3] != -1) {

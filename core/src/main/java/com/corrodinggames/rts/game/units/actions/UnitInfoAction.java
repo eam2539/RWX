@@ -14,12 +14,14 @@ import java.io.IOException;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.a.y */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/a/y.class */
 public class UnitInfoAction extends AbstractUnitAction {
-    public boolean a;
+
+    /* JADX INFO: renamed from: a */
+    public boolean showInfo;
 
     public UnitInfoAction(boolean z) {
         super("c_5");
         this.sortOrder = -9990.0f;
-        this.a = z;
+        this.showInfo = z;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -91,7 +93,7 @@ public class UnitInfoAction extends AbstractUnitAction {
             if (orderableUnitK instanceof EditorOrBuilder) {
                 return "Editor";
             }
-            if (!this.a) {
+            if (!this.showInfo) {
                 strA = gameEngine.gameUI.interfaceRenderer.a((BaseUnit) orderableUnitK, false);
             } else {
                 strA = gameEngine.gameUI.interfaceRenderer.a(orderableUnitK.team);
@@ -115,7 +117,7 @@ public class UnitInfoAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: d */
     public String getDisplayName(BaseUnit baseUnit) {
-        if (this.a) {
+        if (this.showInfo) {
             return VariableScope.nullOrMissingString;
         }
         if (baseUnit != null) {
@@ -127,7 +129,7 @@ public class UnitInfoAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: s */
     public boolean isWaitingForTarget() {
-        if (!this.a || !L()) {
+        if (!this.showInfo || !L()) {
             return true;
         }
         return false;
@@ -136,7 +138,7 @@ public class UnitInfoAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: u */
     public boolean isGuiBlinking() {
-        if (this.a) {
+        if (this.showInfo) {
             return false;
         }
         return true;
@@ -152,7 +154,7 @@ public class UnitInfoAction extends AbstractUnitAction {
     /* JADX INFO: renamed from: a */
     public String getDescription() {
         OrderableUnit orderableUnitK;
-        if (!this.a && (orderableUnitK = K()) != null) {
+        if (!this.showInfo && (orderableUnitK = K()) != null) {
             String strA = GameInterfaceRenderer.a(orderableUnitK, false, true, false);
             if (0 != 0) {
                 DebugGameOutputStream debugGameOutputStream = new DebugGameOutputStream();

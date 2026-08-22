@@ -22,13 +22,13 @@ public class TriggerExecutor {
     public static void a(final MissionEngine f, final MapTrigger a) throws MapLoadException {
         final GameEngine instance = GameEngine.getInstance();
         boolean b = false;
-        if (!a.j) {
+        if (!a.isActive) {
             b = true;
         }
         f.a(a);
         a.i = true;
-        a.j = true;
-        a.k = instance.gameTimeMillis;
+        a.isActive = true;
+        a.activationTime = instance.gameTimeMillis;
         boolean b2 = false;
         if (a.A != null) {
             final Message addMessage = instance.gameUI.messageManager.addMessage(null, a.A.resolveText());
@@ -72,31 +72,31 @@ public class TriggerExecutor {
                 }
             }
         }
-        if (a.g == TriggerType.objective) {
+        if (a.triggerType == TriggerType.objective) {
             if (b) {
                 a.h("objective met");
             }
             b2 = true;
         }
-        if (a.g == TriggerType.trigger_basic) {
+        if (a.triggerType == TriggerType.trigger_basic) {
             b2 = true;
         }
-        if (a.g == TriggerType.trigger_unitDetect) {
+        if (a.triggerType == TriggerType.trigger_unitDetect) {
             b2 = true;
         }
-        if (a.g == TriggerType.trigger_teamTagDetect) {
+        if (a.triggerType == TriggerType.trigger_teamTagDetect) {
             b2 = true;
         }
-        if (a.g == TriggerType.mapText) {
+        if (a.triggerType == TriggerType.mapText) {
             b2 = true;
         }
-        if (a.g == TriggerType.moveCamera) {
+        if (a.triggerType == TriggerType.moveCamera) {
             b2 = true;
             final float n2 = (float) a.b();
             final float n3 = (float) a.c();
             instance.centerViewpoint(n2, n3);
         }
-        if (a.g == TriggerType.event_unitAdd) {
+        if (a.triggerType == TriggerType.event_unitAdd) {
             final float n2 = (float) a.b();
             final float n3 = (float) a.c();
             final float float3 = 0.0f;
@@ -115,7 +115,7 @@ public class TriggerExecutor {
             }
             b2 = true;
         }
-        if (a.g == TriggerType.event_changeCredits) {
+        if (a.triggerType == TriggerType.event_changeCredits) {
             final PlayerTeam a3 = a.a();
             if (a3 == null) {
                 a.g("Team not set for changeCredits");
@@ -130,7 +130,7 @@ public class TriggerExecutor {
                 a3.d((float) d2);
             }
             b2 = true;
-        } else if (a.g == TriggerType.event_teamTags) {
+        } else if (a.triggerType == TriggerType.event_teamTags) {
             final PlayerTeam a4 = a.a();
             if (a4 == null) {
                 a.g("Team not set for event_teamTags");
@@ -146,8 +146,8 @@ public class TriggerExecutor {
             }
             b2 = true;
         } else {
-            if (a.g != TriggerType.event_move) {
-                if (a.g == TriggerType.event_unitRemove) {
+            if (a.triggerType != TriggerType.event_move) {
+                if (a.triggerType == TriggerType.event_unitRemove) {
                     final FastArrayList<BaseUnit> list = new FastArrayList();
                     for (final BaseUnit object : BaseUnit.bE) {
                         if (object instanceof OrderableUnit && a.a(object) && a.b(object)) {
@@ -171,17 +171,17 @@ public class TriggerExecutor {
             }
             final String b5 = a.b("target");
             if (b5 == null) {
-                MissionEngine.i("Move trigger has no target id:" + a.a);
+                MissionEngine.i("Move trigger has no target id:" + a.name);
                 return;
             }
             final PointF f2 = f.f(b5);
             if (f2 == null) {
-                MissionEngine.i("Move trigger: Cannot find target for:" + a.a + " target:" + b5);
+                MissionEngine.i("Move trigger: Cannot find target for:" + a.name + " target:" + b5);
                 return;
             }
             final PlayerTeam a7 = a.a();
             if (a7 == null) {
-                MissionEngine.i("Team not set map trigger:" + a.a);
+                MissionEngine.i("Team not set map trigger:" + a.name);
                 return;
             }
             int n4 = 0;

@@ -21,7 +21,8 @@ import java.io.IOException;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/d/i.class */
 public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQueueInterface {
     public static final KoolPaint y = new KoolPaint();
-    FactoryQueueManager z;
+    /* JADX INFO: renamed from: z */
+    FactoryQueueManager queueManager;
     Rect A;
     Rect B;
 
@@ -33,7 +34,7 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
 
     public FactoryWithQueue(boolean z) {
         super(z);
-        this.z = du();
+        this.queueManager = du();
         this.A = new Rect();
         this.B = new Rect();
     }
@@ -42,7 +43,7 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
     // com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
         gameOutputStream.writeInt(this.buildingAnimationState);
-        this.z.a(gameOutputStream);
+        this.queueManager.a(gameOutputStream);
         super.a(gameOutputStream);
     }
 
@@ -52,7 +53,7 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
         if (gameInputStream.getProtocolVersion() >= 69) {
             setBuildingAnimationState(gameInputStream.readInt());
         }
-        this.z.a(gameInputStream);
+        this.queueManager.a(gameInputStream);
         super.a(gameInputStream);
     }
 
@@ -71,12 +72,12 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
 
     public void a(Projectile projectile) {
         float f;
-        if (this.z.b != null) {
+        if (this.queueManager.b != null) {
             f = this.radius * 2.0f;
         } else {
             f = this.radius * 3.0f;
         }
-        BaseUnit baseUnitA = this.z.a(projectile, f, false, 0.0f);
+        BaseUnit baseUnitA = this.queueManager.a(projectile, f, false, 0.0f);
         if (baseUnitA != null) {
             if (baseUnitA.posY - baseUnitA.radius < this.posY + dv()) {
                 baseUnitA.posY = this.posY + dv() + baseUnitA.radius;
@@ -91,48 +92,48 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public int f(boolean z) {
-        return this.z.a(AbstractUnitAction.NONE_ACTION_ID, z, true);
+        return this.queueManager.a(AbstractUnitAction.NONE_ACTION_ID, z, true);
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public final int a(ActionId actionId, boolean z) {
-        return this.z.a(actionId, z);
+        return this.queueManager.a(actionId, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public Projectile dw() {
-        return this.z.b();
+        return this.queueManager.b();
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: bD */
     public UnitPrice getQueuedActionPriceDelta() {
-        return this.z.c();
+        return this.queueManager.c();
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public FastArrayList dx() {
-        return this.z.c;
+        return this.queueManager.c;
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public int h(UnitType unitType) {
-        return this.z.a(unitType);
+        return this.queueManager.a(unitType);
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public boolean dy() {
-        return this.z.a();
+        return this.queueManager.a();
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public void dz() {
-        this.z.e = 1.0f;
+        this.queueManager.e = 1.0f;
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
     public void a(PointF pointF) {
-        this.z.b = pointF;
+        this.queueManager.b = pointF;
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.FactoryQueueInterface
@@ -142,8 +143,8 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public float bV() {
-        if (isAlive() && !this.z.a()) {
-            return this.z.e;
+        if (isAlive() && !this.queueManager.a()) {
+            return this.queueManager.e;
         }
         return super.bV();
     }
@@ -151,24 +152,24 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: e */
     public AbstractUnitAction getUnitAction(UnitType unitType) {
-        return this.z.b(unitType);
+        return this.queueManager.b(unitType);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: a */
     public void performUnitAction(AbstractUnitAction abstractUnitAction, boolean z) {
-        this.z.a(abstractUnitAction, z, (PointF) null, (BaseUnit) null);
+        this.queueManager.a(abstractUnitAction, z, (PointF) null, (BaseUnit) null);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: b */
     public void stopMoving(AbstractUnitAction abstractUnitAction, boolean z) {
-        this.z.a(abstractUnitAction, z);
+        this.queueManager.a(abstractUnitAction, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public void a(AbstractUnitAction abstractUnitAction) {
-        this.z.a(abstractUnitAction);
+        this.queueManager.a(abstractUnitAction);
     }
 
     @Override
@@ -179,7 +180,7 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
         if (!isAlive() || this.isDead) {
             return;
         }
-        this.z.a(f);
+        this.queueManager.a(f);
     }
 
     @Override
@@ -191,7 +192,7 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
     @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit
     public void bv() {
         PlayerTeam.a((BaseUnit) this);
-        this.z.a(true);
+        this.queueManager.a(true);
         super.bv();
     }
 
@@ -200,7 +201,7 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
     /* JADX INFO: renamed from: a */
     public void remove() {
         PlayerTeam.a((BaseUnit) this);
-        this.z.a(true);
+        this.queueManager.a(true);
         super.remove();
     }
 
@@ -233,14 +234,14 @@ public abstract class FactoryWithQueue extends BaseBuilding implements FactoryQu
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: ca */
     public void drawRallyPoint() {
-        if (this.z.b != null) {
+        if (this.queueManager.b != null) {
             final GameEngine instance = GameEngine.getInstance();
-            instance.renderGraphicsEngine.a((float) (int) (this.posX - instance.viewpointXSnapped), (float) (int) (this.posY - instance.viewpointYSnapped), (float) (int) (this.z.b.x - instance.viewpointXSnapped), (float) (int) (this.z.b.y - instance.viewpointYSnapped), FactoryWithQueue.y);
+            instance.renderGraphicsEngine.a((float) (int) (this.posX - instance.viewpointXSnapped), (float) (int) (this.posY - instance.viewpointYSnapped), (float) (int) (this.queueManager.b.x - instance.viewpointXSnapped), (float) (int) (this.queueManager.b.y - instance.viewpointYSnapped), FactoryWithQueue.y);
         }
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public int a(AnimationTag animationTag) {
-        return this.z.a(animationTag);
+        return this.queueManager.a(animationTag);
     }
 }

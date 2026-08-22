@@ -34,20 +34,34 @@ import java.util.Iterator;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/n/f.class */
 public class MissionEngine extends Serializable {
     public static boolean a = false;
-    int b;
-    int c;
-    PlayerTeam d;
-    WaveSpawnMode e;
-    public LocaleString h;
-    boolean i;
-    boolean j;
-    public boolean k;
-    public boolean l;
-    boolean m;
-    boolean n;
-    boolean o;
-    boolean p;
-    public boolean q;
+    /* JADX INFO: renamed from: b */
+    int lastSaveTime;
+    /* JADX INFO: renamed from: c */
+    int lastAutosaveTime;
+    /* JADX INFO: renamed from: d */
+    PlayerTeam team3;
+    /* JADX INFO: renamed from: e */
+    WaveSpawnMode waveSpawnMode;
+    /* JADX INFO: renamed from: h */
+    public LocaleString introText;
+    /* JADX INFO: renamed from: i */
+    boolean hasMapText;
+    /* JADX INFO: renamed from: j */
+    boolean showIntro;
+    /* JADX INFO: renamed from: k */
+    public boolean isSurvival;
+    /* JADX INFO: renamed from: l */
+    public boolean survivalWavesClassic;
+    /* JADX INFO: renamed from: m */
+    boolean isDefeatWave;
+    /* JADX INFO: renamed from: n */
+    boolean isSkirmish;
+    /* JADX INFO: renamed from: o */
+    boolean shareFogWithAllies;
+    /* JADX INFO: renamed from: p */
+    boolean isTutorial;
+    /* JADX INFO: renamed from: q */
+    public boolean hasCameraStartMarker;
     public KoolPaint E;
     public KoolPaint F;
     public KoolPaint G;
@@ -90,7 +104,7 @@ public class MissionEngine extends Serializable {
 
     @Override // com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
-        gameOutputStream.writeBoolean(this.j);
+        gameOutputStream.writeBoolean(this.showIntro);
         gameOutputStream.writeInt(this.r);
         gameOutputStream.writeInt(this.u);
         gameOutputStream.writeInt(this.v);
@@ -99,22 +113,22 @@ public class MissionEngine extends Serializable {
         gameOutputStream.writeFloat(this.z);
         gameOutputStream.writeFloat(this.A);
         gameOutputStream.writeFloat(this.B);
-        gameOutputStream.writeBoolean(this.m);
+        gameOutputStream.writeBoolean(this.isDefeatWave);
         boolean hasAreaControlMode = this.areaControlMode != null && this.areaControlMode.getZoneCount() > 0;
         boolean hasMapPortalMode = this.mapPortalMode != null && this.mapPortalMode.getPortalCount() > 0;
         int missionStateVersion = (hasAreaControlMode || hasMapPortalMode) ? 8 : 6;
         gameOutputStream.writeInt(missionStateVersion);
         gameOutputStream.writeInt(this.J.size());
         for (MapTrigger mapTrigger : this.J) {
-            gameOutputStream.writeStringUTF(mapTrigger.c);
-            gameOutputStream.writeBoolean(mapTrigger.j);
-            gameOutputStream.writeInt(mapTrigger.k);
+            gameOutputStream.writeStringUTF(mapTrigger.uniqueId);
+            gameOutputStream.writeBoolean(mapTrigger.isActive);
+            gameOutputStream.writeInt(mapTrigger.activationTime);
             gameOutputStream.writeInt(mapTrigger.l);
-            gameOutputStream.writeBoolean(mapTrigger.m);
+            gameOutputStream.writeBoolean(mapTrigger.hasCompleted);
             gameOutputStream.writeInt(mapTrigger.n);
         }
         gameOutputStream.writeInt(this.y);
-        gameOutputStream.writeBoolean(this.l);
+        gameOutputStream.writeBoolean(this.survivalWavesClassic);
         if (missionStateVersion >= 7) {
             gameOutputStream.writeBoolean(hasAreaControlMode);
             if (hasAreaControlMode) {
@@ -134,7 +148,7 @@ public class MissionEngine extends Serializable {
     }
 
     public void a(GameInputStream gameInputStream) throws IOException {
-        this.j = gameInputStream.readBoolean();
+        this.showIntro = gameInputStream.readBoolean();
         this.r = gameInputStream.readInt();
         this.u = gameInputStream.readInt();
         this.v = gameInputStream.readInt();
@@ -143,7 +157,7 @@ public class MissionEngine extends Serializable {
         this.z = gameInputStream.readFloat();
         this.A = gameInputStream.readFloat();
         this.B = gameInputStream.readFloat();
-        this.m = gameInputStream.readBoolean();
+        this.isDefeatWave = gameInputStream.readBoolean();
         int i = gameInputStream.readInt();
         if (i >= 1) {
             int i2 = gameInputStream.readInt();
@@ -168,10 +182,10 @@ public class MissionEngine extends Serializable {
                 if (mapTriggerE == null) {
                     GameEngine.logColored("MissionEngine:readIn: Could not find saved trigger:" + utf + " for de/activation");
                 } else {
-                    mapTriggerE.j = z;
-                    mapTriggerE.k = i4;
+                    mapTriggerE.isActive = z;
+                    mapTriggerE.activationTime = i4;
                     mapTriggerE.l = i5;
-                    mapTriggerE.m = z2;
+                    mapTriggerE.hasCompleted = z2;
                     mapTriggerE.n = i6;
                 }
             }
@@ -180,9 +194,9 @@ public class MissionEngine extends Serializable {
             this.y = gameInputStream.readInt();
         }
         if (i >= 6) {
-            this.l = gameInputStream.readBoolean();
+            this.survivalWavesClassic = gameInputStream.readBoolean();
         } else {
-            this.l = true;
+            this.survivalWavesClassic = true;
         }
         if (i >= 7) {
             boolean hasAreaControlMode = gameInputStream.readBoolean();
@@ -211,11 +225,11 @@ public class MissionEngine extends Serializable {
     }
 
     public boolean a() {
-        return this.n;
+        return this.isSkirmish;
     }
 
     public boolean b() {
-        return this.o;
+        return this.shareFogWithAllies;
     }
 
     private static boolean isMapModeAllowed(GameEngine gameEngine) {
@@ -227,17 +241,17 @@ public class MissionEngine extends Serializable {
 
     public void c() {
         for (MapTrigger mapTrigger : this.J) {
-            if (mapTrigger.g == TriggerType.objective) {
+            if (mapTrigger.triggerType == TriggerType.objective) {
                 boolean z = false;
                 Iterator it = this.g.iterator();
                 while (it.hasNext()) {
-                    if (((TriggerWrapper) it.next()).a == mapTrigger) {
+                    if (((TriggerWrapper) it.next()).trigger == mapTrigger) {
                         z = true;
                     }
                 }
                 if (!z) {
                     TriggerWrapper triggerWrapper = new TriggerWrapper();
-                    triggerWrapper.a = mapTrigger;
+                    triggerWrapper.trigger = mapTrigger;
                     this.g.add(triggerWrapper);
                     GameEngine.log("Found objective: " + triggerWrapper.a());
                 }
@@ -254,7 +268,7 @@ public class MissionEngine extends Serializable {
     public MapTrigger d(String str) {
         String strTrim = str.trim();
         for (MapTrigger mapTrigger : this.J) {
-            if (mapTrigger.b != null && mapTrigger.b.equalsIgnoreCase(strTrim)) {
+            if (mapTrigger.rawId != null && mapTrigger.rawId.equalsIgnoreCase(strTrim)) {
                 return mapTrigger;
             }
         }
@@ -264,7 +278,7 @@ public class MissionEngine extends Serializable {
     public MapTrigger e(String str) {
         String strTrim = str.trim();
         for (MapTrigger mapTrigger : this.J) {
-            if (mapTrigger.c.equalsIgnoreCase(strTrim)) {
+            if (mapTrigger.uniqueId.equalsIgnoreCase(strTrim)) {
                 return mapTrigger;
             }
         }
@@ -324,9 +338,9 @@ public class MissionEngine extends Serializable {
         this.areaControlMode = null;
         this.mapPortalMode = null;
         this.areaControlEditorModified = false;
-        this.q = false;
-        this.b = instance.gameTimeMillis - 1000;
-        this.c = instance.gameTimeMillis - 1000;
+        this.hasCameraStartMarker = false;
+        this.lastSaveTime = instance.gameTimeMillis - 1000;
+        this.lastAutosaveTime = instance.gameTimeMillis - 1000;
         (this.E = new KoolPaint()).a(255, 255, 255, 255);
         this.E.a(true);
         this.E.a(KoolPaint.Align.CENTER);
@@ -342,7 +356,7 @@ public class MissionEngine extends Serializable {
         instance.updatePaintTextSize(this.H, 14.0f);
         (this.F = new KoolPaint()).a(this.H);
         instance.updatePaintTextSize(this.F, 18.0f);
-        this.j = true;
+        this.showIntro = true;
         boolean b = false;
         MapObject objectByName = null;
         if (instance.tileMap.objectsLayer == null) {
@@ -361,8 +375,8 @@ public class MissionEngine extends Serializable {
         }
         if (b) {
             GameEngine.log("MissionEngine", "Defaulting to skirmish");
-            this.n = true;
-            this.e = WaveSpawnMode.noConstructionOrTech;
+            this.isSkirmish = true;
+            this.waveSpawnMode = WaveSpawnMode.noConstructionOrTech;
             return;
         }
         final String mapMode = AreaControlMode.readMode(objectByName);
@@ -373,16 +387,16 @@ public class MissionEngine extends Serializable {
         if (areaControlMap && !isMapModeAllowed(instance)) {
             throw new MapLoadException("Area control maps can be used in single-player or P2P multiplayer only");
         }
-        this.k = "survival".equalsIgnoreCase(objectByName.getDescription("type"));
-        if (this.k) {
-            this.l = "true".equalsIgnoreCase(objectByName.getDescription("survivalWavesClassic"));
-            if (this.l) {
+        this.isSurvival = "survival".equalsIgnoreCase(objectByName.getDescription("type"));
+        if (this.isSurvival) {
+            this.survivalWavesClassic = "true".equalsIgnoreCase(objectByName.getDescription("survivalWavesClassic"));
+            if (this.survivalWavesClassic) {
                 GameEngine.log("Classic survial waves selected");
             }
             this.f();
-            this.p = false;
+            this.isTutorial = false;
             this.y = instance.settingsEngine.aiDifficulty;
-            if (!this.l) {
+            if (!this.survivalWavesClassic) {
                 this.z = 1200.0f;
                 if (this.y < 0) {
                     this.z = 3000.0f;
@@ -399,53 +413,53 @@ public class MissionEngine extends Serializable {
         if (description2 != null) {
             instance.musicManager.playMusic(description2);
         }
-        this.n = "skirmish".equalsIgnoreCase(objectByName.getDescription("type"));
-        if (this.n) {
-            this.e = WaveSpawnMode.noConstructionOrTech;
+        this.isSkirmish = "skirmish".equalsIgnoreCase(objectByName.getDescription("type"));
+        if (this.isSkirmish) {
+            this.waveSpawnMode = WaveSpawnMode.noConstructionOrTech;
         }
-        this.o = "true".equalsIgnoreCase(objectByName.getDescription("shareFogWithAllies"));
+        this.shareFogWithAllies = "true".equalsIgnoreCase(objectByName.getDescription("shareFogWithAllies"));
         final String description3 = objectByName.getDescription("winCondition");
-        if (description3 == null && !this.n && !areaControlMap) {
+        if (description3 == null && !this.isSkirmish && !areaControlMap) {
             throw new MapLoadException("win condition not set");
         }
         if (description3 != null) {
             if (description3.equalsIgnoreCase("none")) {
-                this.e = WaveSpawnMode.none;
+                this.waveSpawnMode = WaveSpawnMode.none;
             } else if (description3.equalsIgnoreCase("allUnitsAndBuildings")) {
-                this.e = WaveSpawnMode.allUnitsAndBuildings;
+                this.waveSpawnMode = WaveSpawnMode.allUnitsAndBuildings;
             } else if (description3.equalsIgnoreCase("allBuildings")) {
-                this.e = WaveSpawnMode.allBuildings;
+                this.waveSpawnMode = WaveSpawnMode.allBuildings;
             } else if (description3.equalsIgnoreCase("mainBuilings")) {
-                this.e = WaveSpawnMode.mainBuildings;
+                this.waveSpawnMode = WaveSpawnMode.mainBuildings;
             } else if (description3.equalsIgnoreCase("mainBuildings")) {
-                this.e = WaveSpawnMode.mainBuildings;
+                this.waveSpawnMode = WaveSpawnMode.mainBuildings;
             } else if (description3.equalsIgnoreCase("commandCenter")) {
-                this.e = WaveSpawnMode.commandCenter;
+                this.waveSpawnMode = WaveSpawnMode.commandCenter;
             } else {
                 if (!description3.equalsIgnoreCase("requiredObjectives")) {
                     throw new MapLoadException("unknown win condition:" + description3);
                 }
-                this.e = WaveSpawnMode.requiredObjectives;
+                this.waveSpawnMode = WaveSpawnMode.requiredObjectives;
             }
         }
-        if (this.n) {
-            this.f = this.e;
+        if (this.isSkirmish) {
+            this.f = this.waveSpawnMode;
         }
         if (areaControlMap) {
-            this.e = WaveSpawnMode.none;
+            this.waveSpawnMode = WaveSpawnMode.none;
             this.f = WaveSpawnMode.none;
         }
-        this.h = objectByName.createLocaleStringFromProperty("introText", null);
-        if (this.h != null) {
-            this.h.replaceAll("\\\\n", "\n");
-            if (this.h.isEmpty()) {
-                this.h = null;
+        this.introText = objectByName.createLocaleStringFromProperty("introText", null);
+        if (this.introText != null) {
+            this.introText.replaceAll("\\\\n", "\n");
+            if (this.introText.isEmpty()) {
+                this.introText = null;
             }
         }
-        if (!instance.isInNetworkOrReplay() && !this.n) {
-            this.d = PlayerTeam.k(3);
-            if (this.d != null) {
-                this.d.teamColorId = 0;
+        if (!instance.isInNetworkOrReplay() && !this.isSkirmish) {
+            this.team3 = PlayerTeam.k(3);
+            if (this.team3 != null) {
+                this.team3.teamColorId = 0;
             }
         }
         if (instance.isInNetworkOrReplay()) {
@@ -492,7 +506,7 @@ public class MissionEngine extends Serializable {
             }
             if ("camera_start".equalsIgnoreCase(mapObject.name) && !boolean1) {
                 instance.centerViewpoint(mapObject.x, mapObject.y);
-                this.q = true;
+                this.hasCameraStartMarker = true;
                 final Integer integerProperty2 = mapObject.getIntegerProperty("zoomTo");
                 if (integerProperty2 != null) {
                     instance.targetZoom = integerProperty2;
@@ -597,8 +611,8 @@ public class MissionEngine extends Serializable {
                         a3.g("linkedTo target not found: " + s);
                         GameEngine.log("Possible IDs:");
                         for (final MapTrigger mapTrigger : this.J) {
-                            if (mapTrigger.b != null) {
-                                GameEngine.log(mapTrigger.b);
+                            if (mapTrigger.rawId != null) {
+                                GameEngine.log(mapTrigger.rawId);
                             }
                         }
                         GameEngine.log("--------");
@@ -635,7 +649,7 @@ public class MissionEngine extends Serializable {
         }
         GameEngine.log("Found " + this.J.size() + " map triggers");
         for (final MapTrigger mapTrigger2 : this.J) {
-            final String[] unvisitedPropertyNames = mapTrigger2.t.getUnvisitedPropertyNames();
+            final String[] unvisitedPropertyNames = mapTrigger2.mapObject.getUnvisitedPropertyNames();
             for (int unitSelected = unvisitedPropertyNames.length, l = 0; l < unitSelected; ++l) {
                 mapTrigger2.g("Key was not used: " + unvisitedPropertyNames[l]);
             }
@@ -929,24 +943,24 @@ public class MissionEngine extends Serializable {
 
     public void b(final float float1) {
         final GameEngine instance = GameEngine.getInstance();
-        if (this.i) {
+        if (this.hasMapText) {
             for (final MapTrigger mapTrigger : this.J) {
-                if (mapTrigger.g == TriggerType.mapText && mapTrigger.j) {
+                if (mapTrigger.triggerType == TriggerType.mapText && mapTrigger.isActive) {
                     float n = mapTrigger.b() - instance.viewpointXSnapped;
                     float n2 = mapTrigger.c() - instance.viewpointYSnapped;
                     n *= instance.zoom;
                     n2 *= instance.zoom;
-                    n += mapTrigger.w;
-                    n2 += mapTrigger.x;
+                    n += mapTrigger.textOffsetX;
+                    n2 += mapTrigger.textOffsetY;
                     if (mapTrigger.C) {
                         final SpriteSheet spriteSheet = EffectManager.effectTemplates[9];
                         spriteSheet.drawSprite(2, n, n2, mapTrigger.B);
                         n2 -= spriteSheet.c - 2;
                     }
-                    if (mapTrigger.z == null) {
+                    if (mapTrigger.text == null) {
                         continue;
                     }
-                    final String resolveText = mapTrigger.z.resolveText();
+                    final String resolveText = mapTrigger.text.resolveText();
                     if (resolveText == null) {
                         continue;
                     }
@@ -963,7 +977,7 @@ public class MissionEngine extends Serializable {
         if (this.mapPortalMode != null) {
             this.mapPortalMode.draw(this.H);
         }
-        if (this.k && !this.N) {
+        if (this.isSurvival && !this.N) {
             final boolean b = true;
             boolean b2 = false;
             this.B = Utility.moveTowardsZero(this.B, float1);
@@ -981,13 +995,13 @@ public class MissionEngine extends Serializable {
                 } else {
                     final int n3 = (int) (23.0f + this.G.k() / 2.0f);
                     String string = "Wave " + (this.r + 1) + " in " + Utility.padRight(String.valueOf((int) (this.z / 60.0)), 3);
-                    if (this.m) {
+                    if (this.isDefeatWave) {
                         string = "Defeat - Wave " + this.r;
                     }
                     instance.renderGraphicsEngine.a(string, instance.currentScreenWidthPixels / 2.0f, (float) n3, this.G);
                     if (this.t == null) {
                         WaveUnitGroup waveunits;
-                        if (!this.l) {
+                        if (!this.survivalWavesClassic) {
                             waveunits = this.b(false);
                         } else {
                             waveunits = this.c(false);
@@ -998,17 +1012,17 @@ public class MissionEngine extends Serializable {
                 }
             }
         }
-        if (this.k && this.N) {
+        if (this.isSurvival && this.N) {
             final MissionWave d = this.d();
             if (d != null) {
                 final int n4 = d.e - instance.gameTimeMillis / 1000;
                 final int n3 = (int) (23.0f + this.G.k() / 2.0f);
                 String string2 = "Wave " + (this.r + 1) + " in " + Utility.padRight(String.valueOf(n4), 3);
-                if (this.m) {
+                if (this.isDefeatWave) {
                     string2 = "Defeat - Wave " + this.r;
                 }
                 instance.renderGraphicsEngine.a(string2, instance.currentScreenWidthPixels / 2.0f, (float) n3, this.G);
-                final String f = d.f;
+                final String f = d.messageText;
                 if (f != null) {
                     instance.renderGraphicsEngine.a(f, instance.currentScreenWidthPixels / 2.0f, n3 + this.G.k() + 2.0f, this.H);
                 }
@@ -1024,8 +1038,8 @@ public class MissionEngine extends Serializable {
         for (String str2 : str.split("\n")) {
             i2++;
             MissionWave waveVar = new MissionWave(this);
-            if (waveVar.a(str2)) {
-                waveVar.e = i + ((int) waveVar.d);
+            if (waveVar.waveGroups(str2)) {
+                waveVar.e = i + ((int) waveVar.timeSeconds);
                 i = waveVar.e;
                 GameEngine.log("Adding wave " + i2 + " at " + waveVar.e);
                 this.O.add(waveVar);
@@ -1076,8 +1090,8 @@ public class MissionEngine extends Serializable {
             unitType = unitTypeC;
         }
         WaveUnitSpawner waveUnitSpawner = new WaveUnitSpawner(this);
-        waveUnitSpawner.a = unitType;
-        waveUnitSpawner.b = f;
+        waveUnitSpawner.unitType = unitType;
+        waveUnitSpawner.difficultyMultiplier = f;
         arrayList.add(waveUnitSpawner);
     }
 
@@ -1091,11 +1105,11 @@ public class MissionEngine extends Serializable {
             return;
         }
         WaveUnitSpawner waveUnitSpawner = (WaveUnitSpawner) this.S.get(i % size);
-        int waveUnitCount = (int) Utility.pow((int) (((double) (i + 3)) * 0.5d * ((double) waveUnitSpawner.b) * ((double) f)), 0.8f);
+        int waveUnitCount = (int) Utility.pow((int) (((double) (i + 3)) * 0.5d * ((double) waveUnitSpawner.difficultyMultiplier) * ((double) f)), 0.8f);
         if (waveUnitCount < 1) {
             waveUnitCount = 1;
         }
-        waveunitsVar.b(waveUnitSpawner.a, waveUnitCount);
+        waveunitsVar.b(waveUnitSpawner.unitType, waveUnitCount);
     }
 
     public WaveUnitGroup b(boolean z) {
@@ -1108,11 +1122,11 @@ public class MissionEngine extends Serializable {
                 GameEngine.logColored("error maxTypeNum: " + size);
             } else {
                 WaveUnitSpawner waveUnitSpawner = (WaveUnitSpawner) this.T.get(i % size);
-                int i2 = (int) (i * waveUnitSpawner.b);
+                int i2 = (int) (i * waveUnitSpawner.difficultyMultiplier);
                 if (i2 < 1) {
                     i2 = 1;
                 }
-                waveunitsVar.b(waveUnitSpawner.a, i2);
+                waveunitsVar.b(waveUnitSpawner.unitType, i2);
             }
             z2 = true;
         }
@@ -1133,10 +1147,10 @@ public class MissionEngine extends Serializable {
 
     public WaveUnitGroup c(boolean z) {
         WaveUnitGroup waveunitsVar = new WaveUnitGroup(this);
-        waveunitsVar.a = false;
+        waveunitsVar.isBossWave = false;
         int i = this.v;
         UnitTypeEnum unitTypeEnum = null;
-        if (this.p) {
+        if (this.isTutorial) {
             unitTypeEnum = UnitTypeEnum.ladybug;
         } else {
             if (this.u == 0) {
@@ -1161,7 +1175,7 @@ public class MissionEngine extends Serializable {
                 }
             }
             if (this.u == 5) {
-                waveunitsVar.a = true;
+                waveunitsVar.isBossWave = true;
                 i = 1;
                 unitTypeEnum = UnitTypeEnum.experimentalTank;
             }
@@ -1239,16 +1253,16 @@ public class MissionEngine extends Serializable {
                 gameEngine.clampCameraPosition();
             }
         }
-        if (this.k) {
+        if (this.isSurvival) {
             if (!this.N) {
-                if (!this.m) {
+                if (!this.isDefeatWave) {
                     this.z = Utility.moveTowardsZero(this.z, f);
                 }
-                if (this.z == 0.0f && !this.m) {
+                if (this.z == 0.0f && !this.isDefeatWave) {
                     this.r++;
                     this.A = 180.0f;
                     PointF pointF = (PointF) this.D.get(Utility.getDeterministicRandomIntInRange(0, this.D.size() - 1, this.r));
-                    if (!this.l) {
+                    if (!this.survivalWavesClassic) {
                         this.s = b(false).toString();
                         waveunitsVarC = b(true);
                     } else {
@@ -1256,7 +1270,7 @@ public class MissionEngine extends Serializable {
                         waveunitsVarC = c(true);
                     }
                     this.z = 1800.0f;
-                    if (!this.l) {
+                    if (!this.survivalWavesClassic) {
                         if (this.y > 0) {
                             this.z -= (this.y * 3) * 60;
                         } else {
@@ -1266,7 +1280,7 @@ public class MissionEngine extends Serializable {
                     waveunitsVarC.a(pointF.x, pointF.y);
                     this.t = null;
                 }
-            } else if (!this.m) {
+            } else if (!this.isDefeatWave) {
                 MissionWave waveVarD = d();
                 if (waveVarD != null) {
                     if (waveVarD.e * 1000 < gameEngine.gameTimeMillis) {
@@ -1278,10 +1292,10 @@ public class MissionEngine extends Serializable {
                 }
             }
         }
-        if (this.j) {
-            this.j = false;
-            if (this.h != null) {
-                gameEngine.showMessageBox("Briefing", this.h);
+        if (this.showIntro) {
+            this.showIntro = false;
+            if (this.introText != null) {
+                gameEngine.showMessageBox("Briefing", this.introText);
             }
         }
         if (this.areaControlMode != null) {
@@ -1290,12 +1304,12 @@ public class MissionEngine extends Serializable {
         if (this.mapPortalMode != null) {
             this.mapPortalMode.update(f);
         }
-        if (i > this.b + 250) {
-            this.b = i;
+        if (i > this.lastSaveTime + 250) {
+            this.lastSaveTime = i;
             a(i);
         }
-        if (i > this.c + 1000) {
-            this.c = i;
+        if (i > this.lastAutosaveTime + 1000) {
+            this.lastAutosaveTime = i;
             if (h()) {
                 h();
                 h();
@@ -1311,9 +1325,9 @@ public class MissionEngine extends Serializable {
             if (!gameEngine.hasWonGame && !gameEngine.hasLostGame && !gameEngine.replayEngine.j() && !z && this.areaControlMode == null) {
                 boolean z2 = true;
                 boolean z3 = true;
-                if (this.e == WaveSpawnMode.none) {
+                if (this.waveSpawnMode == WaveSpawnMode.none) {
                     z2 = false;
-                } else if (this.e == WaveSpawnMode.requiredObjectives) {
+                } else if (this.waveSpawnMode == WaveSpawnMode.requiredObjectives) {
                     Iterator it = this.g.iterator();
                     while (it.hasNext()) {
                         if (!((TriggerWrapper) it.next()).b()) {
@@ -1327,7 +1341,7 @@ public class MissionEngine extends Serializable {
                             break;
                         }
                         BaseUnit baseUnit = (BaseUnit) it2.next();
-                        if (gameEngine.playerTeam.c(baseUnit.team) && a(this.e, baseUnit)) {
+                        if (gameEngine.playerTeam.c(baseUnit.team) && a(this.waveSpawnMode, baseUnit)) {
                             z2 = false;
                             break;
                         }
@@ -1359,7 +1373,7 @@ public class MissionEngine extends Serializable {
                     }
                 }
             }
-            if (this.areaControlMode == null && this.k && !this.m) {
+            if (this.areaControlMode == null && this.isSurvival && !this.isDefeatWave) {
                 boolean z4 = true;
                 for (BaseUnit baseUnit3 : BaseUnit.bE) {
                     if ((baseUnit3 instanceof CommandCenter) || baseUnit3.isTargetable) {
@@ -1369,7 +1383,7 @@ public class MissionEngine extends Serializable {
                     }
                 }
                 if (z4) {
-                    this.m = true;
+                    this.isDefeatWave = true;
                     gameEngine.gameUI.endGameSequence();
                 }
             }
@@ -1410,7 +1424,7 @@ public class MissionEngine extends Serializable {
 
     public void a(MapTrigger mapTrigger) {
         if (g()) {
-            h("Activiated trigger:" + mapTrigger.a + " (id:" + mapTrigger.b + ")");
+            h("Activiated trigger:" + mapTrigger.name + " (id:" + mapTrigger.rawId + ")");
         }
     }
 
@@ -1452,19 +1466,19 @@ public class MissionEngine extends Serializable {
 
     public void a(int i) {
         for (MapTrigger mapTrigger : this.J) {
-            if (mapTrigger.j && mapTrigger.q != -1 && i >= mapTrigger.k + mapTrigger.q) {
-                mapTrigger.j = false;
+            if (mapTrigger.isActive && mapTrigger.q != -1 && i >= mapTrigger.activationTime + mapTrigger.q) {
+                mapTrigger.isActive = false;
                 mapTrigger.u = false;
             }
-            if (!mapTrigger.j && !mapTrigger.u && mapTrigger.d()) {
+            if (!mapTrigger.isActive && !mapTrigger.u && mapTrigger.d()) {
                 mapTrigger.u = true;
             }
-            if ((mapTrigger.j || mapTrigger.u) && mapTrigger.e.b()) {
-                mapTrigger.j = false;
+            if ((mapTrigger.isActive || mapTrigger.u) && mapTrigger.e.b()) {
+                mapTrigger.isActive = false;
                 mapTrigger.u = false;
-                mapTrigger.m = true;
+                mapTrigger.hasCompleted = true;
             }
-            if (mapTrigger.j && mapTrigger.p > 0 && i >= mapTrigger.k + mapTrigger.p) {
+            if (mapTrigger.isActive && mapTrigger.repeatDelay > 0 && i >= mapTrigger.activationTime + mapTrigger.repeatDelay) {
                 mapTrigger.u = true;
             }
             if (mapTrigger.u) {

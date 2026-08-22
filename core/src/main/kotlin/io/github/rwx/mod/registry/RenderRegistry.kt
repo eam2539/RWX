@@ -171,8 +171,8 @@ object RenderRegistry : OwnedRegistry {
                 failures.runSafelyOncePerId("pre-fire:$rendererId") {
                     renderer.render(
                         PreFireRenderContext(
-                            startX = muzzle.a - gameEngine.viewpointXSnapped,
-                            startY = muzzle.b - unit.posZ - muzzle.c - gameEngine.viewpointYSnapped,
+                            startX = muzzle.x - gameEngine.viewpointXSnapped,
+                            startY = muzzle.y - unit.posZ - muzzle.z - gameEngine.viewpointYSnapped,
                             endX = target.posX - gameEngine.viewpointXSnapped,
                             endY = target.posY - target.posZ - gameEngine.viewpointYSnapped,
                             ageTicks = age.coerceIn(0f, turret.preFireDuration),
@@ -222,13 +222,13 @@ object RenderRegistry : OwnedRegistry {
                 failures.runSafelyOncePerId("post-fire:$rendererId") {
                     renderer.render(
                         PostFireRenderContext(
-                            startX = muzzle.a - gameEngine.viewpointXSnapped,
-                            startY = muzzle.b - unit.posZ - muzzle.c - gameEngine.viewpointYSnapped,
+                            startX = muzzle.x - gameEngine.viewpointXSnapped,
+                            startY = muzzle.y - unit.posZ - muzzle.z - gameEngine.viewpointYSnapped,
                             // No recorded aim point means the turret fired without ever
                             // holding a target; collapse the vector onto the muzzle rather
                             // than inventing a direction.
-                            endX = (aim?.x ?: muzzle.a) - gameEngine.viewpointXSnapped,
-                            endY = (aim?.let { it.y - it.z } ?: muzzle.b) - gameEngine.viewpointYSnapped,
+                            endX = (aim?.x ?: muzzle.x) - gameEngine.viewpointXSnapped,
+                            endY = (aim?.let { it.y - it.z } ?: muzzle.y) - gameEngine.viewpointYSnapped,
                             ageTicks = age.coerceIn(0f, turret.postFireDuration),
                             remainingTicks = (turret.postFireDuration - age).coerceAtLeast(0f),
                             durationTicks = turret.postFireDuration,

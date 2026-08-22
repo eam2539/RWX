@@ -51,8 +51,8 @@ public final class PathSolver implements Runnable {
             throw new RuntimeException("setupNewPath: last path not yet finished");
         }
         this.s = false;
-        a(path.o, path);
-        path.v = true;
+        a(path.movementType, path);
+        path.isSolved = true;
         this.D = path;
     }
 
@@ -272,13 +272,13 @@ public final class PathSolver implements Runnable {
         short s2 = (short) this.h;
         int n8 = this.g;
         this.y = GameEngine.getCurrentTimeMillis();
-        short s3 = path.h;
-        short s4 = path.i;
+        short s3 = path.startTileX;
+        short s4 = path.startTileY;
         boolean bl = path.k;
         this.d();
-        this.a(path.o, path.h, path.i, path.j);
-        int n9 = path.l;
-        int n10 = path.m;
+        this.a(path.movementType, path.startTileX, path.startTileY, path.j);
+        int n9 = path.endTileX;
+        int n10 = path.endTileY;
         short s5 = path.n;
         LinkedList linkedList = new LinkedList();
         if (s3 == n9 && s4 == n10) {
@@ -452,13 +452,13 @@ public final class PathSolver implements Runnable {
             n = pathPoint3.d(this, by2) ? 1 : 0;
             s = 0;
             if (n5 == 0) {
-                if (pathPoint3.a == n12 && pathPoint3.b == n13) {
+                if (pathPoint3.tileX == n12 && pathPoint3.tileY == n13) {
                     if (PathEngine.a) {
                         Log.d("RustedWarfare", "Over goal: fakeEnd");
                     }
                     s = 1;
                 }
-                if (Utility.abs(pathPoint3.a - n9) <= s5 && Utility.abs(pathPoint3.b - n10) <= s5) {
+                if (Utility.abs(pathPoint3.tileX - n9) <= s5 && Utility.abs(pathPoint3.tileY - n10) <= s5) {
                     if (PathEngine.a) {
                         Log.d("RustedWarfare", "Over goal: real end");
                     }
@@ -471,15 +471,15 @@ public final class PathSolver implements Runnable {
                     if (PathEngine.a) {
                         Log.d("RustedWarfare", "Not closedOnOtherSide");
                     }
-                    n4 = pathPoint2.a;
-                    s8 = pathPoint2.b;
+                    n4 = pathPoint2.tileX;
+                    s8 = pathPoint2.tileY;
                     bl2 = true;
                     break;
                 }
                 PathPoint pathPoint4 = pathPoint.f(this, by2);
                 if (pathPoint4 == null) {
                     Log.d("RustedWarfare", "findPath: otherConnection==null");
-                    Log.d("RustedWarfare", "currentNode:" + pathPoint2.a + "," + pathPoint2.b);
+                    Log.d("RustedWarfare", "currentNode:" + pathPoint2.tileX + "," + pathPoint2.tileY);
                     Log.d("RustedWarfare", "currentNode cost normal:" + pathPoint2.a(this, (byte) 0));
                     Log.d("RustedWarfare", "currentNode cost opposite:" + pathPoint2.a(this, (byte) 1));
                     linkedList.clear();
@@ -489,18 +489,18 @@ public final class PathSolver implements Runnable {
                     if (PathEngine.a) {
                         Log.d("RustedWarfare", "closing path runFromOppositeSide=false");
                     }
-                    s9 = pathPoint2.a;
-                    s10 = pathPoint2.b;
-                    n4 = pathPoint4.a;
-                    s8 = pathPoint4.b;
+                    s9 = pathPoint2.tileX;
+                    s10 = pathPoint2.tileY;
+                    n4 = pathPoint4.tileX;
+                    s8 = pathPoint4.tileY;
                 } else {
                     if (PathEngine.a) {
                         Log.d("RustedWarfare", "closing path runFromOppositeSide=true");
                     }
-                    s9 = pathPoint4.a;
-                    s10 = pathPoint4.b;
-                    n4 = pathPoint2.a;
-                    s8 = pathPoint2.b;
+                    s9 = pathPoint4.tileX;
+                    s10 = pathPoint4.tileY;
+                    n4 = pathPoint2.tileX;
+                    s8 = pathPoint2.tileY;
                 }
                 bl2 = true;
                 break;
@@ -513,7 +513,7 @@ public final class PathSolver implements Runnable {
                 by5 = 7;
             } else {
                 by = 2;
-                if (this.f != null && this.f[pathPoint3.a * s2 + pathPoint3.b] > 1) {
+                if (this.f != null && this.f[pathPoint3.tileX * s2 + pathPoint3.tileY] > 1) {
                     by = 1;
                 }
                 by4 = (byte) (by3 - by);
@@ -532,39 +532,40 @@ public final class PathSolver implements Runnable {
                     by7 = (byte) (by7 + 8);
                 }
                 if (by7 == 0) {
-                    pathPoint.a = (short) (pathPoint.a + 1);
+                    pathPoint.tileX = (short) (pathPoint.tileX + 1);
                 }
                 if (by7 == 1) {
-                    pathPoint.a = (short) (pathPoint.a + 1);
-                    pathPoint.b = (short) (pathPoint.b + 1);
+                    pathPoint.tileX = (short) (pathPoint.tileX + 1);
+                    pathPoint.tileY = (short) (pathPoint.tileY + 1);
                 }
                 if (by7 == 2) {
-                    pathPoint.b = (short) (pathPoint.b + 1);
+                    pathPoint.tileY = (short) (pathPoint.tileY + 1);
                 }
                 if (by7 == 3) {
-                    pathPoint.b = (short) (pathPoint.b + 1);
-                    pathPoint.a = (short) (pathPoint.a - 1);
+                    pathPoint.tileY = (short) (pathPoint.tileY + 1);
+                    pathPoint.tileX = (short) (pathPoint.tileX - 1);
                 }
                 if (by7 == 4) {
-                    pathPoint.a = (short) (pathPoint.a - 1);
+                    pathPoint.tileX = (short) (pathPoint.tileX - 1);
                 }
                 if (by7 == 5) {
-                    pathPoint.a = (short) (pathPoint.a - 1);
-                    pathPoint.b = (short) (pathPoint.b - 1);
+                    pathPoint.tileX = (short) (pathPoint.tileX - 1);
+                    pathPoint.tileY = (short) (pathPoint.tileY - 1);
                 }
                 if (by7 == 6) {
-                    pathPoint.b = (short) (pathPoint.b - 1);
+                    pathPoint.tileY = (short) (pathPoint.tileY - 1);
                 }
                 if (by7 == 7) {
-                    pathPoint.b = (short) (pathPoint.b - 1);
-                    pathPoint.a = (short) (pathPoint.a + 1);
+                    pathPoint.tileY = (short) (pathPoint.tileY - 1);
+                    pathPoint.tileX = (short) (pathPoint.tileX + 1);
                 }
-                if (pathPoint.a < 0 || pathPoint.a >= n8 || pathPoint.b < 0 || pathPoint.b >= s2 || (n20 = pathPoint.a(this)) == -1)
+                if (pathPoint.tileX < 0 || pathPoint.tileX >= n8 || pathPoint.tileY < 0 || pathPoint.tileY >= s2 || (n20 = pathPoint.a(this)) == -1)
                     continue;
                 int n21 = pathPoint.a(this, by2);
                 if (pathPoint.b(this, by2)) continue;
-                if (pathPoint.a != pathPoint3.a && pathPoint.b != pathPoint3.b) {
-                    if (this.a(pathPoint.a, pathPoint3.b) == -1 || this.a(pathPoint3.a, pathPoint.b) == -1) continue;
+                if (pathPoint.tileX != pathPoint3.tileX && pathPoint.tileY != pathPoint3.tileY) {
+                    if (this.a(pathPoint.tileX, pathPoint3.tileY) == -1 || this.a(pathPoint3.tileX, pathPoint.tileY) == -1)
+                        continue;
                     n19 = n18 + (14 + n20) + 1;
                 } else {
                     n19 = n18 + (10 + n20) + 1;
@@ -577,16 +578,16 @@ public final class PathSolver implements Runnable {
                     }
                 }
                 if (this.f != null) {
-                    n19 += (4 - this.f[pathPoint.a * s2 + pathPoint.b]) * n6;
+                    n19 += (4 - this.f[pathPoint.tileX * s2 + pathPoint.tileY]) * n6;
                 }
-                if (n7 > 0 && this.f != null && (by6 = this.f[pathPoint.a * s2 + pathPoint.b]) <= n7) {
+                if (n7 > 0 && this.f != null && (by6 = this.f[pathPoint.tileX * s2 + pathPoint.tileY]) <= n7) {
                     n19 += 100;
                 }
                 if (n21 >= this.i && n19 >= n21) continue;
                 pathPoint.a(this, by2, by7);
                 pathPoint.a(this, by2, false);
                 pathPoint.a(this, by2, n19);
-                pathOpenListPool.a(n19 - this.i, pathPoint.a, pathPoint.b);
+                pathOpenListPool.a(n19 - this.i, pathPoint.tileX, pathPoint.tileY);
             }
         }
         if (PathEngine.a) {
@@ -633,7 +634,7 @@ public final class PathSolver implements Runnable {
         this.z = GameEngine.getCurrentTimeMillis();
         if (PathEngine.a) {
             long l4 = this.z - this.y;
-            Log.d("RustedWarfare", "path(" + path.e + ") finished in:" + l4);
+            Log.d("RustedWarfare", "path(" + path.pathId + ") finished in:" + l4);
         }
         if (PathEngine.l && !GameEngine.getInstance().isMenuBackgroundMap) {
             Debug.stopMethodTracing();
@@ -686,13 +687,13 @@ public final class PathSolver implements Runnable {
         final int h = this.h;
         final int g = this.g;
         this.y = GameEngine.getCurrentTimeMillis();
-        final short h2 = e.h;
-        final short i = e.i;
+        final short h2 = e.startTileX;
+        final short i = e.startTileY;
         final boolean k = e.k;
         this.d();
-        this.a(e.o, e.h, e.i, e.j);
-        final short l = e.l;
-        final short m = e.m;
+        this.a(e.movementType, e.startTileX, e.startTileY, e.j);
+        final short l = e.endTileX;
+        final short m = e.endTileY;
         final short n2 = e.n;
         final LinkedList list = new LinkedList();
         if (this.n.a.equals(UnitMovementType.NONE)) {
@@ -885,7 +886,7 @@ public final class PathSolver implements Runnable {
                 b5 = 7;
             } else {
                 byte b7 = 2;
-                if (this.f != null && this.f[a.a * h + a.b] > 1) {
+                if (this.f != null && this.f[a.tileX * h + a.tileY] > 1) {
                     b7 = 1;
                 }
                 b6 = (byte) (integer3 - b7);
@@ -902,58 +903,58 @@ public final class PathSolver implements Runnable {
                 }
                 if (integer4 == 0) {
                     final PathPoint pathPoint = r;
-                    ++pathPoint.a;
+                    ++pathPoint.tileX;
                 }
                 if (integer4 == 1) {
                     final PathPoint pathPoint2 = r;
-                    ++pathPoint2.a;
+                    ++pathPoint2.tileX;
                     final PathPoint pathPoint3 = r;
-                    ++pathPoint3.b;
+                    ++pathPoint3.tileY;
                 }
                 if (integer4 == 2) {
                     final PathPoint pathPoint4 = r;
-                    ++pathPoint4.b;
+                    ++pathPoint4.tileY;
                 }
                 if (integer4 == 3) {
                     final PathPoint pathPoint5 = r;
-                    ++pathPoint5.b;
+                    ++pathPoint5.tileY;
                     final PathPoint pathPoint6 = r;
-                    --pathPoint6.a;
+                    --pathPoint6.tileX;
                 }
                 if (integer4 == 4) {
                     final PathPoint pathPoint7 = r;
-                    --pathPoint7.a;
+                    --pathPoint7.tileX;
                 }
                 if (integer4 == 5) {
                     final PathPoint pathPoint8 = r;
-                    --pathPoint8.a;
+                    --pathPoint8.tileX;
                     final PathPoint pathPoint9 = r;
-                    --pathPoint9.b;
+                    --pathPoint9.tileY;
                 }
                 if (integer4 == 6) {
                     final PathPoint pathPoint10 = r;
-                    --pathPoint10.b;
+                    --pathPoint10.tileY;
                 }
                 if (integer4 == 7) {
                     final PathPoint pathPoint11 = r;
-                    --pathPoint11.b;
+                    --pathPoint11.tileY;
                     final PathPoint pathPoint12 = r;
-                    ++pathPoint12.a;
+                    ++pathPoint12.tileX;
                 }
-                if (r.a >= 0) {
-                    if (r.a < g) {
-                        if (r.b >= 0) {
-                            if (r.b < h) {
+                if (r.tileX >= 0) {
+                    if (r.tileX < g) {
+                        if (r.tileY >= 0) {
+                            if (r.tileY < h) {
                                 final int a3 = r.a(this);
                                 if (a3 != -1) {
                                     final int a4 = r.a(this, byte2);
                                     if (!b.c(r)) {
                                         int integer5;
-                                        if (r.a != a.a && r.b != a.b) {
-                                            if (this.a(r.a, a.b) == -1) {
+                                        if (r.tileX != a.tileX && r.tileY != a.tileY) {
+                                            if (this.a(r.tileX, a.tileY) == -1) {
                                                 continue;
                                             }
-                                            if (this.a(a.a, r.b) == -1) {
+                                            if (this.a(a.tileX, r.tileY) == -1) {
                                                 continue;
                                             }
                                             integer5 = a2 + (14 + a3) + 1;
@@ -964,16 +965,16 @@ public final class PathSolver implements Runnable {
                                             integer5 += b(integer3, integer4);
                                         }
                                         if (this.f != null) {
-                                            integer5 += (4 - this.f[r.a * h + r.b]) * n;
+                                            integer5 += (4 - this.f[r.tileX * h + r.tileY]) * n;
                                         }
-                                        if (b2 > 0 && this.f != null && this.f[r.a * h + r.b] <= b2) {
+                                        if (b2 > 0 && this.f != null && this.f[r.tileX * h + r.tileY] <= b2) {
                                             integer5 += 100;
                                         }
                                         if (a4 < this.i || integer5 < a4) {
                                             b.a(r, (byte) (integer4 + 1));
                                             b.a(r, false);
                                             r.a(this, byte2, integer5);
-                                            p.a(integer5 - this.i, r.a, r.b);
+                                            p.a(integer5 - this.i, r.tileX, r.tileY);
                                         }
                                     }
                                 }
@@ -995,7 +996,7 @@ public final class PathSolver implements Runnable {
         PathEngine.e = e;
         this.z = GameEngine.getCurrentTimeMillis();
         if (PathEngine.a) {
-            Log.d("RustedWarfare", "path(" + e.e + ") finished in:" + (this.z - this.y));
+            Log.d("RustedWarfare", "path(" + e.pathId + ") finished in:" + (this.z - this.y));
         }
         if (PathEngine.l && !GameEngine.getInstance().isMenuBackgroundMap) {
             Debug.stopMethodTracing();

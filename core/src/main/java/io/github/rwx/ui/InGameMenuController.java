@@ -68,7 +68,7 @@ public class InGameMenuController {
                     menu.add(0, 10, 0, Locale.get("menus.ingame.exitGame"));
                 }
             } else {
-                if (gameEngine.missionEngine != null && gameEngine.missionEngine.h != null) {
+                if (gameEngine.missionEngine != null && gameEngine.missionEngine.introText != null) {
                     menu.add(0, 11, 0, Locale.get("menus.ingame.briefing"));
                 }
                 menu.add(0, 15, 0, Locale.get("menus.ingame.exitGame"));
@@ -131,8 +131,8 @@ public class InGameMenuController {
                 this.callbacks.requestExit();
                 return;
             case 11:
-                if (gameEngine.missionEngine != null && gameEngine.missionEngine.h != null) {
-                    gameEngine.showMessageBox("Briefing", gameEngine.missionEngine.h);
+                if (gameEngine.missionEngine != null && gameEngine.missionEngine.introText != null) {
+                    gameEngine.showMessageBox("Briefing", gameEngine.missionEngine.introText);
                 }
                 return;
             case 12:

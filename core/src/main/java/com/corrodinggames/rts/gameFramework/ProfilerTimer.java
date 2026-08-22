@@ -3,53 +3,65 @@ package com.corrodinggames.rts.gameFramework;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.bt */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/bt.class */
 public class ProfilerTimer {
-    boolean a;
-    int b;
-    double c;
-    double d;
-    long e;
-    String f;
+
+    /* JADX INFO: renamed from: a */
+    boolean enabled;
+
+    /* JADX INFO: renamed from: b */
+    int count;
+
+    /* JADX INFO: renamed from: c */
+    double totalTimeMs;
+
+    /* JADX INFO: renamed from: d */
+    double peakTimeMs;
+
+    /* JADX INFO: renamed from: e */
+    long startTimeNs;
+
+    /* JADX INFO: renamed from: f */
+    String name;
 
     public ProfilerTimer(String str) {
-        this.a = true;
-        this.f = str;
+        this.enabled = true;
+        this.name = str;
     }
 
     public ProfilerTimer(String str, boolean z) {
-        this.a = true;
-        this.f = str;
-        this.a = z;
+        this.enabled = true;
+        this.name = str;
+        this.enabled = z;
     }
 
     public void a() {
-        if (this.a) {
-            if (this.e != 0) {
-                this.e = Long.MIN_VALUE;
+        if (this.enabled) {
+            if (this.startTimeNs != 0) {
+                this.startTimeNs = Long.MIN_VALUE;
             } else {
-                this.e = PerformanceProfiler.a();
+                this.startTimeNs = PerformanceProfiler.a();
             }
         }
     }
 
     public void b() {
-        if (this.a) {
-            double dA = PerformanceProfiler.a(this.e, PerformanceProfiler.a());
-            this.c += dA;
-            this.b++;
-            if (dA > this.d) {
-                this.d = dA;
+        if (this.enabled) {
+            double dA = PerformanceProfiler.a(this.startTimeNs, PerformanceProfiler.a());
+            this.totalTimeMs += dA;
+            this.count++;
+            if (dA > this.peakTimeMs) {
+                this.peakTimeMs = dA;
             }
-            this.e = 0L;
+            this.startTimeNs = 0L;
         }
     }
 
     public String c() {
         String str;
-        if (!this.a) {
+        if (!this.enabled) {
             return "{ Not enabled }";
         }
-        if (this.b > 0) {
-            str = ((("{ #" + this.b + " = ") + "peak:" + Utility.padString(this.d, 2) + "ms ") + "avg:" + Utility.padString(this.c / ((double) this.b), 2) + "ms ") + "total:" + Utility.padString(this.c, 2) + "ms ";
+        if (this.count > 0) {
+            str = ((("{ #" + this.count + " = ") + "peak:" + Utility.padString(this.peakTimeMs, 2) + "ms ") + "avg:" + Utility.padString(this.totalTimeMs / ((double) this.count), 2) + "ms ") + "total:" + Utility.padString(this.totalTimeMs, 2) + "ms ";
         } else {
             str = "{ #0 = NA";
         }
@@ -57,22 +69,22 @@ public class ProfilerTimer {
     }
 
     public void d() {
-        if (this.a) {
+        if (this.enabled) {
             b();
             e();
         }
     }
 
     public void e() {
-        if (this.a && this.b > 0) {
-            GameEngine.log(GameEngine.addColorCodes(this.f + " - " + c(), "\u001b[36m"));
+        if (this.enabled && this.count > 0) {
+            GameEngine.log(GameEngine.addColorCodes(this.name + " - " + c(), "\u001b[36m"));
             f();
         }
     }
 
     public void f() {
-        this.b = 0;
-        this.c = 0.0d;
-        this.d = 0.0d;
+        this.count = 0;
+        this.totalTimeMs = 0.0d;
+        this.peakTimeMs = 0.0d;
     }
 }

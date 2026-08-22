@@ -514,7 +514,7 @@ public final class TileMap {
         Rect rect2 = new Rect();
         rect2.a(0, 0, 20, 20);
         computeFogAtlasTileRect(i, rect);
-        TileAtlasCache.getPaddingEdgeRect(fogAtlasRenderer, texture, rect2, rect, (KoolPaint) null);
+        TileAtlasCache.blitPaddingEdges(fogAtlasRenderer, texture, rect2, rect, (KoolPaint) null);
     }
 
     /* JADX INFO: renamed from: a */

@@ -7,11 +7,13 @@ import com.corrodinggames.rts.game.units.actions.ActionType;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.q */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/q.class */
 class SetTerrainTypeAction extends AbstractUnitAction {
-    EditorTerrainType a;
+
+    /* JADX INFO: renamed from: a */
+    EditorTerrainType terrainType;
 
     public SetTerrainTypeAction(EditorTerrainType editorTerrainType) {
         super("SetTerrainType" + editorTerrainType.ordinal());
-        this.a = editorTerrainType;
+        this.terrainType = editorTerrainType;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -23,13 +25,13 @@ class SetTerrainTypeAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public String getDescription() {
-        return "Set terrain type to: " + this.a.name();
+        return "Set terrain type to: " + this.terrainType.name();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
     public String getDisplayName() {
-        return "Set " + this.a.name();
+        return "Set " + this.terrainType.name();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction

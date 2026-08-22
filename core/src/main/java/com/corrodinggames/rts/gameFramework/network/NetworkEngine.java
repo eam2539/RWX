@@ -345,7 +345,7 @@ public final class NetworkEngine {
         }
         synchronized (this.banList) {
             for (BanEntry banEntry : this.banList) {
-                if (ipAddress.equals(banEntry.a) && banEntry.b > jCurrentTimeMillis) {
+                if (ipAddress.equals(banEntry.ipAddress) && banEntry.expiryTimeMs > jCurrentTimeMillis) {
                     return banEntry;
                 }
             }
@@ -365,9 +365,9 @@ public final class NetworkEngine {
             return false;
         }
         BanEntry banEntry = new BanEntry();
-        banEntry.a = networkConnection.getIpAddress();
-        banEntry.b = System.currentTimeMillis() + ((long) (i * 1000));
-        banEntry.c = str;
+        banEntry.ipAddress = networkConnection.getIpAddress();
+        banEntry.expiryTimeMs = System.currentTimeMillis() + ((long) (i * 1000));
+        banEntry.reason = str;
         synchronized (this.banList) {
             pruneExpiredBans();
             this.banList.add(banEntry);
@@ -392,7 +392,7 @@ public final class NetworkEngine {
             while (it.hasNext()) {
                 i++;
                 boolean z = false;
-                if (((BanEntry) it.next()).b < jCurrentTimeMillis) {
+                if (((BanEntry) it.next()).expiryTimeMs < jCurrentTimeMillis) {
                     z = true;
                 }
                 if (i > 1000) {
@@ -1180,7 +1180,7 @@ public final class NetworkEngine {
             if (networkConnection.isDirectServer) {
                 throw new RuntimeException("Player: " + networkConnection.getPlayerDisplayName() + " has minor desync");
             }
-            if (networkConnection.x == 0) {
+            if (networkConnection.syncMatchCount == 0) {
                 throw new RuntimeException("Player: " + networkConnection.getPlayerDisplayName() + " has no sync matches");
             }
         }
@@ -1199,9 +1199,9 @@ public final class NetworkEngine {
             }
             if (networkConnection.isDirectServer) {
                 if (this.g) {
-                    GameEngine.log("desync_count:" + networkConnection.y + " lastResyncTimer:" + this.timeSinceLastResync);
+                    GameEngine.log("desync_count:" + networkConnection.desyncCount + " lastResyncTimer:" + this.timeSinceLastResync);
                 }
-                if (networkConnection.y < 4 || this.timeSinceLastResync > 3600.0f) {
+                if (networkConnection.desyncCount < 4 || this.timeSinceLastResync > 3600.0f) {
                     z3 = true;
                 }
             }
@@ -1264,7 +1264,7 @@ public final class NetworkEngine {
         for (NetworkConnection networkConnection : this.sendQueue) {
             networkConnection.isForwarded = false;
             networkConnection.isDirectServer = false;
-            networkConnection.x = 0;
+            networkConnection.syncMatchCount = 0;
         }
     }
 
@@ -2006,14 +2006,14 @@ public final class NetworkEngine {
                             break;
                         } else {
                             if (!networkConnection3.isDirectServer && z2) {
-                                networkConnection3.y++;
+                                networkConnection3.desyncCount++;
                             }
                             networkConnection3.isDirectServer = z2;
                             if (!z2) {
                                 if (this.g) {
                                     GameEngine.log("checksum: client checksum match [" + i6 + "]");
                                 }
-                                networkConnection3.x++;
+                                networkConnection3.syncMatchCount++;
                                 break;
                             } else {
                                 GameEngine.log("client:" + networkConnection3.getPlayerDisplayName() + " desync [" + i6 + "]");
@@ -2375,7 +2375,7 @@ public final class NetworkEngine {
         updateTeamConnectionStatuses();
         for (NetworkConnection networkConnection2 : this.sendQueue) {
             if (networkConnection2.allowLargeIncomingPackets) {
-                GameOutputStream gameOutputStream = new GameOutputStream(networkConnection2.E);
+                GameOutputStream gameOutputStream = new GameOutputStream(networkConnection2.networkVersion);
                 try {
                     gameOutputStream.writeInt(networkConnection2.getPlayerTeamId());
                     int i = PlayerTeam.TEAM_NEUTRAL;
@@ -2384,7 +2384,7 @@ public final class NetworkEngine {
                         boolean z2 = false;
                         if (gameOutputStream.getStreamVersion() >= 141) {
                             z2 = true;
-                            if (this.gameHasBeenStarted && networkConnection2.Q) {
+                            if (this.gameHasBeenStarted && networkConnection2.hasSentFullTeamUpdate) {
                                 z = true;
                             }
                             gameOutputStream.writeBoolean(z);
@@ -2431,10 +2431,10 @@ public final class NetworkEngine {
                     gameOutputStream.writeBoolean(this.roomSettings.sharedControl);
                     gameOutputStream.writeBoolean(this.gamePaused);
                     int i4 = -1;
-                    if (networkConnection == networkConnection2 && networkConnection2.E <= 26) {
+                    if (networkConnection == networkConnection2 && networkConnection2.networkVersion <= 26) {
                         i4 = 1000;
                     }
-                    networkConnection2.Q = true;
+                    networkConnection2.hasSentFullTeamUpdate = true;
                     a(networkConnection2, gameOutputStream.buildPacketData(115, i4));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -2636,7 +2636,7 @@ public final class NetworkEngine {
                 String utf = gameInputStream5.readUTF();
                 String nullableString2 = gameInputStream5.readNullableString();
                 String utf2 = null;
-                networkConnection5.E = i3;
+                networkConnection5.networkVersion = i3;
                 if (i2 >= 1) {
                     networkConnection5.connectionLabel = gameInputStream5.readUTF();
                 }
@@ -2732,7 +2732,7 @@ public final class NetworkEngine {
                 }
                 if (!h(this.W).equals(utf4)) {
                     networkConnection5.logInfo("no extra");
-                    networkConnection5.N = true;
+                    networkConnection5.noExtraChecks = true;
                 }
                 if (networkConnection5.player == null) {
                     synchronized (this.connectionLock) {
@@ -2752,7 +2752,7 @@ public final class NetworkEngine {
                             networkConnection5.sendPacket("kicked");
                         } else {
                             MasterServerAuth.applyHandshakeTimeoutFlag(networkConnection5);
-                            if (!this.chatOnlyMode && networkConnection5.O) {
+                            if (!this.chatOnlyMode && networkConnection5.handshakeTimeoutReached) {
                                 a(networkConnection5, VariableScope.nullOrMissingString);
                                 networkConnection5.sendPacket("kicked");
                                 return;
@@ -2806,8 +2806,8 @@ public final class NetworkEngine {
                             networkConnection5.player.teamName = strP;
                             networkConnection5.player.teamSharedControlType = utf2;
                             networkConnection5.player.teamAIHint = networkConnection5.remoteId;
-                            networkConnection5.E = i3;
-                            GameEngine.log("processSystemPacket", "New player: " + strP + ", networkVersion:" + networkConnection5.E + " existing:" + (existingGameTeam != null));
+                            networkConnection5.networkVersion = i3;
+                            GameEngine.log("processSystemPacket", "New player: " + strP + ", networkVersion:" + networkConnection5.networkVersion + " existing:" + (existingGameTeam != null));
                             networkConnection5.allowLargeIncomingPackets = true;
                             if (existingGameTeam == null) {
                                 this.callbacks.a(networkConnection5.player);
@@ -2866,7 +2866,7 @@ public final class NetworkEngine {
                     return;
                 }
                 GameInputStream gameInputStream8 = new GameInputStream(packet);
-                gameInputStream8.setStreamVersion(packet.connection.E);
+                gameInputStream8.setStreamVersion(packet.connection.networkVersion);
                 NetworkConnection networkConnection8 = packet.connection;
                 int i7 = gameInputStream8.readInt();
                 PlayerTeam playerTeam = null;
@@ -2982,8 +2982,8 @@ public final class NetworkEngine {
                 int i10 = gameInputStream10.readInt();
                 String utf6 = gameInputStream10.readUTF();
                 PasswordHandler passwordHandler2 = new PasswordHandler();
-                passwordHandler2.d = true;
-                passwordHandler2.c = i10;
+                passwordHandler2.isRequesting = true;
+                passwordHandler2.requestId = i10;
                 passwordHandler2.promptMessage = utf6;
                 a(passwordHandler2);
                 return;
@@ -3159,12 +3159,12 @@ public final class NetworkEngine {
                 if (i18 >= 1) {
                     gameInputStream15.readInt();
                 }
-                if (networkConnection13.i) {
+                if (networkConnection13.isSteam) {
                     GameEngine.log("steam: request info packet");
                 }
                 if (i18 >= 2 && (nullableString = gameInputStream15.readNullableString()) != null) {
                     networkConnection13.logInfo("Using query string: " + nullableString);
-                    networkConnection13.o = nullableString;
+                    networkConnection13.queryString = nullableString;
                 }
                 if (i18 >= 3) {
                     gameInputStream15.readUTF();
@@ -3185,7 +3185,7 @@ public final class NetworkEngine {
                 }
                 GameInputStream gameInputStream16 = new GameInputStream(packet);
                 NetworkConnection networkConnection14 = packet.connection;
-                if (networkConnection14.i) {
+                if (networkConnection14.isSteam) {
                     GameEngine.log("steam: got info packet");
                 }
                 gameInputStream16.readUTF();
@@ -3194,7 +3194,7 @@ public final class NetworkEngine {
                 gameInputStream16.readInt();
                 gameInputStream16.readUTF();
                 this.serverUuid = gameInputStream16.readUTF();
-                networkConnection14.E = i20;
+                networkConnection14.networkVersion = i20;
                 if (i19 >= 1) {
                     this.T = gameInputStream16.readInt();
                 }

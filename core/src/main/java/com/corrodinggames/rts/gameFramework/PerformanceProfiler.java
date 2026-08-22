@@ -7,8 +7,12 @@ import io.github.rwx.render.canvas.KoolPaint;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.br */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/br.class */
 public final class PerformanceProfiler {
-    GameEngine a;
-    public static int c = 40;
+
+    /* JADX INFO: renamed from: a */
+    GameEngine gameEngine;
+
+    /* JADX INFO: renamed from: c */
+    public static int dataCapacity = 40;
     public int b = 0;
     public int d = 0;
     ProfilerData e = new ProfilerData(this);
@@ -17,7 +21,7 @@ public final class PerformanceProfiler {
     int h = -1;
 
     public PerformanceProfiler(GameEngine gameEngine) {
-        this.a = gameEngine;
+        this.gameEngine = gameEngine;
     }
 
     public static final long a() {

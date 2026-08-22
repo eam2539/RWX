@@ -6,12 +6,13 @@ import com.corrodinggames.rts.game.units.BaseUnit;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/f/b.class */
 public final class UnitList {
     public static final BaseUnit[] a = new BaseUnit[0];
-    public int b;
+    /* JADX INFO: renamed from: b */
+    public int size;
     transient BaseUnit[] c = a;
 
     public boolean a(BaseUnit baseUnit) {
         BaseUnit[] baseUnitArr = this.c;
-        int i = this.b;
+        int i = this.size;
         if (i == baseUnitArr.length) {
             BaseUnit[] baseUnitArr2 = new BaseUnit[i + (i < 6 ? 12 : i >> 1)];
             System.arraycopy(baseUnitArr, 0, baseUnitArr2, 0, i);
@@ -19,20 +20,20 @@ public final class UnitList {
             this.c = baseUnitArr2;
         }
         baseUnitArr[i] = baseUnit;
-        this.b = i + 1;
+        this.size = i + 1;
         return true;
     }
 
     public boolean b(BaseUnit baseUnit) {
         BaseUnit[] baseUnitArr = this.c;
-        int i = this.b;
+        int i = this.size;
         if (baseUnit != null) {
             for (int i2 = 0; i2 < i; i2++) {
                 if (baseUnit.equals(baseUnitArr[i2])) {
                     int i3 = i - 1;
                     System.arraycopy(baseUnitArr, i2 + 1, baseUnitArr, i2, i3 - i2);
                     baseUnitArr[i3] = null;
-                    this.b = i3;
+                    this.size = i3;
                     return true;
                 }
             }
@@ -43,7 +44,7 @@ public final class UnitList {
                 int i5 = i - 1;
                 System.arraycopy(baseUnitArr, i4 + 1, baseUnitArr, i4, i5 - i4);
                 baseUnitArr[i5] = null;
-                this.b = i5;
+                this.size = i5;
                 return true;
             }
         }

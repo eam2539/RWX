@@ -149,7 +149,7 @@ public class SoundEngine {
     public void loadSounds() {
         soundFactory.initialize();
         attackSound = soundFactory.a(R.raw.attack);
-        attackSound.d = 0.2f;
+        attackSound.volume = 0.2f;
         attack2Sound = soundFactory.a(R.raw.attack2);
         moveSound = soundFactory.a(R.raw.move);
         clickSound = soundFactory.a(R.raw.click);
@@ -193,7 +193,7 @@ public class SoundEngine {
     /* JADX INFO: renamed from: b */
     public void playInterfaceSound(Sound sound, float f) {
         GameEngine gameEngine = GameEngine.getInstance();
-        float f2 = f * gameEngine.settingsEngine.masterVolume * gameEngine.settingsEngine.interfaceVolume * sound.d;
+        float f2 = f * gameEngine.settingsEngine.masterVolume * gameEngine.settingsEngine.interfaceVolume * sound.volume;
         if (!isVolumeEnabled(f2) || f2 < 0.01d || !trackSound(sound, f2)) {
             return;
         }
@@ -206,7 +206,7 @@ public class SoundEngine {
     /* JADX INFO: renamed from: c */
     public void playGameSound(Sound sound, float f) {
         GameEngine gameEngine = GameEngine.getInstance();
-        float f2 = f * gameEngine.settingsEngine.masterVolume * gameEngine.settingsEngine.gameVolume * sound.d;
+        float f2 = f * gameEngine.settingsEngine.masterVolume * gameEngine.settingsEngine.gameVolume * sound.volume;
         if (isVolumeEnabled(f2)) {
             if (gameEngine.isStopped) {
                 f2 /= 20.0f;
@@ -238,7 +238,7 @@ public class SoundEngine {
             if (gameEngine.zoom < 0.5d) {
                 f = f * 4.0f * gameEngine.zoom * gameEngine.zoom;
             }
-            if (f <= 1.0f && !sound.f && fDistanceSq > f5 * f5) {
+            if (f <= 1.0f && !sound.isLooping && fDistanceSq > f5 * f5) {
                 return;
             }
             float fSqrt = (float) Math.sqrt(fDistanceSq);
@@ -247,13 +247,13 @@ public class SoundEngine {
                 f6 = 1.0f - ((fSqrt - gameEngine.halfVisibleWorldWidth) / gameEngine.halfVisibleWorldWidth);
             }
             float f7 = f6 * f;
-            if (f7 <= 0.05d && !sound.f) {
+            if (f7 <= 0.05d && !sound.isLooping) {
                 return;
             }
             if (f7 > 1.0f) {
                 f7 = 1.0f;
             }
-            float f8 = f7 * gameEngine.settingsEngine.masterVolume * gameEngine.settingsEngine.gameVolume * sound.d;
+            float f8 = f7 * gameEngine.settingsEngine.masterVolume * gameEngine.settingsEngine.gameVolume * sound.volume;
             if (!trackSound(sound, f8)) {
                 return;
             }

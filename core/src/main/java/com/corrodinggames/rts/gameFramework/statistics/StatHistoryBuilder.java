@@ -23,7 +23,7 @@ public class StatHistoryBuilder {
         ArrayList arrayList2 = new ArrayList();
         Iterator it = arrayList.iterator();
         while (it.hasNext()) {
-            IntLookupTable<Point2i> intLookupTableA = ((TeamHistoryChart) it.next()).a.a(statisticType);
+            IntLookupTable<Point2i> intLookupTableA = ((TeamHistoryChart) it.next()).teamHistory.a(statisticType);
             arrayList2.add(intLookupTableA);
             for (Point2i point2i : intLookupTableA) {
                 if (point2i.y > this.b) {
@@ -56,7 +56,7 @@ public class StatHistoryBuilder {
                 IntLookupTable intLookupTable = (IntLookupTable) arrayList.get(i2);
                 if (iArr[i2] < intLookupTable.size()) {
                     Point2i point2i = (Point2i) intLookupTable.get(iArr[i2]);
-                    if (point2i.x <= statHistory.a) {
+                    if (point2i.x <= statHistory.historySize) {
                         statHistory.a(i2, point2i.y);
                         int i3 = i2;
                         iArr[i3] = iArr[i3] + 1;

@@ -7,15 +7,17 @@ import java.util.Iterator;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.q */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/q.class */
 public class TaskQueue {
-    FastArrayList a = new FastArrayList();
+
+    /* JADX INFO: renamed from: a */
+    FastArrayList tasks = new FastArrayList();
 
     public void a(Runnable runnable) {
-        this.a.add(runnable);
+        this.tasks.add(runnable);
     }
 
     public void a() {
-        if (this.a.size > 0) {
-            Iterator it = this.a.iterator();
+        if (this.tasks.size > 0) {
+            Iterator it = this.tasks.iterator();
             while (it.hasNext()) {
                 ((Runnable) it.next()).run();
             }
@@ -23,12 +25,12 @@ public class TaskQueue {
     }
 
     public void b() {
-        if (this.a.size > 0) {
-            Iterator it = this.a.iterator();
+        if (this.tasks.size > 0) {
+            Iterator it = this.tasks.iterator();
             while (it.hasNext()) {
                 ((Runnable) it.next()).run();
             }
-            this.a.clear();
+            this.tasks.clear();
         }
     }
 }

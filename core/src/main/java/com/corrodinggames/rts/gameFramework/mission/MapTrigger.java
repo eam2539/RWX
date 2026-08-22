@@ -18,23 +18,37 @@ import io.github.rwx.render.canvas.KoolPaint;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.n.a */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/n/a.class */
 public class MapTrigger {
-    public String a;
-    public String b;
-    public String c;
-    public TriggerType g;
-    public boolean h;
+    /* JADX INFO: renamed from: a */
+    public String name;
+    /* JADX INFO: renamed from: b */
+    public String rawId;
+    /* JADX INFO: renamed from: c */
+    public String uniqueId;
+    /* JADX INFO: renamed from: g */
+    public TriggerType triggerType;
+    /* JADX INFO: renamed from: h */
+    public boolean allToActivate;
     public boolean i;
-    public boolean j;
-    public int k;
+    /* JADX INFO: renamed from: j */
+    public boolean isActive;
+    /* JADX INFO: renamed from: k */
+    public int activationTime;
     public int l;
-    public boolean m;
-    public int p;
-    public MapObject t;
+    /* JADX INFO: renamed from: m */
+    public boolean hasCompleted;
+    /* JADX INFO: renamed from: p */
+    public int repeatDelay;
+    /* JADX INFO: renamed from: t */
+    public MapObject mapObject;
     public UnitSpawner v;
-    public float w;
-    public float x;
-    public PlayerTeam y;
-    public LocaleString z;
+    /* JADX INFO: renamed from: w */
+    public float textOffsetX;
+    /* JADX INFO: renamed from: x */
+    public float textOffsetY;
+    /* JADX INFO: renamed from: y */
+    public PlayerTeam team;
+    /* JADX INFO: renamed from: z */
+    public LocaleString text;
     public LocaleString A;
     public KoolPaint B;
     public boolean C;
@@ -53,19 +67,19 @@ public class MapTrigger {
     }
 
     public void a(String str) {
-        this.t.getDescription(str);
+        this.mapObject.getDescription(str);
     }
 
     public String b(String str) {
-        return this.t.getDescription(str);
+        return this.mapObject.getDescription(str);
     }
 
     public String a(String str, String str2) {
-        return this.t.getPropertyOrDefault(str, str2);
+        return this.mapObject.getPropertyOrDefault(str, str2);
     }
 
     public boolean c(String str) {
-        return this.t.getDescription(str) != null;
+        return this.mapObject.getDescription(str) != null;
     }
 
     public int a(String str, int i) throws MapLoadException {
@@ -183,11 +197,11 @@ public class MapTrigger {
     }
 
     public LocaleString a(String str, LocaleString localeString) {
-        return this.t.createLocaleStringFromProperty(str, localeString);
+        return this.mapObject.createLocaleStringFromProperty(str, localeString);
     }
 
     public boolean a(BaseUnit baseUnit) {
-        return this.t.containsUnitPosition(baseUnit);
+        return this.mapObject.containsUnitPosition(baseUnit);
     }
 
     public MapLoadException f(String str) {
@@ -195,7 +209,7 @@ public class MapTrigger {
     }
 
     public MapLoadException a(String str, Exception exc) {
-        String str2 = "MapTrigger-Error (" + this.a + " id:" + this.b + "): " + str;
+        String str2 = "MapTrigger-Error (" + this.name + " id:" + this.rawId + "): " + str;
         NetworkEngine.reportDesync(str2);
         if (exc == null) {
             return new MapLoadException(str2);
@@ -204,23 +218,23 @@ public class MapTrigger {
     }
 
     public void g(String str) {
-        NetworkEngine.reportDesync("MapTrigger-Error (" + this.a + " id:" + this.b + " type:" + this.g + "): " + str);
+        NetworkEngine.reportDesync("MapTrigger-Error (" + this.name + " id:" + this.rawId + " type:" + this.triggerType + "): " + str);
     }
 
     public void h(String str) {
-        GameEngine.log("MapTrigger-Debug (" + this.b + " type:" + this.g + "): " + str);
+        GameEngine.log("MapTrigger-Debug (" + this.rawId + " type:" + this.triggerType + "): " + str);
     }
 
     public PlayerTeam a() {
-        return this.y;
+        return this.team;
     }
 
     public int b() {
-        return (int) this.t.tileRect.d();
+        return (int) this.mapObject.tileRect.d();
     }
 
     public int c() {
-        return (int) this.t.tileRect.e();
+        return (int) this.mapObject.tileRect.e();
     }
 
     /* JADX WARN: Multi-variable type inference failed */
@@ -240,10 +254,10 @@ public class MapTrigger {
         int i = GameEngine.getInstance().gameTimeMillis;
         boolean z2 = true;
         boolean z3 = false;
-        if (!this.m && this.r != -1) {
+        if (!this.hasCompleted && this.r != -1) {
             if (this.r <= i) {
                 z3 = true;
-                this.m = true;
+                this.hasCompleted = true;
             } else {
                 z2 = false;
             }
@@ -266,7 +280,7 @@ public class MapTrigger {
                 }
             }
         }
-        if (this.h) {
+        if (this.allToActivate) {
             z = z3 && z2;
         } else {
             z = z3;

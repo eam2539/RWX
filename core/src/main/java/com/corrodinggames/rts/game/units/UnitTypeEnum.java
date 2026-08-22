@@ -1776,7 +1776,7 @@ public enum UnitTypeEnum implements UnitType {
         /* JADX INFO: renamed from: a */
         public BaseUnit createUnitInstanceWithBoolean(boolean z) {
             DamageZone damageZone = new DamageZone(z);
-            damageZone.q = true;
+            damageZone.isZoneMarker = true;
             return damageZone;
         }
 

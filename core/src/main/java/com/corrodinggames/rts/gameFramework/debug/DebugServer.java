@@ -13,7 +13,8 @@ import java.util.Locale;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/c/a.class */
 public class DebugServer implements Runnable {
     public static float e;
-    public ServerSocket h;
+    /* JADX INFO: renamed from: h */
+    public ServerSocket serverSocket;
     public static boolean a = false;
     public static boolean b = false;
     public static boolean c = false;
@@ -55,7 +56,7 @@ public class DebugServer implements Runnable {
             GameEngine.log("------------------");
             GameEngine.log(VariableScope.nullOrMissingString);
             if (i != -1) {
-                this.h = new ServerSocket(i);
+                this.serverSocket = new ServerSocket(i);
                 new Thread(this).start();
             }
         } catch (IOException e2) {
@@ -70,7 +71,7 @@ public class DebugServer implements Runnable {
     public void run() {
         while (this.i) {
             try {
-                Socket socketAccept = this.h.accept();
+                Socket socketAccept = this.serverSocket.accept();
                 try {
                     socketAccept.setTcpNoDelay(true);
                     new Thread(new DebugClientHandler(this, socketAccept)).run();

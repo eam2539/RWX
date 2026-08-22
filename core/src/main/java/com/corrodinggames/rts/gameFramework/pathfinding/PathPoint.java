@@ -5,8 +5,12 @@ import com.corrodinggames.rts.gameFramework.GameEngine;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.k.p */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/k/p.class */
 public final class PathPoint {
-    public short a;
-    public short b;
+
+    /* JADX INFO: renamed from: a */
+    public short tileX;
+
+    /* JADX INFO: renamed from: b */
+    public short tileY;
 
     public PathPoint() {
     }
@@ -16,26 +20,26 @@ public final class PathPoint {
     }
 
     public final PathPoint a(short s, short s2) {
-        this.a = s;
-        this.b = s2;
+        this.tileX = s;
+        this.tileY = s2;
         return this;
     }
 
     public final PathPoint a(PathPoint pathPoint) {
-        this.a = pathPoint.a;
-        this.b = pathPoint.b;
+        this.tileX = pathPoint.tileX;
+        this.tileY = pathPoint.tileY;
         return this;
     }
 
     public final PathPoint a(PathOpenListNode pathOpenListNode) {
-        this.a = pathOpenListNode.a;
-        this.b = pathOpenListNode.b;
+        this.tileX = pathOpenListNode.x;
+        this.tileY = pathOpenListNode.y;
         return this;
     }
 
     public final int a(PathSolver pathSolver) {
-        short s = this.a;
-        short s2 = this.b;
+        short s = this.tileX;
+        short s2 = this.tileY;
         if (pathSolver.b[(s * pathSolver.h) + s2] == -1 || pathSolver.c[(s * pathSolver.h) + s2] == -1 || pathSolver.d[(s * pathSolver.h) + s2] == -1) {
             return -1;
         }
@@ -43,55 +47,55 @@ public final class PathPoint {
     }
 
     public final int a(PathSolver pathSolver, byte b) {
-        return pathSolver.l[b][(this.a * pathSolver.h) + this.b];
+        return pathSolver.l[b][(this.tileX * pathSolver.h) + this.tileY];
     }
 
     public final void a(PathSolver pathSolver, byte b, int i) {
-        pathSolver.l[b][(this.a * pathSolver.h) + this.b] = i;
+        pathSolver.l[b][(this.tileX * pathSolver.h) + this.tileY] = i;
     }
 
     public final void a(PathSolver pathSolver, byte b, boolean z) {
         if (z) {
             byte[] bArr = pathSolver.m[b];
-            int i = (this.a * pathSolver.h) + this.b;
+            int i = (this.tileX * pathSolver.h) + this.tileY;
             bArr[i] = (byte) (bArr[i] | 16);
         } else {
             byte[] bArr2 = pathSolver.m[b];
-            int i2 = (this.a * pathSolver.h) + this.b;
+            int i2 = (this.tileX * pathSolver.h) + this.tileY;
             bArr2[i2] = (byte) (bArr2[i2] & (-17));
         }
     }
 
     public final boolean b(PathSolver pathSolver, byte b) {
-        return pathSolver.l[b][(this.a * pathSolver.h) + this.b] >= pathSolver.i && (pathSolver.m[b][(this.a * pathSolver.h) + this.b] & 16) != 0;
+        return pathSolver.l[b][(this.tileX * pathSolver.h) + this.tileY] >= pathSolver.i && (pathSolver.m[b][(this.tileX * pathSolver.h) + this.tileY] & 16) != 0;
     }
 
     public final byte c(PathSolver pathSolver, byte b) {
-        return (byte) (pathSolver.m[b][(this.a * pathSolver.h) + this.b] & 7);
+        return (byte) (pathSolver.m[b][(this.tileX * pathSolver.h) + this.tileY] & 7);
     }
 
     public final boolean d(PathSolver pathSolver, byte b) {
-        return (pathSolver.m[b][(this.a * pathSolver.h) + this.b] & 8) != 0;
+        return (pathSolver.m[b][(this.tileX * pathSolver.h) + this.tileY] & 8) != 0;
     }
 
     public final void b(PathSolver pathSolver, byte b, boolean z) {
         if (z) {
             byte[] bArr = pathSolver.m[b];
-            int i = (this.a * pathSolver.h) + this.b;
+            int i = (this.tileX * pathSolver.h) + this.tileY;
             bArr[i] = (byte) (bArr[i] | 8);
         } else {
             byte[] bArr2 = pathSolver.m[b];
-            int i2 = (this.a * pathSolver.h) + this.b;
+            int i2 = (this.tileX * pathSolver.h) + this.tileY;
             bArr2[i2] = (byte) (bArr2[i2] & (-9));
         }
     }
 
     public final void a(PathSolver pathSolver, byte b, byte b2) {
         byte[] bArr = pathSolver.m[b];
-        int i = (this.a * pathSolver.h) + this.b;
+        int i = (this.tileX * pathSolver.h) + this.tileY;
         bArr[i] = (byte) (bArr[i] & (-16));
         byte[] bArr2 = pathSolver.m[b];
-        int i2 = (this.a * pathSolver.h) + this.b;
+        int i2 = (this.tileX * pathSolver.h) + this.tileY;
         bArr2[i2] = (byte) (bArr2[i2] | (b2 & 15));
     }
 
@@ -117,7 +121,7 @@ public final class PathPoint {
     }
 
     public final boolean e(PathSolver pathSolver, byte b) {
-        if (pathSolver.l[b][(this.a * pathSolver.h) + this.b] >= pathSolver.i) {
+        if (pathSolver.l[b][(this.tileX * pathSolver.h) + this.tileY] >= pathSolver.i) {
             return true;
         }
         return false;
@@ -171,7 +175,7 @@ public final class PathPoint {
             i2--;
             i++;
         }
-        pathPoint.a((short) (this.a - i), (short) (this.b - i2));
+        pathPoint.a((short) (this.tileX - i), (short) (this.tileY - i2));
         return true;
     }
 }

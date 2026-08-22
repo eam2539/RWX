@@ -91,7 +91,7 @@ public class TeamHistory {
 
     public void a(PlayerTeam playerTeam, int i, boolean z) {
         for (StatisticType statisticType : StatisticType.values()) {
-            int iCalculate = statisticType.e.calculate(playerTeam);
+            int iCalculate = statisticType.statType.calculate(playerTeam);
             IntLookupTable intLookupTable = this.b[statisticType.ordinal()];
             if (intLookupTable.isEmpty() || z || ((Point2i) intLookupTable.get(intLookupTable.size() - 1)).y != iCalculate) {
                 intLookupTable.add(new Point2i(i, iCalculate));

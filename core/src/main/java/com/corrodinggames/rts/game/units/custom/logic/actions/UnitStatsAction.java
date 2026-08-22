@@ -240,8 +240,8 @@ public class UnitStatsAction extends LogicAction {
             customUnit.paidBuildProgress = this.setBuilt;
         }
         if (this.offsetSelfAbsolute != null) {
-            customUnit.b(customUnit.posX + this.offsetSelfAbsolute.a, customUnit.posY + this.offsetSelfAbsolute.b);
-            customUnit.posZ += this.offsetSelfAbsolute.c;
+            customUnit.b(customUnit.posX + this.offsetSelfAbsolute.x, customUnit.posY + this.offsetSelfAbsolute.y);
+            customUnit.posZ += this.offsetSelfAbsolute.z;
             customUnit.isMoving = true;
             return true;
         }

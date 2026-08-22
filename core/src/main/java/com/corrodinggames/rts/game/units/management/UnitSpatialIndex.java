@@ -54,7 +54,7 @@ public final class UnitSpatialIndex {
             for (int i2 = iB; i2 <= iB2; i2++) {
                 com.corrodinggames.rts.game.units.management.UnitList unitList2 = unitStatisticsManagerArr[i][i2].a;
                 BaseUnit[] baseUnitArrA = unitList2.a();
-                int i3 = unitList2.b;
+                int i3 = unitList2.size;
                 for (int i4 = 0; i4 < i3; i4++) {
                     BaseUnit baseUnit = baseUnitArrA[i4];
                     float f8 = baseUnit.posX;
@@ -89,7 +89,7 @@ public final class UnitSpatialIndex {
             for (int i2 = iB; i2 <= iB2; i2++) {
                 com.corrodinggames.rts.game.units.management.UnitList unitList2 = unitStatisticsManagerArr[i][i2].a;
                 BaseUnit[] baseUnitArrA = unitList2.a();
-                int i3 = unitList2.b;
+                int i3 = unitList2.size;
                 for (int i4 = 0; i4 < i3; i4++) {
                     BaseUnit baseUnit = baseUnitArrA[i4];
                     float f8 = baseUnit.posX;
@@ -118,7 +118,7 @@ public final class UnitSpatialIndex {
             for (int i3 = iB; i3 <= iB2; i3++) {
                 com.corrodinggames.rts.game.units.management.UnitList unitList2 = unitStatisticsManagerArr[i2][i3].b[i];
                 BaseUnit[] baseUnitArrA = unitList2.a();
-                int i4 = unitList2.b;
+                int i4 = unitList2.size;
                 for (int i5 = 0; i5 < i4; i5++) {
                     BaseUnit baseUnit = baseUnitArrA[i5];
                     float f8 = baseUnit.posX;
@@ -151,7 +151,7 @@ public final class UnitSpatialIndex {
                 for (int i2 = iB; i2 <= iB2; i2++) {
                     com.corrodinggames.rts.game.units.management.UnitList unitList = unitStatisticsManagerArr[i][i2].a;
                     BaseUnit[] baseUnitArrA = unitList.a();
-                    int i3 = unitList.b;
+                    int i3 = unitList.size;
                     for (int i4 = 0; i4 < i3; i4++) {
                         BaseUnit baseUnit = baseUnitArrA[i4];
                         if ((playerTeamK == null || baseUnit.team != playerTeamK) && unitCallback.a(baseUnit)) {
@@ -168,9 +168,9 @@ public final class UnitSpatialIndex {
                 for (int i6 = iA; i6 <= iA2; i6++) {
                     for (int i7 = iB; i7 <= iB2; i7++) {
                         com.corrodinggames.rts.game.units.management.UnitList unitList2 = unitStatisticsManagerArr[i6][i7].d;
-                        if (unitList2.b > 0) {
+                        if (unitList2.size > 0) {
                             BaseUnit[] baseUnitArrA2 = unitList2.a();
-                            int i8 = unitList2.b;
+                            int i8 = unitList2.size;
                             for (int i9 = 0; i9 < i8; i9++) {
                                 BaseUnit baseUnit2 = baseUnitArrA2[i9];
                                 if (unitCallback.a(baseUnit2)) {
@@ -186,9 +186,9 @@ public final class UnitSpatialIndex {
                 for (int i10 = iA; i10 <= iA2; i10++) {
                     for (int i11 = iB; i11 <= iB2; i11++) {
                         com.corrodinggames.rts.game.units.management.UnitList unitList3 = unitStatisticsManagerArr[i10][i11].c;
-                        if (unitList3.b > 0) {
+                        if (unitList3.size > 0) {
                             BaseUnit[] baseUnitArrA3 = unitList3.a();
-                            int i12 = unitList3.b;
+                            int i12 = unitList3.size;
                             for (int i13 = 0; i13 < i12; i13++) {
                                 BaseUnit baseUnit3 = baseUnitArrA3[i13];
                                 if (unitCallback.a(baseUnit3)) {
@@ -203,9 +203,9 @@ public final class UnitSpatialIndex {
             for (int i14 = iA; i14 <= iA2; i14++) {
                 for (int i15 = iB; i15 <= iB2; i15++) {
                     com.corrodinggames.rts.game.units.management.UnitList unitList4 = unitStatisticsManagerArr[i14][i15].b[i5];
-                    if (unitList4.b > 0) {
+                    if (unitList4.size > 0) {
                         BaseUnit[] baseUnitArrA4 = unitList4.a();
-                        int i16 = unitList4.b;
+                        int i16 = unitList4.size;
                         for (int i17 = 0; i17 < i16; i17++) {
                             BaseUnit baseUnit4 = baseUnitArrA4[i17];
                             if (unitCallback.a(baseUnit4)) {
@@ -221,9 +221,9 @@ public final class UnitSpatialIndex {
             for (int i18 = iA; i18 <= iA2; i18++) {
                 for (int i19 = iB; i19 <= iB2; i19++) {
                     com.corrodinggames.rts.game.units.management.UnitList unitList5 = unitStatisticsManagerArr[i18][i19].c;
-                    if (unitList5.b > 0) {
+                    if (unitList5.size > 0) {
                         BaseUnit[] baseUnitArrA5 = unitList5.a();
-                        int i20 = unitList5.b;
+                        int i20 = unitList5.size;
                         for (int i21 = 0; i21 < i20; i21++) {
                             BaseUnit baseUnit5 = baseUnitArrA5[i21];
                             if (unitCallback.a(baseUnit5)) {
@@ -241,7 +241,7 @@ public final class UnitSpatialIndex {
                 for (int i24 = iA; i24 <= iA2; i24++) {
                     for (int i25 = iB; i25 <= iB2; i25++) {
                         com.corrodinggames.rts.game.units.management.UnitList unitList6 = unitStatisticsManagerArr[i24][i25].b[i23];
-                        int i26 = unitList6.b;
+                        int i26 = unitList6.size;
                         if (i26 > 0) {
                             BaseUnit[] baseUnitArrA6 = unitList6.a();
                             for (int i27 = 0; i27 < i26; i27++) {

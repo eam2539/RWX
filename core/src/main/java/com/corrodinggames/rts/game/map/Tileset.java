@@ -313,7 +313,7 @@ public class Tileset {
     }
 
     /* JADX INFO: renamed from: a */
-    public final void getTileRect(int i, Rect rect) {
+    public final void computeTileRect(int i, Rect rect) {
         int i2 = i % this.columns;
         int i3 = (int) (i * this.invColumns);
         int i4 = this.atlasOriginX + (i2 * this.tileStridePixelsX);
@@ -330,7 +330,7 @@ public class Tileset {
             return this.cachedRect;
         }
         this.cachedRectIndex = i;
-        getTileRect(i, this.cachedRect);
+        computeTileRect(i, this.cachedRect);
         return this.cachedRect;
     }
 

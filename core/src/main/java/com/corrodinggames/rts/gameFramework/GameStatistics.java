@@ -14,7 +14,9 @@ public class GameStatistics {
     StatisticsData b = new StatisticsData();
     StatisticsData[] c = new StatisticsData[PlayerTeam.TEAM_ALLIES];
     int d;
-    boolean e;
+
+    /* JADX INFO: renamed from: e */
+    boolean isCollecting;
     public static boolean a = true;
     public static UnitEventManager f = new UnitEventManager();
 
@@ -48,12 +50,12 @@ public class GameStatistics {
             this.c[i] = new StatisticsData();
         }
         this.d = 0;
-        this.e = a;
+        this.isCollecting = a;
     }
 
     public void b() {
         int i = GameEngine.getInstance().gameTimeMillis;
-        if (this.e && this.d <= i) {
+        if (this.isCollecting && this.d <= i) {
             int i2 = 5000;
             if (i < 60000) {
                 i2 = 1000;
@@ -73,7 +75,7 @@ public class GameStatistics {
         for (int i2 = 0; i2 < PlayerTeam.TEAM_NEUTRAL; i2++) {
             PlayerTeam playerTeamK = PlayerTeam.k(i2);
             if (playerTeamK != null) {
-                TeamHistory teamHistory = this.c[i2].l;
+                TeamHistory teamHistory = this.c[i2].teamHistory;
                 if (!z || teamHistory.c()) {
                     teamHistory.a(playerTeamK, i, z2);
                     teamHistory.a(i2);
@@ -83,7 +85,7 @@ public class GameStatistics {
     }
 
     public void c() {
-        this.e = false;
+        this.isCollecting = false;
         a(GameEngine.getInstance().gameTimeMillis, true, true);
     }
 
@@ -91,7 +93,7 @@ public class GameStatistics {
     public ArrayList getActiveTeamStatistics() {
         ArrayList arrayList = new ArrayList();
         for (int i = 0; i < PlayerTeam.TEAM_NEUTRAL; i++) {
-            if (this.c[i].l.c()) {
+            if (this.c[i].teamHistory.c()) {
                 arrayList.add(this.c[i]);
             }
         }
@@ -122,14 +124,14 @@ public class GameStatistics {
             if (z) {
                 f.a(baseUnit, baseUnit2);
                 if (baseUnit2.bI()) {
-                    statisticsDataA.d++;
-                    statisticsDataA2.g++;
+                    statisticsDataA.killedBuildings++;
+                    statisticsDataA2.lostBuildings++;
                 } else if (baseUnit2.isExperimental()) {
-                    statisticsDataA.e++;
-                    statisticsDataA2.h++;
+                    statisticsDataA.killedExperimental++;
+                    statisticsDataA2.lostExperimental++;
                 } else {
-                    statisticsDataA.c++;
-                    statisticsDataA2.f++;
+                    statisticsDataA.killedUnits++;
+                    statisticsDataA2.lostUnits++;
                 }
             }
         }

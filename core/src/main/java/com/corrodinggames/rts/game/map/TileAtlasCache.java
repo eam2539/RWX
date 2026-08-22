@@ -144,7 +144,7 @@ public class TileAtlasCache {
     /* JADX INFO: renamed from: a */
     public int allocateSlotForTile(Tileset tileset, int i) {
         int iAllocateSlotForTile;
-        tileset.getTileRect(i, tmpRectA);
+        tileset.computeTileRect(i, tmpRectA);
         if (this.allocatedSlotCount >= 400) {
             return -1;
         }
@@ -229,11 +229,11 @@ public class TileAtlasCache {
         this.paddingBlitPaint.a(z);
         this.paddingBlitPaint.d(z);
         this.paddingBlitPaint.b(z);
-        getPaddingEdgeRect(this.atlasGraphics, texture, rect, rect2, this.paddingBlitPaint);
+        blitPaddingEdges(this.atlasGraphics, texture, rect, rect2, this.paddingBlitPaint);
     }
 
     /* JADX INFO: renamed from: a */
-    public static void getPaddingEdgeRect(GraphicsEngine graphicsEngine, Texture texture, Rect rect, Rect rect2, KoolPaint paint) {
+    public static void blitPaddingEdges(GraphicsEngine graphicsEngine, Texture texture, Rect rect, Rect rect2, KoolPaint paint) {
         for (int i = 0; i <= 3; i++) {
             getPixelCopyRectForCorner(rect, tmpRectB, i, 0);
             getPixelCopyRectForCorner(rect2, tmpRectC, i, 1);

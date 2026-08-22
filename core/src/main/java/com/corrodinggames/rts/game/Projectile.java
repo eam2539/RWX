@@ -914,9 +914,9 @@ public class Projectile extends PositionedObject {
                     this.followNodeIndex = 0;
                 }
                 Vector3D vector3DD = orderableUnit.D(this.followNodeIndex);
-                f6 = vector3DD.a;
-                f7 = vector3DD.b;
-                f8 = this.sourceUnit.posZ + vector3DD.c;
+                f6 = vector3DD.x;
+                f7 = vector3DD.y;
+                f8 = this.sourceUnit.posZ + vector3DD.z;
             } else {
                 f6 = this.followObject.posX;
                 f7 = this.followObject.posY;
@@ -1233,7 +1233,7 @@ public class Projectile extends PositionedObject {
                     }
                 }
                 if (this.parentProjectile != null) {
-                    if (projectileTemplate.d) {
+                    if (projectileTemplate.killParentOnHit) {
                         this.parentProjectile.lifeTimer = 0.0f;
                     } else {
                         this.parentProjectile.b();
@@ -1517,10 +1517,10 @@ public class Projectile extends PositionedObject {
 
     public void b(float f2) {
         boolean z = false;
-        if (this.template.f) {
+        if (this.template.noExplosion) {
             return;
         }
-        if (this.template.e) {
+        if (this.template.hasSplashDamage) {
             z = true;
         }
         if (!z) {
@@ -1536,7 +1536,7 @@ public class Projectile extends PositionedObject {
         }
         float f3 = this.explosionRadius * f2;
         float f4 = f3;
-        if (this.template.h) {
+        if (this.template.splashRadiusBonus) {
             f4 += 150.0f;
         }
         GameEngine gameEngine = GameEngine.getInstance();
@@ -1584,11 +1584,11 @@ public class Projectile extends PositionedObject {
             return;
         }
         float fDistanceSq = Utility.distanceSq(this.hitX, this.hitY, baseUnit.posX, baseUnit.posY);
-        if (fDistanceSq > f3 * f3 && !this.template.h) {
+        if (fDistanceSq > f3 * f3 && !this.template.splashRadiusBonus) {
             return;
         }
         float fSqrt = (float) StrictMath.sqrt(fDistanceSq);
-        if (this.template.h) {
+        if (this.template.splashRadiusBonus) {
             fSqrt -= baseUnit.radius;
             if (fSqrt < 0.0f) {
                 fSqrt = 0.0f;
@@ -1605,7 +1605,7 @@ public class Projectile extends PositionedObject {
         if (f4 > 1.0f) {
             f4 = 1.0f;
         }
-        if (this.template.g) {
+        if (this.template.fullSplashDamage) {
             f4 = 1.0f;
         }
         float f5 = f4 * this.splashDamage;

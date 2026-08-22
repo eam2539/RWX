@@ -695,8 +695,8 @@ public abstract class BaseUnit extends SizedObject {
             gameOutputStream.writeFloat(unitMovementData.velocityY);
             gameOutputStream.writeFloat(unitMovementData.rotation);
             gameOutputStream.writeFloat(unitMovementData.speed);
-            gameOutputStream.writeFloat(unitMovementData.h);
-            gameOutputStream.writeFloat(unitMovementData.i);
+            gameOutputStream.writeFloat(unitMovementData.shadowOffsetX);
+            gameOutputStream.writeFloat(unitMovementData.shadowOffsetY);
             BaseUnit baseUnit = unitMovementData.targetUnit;
             if (baseUnit != null && baseUnit.isDead) {
                 baseUnit = null;
@@ -720,8 +720,8 @@ public abstract class BaseUnit extends SizedObject {
             gameOutputStream.writeInt(this.unitEffects.length);
             for (int i2 = 0; i2 < this.unitEffects.length; i2++) {
                 UnitEffectData unitEffectData = this.unitEffects[i2];
-                gameOutputStream.writeBoolean(unitEffectData.a);
-                gameOutputStream.writeInt(unitEffectData.b);
+                gameOutputStream.writeBoolean(unitEffectData.isActive);
+                gameOutputStream.writeInt(unitEffectData.unitLevel);
             }
         }
         gameOutputStream.writeFloat(this.unitArmor);
@@ -799,8 +799,8 @@ public abstract class BaseUnit extends SizedObject {
                 unitMovementData.rotation = gameInputStream.readFloat();
                 unitMovementData.speed = gameInputStream.readFloat();
                 if (b >= 8) {
-                    unitMovementData.h = gameInputStream.readFloat();
-                    unitMovementData.i = gameInputStream.readFloat();
+                    unitMovementData.shadowOffsetX = gameInputStream.readFloat();
+                    unitMovementData.shadowOffsetY = gameInputStream.readFloat();
                     unitMovementData.targetUnit = gameInputStream.readBaseUnit();
                 }
                 if (b >= 12) {
@@ -838,8 +838,8 @@ public abstract class BaseUnit extends SizedObject {
             for (int i3 = 0; i3 < this.unitEffects.length; i3++) {
                 this.unitEffects[i3] = new UnitEffectData();
                 UnitEffectData unitEffectData = this.unitEffects[i3];
-                unitEffectData.a = gameInputStream.readBoolean();
-                unitEffectData.b = gameInputStream.readInt();
+                unitEffectData.isActive = gameInputStream.readBoolean();
+                unitEffectData.unitLevel = gameInputStream.readInt();
             }
         }
         if (b >= 13) {
@@ -1695,7 +1695,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: t */
-    public boolean setWidth(BaseUnit baseUnit) {
+    public boolean isCollidingWith(BaseUnit baseUnit) {
         float fDistanceSq = Utility.distanceSq(this.posX, this.posY, baseUnit.posX, baseUnit.posY);
         float f = this.radius + baseUnit.radius;
         if (fDistanceSq < f * f) {
@@ -1903,7 +1903,7 @@ public abstract class BaseUnit extends SizedObject {
     }
 
     /* JADX INFO: renamed from: u */
-    public int setHeight(BaseUnit baseUnit) {
+    public int getRepairRange(BaseUnit baseUnit) {
         return y() + baseUnit.r().a(this);
     }
 
@@ -2295,15 +2295,15 @@ public abstract class BaseUnit extends SizedObject {
         }
         UnitEffectData unitEffectData = this.unitEffects[playerTeam.teamId];
         if (this.isDead) {
-            if (unitEffectData.a && d(playerTeam)) {
-                unitEffectData.a = false;
+            if (unitEffectData.isActive && d(playerTeam)) {
+                unitEffectData.isActive = false;
                 return;
             }
             return;
         }
         if (d(playerTeam)) {
-            unitEffectData.a = true;
-            unitEffectData.b = getUpgradeLevel();
+            unitEffectData.isActive = true;
+            unitEffectData.unitLevel = getUpgradeLevel();
         }
     }
 
@@ -2312,18 +2312,18 @@ public abstract class BaseUnit extends SizedObject {
         GameEngine gameEngine = GameEngine.getInstance();
         if (gameEngine.playerTeam != null && this.team != gameEngine.playerTeam && gameEngine.playerTeam.teamId >= 0 && gameEngine.playerTeam.teamId < PlayerTeam.TEAM_NEUTRAL) {
             UnitEffectData unitEffectData = this.unitEffects[gameEngine.playerTeam.teamId];
-            if (unitEffectData.c != null && unitEffectData.c.isDead) {
-                unitEffectData.c = null;
+            if (unitEffectData.buildPreview != null && unitEffectData.buildPreview.isDead) {
+                unitEffectData.buildPreview = null;
             }
-            if (unitEffectData.c == null && unitEffectData.a && !d(gameEngine.playerTeam)) {
+            if (unitEffectData.buildPreview == null && unitEffectData.isActive && !d(gameEngine.playerTeam)) {
                 BuildPreview buildPreview = new BuildPreview();
-                unitEffectData.c = buildPreview;
+                unitEffectData.buildPreview = buildPreview;
                 buildPreview.unitType = r();
                 buildPreview.worldX = this.posX;
                 buildPreview.worldY = this.posY;
                 buildPreview.isBuilding = false;
                 buildPreview.team = this.team;
-                buildPreview.previewUnitLevel = unitEffectData.b;
+                buildPreview.previewUnitLevel = unitEffectData.unitLevel;
                 buildPreview.placingTeam = gameEngine.playerTeam;
                 buildPreview.isVisibleOnMinimap = c_();
                 buildPreview.attachedUnit = this;

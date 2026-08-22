@@ -6,10 +6,18 @@ import io.github.rwx.render.canvas.KoolPaint;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.ah */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/ah.class */
 public class TextureRenderer extends RenderElement {
-    Texture a;
-    float b = 1.0f;
-    int c;
-    int d;
+
+    /* JADX INFO: renamed from: a */
+    Texture texture;
+
+    /* JADX INFO: renamed from: b */
+    float scale = 1.0f;
+
+    /* JADX INFO: renamed from: c */
+    int width;
+
+    /* JADX INFO: renamed from: d */
+    int height;
     final /* synthetic */ TextRenderQueue e;
 
     public TextureRenderer(TextRenderQueue textRenderQueue) {
@@ -18,6 +26,6 @@ public class TextureRenderer extends RenderElement {
 
     @Override // com.corrodinggames.rts.gameFramework.ui.RenderElement
     public int a(KoolPaint paint) {
-        return this.c;
+        return this.width;
     }
 }

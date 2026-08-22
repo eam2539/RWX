@@ -286,7 +286,7 @@ class ApiImpl private constructor(
             }
         val areaAmount = binding.areaDamageAmount
         if (areaAmount != null && areaAmount != 0f && projectile.i > 0) {
-            projectile.e = true
+            projectile.hasSplashDamage = true
         }
     }
 

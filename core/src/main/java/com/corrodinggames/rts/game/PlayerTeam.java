@@ -807,23 +807,23 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     /* JADX INFO: renamed from: a */
     public final int getUnitCount(boolean z, boolean z2) {
         TeamUnitStats teamUnitStats = this.teamStatistics;
-        int i = teamUnitStats.c;
+        int i = teamUnitStats.completedUnitCount;
         if (z) {
-            i += teamUnitStats.f;
+            i += teamUnitStats.incompleteUnitCount;
         }
         if (z2) {
-            i += teamUnitStats.e;
+            i += teamUnitStats.factoryQueueCount;
         }
         return i;
     }
 
     /* JADX INFO: renamed from: s */
     public final int getTotalUnitCountIncludingQueued() {
-        return this.teamStatistics.c + this.teamStatistics.f + this.teamStatistics.e;
+        return this.teamStatistics.completedUnitCount + this.teamStatistics.incompleteUnitCount + this.teamStatistics.factoryQueueCount;
     }
 
     public int getTeamUnitCountInt() {
-        return this.teamStatistics.b;
+        return this.teamStatistics.unitCount;
     }
 
     public int getTeamBuildingCountInt() {
@@ -833,7 +833,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     /* JADX INFO: renamed from: a */
     public final int getUnitCountWithTag(AnimationTag animationTag, boolean z, boolean z2) {
         TeamUnitStats teamUnitStats = this.teamStatistics;
-        if (teamUnitStats.d == 0) {
+        if (teamUnitStats.totalUnitCount == 0) {
             return 0;
         }
         AnimationTagEntry animationTagEntryA = null;
@@ -874,8 +874,8 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     public boolean hasTeamStatsCacheMismatch() {
         boolean z = false;
         TeamUnitStats teamUnitStatsE = e(false);
-        if (this.teamStatistics.b != teamUnitStatsE.b) {
-            GameEngine.logColored("unitCountExcludingBuildingsIncludingQueued: " + this.teamStatistics.b + "!=" + teamUnitStatsE.b + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+        if (this.teamStatistics.unitCount != teamUnitStatsE.unitCount) {
+            GameEngine.logColored("unitCountExcludingBuildingsIncludingQueued: " + this.teamStatistics.unitCount + "!=" + teamUnitStatsE.unitCount + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
             this.teamStatsMismatchCount++;
             z = true;
         }
@@ -884,23 +884,23 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             this.teamStatsMismatchCount++;
             z = true;
         }
-        if (this.teamStatistics.g != teamUnitStatsE.g) {
-            GameEngine.logColored("incomeRate: " + this.teamStatistics.g + "!=" + teamUnitStatsE.g + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+        if (this.teamStatistics.creditIncomeRate != teamUnitStatsE.creditIncomeRate) {
+            GameEngine.logColored("incomeRate: " + this.teamStatistics.creditIncomeRate + "!=" + teamUnitStatsE.creditIncomeRate + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
             this.teamStatsMismatchCount++;
             z = true;
         }
-        if (this.teamStatistics.f != teamUnitStatsE.f) {
-            GameEngine.logColored("incompleteUnitCountOfAllTypes: " + this.teamStatistics.f + "!=" + teamUnitStatsE.f + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+        if (this.teamStatistics.incompleteUnitCount != teamUnitStatsE.incompleteUnitCount) {
+            GameEngine.logColored("incompleteUnitCountOfAllTypes: " + this.teamStatistics.incompleteUnitCount + "!=" + teamUnitStatsE.incompleteUnitCount + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
             this.teamStatsMismatchCount++;
             z = true;
         }
-        if (this.teamStatistics.e != teamUnitStatsE.e) {
-            GameEngine.logColored("queuedCountOfAllTypes: " + this.teamStatistics.e + "!=" + teamUnitStatsE.e + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+        if (this.teamStatistics.factoryQueueCount != teamUnitStatsE.factoryQueueCount) {
+            GameEngine.logColored("queuedCountOfAllTypes: " + this.teamStatistics.factoryQueueCount + "!=" + teamUnitStatsE.factoryQueueCount + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
             this.teamStatsMismatchCount++;
             z = true;
         }
-        if (this.teamStatistics.c != teamUnitStatsE.c) {
-            GameEngine.logColored("unitCountOfAllTypesOnlyCompleted: " + this.teamStatistics.c + "!=" + teamUnitStatsE.c + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
+        if (this.teamStatistics.completedUnitCount != teamUnitStatsE.completedUnitCount) {
+            GameEngine.logColored("unitCountOfAllTypesOnlyCompleted: " + this.teamStatistics.completedUnitCount + "!=" + teamUnitStatsE.completedUnitCount + " (team:" + this.teamId + " fails: " + this.teamStatsMismatchCount + ")");
             this.teamStatsMismatchCount++;
             z = true;
         }
@@ -957,10 +957,10 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         }
         this.teamStatistics = e(true);
         this.isTeamReady = false;
-        if (this.maxNonBuildingUnitCountIncludingQueued < this.teamStatistics.b) {
-            this.maxNonBuildingUnitCountIncludingQueued = this.teamStatistics.b;
+        if (this.maxNonBuildingUnitCountIncludingQueued < this.teamStatistics.unitCount) {
+            this.maxNonBuildingUnitCountIncludingQueued = this.teamStatistics.unitCount;
         }
-        if (!this.isTeamControlledByAI && this.teamStatistics.m) {
+        if (!this.isTeamControlledByAI && this.teamStatistics.hasAdvancedUnit) {
             this.isTeamControlledByAI = true;
         }
         if (!this.isTeamActive && getTotalUnitCountIncludingQueued() > 0) {
@@ -971,7 +971,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
 
     /* JADX INFO: renamed from: u */
     public int getEconomyScaledIncomeRate() {
-        return (int) (this.teamStatistics.g * getEconomyMultiplier());
+        return (int) (this.teamStatistics.creditIncomeRate * getEconomyMultiplier());
     }
 
     /* JADX INFO: renamed from: v */
@@ -987,7 +987,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
     public int b(Resource resource) {
         int iA;
         if (resource == Resource.D) {
-            iA = this.teamStatistics.g;
+            iA = this.teamStatistics.creditIncomeRate;
         } else {
             iA = (int) this.teamStatistics.h.a(resource);
         }
@@ -1005,7 +1005,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
 
     /* JADX INFO: renamed from: w */
     public int getNonBuildingUnitCountIncludingQueued() {
-        return this.teamStatistics.b;
+        return this.teamStatistics.unitCount;
     }
 
     /* JADX INFO: renamed from: x */
@@ -1664,7 +1664,7 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
             PlayerTeam playerTeam = baseUnit.team;
             playerTeam.teamStatistics.a(baseUnit);
             baseUnit.applyBorrowedResources();
-            if (!playerTeam.isTeamControlledByAI && playerTeam.teamStatistics.m) {
+            if (!playerTeam.isTeamControlledByAI && playerTeam.teamStatistics.hasAdvancedUnit) {
                 playerTeam.isTeamControlledByAI = true;
             }
             if (!playerTeam.isTeamActive) {
@@ -1908,16 +1908,16 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
                         break;
                     }
                     UnitTypeCount unitTypeCount = (UnitTypeCount) it.next();
-                    if (unitTypeCount.a == unitType) {
-                        unitTypeCount.b++;
+                    if (unitTypeCount.unitType == unitType) {
+                        unitTypeCount.count++;
                         z = true;
                         break;
                     }
                 }
                 if (!z) {
                     UnitTypeCount unitTypeCount2 = new UnitTypeCount();
-                    unitTypeCount2.a = unitType;
-                    unitTypeCount2.b = 1;
+                    unitTypeCount2.unitType = unitType;
+                    unitTypeCount2.count = 1;
                     fastArrayList.add(unitTypeCount2);
                 }
             }
@@ -1925,18 +1925,18 @@ public abstract class PlayerTeam extends Serializable implements Comparable<Play
         GameEngine.log("--- Units ---");
         int i2 = 0;
         for (UnitTypeCount unitTypeCount3 : fastArrayList) {
-            if (!unitTypeCount3.a.k()) {
-                GameEngine.log(unitTypeCount3.a.getUnitTypeDescriptionShort() + " - count:" + unitTypeCount3.b);
-                i2 += unitTypeCount3.b;
+            if (!unitTypeCount3.unitType.k()) {
+                GameEngine.log(unitTypeCount3.unitType.getUnitTypeDescriptionShort() + " - count:" + unitTypeCount3.count);
+                i2 += unitTypeCount3.count;
             }
         }
         GameEngine.log("total:" + i2);
         GameEngine.log("--- Buildings/Ignored in count ---");
         int i3 = 0;
         for (UnitTypeCount unitTypeCount4 : fastArrayList) {
-            if (unitTypeCount4.a.k()) {
-                GameEngine.log(unitTypeCount4.a.getUnitTypeDescriptionShort() + " - count:" + unitTypeCount4.b);
-                i3 += unitTypeCount4.b;
+            if (unitTypeCount4.unitType.k()) {
+                GameEngine.log(unitTypeCount4.unitType.getUnitTypeDescriptionShort() + " - count:" + unitTypeCount4.count);
+                i3 += unitTypeCount4.count;
             }
         }
         GameEngine.log("total:" + i3);

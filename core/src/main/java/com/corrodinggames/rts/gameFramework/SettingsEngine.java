@@ -566,7 +566,7 @@ public class SettingsEngine {
             return;
         }
         for (KeyBinding keyBinding : inputController.al) {
-            if (keyBinding.b && !keyBinding.d()) {
+            if (keyBinding.isDefault && !keyBinding.d()) {
                 String strE = keyBinding.e();
                 String string = this.prefs.getString(keyPreferenceName(strE), null);
                 if (string != null && !VariableScope.nullOrMissingString.equals(string)) {
@@ -601,7 +601,7 @@ public class SettingsEngine {
             return;
         }
         for (KeyBinding keyBinding : inputController.al) {
-            if (keyBinding.b && !keyBinding.d()) {
+            if (keyBinding.isDefault && !keyBinding.d()) {
                 preference.putString(keyPreferenceName(keyBinding.e()), inputController.a(keyBinding));
             }
         }

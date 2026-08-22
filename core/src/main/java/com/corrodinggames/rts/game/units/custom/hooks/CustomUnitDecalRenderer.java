@@ -555,9 +555,9 @@ public class CustomUnitDecalRenderer extends CustomUnitRenderHook {
 
                             int var49 = var14.ag;
                             Vector3D var55 = jx.F(var49);
-                            var40 = var55.a;
-                            var42 = var55.b;
-                            var44 = jx.posZ + var55.c;
+                            var40 = var55.x;
+                            var42 = var55.y;
+                            var44 = jx.posZ + var55.z;
                             var18 = jx.movementLevels[var49].targetX + 90.0F;
                             var19 = jx.movementLevels[var49].targetX;
                         } else {

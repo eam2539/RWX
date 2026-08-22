@@ -5,21 +5,23 @@ import java.util.Locale;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.g */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/g.class */
 public final class PlatformResolver {
-    protected static Platform a;
+
+    /* JADX INFO: renamed from: a */
+    protected static Platform currentPlatform;
 
     public static Platform a() {
-        if (a == null) {
+        if (currentPlatform == null) {
             String lowerCase = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
             if (lowerCase.indexOf("mac") >= 0 || lowerCase.indexOf("darwin") >= 0) {
-                a = Platform.MacOS;
+                currentPlatform = Platform.MacOS;
             } else if (lowerCase.indexOf("win") >= 0) {
-                a = Platform.Windows;
+                currentPlatform = Platform.Windows;
             } else if (lowerCase.indexOf("nux") >= 0) {
-                a = Platform.Linux;
+                currentPlatform = Platform.Linux;
             } else {
-                a = Platform.Other;
+                currentPlatform = Platform.Other;
             }
         }
-        return a;
+        return currentPlatform;
     }
 }

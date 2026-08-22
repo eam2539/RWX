@@ -8,13 +8,16 @@ import com.corrodinggames.rts.gameFramework.ui.GameUI;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.l */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/l.class */
 class ChangeTypeFilterAction extends NoneAction {
-    boolean a;
-    boolean b;
+    /* JADX INFO: renamed from: a */
+    boolean isPrevious;
+
+    /* JADX INFO: renamed from: b */
+    boolean isInfoOnly;
 
     public ChangeTypeFilterAction(boolean z, boolean z2) {
         super("changeTypeFilter" + z + "d:" + z2);
-        this.a = z;
-        this.b = z2;
+        this.isPrevious = z;
+        this.isInfoOnly = z2;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -26,7 +29,7 @@ class ChangeTypeFilterAction extends NoneAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
     public String getDisplayName() {
-        if (this.b) {
+        if (this.isInfoOnly) {
             EditorOrBuilder editorOrBuilderL = EditorOrBuilder.L();
             if (editorOrBuilderL != null) {
                 if (editorOrBuilderL.F != null) {
@@ -36,7 +39,7 @@ class ChangeTypeFilterAction extends NoneAction {
             }
             return "Type Filter";
         }
-        if (this.a) {
+        if (this.isPrevious) {
             return "<- Set type";
         }
         return "Set type ->";
@@ -44,8 +47,8 @@ class ChangeTypeFilterAction extends NoneAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public String d() {
-        if (!this.b) {
-            if (this.a) {
+        if (!this.isInfoOnly) {
+            if (this.isPrevious) {
                 return "<-";
             }
             return "->";
@@ -78,7 +81,7 @@ class ChangeTypeFilterAction extends NoneAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: m */
     public int getKeyBinding() {
-        if (this.b) {
+        if (this.isInfoOnly) {
             return 2;
         }
         return 4;
@@ -88,7 +91,7 @@ class ChangeTypeFilterAction extends NoneAction {
     // com.corrodinggames.rts.game.units.actions.NoneAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
     public ActionDisplayType getActionDisplayType() {
-        if (this.b) {
+        if (this.isInfoOnly) {
             return ActionDisplayType.infoOnly;
         }
         return super.getActionDisplayType();
@@ -97,7 +100,7 @@ class ChangeTypeFilterAction extends NoneAction {
     @Override
     // com.corrodinggames.rts.game.units.actions.NoneAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public ActionType getActionType() {
-        if (this.b) {
+        if (this.isInfoOnly) {
             return ActionType.infoOnly;
         }
         return super.getActionType();

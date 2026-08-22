@@ -880,7 +880,7 @@ public class GameLogic extends GameEngine {
                     }
                 }
             }
-            if (!z2 && (this.missionEngine == null || !this.missionEngine.q)) {
+            if (!z2 && (this.missionEngine == null || !this.missionEngine.hasCameraStartMarker)) {
                 setViewpoint(0.0f, 0.0f);
                 int i10 = 0;
                 int i11 = 0;
@@ -936,7 +936,7 @@ public class GameLogic extends GameEngine {
                     ((OrderableUnit) baseUnit4).c(false);
                 }
             }
-            this.gameStateData.e = true;
+            this.gameStateData.isGameStarted = true;
             this.gameStateManager.a();
             loadLevel("Starting game");
             this.hasLoadedLevel = true;

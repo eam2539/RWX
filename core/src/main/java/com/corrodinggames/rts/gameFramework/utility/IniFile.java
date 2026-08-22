@@ -705,10 +705,10 @@ public class IniFile {
                 throw new NumberFormatException("Got:" + strArrSplit.length + " elements expected 2 or 3");
             }
             Vector3D vector3D2 = new Vector3D();
-            vector3D2.a = Float.parseFloat(strArrSplit[0]);
-            vector3D2.b = Float.parseFloat(strArrSplit[1]);
+            vector3D2.x = Float.parseFloat(strArrSplit[0]);
+            vector3D2.y = Float.parseFloat(strArrSplit[1]);
             if (strArrSplit.length > 2) {
-                vector3D2.c = Float.parseFloat(strArrSplit[2]);
+                vector3D2.z = Float.parseFloat(strArrSplit[2]);
             }
             return vector3D2;
         } catch (NumberFormatException e) {

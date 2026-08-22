@@ -276,7 +276,7 @@ fun UiScope.SettingsKeyBindingCard(
             Icon(Icon.Interface, UiTheme.Layout.textButtonGlyphSize, theme.palette.primary).modifier
                 .align(AlignmentX.Start, AlignmentY.Center)
         }
-        Text(row.keyBinding.a) {
+        Text(row.keyBinding.name) {
             modifier
                 .width(labelWidth)
                 .height(UiTheme.Layout.settingsRowHeight)

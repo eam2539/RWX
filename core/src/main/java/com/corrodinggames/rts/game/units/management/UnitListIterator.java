@@ -8,19 +8,23 @@ import java.util.Iterator;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.f.f */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/f/f.class */
 public class UnitListIterator implements Iterable<BaseUnit>, Iterator<BaseUnit> {
-    int a;
-    BaseUnit[] b;
+
+    /* JADX INFO: renamed from: a */
+    int remaining;
+
+    /* JADX INFO: renamed from: b */
+    BaseUnit[] elements;
 
     @Override // java.util.Iterator
     public boolean hasNext() {
-        return this.a > 0;
+        return this.remaining > 0;
     }
 
     @Override // java.util.Iterator
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
     public BaseUnit next() {
-        this.a--;
-        return this.b[this.a];
+        this.remaining--;
+        return this.elements[this.remaining];
     }
 
     @Override // java.util.Iterator
@@ -34,7 +38,7 @@ public class UnitListIterator implements Iterable<BaseUnit>, Iterator<BaseUnit> 
     }
 
     public void a(UnitList unitList) {
-        this.b = unitList.a();
-        this.a = unitList.b;
+        this.elements = unitList.a();
+        this.remaining = unitList.b;
     }
 }

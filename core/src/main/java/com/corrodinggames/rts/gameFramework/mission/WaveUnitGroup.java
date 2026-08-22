@@ -14,8 +14,12 @@ import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.n.i */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/n/i.class */
 class WaveUnitGroup {
-    boolean a;
-    FastArrayList<WaveUnitEntry> b = new FastArrayList();
+
+    /* JADX INFO: renamed from: a */
+    boolean isBossWave;
+
+    /* JADX INFO: renamed from: b */
+    FastArrayList<WaveUnitEntry> entries = new FastArrayList();
     final /* synthetic */ MissionEngine c;
 
     WaveUnitGroup(MissionEngine missionEngine) {
@@ -31,16 +35,16 @@ class WaveUnitGroup {
     }
 
     public void b(UnitType unitType, int i) {
-        for (WaveUnitEntry waveUnitEntry : this.b) {
-            if (waveUnitEntry.a == unitType) {
-                waveUnitEntry.b += i;
+        for (WaveUnitEntry waveUnitEntry : this.entries) {
+            if (waveUnitEntry.unitType == unitType) {
+                waveUnitEntry.count += i;
                 return;
             }
         }
         WaveUnitEntry waveUnitEntry2 = new WaveUnitEntry(this);
-        waveUnitEntry2.a = unitType;
-        waveUnitEntry2.b = i;
-        this.b.add(waveUnitEntry2);
+        waveUnitEntry2.unitType = unitType;
+        waveUnitEntry2.count = i;
+        this.entries.add(waveUnitEntry2);
     }
 
     public void a(float f, float f2) {
@@ -53,9 +57,9 @@ class WaveUnitGroup {
             playerTeamK.teamColorId = 100;
             playerTeamK.isTeamObserver = true;
         }
-        for (WaveUnitEntry waveUnitEntry : this.b) {
-            for (int i2 = 0; i2 < waveUnitEntry.b; i2++) {
-                BaseUnit baseUnitA = waveUnitEntry.a.a();
+        for (WaveUnitEntry waveUnitEntry : this.entries) {
+            for (int i2 = 0; i2 < waveUnitEntry.count; i2++) {
+                BaseUnit baseUnitA = waveUnitEntry.unitType.a();
                 baseUnitA.posX = f + Utility.getDeterministicRandomIntInRange(-85, 85, i + 0);
                 baseUnitA.posY = f2 + Utility.getDeterministicRandomIntInRange(-85, 85, i + 1);
                 baseUnitA.rotationSpeed = Utility.getDeterministicRandomIntInRange(-180, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT, i + 2);
@@ -81,17 +85,17 @@ class WaveUnitGroup {
     }
 
     public String toString() {
-        if (this.b.size() == 0) {
+        if (this.entries.size() == 0) {
             return "No units";
         }
         String str = VariableScope.nullOrMissingString;
         boolean z = true;
-        for (WaveUnitEntry waveUnitEntry : this.b) {
+        for (WaveUnitEntry waveUnitEntry : this.entries) {
             if (!z) {
                 str = str + ", ";
             }
             z = false;
-            str = (str + waveUnitEntry.b + "x ") + waveUnitEntry.a.getUnitName();
+            str = (str + waveUnitEntry.count + "x ") + waveUnitEntry.unitType.getUnitName();
         }
         return str;
     }
