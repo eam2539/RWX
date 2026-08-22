@@ -90,7 +90,7 @@ public class InGameActivity extends TaskQueueActivity {
                 menu.add(0, 10, 0, Locale.get("menus.ingame.exitGame", new Object[0])).setIcon(R.drawable.ic_lock_power_off);
             }
         } else {
-            if (gameEngine.missionEngine != null && gameEngine.missionEngine.h != null) {
+            if (gameEngine.missionEngine != null && gameEngine.missionEngine.introText != null) {
                 menu.add(0, 11, 0, Locale.get("menus.ingame.briefing", new Object[0])).setIcon(R.drawable.ic_dialog_info);
             }
             menu.add(0, 15, 0, Locale.get("menus.ingame.exitGame", new Object[0])).setIcon(R.drawable.ic_lock_power_off);
@@ -190,8 +190,8 @@ public class InGameActivity extends TaskQueueActivity {
                 break;
             case 11:
                 GameEngine gameEngine4 = GameEngine.getInstance();
-                if (gameEngine4.missionEngine != null && gameEngine4.missionEngine.h != null) {
-                    gameEngine4.showMessageBox("Briefing", gameEngine4.missionEngine.h);
+                if (gameEngine4.missionEngine != null && gameEngine4.missionEngine.introText != null) {
+                    gameEngine4.showMessageBox("Briefing", gameEngine4.missionEngine.introText);
                     break;
                 }
                 break;

@@ -10,12 +10,22 @@ import java.util.HashMap;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.be */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/be.class */
 public class GameStateManager {
-    static GameStateManager e = null;
+    static GameStateManager instance = null;
     public boolean a = false;
-    String b = "rtsSave";
-    String c = "rtsSave.bak";
+    String saveFileName = "rtsSave";
+    String backupFileName = "rtsSave.bak";
     public boolean d = false;
-    HashMap<String,GameStateData> f = new HashMap();
+    HashMap<String,GameStateData> states = new HashMap();
+
+    public static GameStateManager c(Context context) {
+        if (instance == null) {
+            instance = new GameStateManager(context);
+            if (!GameEngine.isNonAndroidVersion) {
+                instance.b(context);
+            }
+        }
+        return instance;
+    }
 
     public void a(Context context) {
         if (GameEngine.isNonAndroidVersion || this.a) {
@@ -26,7 +36,7 @@ public class GameStateManager {
                 throw new IOException("context==null");
             }
             try {
-                FileOutputStream fileOutputStreamB = context.b(this.b, 0);
+                FileOutputStream fileOutputStreamB = context.b(this.saveFileName, 0);
                 DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStreamB);
                 a(dataOutputStream);
                 dataOutputStream.close();
@@ -41,7 +51,7 @@ public class GameStateManager {
         }
         if (this.d) {
             try {
-                FileOutputStream fileOutputStream = new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + this.c));
+                FileOutputStream fileOutputStream = new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/" + this.backupFileName));
                 DataOutputStream dataOutputStream2 = new DataOutputStream(fileOutputStream);
                 a(dataOutputStream2);
                 dataOutputStream2.close();
@@ -59,14 +69,14 @@ public class GameStateManager {
         try {
             dataOutputStream.writeInt(1);
             dataOutputStream.writeInt(0);
-            dataOutputStream.writeInt(this.f.size());
-            for (GameStateData gameStateData : this.f.values()) {
+            dataOutputStream.writeInt(this.states.size());
+            for (GameStateData gameStateData : this.states.values()) {
                 dataOutputStream.writeInt(0);
                 dataOutputStream.writeInt(gameStateData.a);
-                dataOutputStream.writeUTF(gameStateData.b);
+                dataOutputStream.writeUTF(gameStateData.mapPath);
                 dataOutputStream.writeInt(gameStateData.c);
                 dataOutputStream.writeBoolean(gameStateData.d);
-                dataOutputStream.writeBoolean(gameStateData.e);
+                dataOutputStream.writeBoolean(gameStateData.isGameStarted);
                 dataOutputStream.writeBoolean(gameStateData.f);
                 dataOutputStream.writeLong(gameStateData.g);
                 dataOutputStream.writeInt(gameStateData.h);
@@ -86,7 +96,7 @@ public class GameStateManager {
         boolean zA = false;
         Log.d("RustedWarfare", "Trying to load from internal memory");
         try {
-            FileInputStream fileInputStreamA = context.a(this.b);
+            FileInputStream fileInputStreamA = context.a(this.saveFileName);
             zA = a(new DataInputStream(fileInputStreamA));
             if (zA) {
                 Log.d("RustedWarfare", "loaded from internal memory");
@@ -98,7 +108,7 @@ public class GameStateManager {
         if (this.d && !zA) {
             Log.d("RustedWarfare", "Trying to load from SD");
             try {
-                FileInputStream fileInputStream = new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/" + this.c));
+                FileInputStream fileInputStream = new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/" + this.backupFileName));
                 DataInputStream dataInputStream = new DataInputStream(fileInputStream);
                 if (a(dataInputStream)) {
                     Log.d("RustedWarfare", "loaded from SD");
@@ -120,7 +130,7 @@ public class GameStateManager {
             }
             dataInputStream.readInt();
             int i2 = dataInputStream.readInt();
-            this.f.clear();
+            this.states.clear();
             for (int i3 = 0; i3 < i2; i3++) {
                 GameStateData gameStateData = new GameStateData(this);
                 dataInputStream.readInt();
@@ -130,30 +140,20 @@ public class GameStateManager {
                     Log.d("RustedWarfare", "converting:" + utf);
                     utf = "maps/challenge/l090;Level 7.tmx";
                 }
-                gameStateData.b = utf;
+                gameStateData.mapPath = utf;
                 gameStateData.c = dataInputStream.readInt();
                 gameStateData.d = dataInputStream.readBoolean();
-                gameStateData.e = dataInputStream.readBoolean();
+                gameStateData.isGameStarted = dataInputStream.readBoolean();
                 gameStateData.f = dataInputStream.readBoolean();
                 gameStateData.g = dataInputStream.readLong();
                 gameStateData.h = dataInputStream.readInt();
-                this.f.put(a(gameStateData.b), gameStateData);
+                this.states.put(a(gameStateData.mapPath), gameStateData);
             }
             return true;
         } catch (IOException e2) {
             Log.b("RustedWarfare", "file read error:", e2);
             return false;
         }
-    }
-
-    public static GameStateManager c(Context context) {
-        if (e == null) {
-            e = new GameStateManager(context);
-            if (!GameEngine.isNonAndroidVersion) {
-                e.b(context);
-            }
-        }
-        return e;
     }
 
     private GameStateManager(Context context) {
@@ -169,13 +169,13 @@ public class GameStateManager {
 
     public GameStateData b(String str) {
         String strA = a(str);
-        GameStateData gameStateData = (GameStateData) this.f.get(strA);
+        GameStateData gameStateData = (GameStateData) this.states.get(strA);
         Log.d("RustedWarfare", "StateEngine: get(" + str + ")=" + gameStateData + "  (key=" + strA + ")");
         if (gameStateData == null) {
             gameStateData = new GameStateData(this);
             gameStateData.a = 1;
-            gameStateData.b = str;
-            this.f.put(strA, gameStateData);
+            gameStateData.mapPath = str;
+            this.states.put(strA, gameStateData);
         }
         return gameStateData;
     }

@@ -14,14 +14,29 @@ import java.util.regex.Pattern;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.n.g */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/n/g.class */
 public class MissionWave {
-    public ArrayList a = new ArrayList();
-    public boolean b;
-    public boolean c;
-    public float d;
+
+    /* JADX INFO: renamed from: a */
+    public ArrayList waveGroups = new ArrayList();
+
+    /* JADX INFO: renamed from: b */
+    public boolean lockSpawn;
+
+    /* JADX INFO: renamed from: c */
+    public boolean unlockSpawn;
+
+    /* JADX INFO: renamed from: d */
+    public float timeSeconds;
+
     public int e;
-    public String f;
-    public boolean g;
-    public boolean h;
+
+    /* JADX INFO: renamed from: f */
+    public String messageText;
+
+    /* JADX INFO: renamed from: g */
+    public boolean noTimer;
+
+    /* JADX INFO: renamed from: h */
+    public boolean hasMessage;
     final /* synthetic */ MissionEngine i;
 
     public MissionWave(MissionEngine missionEngine) {
@@ -73,14 +88,14 @@ public class MissionWave {
                 throw new MapLoadException("Unknown time format in wave: " + strTrim);
             }
             try {
-                this.d = Integer.parseInt(str2) + (Integer.parseInt(str3) * 60);
+                this.timeSeconds = Integer.parseInt(str2) + (Integer.parseInt(str3) * 60);
             } catch (NumberFormatException e) {
                 throw new MapLoadException("Failed to parse time on: " + strTrim, e);
             }
         }
         if (strGroup3 != null) {
-            this.f = strGroup3.trim();
-            this.h = true;
+            this.messageText = strGroup3.trim();
+            this.hasMessage = true;
         }
         if (strGroup != null) {
             for (String str4 : strGroup.split(",")) {
@@ -90,11 +105,11 @@ public class MissionWave {
                     strArrSplit2[1].trim();
                 }
                 if ("lockSpawn".equalsIgnoreCase(strTrim2)) {
-                    this.b = true;
+                    this.lockSpawn = true;
                 } else if ("unlockSpawn".equalsIgnoreCase(strTrim2)) {
-                    this.c = true;
+                    this.unlockSpawn = true;
                 } else if ("noTimer".equalsIgnoreCase(strTrim2)) {
-                    this.g = true;
+                    this.noTimer = true;
                 } else if (!"paused".equalsIgnoreCase(strTrim2) && !"win".equalsIgnoreCase(strTrim2) && !VariableScope.nullOrMissingString.equalsIgnoreCase(strTrim2)) {
                     throw new MapLoadException("Unknown wave option '" + strTrim2 + "' in: " + strTrim);
                 }
@@ -121,7 +136,7 @@ public class MissionWave {
                     }
                     WaveUnitGroup waveunitsVar = new WaveUnitGroup(this.i);
                     waveunitsVar.b(unitTypeByName, i);
-                    this.a.add(waveunitsVar);
+                    this.waveGroups.add(waveunitsVar);
                 } catch (NumberFormatException e2) {
                     throw new MapLoadException("Expected starting number in wave format '" + strTrim4 + "' in: " + strTrim);
                 }
@@ -137,17 +152,17 @@ public class MissionWave {
             this.i.e();
         }
         PointF pointF = this.i.P;
-        Iterator it = this.a.iterator();
+        Iterator it = this.waveGroups.iterator();
         while (it.hasNext()) {
             ((WaveUnitGroup) it.next()).a(pointF.x, pointF.y);
         }
         if (!this.i.Q) {
             this.i.e();
         }
-        if (this.b) {
+        if (this.lockSpawn) {
             this.i.Q = true;
         }
-        if (this.c) {
+        if (this.unlockSpawn) {
             this.i.Q = false;
         }
     }

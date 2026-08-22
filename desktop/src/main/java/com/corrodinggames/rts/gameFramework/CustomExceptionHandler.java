@@ -6,10 +6,12 @@ import com.corrodinggames.rts.gameFramework.network.MasterServerClient;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.i */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/i.class */
 public class CustomExceptionHandler implements Thread.UncaughtExceptionHandler {
-    private Thread.UncaughtExceptionHandler a;
+
+    /* JADX INFO: renamed from: a */
+    private Thread.UncaughtExceptionHandler defaultHandler;
 
     CustomExceptionHandler(Thread.UncaughtExceptionHandler uncaughtExceptionHandler) {
-        this.a = uncaughtExceptionHandler;
+        this.defaultHandler = uncaughtExceptionHandler;
     }
 
     @Override // java.lang.Thread.UncaughtExceptionHandler
@@ -96,9 +98,9 @@ public class CustomExceptionHandler implements Thread.UncaughtExceptionHandler {
                     }
                 }
                 if (!GameEngine.isDesktopVersion) {
-                    if (this.a != null) {
+                    if (this.defaultHandler != null) {
                         GameEngine.log("CustomExceptionHandler: sending to: defaultUEH.uncaughtException");
-                        this.a.uncaughtException(thread, th);
+                        this.defaultHandler.uncaughtException(thread, th);
                         GameEngine.log("CustomExceptionHandler: back from: defaultUEH.uncaughtException");
                     } else {
                         GameEngine.log("CustomExceptionHandler: defaultUEH==null");

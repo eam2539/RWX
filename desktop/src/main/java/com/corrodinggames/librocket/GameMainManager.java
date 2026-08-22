@@ -273,7 +273,7 @@ public abstract class GameMainManager {
     /* JADX INFO: renamed from: a */
     public void showPasswordPrompt(PasswordHandler passwordHandler) {
         GameEngine.getInstance();
-        GameEngine.log("[relay-debug] GameMainManager.showPasswordPrompt prompt=" + passwordHandler.promptMessage + " title=" + passwordHandler.dialogTitle + " relayQuestion=" + passwordHandler.d);
+        GameEngine.log("[relay-debug] GameMainManager.showPasswordPrompt prompt=" + passwordHandler.promptMessage + " title=" + passwordHandler.dialogTitle + " relayQuestion=" + passwordHandler.isRequesting);
         ScriptEngine scriptEngine = ScriptEngine.getInstance();
         if (scriptEngine != null) {
             GameEngine.log("[relay-debug] GameMainManager.showPasswordPrompt queueing script runnable");

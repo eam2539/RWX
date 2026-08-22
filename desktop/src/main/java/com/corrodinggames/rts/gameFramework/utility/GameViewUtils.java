@@ -164,7 +164,7 @@ public final class GameViewUtils {
             GameEngine gameEngine = GameEngine.getInstance();
             Vector3D vector3DD = orderableUnit.D(i);
             gameEngine.renderGraphicsEngine.k();
-            gameEngine.renderGraphicsEngine.b(vector3DD.a - gameEngine.viewpointXSnapped, ((vector3DD.b - vector3DD.c) - orderableUnit.posZ) - gameEngine.viewpointYSnapped);
+            gameEngine.renderGraphicsEngine.b(vector3DD.x - gameEngine.viewpointXSnapped, ((vector3DD.y - vector3DD.z) - orderableUnit.posZ) - gameEngine.viewpointYSnapped);
             gameEngine.renderGraphicsEngine.a(f2, f2);
             gameEngine.renderGraphicsEngine.a(texture, 0.0f, 0.0f, (Paint) null);
             gameEngine.renderGraphicsEngine.l();
@@ -180,8 +180,8 @@ public final class GameViewUtils {
         Paint renderPaint = orderableUnit.getRenderPaint();
         GameEngine gameEngine = GameEngine.getInstance();
         Vector3D vector3DF = orderableUnit.F(i);
-        float f2 = vector3DF.a - GameEngine.getInstance().viewpointXSnapped;
-        float f3 = ((vector3DF.b - GameEngine.getInstance().viewpointYSnapped) - orderableUnit.posZ) - vector3DF.c;
+        float f2 = vector3DF.x - GameEngine.getInstance().viewpointXSnapped;
+        float f3 = ((vector3DF.y - GameEngine.getInstance().viewpointYSnapped) - orderableUnit.posZ) - vector3DF.z;
         GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
         graphicsEngine.k();
         if (fP != 1.0f) {
@@ -287,11 +287,11 @@ public final class GameViewUtils {
             if (g[i2] == null) {
                 PaintCache paintCache = new PaintCache(i, style);
                 g[i2] = paintCache;
-                return paintCache.c;
+                return paintCache.paint;
             }
             PaintCache paintCache2 = g[i2];
-            if (paintCache2.a == i && paintCache2.b == style) {
-                return paintCache2.c;
+            if (paintCache2.color == i && paintCache2.style == style) {
+                return paintCache2.paint;
             }
         }
         if (!h) {

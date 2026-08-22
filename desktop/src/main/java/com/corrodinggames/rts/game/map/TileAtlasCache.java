@@ -97,26 +97,18 @@ public class TileAtlasCache {
     }
 
     /* JADX INFO: renamed from: a */
-    public int allocateSlotForTile(Tileset tileset, int i) {
-        int iAllocateSlotForTile;
-        tileset.getTileRect(i, tmpRectA);
-        if (this.allocatedSlotCount >= 400) {
-            return -1;
+    public static void blitPaddingEdges(GraphicsEngine graphicsEngine, Texture texture, Rect rect, Rect rect2, Paint paint) {
+        for (int i = 0; i <= 3; i++) {
+            getPixelCopyRectForCorner(rect, tmpRectB, i, 0);
+            getPixelCopyRectForCorner(rect2, tmpRectC, i, 1);
+            graphicsEngine.a(texture, tmpRectB, tmpRectC, paint);
         }
-        boolean z = true;
-        if (!this.isAlphaAtlas) {
-            z = !hasTransparencyInRect(tileset.tilesetBitmap, tmpRectA);
+        for (int i2 = 0; i2 <= 3; i2++) {
+            getPaddingCornerRect(rect, tmpRectB, i2, 1, -1);
+            getPaddingCornerRect(rect2, tmpRectC, i2, 1, 0);
+            graphicsEngine.a(texture, tmpRectB, tmpRectC, paint);
         }
-        if (z) {
-            int i2 = this.allocatedSlotCount;
-            this.allocatedSlotCount++;
-            blitWithPadding(i2, tileset.tilesetBitmap, tmpRectA);
-            return i2;
-        }
-        if (this.alphaAtlasCache != null && (iAllocateSlotForTile = this.alphaAtlasCache.allocateSlotForTile(tileset, i)) != -1) {
-            return iAllocateSlotForTile + 500;
-        }
-        return -1;
+        graphicsEngine.a(texture, rect, rect2, paint);
     }
 
     /* JADX INFO: renamed from: a */
@@ -174,6 +166,29 @@ public class TileAtlasCache {
     }
 
     /* JADX INFO: renamed from: a */
+    public int allocateSlotForTile(Tileset tileset, int i) {
+        int iAllocateSlotForTile;
+        tileset.computeTileRect(i, tmpRectA);
+        if (this.allocatedSlotCount >= 400) {
+            return -1;
+        }
+        boolean z = true;
+        if (!this.isAlphaAtlas) {
+            z = !hasTransparencyInRect(tileset.tilesetBitmap, tmpRectA);
+        }
+        if (z) {
+            int i2 = this.allocatedSlotCount;
+            this.allocatedSlotCount++;
+            blitWithPadding(i2, tileset.tilesetBitmap, tmpRectA);
+            return i2;
+        }
+        if (this.alphaAtlasCache != null && (iAllocateSlotForTile = this.alphaAtlasCache.allocateSlotForTile(tileset, i)) != -1) {
+            return iAllocateSlotForTile + 500;
+        }
+        return -1;
+    }
+
+    /* JADX INFO: renamed from: a */
     public void blitWithPadding(int i, Texture texture, Rect rect) {
         Rect rect2 = new Rect();
         computeAtlasSlotRect(i, rect2);
@@ -184,22 +199,7 @@ public class TileAtlasCache {
         this.paddingBlitPaint.a(z);
         this.paddingBlitPaint.d(z);
         this.paddingBlitPaint.b(z);
-        getPaddingEdgeRect(this.atlasGraphics, texture, rect, rect2, this.paddingBlitPaint);
-    }
-
-    /* JADX INFO: renamed from: a */
-    public static void getPaddingEdgeRect(GraphicsEngine graphicsEngine, Texture texture, Rect rect, Rect rect2, Paint paint) {
-        for (int i = 0; i <= 3; i++) {
-            getPixelCopyRectForCorner(rect, tmpRectB, i, 0);
-            getPixelCopyRectForCorner(rect2, tmpRectC, i, 1);
-            graphicsEngine.a(texture, tmpRectB, tmpRectC, paint);
-        }
-        for (int i2 = 0; i2 <= 3; i2++) {
-            getPaddingCornerRect(rect, tmpRectB, i2, 1, -1);
-            getPaddingCornerRect(rect2, tmpRectC, i2, 1, 0);
-            graphicsEngine.a(texture, tmpRectB, tmpRectC, paint);
-        }
-        graphicsEngine.a(texture, rect, rect2, paint);
+        blitPaddingEdges(this.atlasGraphics, texture, rect, rect2, this.paddingBlitPaint);
     }
 
     /* JADX INFO: renamed from: a */

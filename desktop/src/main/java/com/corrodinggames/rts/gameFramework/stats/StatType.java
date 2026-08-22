@@ -33,13 +33,13 @@ public enum StatType {
                 return scaledIncomeRate;
             }
             case armyValue: {
-                return n.teamStatistics.n;
+                return n.teamStatistics.nonBuildingUnitValue;
             }
             case buildingValue: {
-                return n.teamStatistics.o;
+                return n.teamStatistics.buildingUnitValue;
             }
             case totalValue: {
-                return n.teamStatistics.n + n.teamStatistics.o;
+                return n.teamStatistics.nonBuildingUnitValue + n.teamStatistics.buildingUnitValue;
             }
             case credits: {
                 return (int)n.credits;

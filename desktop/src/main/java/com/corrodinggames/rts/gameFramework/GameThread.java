@@ -8,18 +8,24 @@ import java.io.IOException;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.z */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/z.class */
 public class GameThread extends Thread {
-    static int a = 0;
-    public boolean b;
-    long c;
 
-    public synchronized void a(boolean z) {
-        this.b = z;
-    }
+    /* JADX INFO: renamed from: a */
+    static int threadCount = 0;
+
+    /* JADX INFO: renamed from: b */
+    public boolean running;
+
+    /* JADX INFO: renamed from: c */
+    long lastFrameTime;
 
     public GameThread() {
-        super("GameThread" + a);
-        this.b = true;
-        a++;
+        super("GameThread" + threadCount);
+        this.running = true;
+        threadCount++;
+    }
+
+    public synchronized void a(boolean z) {
+        this.running = z;
     }
 
     @Override // java.lang.Thread, java.lang.Runnable
@@ -30,14 +36,14 @@ public class GameThread extends Thread {
             Process.setThreadPriority(-4);
         }
         a();
-        long j2 = this.c;
+        long j2 = this.lastFrameTime;
         GameEngine gameEngine = GameEngine.getInstance();
-        while (this.b) {
+        while (this.running) {
             long jNanoTime = System.nanoTime();
-            long j3 = this.c;
+            long j3 = this.lastFrameTime;
             a();
             try {
-                gameEngine.gameLoop((this.c - j3) * 0.060000002f, (int) (this.c - j3));
+                gameEngine.gameLoop((this.lastFrameTime - j3) * 0.060000002f, (int) (this.lastFrameTime - j3));
             } catch (ConfigParseException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {
@@ -73,6 +79,6 @@ public class GameThread extends Thread {
     }
 
     public void a() {
-        this.c = System.currentTimeMillis();
+        this.lastFrameTime = System.currentTimeMillis();
     }
 }

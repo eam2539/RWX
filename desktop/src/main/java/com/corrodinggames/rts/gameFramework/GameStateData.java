@@ -4,10 +4,16 @@ package com.corrodinggames.rts.gameFramework;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/bf.class */
 public class GameStateData {
     public int a;
-    public String b;
+
+    /* JADX INFO: renamed from: b */
+    public String mapPath;
+
     public int c;
     public boolean d;
-    public boolean e;
+
+    /* JADX INFO: renamed from: e */
+    public boolean isGameStarted;
+
     public boolean f;
     public long g;
     public int h;

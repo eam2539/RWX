@@ -11,63 +11,63 @@ import java.util.Iterator;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.ap */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/ap.class */
 public class WarLogDisplay {
-    private GameEngine a;
-    private Paint b;
-    private ArrayList<WarLogEntry> c = new ArrayList();
+    private GameEngine gameEngine;
+    private Paint paint;
+    private ArrayList<WarLogEntry> entries = new ArrayList();
 
     public WarLogDisplay(GameEngine gameEngine) {
-        this.a = gameEngine;
+        this.gameEngine = gameEngine;
         a();
     }
 
     public void a() {
-        this.b = new Paint();
-        this.b.a(255, 255, 255, 255);
-        this.b.a(true);
-        this.b.c(true);
-        this.b.a(Typeface.a(Typeface.c, 1));
-        this.a.updatePaintTextSize(this.b, 14.0f);
+        this.paint = new Paint();
+        this.paint.a(255, 255, 255, 255);
+        this.paint.a(true);
+        this.paint.c(true);
+        this.paint.a(Typeface.a(Typeface.c, 1));
+        this.gameEngine.updatePaintTextSize(this.paint, 14.0f);
     }
 
     public synchronized void b() {
-        this.c.clear();
+        this.entries.clear();
     }
 
     public synchronized void a(BaseUnit baseUnit) {
         UnitCreatedLogEntry unitCreatedLogEntry = new UnitCreatedLogEntry(baseUnit.posX, baseUnit.posY, baseUnit.r());
-        unitCreatedLogEntry.c = GameEngine.getCurrentTimeMillis();
+        unitCreatedLogEntry.timestamp = GameEngine.getCurrentTimeMillis();
         a(unitCreatedLogEntry);
     }
 
     public synchronized void b(BaseUnit baseUnit) {
         UnitUpgradedLogEntry unitUpgradedLogEntry = new UnitUpgradedLogEntry(baseUnit.posX, baseUnit.posY, baseUnit.r());
-        unitUpgradedLogEntry.c = GameEngine.getCurrentTimeMillis();
+        unitUpgradedLogEntry.timestamp = GameEngine.getCurrentTimeMillis();
         a(unitUpgradedLogEntry);
     }
 
     public synchronized void c(BaseUnit baseUnit) {
         UnitDamagedLogEntry unitDamagedLogEntry = new UnitDamagedLogEntry(baseUnit.posX, baseUnit.posY, baseUnit.bI());
-        unitDamagedLogEntry.c = GameEngine.getCurrentTimeMillis();
+        unitDamagedLogEntry.timestamp = GameEngine.getCurrentTimeMillis();
         a(unitDamagedLogEntry);
     }
 
     public synchronized void a(String str) {
         StringLogEntry stringLogEntry = new StringLogEntry(str);
-        stringLogEntry.c = GameEngine.getCurrentTimeMillis();
+        stringLogEntry.timestamp = GameEngine.getCurrentTimeMillis();
         a(stringLogEntry);
     }
 
     public synchronized void a(String str, int i) {
         StringLogEntry stringLogEntry = new StringLogEntry(str);
-        stringLogEntry.c = GameEngine.getCurrentTimeMillis();
-        stringLogEntry.d = i;
-        stringLogEntry.i = true;
+        stringLogEntry.timestamp = GameEngine.getCurrentTimeMillis();
+        stringLogEntry.durationMs = i;
+        stringLogEntry.alwaysShow = true;
         a(stringLogEntry);
     }
 
     private void a(WarLogEntry warLogEntry) {
         boolean z = false;
-        Iterator it = this.c.iterator();
+        Iterator it = this.entries.iterator();
         while (true) {
             if (!it.hasNext()) {
                 break;
@@ -80,9 +80,9 @@ public class WarLogDisplay {
             }
         }
         if (z) {
-            Collections.sort(this.c);
+            Collections.sort(this.entries);
         } else {
-            this.c.add(0, warLogEntry);
+            this.entries.add(0, warLogEntry);
         }
     }
 
@@ -91,16 +91,16 @@ public class WarLogDisplay {
         GameEngine gameEngine = GameEngine.getInstance();
         int i = (int) (gameEngine.screenHeight - (130.0f * gameEngine.screenScale));
         int i2 = (int) (20.0f * gameEngine.screenScale);
-        for (WarLogEntry warLogEntry : this.c) {
+        for (WarLogEntry warLogEntry : this.entries) {
             String strA = warLogEntry.a();
-            if (gameEngine.settingsEngine.showWarLogOnScreen || warLogEntry.i) {
-                if (warLogEntry.c + warLogEntry.d >= System.currentTimeMillis()) {
-                    if (warLogEntry.h) {
-                        this.b.a(255, 160, 160, 160);
+            if (gameEngine.settingsEngine.showWarLogOnScreen || warLogEntry.alwaysShow) {
+                if (warLogEntry.timestamp + warLogEntry.durationMs >= System.currentTimeMillis()) {
+                    if (warLogEntry.hasBeenShown) {
+                        this.paint.a(255, 160, 160, 160);
                     } else {
-                        this.b.a(255, 255, 255, 255);
+                        this.paint.a(255, 255, 255, 255);
                     }
-                    gameEngine.renderGraphicsEngine.a(strA, 20, i, this.b);
+                    gameEngine.renderGraphicsEngine.a(strA, 20, i, this.paint);
                     i -= i2;
                 } else {
                     return;
@@ -110,22 +110,22 @@ public class WarLogDisplay {
     }
 
     public synchronized void c() {
-        Iterator it = this.c.iterator();
+        Iterator it = this.entries.iterator();
         while (it.hasNext()) {
-            if (((WarLogEntry) it.next()).c + 20000 < System.currentTimeMillis()) {
+            if (((WarLogEntry) it.next()).timestamp + 20000 < System.currentTimeMillis()) {
                 it.remove();
             }
         }
     }
 
     public synchronized void d() {
-        if (this.c.isEmpty()) {
+        if (this.entries.isEmpty()) {
             return;
         }
-        for (WarLogEntry warLogEntry : this.c) {
-            if (!warLogEntry.h) {
-                warLogEntry.h = true;
-                this.a.centerViewpoint(warLogEntry.e, warLogEntry.f);
+        for (WarLogEntry warLogEntry : this.entries) {
+            if (!warLogEntry.hasBeenShown) {
+                warLogEntry.hasBeenShown = true;
+                this.gameEngine.centerViewpoint(warLogEntry.x, warLogEntry.y);
                 return;
             }
         }

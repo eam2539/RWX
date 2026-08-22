@@ -10,19 +10,23 @@ import com.corrodinggames.rts.gameFramework.mission.MapTrigger;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.n.a.b */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/n/a/b.class */
 public class TeamTagDetectCondition extends TriggerCondition {
-    PlayerTeam a;
-    AnimationTag b;
+
+    /* JADX INFO: renamed from: a */
+    PlayerTeam team;
+
+    /* JADX INFO: renamed from: b */
+    AnimationTag teamTag;
 
     public static TeamTagDetectCondition d(MapTrigger mapTrigger) throws MapLoadException {
         TeamTagDetectCondition teamTagDetectCondition = new TeamTagDetectCondition();
-        teamTagDetectCondition.a = mapTrigger.a();
-        if (teamTagDetectCondition.a == null) {
+        teamTagDetectCondition.team = mapTrigger.a();
+        if (teamTagDetectCondition.team == null) {
             throw new MapLoadException("teamTagDetect requires a team set");
         }
         String strB = mapTrigger.b("teamTag");
         if (strB != null && !strB.equals(VariableScope.nullOrMissingString)) {
             try {
-                teamTagDetectCondition.b = AnimationTag.b(strB);
+                teamTagDetectCondition.teamTag = AnimationTag.b(strB);
                 return teamTagDetectCondition;
             } catch (ConfigParseException e) {
                 throw new MapLoadException(e.getMessage());
@@ -33,7 +37,7 @@ public class TeamTagDetectCondition extends TriggerCondition {
 
     @Override // com.corrodinggames.rts.gameFramework.mission.conditions.TriggerCondition
     public boolean b(MapTrigger mapTrigger) {
-        if (AnimationTag.a(this.b, this.a.getTeamAnimationSet())) {
+        if (AnimationTag.a(this.teamTag, this.team.getTeamAnimationSet())) {
             return true;
         }
         return false;

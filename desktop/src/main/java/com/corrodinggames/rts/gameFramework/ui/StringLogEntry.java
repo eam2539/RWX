@@ -5,7 +5,7 @@ package com.corrodinggames.rts.gameFramework.ui;
 class StringLogEntry extends WarLogEntry {
     public StringLogEntry(String str) {
         super(-1000.0f, -1000.0f);
-        this.g = str;
+        this.text = str;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.ui.WarLogEntry
@@ -19,6 +19,6 @@ class StringLogEntry extends WarLogEntry {
 
     @Override // com.corrodinggames.rts.gameFramework.ui.WarLogEntry
     public String a() {
-        return this.g;
+        return this.text;
     }
 }

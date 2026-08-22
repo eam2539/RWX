@@ -56,8 +56,8 @@ public class JavaInGameActivity extends InGameActivity {
                 break;
             case 11:
                 GameEngine gameEngine3 = GameEngine.getInstance();
-                if (gameEngine3.missionEngine != null && gameEngine3.missionEngine.h != null) {
-                    gameEngine3.showMessageBox("Briefing", gameEngine3.missionEngine.h);
+                if (gameEngine3.missionEngine != null && gameEngine3.missionEngine.introText != null) {
+                    gameEngine3.showMessageBox("Briefing", gameEngine3.missionEngine.introText);
                     break;
                 }
                 break;

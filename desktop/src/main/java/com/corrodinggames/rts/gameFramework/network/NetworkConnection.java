@@ -28,8 +28,10 @@ public class NetworkConnection {
 
     /* JADX INFO: renamed from: g */
     public long lastActivityTime;
-    public boolean h;
-    public boolean i;
+    /* JADX INFO: renamed from: h */
+    public boolean isUdp;
+    /* JADX INFO: renamed from: i */
+    public boolean isSteam;
 
     /* JADX INFO: renamed from: j */
     public NetworkConnection relayConnection;
@@ -42,7 +44,8 @@ public class NetworkConnection {
 
     /* JADX INFO: renamed from: n */
     public String forwardedIpAddress;
-    public String o;
+    /* JADX INFO: renamed from: o */
+    public String queryString;
 
     /* JADX INFO: renamed from: p */
     public boolean allowLargeIncomingPackets;
@@ -67,8 +70,10 @@ public class NetworkConnection {
 
     /* JADX INFO: renamed from: w */
     public boolean isForwarded;
-    public int x;
-    public int y;
+    /* JADX INFO: renamed from: x */
+    public int syncMatchCount;
+    /* JADX INFO: renamed from: y */
+    public int desyncCount;
 
     /* JADX INFO: renamed from: z */
     public GameTeam player;
@@ -90,12 +95,15 @@ public class NetworkConnection {
 
     /* JADX INFO: renamed from: M */
     public int sessionRandomId;
-    public boolean N;
-    public boolean O;
+    /* JADX INFO: renamed from: N */
+    public boolean noExtraChecks;
+    /* JADX INFO: renamed from: O */
+    public boolean handshakeTimeoutReached;
 
     /* JADX INFO: renamed from: P */
     public int bytesReadIterations;
-    public boolean Q;
+    /* JADX INFO: renamed from: Q */
+    public boolean hasSentFullTeamUpdate;
 
     /* JADX INFO: renamed from: R */
     public int commandCounter;
@@ -127,7 +135,8 @@ public class NetworkConnection {
     long B = -1;
     boolean C = false;
     boolean D = false;
-    public int E = 999999;
+    /* JADX INFO: renamed from: E */
+    public int networkVersion = 999999;
 
     /* JADX INFO: renamed from: J */
     boolean isInputClosed = false;

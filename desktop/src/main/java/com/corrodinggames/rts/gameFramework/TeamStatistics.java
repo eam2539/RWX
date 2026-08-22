@@ -12,16 +12,16 @@ public class TeamStatistics extends StatisticsData {
             StatisticsData statisticsData = (StatisticsData) it.next();
             this.a += statisticsData.a;
             this.b += statisticsData.b;
-            this.c += statisticsData.c;
-            this.d += statisticsData.d;
-            this.e += statisticsData.e;
-            this.f += statisticsData.f;
-            this.g += statisticsData.g;
-            this.h += statisticsData.h;
+            this.killedUnits += statisticsData.killedUnits;
+            this.killedBuildings += statisticsData.killedBuildings;
+            this.killedExperimental += statisticsData.killedExperimental;
+            this.lostUnits += statisticsData.lostUnits;
+            this.lostBuildings += statisticsData.lostBuildings;
+            this.lostExperimental += statisticsData.lostExperimental;
             this.i += statisticsData.i;
             this.j = Math.max(this.j, statisticsData.j);
             this.k += statisticsData.k;
-            this.l.a(statisticsData.l);
+            this.teamHistory.a(statisticsData.teamHistory);
         }
     }
 }

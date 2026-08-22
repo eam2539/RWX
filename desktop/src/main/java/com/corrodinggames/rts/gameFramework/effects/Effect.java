@@ -363,7 +363,7 @@ public final class Effect {
     }
 
     /* JADX INFO: renamed from: a */
-    public static void getEffectSprite(int i2, SpriteSheet spriteSheet, Rect rect) {
+    public static void computeSpriteRect(int i2, SpriteSheet spriteSheet, Rect rect) {
         int i3 = 0;
         if (i2 >= spriteSheet.h) {
             i3 = 0 + (i2 / spriteSheet.h);
@@ -397,7 +397,7 @@ public final class Effect {
             spriteSheet = EffectManager.effectTemplates[this.aq];
         }
         if (!spriteSheet.k) {
-            getEffectSprite(this.ap, spriteSheet, rect);
+            computeSpriteRect(this.ap, spriteSheet, rect);
         } else {
             rect.a(0, 0, spriteSheet.i.m(), spriteSheet.i.l());
         }

@@ -372,7 +372,7 @@ public abstract class AbstractUnitAction implements Comparable<AbstractUnitActio
     /* JADX INFO: renamed from: a */
     public void renderDisplayText(BaseUnit baseUnit, TextRenderQueue textRenderQueue, Paint paint, Paint paint2) {
         String displayTextForUnitWithQueueCount;
-        Paint paint3 = textRenderQueue.g;
+        Paint paint3 = textRenderQueue.currentPaint;
         if (paint != null) {
             textRenderQueue.a(paint);
         }

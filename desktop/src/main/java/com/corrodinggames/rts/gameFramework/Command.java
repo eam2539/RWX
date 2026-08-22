@@ -148,9 +148,9 @@ public class Command {
                     commandTarget.createdTick = gameEngine.currentTick;
                     commandTarget.movementType = orderableUnit.getMovementType();
                     commandTarget.path = orderableUnit.createPathToTarget(targetX, targetY, pathingTargetRadiusTiles, true, false, false);
-                    commandTarget.path.t = 120.0f;
-                    commandTarget.path.s = commandTarget.path.t;
-                    commandTarget.path.u = true;
+                    commandTarget.path.remainingTimeMs = 120.0f;
+                    commandTarget.path.allowedDelayMs = commandTarget.path.remainingTimeMs;
+                    commandTarget.path.isTimedOut = true;
                     this.commandTargets.add(commandTarget);
                 }
             }
@@ -508,7 +508,7 @@ public class Command {
                     GameEngine.log("new DebugDesyncDetector (stress test)");
                     UnitSpawner unitSpawner = new UnitSpawner(false);
                     unitSpawner.setUnitTeam(PlayerTeam.TEAM_ALL);
-                    unitSpawner.a = true;
+                    unitSpawner.stressTestMode = true;
                     return;
                 }
                 if (this.systemActionType == 100) {

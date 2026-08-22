@@ -179,7 +179,7 @@ public class GameSaver {
             gameOutputStream.writeFloat(gameEngine.viewpointX + gameEngine.halfVisibleWorldWidth);
             gameOutputStream.writeFloat(gameEngine.viewpointY + gameEngine.halfVisibleWorldHeight);
             gameOutputStream.writeFloat(gameEngine.targetZoom);
-            gameOutputStream.writeInt(gameEngine.formationEngine.a);
+            gameOutputStream.writeInt(gameEngine.formationEngine.nextFormationId);
             gameOutputStream.writeInt(0);
             gameOutputStream.writeMagicShort();
             gameEngine.tileMap.writeCursorSelectionPresenceFlag(gameOutputStream);
@@ -406,7 +406,7 @@ public class GameSaver {
                         }
                         if ((gameEngine.replayEngine.j() || !gameEngine.networkEngine.networkGameActive) && !z3 && z5) {
                             GameEngine.log("Using game rules from save");
-                            gameEngine.replayEngine.O = true;
+                            gameEngine.replayEngine.hasGameSetupRead = true;
                             gameEngine.networkEngine.a(gameInputStream);
                             numValueOf = Integer.valueOf(gameEngine.currentUnitCap);
                             numValueOf2 = Integer.valueOf(gameEngine.maxUnitCap);
@@ -461,7 +461,7 @@ public class GameSaver {
                             gameEngine.targetZoom = f3;
                         }
                         if (i >= 18) {
-                            gameEngine.formationEngine.a = gameInputStream.readInt();
+                            gameEngine.formationEngine.nextFormationId = gameInputStream.readInt();
                         }
                         gameInputStream.readInt();
                         if (i >= 19) {

@@ -221,7 +221,7 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
             for (PointF pointF : pointFArrB) {
                 float f2 = (currentRepairOrReclaimTarget.posX + pointF.x) - gameEngine.viewpointXSnapped;
                 float f3 = ((currentRepairOrReclaimTarget.posY - currentRepairOrReclaimTarget.posZ) + pointF.y) - gameEngine.viewpointYSnapped;
-                gameEngine.renderGraphicsEngine.a((vector3DBn.a + (pointF.x * 0.15f)) - gameEngine.viewpointXSnapped, (((vector3DBn.b - vector3DBn.c) + (pointF.y * 0.15f)) - gameEngine.viewpointYSnapped) - orderableUnit.posZ, f2, f3, paint);
+                gameEngine.renderGraphicsEngine.a((vector3DBn.x + (pointF.x * 0.15f)) - gameEngine.viewpointXSnapped, (((vector3DBn.y - vector3DBn.z) + (pointF.y * 0.15f)) - gameEngine.viewpointYSnapped) - orderableUnit.posZ, f2, f3, paint);
                 gameEngine.renderGraphicsEngine.k();
                 gameEngine.renderGraphicsEngine.b(f2, f3);
                 gameEngine.renderGraphicsEngine.a(0.5f, 0.5f);
@@ -273,7 +273,7 @@ public class BuilderUnit extends LandUnit implements UnitPathPoints {
             if (fE != 0.0f) {
                 Vector3D vector3DBn = bn();
                 gameEngine.renderGraphicsEngine.i();
-                gameEngine.renderGraphicsEngine.b(vector3DBn.a - gameEngine.viewpointXSnapped, (vector3DBn.b - vector3DBn.c) - gameEngine.viewpointYSnapped);
+                gameEngine.renderGraphicsEngine.b(vector3DBn.x - gameEngine.viewpointXSnapped, (vector3DBn.y - vector3DBn.z) - gameEngine.viewpointYSnapped);
                 gameEngine.renderGraphicsEngine.a(fE, fE);
                 if (isCurrentCommandReclaim()) {
                     gameEngine.renderGraphicsEngine.a(builderDechargeTexture, 0.0f, 0.0f, (Paint) null);

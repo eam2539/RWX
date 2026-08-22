@@ -10,8 +10,12 @@ import com.corrodinggames.rts.gameFramework.GameEngine;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.a.d */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/a/d.class */
 public class AttackModeAction extends AbstractUnitAction {
-    int a;
-    AttackMode b;
+
+    /* JADX INFO: renamed from: a */
+    int selectionChangeCounter;
+
+    /* JADX INFO: renamed from: b */
+    AttackMode attackMode;
 
     public AttackModeAction() {
         super("c_7");
@@ -88,8 +92,8 @@ public class AttackModeAction extends AbstractUnitAction {
             }
         }
         commandCreateCommandForTeam.setAttackMode(attackModeA);
-        this.a = gameEngine.gameUI.selectionChangeCounter;
-        this.b = attackModeA;
+        this.selectionChangeCounter = gameEngine.gameUI.selectionChangeCounter;
+        this.attackMode = attackModeA;
     }
 
     public AttackMode a(AttackMode attackMode) {
@@ -105,14 +109,14 @@ public class AttackModeAction extends AbstractUnitAction {
     public AttackMode q() {
         GameEngine gameEngine = GameEngine.getInstance();
         AttackMode attackModeR = r();
-        this.a = gameEngine.gameUI.selectionChangeCounter;
-        this.b = attackModeR;
+        this.selectionChangeCounter = gameEngine.gameUI.selectionChangeCounter;
+        this.attackMode = attackModeR;
         return attackModeR;
     }
 
     public AttackMode r() {
-        if (this.a == GameEngine.getInstance().gameUI.selectionChangeCounter && this.b != null) {
-            return this.b;
+        if (this.selectionChangeCounter == GameEngine.getInstance().gameUI.selectionChangeCounter && this.attackMode != null) {
+            return this.attackMode;
         }
         AttackMode attackMode = null;
         for (BaseUnit baseUnit : BaseUnit.bE) {

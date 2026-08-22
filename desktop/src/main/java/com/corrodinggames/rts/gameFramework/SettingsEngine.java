@@ -467,7 +467,7 @@ public class SettingsEngine {
             }
             printWriter.println("[keys]");
             for (KeyBinding keyBinding : gameEngine.inputController.al) {
-                if (keyBinding.b && !keyBinding.d()) {
+                if (keyBinding.isDefault && !keyBinding.d()) {
                     printWriter.println((VariableScope.nullOrMissingString + keyBinding.e()) + ":" + gameEngine.inputController.a(keyBinding));
                 }
             }
@@ -508,7 +508,7 @@ public class SettingsEngine {
                 }
             }
             for (KeyBinding keyBinding : gameEngine.inputController.al) {
-                if (keyBinding.b && !keyBinding.d()) {
+                if (keyBinding.isDefault && !keyBinding.d()) {
                     String strE = keyBinding.e();
                     String string2 = iniFile.getString("keys", strE, (String) null);
                     if (string2 != null && !VariableScope.nullOrMissingString.equals(string2)) {

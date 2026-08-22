@@ -363,36 +363,36 @@ public final class PathEngine {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        a(a(path.o), z);
+        a(a(path.movementType), z);
         path.e();
-        path.t = 300.0f;
-        int iAbs = Utility.abs(path.h - path.l);
-        int iAbs2 = Utility.abs(path.i - path.m);
+        path.remainingTimeMs = 300.0f;
+        int iAbs = Utility.abs(path.startTileX - path.endTileX);
+        int iAbs2 = Utility.abs(path.startTileY - path.endTileY);
         if (iAbs < 15 && iAbs2 < 15) {
-            path.t = 12.0f;
+            path.remainingTimeMs = 12.0f;
         } else if (iAbs < 50 && iAbs2 < 50) {
-            path.t = 16.0f;
+            path.remainingTimeMs = 16.0f;
         } else if (iAbs < 200 && iAbs2 < 200) {
-            path.t = 24.0f;
+            path.remainingTimeMs = 24.0f;
         } else if (iAbs < 400 && iAbs2 < 400) {
-            path.t = 50.0f;
+            path.remainingTimeMs = 50.0f;
         } else if (iAbs < 1000 && iAbs2 < 1000) {
-            path.t = 100.0f;
+            path.remainingTimeMs = 100.0f;
         } else if (iAbs < 2000 && iAbs2 < 2000) {
-            path.t = 200.0f;
+            path.remainingTimeMs = 200.0f;
         }
         if (!gameEngine.networkEngine.networkGameActive && !gameEngine.replayEngine.i()) {
             if (iAbs < 1000 && iAbs2 < 1000) {
-                path.t = 180.0f;
+                path.remainingTimeMs = 180.0f;
             } else {
-                path.t = 360.0f;
+                path.remainingTimeMs = 360.0f;
             }
         }
         if (path.isLowPriority) {
-            path.t *= 2.0f;
-            path.t += 50.0f;
+            path.remainingTimeMs *= 2.0f;
+            path.remainingTimeMs += 50.0f;
         }
-        path.s = path.t;
+        path.allowedDelayMs = path.remainingTimeMs;
         if (!this.n || z2) {
             this.o.a(path);
             this.o.b();
@@ -451,7 +451,7 @@ public final class PathEngine {
 
     public boolean e() {
         for (Path path : this.I) {
-            if (path.t <= 0.0f && !path.c()) {
+            if (path.remainingTimeMs <= 0.0f && !path.c()) {
                 return true;
             }
         }
@@ -462,9 +462,9 @@ public final class PathEngine {
         String str = null;
         int i2 = 0;
         for (Path path : this.I) {
-            if (path.t <= 0.0f && !path.c()) {
+            if (path.remainingTimeMs <= 0.0f && !path.c()) {
                 if (str == null) {
-                    str = "[distance:" + Utility.distance(path.h, path.i, path.l, path.m) + ", allowedDelay:" + path.s + " lowPriority:" + path.isLowPriority + "]";
+                    str = "[distance:" + Utility.distance(path.startTileX, path.startTileY, path.endTileX, path.endTileY) + ", allowedDelay:" + path.allowedDelayMs + " lowPriority:" + path.isLowPriority + "]";
                 }
                 i2++;
             }
@@ -480,9 +480,9 @@ public final class PathEngine {
         Iterator it = this.I.iterator();
         while (it.hasNext()) {
             Path path = (Path) it.next();
-            if (path.t <= 0.0f) {
-                path.t = 0.0f;
-                path.u = true;
+            if (path.remainingTimeMs <= 0.0f) {
+                path.remainingTimeMs = 0.0f;
+                path.isTimedOut = true;
                 if (j) {
                     k.add(path);
                     if (k.size() > 10) {
@@ -499,7 +499,7 @@ public final class PathEngine {
                     it.remove();
                 }
             } else {
-                path.t -= f2;
+                path.remainingTimeMs -= f2;
             }
         }
     }
@@ -507,7 +507,7 @@ public final class PathEngine {
     private Path g() {
         Path path = null;
         for (Path path2 : this.J) {
-            if (path == null || path.t > path2.t) {
+            if (path == null || path.remainingTimeMs > path2.remainingTimeMs) {
                 path = path2;
             }
         }
@@ -539,7 +539,7 @@ public final class PathEngine {
             synchronized (this.K) {
                 while (linkedList.size() > 0 && (pathSolverJ = j()) != null) {
                     Path pathG = g();
-                    if (!pathG.v) {
+                    if (!pathG.isSolved) {
                         a(pathSolverJ, pathG);
                     }
                 }
@@ -558,7 +558,7 @@ public final class PathEngine {
 
     public void a(Path path) {
         PathSolver pathSolverJ;
-        if (!path.v) {
+        if (!path.isSolved) {
             while (true) {
                 synchronized (this.G) {
                     pathSolverJ = j();
@@ -589,7 +589,7 @@ public final class PathEngine {
                 }
             }
             if (!z && b) {
-                GameEngine.log("PathEngine", "We were blocked path(" + path.e + ") for:" + (GameEngine.getCurrentTimeMillis() - currentTimeMillis));
+                GameEngine.log("PathEngine", "We were blocked path(" + path.pathId + ") for:" + (GameEngine.getCurrentTimeMillis() - currentTimeMillis));
                 return;
             }
         }
@@ -599,7 +599,7 @@ public final class PathEngine {
 
     private void a(PathSolver pathSolver, Path path) {
         synchronized (path) {
-            if (!path.v) {
+            if (!path.isSolved) {
                 pathSolver.a(path);
                 pathSolver.a();
             }

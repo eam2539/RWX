@@ -1228,7 +1228,7 @@ public abstract class GameEngine {
     protected void refreshPaintSizeTrackers() {
         Iterator it = this.paintSizeTrackers.iterator();
         while (it.hasNext()) {
-            this.renderGraphicsEngine.a(((PaintSizeTracker) it.next()).b);
+            this.renderGraphicsEngine.a(((PaintSizeTracker) it.next()).paint);
         }
         this.paintSizeTrackersReady = true;
     }
@@ -1241,14 +1241,14 @@ public abstract class GameEngine {
     /* JADX INFO: renamed from: a */
     public void updatePaintTextSize(Paint paint, float f) {
         PaintSizeTracker paintSizeTracker = new PaintSizeTracker(this);
-        paintSizeTracker.a = f;
-        paintSizeTracker.b = paint;
+        paintSizeTracker.textSize = f;
+        paintSizeTracker.paint = paint;
         paintSizeTracker.a();
         synchronized (this.paintSizeTrackers) {
             this.paintSizeTrackers.add(paintSizeTracker);
         }
         if (this.paintSizeTrackersReady) {
-            this.renderGraphicsEngine.a(paintSizeTracker.b);
+            this.renderGraphicsEngine.a(paintSizeTracker.paint);
         }
     }
 
@@ -1573,14 +1573,14 @@ public abstract class GameEngine {
             if (inputEvent != null) {
                 if (inputEvent instanceof QueuedKeyStateEvent) {
                     QueuedKeyStateEvent keyStateEvent = (QueuedKeyStateEvent) inputEvent;
-                    if (keyStateEvent.c >= this.keyDownStates.length || keyStateEvent.c < 0) {
-                        log("updateKeyState", "keyCode (" + keyStateEvent.c + ") is out of range");
+                    if (keyStateEvent.keyCode >= this.keyDownStates.length || keyStateEvent.keyCode < 0) {
+                        log("updateKeyState", "keyCode (" + keyStateEvent.keyCode + ") is out of range");
                     } else {
-                        this.keyDownStates[keyStateEvent.c] = !keyStateEvent.d;
-                        this.keyPressPendingStates[keyStateEvent.c] = !keyStateEvent.d;
+                        this.keyDownStates[keyStateEvent.keyCode] = !keyStateEvent.isPressed;
+                        this.keyPressPendingStates[keyStateEvent.keyCode] = !keyStateEvent.isPressed;
                     }
                 } else if (inputEvent instanceof QueuedMouseWheelEvent) {
-                    this.accumulatedMouseWheelDelta += ((QueuedMouseWheelEvent) inputEvent).c;
+                    this.accumulatedMouseWheelDelta += ((QueuedMouseWheelEvent) inputEvent).delta;
                 }
             } else {
                 return;

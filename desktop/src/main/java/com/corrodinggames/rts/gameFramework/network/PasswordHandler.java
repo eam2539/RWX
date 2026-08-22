@@ -9,8 +9,12 @@ public class PasswordHandler {
 
     /* JADX INFO: renamed from: b */
     public String promptMessage;
-    public int c;
-    public boolean d;
+
+    /* JADX INFO: renamed from: c */
+    public int requestId;
+
+    /* JADX INFO: renamed from: d */
+    public boolean isRequesting;
 
     /* JADX INFO: renamed from: e */
     public String dialogTitle;
@@ -24,11 +28,11 @@ public class PasswordHandler {
     /* JADX INFO: renamed from: a */
     public void submitPassword(String str) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (this.d) {
+        if (this.isRequesting) {
             try {
                 GameOutputStream gameOutputStream = new GameOutputStream();
                 gameOutputStream.writeByte(1);
-                gameOutputStream.writeInt(this.c);
+                gameOutputStream.writeInt(this.requestId);
                 gameOutputStream.writeStringUTF(str);
                 gameEngine.networkEngine.d(gameOutputStream.buildPacketData(118));
                 return;

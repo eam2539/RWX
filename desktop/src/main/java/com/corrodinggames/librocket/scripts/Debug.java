@@ -258,7 +258,7 @@ public class Debug extends ScriptContext {
             this.root.logWarn("Found team but could not find connection for team:" + i);
             return null;
         }
-        return networkConnectionC.o;
+        return networkConnectionC.queryString;
     }
 
     public boolean setTeamCredits(int i, int i2) {
@@ -624,8 +624,8 @@ public class Debug extends ScriptContext {
                 GameEngine.logColored("pathDistance inconsistency detected:" + i5 + "!=" + i6);
             }
             PathPoint pathPoint2 = (PathPoint) linkedListA.getLast();
-            if (pathPoint2.a != i2 || pathPoint2.b != i3) {
-                GameEngine.logColored("path did not react goal, got to:" + ((int) pathPoint2.a) + "," + ((int) pathPoint2.b) + " (vs " + i2 + ", " + i3 + ")");
+            if (pathPoint2.tileX != i2 || pathPoint2.tileY != i3) {
+                GameEngine.logColored("path did not react goal, got to:" + ((int) pathPoint2.tileX) + "," + ((int) pathPoint2.tileY) + " (vs " + i2 + ", " + i3 + ")");
             }
             i5 = i6;
         }

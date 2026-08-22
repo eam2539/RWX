@@ -8,17 +8,19 @@ import com.corrodinggames.rts.gameFramework.ui.GameUI;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.a.m */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/a/m.class */
 public class ReclaimTargetAction extends AbstractUnitAction {
-    boolean a;
+
+    /* JADX INFO: renamed from: a */
+    boolean canReclaim;
 
     public ReclaimTargetAction(boolean z) {
         super("c_2");
-        this.a = z;
+        this.canReclaim = z;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public String getDescription() {
-        if (!this.a) {
+        if (!this.canReclaim) {
             return Locale.get("gui.actions.reclaimBuildingTarget.description", new Object[0]);
         }
         return Locale.get("gui.actions.reclaimTarget.description", new Object[0]);
@@ -27,7 +29,7 @@ public class ReclaimTargetAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
     public String getDisplayName() {
-        if (!this.a) {
+        if (!this.canReclaim) {
             return Locale.get("gui.actions.reclaimBuildingTarget", new Object[0]);
         }
         return Locale.get("gui.actions.reclaimTarget", new Object[0]);
@@ -77,7 +79,7 @@ public class ReclaimTargetAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: o */
     public boolean isAvailableAndVisible(BaseUnit baseUnit) {
-        if (baseUnit != null && !this.a) {
+        if (baseUnit != null && !this.canReclaim) {
             return baseUnit.bI();
         }
         return true;

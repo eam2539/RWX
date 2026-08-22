@@ -13,8 +13,8 @@ import java.io.IOException;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.ap */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/ap.class */
 public class AndroidMusicTrack extends MusicTrack {
-    MediaPlayer a;
-    AndroidMusic b;
+    MediaPlayer music;
+    AndroidMusic factory;
     AndroidMusicFactory c;
 
     public AndroidMusicTrack(AndroidMusicFactory androidMusicFactory) {
@@ -24,30 +24,30 @@ public class AndroidMusicTrack extends MusicTrack {
         }
         MediaPlayer mediaPlayer = (MediaPlayer) androidMusicFactory.availablePlayers.remove(0);
         androidMusicFactory.playingPlayers.add(this);
-        this.a = mediaPlayer;
+        this.music = mediaPlayer;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.MusicTrack
     public void a(Music music) {
-        this.b = (AndroidMusic) music;
+        this.factory = (AndroidMusic) music;
     }
 
     /* JADX WARN: Finally extract failed */
     @Override // com.corrodinggames.rts.gameFramework.MusicTrack
     public void a(boolean z) {
         try {
-            MediaPlayer mediaPlayer = this.a;
+            MediaPlayer mediaPlayer = this.music;
             mediaPlayer.reset();
             AssetFileDescriptor assetFileDescriptorB = null;
-            if (this.b.path.startsWith("music")) {
+            if (this.factory.path.startsWith("music")) {
                 try {
-                    assetFileDescriptorB = this.c.musicManager.context.d().b(FileHelper.convertAbstractPath(this.b.path));
+                    assetFileDescriptorB = this.c.musicManager.context.d().b(FileHelper.convertAbstractPath(this.factory.path));
                     mediaPlayer.setDataSource(assetFileDescriptorB.getFileDescriptor(), assetFileDescriptorB.getStartOffset(), assetFileDescriptorB.getLength());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else {
-                String strConvertAbstractPath = FileHelper.convertAbstractPath(this.b.path);
+                String strConvertAbstractPath = FileHelper.convertAbstractPath(this.factory.path);
                 if (FileLoaderFactory.getFileLoaderForPath(strConvertAbstractPath) == null) {
                     mediaPlayer.setDataSource(strConvertAbstractPath);
                 } else {
@@ -104,38 +104,38 @@ public class AndroidMusicTrack extends MusicTrack {
 
     @Override // com.corrodinggames.rts.gameFramework.MusicTrack
     public void a() {
-        this.a.pause();
+        this.music.pause();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.MusicTrack
     public void b() {
-        this.a.start();
+        this.music.start();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.MusicTrack
     public boolean c() {
-        return this.a.isPlaying();
+        return this.music.isPlaying();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.MusicTrack
     public void d() {
-        if (this.a != null) {
-            this.a.stop();
+        if (this.music != null) {
+            this.music.stop();
         }
     }
 
     @Override // com.corrodinggames.rts.gameFramework.MusicTrack
     public void e() {
-        if (this.a != null) {
-            this.a.stop();
+        if (this.music != null) {
+            this.music.stop();
         }
-        this.a = null;
+        this.music = null;
         this.c.playingPlayers.remove(this);
-        this.c.availablePlayers.add(this.a);
+        this.c.availablePlayers.add(this.music);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.MusicTrack
     public void a(float f) {
-        this.a.setVolume(f, f);
+        this.music.setVolume(f, f);
     }
 }

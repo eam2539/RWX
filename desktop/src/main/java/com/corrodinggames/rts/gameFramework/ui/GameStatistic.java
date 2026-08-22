@@ -42,21 +42,21 @@ public class GameStatistic {
             statisticsDataA = gameEngine.gameStatistics.a(gameEngine.playerTeam);
         }
         if (statisticsDataA != null) {
-            if (gameEngine.missionEngine != null && gameEngine.missionEngine.k) {
+            if (gameEngine.missionEngine != null && gameEngine.missionEngine.isSurvival) {
                 arrayList.add(new GameStatistic("Lasted till wave: " + gameEngine.missionEngine.r, VariableScope.nullOrMissingString));
-                if (!gameEngine.missionEngine.l) {
+                if (!gameEngine.missionEngine.survivalWavesClassic) {
                     arrayList.add(new GameStatistic("Wave difficulty: " + gameEngine.networkEngine.c(gameEngine.missionEngine.y), VariableScope.nullOrMissingString));
                 }
             }
             arrayList.add(new GameStatistic("Game Time", Utility.formatDuration(gameEngine.gameTimeMillis / 1000)));
             arrayList.add(new GameStatistic("=============================", VariableScope.nullOrMissingString));
-            arrayList.add(new GameStatistic("Units Killed", statisticsDataA.c));
-            arrayList.add(new GameStatistic("Buildings Killed", statisticsDataA.d));
-            arrayList.add(new GameStatistic("Experimentals Killed", statisticsDataA.e));
+            arrayList.add(new GameStatistic("Units Killed", statisticsDataA.killedUnits));
+            arrayList.add(new GameStatistic("Buildings Killed", statisticsDataA.killedBuildings));
+            arrayList.add(new GameStatistic("Experimentals Killed", statisticsDataA.killedExperimental));
             arrayList.add(new GameStatistic("=============================", VariableScope.nullOrMissingString));
-            arrayList.add(new GameStatistic("Units Lost", statisticsDataA.f));
-            arrayList.add(new GameStatistic("Buildings Lost", statisticsDataA.g));
-            arrayList.add(new GameStatistic("Experimentals Lost", statisticsDataA.h));
+            arrayList.add(new GameStatistic("Units Lost", statisticsDataA.lostUnits));
+            arrayList.add(new GameStatistic("Buildings Lost", statisticsDataA.lostBuildings));
+            arrayList.add(new GameStatistic("Experimentals Lost", statisticsDataA.lostExperimental));
             arrayList.add(new GameStatistic("=============================", VariableScope.nullOrMissingString));
         }
         return arrayList;

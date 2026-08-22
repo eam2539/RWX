@@ -46,10 +46,10 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         }
         customProjectileTemplate.b = iniFile.getInt(str, "directDamage", Integer.valueOf(customProjectileTemplate.b)).intValue();
         customProjectileTemplate.c = iniFile.getInt(str, "areaDamage", Integer.valueOf(customProjectileTemplate.c)).intValue();
-        customProjectileTemplate.d = iniFile.getBoolean(str, "interceptProjectile_removeTargetLifeOnly", Boolean.valueOf(customProjectileTemplate.d)).booleanValue();
-        customProjectileTemplate.g = iniFile.getBoolean(str, "areaDamageNoFalloff", Boolean.valueOf(customProjectileTemplate.g)).booleanValue();
+        customProjectileTemplate.killParentOnHit = iniFile.getBoolean(str, "interceptProjectile_removeTargetLifeOnly", Boolean.valueOf(customProjectileTemplate.killParentOnHit)).booleanValue();
+        customProjectileTemplate.fullSplashDamage = iniFile.getBoolean(str, "areaDamageNoFalloff", Boolean.valueOf(customProjectileTemplate.fullSplashDamage)).booleanValue();
         customProjectileTemplate.j = iniFile.getFloat(str, "areaIgnoreUnitsCloserThan", Float.valueOf(customProjectileTemplate.j)).floatValue();
-        customProjectileTemplate.h = iniFile.getBoolean(str, "areaRadiusFromEdge", Boolean.valueOf(customProjectileTemplate.h)).booleanValue();
+        customProjectileTemplate.splashRadiusBonus = iniFile.getBoolean(str, "areaRadiusFromEdge", Boolean.valueOf(customProjectileTemplate.splashRadiusBonus)).booleanValue();
         if ("only-ignoreEnemy".equalsIgnoreCase(iniFile.getString(str, "friendlyFire", (String) null))) {
             customProjectileTemplate.l = true;
         } else {
@@ -301,7 +301,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
                 if (customProjectileTemplate.bf == null) {
                     customProjectileTemplate.bf = new FastArrayList();
                 }
-                customProjectileTemplate.e = true;
+                customProjectileTemplate.hasSplashDamage = true;
                 customProjectileTemplate.bf.add(unitFilter);
             }
             if (unitFilter.g != null) {
@@ -312,12 +312,12 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             }
         }
         if (customProjectileTemplate.c != 0 && customProjectileTemplate.i > 0) {
-            customProjectileTemplate.e = true;
+            customProjectileTemplate.hasSplashDamage = true;
         }
         if ((customProjectileTemplate.pushForce != 0.0f || customProjectileTemplate.pushVelocity != 0.0f) && customProjectileTemplate.i > 0) {
-            customProjectileTemplate.e = true;
+            customProjectileTemplate.hasSplashDamage = true;
         }
-        customProjectileTemplate.f = !customProjectileTemplate.e;
+        customProjectileTemplate.noExplosion = !customProjectileTemplate.hasSplashDamage;
         customUnitConfig.projectileTemplates.add(customProjectileTemplate);
     }
 

@@ -15,43 +15,53 @@ import java.util.Iterator;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/am.class */
 public class UnitGroupMarker extends Serializable {
     private final GameInterfaceRenderer i;
-    public ArrayList<BaseUnit> a = new ArrayList();
-    public float b;
-    public long c;
+
+    /* JADX INFO: renamed from: a */
+    public ArrayList<BaseUnit> units = new ArrayList();
+
+    /* JADX INFO: renamed from: b */
+    public float radius;
+
+    /* JADX INFO: renamed from: c */
+    public long lastClickTime;
+
     public float d;
     public float e;
     public float f;
-    public boolean g;
+
+    /* JADX INFO: renamed from: g */
+    public boolean isHotkey;
+
     public boolean h;
 
     public UnitGroupMarker(GameInterfaceRenderer gameInterfaceRenderer, boolean z) {
         this.i = gameInterfaceRenderer;
-        this.g = z;
+        this.isHotkey = z;
     }
 
     public void a() {
         BaseUnit baseUnit = null;
-        for (BaseUnit baseUnit2 : this.a) {
+        for (BaseUnit baseUnit2 : this.units) {
             if (!baseUnit2.isDead && baseUnit2.transportContainer == null && this.i.gameUI.selectUnit(baseUnit2) && baseUnit2.isVisibleToLocalPlayer()) {
                 baseUnit = baseUnit2;
             }
         }
-        if (this.c > GameEngine.getCurrentTimeMillis() - 700 && baseUnit != null) {
+        if (this.lastClickTime > GameEngine.getCurrentTimeMillis() - 700 && baseUnit != null) {
             this.i.gameEngine.centerViewpoint(baseUnit.posX, baseUnit.posY);
         }
-        this.c = GameEngine.getCurrentTimeMillis();
+        this.lastClickTime = GameEngine.getCurrentTimeMillis();
     }
 
     public void b() {
-        this.a.clear();
+        this.units.clear();
     }
 
     public void c() {
         for (GameObject gameObject : GameObject.fastGameObjectList) {
             if (gameObject instanceof OrderableUnit) {
                 OrderableUnit orderableUnit = (OrderableUnit) gameObject;
-                if (orderableUnit.isSelected && !this.a.contains(orderableUnit)) {
-                    this.a.add(orderableUnit);
+                if (orderableUnit.isSelected && !this.units.contains(orderableUnit)) {
+                    this.units.add(orderableUnit);
                 }
             }
         }
@@ -60,10 +70,10 @@ public class UnitGroupMarker extends Serializable {
     @Override // com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
         d();
-        gameOutputStream.writeFloat(this.b);
-        gameOutputStream.writeLong(this.c);
-        gameOutputStream.writeInt(this.a.size());
-        Iterator it = this.a.iterator();
+        gameOutputStream.writeFloat(this.radius);
+        gameOutputStream.writeLong(this.lastClickTime);
+        gameOutputStream.writeInt(this.units.size());
+        Iterator it = this.units.iterator();
         while (it.hasNext()) {
             gameOutputStream.writeUnitIdOrNullBaseUnit((BaseUnit) it.next());
         }
@@ -71,24 +81,24 @@ public class UnitGroupMarker extends Serializable {
     }
 
     public void a(GameInputStream gameInputStream) throws IOException {
-        this.b = gameInputStream.readFloat();
-        this.c = gameInputStream.readLong();
-        this.a.clear();
+        this.radius = gameInputStream.readFloat();
+        this.lastClickTime = gameInputStream.readLong();
+        this.units.clear();
         int i = gameInputStream.readInt();
         for (int i2 = 0; i2 < i; i2++) {
             BaseUnit baseUnit = gameInputStream.readBaseUnit();
             if (baseUnit != null) {
-                this.a.add(baseUnit);
+                this.units.add(baseUnit);
             }
         }
         gameInputStream.readByte();
     }
 
     public void d() {
-        if (this.a.size() == 0) {
+        if (this.units.size() == 0) {
             return;
         }
-        Iterator it = this.a.iterator();
+        Iterator it = this.units.iterator();
         while (it.hasNext()) {
             if (((BaseUnit) it.next()).isDead) {
                 it.remove();
@@ -97,17 +107,17 @@ public class UnitGroupMarker extends Serializable {
     }
 
     public void e() {
-        if (this.a.size() == 0) {
+        if (this.units.size() == 0) {
             return;
         }
         ArrayList arrayList = new ArrayList();
-        Iterator it = this.a.iterator();
+        Iterator it = this.units.iterator();
         while (it.hasNext()) {
             BaseUnit baseUnitA = GameObject.a(((BaseUnit) it.next()).objectId, true);
             if (baseUnitA != null && !baseUnitA.isDead) {
                 arrayList.add(baseUnitA);
             }
         }
-        this.a = arrayList;
+        this.units = arrayList;
     }
 }

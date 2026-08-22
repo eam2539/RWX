@@ -7,19 +7,19 @@ import android.view.*;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.w */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/w.class */
 public class AndroidMenuItem implements MenuItem {
-    CharSequence a;
+    CharSequence title;
     Drawable b;
-    int c;
+    int id;
 
     @Override // android.view.MenuItem
     public MenuItem setTitle(CharSequence charSequence) {
-        this.a = charSequence;
+        this.title = charSequence;
         return this;
     }
 
     @Override // android.view.MenuItem
     public CharSequence getTitle() {
-        return this.a;
+        return this.title;
     }
 
     @Override // android.view.MenuItem
@@ -40,11 +40,11 @@ public class AndroidMenuItem implements MenuItem {
 
     @Override // android.view.MenuItem
     public int getItemId() {
-        return this.c;
+        return this.id;
     }
 
     public MenuItem a(int i) {
-        this.c = i;
+        this.id = i;
         return this;
     }
 

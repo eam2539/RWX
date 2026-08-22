@@ -72,10 +72,10 @@ public class MasterServerAuth {
 
     /* JADX INFO: renamed from: a */
     public static void applyHandshakeTimeoutFlag(NetworkConnection networkConnection) {
-        if (networkConnection.N) {
+        if (networkConnection.noExtraChecks) {
             GameEngine.getCurrentTimeMillis();
             if (GameEngine.getInstance().currentTick > -5) {
-                networkConnection.O = Utility.distanceSq(0.0f, 0.0f, (float) handshakeTimeoutSec, 0.0f) > 10.0f;
+                networkConnection.handshakeTimeoutReached = Utility.distanceSq(0.0f, 0.0f, (float) handshakeTimeoutSec, 0.0f) > 10.0f;
             }
         }
     }

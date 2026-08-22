@@ -13,15 +13,33 @@ import com.corrodinggames.rts.gameFramework.utility.FastArrayList;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.s */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/s.class */
 public final class TeamUnitStats {
-    public int b;
-    public int c;
-    public int d;
-    public int e;
-    public int f;
-    public int g;
-    public boolean m;
-    public int n;
-    public int o;
+
+    /* JADX INFO: renamed from: b */
+    public int unitCount;
+
+    /* JADX INFO: renamed from: c */
+    public int completedUnitCount;
+
+    /* JADX INFO: renamed from: d */
+    public int totalUnitCount;
+
+    /* JADX INFO: renamed from: e */
+    public int factoryQueueCount;
+
+    /* JADX INFO: renamed from: f */
+    public int incompleteUnitCount;
+
+    /* JADX INFO: renamed from: g */
+    public int creditIncomeRate;
+
+    /* JADX INFO: renamed from: m */
+    public boolean hasAdvancedUnit;
+
+    /* JADX INFO: renamed from: n */
+    public int nonBuildingUnitValue;
+
+    /* JADX INFO: renamed from: o */
+    public int buildingUnitValue;
     public int a = 5;
     public StoredResources h = new StoredResources();
     public StoredResources i = new StoredResources();
@@ -33,18 +51,18 @@ public final class TeamUnitStats {
 
     /* JADX WARN: Multi-variable type inference failed */
     public void a(BaseUnit baseUnit) {
-        this.d++;
+        this.totalUnitCount++;
         if (baseUnit.buildProgress < 1.0f) {
-            this.f++;
+            this.incompleteUnitCount++;
         } else {
-            this.c++;
+            this.completedUnitCount++;
         }
         UnitType unitTypeR = baseUnit.r();
         if (!unitTypeR.k()) {
-            this.b++;
+            this.unitCount++;
         }
-        if (!this.m && !baseUnit.u() && baseUnit.r().y()) {
-            this.m = true;
+        if (!this.hasAdvancedUnit && !baseUnit.u() && baseUnit.r().y()) {
+            this.hasAdvancedUnit = true;
         }
         UnitPrice unitPriceDq = baseUnit.dq();
         if (unitPriceDq != null) {
@@ -54,8 +72,8 @@ public final class TeamUnitStats {
         if (baseUnit instanceof FactoryQueueInterface) {
             FactoryQueueInterface factoryQueueInterface = (FactoryQueueInterface) baseUnit;
             int iF = factoryQueueInterface.f(false);
-            this.b += iF;
-            this.e += iF;
+            this.unitCount += iF;
+            this.factoryQueueCount += iF;
             if (iF != 0) {
                 a(factoryQueueInterface);
             }
@@ -63,7 +81,7 @@ public final class TeamUnitStats {
         c(baseUnit);
         float fCy = baseUnit.getCreditIncomeRate();
         if (fCy != 0.0f && baseUnit.buildProgress >= 1.0f) {
-            this.g = (int) (this.g + fCy);
+            this.creditIncomeRate = (int) (this.creditIncomeRate + fCy);
         }
         StoredResources unitRotationData = baseUnit.getGlobalCustomResourceGenerationRates();
         if (!unitRotationData.c() && baseUnit.buildProgress >= 1.0f) {
@@ -78,24 +96,24 @@ public final class TeamUnitStats {
                 iB += unitPriceB.b();
             }
             if (unitTypeR.isBuildingUnit()) {
-                this.o += iB;
+                this.buildingUnitValue += iB;
             } else {
-                this.n += iB;
+                this.nonBuildingUnitValue += iB;
             }
         }
     }
 
     /* JADX WARN: Multi-variable type inference failed */
     public void b(BaseUnit baseUnit) {
-        this.d--;
+        this.totalUnitCount--;
         if (baseUnit.buildProgress < 1.0f) {
-            this.f--;
+            this.incompleteUnitCount--;
         } else {
-            this.c--;
+            this.completedUnitCount--;
         }
         UnitType unitTypeR = baseUnit.r();
         if (!unitTypeR.k()) {
-            this.b--;
+            this.unitCount--;
         }
         UnitPrice unitPriceDq = baseUnit.dq();
         if (unitPriceDq != null) {
@@ -105,8 +123,8 @@ public final class TeamUnitStats {
         if (baseUnit instanceof FactoryQueueInterface) {
             FactoryQueueInterface factoryQueueInterface = (FactoryQueueInterface) baseUnit;
             int iF = factoryQueueInterface.f(false);
-            this.b -= iF;
-            this.e -= iF;
+            this.unitCount -= iF;
+            this.factoryQueueCount -= iF;
             if (iF != 0) {
                 b(factoryQueueInterface);
             }
@@ -114,7 +132,7 @@ public final class TeamUnitStats {
         d(baseUnit);
         float fCy = baseUnit.getCreditIncomeRate();
         if (fCy != 0.0f && baseUnit.buildProgress >= 1.0f) {
-            this.g = (int) (this.g - fCy);
+            this.creditIncomeRate = (int) (this.creditIncomeRate - fCy);
         }
         StoredResources unitRotationData = baseUnit.getGlobalCustomResourceGenerationRates();
         if (!unitRotationData.c() && baseUnit.buildProgress >= 1.0f) {
@@ -129,9 +147,9 @@ public final class TeamUnitStats {
                 iB += unitPriceB.b();
             }
             if (unitTypeR.isBuildingUnit()) {
-                this.o -= iB;
+                this.buildingUnitValue -= iB;
             } else {
-                this.n -= iB;
+                this.nonBuildingUnitValue -= iB;
             }
         }
     }

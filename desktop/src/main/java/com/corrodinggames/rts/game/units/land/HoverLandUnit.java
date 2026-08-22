@@ -13,7 +13,8 @@ import com.corrodinggames.rts.gameFramework.graphics.Texture;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.e.h */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/e/h.class */
 public abstract class HoverLandUnit extends LandUnit {
-    float l;
+    /* JADX INFO: renamed from: l */
+    float hoverTimer;
     public static Texture m = null;
     public static Texture[] n = new Texture[10];
 
@@ -48,10 +49,10 @@ public abstract class HoverLandUnit extends LandUnit {
         super.update(f);
         if (isAlive() && !this.isDead && isOverLiquid()) {
             if (this.rotation > 0.0f) {
-                this.l += f;
+                this.hoverTimer += f;
             }
-            if (this.l > 10.0f) {
-                this.l = 0.0f;
+            if (this.hoverTimer > 10.0f) {
+                this.hoverTimer = 0.0f;
                 if (isVisibleOnScreen()) {
                     Effect effectCreateEffectInternal = GameEngine.getInstance().effectManager.createEffectInternal(this.posX + (Utility.fastCos(this.rotationSpeed) * 4.0f), this.posY + (Utility.fastSin(this.rotationSpeed) * 4.0f), 0.0f, EffectType.custom, false, EffectQuality.low);
                     if (effectCreateEffectInternal != null) {

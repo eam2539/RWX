@@ -84,8 +84,8 @@ public class ConnectionAcceptor implements Runnable {
                     break;
                 }
                 ConnectionAttemptTracker connectionAttemptTracker = (ConnectionAttemptTracker) it.next();
-                if (inetAddress.equals(connectionAttemptTracker.a)) {
-                    connectionAttemptTracker.b++;
+                if (inetAddress.equals(connectionAttemptTracker.address)) {
+                    connectionAttemptTracker.attemptCount++;
                     int i = 30;
                     if (this.pendingLimit > 100) {
                         i = 10;
@@ -93,14 +93,14 @@ public class ConnectionAcceptor implements Runnable {
                     if (this.pendingLimit > 250) {
                         i = 5;
                     }
-                    if (connectionAttemptTracker.b > i) {
-                        if (!connectionAttemptTracker.c) {
-                            connectionAttemptTracker.c = true;
-                            GameEngine.log("DOS: Too many attempts:" + connectionAttemptTracker.b + " ip:" + inetAddress.toString());
+                    if (connectionAttemptTracker.attemptCount > i) {
+                        if (!connectionAttemptTracker.dosWarningLogged) {
+                            connectionAttemptTracker.dosWarningLogged = true;
+                            GameEngine.log("DOS: Too many attempts:" + connectionAttemptTracker.attemptCount + " ip:" + inetAddress.toString());
                         }
-                        if (connectionAttemptTracker.b > 300 && !connectionAttemptTracker.d) {
-                            connectionAttemptTracker.d = true;
-                            GameEngine.log("DOS: Excessive attempts:" + connectionAttemptTracker.b + " ip:" + inetAddress.toString());
+                        if (connectionAttemptTracker.attemptCount > 300 && !connectionAttemptTracker.dosExcessiveLogged) {
+                            connectionAttemptTracker.dosExcessiveLogged = true;
+                            GameEngine.log("DOS: Excessive attempts:" + connectionAttemptTracker.attemptCount + " ip:" + inetAddress.toString());
                         }
                         return false;
                     }
@@ -114,7 +114,7 @@ public class ConnectionAcceptor implements Runnable {
                 if (this.pendingConnections.size() > 200) {
                     ConnectionAttemptTracker connectionAttemptTracker2 = null;
                     for (ConnectionAttemptTracker connectionAttemptTracker3 : this.pendingConnections) {
-                        if (connectionAttemptTracker2 == null || connectionAttemptTracker2.b > connectionAttemptTracker3.b) {
+                        if (connectionAttemptTracker2 == null || connectionAttemptTracker2.attemptCount > connectionAttemptTracker3.attemptCount) {
                             connectionAttemptTracker2 = connectionAttemptTracker3;
                         }
                     }
@@ -123,7 +123,7 @@ public class ConnectionAcceptor implements Runnable {
                     }
                 }
                 ConnectionAttemptTracker connectionAttemptTracker4 = new ConnectionAttemptTracker(this);
-                connectionAttemptTracker4.a = inetAddress;
+                connectionAttemptTracker4.address = inetAddress;
                 this.pendingConnections.add(connectionAttemptTracker4);
             }
             if (this.acceptedCount > 500) {
@@ -240,7 +240,7 @@ public class ConnectionAcceptor implements Runnable {
                             str = str + " (udp)";
                         }
                         this.networkEngine.d(str);
-                        networkConnection.h = this.isUdp;
+                        networkConnection.isUdp = this.isUdp;
                         networkConnection.inetAddress = inetAddress;
                         networkConnection.startWorkers();
                         this.networkEngine.sendQueue.add(networkConnection);

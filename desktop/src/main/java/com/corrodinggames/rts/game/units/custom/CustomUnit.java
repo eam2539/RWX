@@ -862,9 +862,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             if (baseUnit instanceof OrderableUnit) {
                 projectile.followNodeIndex = i;
                 Vector3D vector3DD = ((OrderableUnit) baseUnit).D(i);
-                projectile.followLastX = vector3DD.a;
-                projectile.followLastY = vector3DD.b;
-                projectile.followLastZ = baseUnit.posZ + vector3DD.c;
+                projectile.followLastX = vector3DD.x;
+                projectile.followLastY = vector3DD.y;
+                projectile.followLastZ = baseUnit.posZ + vector3DD.z;
             } else {
                 projectile.followLastX = baseUnit.posX;
                 projectile.followLastY = baseUnit.posY;
@@ -1523,8 +1523,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                     BaseUnit baseUnit2 = (BaseUnit) this.transportedUnits.remove(this.transportedUnits.size() - 1);
                     UnitMovementData unitMovementData = this.movementLevels[i];
                     GameViewUtils.a(baseUnit2, this);
-                    baseUnit2.posX = vector3DD.a;
-                    baseUnit2.posY = vector3DD.b;
+                    baseUnit2.posX = vector3DD.x;
+                    baseUnit2.posY = vector3DD.y;
                     baseUnit2.rotationSpeed = unitMovementData.targetX;
                     if (baseUnit2 instanceof OrderableUnit) {
                         OrderableUnit orderableUnit = (OrderableUnit) baseUnit2;
@@ -1545,7 +1545,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             }
             if (this.G[i] != null && !this.G[i].isDestroyed) {
                 projectileA = this.G[i];
-                projectileA.a(this, vector3DD.a, vector3DD.b, this.posZ + vector3DD.c);
+                projectileA.a(this, vector3DD.x, vector3DD.y, this.posZ + vector3DD.z);
                 if (!customProjectileTemplate2.N && projectileA.hitUnits != null) {
                     projectileA.hitUnits.clear();
                 }
@@ -1555,7 +1555,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         float f3 = this.movementLevels[i].targetX;
         boolean z = false;
         if (projectileA == null) {
-            projectileA = Projectile.a(this, vector3DD.a, vector3DD.b, this.posZ + vector3DD.c, i);
+            projectileA = Projectile.a(this, vector3DD.x, vector3DD.y, this.posZ + vector3DD.z, i);
             if (customProjectileTemplate2.L && customProjectileTemplate == null) {
                 this.G[i] = projectileA;
             }
@@ -1563,20 +1563,20 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             projectileA.template = customProjectileTemplate2;
             z = true;
         }
-        a(projectileA, this, i, customProjectileTemplate2, vector3DD.a, vector3DD.b, this.posZ + vector3DD.c, f3);
+        a(projectileA, this, i, customProjectileTemplate2, vector3DD.x, vector3DD.y, this.posZ + vector3DD.z, f3);
         customProjectileTemplate2.a(this, projectileA, baseUnit, f, f2, m());
         if (!z && customProjectileTemplate2.R == 0.0f && customProjectileTemplate2.S == 0.0f) {
             projectileA.trackOffsetX = shadowTexture.x;
             projectileA.trackOffsetY = shadowTexture.y;
         }
         if (turretConfig.shootLightColor != null) {
-            gameEngine.effectManager.createLightEffect(vector3DD.a, vector3DD.b, this.posZ + vector3DD.c, turretConfig.shootLightColor.intValue());
+            gameEngine.effectManager.createLightEffect(vector3DD.x, vector3DD.y, this.posZ + vector3DD.z, turretConfig.shootLightColor.intValue());
         }
         if (turretConfig.shootFlameEffect != null) {
-            turretConfig.shootFlameEffect.a(vector3DD.a, vector3DD.b, this.posZ + vector3DD.c, this.movementLevels[i].targetX, this);
+            turretConfig.shootFlameEffect.a(vector3DD.x, vector3DD.y, this.posZ + vector3DD.z, this.movementLevels[i].targetX, this);
         }
         if (turretConfig.shootSound != null) {
-            turretConfig.shootSound.a(vector3DD.a, vector3DD.b, 1.0f + Utility.randomFloatInRange(-0.07f, 0.07f));
+            turretConfig.shootSound.a(vector3DD.x, vector3DD.y, 1.0f + Utility.randomFloatInRange(-0.07f, 0.07f));
         }
         if (this.unitConfig.stopTargetingAfterFiring) {
             this.attackTarget = null;
@@ -2171,7 +2171,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: u */
-    public int setHeight(BaseUnit baseUnit) {
+    public int getRepairRange(BaseUnit baseUnit) {
         int iA = baseUnit.r().a(this);
         if (this.unitConfig.nanoRangeForRepair != -1) {
             if (this.unitConfig.nanoRangeForRepairIsMelee) {
@@ -2422,7 +2422,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 if (z2 && customUnitConfig.turrets[customUnitConfig.mainNanoTurret.turretIndex].chargeEffectImage == null) {
                     Vector3D vector3DBn = bn();
                     gameEngine.renderGraphicsEngine.k();
-                    gameEngine.renderGraphicsEngine.b(vector3DBn.a - gameEngine.viewpointXSnapped, ((vector3DBn.b - vector3DBn.c) - gameEngine.viewpointYSnapped) - this.posZ);
+                    gameEngine.renderGraphicsEngine.b(vector3DBn.x - gameEngine.viewpointXSnapped, ((vector3DBn.y - vector3DBn.z) - gameEngine.viewpointYSnapped) - this.posZ);
                     gameEngine.renderGraphicsEngine.a(fE, fE);
                     if (zY) {
                         gameEngine.renderGraphicsEngine.a(BuilderUnit.builderDechargeTexture, 0.0f, 0.0f, (Paint) null);
@@ -2817,8 +2817,8 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public PointF G(int i) {
         Vector3D vector3DA = a(i, false);
-        K.x = vector3DA.a;
-        K.y = vector3DA.b;
+        K.x = vector3DA.x;
+        K.y = vector3DA.y;
         return K;
     }
 
@@ -2838,9 +2838,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 throw new RuntimeException("Turret can not be attached to turret that is not attached to the body");
             }
             Vector3D vector3DA = a(turretConfig.linkedTurretIndex, true);
-            fFastCos = vector3DA.a;
-            fFastSin = vector3DA.b;
-            f = vector3DA.c;
+            fFastCos = vector3DA.x;
+            fFastSin = vector3DA.y;
+            f = vector3DA.z;
             f2 = this.movementLevels[turretConfig.linkedTurretIndex].targetX;
         }
         if (this.movementLevels[i].rotation > 0.0f && turretConfig.p != 0.0f) {
@@ -2865,9 +2865,9 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             fFastCos += (fFastCos2 * f5) - (fFastSin2 * f4);
             fFastSin += ((fFastSin2 * f5) + (fFastCos2 * f4)) * turretConfig.i;
         }
-        dK.a = fFastCos;
-        dK.b = fFastSin;
-        dK.c = f + f6;
+        dK.x = fFastCos;
+        dK.y = fFastSin;
+        dK.z = f + f6;
         return dK;
     }
 
@@ -3935,22 +3935,22 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                 } else {
                     fC = C(i);
                 }
-                unitMovementData.k += f;
+                unitMovementData.idleSweepTimer += f;
                 float f2 = f * turretConfig.idleSweepSpeed;
-                if (unitMovementData.l > 0.0f) {
-                    if (unitMovementData.l < Float.POSITIVE_INFINITY && a(f2, fC + unitMovementData.l, i) == 0.0f) {
-                        unitMovementData.l = Float.POSITIVE_INFINITY;
+                if (unitMovementData.idleSweepAngle > 0.0f) {
+                    if (unitMovementData.idleSweepAngle < Float.POSITIVE_INFINITY && a(f2, fC + unitMovementData.idleSweepAngle, i) == 0.0f) {
+                        unitMovementData.idleSweepAngle = Float.POSITIVE_INFINITY;
                     }
-                } else if (unitMovementData.l > Float.NEGATIVE_INFINITY && a(f2, fC + unitMovementData.l, i) == 0.0f) {
-                    unitMovementData.l = Float.NEGATIVE_INFINITY;
+                } else if (unitMovementData.idleSweepAngle > Float.NEGATIVE_INFINITY && a(f2, fC + unitMovementData.idleSweepAngle, i) == 0.0f) {
+                    unitMovementData.idleSweepAngle = Float.NEGATIVE_INFINITY;
                 }
-                if (unitMovementData.k > turretConfig.idleSweepDelay) {
-                    unitMovementData.k = -Utility.getDeterministicRandomInt(this, 0, (int) turretConfig.idleSweepAddRandomDelay);
+                if (unitMovementData.idleSweepTimer > turretConfig.idleSweepDelay) {
+                    unitMovementData.idleSweepTimer = -Utility.getDeterministicRandomInt(this, 0, (int) turretConfig.idleSweepAddRandomDelay);
                     float fClamp = turretConfig.idleSweepAngle;
                     if (turretConfig.idleSweepAddRandomAngle > 0.0f) {
                         fClamp += Utility.getDeterministicRandomFloatForUnit(this, 0.0f, turretConfig.idleSweepAddRandomAngle, i);
                     }
-                    unitMovementData.l = unitMovementData.l > 0.0f ? -fClamp : fClamp;
+                    unitMovementData.idleSweepAngle = unitMovementData.idleSweepAngle > 0.0f ? -fClamp : fClamp;
                     return false;
                 }
                 return false;
@@ -4392,27 +4392,27 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         TurretConfig turretConfig = this.unitConfig.turrets[i];
         float f = turretConfig.barrelY;
         float f2 = turretConfig.barrelX;
-        if (turretConfig.barrelOffsetXOnOddShots != 0.0f && unitMovementData.m) {
+        if (turretConfig.barrelOffsetXOnOddShots != 0.0f && unitMovementData.isOddShot) {
             f2 += turretConfig.barrelOffsetXOnOddShots;
         }
         float f3 = E() ? this.rotationSpeed : unitMovementData.targetX;
         Vector3D vector3DF = F(i);
         float fFastCos = Utility.fastCos(f3);
         float fFastSin = Utility.fastSin(f3);
-        float f4 = vector3DF.a;
-        float f5 = vector3DF.b;
-        float f6 = vector3DF.c;
-        ee.a = f4 + ((fFastCos * f) - (fFastSin * f2));
-        ee.b = f5 + (fFastSin * f) + (fFastCos * f2);
-        ee.c = f6 + turretConfig.barrelHeight;
+        float f4 = vector3DF.x;
+        float f5 = vector3DF.y;
+        float f6 = vector3DF.z;
+        ee.x = f4 + ((fFastCos * f) - (fFastSin * f2));
+        ee.y = f5 + (fFastSin * f) + (fFastCos * f2);
+        ee.z = f6 + turretConfig.barrelHeight;
         return ee;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public PointF E(int i) {
         Vector3D vector3DD = D(i);
-        ef.x = vector3DD.a;
-        ef.y = vector3DD.b;
+        ef.x = vector3DD.x;
+        ef.y = vector3DD.y;
         return ef;
     }
 

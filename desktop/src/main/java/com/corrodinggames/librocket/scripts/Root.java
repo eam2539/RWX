@@ -883,7 +883,7 @@ public class Root extends ScriptContext {
     }
 
     public String getKeyBindingAction(int i, KeyBinding keyBinding, int i2) {
-        return "createAndShowPopup('settingsKeyBindingSet.rml', " + escapedString(i + ":" + i2) + ", " + escapedString(keyBinding.a) + "); showKeyBindingPopup();";
+        return "createAndShowPopup('settingsKeyBindingSet.rml', " + escapedString(i + ":" + i2) + ", " + escapedString(keyBinding.name) + "); showKeyBindingPopup();";
     }
 
     public void backWarnIfOverlappingKeyBinding() {
@@ -915,9 +915,9 @@ public class Root extends ScriptContext {
         boolean z = false;
         for (int i = 0; i < arrayList2.size(); i++) {
             KeyBinding keyBinding = (KeyBinding) arrayList2.get(i);
-            if (keyBinding.b) {
+            if (keyBinding.isDefault) {
                 TableRow tableRow = new TableRow();
-                tableRow.addCell(keyBinding.a);
+                tableRow.addCell(keyBinding.name);
                 if (keyBinding.d()) {
                     tableRow.addClass("rowHeader");
                 } else {

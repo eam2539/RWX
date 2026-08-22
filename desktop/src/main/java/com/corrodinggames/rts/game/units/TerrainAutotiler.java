@@ -210,13 +210,13 @@ public class TerrainAutotiler {
         if (tileCoordinate == null) {
             return false;
         }
-        if (tileCoordinate.a == 1 && tileCoordinate.b == 1) {
+        if (tileCoordinate.x == 1 && tileCoordinate.y == 1) {
             tileMap.groundLayer.setTileAt(i, i2, mapTile, false);
             orCreateTileFromTilesetIndex = null;
             z = true;
         } else {
             try {
-                orCreateTileFromTilesetIndex = tileMap.getOrCreateTileFromTilesetIndex(str, tileCoordinate.a, tileCoordinate.b);
+                orCreateTileFromTilesetIndex = tileMap.getOrCreateTileFromTilesetIndex(str, tileCoordinate.x, tileCoordinate.y);
             } catch (MapLoadException e) {
                 e.printStackTrace();
                 return false;

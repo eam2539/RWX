@@ -1539,7 +1539,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             if (z2) {
                 z3 = 1 == 0;
             }
-            if (teamChangeAction.a) {
+            if (teamChangeAction.isPrevious) {
                 z3 = !z3;
             }
             if (z3) {
@@ -1642,7 +1642,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             if (z2) {
                 z4 = 1 == 0;
             }
-            if (modFilterAction.a) {
+            if (modFilterAction.isPrevious) {
                 z4 = !z4;
             }
             ArrayList activeMods = gameEngine.modManager.getActiveMods();
@@ -1699,7 +1699,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             if (z2) {
                 z7 = 1 == 0;
             }
-            if (changeTypeFilterAction.a) {
+            if (changeTypeFilterAction.isPrevious) {
                 z7 = !z7;
             }
             this.F = this.F.a(!z7);
@@ -1888,7 +1888,7 @@ public class EditorOrBuilder extends LandUnit implements UnitPathPoints {
             gameEngine.gameStatistics.a();
         }
         if (abstractUnitAction instanceof SetTerrainTypeAction) {
-            TerrainAutotiler.a(((SetTerrainTypeAction) abstractUnitAction).a, pointF);
+            TerrainAutotiler.a(((SetTerrainTypeAction) abstractUnitAction).terrainType, pointF);
         }
         super.a(abstractUnitAction, z2, pointF, baseUnit);
     }

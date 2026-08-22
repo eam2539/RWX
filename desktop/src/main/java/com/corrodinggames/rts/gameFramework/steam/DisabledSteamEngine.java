@@ -6,10 +6,11 @@ import com.corrodinggames.rts.gameFramework.mod.ModInfo;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.o.a */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/o/a.class */
 public class DisabledSteamEngine {
-    public static DisabledSteamEngine a = new DisabledSteamEngine();
+    /* JADX INFO: renamed from: a */
+    public static DisabledSteamEngine instance = new DisabledSteamEngine();
 
     public static DisabledSteamEngine a() {
-        return a;
+        return instance;
     }
 
     public void b() {

@@ -12,15 +12,24 @@ import java.util.Properties;
 public class InputController {
     public static AbstractC0003aj a = new DefaultInputHandler();
     public static InputHandler b = new InputHandler();
-    public KeyBinding c;
-    public KeyBinding d;
-    public KeyBinding e;
-    public KeyBinding f;
-    public KeyBinding g;
-    public KeyBinding h;
-    public KeyBinding i;
-    public KeyBinding j;
-    public KeyBinding k;
+        /* JADX INFO: renamed from: c */
+    public KeyBinding shootKey;
+        /* JADX INFO: renamed from: d */
+    public KeyBinding moveUpKey;
+        /* JADX INFO: renamed from: e */
+    public KeyBinding moveDownKey;
+        /* JADX INFO: renamed from: f */
+    public KeyBinding moveLeftKey;
+        /* JADX INFO: renamed from: g */
+    public KeyBinding moveRightKey;
+        /* JADX INFO: renamed from: h */
+    public KeyBinding aimUpKey;
+        /* JADX INFO: renamed from: i */
+    public KeyBinding aimDownKey;
+        /* JADX INFO: renamed from: j */
+    public KeyBinding aimLeftKey;
+        /* JADX INFO: renamed from: k */
+    public KeyBinding aimRightKey;
     public KeyBinding l = a("Debug Left");
     public KeyBinding m = a("Debug Right");
     public KeyBinding n = b("Camera Up");
@@ -169,8 +178,8 @@ public class InputController {
             this.al = new ArrayList();
         }
         KeyBinding keyBinding = new KeyBinding();
-        keyBinding.a = str;
-        keyBinding.b = false;
+        keyBinding.name = str;
+        keyBinding.isDefault = false;
         this.al.add(keyBinding);
         return keyBinding;
     }
@@ -180,8 +189,8 @@ public class InputController {
             this.al = new ArrayList();
         }
         KeyBinding keyBinding = new KeyBinding();
-        keyBinding.a = str;
-        keyBinding.b = true;
+        keyBinding.name = str;
+        keyBinding.isDefault = true;
         this.al.add(keyBinding);
         return keyBinding;
     }
@@ -191,8 +200,8 @@ public class InputController {
             this.al = new ArrayList();
         }
         AlwaysActiveKeyBinding alwaysActiveKeyBinding = new AlwaysActiveKeyBinding();
-        alwaysActiveKeyBinding.a = str;
-        alwaysActiveKeyBinding.b = true;
+        alwaysActiveKeyBinding.name = str;
+        alwaysActiveKeyBinding.isDefault = true;
         this.al.add(alwaysActiveKeyBinding);
         return alwaysActiveKeyBinding;
     }
@@ -201,7 +210,7 @@ public class InputController {
         String strTrim = str.toLowerCase(Locale.ENGLISH).trim();
         KeyBinding keyBinding = null;
         for (KeyBinding keyBinding2 : this.al) {
-            if (keyBinding2.a != null && keyBinding2.e().equals(strTrim)) {
+            if (keyBinding2.name != null && keyBinding2.e().equals(strTrim)) {
                 keyBinding = keyBinding2;
             }
         }
@@ -214,8 +223,8 @@ public class InputController {
             String str3 = strArrSplit[i];
             if (!str3.equalsIgnoreCase("DEFAULT")) {
                 keyBinding.a(str3, i);
-                if (keyBinding.c.size() > i && keyBinding.c.get(i) != null) {
-                    ((InputBinding) keyBinding.c.get(i)).d = true;
+                if (keyBinding.bindings.size() > i && keyBinding.bindings.get(i) != null) {
+                    ((InputBinding) keyBinding.bindings.get(i)).isUserDefined = true;
                 } else {
                     GameEngine.logWarningAndStack("out of range");
                 }
@@ -226,13 +235,13 @@ public class InputController {
     public String a(KeyBinding keyBinding) {
         String str = VariableScope.nullOrMissingString;
         boolean z = true;
-        for (InputBinding inputBinding : keyBinding.c) {
+        for (InputBinding inputBinding : keyBinding.bindings) {
             if (z) {
                 z = false;
             } else {
                 str = str + ",";
             }
-            if (inputBinding.d) {
+            if (inputBinding.isUserDefined) {
                 if (inputBinding.d()) {
                     str = str + "CLEARED";
                 } else {
@@ -255,7 +264,7 @@ public class InputController {
         for (int i2 = 0; i2 < arrayList.size(); i2++) {
             KeyBinding keyBinding2 = (KeyBinding) arrayList.get(i2);
             if (keyBinding2 != keyBinding) {
-                Iterator it = keyBinding2.c.iterator();
+                Iterator it = keyBinding2.bindings.iterator();
                 while (it.hasNext()) {
                     if (inputBindingA.a((InputBinding) it.next())) {
                         return true;
@@ -267,35 +276,35 @@ public class InputController {
     }
 
     public void a() {
-        this.c = a("shoot");
-        this.d = a("move up");
-        this.e = a("move down");
-        this.f = a("move left");
-        this.g = a("move right");
-        this.h = a("aim up");
-        this.i = a("aim down");
-        this.j = a("aim left");
-        this.k = a("aim right");
-        this.c.a(0, "enter", -1);
-        this.c.a(0, "space", -1);
-        this.d.a(0, "w", -1);
-        this.e.a(0, "s", -1);
-        this.f.a(0, "a", -1);
-        this.g.a(0, "d", -1);
-        this.h.a(0, "UP", -1);
-        this.i.a(0, "DOWN", -1);
-        this.j.a(0, "LEFT", -1);
-        this.k.a(0, "RIGHT", -1);
+        this.shootKey = a("shoot");
+        this.moveUpKey = a("move up");
+        this.moveDownKey = a("move down");
+        this.moveLeftKey = a("move left");
+        this.moveRightKey = a("move right");
+        this.aimUpKey = a("aim up");
+        this.aimDownKey = a("aim down");
+        this.aimLeftKey = a("aim left");
+        this.aimRightKey = a("aim right");
+        this.shootKey.a(0, "enter", -1);
+        this.shootKey.a(0, "space", -1);
+        this.moveUpKey.a(0, "w", -1);
+        this.moveDownKey.a(0, "s", -1);
+        this.moveLeftKey.a(0, "a", -1);
+        this.moveRightKey.a(0, "d", -1);
+        this.aimUpKey.a(0, "UP", -1);
+        this.aimDownKey.a(0, "DOWN", -1);
+        this.aimLeftKey.a(0, "LEFT", -1);
+        this.aimRightKey.a(0, "RIGHT", -1);
         GameEngine.log("getControllerCount:" + b.a());
-        this.d.b(0, 1, 0, true);
-        this.e.b(0, 1, 0, false);
-        this.f.b(0, 1, 1, true);
-        this.g.b(0, 1, 1, false);
-        this.h.b(0, 1, 2, true);
-        this.i.b(0, 1, 2, false);
-        this.j.b(0, 1, 3, true);
-        this.k.b(0, 1, 3, false);
-        this.c.b(0, 1, 4, true);
+        this.moveUpKey.b(0, 1, 0, true);
+        this.moveDownKey.b(0, 1, 0, false);
+        this.moveLeftKey.b(0, 1, 1, true);
+        this.moveRightKey.b(0, 1, 1, false);
+        this.aimUpKey.b(0, 1, 2, true);
+        this.aimDownKey.b(0, 1, 2, false);
+        this.aimLeftKey.b(0, 1, 3, true);
+        this.aimRightKey.b(0, 1, 3, false);
+        this.shootKey.b(0, 1, 4, true);
     }
 
     public void b() {

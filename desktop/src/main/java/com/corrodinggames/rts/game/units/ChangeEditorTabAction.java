@@ -10,13 +10,16 @@ import com.corrodinggames.rts.gameFramework.ui.GameUI;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.m */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/m.class */
 class ChangeEditorTabAction extends NoneAction {
-    boolean a;
-    boolean b;
+    /* JADX INFO: renamed from: a */
+    boolean isPrevious;
+
+    /* JADX INFO: renamed from: b */
+    boolean isInfoOnly;
 
     public ChangeEditorTabAction(boolean z, boolean z2) {
         super("changeUnitTab" + z + "d:" + z2);
-        this.a = z;
-        this.b = z2;
+        this.isPrevious = z;
+        this.isInfoOnly = z2;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -31,14 +34,14 @@ class ChangeEditorTabAction extends NoneAction {
         if (editorOrBuilderL == null) {
             return "<NULL>";
         }
-        if (this.b) {
+        if (this.isInfoOnly) {
             return editorOrBuilderL.G.a();
         }
         String str = VariableScope.nullOrMissingString;
-        if (this.a) {
+        if (this.isPrevious) {
             str = str + "<- ";
         }
-        if (!this.a) {
+        if (!this.isPrevious) {
             str = str + " ->";
         }
         return str;
@@ -49,10 +52,10 @@ class ChangeEditorTabAction extends NoneAction {
         if (editorOrBuilderL == null) {
             GameEngine.logColored("Editor not active");
         } else {
-            if (this.b) {
+            if (this.isInfoOnly) {
                 return;
             }
-            editorOrBuilderL.G = editorOrBuilderL.G.a(this.a);
+            editorOrBuilderL.G = editorOrBuilderL.G.a(this.isPrevious);
         }
     }
 
@@ -74,7 +77,7 @@ class ChangeEditorTabAction extends NoneAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: m */
     public int getKeyBinding() {
-        if (this.b) {
+        if (this.isInfoOnly) {
             return 2;
         }
         return 4;
@@ -83,7 +86,7 @@ class ChangeEditorTabAction extends NoneAction {
     @Override // com.corrodinggames.rts.game.units.actions.NoneAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
     public ActionDisplayType getActionDisplayType() {
-        if (this.b) {
+        if (this.isInfoOnly) {
             return ActionDisplayType.infoOnly;
         }
         return super.getActionDisplayType();
@@ -91,7 +94,7 @@ class ChangeEditorTabAction extends NoneAction {
 
     @Override // com.corrodinggames.rts.game.units.actions.NoneAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public ActionType getActionType() {
-        if (this.b) {
+        if (this.isInfoOnly) {
             return ActionType.infoOnly;
         }
         return super.getActionType();

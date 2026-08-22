@@ -7,62 +7,73 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.bb */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/bb.class */
 class ReplayWriter implements Runnable {
-    volatile int b;
-    int c;
+
+    /* JADX INFO: renamed from: i */
+    public ConcurrentLinkedQueue commandQueue = new ConcurrentLinkedQueue();
+    /* JADX INFO: renamed from: j */
+    public long lastFlushTime = 0;
+
     int d;
     int e;
-    int f;
-    int g;
+    /* JADX INFO: renamed from: b */
+    volatile int stopFrame;
+    /* JADX INFO: renamed from: c */
+    int stopGameTime;
+
     final /* synthetic */ ReplayEngine k;
-    volatile boolean a = true;
-    boolean h = false;
-    public ConcurrentLinkedQueue i = new ConcurrentLinkedQueue();
-    public long j = 0;
+    /* JADX INFO: renamed from: f */
+    int lastCommandFrame;
+    /* JADX INFO: renamed from: g */
+    int lastWrittenFrame;
+    /* JADX INFO: renamed from: a */
+    volatile boolean running = true;
+    /* JADX INFO: renamed from: h */
+    boolean stopped = false;
 
     ReplayWriter(ReplayEngine replayEngine) {
         this.k = replayEngine;
     }
 
     public synchronized void a(ReplayCommand replayCommand) {
-        if (this.h) {
+        if (this.stopped) {
             GameEngine.log("Replay:addCommand skipped due to stopped recording");
         }
-        this.i.add(replayCommand);
-        this.f = replayCommand.a;
-        if (replayCommand.e != null) {
-            this.k.A++;
+        this.commandQueue.add(replayCommand);
+        this.lastCommandFrame = replayCommand.tick;
+        if (replayCommand.command != null) {
+            this.k.recordedCommandCount++;
         }
-        if (replayCommand.f != null) {
-            this.k.B++;
+        if (replayCommand.resyncData != null) {
+            this.k.recordedResyncCount++;
         }
         notifyAll();
     }
 
     public synchronized void a() {
-        this.a = false;
+        this.running = false;
         GameEngine gameEngine = GameEngine.getInstance();
         ReplayEngine.a("stop requested at:" + gameEngine.currentTick);
         if (!this.k.P) {
             ReplayEngine.a("Replay stop: warning: active==false");
         }
-        if (this.k.u) {
+        if (this.k.isReplaying) {
             ReplayEngine.a("Replay stop: warning: replaying==true");
         }
-        this.b = gameEngine.currentTick;
-        this.c = gameEngine.gameTimeMillis;
-        this.d = this.k.A;
-        this.e = this.k.B;
-        if (this.b < this.f) {
-            GameEngine.log("Replay: stoppedFrame<lastCommandFrame: " + this.b + "<" + this.f);
-            this.b = this.f;
+        this.stopFrame = gameEngine.currentTick;
+        this.stopGameTime = gameEngine.gameTimeMillis;
+        this.d = this.k.recordedCommandCount;
+        this.e = this.k.recordedResyncCount;
+        if (this.stopFrame < this.lastCommandFrame) {
+            GameEngine.log("Replay: stoppedFrame<lastCommandFrame: " + this.stopFrame + "<" + this.lastCommandFrame);
+            this.stopFrame = this.lastCommandFrame;
         }
-        this.j = 0L;
+        this.lastFlushTime = 0L;
         notifyAll();
     }
 
     private synchronized void b() {
         try {
-            if (this.a) {
+            if (this.running) {
                 wait();
             }
         } catch (InterruptedException e) {
@@ -72,89 +83,89 @@ class ReplayWriter implements Runnable {
     @Override // java.lang.Runnable
     public void run() {
         GameEngine.setupUncaughtExceptionHandler();
-        while (this.a) {
-            if (this.i.size() > 0) {
-                ReplayCommand replayCommand = (ReplayCommand) this.i.remove();
+        while (this.running) {
+            if (this.commandQueue.size() > 0) {
+                ReplayCommand replayCommand = (ReplayCommand) this.commandQueue.remove();
                 try {
-                    if (replayCommand.e != null) {
-                        this.k.J.startBlock("rc");
-                        this.k.J.writeInt(replayCommand.a);
-                        replayCommand.e.serializeCommand(this.k.J);
-                        this.k.J.endBlock("rc");
-                        this.g = replayCommand.a;
-                    } else if (replayCommand.c != null) {
-                        this.k.J.startBlock("cs");
-                        this.k.J.writeInt(replayCommand.a);
-                        this.k.J.writeLong(replayCommand.c.longValue());
-                        this.k.J.endBlock("cs");
-                    } else if (replayCommand.d != null) {
-                        this.k.J.startBlock("wait");
-                        this.k.J.writeInt(replayCommand.a);
-                        this.k.J.endBlock("wait");
-                        this.k.J.startBlock("es");
-                        this.k.J.writeInt(replayCommand.a);
-                        this.k.J.writeBytesWithLength(replayCommand.d);
-                        this.k.J.endBlock("es");
-                    } else if (replayCommand.f != null) {
-                        this.k.J.startBlock("wait");
-                        this.k.J.writeInt(replayCommand.a);
-                        this.k.J.endBlock("wait");
-                        this.k.J.startBlock("resync");
-                        this.k.J.writeInt(replayCommand.a);
-                        this.k.J.writeInt(replayCommand.h);
-                        this.k.J.writeInt(replayCommand.i);
-                        this.k.J.writeFloat(replayCommand.j);
-                        this.k.J.writeFloat(replayCommand.k);
-                        this.k.J.writeBytesWithLength(replayCommand.f);
-                        this.k.J.endBlock("resync");
-                    } else if (replayCommand.g != null) {
-                        this.k.J.startBlock("chat");
-                        this.k.J.writeInt(replayCommand.a);
-                        this.k.J.writeInt(replayCommand.g.a);
-                        this.k.J.writeStringNullable(replayCommand.g.b);
-                        this.k.J.writeStringNullable(replayCommand.g.c);
-                        this.k.J.endBlock("chat");
+                    if (replayCommand.command != null) {
+                        this.k.gameOutputStream.startBlock("rc");
+                        this.k.gameOutputStream.writeInt(replayCommand.tick);
+                        replayCommand.command.serializeCommand(this.k.gameOutputStream);
+                        this.k.gameOutputStream.endBlock("rc");
+                        this.lastWrittenFrame = replayCommand.tick;
+                    } else if (replayCommand.checksum != null) {
+                        this.k.gameOutputStream.startBlock("cs");
+                        this.k.gameOutputStream.writeInt(replayCommand.tick);
+                        this.k.gameOutputStream.writeLong(replayCommand.checksum.longValue());
+                        this.k.gameOutputStream.endBlock("cs");
+                    } else if (replayCommand.checksumData != null) {
+                        this.k.gameOutputStream.startBlock("wait");
+                        this.k.gameOutputStream.writeInt(replayCommand.tick);
+                        this.k.gameOutputStream.endBlock("wait");
+                        this.k.gameOutputStream.startBlock("es");
+                        this.k.gameOutputStream.writeInt(replayCommand.tick);
+                        this.k.gameOutputStream.writeBytesWithLength(replayCommand.checksumData);
+                        this.k.gameOutputStream.endBlock("es");
+                    } else if (replayCommand.resyncData != null) {
+                        this.k.gameOutputStream.startBlock("wait");
+                        this.k.gameOutputStream.writeInt(replayCommand.tick);
+                        this.k.gameOutputStream.endBlock("wait");
+                        this.k.gameOutputStream.startBlock("resync");
+                        this.k.gameOutputStream.writeInt(replayCommand.tick);
+                        this.k.gameOutputStream.writeInt(replayCommand.resyncTick);
+                        this.k.gameOutputStream.writeInt(replayCommand.resyncGameTimeMillis);
+                        this.k.gameOutputStream.writeFloat(replayCommand.resyncStepRate);
+                        this.k.gameOutputStream.writeFloat(replayCommand.k);
+                        this.k.gameOutputStream.writeBytesWithLength(replayCommand.resyncData);
+                        this.k.gameOutputStream.endBlock("resync");
+                    } else if (replayCommand.chatMessage != null) {
+                        this.k.gameOutputStream.startBlock("chat");
+                        this.k.gameOutputStream.writeInt(replayCommand.tick);
+                        this.k.gameOutputStream.writeInt(replayCommand.chatMessage.a);
+                        this.k.gameOutputStream.writeStringNullable(replayCommand.chatMessage.b);
+                        this.k.gameOutputStream.writeStringNullable(replayCommand.chatMessage.c);
+                        this.k.gameOutputStream.endBlock("chat");
                     } else {
                         throw new RuntimeException("Unknown saved command");
                     }
-                    if (this.j == 0 || this.j + 3000 < System.currentTimeMillis()) {
-                        this.j = System.currentTimeMillis();
-                        this.k.J.flushAllBuffers();
+                    if (this.lastFlushTime == 0 || this.lastFlushTime + 3000 < System.currentTimeMillis()) {
+                        this.lastFlushTime = System.currentTimeMillis();
+                        this.k.gameOutputStream.flushAllBuffers();
                     }
                 } catch (IOException e) {
                     GameEngine gameEngine = GameEngine.getInstance();
                     GameEngine.log("Replay error", (Throwable) e);
                     gameEngine.gameUI.messageManager.addMessage(VariableScope.nullOrMissingString, "IO error recording replay, disabling record");
                     this.k.P = false;
-                    this.h = true;
+                    this.stopped = true;
                     return;
                 }
             }
-            if (this.i.size() == 0) {
+            if (this.commandQueue.size() == 0) {
                 b();
             }
         }
         try {
-            this.k.J.startBlock("wait");
-            this.k.J.writeInt(this.b);
-            this.k.J.endBlock("wait");
-            this.k.J.startBlock("end");
-            this.k.J.endBlock("end");
-            this.k.J.startBlock("endReplayMetaData");
-            this.k.J.writeByte(0);
-            this.k.J.writeInt(this.b);
-            this.k.J.writeInt(this.c);
-            this.k.J.writeInt(this.d);
-            this.k.J.writeInt(this.e);
-            this.k.J.writeStringUTF("{frames:" + this.b + ",time:" + this.c + ",commandCount:" + this.d + ",resyncCount:" + this.e + "}");
-            this.k.J.endBlock("endReplayMetaData");
-            this.k.J.flushAllBuffers();
+            this.k.gameOutputStream.startBlock("wait");
+            this.k.gameOutputStream.writeInt(this.stopFrame);
+            this.k.gameOutputStream.endBlock("wait");
+            this.k.gameOutputStream.startBlock("end");
+            this.k.gameOutputStream.endBlock("end");
+            this.k.gameOutputStream.startBlock("endReplayMetaData");
+            this.k.gameOutputStream.writeByte(0);
+            this.k.gameOutputStream.writeInt(this.stopFrame);
+            this.k.gameOutputStream.writeInt(this.stopGameTime);
+            this.k.gameOutputStream.writeInt(this.d);
+            this.k.gameOutputStream.writeInt(this.e);
+            this.k.gameOutputStream.writeStringUTF("{frames:" + this.stopFrame + ",time:" + this.stopGameTime + ",commandCount:" + this.d + ",resyncCount:" + this.e + "}");
+            this.k.gameOutputStream.endBlock("endReplayMetaData");
+            this.k.gameOutputStream.flushAllBuffers();
             ReplayEngine.a("Background writer stopping");
-            ReplayEngine.a("Remainding commands: " + this.i.size());
-            ReplayEngine.a("last command: " + this.f);
-            ReplayEngine.a("last command write: " + this.g);
+            ReplayEngine.a("Remainding commands: " + this.commandQueue.size());
+            ReplayEngine.a("last command: " + this.lastCommandFrame);
+            ReplayEngine.a("last command write: " + this.lastWrittenFrame);
             ReplayEngine.a("Commands issued: " + this.d);
-            this.h = true;
+            this.stopped = true;
         } catch (IOException e2) {
             throw new RuntimeException(e2);
         }

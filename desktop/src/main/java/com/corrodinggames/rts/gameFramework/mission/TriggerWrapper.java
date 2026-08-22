@@ -3,16 +3,18 @@ package com.corrodinggames.rts.gameFramework.mission;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.n.m */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/n/m.class */
 public class TriggerWrapper {
-    MapTrigger a;
+
+    /* JADX INFO: renamed from: a */
+    MapTrigger trigger;
 
     public String a() {
-        if (this.a.z == null) {
+        if (this.trigger.text == null) {
             return "<null>";
         }
-        return this.a.z.resolveText();
+        return this.trigger.text.resolveText();
     }
 
     public boolean b() {
-        return this.a.j;
+        return this.trigger.isActive;
     }
 }

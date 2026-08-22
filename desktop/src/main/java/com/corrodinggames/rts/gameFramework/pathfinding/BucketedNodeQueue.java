@@ -10,7 +10,7 @@ public final class BucketedNodeQueue extends NodeQueue {
 
     @Override // com.corrodinggames.rts.gameFramework.pathfinding.NodeQueue
     public void a(PathOpenListNode pathOpenListNode) {
-        int i = pathOpenListNode.c;
+        int i = pathOpenListNode.score;
         if (i <= this.b) {
             if (i == this.b) {
                 this.c.b(pathOpenListNode);
@@ -73,14 +73,14 @@ public final class BucketedNodeQueue extends NodeQueue {
         DirectAccessPathNodeArrayList directAccessPathNodeArrayList = this.d;
         PathOpenListNode[] pathOpenListNodeArrA = directAccessPathNodeArrayList.a();
         for (int i2 = directAccessPathNodeArrayList.b - 1; i2 >= 0; i2--) {
-            int i3 = pathOpenListNodeArrA[i2].c;
+            int i3 = pathOpenListNodeArrA[i2].score;
             if (i3 < i) {
                 i = i3;
             }
         }
         for (int i4 = directAccessPathNodeArrayList.b - 1; i4 >= 0; i4--) {
             PathOpenListNode pathOpenListNode = pathOpenListNodeArrA[i4];
-            if (pathOpenListNode.c == i) {
+            if (pathOpenListNode.score == i) {
                 this.c.add(pathOpenListNode);
                 int i5 = directAccessPathNodeArrayList.b - 1;
                 pathOpenListNodeArrA[i4] = pathOpenListNodeArrA[i5];

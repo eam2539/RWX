@@ -133,7 +133,7 @@ public class JavaSteamEngine extends DisabledSteamEngine {
         } else {
             GameEngine.log("cannot show alert game has not been created");
         }
-        DisabledSteamEngine.a = new DisabledSteamEngine();
+        DisabledSteamEngine.instance = new DisabledSteamEngine();
     }
 
     @Override // com.corrodinggames.rts.gameFramework.steam.DisabledSteamEngine
@@ -183,7 +183,7 @@ public class JavaSteamEngine extends DisabledSteamEngine {
         SteamSocket steamSocket2 = new SteamSocket(this, steamID);
         NetworkConnection networkConnection = new NetworkConnection(gameEngine.networkEngine, steamSocket2);
         try {
-            networkConnection.i = true;
+            networkConnection.isSteam = true;
             networkConnection.startWorkers();
             gameEngine.networkEngine.sendQueue.add(networkConnection);
             this.l.put(steamID, steamSocket2);
@@ -230,7 +230,7 @@ public class JavaSteamEngine extends DisabledSteamEngine {
                         gameEngine.networkEngine.a(steamSocket2);
                         Iterator it = gameEngine.networkEngine.sendQueue.iterator();
                         while (it.hasNext()) {
-                            ((NetworkConnection) it.next()).i = true;
+                            ((NetworkConnection) it.next()).isSteam = true;
                         }
                         JavaSteamEngine.this.a("connected");
                         root.showBattleroom();

@@ -4,10 +4,10 @@ package com.corrodinggames.rts.gameFramework;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/ax.class */
 public class NullMusicTrack extends MusicTrack {
     NullMusic a;
-    NullMusicFactory b;
+    NullMusicFactory factory;
 
     public NullMusicTrack(NullMusicFactory nullMusicFactory) {
-        this.b = nullMusicFactory;
+        this.factory = nullMusicFactory;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.MusicTrack

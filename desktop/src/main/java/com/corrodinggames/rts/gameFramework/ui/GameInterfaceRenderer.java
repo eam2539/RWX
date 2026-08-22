@@ -2576,14 +2576,14 @@ public class GameInterfaceRenderer extends Serializable {
                 }
             }
             if (this.gameEngine.settingsEngine.showUnitGroups && i5 < 3) {
-                if (unitGroupMarker.a.size() == 0) {
+                if (unitGroupMarker.units.size() == 0) {
                     if (this.gameUI.isUILoggingEnabled) {
                         str = "Empty";
                     } else {
                         str = "(" + (i5 + 1) + ")";
                     }
                 } else {
-                    str = VariableScope.nullOrMissingString + unitGroupMarker.a.size();
+                    str = VariableScope.nullOrMissingString + unitGroupMarker.units.size();
                 }
                 boolean z = false;
                 unitGroupMarker.d = Utility.moveTowardsZero(unitGroupMarker.d, 0.01f * f);
@@ -2591,17 +2591,17 @@ public class GameInterfaceRenderer extends Serializable {
                 unitGroupMarker.f = Utility.moveTowardsZero(unitGroupMarker.f, 0.01f * f);
                 if (this.gameUI.a(i2, i, i4, (int) (31.0f * this.gameEngine.screenScale), str, IconGroup.none, true, Color.a(50, (int) (100.0f + (unitGroupMarker.f * 100.0f)), (int) (100.0f + (unitGroupMarker.e * 100.0f)), (int) (100.0f + (unitGroupMarker.d * 100.0f)))) && this.gameUI.currentAction == null && !this.gameUI.isInputDisabled) {
                     z = true;
-                    unitGroupMarker.b += f;
+                    unitGroupMarker.radius += f;
                     this.gameUI.resetMouseState();
                     float f2 = 1.0f;
                     this.paintUnitInfo.a();
                     this.paintUnitInfo.b(Color.a(120, 200, 0, 0));
-                    if (unitGroupMarker.b < 50.0f) {
-                        f2 = unitGroupMarker.b / 50.0f;
+                    if (unitGroupMarker.radius < 50.0f) {
+                        f2 = unitGroupMarker.radius / 50.0f;
                         this.paintUnitInfo.b(Color.a((int) (150.0f + (f2 * 40.0f)), 0, 200, 0));
                         a(i2, i, i4, "Select Group", "(Hold for more..)", this.paintUnitInfo, f2);
-                    } else if (unitGroupMarker.b < 100.0f) {
-                        f2 = (unitGroupMarker.b - 50.0f) / 50.0f;
+                    } else if (unitGroupMarker.radius < 100.0f) {
+                        f2 = (unitGroupMarker.radius - 50.0f) / 50.0f;
                         this.paintUnitInfo.b(Color.a((int) (150.0f + (f2 * 40.0f)), 200, 0, 0));
                         a(i2, i, i4, "Add to Group", "(Hold for more..)", this.paintUnitInfo, f2);
                     } else {
@@ -2612,18 +2612,18 @@ public class GameInterfaceRenderer extends Serializable {
                     this.gameEngine.renderGraphicsEngine.b(this.zoomButtonRect, this.paintUnitInfo);
                 }
                 if (!z) {
-                    if (unitGroupMarker.b != 0.0f && !this.gameUI.isMousePressed) {
-                        if (unitGroupMarker.b > 100.0f) {
+                    if (unitGroupMarker.radius != 0.0f && !this.gameUI.isMousePressed) {
+                        if (unitGroupMarker.radius > 100.0f) {
                             unitGroupMarker.b();
                             unitGroupMarker.c();
                             unitGroupMarker.f = 1.0f;
-                        } else if (unitGroupMarker.b > 50.0f) {
+                        } else if (unitGroupMarker.radius > 50.0f) {
                             unitGroupMarker.c();
                             this.gameUI.clearCurrentAction();
                             this.gameUI.clearSelection();
                             unitGroupMarker.a();
                             unitGroupMarker.e = 1.0f;
-                        } else if (unitGroupMarker.a.size() != 0) {
+                        } else if (unitGroupMarker.units.size() != 0) {
                             this.gameUI.clearCurrentAction();
                             this.gameUI.clearSelection();
                             unitGroupMarker.a();
@@ -2635,7 +2635,7 @@ public class GameInterfaceRenderer extends Serializable {
                         }
                     }
                     if (!z) {
-                        unitGroupMarker.b = 0.0f;
+                        unitGroupMarker.radius = 0.0f;
                     }
                 }
                 i2 += i3;

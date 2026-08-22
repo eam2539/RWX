@@ -22,17 +22,24 @@ import java.util.Iterator;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.y */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/y.class */
 public class StatsHistoryChart {
-    private ArrayList<GameStatistic> e;
-    private ArrayList<TeamHistoryChart> l;
-    private StatHistoryBuilder[] m;
-    TeamHistoryChart a;
-    private long n;
+        /* JADX INFO: renamed from: a */
+    TeamHistoryChart currentTeamChart;
+    Paint leftTextPaint;
+    Paint rightTextPaint;
+        /* JADX INFO: renamed from: e */
+    private ArrayList<GameStatistic> statistics;
+        /* JADX INFO: renamed from: l */
+    private ArrayList<TeamHistoryChart> teamCharts;
     private Texture o;
-    private Texture[] p;
+        /* JADX INFO: renamed from: m */
+    private StatHistoryBuilder[] statBuilders;
     private Rect q;
-    private Rect r;
-    Paint c;
-    Paint d;
+        /* JADX INFO: renamed from: n */
+    private long lastTabSwitchTime;
+        /* JADX INFO: renamed from: p */
+    private Texture[] tabTextures;
+        /* JADX INFO: renamed from: r */
+    private Rect tabRect;
     private StatsTab f = StatsTab.overallStats;
     private ValueDisplayMode g = ValueDisplayMode.absolute;
     private ArrayList h = new ArrayList();
@@ -51,62 +58,62 @@ public class StatsHistoryChart {
     }
 
     private StatsHistoryChart(ArrayList arrayList, ArrayList arrayList2) {
-        this.e = arrayList2;
+        this.statistics = arrayList2;
         Iterator it = arrayList.iterator();
         while (it.hasNext()) {
             StatisticsData statisticsData = (StatisticsData) it.next();
-            PlayerTeam playerTeamK = PlayerTeam.k(statisticsData.l.b());
-            this.h.add(new TeamHistoryChart(statisticsData.l, playerTeamK.teamName, playerTeamK.getTeamColorArgb()));
+            PlayerTeam playerTeamK = PlayerTeam.k(statisticsData.teamHistory.b());
+            this.h.add(new TeamHistoryChart(statisticsData.teamHistory, playerTeamK.teamName, playerTeamK.getTeamColorArgb()));
         }
         for (Integer num : PlayerTeam.getTeamColorIds()) {
             ArrayList arrayList3 = new ArrayList();
             Iterator it2 = arrayList.iterator();
             while (it2.hasNext()) {
                 StatisticsData statisticsData2 = (StatisticsData) it2.next();
-                if (PlayerTeam.k(statisticsData2.l.b()).teamColorId == num.intValue()) {
+                if (PlayerTeam.k(statisticsData2.teamHistory.b()).teamColorId == num.intValue()) {
                     arrayList3.add(statisticsData2);
                 }
             }
             if (!arrayList3.isEmpty()) {
-                this.j.add(new TeamHistoryChart(new TeamStatistics(arrayList3).l, "Team " + PlayerTeam.getTeamSlotLabel(num.intValue()), PlayerTeam.i(num.intValue())));
+                this.j.add(new TeamHistoryChart(new TeamStatistics(arrayList3).teamHistory, "Team " + PlayerTeam.getTeamSlotLabel(num.intValue()), PlayerTeam.i(num.intValue())));
             }
         }
         for (StatisticType statisticType : StatisticType.values()) {
             this.i[statisticType.ordinal()] = new StatHistoryBuilder(statisticType, this.h);
             this.k[statisticType.ordinal()] = new StatHistoryBuilder(statisticType, this.j);
         }
-        this.l = this.h;
-        this.m = this.i;
+        this.teamCharts = this.h;
+        this.statBuilders = this.i;
         b();
     }
 
     public void b() {
         this.f = StatsTab.overallStats;
         GameEngine gameEngine = GameEngine.getInstance();
-        this.c = new Paint();
-        this.c.a(true);
-        this.c.a(Paint.Align.LEFT);
-        this.c.a(255, 0, 255, 0);
-        gameEngine.setScaledTextSize(this.c, 16.0f);
-        this.d = new Paint();
-        this.d.a(true);
-        this.d.a(Paint.Align.RIGHT);
-        this.d.a(255, 0, 255, 0);
-        gameEngine.setScaledTextSize(this.d, 16.0f);
+        this.leftTextPaint = new Paint();
+        this.leftTextPaint.a(true);
+        this.leftTextPaint.a(Paint.Align.LEFT);
+        this.leftTextPaint.a(255, 0, 255, 0);
+        gameEngine.setScaledTextSize(this.leftTextPaint, 16.0f);
+        this.rightTextPaint = new Paint();
+        this.rightTextPaint.a(true);
+        this.rightTextPaint.a(Paint.Align.RIGHT);
+        this.rightTextPaint.a(255, 0, 255, 0);
+        gameEngine.setScaledTextSize(this.rightTextPaint, 16.0f);
         c();
     }
 
     private void c() {
         GameEngine gameEngine = GameEngine.getInstance();
-        this.p = new Texture[StatsTab.values().length + 2];
-        this.p[0] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_button_info);
-        this.p[1] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_button_income);
-        this.p[2] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_button_armyvalue);
-        this.p[3] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_button_buildingvalue);
-        this.p[4] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_button_totalvalue);
-        this.p[5] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_toggle_relative);
-        this.p[6] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_toggle_teams);
-        this.r = new Rect(0, 0, this.p[0].m(), this.p[0].l());
+        this.tabTextures = new Texture[StatsTab.values().length + 2];
+        this.tabTextures[0] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_button_info);
+        this.tabTextures[1] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_button_income);
+        this.tabTextures[2] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_button_armyvalue);
+        this.tabTextures[3] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_button_buildingvalue);
+        this.tabTextures[4] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_button_totalvalue);
+        this.tabTextures[5] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_toggle_relative);
+        this.tabTextures[6] = gameEngine.renderGraphicsEngine.a(R.drawable.stats_toggle_teams);
+        this.tabRect = new Rect(0, 0, this.tabTextures[0].m(), this.tabTextures[0].l());
     }
 
     public void a(Rect rect, Rect rect2, float f, boolean z, boolean z2) {
@@ -130,7 +137,7 @@ public class StatsHistoryChart {
                     if (gameUI.a(i4, i2, i, screenPixels, IconGroup.none, false)) {
                         if (this.f != statsTab) {
                             this.f = statsTab;
-                            this.n = System.currentTimeMillis();
+                            this.lastTabSwitchTime = System.currentTimeMillis();
                             this.u = -1;
                             this.v = -1;
                             this.w = -1;
@@ -140,12 +147,12 @@ public class StatsHistoryChart {
                         }
                     }
                     this.b.a(i4, i2, i4 + i, i2 + screenPixels);
-                    gameEngine.renderGraphicsEngine.a(gameEngine.gameUI.uiTexture1, this.r, this.b, paint);
+                    gameEngine.renderGraphicsEngine.a(gameEngine.gameUI.uiTexture1, this.tabRect, this.b, paint);
                     Paint paint3 = paint2;
                     if (!gameUI.c || this.f == statsTab) {
                         paint3 = paint;
                     }
-                    gameEngine.renderGraphicsEngine.a(this.p[i5], this.r, this.b, paint3);
+                    gameEngine.renderGraphicsEngine.a(this.tabTextures[i5], this.tabRect, this.b, paint3);
                     i4 += screenPixels2 + i;
                 }
             }
@@ -154,42 +161,42 @@ public class StatsHistoryChart {
                 boolean z4 = this.g != ValueDisplayMode.absolute;
                 if (gameUI.a(i6, i2, i, screenPixels, IconGroup.none, false)) {
                     this.g = !z4 ? ValueDisplayMode.relative : ValueDisplayMode.absolute;
-                    this.n = System.currentTimeMillis();
+                    this.lastTabSwitchTime = System.currentTimeMillis();
                 }
                 this.b.a(i6, i2, i6 + i, i2 + screenPixels);
                 Paint paint4 = paint;
                 if (this.f == StatsTab.overallStats) {
                     paint4 = paint2;
                 }
-                gameEngine.renderGraphicsEngine.a(gameEngine.gameUI.uiTexture1, this.r, this.b, paint4);
+                gameEngine.renderGraphicsEngine.a(gameEngine.gameUI.uiTexture1, this.tabRect, this.b, paint4);
                 Paint paint5 = paint;
                 if (!z4 || this.f == StatsTab.overallStats) {
                     paint5 = paint2;
                 }
-                gameEngine.renderGraphicsEngine.a(this.p[5], this.r, this.b, paint5);
+                gameEngine.renderGraphicsEngine.a(this.tabTextures[5], this.tabRect, this.b, paint5);
                 int i7 = i6 + screenPixels2 + i;
-                boolean z5 = this.l == this.j;
+                boolean z5 = this.teamCharts == this.j;
                 if (gameUI.a(i7, i2, i, screenPixels, IconGroup.none, false)) {
                     if (!z5) {
-                        this.l = this.j;
-                        this.m = this.k;
+                        this.teamCharts = this.j;
+                        this.statBuilders = this.k;
                     } else {
-                        this.l = this.h;
-                        this.m = this.i;
+                        this.teamCharts = this.h;
+                        this.statBuilders = this.i;
                     }
-                    this.n = System.currentTimeMillis();
+                    this.lastTabSwitchTime = System.currentTimeMillis();
                 }
                 this.b.a(i7, i2, i7 + i, i2 + screenPixels);
                 Paint paint6 = paint;
                 if (this.f == StatsTab.overallStats) {
                     paint6 = paint2;
                 }
-                gameEngine.renderGraphicsEngine.a(gameEngine.gameUI.uiTexture1, this.r, this.b, paint6);
+                gameEngine.renderGraphicsEngine.a(gameEngine.gameUI.uiTexture1, this.tabRect, this.b, paint6);
                 Paint paint7 = paint;
                 if (!z5 || this.f == StatsTab.overallStats) {
                     paint7 = paint2;
                 }
-                gameEngine.renderGraphicsEngine.a(this.p[6], this.r, this.b, paint7);
+                gameEngine.renderGraphicsEngine.a(this.tabTextures[6], this.tabRect, this.b, paint7);
                 int i8 = i7 + screenPixels2 + i;
             }
             if (this.f == StatsTab.overallStats) {
@@ -213,9 +220,9 @@ public class StatsHistoryChart {
         float f2 = 1.5f;
         int screenPixels = rect.b + gameEngine.toScreenPixels(25);
         int iD = rect.d();
-        this.c.a("123|", 0, "123|".length(), this.b);
+        this.leftTextPaint.a("123|", 0, "123|".length(), this.b);
         float fC = this.b.c() + 6;
-        for (GameStatistic gameStatistic : this.e) {
+        for (GameStatistic gameStatistic : this.statistics) {
             if (gameStatistic.revealProgress != 1.0f && f2 > 0.0f) {
                 gameStatistic.revealProgress = Utility.distanceSq(gameStatistic.revealProgress, 1.0f, 0.01f * f2 * f);
                 f2 -= 1.0f - gameStatistic.revealProgress;
@@ -240,8 +247,8 @@ public class StatsHistoryChart {
             if (iDistance > 0 && iDistance < str2.length() - 1) {
                 str3 = "_";
             }
-            gameEngine.renderGraphicsEngine.a(str2.substring(0, iDistance) + str3 + Utility.repeat(" ", (str2.length() + str3.length()) - iDistance), iD - (8.0f * this.c.k()), screenPixels, this.c);
-            gameEngine.renderGraphicsEngine.a(str, iD + (8.0f * this.c.k()), screenPixels, this.d);
+            gameEngine.renderGraphicsEngine.a(str2.substring(0, iDistance) + str3 + Utility.repeat(" ", (str2.length() + str3.length()) - iDistance), iD - (8.0f * this.leftTextPaint.k()), screenPixels, this.leftTextPaint);
+            gameEngine.renderGraphicsEngine.a(str, iD + (8.0f * this.leftTextPaint.k()), screenPixels, this.rightTextPaint);
             screenPixels = (int) (screenPixels + fC);
         }
     }
@@ -254,8 +261,8 @@ public class StatsHistoryChart {
     private void a(GraphicsEngine y, StatisticType bj, ValueDisplayMode z, Rect rect) {
         GameEngine var5 = GameEngine.getInstance();
         GameUI var6 = var5.gameUI;
-        StatHistoryBuilder var7 = this.m[bj.ordinal()];
-        float var8 = (float)(System.currentTimeMillis() - this.n) / 250.0F;
+        StatHistoryBuilder var7 = this.statBuilders[bj.ordinal()];
+        float var8 = (float)(System.currentTimeMillis() - this.lastTabSwitchTime) / 250.0F;
         Paint var9 = new Paint();
         var9.a(255, 0, 255, 0);
         var9.a(true);
@@ -317,7 +324,7 @@ public class StatsHistoryChart {
         if (z == ValueDisplayMode.absolute) {
             label170:
             for (int var41 = 0; var41 <= 2; var41++) {
-                Iterator var44 = this.l.iterator();
+                Iterator var44 = this.teamCharts.iterator();
 
                 while (true) {
                     boolean var26;
@@ -330,12 +337,12 @@ public class StatsHistoryChart {
                         }
 
                         var47 = (TeamHistoryChart)var44.next();
-                        var50 = var47.a.a(bj);
+                        var50 = var47.teamHistory.a(bj);
                         var26 = var41 == 0;
                         if (!var26) {
                             var54 = 220;
-                            if (this.a != null) {
-                                if (var47 == this.a) {
+                            if (this.currentTeamChart != null) {
+                                if (var47 == this.currentTeamChart) {
                                     var54 = 255;
                                 } else {
                                     var54 = 50;
@@ -344,10 +351,10 @@ public class StatsHistoryChart {
                             break;
                         }
 
-                        if (var47.c == -16777216) {
+                        if (var47.teamColor == -16777216) {
                             var54 = 255;
-                            if (this.a != null) {
-                                if (var47 == this.a) {
+                            if (this.currentTeamChart != null) {
+                                if (var47 == this.currentTeamChart) {
                                     var54 = 255;
                                 } else {
                                     var54 = 50;
@@ -357,7 +364,7 @@ public class StatsHistoryChart {
                         }
                     }
 
-                    if (var41 == 2 ? var47 == this.a : var41 != 1 || var47 != this.a) {
+                    if (var41 == 2 ? var47 == this.currentTeamChart : var41 != 1 || var47 != this.currentTeamChart) {
                         Point2i var27 = (Point2i)var50.get(0);
                         float var28 = var12.a;
                         float var29 = var12.d - var38 * (var27.y - var7.c);
@@ -382,16 +389,16 @@ public class StatsHistoryChart {
 
             for (int var48 = 1; var48 < var42.size(); var48++) {
                 StatHistory var51 = (StatHistory)var42.get(var48);
-                float var55 = var12.a + var40 * var45.a;
-                float var60 = var12.a + var40 * var51.a;
+                float var55 = var12.a + var40 * var45.historySize;
+                float var60 = var12.a + var40 * var51.historySize;
                 float var66 = var12.d;
 
-                for (int var70 = 0; var70 < this.l.size(); var70++) {
+                for (int var70 = 0; var70 < this.teamCharts.size(); var70++) {
                     float var73 = var45.a(var70);
                     float var76 = var66 - var12.c() * var73;
                     if (var73 > 0.0F) {
-                        TeamHistoryChart var79 = this.l.get(var70);
-                        float var82 = Math.min(1.0F, Math.max(0.0F, var8 - (float) var45.a / var7.d));
+                        TeamHistoryChart var79 = this.teamCharts.get(var70);
+                        float var82 = Math.min(1.0F, Math.max(0.0F, var8 - (float) var45.historySize / var7.d));
                         GamePaint var83 = var79.a((int)(var82 * 255.0F), false);
                         this.b.a((int)var55, (int)(var76 + 0.5F), (int)var60, (int)(var66 + 0.5F));
                         if (this.o != null) {
@@ -427,8 +434,8 @@ public class StatsHistoryChart {
                 if (z == ValueDisplayMode.absolute) {
                     float var56 = 30.0F;
 
-                    for (TeamHistoryChart var67 : this.l) {
-                        TeamHistory var71 = var67.a;
+                    for (TeamHistoryChart var67 : this.teamCharts) {
+                        TeamHistory var71 = var67.teamHistory;
                         int var74 = var71.a(bj, this.u);
                         float var77 = var12.d - var38 * (var74 - var7.c);
                         float var80 = Utility.abs(var77 - var6.selectionBoxStartY);
@@ -439,15 +446,15 @@ public class StatsHistoryChart {
                     }
                 }
 
-                this.a = var52;
+                this.currentTeamChart = var52;
 
-                for (TeamHistoryChart var62 : this.l) {
-                    TeamHistory var68 = var62.a;
+                for (TeamHistoryChart var62 : this.teamCharts) {
+                    TeamHistory var68 = var62.teamHistory;
                     int var72 = var68.a(bj, this.u);
-                    String var75 = TeamStats.formatValue(var7.a.a(), var72) + " " + var62.b;
+                    String var75 = TeamStats.formatValue(var7.a.a(), var72) + " " + var62.teamName;
                     this.s.add(var75);
-                    int var78 = var62.c;
-                    if (this.a != null && this.a != var62) {
+                    int var78 = var62.teamColor;
+                    if (this.currentTeamChart != null && this.currentTeamChart != var62) {
                         byte var81 = 60;
                         var78 = Color.a(var81, Color.b(var78), Color.c(var78), Color.d(var78));
                     }
@@ -478,6 +485,6 @@ public class StatsHistoryChart {
                 var64 += var18;
             }
         } else {
-            this.a = null;
+            this.currentTeamChart = null;
         }
     }}

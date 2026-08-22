@@ -17,16 +17,23 @@ import com.corrodinggames.rts.gameFramework.graphics.Texture;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.g */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/g.class */
 public class UnitSpawner extends LandUnit implements UnitPathPoints {
-    public boolean a;
-    PointF[] b;
-    PointF[] c;
+        /* JADX INFO: renamed from: a */
+    public boolean stressTestMode;
+        /* JADX INFO: renamed from: b */
+    PointF[] spawnPoints;
+        /* JADX INFO: renamed from: c */
+    PointF[] spawnDirections;
     static Paint d;
     static Paint e;
     static Paint f;
-    int g;
-    float h;
-    float i;
-    int j;
+        /* JADX INFO: renamed from: g */
+    int updateCount;
+        /* JADX INFO: renamed from: h */
+    float totalElapsedTime;
+        /* JADX INFO: renamed from: i */
+    float spawnTimer;
+        /* JADX INFO: renamed from: j */
+    int spawnedCount;
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: f, reason: merged with bridge method [inline-methods] */
@@ -34,14 +41,38 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
         return UnitTypeEnum.builder;
     }
 
-    @Override // com.corrodinggames.rts.game.units.UnitPathPoints
-    public PointF[] b() {
-        return this.b;
+    public UnitSpawner(boolean z) {
+        super(z);
+        this.spawnPoints = new PointF[6];
+        this.spawnDirections = new PointF[this.spawnPoints.length];
+        d = new Paint();
+        d.a(40, 0, 255, 0);
+        d.a(true);
+        d.a(2.0f);
+        d.a(Paint.Cap.ROUND);
+        e = new Paint();
+        e.a(d);
+        e.a(55, 255, 60, 60);
+        f = new Paint();
+        f.a(60, 255, 255, 255);
+        T(20);
+        U(20);
+        this.radius = 10.0f;
+        this.posX = -1000.0f;
+        this.posY = -1000.0f;
+        this.displayRadius = this.radius;
+        this.maxHealth = 170000.0f;
+        this.currentHealth = this.maxHealth;
+        this.baseTexture = BuilderUnit.builderTexture_dead;
+        for (int i = 0; i < this.spawnPoints.length; i++) {
+            this.spawnPoints[i] = new PointF();
+            this.spawnDirections[i] = new PointF();
+        }
     }
 
     @Override // com.corrodinggames.rts.game.units.UnitPathPoints
-    public PointF[] e_() {
-        return this.c;
+    public PointF[] b() {
+        return this.spawnPoints;
     }
 
     @Override // com.corrodinggames.rts.game.units.land.LandUnit, com.corrodinggames.rts.game.units.BaseUnit
@@ -76,33 +107,9 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
         return null;
     }
 
-    public UnitSpawner(boolean z) {
-        super(z);
-        this.b = new PointF[6];
-        this.c = new PointF[this.b.length];
-        d = new Paint();
-        d.a(40, 0, 255, 0);
-        d.a(true);
-        d.a(2.0f);
-        d.a(Paint.Cap.ROUND);
-        e = new Paint();
-        e.a(d);
-        e.a(55, 255, 60, 60);
-        f = new Paint();
-        f.a(60, 255, 255, 255);
-        T(20);
-        U(20);
-        this.radius = 10.0f;
-        this.posX = -1000.0f;
-        this.posY = -1000.0f;
-        this.displayRadius = this.radius;
-        this.maxHealth = 170000.0f;
-        this.currentHealth = this.maxHealth;
-        this.baseTexture = BuilderUnit.builderTexture_dead;
-        for (int i = 0; i < this.b.length; i++) {
-            this.b[i] = new PointF();
-            this.c[i] = new PointF();
-        }
+    @Override // com.corrodinggames.rts.game.units.UnitPathPoints
+    public PointF[] e_() {
+        return this.spawnDirections;
     }
 
     /* JADX WARN: Multi-variable type inference failed */
@@ -163,13 +170,13 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
             a(f2, this);
         }
         this.currentHealth = this.maxHealth;
-        this.g++;
-        this.h += f2;
-        this.i += f2;
+        this.updateCount++;
+        this.totalElapsedTime += f2;
+        this.spawnTimer += f2;
         GameEngine.getInstance();
-        if (!this.a) {
-            if (this.i > 3.0f) {
-                this.i = 0.0f;
+        if (!this.stressTestMode) {
+            if (this.spawnTimer > 3.0f) {
+                this.spawnTimer = 0.0f;
                 w();
                 return;
             }
@@ -184,8 +191,8 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
 
     public void w() {
         GameEngine gameEngine = GameEngine.getInstance();
-        this.j++;
-        UnitType unitType = (UnitType) UnitTypeEnum.ae.get(Utility.getDeterministicRandomInt((GameObject) this, 0, UnitTypeEnum.ae.size() - 1, 1 + this.j));
+        this.spawnedCount++;
+        UnitType unitType = (UnitType) UnitTypeEnum.ae.get(Utility.getDeterministicRandomInt((GameObject) this, 0, UnitTypeEnum.ae.size() - 1, 1 + this.spawnedCount));
         boolean z = true;
         if (CustomUnitConfig.instance == unitType) {
             z = false;
@@ -195,10 +202,10 @@ public class UnitSpawner extends LandUnit implements UnitPathPoints {
         }
         if (z) {
             BaseUnit baseUnitA = unitType.a();
-            baseUnitA.posX = Utility.getDeterministicRandomInt((GameObject) this, 200, ((int) gameEngine.tileMap.getWorldWidth()) - 200, 2 + this.g + this.j);
-            baseUnitA.posY = Utility.getDeterministicRandomInt((GameObject) this, 200, ((int) gameEngine.tileMap.getWorldHeight()) - 200, 3 + this.g + this.j + (this.j * 9));
+            baseUnitA.posX = Utility.getDeterministicRandomInt((GameObject) this, 200, ((int) gameEngine.tileMap.getWorldWidth()) - 200, 2 + this.updateCount + this.spawnedCount);
+            baseUnitA.posY = Utility.getDeterministicRandomInt((GameObject) this, 200, ((int) gameEngine.tileMap.getWorldHeight()) - 200, 3 + this.updateCount + this.spawnedCount + (this.spawnedCount * 9));
             try {
-                baseUnitA.setTeam(Utility.getDeterministicRandomInt((GameObject) this, 0, 3, 4 + this.g + this.j + (this.j * 9)));
+                baseUnitA.setTeam(Utility.getDeterministicRandomInt((GameObject) this, 0, 3, 4 + this.updateCount + this.spawnedCount + (this.spawnedCount * 9)));
                 PlayerTeam.c(baseUnitA);
                 if (baseUnitA.u()) {
                     baseUnitA.remove();

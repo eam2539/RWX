@@ -34,35 +34,63 @@ public class ReplayEngine {
     public static boolean f = false;
     public boolean h;
     int i;
-    int j;
-    boolean k;
-    int l;
-    boolean m;
-    public int o;
-    public int p;
-    public int q;
-    public String r;
-    boolean s;
+        /* JADX INFO: renamed from: o */
+    public int lastCommandTick;
+        /* JADX INFO: renamed from: p */
+    public int commandCount;
+        /* JADX INFO: renamed from: q */
+    public int replayVersion;
+        /* JADX INFO: renamed from: r */
+    public String replayName;
+    /* JADX INFO: renamed from: O */
+    public boolean hasGameSetupRead;
+        /* JADX INFO: renamed from: j */
+    int checksumCounter;
+    /* JADX INFO: renamed from: k */
+    boolean desyncWarningShown;
+        /* JADX INFO: renamed from: l */
+    int desyncCount;
+        /* JADX INFO: renamed from: m */
+    boolean checksumOkLogged;
     public volatile boolean P;
-    String t;
-    boolean u;
-    ReplayCommand w;
-    ReplayCommand x;
-    int y;
-    int z;
-    int A;
-    int B;
-    InputStream C;
-    BufferedInputStream D;
-    DataInputStream E;
-    GameInputStream F;
-    OutputStream G;
-    BufferedOutputStream H;
-    DataOutputStream I;
-    GameOutputStream J;
-    ReplayWriter K;
-    Thread L;
-    public boolean O;
+        /* JADX INFO: renamed from: s */
+    boolean isStopped;
+    /* JADX INFO: renamed from: t */
+    String replayFilePath;
+        /* JADX INFO: renamed from: u */
+    boolean isReplaying;
+    /* JADX INFO: renamed from: w */
+    ReplayCommand nextCommand;
+    /* JADX INFO: renamed from: x */
+    ReplayCommand lastLoggedCommand;
+        /* JADX INFO: renamed from: y */
+    int commandId;
+        /* JADX INFO: renamed from: z */
+    int executedCommandCount;
+        /* JADX INFO: renamed from: A */
+    int recordedCommandCount;
+        /* JADX INFO: renamed from: B */
+    int recordedResyncCount;
+    /* JADX INFO: renamed from: C */
+    InputStream fileInputStream;
+    /* JADX INFO: renamed from: D */
+    BufferedInputStream bufferedInput;
+    /* JADX INFO: renamed from: E */
+    DataInputStream dataInputStream;
+    /* JADX INFO: renamed from: F */
+    GameInputStream gameInputStream;
+    /* JADX INFO: renamed from: G */
+    OutputStream fileOutput;
+    /* JADX INFO: renamed from: H */
+    BufferedOutputStream bufferedOutput;
+    /* JADX INFO: renamed from: I */
+    DataOutputStream dataOutputStream;
+    /* JADX INFO: renamed from: J */
+    GameOutputStream gameOutputStream;
+    /* JADX INFO: renamed from: K */
+    ReplayWriter replayWriter;
+    /* JADX INFO: renamed from: L */
+    Thread writerThread;
     String a = "replays/";
     public GameStateChecksum g = new GameStateChecksum();
     public boolean n = false;
@@ -130,16 +158,16 @@ public class ReplayEngine {
     }
 
     public void a(int i, String str, String str2, int i2) {
-        ReplayWriter replayWriter = this.K;
-        if (this.P && !this.u) {
+        ReplayWriter replayWriter = this.replayWriter;
+        if (this.P && !this.isReplaying) {
             if (str2.startsWith("-t ")) {
             }
             ReplayCommand replayCommand = new ReplayCommand();
-            replayCommand.a = i2;
-            replayCommand.g = new ChatMessage();
-            replayCommand.g.a = i;
-            replayCommand.g.b = str;
-            replayCommand.g.c = str2;
+            replayCommand.tick = i2;
+            replayCommand.chatMessage = new ChatMessage();
+            replayCommand.chatMessage.a = i;
+            replayCommand.chatMessage.b = str;
+            replayCommand.chatMessage.c = str2;
             if (replayWriter == null) {
                 GameEngine.logWarningAndStack("Failed to record chat message, replay might have already stopped");
             } else {
@@ -149,14 +177,14 @@ public class ReplayEngine {
     }
 
     public void a(byte[] bArr, int i, int i2, int i3, float f2, float f3) {
-        ReplayWriter replayWriter = this.K;
-        if (this.P && !this.u) {
+        ReplayWriter replayWriter = this.replayWriter;
+        if (this.P && !this.isReplaying) {
             ReplayCommand replayCommand = new ReplayCommand();
-            replayCommand.a = i;
-            replayCommand.f = bArr;
-            replayCommand.h = i2;
-            replayCommand.i = i3;
-            replayCommand.j = f2;
+            replayCommand.tick = i;
+            replayCommand.resyncData = bArr;
+            replayCommand.resyncTick = i2;
+            replayCommand.resyncGameTimeMillis = i3;
+            replayCommand.resyncStepRate = f2;
             replayCommand.k = f3;
             if (replayWriter == null) {
                 GameEngine.logWarningAndStack("Failed to save resync, replay might have already stopped");
@@ -173,30 +201,30 @@ public class ReplayEngine {
     }
 
     public void a(Command command, int i) {
-        ReplayWriter replayWriter = this.K;
-        if (this.P && !this.u) {
+        ReplayWriter replayWriter = this.replayWriter;
+        if (this.P && !this.isReplaying) {
             if (replayWriter == null) {
                 GameEngine.logWarningAndStack("Failed to record command, replay might have already stopped");
                 return;
             }
             ReplayCommand replayCommand = new ReplayCommand();
-            replayCommand.e = command.cloneCommand();
-            replayCommand.a = i;
+            replayCommand.command = command.cloneCommand();
+            replayCommand.tick = i;
             replayWriter.a(replayCommand);
-            this.j++;
-            if (this.j > 5) {
-                this.j = 0;
+            this.checksumCounter++;
+            if (this.checksumCounter > 5) {
+                this.checksumCounter = 0;
                 GameEngine gameEngine = GameEngine.getInstance();
                 ReplayCommand replayCommand2 = new ReplayCommand();
-                replayCommand2.c = f();
-                replayCommand2.a = gameEngine.currentTick;
+                replayCommand2.checksum = f();
+                replayCommand2.tick = gameEngine.currentTick;
                 replayWriter.a(replayCommand2);
             }
         }
     }
 
     public void d() throws IOException {
-        if (this.P && !this.u) {
+        if (this.P && !this.isReplaying) {
             this.g.computeChecksums();
             a(this.g, true);
         }
@@ -207,7 +235,7 @@ public class ReplayEngine {
     }
 
     public void a(GameStateChecksum gameStateChecksum, boolean z) throws IOException {
-        if (this.P && !this.u) {
+        if (this.P && !this.isReplaying) {
             GameEngine gameEngine = GameEngine.getInstance();
             ReplayCommand replayCommand = new ReplayCommand();
             GameOutputStream gameOutputStream = new GameOutputStream();
@@ -221,9 +249,9 @@ public class ReplayEngine {
             while (it.hasNext()) {
                 gameOutputStream.writeLong(((ChecksumField) it.next()).value);
             }
-            replayCommand.d = gameOutputStream.toByteArray();
-            replayCommand.a = gameEngine.currentTick;
-            this.K.a(replayCommand);
+            replayCommand.checksumData = gameOutputStream.toByteArray();
+            replayCommand.tick = gameEngine.currentTick;
+            this.replayWriter.a(replayCommand);
         }
     }
 
@@ -232,84 +260,84 @@ public class ReplayEngine {
         synchronized (this.M) {
             try {
                 try {
-                    if (this.K != null) {
-                        this.K.a();
+                    if (this.replayWriter != null) {
+                        this.replayWriter.a();
                         try {
-                            this.L.join();
+                            this.writerThread.join();
                         } catch (InterruptedException e2) {
                             e2.printStackTrace();
                         }
                         this.P = false;
-                        this.K = null;
-                        this.L = null;
+                        this.replayWriter = null;
+                        this.writerThread = null;
                     }
-                    if (this.G != null) {
-                        this.I.flush();
-                        this.I.close();
-                        this.H.flush();
-                        this.H.close();
-                        this.G.flush();
-                        this.G.close();
+                    if (this.fileOutput != null) {
+                        this.dataOutputStream.flush();
+                        this.dataOutputStream.close();
+                        this.bufferedOutput.flush();
+                        this.bufferedOutput.close();
+                        this.fileOutput.flush();
+                        this.fileOutput.close();
                     }
-                    this.G = null;
-                    this.H = null;
-                    this.I = null;
-                    this.J = null;
+                    this.fileOutput = null;
+                    this.bufferedOutput = null;
+                    this.dataOutputStream = null;
+                    this.gameOutputStream = null;
                 } catch (IOException e3) {
                     e3.printStackTrace();
-                    this.G = null;
-                    this.H = null;
-                    this.I = null;
-                    this.J = null;
+                    this.fileOutput = null;
+                    this.bufferedOutput = null;
+                    this.dataOutputStream = null;
+                    this.gameOutputStream = null;
                 }
-                this.s = false;
+                this.isStopped = false;
                 this.P = false;
-                this.u = false;
-                this.t = null;
+                this.isReplaying = false;
+                this.replayFilePath = null;
                 this.i = 0;
-                this.j = 0;
-                this.k = false;
-                this.l = 0;
-                this.m = false;
-                this.y = 0;
+                this.checksumCounter = 0;
+                this.desyncWarningShown = false;
+                this.desyncCount = 0;
+                this.checksumOkLogged = false;
+                this.commandId = 0;
                 this.v = 1;
-                this.z = 0;
-                this.A = 0;
-                this.B = 0;
-                this.o = -1;
-                this.p = 0;
-                this.q = -1;
-                this.r = null;
+                this.executedCommandCount = 0;
+                this.recordedCommandCount = 0;
+                this.recordedResyncCount = 0;
+                this.lastCommandTick = -1;
+                this.commandCount = 0;
+                this.replayVersion = -1;
+                this.replayName = null;
                 try {
                     try {
-                        if (this.C != null) {
-                            this.E.close();
-                            this.D.close();
-                            this.C.close();
+                        if (this.fileInputStream != null) {
+                            this.dataInputStream.close();
+                            this.bufferedInput.close();
+                            this.fileInputStream.close();
                         }
-                        this.C = null;
-                        this.D = null;
-                        this.E = null;
-                        this.F = null;
+                        this.fileInputStream = null;
+                        this.bufferedInput = null;
+                        this.dataInputStream = null;
+                        this.gameInputStream = null;
                     } catch (IOException e4) {
                         e4.printStackTrace();
-                        this.C = null;
-                        this.D = null;
-                        this.E = null;
-                        this.F = null;
+                        this.fileInputStream = null;
+                        this.bufferedInput = null;
+                        this.dataInputStream = null;
+                        this.gameInputStream = null;
                     }
                 } catch (Throwable th) {
-                    this.C = null;
-                    this.D = null;
-                    this.E = null;
-                    this.F = null;
+                    this.fileInputStream = null;
+                    this.bufferedInput = null;
+                    this.dataInputStream = null;
+                    this.gameInputStream = null;
                     throw th;
                 }
             } catch (Throwable th2) {
-                this.G = null;
-                this.H = null;
-                this.I = null;
-                this.J = null;
+                this.fileOutput = null;
+                this.bufferedOutput = null;
+                this.dataOutputStream = null;
+                this.gameOutputStream = null;
                 throw th2;
             }
         }
@@ -347,7 +375,7 @@ public class ReplayEngine {
 
     public boolean a(String str, File file) {
         if (this.P) {
-            if (this.u) {
+            if (this.isReplaying) {
                 GameEngine.logColored("startReplayingFile: A replay is already playing");
             } else {
                 GameEngine.logColored("startReplayingFile: A replay is already saving");
@@ -357,11 +385,11 @@ public class ReplayEngine {
         GameEngine gameEngine = GameEngine.getInstance();
         gameEngine.stopAndReset();
         gameEngine.networkEngine.q();
-        this.w = null;
-        this.s = false;
+        this.nextCommand = null;
+        this.isStopped = false;
         this.P = true;
-        this.u = true;
-        this.t = str;
+        this.isReplaying = true;
+        this.replayFilePath = str;
         try {
             if (file.isDirectory()) {
                 GameEngine.log("File is a directory: " + file.getAbsolutePath());
@@ -369,27 +397,27 @@ public class ReplayEngine {
                 gameEngine.alert("Cannot load replay: Target is a folder, instead of a file", 1);
                 return false;
             }
-            this.C = FileHelper.openFile(file);
-            if (this.C == null) {
+            this.fileInputStream = FileHelper.openFile(file);
+            if (this.fileInputStream == null) {
                 GameEngine.log("Cannot load replay: Failed to read replay file");
                 gameEngine.alert("Cannot load replay: Failed to read replay file", 1);
                 return false;
             }
-            this.D = new BufferedInputStream(this.C);
-            this.E = new DataInputStream(this.D);
-            this.F = new GameInputStream(this.E);
-            String utf = this.F.readUTF();
+            this.bufferedInput = new BufferedInputStream(this.fileInputStream);
+            this.dataInputStream = new DataInputStream(this.bufferedInput);
+            this.gameInputStream = new GameInputStream(this.dataInputStream);
+            String utf = this.gameInputStream.readUTF();
             if (!utf.equals("rustedWarfareReplay")) {
                 GameEngine.log("Header is not correct:" + utf);
                 GameEngine.log("Cannot load replay: File is missing header (check if this file is a replay)");
                 gameEngine.alert("Cannot load replay: File is missing header (check if this file is a replay)", 1);
                 return false;
             }
-            int i = this.F.readInt();
-            int i2 = this.F.readInt();
+            int i = this.gameInputStream.readInt();
+            int i2 = this.gameInputStream.readInt();
             a("Loading save from version: " + i2);
-            this.F.setProtocolVersion(i2);
-            String utf2 = this.F.readUTF();
+            this.gameInputStream.setProtocolVersion(i2);
+            String utf2 = this.gameInputStream.readUTF();
             if ((i2 != 96 || i != gameEngine.getVersionCode(true)) && !this.n) {
                 String str2 = "Cannot load replay: This replay was recording with a different version: " + utf2;
                 if (GameEngine.isPC()) {
@@ -403,17 +431,17 @@ public class ReplayEngine {
                     return false;
                 }
             }
-            this.q = i2;
-            this.r = utf2;
-            this.F.readBoolean();
-            this.F.startBlockNamed("gamesave");
-            this.O = false;
+            this.replayVersion = i2;
+            this.replayName = utf2;
+            this.gameInputStream.readBoolean();
+            this.gameInputStream.startBlockNamed("gamesave");
+            this.hasGameSetupRead = false;
             this.N = true;
             a("Loading replay initial save");
-            gameEngine.gameSaver.readSaveFromStream(this.F, false, false, false);
+            gameEngine.gameSaver.readSaveFromStream(this.gameInputStream, false, false, false);
             this.N = false;
-            this.F.d("gamesave");
-            if (!this.O) {
+            this.gameInputStream.d("gamesave");
+            if (!this.hasGameSetupRead) {
                 a("ReplayEngine: --- No game setup read ----");
                 gameEngine.networkEngine.roomSettings.noNukes = true;
                 gameEngine.maxUnitCap = gameEngine.settingsEngine.teamUnitCapHostedGame;
@@ -463,7 +491,7 @@ public class ReplayEngine {
     public void d(String str) {
         a("Recording replay to: " + str);
         if (this.P) {
-            if (this.u) {
+            if (this.isReplaying) {
                 b("startSaving: A replay is already playing");
             } else {
                 b("startSaving: A replay is already saving");
@@ -475,34 +503,34 @@ public class ReplayEngine {
         if (f) {
             gameEngine.networkEngine.j("Warning traceChecksumsWriting is on. Large replay file size will be created.");
         }
-        this.s = false;
+        this.isStopped = false;
         this.P = true;
-        this.u = false;
-        this.t = str;
+        this.isReplaying = false;
+        this.replayFilePath = str;
         try {
             File fileA = a(str, true);
-            this.G = FileHelper.openOutputStream(fileA, false);
-            if (this.G == null) {
+            this.fileOutput = FileHelper.openOutputStream(fileA, false);
+            if (this.fileOutput == null) {
                 b("Failed to create replay file at:" + fileA.getAbsolutePath());
                 GameEngine.getInstance().alert("Failed to create replay file (Replay recording will be disabled)");
                 e();
                 return;
             }
-            this.H = new BufferedOutputStream(this.G);
-            this.I = new DataOutputStream(this.H);
-            this.J = new GameOutputStream(this.I);
-            this.J.writeStringUTF("rustedWarfareReplay");
-            this.J.writeInt(gameEngine.getVersionCode(true));
-            this.J.writeInt(96);
-            this.J.writeStringUTF(gameEngine.getVersionString());
-            this.J.writeBoolean(gameEngine.isDemo);
-            this.J.startBlock("gamesave");
-            gameEngine.gameSaver.writeSaveToStream(this.J);
-            this.J.endBlock("gamesave");
-            this.I.flush();
-            this.K = new ReplayWriter(this);
-            this.L = new Thread(this.K);
-            this.L.start();
+            this.bufferedOutput = new BufferedOutputStream(this.fileOutput);
+            this.dataOutputStream = new DataOutputStream(this.bufferedOutput);
+            this.gameOutputStream = new GameOutputStream(this.dataOutputStream);
+            this.gameOutputStream.writeStringUTF("rustedWarfareReplay");
+            this.gameOutputStream.writeInt(gameEngine.getVersionCode(true));
+            this.gameOutputStream.writeInt(96);
+            this.gameOutputStream.writeStringUTF(gameEngine.getVersionString());
+            this.gameOutputStream.writeBoolean(gameEngine.isDemo);
+            this.gameOutputStream.startBlock("gamesave");
+            gameEngine.gameSaver.writeSaveToStream(this.gameOutputStream);
+            this.gameOutputStream.endBlock("gamesave");
+            this.dataOutputStream.flush();
+            this.replayWriter = new ReplayWriter(this);
+            this.writerThread = new Thread(this.replayWriter);
+            this.writerThread.start();
         } catch (IOException e2) {
             a("Failed to start recording replay", e2);
             GameEngine.getInstance().alert("Failed to start recording replay: " + e2.getMessage());
@@ -516,21 +544,21 @@ public class ReplayEngine {
 
     public boolean h() throws IOException {
         GameEngine gameEngine = GameEngine.getInstance();
-        String strStartBlockAndGetName = this.F.startBlockAndGetName();
+        String strStartBlockAndGetName = this.gameInputStream.startBlockAndGetName();
         if ("rc".equals(strStartBlockAndGetName)) {
-            this.y++;
+            this.commandId++;
             ReplayCommand replayCommand = new ReplayCommand();
-            replayCommand.a = this.F.readInt();
+            replayCommand.tick = this.gameInputStream.readInt();
             Command commandCreateCommand = gameEngine.commandController.createCommand();
-            commandCreateCommand.deserializeCommand(this.F);
+            commandCreateCommand.deserializeCommand(this.gameInputStream);
             commandCreateCommand.isReplayCommand = true;
-            replayCommand.e = commandCreateCommand;
-            this.F.d("rc");
-            this.w = replayCommand;
-            this.p++;
-            this.o = replayCommand.a;
+            replayCommand.command = commandCreateCommand;
+            this.gameInputStream.d("rc");
+            this.nextCommand = replayCommand;
+            this.commandCount++;
+            this.lastCommandTick = replayCommand.tick;
             if (c) {
-                a("updateGameFrame: Command: " + commandCreateCommand.team.teamName + " (" + commandCreateCommand.team.teamId + ") count:" + commandCreateCommand.getAffectedUnitCount() + " id:" + this.y);
+                a("updateGameFrame: Command: " + commandCreateCommand.team.teamName + " (" + commandCreateCommand.team.teamId + ") count:" + commandCreateCommand.getAffectedUnitCount() + " id:" + this.commandId);
                 if (commandCreateCommand.unitCommand != null) {
                     a("updateGameFrame: Waypoint: " + commandCreateCommand.unitCommand.getCommandType().name());
                     if (commandCreateCommand.unitCommand.getBuildUnitType() != null) {
@@ -561,15 +589,15 @@ public class ReplayEngine {
         }
         if ("wait".equals(strStartBlockAndGetName)) {
             ReplayCommand replayCommand2 = new ReplayCommand();
-            replayCommand2.a = this.F.readInt();
-            replayCommand2.b = true;
-            this.w = replayCommand2;
-            this.F.d("wait");
+            replayCommand2.tick = this.gameInputStream.readInt();
+            replayCommand2.isChecksumCommand = true;
+            this.nextCommand = replayCommand2;
+            this.gameInputStream.d("wait");
             return true;
         }
         if ("cs".equals(strStartBlockAndGetName)) {
-            int i = this.F.readInt();
-            long j = this.F.readLong();
+            int i = this.gameInputStream.readInt();
+            long j = this.gameInputStream.readLong();
             if (!this.n) {
                 if (gameEngine.currentTick != i) {
                     GameEngine.log("replay:updateGameFrame", "expected:" + i + " got:" + gameEngine.currentTick);
@@ -579,25 +607,25 @@ public class ReplayEngine {
                     b("checksum: game frameNumber:" + gameEngine.currentTick);
                     b("checksum: Replay checksum:" + j);
                     b("checksum: Game checksum  :" + f());
-                    this.l++;
-                    if (!this.k) {
-                        this.k = true;
+                    this.desyncCount++;
+                    if (!this.desyncWarningShown) {
+                        this.desyncWarningShown = true;
                         gameEngine.gameUI.messageManager.addMessage(VariableScope.nullOrMissingString, "Error: This replay might be out of sync");
                     }
                 } else {
                     a("checksum: checksums are matching frameNumber:" + gameEngine.currentTick);
                 }
             }
-            this.F.d("cs");
+            this.gameInputStream.d("cs");
             return true;
         }
         if ("es".equals(strStartBlockAndGetName)) {
-            int i2 = this.F.readInt();
+            int i2 = this.gameInputStream.readInt();
             if (!this.n) {
                 if (gameEngine.currentTick != i2) {
                     GameEngine.logColored("replay.updateGameFrame: expected:" + i2 + " got:" + gameEngine.currentTick);
                 }
-                GameInputStream gameInputStream = new GameInputStream(this.F.readBytesWithLength());
+                GameInputStream gameInputStream = new GameInputStream(this.gameInputStream.readBytesWithLength());
                 boolean z = false;
                 if (UnitPrice.a(gameInputStream.readByte(), 1)) {
                     z = true;
@@ -611,32 +639,32 @@ public class ReplayEngine {
                 gameInputStream.readInt();
                 for (ChecksumField checksumField : gameEngine.networkEngine.stateChecksum.fields) {
                     long j2 = gameInputStream.readLong();
-                    if (!this.m && j2 == checksumField.value) {
+                    if (!this.checksumOkLogged && j2 == checksumField.value) {
                         a("extraChecksum: " + checksumField.label + " Checksum [" + i2 + "]. " + j2 + " == " + checksumField.value + " (ok)");
                     }
                     if (j2 != checksumField.value) {
-                        if (this.l < 150) {
+                        if (this.desyncCount < 150) {
                             b("extraChecksum: " + checksumField.label + " Checksum [" + i2 + "]. " + j2 + " != " + checksumField.value + " (failed)");
                         }
-                        this.l++;
+                        this.desyncCount++;
                     }
                 }
             }
-            this.m = true;
-            this.F.d("es");
+            this.checksumOkLogged = true;
+            this.gameInputStream.d("es");
             return true;
         }
         if ("resync".equals(strStartBlockAndGetName)) {
-            int i3 = this.F.readInt();
+            int i3 = this.gameInputStream.readInt();
             GameEngine.log("Loading resync from replay");
             if (gameEngine.currentTick != i3) {
                 GameEngine.log("replay:resync", "expected:" + i3 + " got:" + gameEngine.currentTick);
             }
-            int i4 = this.F.readInt();
-            int i5 = this.F.readInt();
-            float f2 = this.F.readFloat();
-            float f3 = this.F.readFloat();
-            gameEngine.gameSaver.readSaveFromStream(new GameInputStream(this.F.readBytesWithLength()), true, true, true);
+            int i4 = this.gameInputStream.readInt();
+            int i5 = this.gameInputStream.readInt();
+            float f2 = this.gameInputStream.readFloat();
+            float f3 = this.gameInputStream.readFloat();
+            gameEngine.gameSaver.readSaveFromStream(new GameInputStream(this.gameInputStream.readBytesWithLength()), true, true, true);
             l();
             gameEngine.currentTick = i4;
             gameEngine.gameTimeMillis = i5;
@@ -646,57 +674,57 @@ public class ReplayEngine {
             }
             gameEngine.networkEngine.applyChangedSetup(f2, "replay");
             gameEngine.networkEngine.J = f3;
-            this.F.d("resync");
+            this.gameInputStream.d("resync");
             return true;
         }
         if ("chat".equals(strStartBlockAndGetName)) {
             ReplayCommand replayCommand3 = new ReplayCommand();
-            replayCommand3.a = this.F.readInt();
-            replayCommand3.g = new ChatMessage();
-            replayCommand3.g.a = this.F.readInt();
-            replayCommand3.g.b = this.F.readNullableString();
-            replayCommand3.g.c = this.F.readNullableString();
-            this.w = replayCommand3;
-            this.F.d("chat");
+            replayCommand3.tick = this.gameInputStream.readInt();
+            replayCommand3.chatMessage = new ChatMessage();
+            replayCommand3.chatMessage.a = this.gameInputStream.readInt();
+            replayCommand3.chatMessage.b = this.gameInputStream.readNullableString();
+            replayCommand3.chatMessage.c = this.gameInputStream.readNullableString();
+            this.nextCommand = replayCommand3;
+            this.gameInputStream.d("chat");
             return true;
         }
         if ("end".equals(strStartBlockAndGetName)) {
             GameEngine.log("replay:updateGameFrame", "end of replay block found");
             gameEngine.gameUI.messageManager.addMessage(VariableScope.nullOrMissingString, "Replay has ended");
             if (!gameEngine.isGameStarted) {
-                this.s = true;
+                this.isStopped = true;
                 gameEngine.gameSpeed = 0.25f;
                 GameEngine.getInstance().gameUI.startGameEndSequence();
             } else {
-                this.s = false;
+                this.isStopped = false;
                 this.P = false;
-                this.u = false;
+                this.isReplaying = false;
                 EditorOrBuilder editorOrBuilder = gameEngine.gameUI.getEditorOrBuilder();
                 if (editorOrBuilder != null) {
                     gameEngine.playerTeam = editorOrBuilder.team;
                 }
             }
-            this.F.d("end");
-            GameEngine.log("number of replay commands issued:" + this.z);
+            this.gameInputStream.d("end");
+            GameEngine.log("number of replay commands issued:" + this.executedCommandCount);
             return false;
         }
         if ("endReplayMetaData".equals(strStartBlockAndGetName)) {
-            this.F.d("endReplayMetaData");
+            this.gameInputStream.d("endReplayMetaData");
             return true;
         }
         GameEngine.log("updateGameFrame", "Unknown command block:" + strStartBlockAndGetName);
-        this.F.d(strStartBlockAndGetName);
+        this.gameInputStream.d(strStartBlockAndGetName);
         return true;
     }
 
     /* JADX INFO: renamed from: a */
     public void update(float f2) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (this.s || !this.P || !this.u) {
+        if (this.isStopped || !this.P || !this.isReplaying) {
             return;
         }
         while (true) {
-            if (this.w == null) {
+            if (this.nextCommand == null) {
                 try {
                     if (!h()) {
                         return;
@@ -705,54 +733,54 @@ public class ReplayEngine {
                     GameEngine.log("updateGameFrame", "IOException, read of replay?");
                     e2.printStackTrace();
                     gameEngine.gameSpeed = 0.25f;
-                    if (!this.s && this.P) {
+                    if (!this.isStopped && this.P) {
                         gameEngine.gameUI.messageManager.addMessage(VariableScope.nullOrMissingString, "Replay ended (unexpected)");
                     }
-                    this.s = true;
+                    this.isStopped = true;
                     return;
                 }
             }
-            if (this.w != null) {
+            if (this.nextCommand != null) {
                 if (this.n) {
-                    this.w = null;
+                    this.nextCommand = null;
                 } else {
-                    if (b && this.w != null && this.x != this.w) {
-                        this.x = this.w;
-                        GameEngine.log("replay: upcoming in " + (this.w.a - gameEngine.currentTick) + " command:" + (this.w.e != null));
+                    if (b && this.nextCommand != null && this.lastLoggedCommand != this.nextCommand) {
+                        this.lastLoggedCommand = this.nextCommand;
+                        GameEngine.log("replay: upcoming in " + (this.nextCommand.tick - gameEngine.currentTick) + " command:" + (this.nextCommand.command != null));
                     }
-                    if (this.w.b && this.z == 0) {
+                    if (this.nextCommand.isChecksumCommand && this.executedCommandCount == 0) {
                         GameEngine.log("updateGameFrame: replay: Skipping wait on first resync without commands to avoid delay");
-                        this.w = null;
-                    } else if (gameEngine.currentTick >= this.w.a) {
-                        if (this.w.e != null) {
-                            if (gameEngine.currentTick > this.w.a) {
-                                GameEngine.logColored("updateGameFrame: replay incorrect frameNumber, skipping command:" + gameEngine.currentTick + " vs " + this.w.a);
+                        this.nextCommand = null;
+                    } else if (gameEngine.currentTick >= this.nextCommand.tick) {
+                        if (this.nextCommand.command != null) {
+                            if (gameEngine.currentTick > this.nextCommand.tick) {
+                                GameEngine.logColored("updateGameFrame: replay incorrect frameNumber, skipping command:" + gameEngine.currentTick + " vs " + this.nextCommand.tick);
                             } else {
                                 if (d) {
-                                    if (this.w.e.sourceTeam == null) {
+                                    if (this.nextCommand.command.sourceTeam == null) {
                                         GameEngine.log("Precommand Team: commandingPlayer==null");
-                                        if (this.w.e.team != null) {
-                                            GameEngine.log("Precommand Team id:" + this.w.e.team.teamId + " credits:" + this.w.e.team.credits);
+                                        if (this.nextCommand.command.team != null) {
+                                            GameEngine.log("Precommand Team id:" + this.nextCommand.command.team.teamId + " credits:" + this.nextCommand.command.team.credits);
                                         }
                                     } else {
-                                        GameEngine.log("Precommand Team id:" + this.w.e.sourceTeam.teamId + " credits:" + this.w.e.sourceTeam.credits + " count:" + this.w.e.sourceTeam.getNonBuildingUnitCountIncludingQueued() + " max:" + this.w.e.sourceTeam.getUnitCap());
+                                        GameEngine.log("Precommand Team id:" + this.nextCommand.command.sourceTeam.teamId + " credits:" + this.nextCommand.command.sourceTeam.credits + " count:" + this.nextCommand.command.sourceTeam.getNonBuildingUnitCountIncludingQueued() + " max:" + this.nextCommand.command.sourceTeam.getUnitCap());
                                     }
                                 }
-                                if (this.w.e.isSystemAction && this.w.e.systemActionType != 0) {
-                                    GameEngine.log("replay:issueCommand", "systemAction_action:" + this.w.e.systemActionType);
+                                if (this.nextCommand.command.isSystemAction && this.nextCommand.command.systemActionType != 0) {
+                                    GameEngine.log("replay:issueCommand", "systemAction_action:" + this.nextCommand.command.systemActionType);
                                 }
-                                this.w.e.executeCommand();
+                                this.nextCommand.command.executeCommand();
                                 if (d) {
-                                    if (this.w.e.sourceTeam != null) {
-                                        GameEngine.log("Postcommand credits:" + this.w.e.sourceTeam.credits + " count:" + this.w.e.sourceTeam.getNonBuildingUnitCountIncludingQueued() + " max:" + this.w.e.sourceTeam.getUnitCap());
-                                    } else if (this.w.e.team != null) {
-                                        GameEngine.log("Postcommand Team id:" + this.w.e.team.teamId + " credits:" + this.w.e.team.credits);
+                                    if (this.nextCommand.command.sourceTeam != null) {
+                                        GameEngine.log("Postcommand credits:" + this.nextCommand.command.sourceTeam.credits + " count:" + this.nextCommand.command.sourceTeam.getNonBuildingUnitCountIncludingQueued() + " max:" + this.nextCommand.command.sourceTeam.getUnitCap());
+                                    } else if (this.nextCommand.command.team != null) {
+                                        GameEngine.log("Postcommand Team id:" + this.nextCommand.command.team.teamId + " credits:" + this.nextCommand.command.team.credits);
                                     }
                                 }
-                                this.z++;
+                                this.executedCommandCount++;
                             }
-                        } else if (this.w.g != null) {
-                            ChatMessage chatMessage = this.w.g;
+                        } else if (this.nextCommand.chatMessage != null) {
+                            ChatMessage chatMessage = this.nextCommand.chatMessage;
                             boolean z = false;
                             if (chatMessage.c == null) {
                                 z = true;
@@ -779,17 +807,17 @@ public class ReplayEngine {
                                 GameEngine.log("replay:updateGameFrame", "message: " + chatMessage.b + ":" + chatMessage.c);
                                 gameEngine.gameUI.messageManager.addMessage(chatMessage.b, chatMessage.c);
                             }
-                        } else if (this.w.b) {
+                        } else if (this.nextCommand.isChecksumCommand) {
                             if (c) {
                             }
                         } else {
                             GameEngine.log("updateGameFrame", "error: lastReadCommand null action");
                         }
-                        this.w = null;
+                        this.nextCommand = null;
                     }
                 }
             }
-            if (this.w != null) {
+            if (this.nextCommand != null) {
                 return;
             }
         }
@@ -821,10 +849,10 @@ public class ReplayEngine {
     }
 
     public boolean j() {
-        return this.P && this.u;
+        return this.P && this.isReplaying;
     }
 
     public boolean k() {
-        return this.P && !this.u;
+        return this.P && !this.isReplaying;
     }
 }

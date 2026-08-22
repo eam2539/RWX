@@ -5,48 +5,48 @@ import android.graphics.Paint;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.ag */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/ag.class */
 public class ColoredTextRenderer extends TextRenderer {
-    public Paint a;
-    public int b;
+    public Paint paint;
+    public int color;
     final /* synthetic */ TextRenderQueue c;
 
     /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
     ColoredTextRenderer(TextRenderQueue textRenderQueue, String str, Paint paint) {
         super(textRenderQueue, str);
         this.c = textRenderQueue;
-        this.b = 0;
-        this.a = paint;
+        this.color = 0;
+        this.paint = paint;
     }
 
     /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
     ColoredTextRenderer(TextRenderQueue textRenderQueue, String str, Paint paint, int i) {
         super(textRenderQueue, str);
         this.c = textRenderQueue;
-        this.b = 0;
-        this.a = paint;
-        this.b = i;
+        this.color = 0;
+        this.paint = paint;
+        this.color = i;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.ui.TextRenderer
     public Paint b(Paint paint) {
-        if (this.a == null) {
-            if (this.b != 0) {
-                TextRenderQueue.f.a(paint);
-                TextRenderQueue.f.b(this.b);
-                return TextRenderQueue.f;
+        if (this.paint == null) {
+            if (this.color != 0) {
+                TextRenderQueue.coloredTextPaint.a(paint);
+                TextRenderQueue.coloredTextPaint.b(this.color);
+                return TextRenderQueue.coloredTextPaint;
             }
             return paint;
         }
-        if (this.b != 0) {
-            TextRenderQueue.f.a(this.a);
-            TextRenderQueue.f.b(this.b);
-            return TextRenderQueue.f;
+        if (this.color != 0) {
+            TextRenderQueue.coloredTextPaint.a(this.paint);
+            TextRenderQueue.coloredTextPaint.b(this.color);
+            return TextRenderQueue.coloredTextPaint;
         }
-        return this.a;
+        return this.paint;
     }
 
     @Override // com.corrodinggames.rts.gameFramework.ui.TextRenderer
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
     public ColoredTextRenderer b(String str) {
-        return new ColoredTextRenderer(this.c, str, this.a, this.b);
+        return new ColoredTextRenderer(this.c, str, this.paint, this.color);
     }
 }

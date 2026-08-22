@@ -317,7 +317,7 @@ public class Main extends NetworkCallbacks {
             System.setProperty("java.net.preferIPv4Stack", "true");
         }
         if (GameEngine.isSteamModeEnabled) {
-            DisabledSteamEngine.a = new JavaSteamEngine();
+            DisabledSteamEngine.instance = new JavaSteamEngine();
             GameEngine.log("Early steam init");
             DisabledSteamEngine.a().b();
             GameEngine.log("Early steam init done.");

@@ -315,7 +315,7 @@ public class BuilderShip extends WaterUnit implements UnitPathPoints {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: u */
-    public int setHeight(BaseUnit baseUnit) {
+    public int getRepairRange(BaseUnit baseUnit) {
         return (int) f(baseUnit.r());
     }
 

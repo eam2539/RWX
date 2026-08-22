@@ -51,7 +51,7 @@ public class DynamicUnitPath extends Path {
             return false;
         }
         DynamicUnitPath dynamicUnitPath = (DynamicUnitPath) path;
-        if (this.l != dynamicUnitPath.l || this.m != dynamicUnitPath.m || this.o != dynamicUnitPath.o) {
+        if (this.endTileX != dynamicUnitPath.endTileX || this.endTileY != dynamicUnitPath.endTileY || this.movementType != dynamicUnitPath.movementType) {
             return false;
         }
         return true;
@@ -60,7 +60,7 @@ public class DynamicUnitPath extends Path {
     /* JADX INFO: Access modifiers changed from: protected */
     @Override // com.corrodinggames.rts.gameFramework.pathfinding.Path
     public boolean c() {
-        return this.x != null;
+        return this.pathPoints != null;
     }
 
     public final byte a(int i, int i2) {
