@@ -276,7 +276,7 @@ public final class AIController extends PlayerTeam {
 
     /* JADX INFO: renamed from: ah */
     public boolean isPathfindingOverloaded() {
-        if (GameEngine.getInstance().pathfindingEngine.A.i > 3000) {
+        if (GameEngine.getInstance().pathfindingEngine.airCostMap.i > 3000) {
             return true;
         }
         return false;
@@ -561,10 +561,10 @@ public final class AIController extends PlayerTeam {
             }
             if (aIStrategyNode instanceof UnitGroup) {
                 UnitGroup unitGroup = (UnitGroup) aIStrategyNode;
-                if (!unitGroup.a) {
-                    if (unitGroup.h) {
+                if (!unitGroup.isActive) {
+                    if (unitGroup.isReadyToAct) {
                         this.attackGroupCount++;
-                        if (!unitGroup.v && !unitGroup.d()) {
+                        if (!unitGroup.isEngaging && !unitGroup.d()) {
                             if (unitGroup.B) {
                                 this.airAttackGroupCount++;
                             } else {
@@ -1168,14 +1168,14 @@ public final class AIController extends PlayerTeam {
                 }
                 if (aIStrategyNode instanceof UnitGroup) {
                     UnitGroup unitGroup = (UnitGroup) aIStrategyNode;
-                    if (unitGroup.c) {
+                    if (unitGroup.requiresTarget) {
                         str3 = str3 + "\nVIP Mode";
                     }
-                    String str6 = (((str3 + "\n" + (unitGroup.b() ? "Defensive Type" : "Attack Type")) + "\nUnits: " + unitGroup.F.size() + " / " + unitGroup.A) + "\nStagingForAttack: " + unitGroup.q) + "\nAttackDelay: " + unitGroup.l;
-                    if (unitGroup.u != 0.0f) {
-                        str6 = str6 + "\nStagingTimer: " + unitGroup.u;
+                    String str6 = (((str3 + "\n" + (unitGroup.b() ? "Defensive Type" : "Attack Type")) + "\nUnits: " + unitGroup.F.size() + " / " + unitGroup.maxUnits) + "\nStagingForAttack: " + unitGroup.isDefending) + "\nAttackDelay: " + unitGroup.l;
+                    if (unitGroup.defendDuration != 0.0f) {
+                        str6 = str6 + "\nStagingTimer: " + unitGroup.defendDuration;
                     }
-                    String str7 = str6 + "\nStagingTargetFound: " + unitGroup.r;
+                    String str7 = str6 + "\nStagingTargetFound: " + unitGroup.isInCombat;
                     if (unitGroup.o != 0.0f) {
                         str7 = str7 + "\nattackingFor: " + unitGroup.o;
                     }
@@ -1186,22 +1186,22 @@ public final class AIController extends PlayerTeam {
                     if (unitGroup.G.size() > 0) {
                         str3 = str3 + "\nunitsNeedingTransport:" + unitGroup.G.size();
                     }
-                    if (unitGroup.b != null) {
-                        str3 = str3 + "\nlast action:" + unitGroup.b;
+                    if (unitGroup.groupName != null) {
+                        str3 = str3 + "\nlast action:" + unitGroup.groupName;
                     }
-                    if (!unitGroup.v && !unitGroup.q) {
+                    if (!unitGroup.isEngaging && !unitGroup.isDefending) {
                         str3 = str3 + "\nnext move:" + ((int) secondsToMinutes(unitGroup.n)) + "s";
                     }
                 }
                 if (aIStrategyNode instanceof TransporterGroup) {
                     TransporterGroup transporterGroup = (TransporterGroup) aIStrategyNode;
-                    str3 = ((str3 + "\nUnitsWanted: " + transporterGroup.l) + "\nunits: " + transporterGroup.F.size()) + "\nreadyToMoveOut: " + transporterGroup.q;
-                    if (transporterGroup.m != null) {
-                        str3 = str3 + "\nCurrentlyHelping: " + transporterGroup.m.strategyId;
+                    str3 = ((str3 + "\nUnitsWanted: " + transporterGroup.capacity) + "\nunits: " + transporterGroup.F.size()) + "\nreadyToMoveOut: " + transporterGroup.isWaitingForUnits;
+                    if (transporterGroup.unitGroup != null) {
+                        str3 = str3 + "\nCurrentlyHelping: " + transporterGroup.unitGroup.strategyId;
                     }
                 }
                 if (aIStrategyNode instanceof RallyGroup) {
-                    str3 = str3 + "\nneedsTransportGroup: " + ((RallyGroup) aIStrategyNode).a;
+                    str3 = str3 + "\nneedsTransportGroup: " + ((RallyGroup) aIStrategyNode).lifetime;
                 }
                 this.debugPaint.b(getTeamColorArgb());
                 for (String str8 : str3.split("\n")) {
@@ -2019,9 +2019,9 @@ public final class AIController extends PlayerTeam {
             }
             if (this.builderGroupCount < i7) {
                 UnitGroup unitGroup = new UnitGroup(this, false);
-                unitGroup.A = 8;
+                unitGroup.maxUnits = 8;
                 if (isInsaneDifficulty()) {
-                    unitGroup.A = 10;
+                    unitGroup.maxUnits = 10;
                 }
                 unitGroup.k();
                 this.mapHeight++;
@@ -2029,16 +2029,16 @@ public final class AIController extends PlayerTeam {
             if ((this.waterBuilderGroupCount >= i7 || this.totalBuilderUnits > 6) && this.landAttackGroupCount < 1 && z2) {
                 UnitGroup unitGroup2 = new UnitGroup(this, true);
                 if (this.mapWidth < 2) {
-                    unitGroup2.A = 3;
+                    unitGroup2.maxUnits = 3;
                 } else if (this.mapWidth < 5) {
-                    unitGroup2.A = 5;
+                    unitGroup2.maxUnits = 5;
                 } else {
-                    unitGroup2.A = 7;
+                    unitGroup2.maxUnits = 7;
                     if (isInsaneDifficulty()) {
                         if (this.mapWidth < 25) {
-                            unitGroup2.A = 14;
+                            unitGroup2.maxUnits = 14;
                         } else {
-                            unitGroup2.A = 18;
+                            unitGroup2.maxUnits = 18;
                         }
                     }
                 }
@@ -2048,15 +2048,15 @@ public final class AIController extends PlayerTeam {
             if (isPathfindingOverloaded() && this.airAttackGroupCount < 1 && z2) {
                 UnitGroup unitGroup3 = new UnitGroup(this, true);
                 unitGroup3.B = true;
-                unitGroup3.A = 5;
+                unitGroup3.maxUnits = 5;
                 if (isInsaneDifficulty()) {
-                    unitGroup3.A = 10;
+                    unitGroup3.maxUnits = 10;
                 }
                 unitGroup3.k();
             }
             if (isAttackBlockedByConditions() && this.transporterGroupCount < 3) {
                 TransporterGroup transporterGroup = new TransporterGroup(this);
-                transporterGroup.l = 1;
+                transporterGroup.capacity = 1;
                 transporterGroup.f();
             }
         }

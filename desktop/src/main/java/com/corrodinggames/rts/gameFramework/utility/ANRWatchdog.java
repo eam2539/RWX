@@ -21,14 +21,14 @@ public class ANRWatchdog extends Thread {
             Log.c("ANRWatchdog", "Interrupted: " + interruptedException.getMessage());
         }
     };
-    private ANRCallback c;
-    private InterruptCallback d;
+    private final int intervalMs;
+    private ANRCallback anrCallback;
     private final Handler e;
-    private final int f;
+    private InterruptCallback interruptCallback;
     private String g;
     private boolean h;
     private boolean i;
-    private volatile int j;
+    private volatile int tickCount;
     private final Runnable k;
 
     public ANRWatchdog() {
@@ -36,27 +36,27 @@ public class ANRWatchdog extends Thread {
     }
 
     public ANRWatchdog(int i) {
-        this.c = a;
-        this.d = b;
+        this.anrCallback = a;
+        this.interruptCallback = b;
         this.e = new Handler(Looper.b());
         this.g = VariableScope.nullOrMissingString;
         this.h = false;
         this.i = false;
-        this.j = 0;
+        this.tickCount = 0;
         this.k = new Runnable() { // from class: com.corrodinggames.rts.gameFramework.utility.d.3
             @Override // java.lang.Runnable
             public void run() {
-                ANRWatchdog.this.j = (ANRWatchdog.this.j + 1) % Integer.MAX_VALUE;
+                ANRWatchdog.this.tickCount = (ANRWatchdog.this.tickCount + 1) % Integer.MAX_VALUE;
             }
         };
-        this.f = i;
+        this.intervalMs = i;
     }
 
     public ANRWatchdog a(ANRCallback aNRCallback) {
         if (aNRCallback == null) {
-            this.c = a;
+            this.anrCallback = a;
         } else {
-            this.c = aNRCallback;
+            this.anrCallback = aNRCallback;
         }
         return this;
     }
@@ -67,28 +67,28 @@ public class ANRWatchdog extends Thread {
         setName("|ANR-WatchDog|");
         int i = -1;
         while (!isInterrupted()) {
-            int i2 = this.j;
+            int i2 = this.tickCount;
             this.e.a(this.k);
             try {
-                Thread.sleep(this.f);
-                if (this.j == i2) {
+                Thread.sleep(this.intervalMs);
+                if (this.tickCount == i2) {
                     if (!this.i && Debug.isDebuggerConnected()) {
-                        if (this.j != i) {
+                        if (this.tickCount != i) {
                             Log.c("ANRWatchdog", "An ANR was detected but ignored because the debugger is connected (you can prevent this with setIgnoreDebugger(true))");
                         }
-                        i = this.j;
+                        i = this.tickCount;
                     } else {
                         if (this.g != null) {
                             aNRExceptionA = ANRException.a(this.g, this.h);
                         } else {
                             aNRExceptionA = ANRException.a();
                         }
-                        this.c.a(aNRExceptionA);
+                        this.anrCallback.a(aNRExceptionA);
                         return;
                     }
                 }
             } catch (InterruptedException e) {
-                this.d.a(e);
+                this.interruptCallback.a(e);
                 return;
             }
         }

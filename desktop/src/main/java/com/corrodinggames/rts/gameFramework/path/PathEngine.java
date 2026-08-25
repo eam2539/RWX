@@ -35,14 +35,22 @@ public final class PathEngine {
     static ArrayList<Path> k;
     public static boolean l;
     public static final boolean m;
-    public TileMap q;
-    int r;
-    public short s;
-    public short t;
-    public PathCostMap x;
-    public PathCostMap y;
-    public PathCostMap z;
-    public PathCostMap A;
+    /* JADX INFO: renamed from: q */
+    public TileMap tileMap;
+    /* JADX INFO: renamed from: s */
+    public short widthTiles;
+    /* JADX INFO: renamed from: t */
+    public short heightTiles;
+    /* JADX INFO: renamed from: x */
+    public PathCostMap noneCostMap;
+    /* JADX INFO: renamed from: y */
+    public PathCostMap landCostMap;
+    /* JADX INFO: renamed from: z */
+    public PathCostMap buildingCostMap;
+    /* JADX INFO: renamed from: A */
+    public PathCostMap airCostMap;
+    /* JADX INFO: renamed from: r */
+    int mapSignature;
     public PathCostMap B;
     public PathCostMap C;
     public PathCostMap D;
@@ -96,13 +104,13 @@ public final class PathEngine {
     }
 
     public boolean a(PathCostMap pathCostMap, int i2, int i3, boolean z) {
-        if (!this.q.isInBounds(i2, i3)) {
+        if (!this.tileMap.isInBounds(i2, i3)) {
             return true;
         }
         if (pathCostMap.a == UnitMovementType.AIR) {
             return false;
         }
-        int i4 = (i2 * this.t) + i3;
+        int i4 = (i2 * this.heightTiles) + i3;
         if ((!z && pathCostMap.e[i4] == -1) || pathCostMap.d[i4] == -1 || pathCostMap.f[i4] == -1) {
             return true;
         }
@@ -110,13 +118,13 @@ public final class PathEngine {
     }
 
     public final int b(PathCostMap pathCostMap, int i2, int i3) {
-        if (!this.q.isInBounds(i2, i3)) {
+        if (!this.tileMap.isInBounds(i2, i3)) {
             return -1;
         }
         if (pathCostMap.a == UnitMovementType.AIR) {
             return 0;
         }
-        int i4 = (i2 * this.t) + i3;
+        int i4 = (i2 * this.heightTiles) + i3;
         if (pathCostMap.d[i4] == -1 || pathCostMap.e[i4] == -1 || pathCostMap.f[i4] == -1) {
             return -1;
         }
@@ -124,7 +132,7 @@ public final class PathEngine {
     }
 
     public final int c(PathCostMap pathCostMap, int i2, int i3) {
-        if (!this.q.isInBounds(i2, i3)) {
+        if (!this.tileMap.isInBounds(i2, i3)) {
             return -1;
         }
         if (pathCostMap.a == UnitMovementType.AIR) {
@@ -133,25 +141,25 @@ public final class PathEngine {
         if (pathCostMap.j == null) {
             return -1;
         }
-        return pathCostMap.j[(i2 * this.t) + i3];
+        return pathCostMap.j[(i2 * this.heightTiles) + i3];
     }
 
     public boolean a(int i2, int i3) {
-        if (!this.q.isInBounds(i2, i3)) {
+        if (!this.tileMap.isInBounds(i2, i3)) {
             return true;
         }
-        int i4 = (i2 * this.t) + i3;
-        if (this.D.d[i4] != -1 || this.A.d[i4] == -1) {
+        int i4 = (i2 * this.heightTiles) + i3;
+        if (this.D.d[i4] != -1 || this.airCostMap.d[i4] == -1) {
             return false;
         }
         return true;
     }
 
     public boolean b(int i2, int i3) {
-        if (!this.q.isInBounds(i2, i3)) {
+        if (!this.tileMap.isInBounds(i2, i3)) {
             return true;
         }
-        int i4 = (i2 * this.t) + i3;
+        int i4 = (i2 * this.heightTiles) + i3;
         if (this.C.d[i4] != -1 || this.E.d[i4] == -1) {
             return false;
         }
@@ -162,8 +170,8 @@ public final class PathEngine {
         d();
         GameEngine.log("PathEngine: Setting up map costs");
         boolean z2 = false;
-        if (z && this.q != null && this.q == tileMap && this.s == tileMap.groundLayer.widthTiles && this.t == tileMap.groundLayer.heightTiles) {
-            if (this.r == PathCostMap.a(tileMap)) {
+        if (z && this.tileMap != null && this.tileMap == tileMap && this.widthTiles == tileMap.groundLayer.widthTiles && this.heightTiles == tileMap.groundLayer.heightTiles) {
+            if (this.mapSignature == PathCostMap.a(tileMap)) {
                 GameEngine.log("PathEngine: Keeping existing map costs");
                 z2 = true;
             } else {
@@ -172,29 +180,29 @@ public final class PathEngine {
         }
         if (z2) {
         }
-        this.q = tileMap;
-        this.r = PathCostMap.a(tileMap);
-        this.s = (short) tileMap.groundLayer.widthTiles;
-        this.t = (short) tileMap.groundLayer.heightTiles;
+        this.tileMap = tileMap;
+        this.mapSignature = PathCostMap.a(tileMap);
+        this.widthTiles = (short) tileMap.groundLayer.widthTiles;
+        this.heightTiles = (short) tileMap.groundLayer.heightTiles;
         e = null;
         this.u.clear();
         this.v = new PathCostMap[0];
-        this.x = new PathCostMap(this, UnitMovementType.NONE, this.s, this.t);
-        this.y = new PathCostMap(this, UnitMovementType.LAND, this.s, this.t);
-        this.y.b();
-        this.y.a((OrderableUnit) null);
-        this.z = new PathCostMap(this, UnitMovementType.BUILDING, this.s, this.t);
-        this.A = new PathCostMap(this, UnitMovementType.WATER, this.s, this.t);
-        this.A.b();
-        this.A.a((OrderableUnit) null);
-        this.B = new PathCostMap(this, UnitMovementType.AIR, this.s, this.t);
-        this.C = new PathCostMap(this, UnitMovementType.HOVER, this.s, this.t);
+        this.noneCostMap = new PathCostMap(this, UnitMovementType.NONE, this.widthTiles, this.heightTiles);
+        this.landCostMap = new PathCostMap(this, UnitMovementType.LAND, this.widthTiles, this.heightTiles);
+        this.landCostMap.b();
+        this.landCostMap.a((OrderableUnit) null);
+        this.buildingCostMap = new PathCostMap(this, UnitMovementType.BUILDING, this.widthTiles, this.heightTiles);
+        this.airCostMap = new PathCostMap(this, UnitMovementType.WATER, this.widthTiles, this.heightTiles);
+        this.airCostMap.b();
+        this.airCostMap.a((OrderableUnit) null);
+        this.B = new PathCostMap(this, UnitMovementType.AIR, this.widthTiles, this.heightTiles);
+        this.C = new PathCostMap(this, UnitMovementType.HOVER, this.widthTiles, this.heightTiles);
         this.C.b();
         this.C.a((OrderableUnit) null);
-        this.D = new PathCostMap(this, UnitMovementType.OVER_CLIFF, this.s, this.t);
+        this.D = new PathCostMap(this, UnitMovementType.OVER_CLIFF, this.widthTiles, this.heightTiles);
         this.D.b();
         this.D.a((OrderableUnit) null);
-        this.E = new PathCostMap(this, UnitMovementType.OVER_CLIFF_WATER, this.s, this.t);
+        this.E = new PathCostMap(this, UnitMovementType.OVER_CLIFF_WATER, this.widthTiles, this.heightTiles);
         this.E.b();
         this.E.a((OrderableUnit) null);
         Iterator it = this.H.iterator();
@@ -210,41 +218,41 @@ public final class PathEngine {
         int i3;
         int i4;
         GameEngine gameEngine = GameEngine.getInstance();
-        PathCostMap pathCostMap = this.y;
+        PathCostMap pathCostMap = this.landCostMap;
         Rect rect = new Rect();
         float f2 = gameEngine.viewpointXSnapped;
         float f3 = gameEngine.viewpointYSnapped;
         float f4 = gameEngine.visibleWorldWidth;
         float f5 = gameEngine.visibleWorldHeight;
         MapLayer mapLayer = gameEngine.tileMap.groundLayer;
-        int i5 = (int) ((f2 * this.q.tileScaleX) - 1.0f);
+        int i5 = (int) ((f2 * this.tileMap.tileScaleX) - 1.0f);
         if (i5 < 0) {
             i5 = 0;
         }
-        int i6 = (int) ((f3 * this.q.tileScaleY) - 1.0f);
+        int i6 = (int) ((f3 * this.tileMap.tileScaleY) - 1.0f);
         if (i6 < 0) {
             i6 = 0;
         }
-        int i7 = (int) (((f2 + f4) * this.q.tileScaleX) + 1.0f);
-        if (i7 > this.s - 1) {
-            i7 = this.s - 1;
+        int i7 = (int) (((f2 + f4) * this.tileMap.tileScaleX) + 1.0f);
+        if (i7 > this.widthTiles - 1) {
+            i7 = this.widthTiles - 1;
         }
-        int i8 = (int) (((f3 + f5) * this.q.tileScaleY) + 1.0f);
-        if (i8 > this.t - 1) {
-            i8 = this.t - 1;
+        int i8 = (int) (((f3 + f5) * this.tileMap.tileScaleY) + 1.0f);
+        if (i8 > this.heightTiles - 1) {
+            i8 = this.heightTiles - 1;
         }
         for (int i9 = i5; i9 < i7 + 1; i9++) {
             for (int i10 = i6; i10 < i8 + 1; i10++) {
                 if (mapLayer.getTileAt(i9, i10) != null) {
-                    int i11 = i9 * this.q.tileWorldSizeX;
-                    int i12 = i10 * this.q.tileWorldSizeY;
-                    rect.a(i11, i12, i11 + this.q.tileWorldSizeX, i12 + this.q.tileWorldSizeY);
+                    int i11 = i9 * this.tileMap.tileWorldSizeX;
+                    int i12 = i10 * this.tileMap.tileWorldSizeY;
+                    rect.a(i11, i12, i11 + this.tileMap.tileWorldSizeX, i12 + this.tileMap.tileWorldSizeY);
                     rect.a((int) (-f2), (int) (-f3));
                     boolean zB = rect.b((int) (gameEngine.gameUI.selectionBoxStartX / gameEngine.zoom), (int) (gameEngine.gameUI.selectionBoxStartY / gameEngine.zoom));
                     if (!g || zB) {
-                        byte b2 = pathCostMap.d[(i9 * this.t) + i10];
-                        byte b3 = pathCostMap.e[(i9 * this.t) + i10];
-                        int i13 = pathCostMap.f[(i9 * this.t) + i10];
+                        byte b2 = pathCostMap.d[(i9 * this.heightTiles) + i10];
+                        byte b3 = pathCostMap.e[(i9 * this.heightTiles) + i10];
+                        int i13 = pathCostMap.f[(i9 * this.heightTiles) + i10];
                         if (b2 == -1) {
                             i2 = 255;
                         } else {
@@ -266,7 +274,7 @@ public final class PathEngine {
                         this.F.a(128, i2, i3, i4);
                         gameEngine.renderGraphicsEngine.b(rect, this.F);
                         if (zB && pathCostMap.f != null) {
-                            gameEngine.renderGraphicsEngine.a("o:" + ((int) pathCostMap.f[(i9 * this.t) + i10]), rect.d(), rect.e(), gameEngine.loadingPaint);
+                            gameEngine.renderGraphicsEngine.a("o:" + ((int) pathCostMap.f[(i9 * this.heightTiles) + i10]), rect.d(), rect.e(), gameEngine.loadingPaint);
                         }
                     }
                 }
@@ -281,7 +289,7 @@ public final class PathEngine {
         for (PathCostMap pathCostMap : this.v) {
             pathCostMap.c(orderableUnit);
         }
-        this.y.a(orderableUnit);
+        this.landCostMap.a(orderableUnit);
         this.C.a(orderableUnit);
         this.D.a(orderableUnit);
         this.E.a(orderableUnit);

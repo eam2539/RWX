@@ -8,35 +8,38 @@ public final class PathOpenListPool {
     int a;
     int b;
     public static int c;
-    final BucketedNodeQueue e = new BucketedNodeQueue();
-    final DirectAccessPathNodeArrayList d = new DirectAccessPathNodeArrayList(1000 + 100);
+    /* JADX INFO: renamed from: e */
+    final BucketedNodeQueue queue = new BucketedNodeQueue();
+
+    /* JADX INFO: renamed from: d */
+    final DirectAccessPathNodeArrayList pool = new DirectAccessPathNodeArrayList(1000 + 100);
 
     PathOpenListPool() {
         for (int i = 0; i < 1000; i++) {
-            this.d.add(new PathOpenListNode());
+            this.pool.add(new PathOpenListNode());
         }
     }
 
     PathOpenListNode a() {
-        if (this.d.b == 0) {
+        if (this.pool.size == 0) {
             c++;
             return new PathOpenListNode();
         }
-        return this.d.b();
+        return this.pool.b();
     }
 
     final void a(PathOpenListNode pathOpenListNode) {
         if (pathOpenListNode != null) {
-            this.d.b(pathOpenListNode);
+            this.pool.b(pathOpenListNode);
         }
     }
 
     void b() {
-        if (this.d.size() > 50000) {
+        if (this.pool.size() > 50000) {
             GameEngine.log("PathOpenList: resetPool:memoryPool over 50000 clearing");
-            this.d.clear();
+            this.pool.clear();
         }
-        this.e.a(this);
+        this.queue.a(this);
     }
 
     public void a(int i, int i2) {
@@ -49,11 +52,11 @@ public final class PathOpenListPool {
         PathOpenListNode pathOpenListNodeA = a();
         pathOpenListNodeA.a(s, s2);
         pathOpenListNodeA.a(i, this.a, this.b);
-        this.e.a(pathOpenListNodeA);
+        this.queue.a(pathOpenListNodeA);
     }
 
     public final PathOpenListNode c() {
-        PathOpenListNode pathOpenListNodeA = this.e.a();
+        PathOpenListNode pathOpenListNodeA = this.queue.a();
         if (pathOpenListNodeA != null) {
             a(pathOpenListNodeA);
         }

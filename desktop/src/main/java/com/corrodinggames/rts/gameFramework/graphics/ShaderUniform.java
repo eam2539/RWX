@@ -3,63 +3,67 @@ package com.corrodinggames.rts.gameFramework.graphics;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.m.af */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/m/af.class */
 public class ShaderUniform {
-    public String a;
-    public boolean c;
+    /* JADX INFO: renamed from: a */
+    public String name;
+    /* JADX INFO: renamed from: c */
+    public boolean isDirty;
     public boolean d;
-    public Texture f;
+    /* JADX INFO: renamed from: f */
+    public Texture texture;
     public boolean g;
     public int b = -1;
-    public float[] e = new float[1];
+    /* JADX INFO: renamed from: e */
+    public float[] floatValues = new float[1];
 
     public void a(float f) {
-        if (this.e.length != 1) {
-            this.e = new float[1];
+        if (this.floatValues.length != 1) {
+            this.floatValues = new float[1];
         }
-        if (this.e[0] == f) {
+        if (this.floatValues[0] == f) {
             return;
         }
-        this.e[0] = f;
-        this.c = true;
+        this.floatValues[0] = f;
+        this.isDirty = true;
     }
 
     public void a(float f, float f2) {
-        if (this.e.length != 2) {
-            this.e = new float[2];
+        if (this.floatValues.length != 2) {
+            this.floatValues = new float[2];
         }
-        if (this.e[0] == f && this.e[1] == f2) {
+        if (this.floatValues[0] == f && this.floatValues[1] == f2) {
             return;
         }
-        this.e[0] = f;
-        this.e[1] = f2;
-        this.c = true;
+        this.floatValues[0] = f;
+        this.floatValues[1] = f2;
+        this.isDirty = true;
     }
 
     public void a(float f, float f2, float f3, float f4) {
-        if (this.e.length != 4) {
-            this.e = new float[4];
+        if (this.floatValues.length != 4) {
+            this.floatValues = new float[4];
         }
-        if (this.e[0] == f && this.e[1] == f2 && this.e[2] == f3 && this.e[3] == f4) {
+        if (this.floatValues[0] == f && this.floatValues[1] == f2 && this.floatValues[2] == f3 && this.floatValues[3] == f4) {
             return;
         }
-        this.e[0] = f;
-        this.e[1] = f2;
-        this.e[2] = f3;
-        this.e[3] = f4;
-        this.c = true;
+        this.floatValues[0] = f;
+        this.floatValues[1] = f2;
+        this.floatValues[2] = f3;
+        this.floatValues[3] = f4;
+        this.isDirty = true;
     }
 
     public void a(Texture texture) {
-        if (this.f != texture) {
-            this.f = texture;
-            this.c = true;
+        if (this.texture != texture) {
+            this.texture = texture;
+            this.isDirty = true;
         }
     }
 
     public void b(Texture texture) {
         this.g = true;
-        if (this.f != texture) {
-            this.f = texture;
-            this.c = true;
+        if (this.texture != texture) {
+            this.texture = texture;
+            this.isDirty = true;
         }
     }
 }

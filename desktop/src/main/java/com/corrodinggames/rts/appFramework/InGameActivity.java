@@ -273,7 +273,7 @@ public class InGameActivity extends TaskQueueActivity {
         builder.setView(viewInflate);
         TextView textView = (TextView) viewInflate.findViewById(com.corrodinggames.rts.R.id.chat_messages);
         final EditText editText = (EditText) viewInflate.findViewById(com.corrodinggames.rts.R.id.chat_text);
-        textView.setText(gameEngine.networkEngine.chatLog.a());
+        textView.setText(gameEngine.networkEngine.chatLog.getAllMessagesText());
         editText.setText(VariableScope.nullOrMissingString);
         editText.requestFocus();
         builder.setPositiveButton(z ? "Send Team" : "Send", new DialogInterface.OnClickListener() { // from class: com.corrodinggames.rts.appFramework.g.16

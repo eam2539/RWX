@@ -3,34 +3,41 @@ package com.corrodinggames.rts.gameFramework.ui.widgets;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.a.c */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/a/c.class */
 public class UIEvent {
-    public int a;
-    public int b;
-    public UIEventType c;
-    public int d = -1;
+    /* JADX INFO: renamed from: a */
+    public int x;
+
+    /* JADX INFO: renamed from: b */
+    public int y;
+
+    /* JADX INFO: renamed from: c */
+    public UIEventType type;
+
+    /* JADX INFO: renamed from: d */
+    public int button = -1;
 
     public static UIEvent a(int i, int i2) {
         UIEvent uIEvent = new UIEvent();
-        uIEvent.a = i;
-        uIEvent.b = i2;
-        uIEvent.c = UIEventType.mouseClick;
-        uIEvent.d = 1;
+        uIEvent.x = i;
+        uIEvent.y = i2;
+        uIEvent.type = UIEventType.mouseClick;
+        uIEvent.button = 1;
         return uIEvent;
     }
 
     public static UIEvent b(int i, int i2) {
         UIEvent uIEvent = new UIEvent();
-        uIEvent.a = i;
-        uIEvent.b = i2;
-        uIEvent.c = UIEventType.mouseMove;
-        uIEvent.d = 1;
+        uIEvent.x = i;
+        uIEvent.y = i2;
+        uIEvent.type = UIEventType.mouseMove;
+        uIEvent.button = 1;
         return uIEvent;
     }
 
     public boolean a() {
-        return this.c == UIEventType.mouseClick;
+        return this.type == UIEventType.mouseClick;
     }
 
     public boolean b() {
-        return this.c == UIEventType.mouseMove;
+        return this.type == UIEventType.mouseMove;
     }
 }

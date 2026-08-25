@@ -19,8 +19,8 @@ public class LayoutContainer extends UIElement {
     public void b() {
         super.b();
         d();
-        this.i = this.z;
-        this.j = this.y;
+        this.i = this.layoutWidth;
+        this.j = this.layoutHeight;
         this.i += this.m + this.n;
         this.j += this.k + this.l;
     }

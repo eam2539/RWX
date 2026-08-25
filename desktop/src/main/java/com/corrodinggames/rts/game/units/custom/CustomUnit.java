@@ -919,7 +919,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
         if (customProjectileTemplate.lightColor != -1) {
             boolean z = false;
             Effect effect = projectile.aP;
-            if (effect != null && effect.b == projectile && effect.d && effect != null) {
+            if (effect != null && effect.parentObject == projectile && effect.d && effect != null) {
                 if (effect.V < 150.0f) {
                     effect.V = 200.0f;
                 }
@@ -927,7 +927,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
             }
             if (!z && (effectCreateLightEffect = gameEngine.effectManager.createLightEffect(projectile, customProjectileTemplate.lightColor, customProjectileTemplate.lightSize)) != null) {
                 if (customProjectileTemplate.lightCastOnGround) {
-                    effectCreateLightEffect.c = true;
+                    effectCreateLightEffect.ignoreParentZ = true;
                 }
                 if (customProjectileTemplate.L) {
                     projectile.aP = effectCreateLightEffect;
@@ -1648,7 +1648,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                                 effectCreateEffectInternal.aq = 0;
                                 effectCreateEffectInternal.ap = 0;
                                 effectCreateEffectInternal.ar = (short) 2;
-                                effectCreateEffectInternal.r = true;
+                                effectCreateEffectInternal.fadeIn = true;
                                 effectCreateEffectInternal.E = 0.5f;
                                 effectCreateEffectInternal.W = 60.0f;
                                 effectCreateEffectInternal.V = 60.0f;
@@ -2027,13 +2027,13 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                                 effectCreateEffectInternal3.aq = 0;
                                 effectCreateEffectInternal3.ap = 0;
                                 effectCreateEffectInternal3.ar = (short) 2;
-                                effectCreateEffectInternal3.r = true;
-                                effectCreateEffectInternal3.s = true;
-                                effectCreateEffectInternal3.t = 40.0f;
+                                effectCreateEffectInternal3.fadeIn = true;
+                                effectCreateEffectInternal3.fadeOut = true;
+                                effectCreateEffectInternal3.fadeDuration = 40.0f;
                                 effectCreateEffectInternal3.an = true;
                                 effectCreateEffectInternal3.P = 0.1f;
                                 effectCreateEffectInternal3.R = 0.0f;
-                                effectCreateEffectInternal3.u = true;
+                                effectCreateEffectInternal3.useGravity = true;
                                 effectCreateEffectInternal3.E = 0.4f;
                                 effectCreateEffectInternal3.W = 380.0f;
                                 effectCreateEffectInternal3.V = effectCreateEffectInternal3.W;
@@ -2113,12 +2113,12 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
                             if (projectileB != null) {
                                 float f12 = Float.MIN_VALUE;
                                 float f13 = Float.MIN_VALUE;
-                                if (projectileB.i != null) {
-                                    f12 = projectileB.i.posX;
-                                    f13 = projectileB.i.posY;
-                                } else if (projectileB.h != null) {
-                                    f12 = projectileB.h.x;
-                                    f13 = projectileB.h.y;
+                                if (projectileB.targetUnit != null) {
+                                    f12 = projectileB.targetUnit.posX;
+                                    f13 = projectileB.targetUnit.posY;
+                                } else if (projectileB.targetPoint != null) {
+                                    f12 = projectileB.targetPoint.x;
+                                    f13 = projectileB.targetPoint.y;
                                 }
                                 if (f12 > Float.MIN_VALUE) {
                                     fFloatValue += Utility.getAngleBetweenPoints(f10, f11, f12, f13);
@@ -4218,7 +4218,7 @@ public class CustomUnit extends MovableUnit implements TransportUnitInterface, U
     public void a(com.corrodinggames.rts.game.units.buildings.Projectile projectile) {
         float fFloatValue;
         AbstractUnitAction abstractUnitActionValidateActionId = validateActionId(projectile.j);
-        if (abstractUnitActionValidateActionId != null && a(abstractUnitActionValidateActionId, projectile.h, projectile.i, 0, 0)) {
+        if (abstractUnitActionValidateActionId != null && a(abstractUnitActionValidateActionId, projectile.targetPoint, projectile.targetUnit, 0, 0)) {
             return;
         }
         float fFloatValue2 = 0.0f;

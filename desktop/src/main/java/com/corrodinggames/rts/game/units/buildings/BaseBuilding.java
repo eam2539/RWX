@@ -179,7 +179,7 @@ public abstract class BaseBuilding extends OrderableUnit {
             return strA;
         }
         if (unitType == UnitTypeEnum.seaFactory || unitMovementType == UnitMovementType.WATER) {
-            if (!gameEngine.pathfindingEngine.a(gameEngine.pathfindingEngine.A, i, i2)) {
+            if (!gameEngine.pathfindingEngine.a(gameEngine.pathfindingEngine.airCostMap, i, i2)) {
                 return null;
             }
             return "{3}";
@@ -212,7 +212,7 @@ public abstract class BaseBuilding extends OrderableUnit {
             }
             return "{0}";
         }
-        if (gameEngine.pathfindingEngine.a(gameEngine.pathfindingEngine.z, i, i2, z)) {
+        if (gameEngine.pathfindingEngine.a(gameEngine.pathfindingEngine.buildingCostMap, i, i2, z)) {
             boolean z2 = false;
             if (playerTeam != null && !gameEngine.tileMap.isTileVisibleForTeam(i, i2, playerTeam)) {
                 z2 = true;

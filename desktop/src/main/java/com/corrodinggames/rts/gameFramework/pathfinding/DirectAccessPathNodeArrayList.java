@@ -8,8 +8,11 @@ import java.util.*;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/k/a.class */
 public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenListNode> implements Serializable, Cloneable, RandomAccess {
     public static final PathOpenListNode[] a = new PathOpenListNode[0];
-    public int b;
-    transient PathOpenListNode[] c;
+    /* JADX INFO: renamed from: b */
+    public int size;
+
+    /* JADX INFO: renamed from: c */
+    transient PathOpenListNode[] elements;
 
     static /* synthetic */ int e(DirectAccessPathNodeArrayList directAccessPathNodeArrayList) {
         return directAccessPathNodeArrayList.modCount;
@@ -25,52 +28,52 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
         if (i < 0) {
             throw new IllegalArgumentException("capacity < 0: " + i);
         }
-        this.c = i == 0 ? a : new PathOpenListNode[i];
+        this.elements = i == 0 ? a : new PathOpenListNode[i];
     }
 
     public DirectAccessPathNodeArrayList() {
-        this.c = a;
+        this.elements = a;
     }
 
     public PathOpenListNode[] a() {
-        return this.c;
+        return this.elements;
     }
 
     @Override // java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
     public boolean add(PathOpenListNode pathOpenListNode) {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
-        int i = this.b;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
+        int i = this.size;
         if (i == pathOpenListNodeArr.length) {
             PathOpenListNode[] pathOpenListNodeArr2 = new PathOpenListNode[i + (i < 6 ? 12 : i >> 1)];
             System.arraycopy(pathOpenListNodeArr, 0, pathOpenListNodeArr2, 0, i);
             pathOpenListNodeArr = pathOpenListNodeArr2;
-            this.c = pathOpenListNodeArr2;
+            this.elements = pathOpenListNodeArr2;
         }
         pathOpenListNodeArr[i] = pathOpenListNode;
-        this.b = i + 1;
+        this.size = i + 1;
         this.modCount++;
         return true;
     }
 
     public void b(PathOpenListNode pathOpenListNode) {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
-        int i = this.b;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
+        int i = this.size;
         if (i == pathOpenListNodeArr.length) {
             PathOpenListNode[] pathOpenListNodeArr2 = new PathOpenListNode[i + (i < 6 ? 12 : i >> 1)];
             System.arraycopy(pathOpenListNodeArr, 0, pathOpenListNodeArr2, 0, i);
             pathOpenListNodeArr = pathOpenListNodeArr2;
-            this.c = pathOpenListNodeArr2;
+            this.elements = pathOpenListNodeArr2;
         }
         pathOpenListNodeArr[i] = pathOpenListNode;
-        this.b = i + 1;
+        this.size = i + 1;
     }
 
     @Override // java.util.AbstractList, java.util.List
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
     public void add(int i, PathOpenListNode pathOpenListNode) {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
-        int i2 = this.b;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
+        int i2 = this.size;
         if (i > i2 || i < 0) {
             a(i, i2);
         }
@@ -81,10 +84,10 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
             System.arraycopy(pathOpenListNodeArr, 0, pathOpenListNodeArr2, 0, i);
             System.arraycopy(pathOpenListNodeArr, i, pathOpenListNodeArr2, i + 1, i2 - i);
             pathOpenListNodeArr = pathOpenListNodeArr2;
-            this.c = pathOpenListNodeArr2;
+            this.elements = pathOpenListNodeArr2;
         }
         pathOpenListNodeArr[i] = pathOpenListNode;
-        this.b = i2 + 1;
+        this.size = i2 + 1;
         this.modCount++;
     }
 
@@ -99,24 +102,24 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
         if (length == 0) {
             return false;
         }
-        PathOpenListNode[] pathOpenListNodeArr2 = this.c;
-        int i = this.b;
+        PathOpenListNode[] pathOpenListNodeArr2 = this.elements;
+        int i = this.size;
         int i2 = i + length;
         if (i2 > pathOpenListNodeArr2.length) {
             PathOpenListNode[] pathOpenListNodeArr3 = new PathOpenListNode[c(i2 - 1)];
             System.arraycopy(pathOpenListNodeArr2, 0, pathOpenListNodeArr3, 0, i);
             pathOpenListNodeArr2 = pathOpenListNodeArr3;
-            this.c = pathOpenListNodeArr3;
+            this.elements = pathOpenListNodeArr3;
         }
         System.arraycopy(pathOpenListNodeArr, 0, pathOpenListNodeArr2, i, length);
-        this.b = i2;
+        this.size = i2;
         this.modCount++;
         return true;
     }
 
     @Override // java.util.AbstractList, java.util.List
     public boolean addAll(int i, Collection collection) {
-        int i2 = this.b;
+        int i2 = this.size;
         if (i > i2 || i < 0) {
             a(i, i2);
         }
@@ -125,7 +128,7 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
         if (length == 0) {
             return false;
         }
-        PathOpenListNode[] pathOpenListNodeArr2 = this.c;
+        PathOpenListNode[] pathOpenListNodeArr2 = this.elements;
         int i3 = i2 + length;
         if (i3 <= pathOpenListNodeArr2.length) {
             System.arraycopy(pathOpenListNodeArr2, i, pathOpenListNodeArr2, i + length, i2 - i);
@@ -134,10 +137,10 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
             System.arraycopy(pathOpenListNodeArr2, 0, pathOpenListNodeArr3, 0, i);
             System.arraycopy(pathOpenListNodeArr2, i, pathOpenListNodeArr3, i + length, i2 - i);
             pathOpenListNodeArr2 = pathOpenListNodeArr3;
-            this.c = pathOpenListNodeArr3;
+            this.elements = pathOpenListNodeArr3;
         }
         System.arraycopy(pathOpenListNodeArr, 0, pathOpenListNodeArr2, i, length);
-        this.b = i3;
+        this.size = i3;
         this.modCount++;
         return true;
     }
@@ -148,9 +151,9 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
 
     @Override // java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
     public void clear() {
-        if (this.b != 0) {
-            Arrays.fill(this.c, 0, this.b, (Object) null);
-            this.b = 0;
+        if (this.size != 0) {
+            Arrays.fill(this.elements, 0, this.size, (Object) null);
+            this.size = 0;
             this.modCount++;
         }
     }
@@ -158,7 +161,7 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
     public Object clone() {
         try {
             DirectAccessPathNodeArrayList directAccessPathNodeArrayList = (DirectAccessPathNodeArrayList) super.clone();
-            directAccessPathNodeArrayList.c = (PathOpenListNode[]) this.c.clone();
+            directAccessPathNodeArrayList.elements = (PathOpenListNode[]) this.elements.clone();
             return directAccessPathNodeArrayList;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
@@ -168,26 +171,26 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
     @Override // java.util.AbstractList, java.util.List
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
     public PathOpenListNode get(int i) {
-        if (i >= this.b) {
-            a(i, this.b);
+        if (i >= this.size) {
+            a(i, this.size);
         }
-        return this.c[i];
+        return this.elements[i];
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public final int size() {
-        return this.b;
+        return this.size;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public final boolean isEmpty() {
-        return this.b == 0;
+        return this.size == 0;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean contains(Object obj) {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
-        int i = this.b;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
+        int i = this.size;
         if (obj != null) {
             for (int i2 = 0; i2 < i; i2++) {
                 if (obj.equals(pathOpenListNodeArr[i2])) {
@@ -206,8 +209,8 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
 
     @Override // java.util.AbstractList, java.util.List
     public int indexOf(Object obj) {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
-        int i = this.b;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
+        int i = this.size;
         if (obj != null) {
             for (int i2 = 0; i2 < i; i2++) {
                 if (obj.equals(pathOpenListNodeArr[i2])) {
@@ -226,16 +229,16 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
 
     @Override // java.util.AbstractList, java.util.List
     public int lastIndexOf(Object obj) {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
         if (obj != null) {
-            for (int i = this.b - 1; i >= 0; i--) {
+            for (int i = this.size - 1; i >= 0; i--) {
                 if (obj.equals(pathOpenListNodeArr[i])) {
                     return i;
                 }
             }
             return -1;
         }
-        for (int i2 = this.b - 1; i2 >= 0; i2--) {
+        for (int i2 = this.size - 1; i2 >= 0; i2--) {
             if (pathOpenListNodeArr[i2] == null) {
                 return i2;
             }
@@ -246,8 +249,8 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
     @Override // java.util.AbstractList, java.util.List
     /* JADX INFO: renamed from: b, reason: merged with bridge method [inline-methods] */
     public PathOpenListNode remove(int i) {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
-        int i2 = this.b;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
+        int i2 = this.size;
         if (i >= i2) {
             a(i, i2);
         }
@@ -255,31 +258,31 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
         int i3 = i2 - 1;
         System.arraycopy(pathOpenListNodeArr, i + 1, pathOpenListNodeArr, i, i3 - i);
         pathOpenListNodeArr[i3] = null;
-        this.b = i3;
+        this.size = i3;
         this.modCount++;
         return pathOpenListNode;
     }
 
     public PathOpenListNode b() {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
-        int i = this.b - 1;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
+        int i = this.size - 1;
         PathOpenListNode pathOpenListNode = pathOpenListNodeArr[i];
         pathOpenListNodeArr[i] = null;
-        this.b = i;
+        this.size = i;
         return pathOpenListNode;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean remove(Object obj) {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
-        int i = this.b;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
+        int i = this.size;
         if (obj != null) {
             for (int i2 = 0; i2 < i; i2++) {
                 if (obj.equals(pathOpenListNodeArr[i2])) {
                     int i3 = i - 1;
                     System.arraycopy(pathOpenListNodeArr, i2 + 1, pathOpenListNodeArr, i2, i3 - i2);
                     pathOpenListNodeArr[i3] = null;
-                    this.b = i3;
+                    this.size = i3;
                     this.modCount++;
                     return true;
                 }
@@ -291,7 +294,7 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
                 int i5 = i - 1;
                 System.arraycopy(pathOpenListNodeArr, i4 + 1, pathOpenListNodeArr, i4, i5 - i4);
                 pathOpenListNodeArr[i5] = null;
-                this.b = i5;
+                this.size = i5;
                 this.modCount++;
                 return true;
             }
@@ -304,13 +307,13 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
         if (i == i2) {
             return;
         }
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
-        int i3 = this.b;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
+        int i3 = this.size;
         if (i >= i3) {
-            throw new IndexOutOfBoundsException("fromIndex " + i + " >= size " + this.b);
+            throw new IndexOutOfBoundsException("fromIndex " + i + " >= size " + this.size);
         }
         if (i2 > i3) {
-            throw new IndexOutOfBoundsException("toIndex " + i2 + " > size " + this.b);
+            throw new IndexOutOfBoundsException("toIndex " + i2 + " > size " + this.size);
         }
         if (i > i2) {
             throw new IndexOutOfBoundsException("fromIndex " + i + " > toIndex " + i2);
@@ -318,16 +321,16 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
         System.arraycopy(pathOpenListNodeArr, i2, pathOpenListNodeArr, i, i3 - i2);
         int i4 = i2 - i;
         Arrays.fill(pathOpenListNodeArr, i3 - i4, i3, (Object) null);
-        this.b = i3 - i4;
+        this.size = i3 - i4;
         this.modCount++;
     }
 
     @Override // java.util.AbstractList, java.util.List
     /* JADX INFO: renamed from: b, reason: merged with bridge method [inline-methods] */
     public PathOpenListNode set(int i, PathOpenListNode pathOpenListNode) {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
-        if (i >= this.b) {
-            a(i, this.b);
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
+        if (i >= this.size) {
+            a(i, this.size);
         }
         PathOpenListNode pathOpenListNode2 = pathOpenListNodeArr[i];
         pathOpenListNodeArr[i] = pathOpenListNode;
@@ -336,19 +339,19 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public Object[] toArray() {
-        int i = this.b;
+        int i = this.size;
         Object[] objArr = new Object[i];
-        System.arraycopy(this.c, 0, objArr, 0, i);
+        System.arraycopy(this.elements, 0, objArr, 0, i);
         return objArr;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public Object[] toArray(Object[] objArr) {
-        int i = this.b;
+        int i = this.size;
         if (objArr.length < i) {
             objArr = (Object[]) Array.newInstance(objArr.getClass().getComponentType(), i);
         }
-        System.arraycopy(this.c, 0, objArr, 0, i);
+        System.arraycopy(this.elements, 0, objArr, 0, i);
         if (objArr.length > i) {
             objArr[i] = null;
         }
@@ -362,9 +365,9 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
 
     @Override // java.util.AbstractList, java.util.Collection, java.util.List
     public int hashCode() {
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
         int iHashCode = 1;
-        int i = this.b;
+        int i = this.size;
         for (int i2 = 0; i2 < i; i2++) {
             PathOpenListNode pathOpenListNode = pathOpenListNodeArr[i2];
             iHashCode = (31 * iHashCode) + (pathOpenListNode == null ? 0 : pathOpenListNode.hashCode());
@@ -381,11 +384,11 @@ public final class DirectAccessPathNodeArrayList extends AbstractList<PathOpenLi
             return false;
         }
         List list = (List) obj;
-        int i = this.b;
+        int i = this.size;
         if (list.size() != i) {
             return false;
         }
-        PathOpenListNode[] pathOpenListNodeArr = this.c;
+        PathOpenListNode[] pathOpenListNodeArr = this.elements;
         if (list instanceof RandomAccess) {
             for (int i2 = 0; i2 < i; i2++) {
                 PathOpenListNode pathOpenListNode = pathOpenListNodeArr[i2];

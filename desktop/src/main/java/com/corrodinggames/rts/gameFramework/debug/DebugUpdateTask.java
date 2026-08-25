@@ -24,10 +24,10 @@ class DebugUpdateTask implements Runnable {
             }
             gameEngine.musicManager.quickFade = true;
             if (!gameEngine.musicManager.isFading()) {
-                DebugServer.e += 1.0f;
+                DebugServer.updateTimer += 1.0f;
             }
-            if (DebugServer.e > 5.0f) {
-                DebugServer.e = 0.0f;
+            if (DebugServer.updateTimer > 5.0f) {
+                DebugServer.updateTimer = 0.0f;
                 System.gc();
                 System.gc();
                 gameEngine.musicManager.skipToNextTrack();

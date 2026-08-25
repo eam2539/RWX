@@ -991,7 +991,7 @@ public final class PathSolver implements Runnable {
         final long currentTimeMillis = System.currentTimeMillis();
         b.c = n4;
         b.d = n5;
-        e.b = b;
+        e.flowField = b;
         PathEngine.e = e;
         this.z = GameEngine.getCurrentTimeMillis();
         if (PathEngine.a) {

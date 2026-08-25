@@ -216,7 +216,7 @@ public final class GameViewUtils {
         if (!tileMap.isInBounds(i, i2)) {
             return (short) -2;
         }
-        return pathCostMapA.g[(i * pathCostMapA.c) + i2];
+        return pathCostMapA.g[(i * pathCostMapA.height) + i2];
     }
 
     public static int c(float f2, float f3, UnitMovementType unitMovementType) {
@@ -310,12 +310,12 @@ public final class GameViewUtils {
         Iterator it = c.iterator();
         while (it.hasNext()) {
             DebugDrawItem debugDrawItem = (DebugDrawItem) it.next();
-            if (debugDrawItem.e <= 0.0f) {
+            if (debugDrawItem.remainingTime <= 0.0f) {
                 it.remove();
             } else {
-                debugDrawItem.e -= f2;
-                if (f2 == 0.0f && debugDrawItem.e < 1.0f) {
-                    debugDrawItem.e = -1.0f;
+                debugDrawItem.remainingTime -= f2;
+                if (f2 == 0.0f && debugDrawItem.remainingTime < 1.0f) {
+                    debugDrawItem.remainingTime = -1.0f;
                 }
             }
         }
@@ -327,24 +327,24 @@ public final class GameViewUtils {
         }
         GameEngine gameEngine = GameEngine.getInstance();
         for (DebugDrawItem debugDrawItem : c) {
-            float f3 = debugDrawItem.b.a;
-            float f4 = debugDrawItem.b.b;
-            float f5 = debugDrawItem.b.c;
-            float f6 = debugDrawItem.b.d;
+            float f3 = debugDrawItem.rect.a;
+            float f4 = debugDrawItem.rect.b;
+            float f5 = debugDrawItem.rect.c;
+            float f6 = debugDrawItem.rect.d;
             if (debugDrawItem.d) {
                 f3 -= GameEngine.getInstance().viewpointXSnapped;
                 f4 -= GameEngine.getInstance().viewpointYSnapped;
                 f5 -= GameEngine.getInstance().viewpointXSnapped;
                 f6 -= GameEngine.getInstance().viewpointYSnapped;
             }
-            if (debugDrawItem.c) {
-                gameEngine.renderGraphicsEngine.a(f3, f4, f5, f6, debugDrawItem.a);
+            if (debugDrawItem.isExpired) {
+                gameEngine.renderGraphicsEngine.a(f3, f4, f5, f6, debugDrawItem.paint);
             } else {
                 if (debugDrawItem.d) {
                 }
-                gameEngine.renderGraphicsEngine.a(debugDrawItem.b, debugDrawItem.a);
+                gameEngine.renderGraphicsEngine.a(debugDrawItem.rect, debugDrawItem.paint);
             }
-            if (debugDrawItem.f != null) {
+            if (debugDrawItem.text != null) {
                 gameEngine.renderGraphicsEngine.i();
                 gameEngine.restoreZoomTransform();
                 float f7 = f5;
@@ -353,7 +353,7 @@ public final class GameViewUtils {
                     f7 *= gameEngine.zoom;
                     f8 *= gameEngine.zoom;
                 }
-                gameEngine.renderGraphicsEngine.a(debugDrawItem.f, f7, f8, debugDrawItem.a);
+                gameEngine.renderGraphicsEngine.a(debugDrawItem.text, f7, f8, debugDrawItem.paint);
                 gameEngine.renderGraphicsEngine.j();
             }
         }

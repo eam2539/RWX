@@ -8,57 +8,62 @@ import java.util.NoSuchElementException;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.utility.v */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/utility/v.class */
 class UnitListIterator implements Iterator {
-    private int b;
-    private int c;
-    private int d;
+    /* JADX INFO: renamed from: b */
+    private int remaining;
+
+    /* JADX INFO: renamed from: c */
+    private int lastRetrieved;
+
+    /* JADX INFO: renamed from: d */
+    private int expectedModCount;
     final /* synthetic */ UnitList a;
 
     UnitListIterator(UnitList unitList) {
         this.a = unitList;
-        this.b = this.a.b;
-        this.c = -1;
-        this.d = UnitList.e(this.a);
+        this.remaining = this.a.b;
+        this.lastRetrieved = -1;
+        this.expectedModCount = UnitList.e(this.a);
     }
 
     @Override // java.util.Iterator
     public boolean hasNext() {
-        return this.b != 0;
+        return this.remaining != 0;
     }
 
     @Override // java.util.Iterator
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
     public BaseUnit next() {
         UnitList unitList = this.a;
-        int i = this.b;
-        if (UnitList.e(unitList) != this.d) {
+        int i = this.remaining;
+        if (UnitList.e(unitList) != this.expectedModCount) {
             throw new ConcurrentModificationException();
         }
         if (i == 0) {
             throw new NoSuchElementException();
         }
-        this.b = i - 1;
+        this.remaining = i - 1;
         BaseUnit[] baseUnitArr = unitList.c;
         int i2 = unitList.b - i;
-        this.c = i2;
+        this.lastRetrieved = i2;
         return baseUnitArr[i2];
     }
 
     @Override // java.util.Iterator
     public void remove() {
         BaseUnit[] baseUnitArr = this.a.c;
-        int i = this.c;
-        if (UnitList.e(this.a) != this.d) {
+        int i = this.lastRetrieved;
+        if (UnitList.e(this.a) != this.expectedModCount) {
             throw new ConcurrentModificationException();
         }
         if (i < 0) {
             throw new IllegalStateException();
         }
-        System.arraycopy(baseUnitArr, i + 1, baseUnitArr, i, this.b);
+        System.arraycopy(baseUnitArr, i + 1, baseUnitArr, i, this.remaining);
         UnitList unitList = this.a;
         int i2 = unitList.b - 1;
         unitList.b = i2;
         baseUnitArr[i2] = null;
-        this.c = -1;
-        this.d = UnitList.d(this.a);
+        this.lastRetrieved = -1;
+        this.expectedModCount = UnitList.d(this.a);
     }
 }

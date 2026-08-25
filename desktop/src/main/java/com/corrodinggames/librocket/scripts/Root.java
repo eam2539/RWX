@@ -1575,13 +1575,13 @@ public class Root extends ScriptContext {
             activeElementById2.hide();
         }
         activeElementById.setInnerRML(VariableScope.nullOrMissingString);
-        ConcurrentLinkedQueue<ChatMessage> concurrentLinkedQueueB = gameEngine.networkEngine.chatLog.b();
+        ConcurrentLinkedQueue<ChatMessage> concurrentLinkedQueueB = gameEngine.networkEngine.chatLog.getMessages();
         StringBuffer stringBuffer = new StringBuffer();
         for (ChatMessage chatMessage : concurrentLinkedQueueB) {
             if (attributeBoolean) {
-                stringBuffer.insert(0, "<div>" + chatMessage.b() + "</div>");
+                stringBuffer.insert(0, "<div>" + chatMessage.getHtmlText() + "</div>");
             } else {
-                stringBuffer.append("<div>" + chatMessage.b() + "</div>");
+                stringBuffer.append("<div>" + chatMessage.getHtmlText() + "</div>");
             }
         }
         stringBuffer.append("<div id='chatLastRowSpacer'></div>");

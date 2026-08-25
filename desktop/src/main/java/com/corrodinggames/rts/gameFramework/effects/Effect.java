@@ -16,19 +16,29 @@ import java.io.IOException;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/d/e.class */
 public final class Effect {
     private final EffectManager ay;
-    public GameObject b;
-    public boolean c;
+        /* JADX INFO: renamed from: b */
+    public GameObject parentObject;
+        /* JADX INFO: renamed from: c */
+    public boolean ignoreParentZ;
     public boolean d;
     public int g;
-    public boolean o;
+        /* JADX INFO: renamed from: o */
+    public boolean isActive;
     public boolean p;
-    public boolean r;
-    public boolean s;
-    public float t;
-    public boolean u;
-    public boolean v;
-    public int x;
-    public int y;
+        /* JADX INFO: renamed from: r */
+    public boolean fadeIn;
+        /* JADX INFO: renamed from: s */
+    public boolean fadeOut;
+        /* JADX INFO: renamed from: t */
+    public float fadeDuration;
+        /* JADX INFO: renamed from: u */
+    public boolean useGravity;
+        /* JADX INFO: renamed from: v */
+    public boolean useBounce;
+        /* JADX INFO: renamed from: x */
+    public int startColor;
+        /* JADX INFO: renamed from: y */
+    public int endColor;
     public short A;
     public float E;
     public float F;
@@ -123,20 +133,20 @@ public final class Effect {
 
     /* JADX INFO: renamed from: b */
     public void reset() {
-        if (this.o) {
-            this.o = false;
+        if (this.isActive) {
+            this.isActive = false;
             this.ay.activeEffectsCount--;
             EffectManager.useStrictCounting = true;
             if (this.a.alsoEmitEffectsOnDeath != null && this.A < 20) {
                 float f = this.I;
                 float f2 = this.J;
                 float f3 = this.K;
-                if (this.b != null) {
-                    f += this.b.posX;
-                    f2 += this.b.posY;
-                    f3 += this.b.posZ;
+                if (this.parentObject != null) {
+                    f += this.parentObject.posX;
+                    f2 += this.parentObject.posY;
+                    f3 += this.parentObject.posZ;
                 }
-                this.a.alsoEmitEffectsOnDeath.a(f, f2, f3, this.Y, this.b, 0, this.A);
+                this.a.alsoEmitEffectsOnDeath.a(f, f2, f3, this.Y, this.parentObject, 0, this.A);
             }
         }
     }
@@ -145,8 +155,8 @@ public final class Effect {
     public void free() {
         this.a = EffectTemplate.defaultEffectTemplate;
         this.q = EffectQuality.verylow;
-        this.b = null;
-        this.c = false;
+        this.parentObject = null;
+        this.ignoreParentZ = false;
         this.d = false;
         this.e = true;
         this.f = false;
@@ -176,14 +186,14 @@ public final class Effect {
         this.V = 15.0f;
         this.W = this.V;
         this.X = 0.0f;
-        this.r = false;
-        this.s = false;
-        this.t = 0.0f;
+        this.fadeIn = false;
+        this.fadeOut = false;
+        this.fadeDuration = 0.0f;
         this.F = 1.0f;
         this.G = 1.0f;
         this.H = false;
-        this.u = false;
-        this.v = false;
+        this.useGravity = false;
+        this.useBounce = false;
         this.w = 1.0f;
         this.E = 1.0f;
         this.Y = 0.0f;
@@ -198,9 +208,9 @@ public final class Effect {
         this.ac = 0.0f;
         this.ad = 0.0f;
         this.A = (short) 0;
-        this.x = -1;
+        this.startColor = -1;
         this.B = null;
-        this.y = -1;
+        this.endColor = -1;
         this.z = -1.0f;
         this.at.a((ColorFilter) null);
         this.aw = false;
@@ -213,8 +223,8 @@ public final class Effect {
         this.a = effect.a;
         this.q = effect.q;
         this.g = effect.g;
-        this.b = effect.b;
-        this.c = effect.c;
+        this.parentObject = effect.parentObject;
+        this.ignoreParentZ = effect.ignoreParentZ;
         this.d = effect.d;
         this.e = effect.e;
         this.p = effect.p;
@@ -242,14 +252,14 @@ public final class Effect {
         this.V = effect.V;
         this.W = effect.W;
         this.X = effect.X;
-        this.r = effect.r;
-        this.s = effect.s;
-        this.t = effect.t;
+        this.fadeIn = effect.fadeIn;
+        this.fadeOut = effect.fadeOut;
+        this.fadeDuration = effect.fadeDuration;
         this.F = effect.F;
         this.G = effect.G;
         this.H = effect.H;
-        this.u = effect.u;
-        this.v = effect.v;
+        this.useGravity = effect.useGravity;
+        this.useBounce = effect.useBounce;
         this.w = effect.w;
         this.E = effect.E;
         this.Y = effect.Y;
@@ -264,8 +274,8 @@ public final class Effect {
         this.ac = effect.ac;
         this.ad = effect.ad;
         this.A = effect.A;
-        this.x = effect.x;
-        this.y = effect.y;
+        this.startColor = effect.startColor;
+        this.endColor = effect.endColor;
         this.z = effect.z;
         this.B = effect.B;
         this.as = effect.as;
@@ -278,7 +288,7 @@ public final class Effect {
             return;
         }
         this.V -= f;
-        if (this.b != null && this.b.isDestroyed && !this.a.liveAfterAttachedDies) {
+        if (this.parentObject != null && this.parentObject.isDestroyed && !this.a.liveAfterAttachedDies) {
             this.V = -1.0f;
         }
         if (this.V < 0.0f) {
@@ -315,11 +325,11 @@ public final class Effect {
             }
             this.ap = (int) this.ak;
         }
-        if (this.u) {
+        if (this.useGravity) {
             this.R -= (this.R * 0.002f) * f;
             this.P -= f * 0.0015f;
         }
-        if (this.v) {
+        if (this.useBounce) {
             if (this.K > 0.0f) {
                 this.R -= (0.1f * this.w) * f;
             } else {
@@ -351,12 +361,12 @@ public final class Effect {
                     float f2 = this.I;
                     float f3 = this.J;
                     float f4 = this.K;
-                    if (this.b != null) {
-                        f2 += this.b.posX;
-                        f3 += this.b.posY;
-                        f4 += this.b.posZ;
+                    if (this.parentObject != null) {
+                        f2 += this.parentObject.posX;
+                        f3 += this.parentObject.posY;
+                        f4 += this.parentObject.posZ;
                     }
-                    this.a.trailEffect.a(f2, f3, f4, this.Y, this.b, 0, this.A);
+                    this.a.trailEffect.a(f2, f3, f4, this.Y, this.parentObject, 0, this.A);
                 }
             }
         }
@@ -422,11 +432,11 @@ public final class Effect {
         if (this.ao != 0.0f) {
             rectF.a(0.0f, rectF.c() * this.ao * fFromHexString);
         }
-        if (this.b != null) {
-            if (!z && !this.c) {
-                rectF.a(this.b.posX, this.b.posY - this.b.posZ);
+        if (this.parentObject != null) {
+            if (!z && !this.ignoreParentZ) {
+                rectF.a(this.parentObject.posX, this.parentObject.posY - this.parentObject.posZ);
             } else {
-                rectF.a(this.b.posX, this.b.posY);
+                rectF.a(this.parentObject.posX, this.parentObject.posY);
             }
         }
         if ((!z2 || this.L) && !Utility.rectanglesOverlap(gameEngine.bufferedVisibleWorldRect, rectF)) {
@@ -450,11 +460,11 @@ public final class Effect {
         float f3 = 1.0f;
         float f4 = 1.0f;
         boolean z4 = false;
-        if (this.x != -1) {
-            fA = Color.a(this.x) * 0.003921569f;
-            int iB = Color.b(this.x);
-            int iC = Color.c(this.x);
-            int iD = Color.d(this.x);
+        if (this.startColor != -1) {
+            fA = Color.a(this.startColor) * 0.003921569f;
+            int iB = Color.b(this.startColor);
+            int iC = Color.c(this.startColor);
+            int iD = Color.d(this.startColor);
             if (iB != 255 || iC != 255 || iD != 255) {
                 z4 = true;
                 f2 = iB * 0.003921569f;
@@ -463,10 +473,10 @@ public final class Effect {
             }
         }
         if (this.z >= 0.0f) {
-            float fA2 = Color.a(this.y) * 0.003921569f;
-            float fB = Color.b(this.y) * 0.003921569f;
-            float fC = Color.c(this.y) * 0.003921569f;
-            float fD = Color.d(this.y) * 0.003921569f;
+            float fA2 = Color.a(this.endColor) * 0.003921569f;
+            float fB = Color.b(this.endColor) * 0.003921569f;
+            float fC = Color.c(this.endColor) * 0.003921569f;
+            float fD = Color.d(this.endColor) * 0.003921569f;
             if (this.z <= f) {
                 fA = fA2;
                 z4 = true;
@@ -483,10 +493,10 @@ public final class Effect {
                 f4 = (f4 * f6) + (fD * f5);
             }
         }
-        if (this.r && f >= this.t) {
-            fClampTo255 = fA * (this.V / (this.W - this.t)) * this.E;
-        } else if (this.s && f < this.t) {
-            fClampTo255 = fA * (f / this.t) * this.E;
+        if (this.fadeIn && f >= this.fadeDuration) {
+            fClampTo255 = fA * (this.V / (this.W - this.fadeDuration)) * this.E;
+        } else if (this.fadeOut && f < this.fadeDuration) {
+            fClampTo255 = fA * (f / this.fadeDuration) * this.E;
         } else {
             fClampTo255 = fA * this.E;
         }

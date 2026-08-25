@@ -12,10 +12,17 @@ import java.util.RandomAccess;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.utility.o */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/utility/o.class */
 public final class TransactionalArrayList<T> extends AbstractList<T> implements Serializable, Cloneable, RandomAccess {
-    public int c;
-    public FastArrayList<ListOperationEntry> a = new FastArrayList();
-    public FastArrayList<ListOperationEntry> b = new FastArrayList();
-    transient Object[] d = EmptyArrays.EMPTY_OBJECT;
+    /* JADX INFO: renamed from: c */
+    public int size;
+
+    /* JADX INFO: renamed from: a */
+    public FastArrayList<ListOperationEntry> pendingOperations = new FastArrayList();
+
+    /* JADX INFO: renamed from: b */
+    public FastArrayList<ListOperationEntry> completedOperations = new FastArrayList();
+
+    /* JADX INFO: renamed from: d */
+    transient Object[] elements = EmptyArrays.EMPTY_OBJECT;
 
     static /* synthetic */ int e(TransactionalArrayList transactionalArrayList) {
         return transactionalArrayList.modCount;
@@ -29,76 +36,76 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
 
     public void a(Object obj) {
         ListOperationEntry listOperationEntry;
-        if (this.b.size != 0) {
-            listOperationEntry = (ListOperationEntry) this.b.b();
+        if (this.completedOperations.size != 0) {
+            listOperationEntry = (ListOperationEntry) this.completedOperations.b();
         } else {
             listOperationEntry = new ListOperationEntry();
         }
-        listOperationEntry.a = ListOperation.add;
-        listOperationEntry.b = obj;
-        this.a.add(listOperationEntry);
+        listOperationEntry.operation = ListOperation.add;
+        listOperationEntry.value = obj;
+        this.pendingOperations.add(listOperationEntry);
     }
 
     public void b(Object obj) {
         ListOperationEntry listOperationEntry;
-        if (this.b.size != 0) {
-            listOperationEntry = (ListOperationEntry) this.b.b();
+        if (this.completedOperations.size != 0) {
+            listOperationEntry = (ListOperationEntry) this.completedOperations.b();
         } else {
             listOperationEntry = new ListOperationEntry();
         }
-        listOperationEntry.a = ListOperation.remove;
-        listOperationEntry.b = obj;
-        this.a.add(listOperationEntry);
+        listOperationEntry.operation = ListOperation.remove;
+        listOperationEntry.value = obj;
+        this.pendingOperations.add(listOperationEntry);
     }
 
     public void a() {
         this.modCount++;
-        if (this.a.size != 0) {
-            for (ListOperationEntry listOperationEntry : this.a) {
-                if (listOperationEntry.a == ListOperation.add) {
-                    Object obj = listOperationEntry.b;
+        if (this.pendingOperations.size != 0) {
+            for (ListOperationEntry listOperationEntry : this.pendingOperations) {
+                if (listOperationEntry.operation == ListOperation.add) {
+                    Object obj = listOperationEntry.value;
                     if (obj == null) {
                         throw new RuntimeException("Trying to insert null into array");
                     }
                     add(obj);
-                } else if (listOperationEntry.a == ListOperation.remove) {
-                    remove(listOperationEntry.b);
+                } else if (listOperationEntry.operation == ListOperation.remove) {
+                    remove(listOperationEntry.value);
                 } else {
-                    throw new RuntimeException("Unknown operationType:" + listOperationEntry.a);
+                    throw new RuntimeException("Unknown operationType:" + listOperationEntry.operation);
                 }
-                listOperationEntry.b = null;
+                listOperationEntry.value = null;
             }
-            if (this.a.size() < 100) {
-                this.b.addAll(this.a);
+            if (this.pendingOperations.size() < 100) {
+                this.completedOperations.addAll(this.pendingOperations);
             }
-            this.a.clear();
+            this.pendingOperations.clear();
         }
     }
 
     public Object[] b() {
-        return this.d;
+        return this.elements;
     }
 
     @Override // java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean add(Object obj) {
-        Object[] objArr = this.d;
-        int i = this.c;
+        Object[] objArr = this.elements;
+        int i = this.size;
         if (i == objArr.length) {
             Object[] objArr2 = new Object[i + (i < 6 ? 12 : i >> 1)];
             System.arraycopy(objArr, 0, objArr2, 0, i);
             objArr = objArr2;
-            this.d = objArr2;
+            this.elements = objArr2;
         }
         objArr[i] = obj;
-        this.c = i + 1;
+        this.size = i + 1;
         this.modCount++;
         return true;
     }
 
     @Override // java.util.AbstractList, java.util.List
     public void add(int i, Object obj) {
-        Object[] objArr = this.d;
-        int i2 = this.c;
+        Object[] objArr = this.elements;
+        int i2 = this.size;
         if (i > i2 || i < 0) {
             a(i, i2);
         }
@@ -109,10 +116,10 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
             System.arraycopy(objArr, 0, objArr2, 0, i);
             System.arraycopy(objArr, i, objArr2, i + 1, i2 - i);
             objArr = objArr2;
-            this.d = objArr2;
+            this.elements = objArr2;
         }
         objArr[i] = obj;
-        this.c = i2 + 1;
+        this.size = i2 + 1;
         this.modCount++;
     }
 
@@ -127,24 +134,24 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
         if (length == 0) {
             return false;
         }
-        Object[] objArr = this.d;
-        int i = this.c;
+        Object[] objArr = this.elements;
+        int i = this.size;
         int i2 = i + length;
         if (i2 > objArr.length) {
             Object[] objArr2 = new Object[a(i2 - 1)];
             System.arraycopy(objArr, 0, objArr2, 0, i);
             objArr = objArr2;
-            this.d = objArr2;
+            this.elements = objArr2;
         }
         System.arraycopy(array, 0, objArr, i, length);
-        this.c = i2;
+        this.size = i2;
         this.modCount++;
         return true;
     }
 
     @Override // java.util.AbstractList, java.util.List
     public boolean addAll(int i, Collection collection) {
-        int i2 = this.c;
+        int i2 = this.size;
         if (i > i2 || i < 0) {
             a(i, i2);
         }
@@ -153,7 +160,7 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
         if (length == 0) {
             return false;
         }
-        Object[] objArr = this.d;
+        Object[] objArr = this.elements;
         int i3 = i2 + length;
         if (i3 <= objArr.length) {
             System.arraycopy(objArr, i, objArr, i + length, i2 - i);
@@ -162,10 +169,10 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
             System.arraycopy(objArr, 0, objArr2, 0, i);
             System.arraycopy(objArr, i, objArr2, i + length, i2 - i);
             objArr = objArr2;
-            this.d = objArr2;
+            this.elements = objArr2;
         }
         System.arraycopy(array, 0, objArr, i, length);
-        this.c = i3;
+        this.size = i3;
         this.modCount++;
         return true;
     }
@@ -176,10 +183,10 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
 
     @Override // java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
     public synchronized void clear() {
-        this.a.clear();
-        if (this.c != 0) {
-            Arrays.fill(this.d, 0, this.c, (Object) null);
-            this.c = 0;
+        this.pendingOperations.clear();
+        if (this.size != 0) {
+            Arrays.fill(this.elements, 0, this.size, (Object) null);
+            this.size = 0;
             this.modCount++;
         }
     }
@@ -187,7 +194,7 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
     public Object clone() {
         try {
             TransactionalArrayList transactionalArrayList = (TransactionalArrayList) super.clone();
-            transactionalArrayList.d = (Object[]) this.d.clone();
+            transactionalArrayList.elements = (Object[]) this.elements.clone();
             return transactionalArrayList;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
@@ -196,26 +203,26 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
 
     @Override // java.util.AbstractList, java.util.List
     public T get(int i) {
-        if (i >= this.c) {
-            a(i, this.c);
+        if (i >= this.size) {
+            a(i, this.size);
         }
-        return (T) this.d[i];
+        return (T) this.elements[i];
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public int size() {
-        return this.c;
+        return this.size;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean isEmpty() {
-        return this.c == 0;
+        return this.size == 0;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean contains(Object obj) {
-        Object[] objArr = this.d;
-        int i = this.c;
+        Object[] objArr = this.elements;
+        int i = this.size;
         if (obj != null) {
             for (int i2 = 0; i2 < i; i2++) {
                 if (obj.equals(objArr[i2])) {
@@ -234,8 +241,8 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
 
     @Override // java.util.AbstractList, java.util.List
     public int indexOf(Object obj) {
-        Object[] objArr = this.d;
-        int i = this.c;
+        Object[] objArr = this.elements;
+        int i = this.size;
         if (obj != null) {
             for (int i2 = 0; i2 < i; i2++) {
                 if (obj.equals(objArr[i2])) {
@@ -254,16 +261,16 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
 
     @Override // java.util.AbstractList, java.util.List
     public int lastIndexOf(Object obj) {
-        Object[] objArr = this.d;
+        Object[] objArr = this.elements;
         if (obj != null) {
-            for (int i = this.c - 1; i >= 0; i--) {
+            for (int i = this.size - 1; i >= 0; i--) {
                 if (obj.equals(objArr[i])) {
                     return i;
                 }
             }
             return -1;
         }
-        for (int i2 = this.c - 1; i2 >= 0; i2--) {
+        for (int i2 = this.size - 1; i2 >= 0; i2--) {
             if (objArr[i2] == null) {
                 return i2;
             }
@@ -273,8 +280,8 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
 
     @Override // java.util.AbstractList, java.util.List
     public T remove(int i) {
-        Object[] objArr = this.d;
-        int i2 = this.c;
+        Object[] objArr = this.elements;
+        int i2 = this.size;
         if (i >= i2) {
             a(i, i2);
         }
@@ -282,22 +289,22 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
         int i3 = i2 - 1;
         System.arraycopy(objArr, i + 1, objArr, i, i3 - i);
         objArr[i3] = null;
-        this.c = i3;
+        this.size = i3;
         this.modCount++;
         return (T) obj;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean remove(Object obj) {
-        Object[] objArr = this.d;
-        int i = this.c;
+        Object[] objArr = this.elements;
+        int i = this.size;
         if (obj != null) {
             for (int i2 = 0; i2 < i; i2++) {
                 if (obj.equals(objArr[i2])) {
                     int i3 = i - 1;
                     System.arraycopy(objArr, i2 + 1, objArr, i2, i3 - i2);
                     objArr[i3] = null;
-                    this.c = i3;
+                    this.size = i3;
                     this.modCount++;
                     return true;
                 }
@@ -309,7 +316,7 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
                 int i5 = i - 1;
                 System.arraycopy(objArr, i4 + 1, objArr, i4, i5 - i4);
                 objArr[i5] = null;
-                this.c = i5;
+                this.size = i5;
                 this.modCount++;
                 return true;
             }
@@ -322,13 +329,13 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
         if (i == i2) {
             return;
         }
-        Object[] objArr = this.d;
-        int i3 = this.c;
+        Object[] objArr = this.elements;
+        int i3 = this.size;
         if (i >= i3) {
-            throw new IndexOutOfBoundsException("fromIndex " + i + " >= size " + this.c);
+            throw new IndexOutOfBoundsException("fromIndex " + i + " >= size " + this.size);
         }
         if (i2 > i3) {
-            throw new IndexOutOfBoundsException("toIndex " + i2 + " > size " + this.c);
+            throw new IndexOutOfBoundsException("toIndex " + i2 + " > size " + this.size);
         }
         if (i > i2) {
             throw new IndexOutOfBoundsException("fromIndex " + i + " > toIndex " + i2);
@@ -336,15 +343,15 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
         System.arraycopy(objArr, i2, objArr, i, i3 - i2);
         int i4 = i2 - i;
         Arrays.fill(objArr, i3 - i4, i3, (Object) null);
-        this.c = i3 - i4;
+        this.size = i3 - i4;
         this.modCount++;
     }
 
     @Override // java.util.AbstractList, java.util.List
     public Object set(int i, Object obj) {
-        Object[] objArr = this.d;
-        if (i >= this.c) {
-            a(i, this.c);
+        Object[] objArr = this.elements;
+        if (i >= this.size) {
+            a(i, this.size);
         }
         Object obj2 = objArr[i];
         objArr[i] = obj;
@@ -353,19 +360,19 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public Object[] toArray() {
-        int i = this.c;
+        int i = this.size;
         Object[] objArr = new Object[i];
-        System.arraycopy(this.d, 0, objArr, 0, i);
+        System.arraycopy(this.elements, 0, objArr, 0, i);
         return objArr;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public Object[] toArray(Object[] objArr) {
-        int i = this.c;
+        int i = this.size;
         if (objArr.length < i) {
             objArr = (Object[]) Array.newInstance(objArr.getClass().getComponentType(), i);
         }
-        System.arraycopy(this.d, 0, objArr, 0, i);
+        System.arraycopy(this.elements, 0, objArr, 0, i);
         if (objArr.length > i) {
             objArr[i] = null;
         }
@@ -379,9 +386,9 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
 
     @Override // java.util.AbstractList, java.util.Collection, java.util.List
     public int hashCode() {
-        Object[] objArr = this.d;
+        Object[] objArr = this.elements;
         int iHashCode = 1;
-        int i = this.c;
+        int i = this.size;
         for (int i2 = 0; i2 < i; i2++) {
             Object obj = objArr[i2];
             iHashCode = (31 * iHashCode) + (obj == null ? 0 : obj.hashCode());
@@ -398,11 +405,11 @@ public final class TransactionalArrayList<T> extends AbstractList<T> implements 
             return false;
         }
         List list = (List) obj;
-        int i = this.c;
+        int i = this.size;
         if (list.size() != i) {
             return false;
         }
-        Object[] objArr = this.d;
+        Object[] objArr = this.elements;
         if (list instanceof RandomAccess) {
             for (int i2 = 0; i2 < i; i2++) {
                 Object obj2 = objArr[i2];

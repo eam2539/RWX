@@ -28,31 +28,42 @@ public class Helicopter extends AirUnit {
     static Texture e = null;
     static Texture[] f = new Texture[10];
     boolean g;
-    float o;
-    float p;
-    float q;
+    /* JADX INFO: renamed from: o */
+    float rotorSpeed;
+
+    /* JADX INFO: renamed from: p */
+    float bobPhase;
+
+    /* JADX INFO: renamed from: q */
+    float rotorPhase;
     Rect r;
     Rect s;
 
-    @Override // com.corrodinggames.rts.game.units.air.AirUnit, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
-    public void a(GameOutputStream gameOutputStream) throws IOException {
-        gameOutputStream.writeFloat(this.p);
-        gameOutputStream.writeFloat(this.o);
-        super.a(gameOutputStream);
+    public Helicopter(boolean z) {
+        super(z);
+        this.g = false;
+        this.bobPhase = 0.0f;
+        this.r = new Rect();
+        this.s = new Rect();
+        T(26);
+        U(46);
+        this.radius = 13.0f;
+        this.displayRadius = this.radius + 2.0f;
+        this.maxHealth = 150.0f;
+        this.currentHealth = this.maxHealth;
+        this.baseTexture = b;
+        this.shadowTexture = d;
+        this.posZ = 0.0f;
+        this.rotorSpeed = 0.14f;
+        this.rotorPhase = 0.0f;
+        S(5);
     }
 
-    @Override // com.corrodinggames.rts.game.units.air.AirUnit, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject
-    public void a(GameInputStream gameInputStream) throws IOException {
-        if (gameInputStream.getProtocolVersion() >= 9) {
-            this.p = gameInputStream.readFloat();
-            this.o = gameInputStream.readFloat();
-            if (gameInputStream.getProtocolVersion() == 8) {
-                this.g = gameInputStream.readBoolean();
-            }
-        } else {
-            this.o = 0.5f;
-        }
-        super.a(gameInputStream);
+    @Override // com.corrodinggames.rts.game.units.air.AirUnit, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
+    public void a(GameOutputStream gameOutputStream) throws IOException {
+        gameOutputStream.writeFloat(this.bobPhase);
+        gameOutputStream.writeFloat(this.rotorSpeed);
+        super.a(gameOutputStream);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -89,24 +100,18 @@ public class Helicopter extends AirUnit {
         return null;
     }
 
-    public Helicopter(boolean z) {
-        super(z);
-        this.g = false;
-        this.p = 0.0f;
-        this.r = new Rect();
-        this.s = new Rect();
-        T(26);
-        U(46);
-        this.radius = 13.0f;
-        this.displayRadius = this.radius + 2.0f;
-        this.maxHealth = 150.0f;
-        this.currentHealth = this.maxHealth;
-        this.baseTexture = b;
-        this.shadowTexture = d;
-        this.posZ = 0.0f;
-        this.o = 0.14f;
-        this.q = 0.0f;
-        S(5);
+    @Override // com.corrodinggames.rts.game.units.air.AirUnit, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject
+    public void a(GameInputStream gameInputStream) throws IOException {
+        if (gameInputStream.getProtocolVersion() >= 9) {
+            this.bobPhase = gameInputStream.readFloat();
+            this.rotorSpeed = gameInputStream.readFloat();
+            if (gameInputStream.getProtocolVersion() == 8) {
+                this.g = gameInputStream.readBoolean();
+            }
+        } else {
+            this.rotorSpeed = 0.5f;
+        }
+        super.a(gameInputStream);
     }
 
     @Override // com.corrodinggames.rts.game.units.air.AirUnit, com.corrodinggames.rts.game.units.BaseUnit
@@ -122,7 +127,7 @@ public class Helicopter extends AirUnit {
     public void n() {
         super.n();
         this.posZ = 20.0f;
-        this.o = 0.5f;
+        this.rotorSpeed = 0.5f;
     }
 
     @Override // com.corrodinggames.rts.game.units.MovableUnit, com.corrodinggames.rts.game.units.OrderableUnit
@@ -142,18 +147,18 @@ public class Helicopter extends AirUnit {
         if (this.isDead) {
             return;
         }
-        this.o = Utility.distanceSq(this.o, 0.5f, 0.003f * f2);
-        this.q += 70.0f * this.o * f2;
-        if (this.q >= 360.0f) {
-            this.q -= 360.0f;
-            this.q += Utility.getDeterministicRandomInt(this, 0, 4);
+        this.rotorSpeed = Utility.distanceSq(this.rotorSpeed, 0.5f, 0.003f * f2);
+        this.rotorPhase += 70.0f * this.rotorSpeed * f2;
+        if (this.rotorPhase >= 360.0f) {
+            this.rotorPhase -= 360.0f;
+            this.rotorPhase += Utility.getDeterministicRandomInt(this, 0, 4);
         }
-        if (this.o > 0.4f) {
-            this.p += 2.0f * f2;
-            if (this.p > 360.0f) {
-                this.p -= 360.0f;
+        if (this.rotorSpeed > 0.4f) {
+            this.bobPhase += 2.0f * f2;
+            if (this.bobPhase > 360.0f) {
+                this.bobPhase -= 360.0f;
             }
-            this.posZ = Utility.distanceSq(this.posZ, 20.0f + (Utility.fastSin(this.p) * 1.5f), 0.1f * f2);
+            this.posZ = Utility.distanceSq(this.posZ, 20.0f + (Utility.fastSin(this.bobPhase) * 1.5f), 0.1f * f2);
         }
     }
 
@@ -244,7 +249,7 @@ public class Helicopter extends AirUnit {
             Paint paintAN = getRenderPaint();
             GameEngine gameEngine = GameEngine.getInstance();
             this.s.a(0, 0, c.m(), c.l());
-            float f3 = this.q;
+            float f3 = this.rotorPhase;
             if (this.isUnitStunned) {
             }
             gameEngine.renderGraphicsEngine.a(c, this.s, this.posX - GameEngine.getInstance().viewpointXSnapped, (this.posY - GameEngine.getInstance().viewpointYSnapped) - this.posZ, f3, paintAN);

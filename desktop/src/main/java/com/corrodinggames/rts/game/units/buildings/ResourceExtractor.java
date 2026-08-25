@@ -311,10 +311,10 @@ public class ResourceExtractor extends FactoryWithQueue {
         S(0);
         this.isAlive = false;
         gameEngine.soundEngine.playSound(SoundEngine.buildingExplodeSound, 0.8f, this.posX, this.posY);
-        EffectEmitter.a(this.posX, this.posY).j = -6684775;
+        EffectEmitter.a(this.posX, this.posY).startColorOverride = -6684775;
         EffectEmitter effectEmitterB = EffectEmitter.b(this.posX, this.posY);
-        effectEmitterB.a = 500.0f;
-        effectEmitterB.j = -6684775;
+        effectEmitterB.duration = 500.0f;
+        effectEmitterB.startColorOverride = -6684775;
         gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
         Effect effectCreateSmallExplosion = gameEngine.effectManager.createSmallExplosion(this.posX, this.posY, this.posZ, -1127220);
         if (effectCreateSmallExplosion != null) {
@@ -324,7 +324,7 @@ public class ResourceExtractor extends FactoryWithQueue {
             effectCreateSmallExplosion.V = 35.0f;
             effectCreateSmallExplosion.W = effectCreateSmallExplosion.V;
             effectCreateSmallExplosion.U = 0.0f;
-            effectCreateSmallExplosion.x = -13378253;
+            effectCreateSmallExplosion.startColor = -13378253;
         }
         bo();
         return false;

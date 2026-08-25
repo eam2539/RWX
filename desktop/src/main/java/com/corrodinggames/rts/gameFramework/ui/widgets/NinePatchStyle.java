@@ -9,10 +9,17 @@ import com.corrodinggames.rts.gameFramework.graphics.opengl.GraphicsUtils;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.a.e */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/a/e.class */
 public class NinePatchStyle extends UIStyle {
-    int a;
-    int b;
-    float c;
-    float d;
+    /* JADX INFO: renamed from: a */
+    int patchWidth;
+
+    /* JADX INFO: renamed from: b */
+    int patchHeight;
+
+    /* JADX INFO: renamed from: c */
+    float normalizedWidth;
+
+    /* JADX INFO: renamed from: d */
+    float normalizedHeight;
     public boolean e = true;
     public boolean f = false;
     public float g = 1.0f;
@@ -28,10 +35,10 @@ public class NinePatchStyle extends UIStyle {
     }
 
     public void a(Texture texture, int i2, int i3) {
-        this.a = i2;
-        this.b = i3;
-        this.c = i2 / (float) texture.p;
-        this.d = i3 / (float) texture.q;
+        this.patchWidth = i2;
+        this.patchHeight = i3;
+        this.normalizedWidth = i2 / (float) texture.p;
+        this.normalizedHeight = i3 / (float) texture.q;
     }
 
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
@@ -44,10 +51,10 @@ public class NinePatchStyle extends UIStyle {
     @Override // com.corrodinggames.rts.gameFramework.ui.widgets.UIStyle
     public void a(UIStyle uIStyle) {
         NinePatchStyle ninePatchStyle = (NinePatchStyle) uIStyle;
-        this.a = ninePatchStyle.a;
-        this.b = ninePatchStyle.b;
-        this.c = ninePatchStyle.c;
-        this.d = ninePatchStyle.d;
+        this.patchWidth = ninePatchStyle.patchWidth;
+        this.patchHeight = ninePatchStyle.patchHeight;
+        this.normalizedWidth = ninePatchStyle.normalizedWidth;
+        this.normalizedHeight = ninePatchStyle.normalizedHeight;
         this.e = ninePatchStyle.e;
         super.a(ninePatchStyle);
     }
@@ -65,7 +72,7 @@ public class NinePatchStyle extends UIStyle {
     }
 
     public void b(GraphicsEngine graphicsEngine, Rect rect) {
-        a(graphicsEngine, this.p, this.o, rect);
+        a(graphicsEngine, this.backgroundTexture, this.o, rect);
     }
 
     private boolean c() {
@@ -77,8 +84,8 @@ public class NinePatchStyle extends UIStyle {
         int i3 = rect.b;
         int iB = rect.b();
         int iC = rect.c();
-        int i4 = this.a;
-        int i5 = this.b;
+        int i4 = this.patchWidth;
+        int i5 = this.patchHeight;
         if (!this.e) {
             if (i4 > iB / 2) {
                 i4 = iB / 2;
@@ -96,22 +103,22 @@ public class NinePatchStyle extends UIStyle {
             if (i5 * f > i7) {
                 f = i7 / (float) i5;
             }
-            i4 = (int) (this.a * f);
-            i5 = (int) (this.b * f);
+            i4 = (int) (this.patchWidth * f);
+            i5 = (int) (this.patchHeight * f);
         }
         int i8 = iB - (2 * i4);
         int i9 = iC - (2 * i5);
-        float f2 = this.c;
-        float f3 = this.d;
+        float f2 = this.normalizedWidth;
+        float f3 = this.normalizedHeight;
         if (c()) {
             a(graphicsEngine, texture, paint, i2 + i4, i3 + 0, i8, i5, f2, 0.0f, 1.0f - f2, f3, this.f);
             a(graphicsEngine, texture, paint, i2 + 0, i3 + i5, i4, i9, 0.0f, f3, f2, 1.0f - f3, this.f);
             a(graphicsEngine, texture, paint, i2 + i4, (i3 + iC) - i5, i8, i5, f2, 1.0f - f3, 1.0f - f2, 1.0f, this.f);
             a(graphicsEngine, texture, paint, (i2 + iB) - i4, i3 + i5, i4, i9, 1.0f - f2, f3, 1.0f, 1.0f - f3, this.f);
-            a(graphicsEngine, texture, paint, i2 + 0, i3 + 0, i4, i5, 0.0f, 0.0f, this.c, this.d);
-            a(graphicsEngine, texture, paint, (i2 + iB) - i4, i3 + 0, i4, i5, 1.0f - this.c, 0.0f, 1.0f, this.d);
-            a(graphicsEngine, texture, paint, i2 + 0, (i3 + iC) - i5, i4, i5, 0.0f, 1.0f - this.d, this.c, 1.0f);
-            a(graphicsEngine, texture, paint, (i2 + iB) - i4, (i3 + iC) - i5, i4, i5, 1.0f - this.c, 1.0f - this.d, 1.0f, 1.0f);
+            a(graphicsEngine, texture, paint, i2 + 0, i3 + 0, i4, i5, 0.0f, 0.0f, this.normalizedWidth, this.normalizedHeight);
+            a(graphicsEngine, texture, paint, (i2 + iB) - i4, i3 + 0, i4, i5, 1.0f - this.normalizedWidth, 0.0f, 1.0f, this.normalizedHeight);
+            a(graphicsEngine, texture, paint, i2 + 0, (i3 + iC) - i5, i4, i5, 0.0f, 1.0f - this.normalizedHeight, this.normalizedWidth, 1.0f);
+            a(graphicsEngine, texture, paint, (i2 + iB) - i4, (i3 + iC) - i5, i4, i5, 1.0f - this.normalizedWidth, 1.0f - this.normalizedHeight, 1.0f, 1.0f);
         }
         a(graphicsEngine, texture, paint, i2 + i4, i3 + i5, i8, i9, f2, f3, 1.0f - f2, 1.0f - f3, this.f);
     }

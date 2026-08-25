@@ -13,23 +13,36 @@ import java.util.Arrays;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.m.ae */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/m/ae.class */
 public class ShaderProgram {
-    public String c;
+    /* JADX INFO: renamed from: c */
+    public String name;
     public String d;
-    public String e;
-    public String f;
-    public int g;
-    public int h;
-    String i;
-    String j;
-    long k;
-    long l;
+    /* JADX INFO: renamed from: e */
+    public String vertexSource;
+    /* JADX INFO: renamed from: f */
+    public String fragmentSource;
+    /* JADX INFO: renamed from: g */
+    public int vertexShaderId;
+    /* JADX INFO: renamed from: h */
+    public int fragmentShaderId;
+    /* JADX INFO: renamed from: o */
+    public int programStatus;
+    /* JADX INFO: renamed from: p */
+    public ShaderUniform[] uniforms;
+    /* JADX INFO: renamed from: r */
+    public int errorCount;
+    /* JADX INFO: renamed from: i */
+    String vertexPath;
     public boolean m;
     public int n;
-    public int o;
-    public ShaderUniform[] p;
+    /* JADX INFO: renamed from: j */
+    String fragmentPath;
+    /* JADX INFO: renamed from: k */
+    long vertexFileTimestamp;
     public Object q;
-    public int r;
-    int s;
+    /* JADX INFO: renamed from: l */
+    long fragmentFileTimestamp;
+    /* JADX INFO: renamed from: s */
+    int compileCount;
 
     public void a(String str, float f) {
         a(str).a(f);
@@ -51,65 +64,65 @@ public class ShaderProgram {
         a(str).b(texture);
     }
 
-    public ShaderUniform a(String str) {
-        for (ShaderUniform shaderUniform : this.p) {
-            if (shaderUniform.a.equals(str)) {
-                return shaderUniform;
-            }
-        }
-        ShaderUniform shaderUniform2 = new ShaderUniform();
-        shaderUniform2.a = str;
-        ShaderUniform[] shaderUniformArr = (ShaderUniform[]) Arrays.copyOf(this.p, this.p.length + 1);
-        shaderUniformArr[shaderUniformArr.length - 1] = shaderUniform2;
-        this.p = shaderUniformArr;
-        return shaderUniform2;
-    }
-
     public ShaderProgram(String str) throws IOException {
         this.d = VariableScope.nullOrMissingString;
-        this.p = new ShaderUniform[0];
+        this.uniforms = new ShaderUniform[0];
         a(GameEngine.isGDXVersion ? "assets/shaders/plainGDX.vert" : "assets/shaders/plain.vert", str);
-    }
-
-    public void a(String str, String str2) throws IOException {
-        this.c = Utility.getFileNameWithoutExtension(str2);
-        this.i = str;
-        this.j = str2;
-        d();
-        e();
     }
 
     public ShaderProgram() {
         this.d = VariableScope.nullOrMissingString;
-        this.p = new ShaderUniform[0];
-        this.c = "Invalid";
-        this.o = 1;
+        this.uniforms = new ShaderUniform[0];
+        this.name = "Invalid";
+        this.programStatus = 1;
+    }
+
+    public ShaderUniform a(String str) {
+        for (ShaderUniform shaderUniform : this.uniforms) {
+            if (shaderUniform.name.equals(str)) {
+                return shaderUniform;
+            }
+        }
+        ShaderUniform shaderUniform2 = new ShaderUniform();
+        shaderUniform2.name = str;
+        ShaderUniform[] shaderUniformArr = (ShaderUniform[]) Arrays.copyOf(this.uniforms, this.uniforms.length + 1);
+        shaderUniformArr[shaderUniformArr.length - 1] = shaderUniform2;
+        this.uniforms = shaderUniformArr;
+        return shaderUniform2;
+    }
+
+    public void a(String str, String str2) throws IOException {
+        this.name = Utility.getFileNameWithoutExtension(str2);
+        this.vertexPath = str;
+        this.fragmentPath = str2;
+        d();
+        e();
     }
 
     public void d() throws IOException {
-        AssetInputStream assetInputStreamOpenFileByPath = FileHelper.openFileByPath(this.i);
+        AssetInputStream assetInputStreamOpenFileByPath = FileHelper.openFileByPath(this.vertexPath);
         if (assetInputStreamOpenFileByPath == null) {
-            throw new IOException("Cannot find: " + this.i);
+            throw new IOException("Cannot find: " + this.vertexPath);
         }
-        this.e = Utility.readStreamToString(assetInputStreamOpenFileByPath);
-        AssetInputStream assetInputStreamOpenFileByPath2 = FileHelper.openFileByPath(this.j);
+        this.vertexSource = Utility.readStreamToString(assetInputStreamOpenFileByPath);
+        AssetInputStream assetInputStreamOpenFileByPath2 = FileHelper.openFileByPath(this.fragmentPath);
         if (assetInputStreamOpenFileByPath2 == null) {
-            throw new IOException("Cannot find: " + this.j);
+            throw new IOException("Cannot find: " + this.fragmentPath);
         }
-        this.f = Utility.readStreamToString(assetInputStreamOpenFileByPath2);
+        this.fragmentSource = Utility.readStreamToString(assetInputStreamOpenFileByPath2);
     }
 
     public void b(String str) {
-        GameEngine.log("shader(" + this.c + "): " + str);
+        GameEngine.log("shader(" + this.name + "): " + str);
     }
 
     public void c(String str) {
-        if (this.r < 3) {
-            this.r++;
-            GameEngine.reportNonFatalError("shader(" + this.c + "): " + str);
+        if (this.errorCount < 3) {
+            this.errorCount++;
+            GameEngine.reportNonFatalError("shader(" + this.name + "): " + str);
         }
-        GameEngine.logErrorColored("shader(" + this.c + "): " + str);
-        this.o = 1;
+        GameEngine.logErrorColored("shader(" + this.name + "): " + str);
+        this.programStatus = 1;
     }
 
     public boolean a() {
@@ -125,28 +138,28 @@ public class ShaderProgram {
     }
 
     public boolean e() {
-        long jA = FileChangeEngine.a(this.i, false);
-        long jA2 = FileChangeEngine.a(this.j, false);
-        boolean z = (jA == this.k && jA2 == this.l) ? false : true;
-        this.k = jA;
-        this.l = jA2;
+        long jA = FileChangeEngine.a(this.vertexPath, false);
+        long jA2 = FileChangeEngine.a(this.fragmentPath, false);
+        boolean z = (jA == this.vertexFileTimestamp && jA2 == this.fragmentFileTimestamp) ? false : true;
+        this.vertexFileTimestamp = jA;
+        this.fragmentFileTimestamp = jA2;
         return z;
     }
 
     public void f() {
-        this.s++;
-        if (this.s < 100) {
+        this.compileCount++;
+        if (this.compileCount < 100) {
             return;
         }
-        this.s = 0;
+        this.compileCount = 0;
         if (e()) {
             b("Reloading shader");
             try {
                 d();
                 this.m = true;
-                this.o = 0;
-                for (ShaderUniform shaderUniform : this.p) {
-                    shaderUniform.c = true;
+                this.programStatus = 0;
+                for (ShaderUniform shaderUniform : this.uniforms) {
+                    shaderUniform.isDirty = true;
                     shaderUniform.b = -1;
                 }
             } catch (IOException e) {

@@ -821,7 +821,7 @@ public class Projectile extends PositionedObject {
                         effectCreateEffectInternal2.aq = 0;
                         effectCreateEffectInternal2.ap = 0;
                         effectCreateEffectInternal2.ar = (short) 2;
-                        effectCreateEffectInternal2.r = true;
+                        effectCreateEffectInternal2.fadeIn = true;
                         effectCreateEffectInternal2.E = 0.5f;
                         effectCreateEffectInternal2.W = 60.0f;
                         effectCreateEffectInternal2.V = 60.0f;
@@ -1013,7 +1013,7 @@ public class Projectile extends PositionedObject {
                         effectCreateEffectInternal.aq = 0;
                         effectCreateEffectInternal.ap = 0;
                         effectCreateEffectInternal.ar = (short) 2;
-                        effectCreateEffectInternal.r = true;
+                        effectCreateEffectInternal.fadeIn = true;
                         effectCreateEffectInternal.E = 0.5f;
                         effectCreateEffectInternal.V = 70.0f;
                         effectCreateEffectInternal.W = effectCreateEffectInternal.V;
@@ -1022,8 +1022,8 @@ public class Projectile extends PositionedObject {
                             effectCreateEffectInternal.as = false;
                         }
                         effectCreateEffectInternal.Q = 0.1f;
-                        effectCreateEffectInternal.s = true;
-                        effectCreateEffectInternal.t = 5.0f;
+                        effectCreateEffectInternal.fadeOut = true;
+                        effectCreateEffectInternal.fadeDuration = 5.0f;
                         effectCreateEffectInternal.G = 0.5f;
                         effectCreateEffectInternal.F = 1.2f;
                         effectCreateEffectInternal.Y = Utility.randomFloatInRange(-180.0f, 180.0f);
@@ -1035,7 +1035,7 @@ public class Projectile extends PositionedObject {
                         effectCreateEffectInternal.aq = 9;
                         effectCreateEffectInternal.ap = 1;
                         effectCreateEffectInternal.ar = (short) 1;
-                        effectCreateEffectInternal.r = true;
+                        effectCreateEffectInternal.fadeIn = true;
                         effectCreateEffectInternal.E = 0.5f;
                         effectCreateEffectInternal.W = 60.0f;
                         effectCreateEffectInternal.V = 60.0f;
@@ -1216,7 +1216,7 @@ public class Projectile extends PositionedObject {
                     }
                     if (this.spawnEmitterOnHit) {
                         z10 = false;
-                        EffectEmitter.b(this.posX, this.posY).a = 21.0f;
+                        EffectEmitter.b(this.posX, this.posY).duration = 21.0f;
                     }
                     if (z10) {
                         if (!this.isSmallExplosion) {
@@ -1246,7 +1246,7 @@ public class Projectile extends PositionedObject {
                                 effectCreateLightEffect.E = 0.9f;
                                 effectCreateLightEffect.V = 35.0f;
                                 effectCreateLightEffect.W = effectCreateLightEffect.V;
-                                effectCreateLightEffect.r = true;
+                                effectCreateLightEffect.fadeIn = true;
                             }
                             gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
                             Effect effectCreateSmallExplosion = gameEngine.effectManager.createSmallExplosion(this.hitX, this.hitY, this.hitZ, -1127220);
@@ -1307,7 +1307,7 @@ public class Projectile extends PositionedObject {
                                 effectCreateLightEffect5.E = 0.2f;
                                 effectCreateLightEffect5.V = 870.0f;
                                 effectCreateLightEffect5.W = effectCreateLightEffect5.V;
-                                effectCreateLightEffect5.r = true;
+                                effectCreateLightEffect5.fadeIn = true;
                                 effectCreateLightEffect5.U = 70.0f;
                             }
                             gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
@@ -1327,8 +1327,8 @@ public class Projectile extends PositionedObject {
                                 effectCreateLightEffect7.E = 1.0f;
                                 effectCreateLightEffect7.V = 340.0f;
                                 effectCreateLightEffect7.W = effectCreateLightEffect7.V;
-                                effectCreateLightEffect7.s = true;
-                                effectCreateLightEffect7.t = 20.0f;
+                                effectCreateLightEffect7.fadeOut = true;
+                                effectCreateLightEffect7.fadeDuration = 20.0f;
                             }
                             gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
                             Effect effectCreateLightEffect8 = gameEngine.effectManager.createLightEffect(this.hitX, this.hitY, this.posZ, Color.a(245, 255, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_AVR_INPUT, 110));
@@ -1338,8 +1338,8 @@ public class Projectile extends PositionedObject {
                                 effectCreateLightEffect8.E = 0.3f;
                                 effectCreateLightEffect8.V = 1340.0f;
                                 effectCreateLightEffect8.W = effectCreateLightEffect8.V;
-                                effectCreateLightEffect8.s = true;
-                                effectCreateLightEffect8.t = 40.0f;
+                                effectCreateLightEffect8.fadeOut = true;
+                                effectCreateLightEffect8.fadeDuration = 40.0f;
                                 effectCreateLightEffect8.U = 140.0f;
                             }
                             for (int i4 = 0; i4 < 4; i4++) {
@@ -1352,8 +1352,8 @@ public class Projectile extends PositionedObject {
                                     effectCreateLightEffect9.V = 340.0f;
                                     effectCreateLightEffect9.W = effectCreateLightEffect9.V;
                                     effectCreateLightEffect9.Q = -0.29f;
-                                    effectCreateLightEffect9.s = true;
-                                    effectCreateLightEffect9.t = 50.0f;
+                                    effectCreateLightEffect9.fadeOut = true;
+                                    effectCreateLightEffect9.fadeDuration = 50.0f;
                                     effectCreateLightEffect9.U = 30 + (i4 * 40);
                                 }
                             }
@@ -1367,8 +1367,8 @@ public class Projectile extends PositionedObject {
                                     effectCreateLightEffect10.V = 340.0f;
                                     effectCreateLightEffect10.W = effectCreateLightEffect10.V;
                                     effectCreateLightEffect10.Q = -0.14f;
-                                    effectCreateLightEffect10.s = true;
-                                    effectCreateLightEffect10.t = 50.0f;
+                                    effectCreateLightEffect10.fadeOut = true;
+                                    effectCreateLightEffect10.fadeDuration = 50.0f;
                                     effectCreateLightEffect10.U = 70 + (i5 * 70);
                                 }
                             }
@@ -1382,10 +1382,10 @@ public class Projectile extends PositionedObject {
                                     effectCreateLightEffect11.V = 510.0f;
                                     effectCreateLightEffect11.W = effectCreateLightEffect11.V;
                                     effectCreateLightEffect11.Q = -0.2f;
-                                    effectCreateLightEffect11.s = true;
-                                    effectCreateLightEffect11.t = 50.0f;
+                                    effectCreateLightEffect11.fadeOut = true;
+                                    effectCreateLightEffect11.fadeDuration = 50.0f;
                                     effectCreateLightEffect11.B = null;
-                                    effectCreateLightEffect11.x = Color.a(175, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG);
+                                    effectCreateLightEffect11.startColor = Color.a(175, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG, SlickToAndroidKeycodes.AndroidCodes.KEYCODE_TV_TERRESTRIAL_ANALOG);
                                     effectCreateLightEffect11.U = 20 + (i6 * 40);
                                 }
                             }
@@ -1399,18 +1399,18 @@ public class Projectile extends PositionedObject {
                                     effectCreateLightEffect12.V = 590.0f;
                                     effectCreateLightEffect12.W = effectCreateLightEffect12.V;
                                     effectCreateLightEffect12.Q = -0.2f;
-                                    effectCreateLightEffect12.s = true;
-                                    effectCreateLightEffect12.t = 50.0f;
+                                    effectCreateLightEffect12.fadeOut = true;
+                                    effectCreateLightEffect12.fadeDuration = 50.0f;
                                     effectCreateLightEffect12.B = null;
-                                    effectCreateLightEffect12.x = Color.a(105, 115, 115, 115);
+                                    effectCreateLightEffect12.startColor = Color.a(105, 115, 115, 115);
                                     effectCreateLightEffect12.U = 20 + (i7 * 40);
                                 }
                             }
                             for (int i8 = 0; i8 < 1; i8++) {
                                 EffectEmitter effectEmitterA = EffectEmitter.a(this.hitX + Utility.getDeterministicRandomFloat(-10.0f, 10.0f, (int) this.objectId), this.hitY + Utility.getDeterministicRandomFloat(-10.0f, 10.0f, ((int) this.objectId) + i8));
                                 if (effectEmitterA != null) {
-                                    effectEmitterA.t = 200 + (i8 * 70);
-                                    effectEmitterA.a = 980 + (i8 * 800);
+                                    effectEmitterA.startDelay = 200 + (i8 * 70);
+                                    effectEmitterA.duration = 980 + (i8 * 800);
                                 }
                             }
                             if (!GameViewUtils.d(this.hitX, this.hitY)) {
@@ -1436,8 +1436,8 @@ public class Projectile extends PositionedObject {
                                     effectCreateLightEffect13.V = 60.0f;
                                     effectCreateLightEffect13.W = effectCreateLightEffect13.V;
                                     effectCreateLightEffect13.Q = -0.2f;
-                                    effectCreateLightEffect13.s = true;
-                                    effectCreateLightEffect13.t = 1.0f;
+                                    effectCreateLightEffect13.fadeOut = true;
+                                    effectCreateLightEffect13.fadeDuration = 1.0f;
                                     effectCreateLightEffect13.B = null;
                                     effectCreateLightEffect13.U = 0.0f;
                                 }

@@ -44,20 +44,24 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/j/ad.class */
 public final class NetworkEngine {
     ArrayList f;
-    public boolean g;
+    /* JADX INFO: renamed from: g */
+    public boolean debugLogging;
     public boolean i;
     public float j;
     public float k;
-    public int m;
+    /* JADX INFO: renamed from: m */
+    public int networkPort;
     /* JADX INFO: renamed from: as */
     public static boolean forceIgnoreDesync;
     /* JADX INFO: renamed from: bl */
     public final Object queuedDisconnectLock = new Object();
-    public boolean p;
+    /* JADX INFO: renamed from: p */
+    public boolean isSandboxMode;
     /* JADX INFO: renamed from: n */
     public String roomPassword;
     public boolean useMasterServer = true;
-    public boolean s;
+    /* JADX INFO: renamed from: s */
+    public boolean allowJoinInProgress;
     public String u;
 
     /* JADX INFO: renamed from: y */
@@ -961,7 +965,7 @@ public final class NetworkEngine {
         this.bH = false;
         this.bG = false;
         this.localPlayerTeam = null;
-        this.p = false;
+        this.isSandboxMode = false;
         this.totalBytesSent = System.currentTimeMillis();
         this.nextBlockingFrame = 0;
         this.I = 0;
@@ -1021,7 +1025,7 @@ public final class NetworkEngine {
         this.A = false;
         resetNetworkGameState();
         this.serverUuid = null;
-        this.m = 0;
+        this.networkPort = 0;
         this.i = false;
         this.j = 0.0f;
         this.k = 0.0f;
@@ -1044,7 +1048,7 @@ public final class NetworkEngine {
         this.roomSettings.roomLock = false;
         this.roomSettings.randomSeed = 0;
         clearBans();
-        this.chatLog.c();
+        this.chatLog.clearMessages();
         GameEngine.getInstance().gameUI.clearMessages();
         if ("<CHAT ONLY>".equals(this.roomSettings.mapPath)) {
             GameEngine.log("Chat only map selection - restarting");
@@ -1200,7 +1204,7 @@ public final class NetworkEngine {
                 z = true;
             }
             if (networkConnection.isDirectServer) {
-                if (this.g) {
+                if (this.debugLogging) {
                     GameEngine.log("desync_count:" + networkConnection.desyncCount + " lastResyncTimer:" + this.timeSinceLastResync);
                 }
                 if (networkConnection.desyncCount < 4 || this.timeSinceLastResync > 3600.0f) {
@@ -1748,7 +1752,7 @@ public final class NetworkEngine {
                     gameOutputStream.writeLong(((ChecksumField) it.next()).value);
                 }
                 h(gameOutputStream.buildPacketData(30));
-                if (this.g) {
+                if (this.debugLogging) {
                     GameEngine.log("Sent checksum to client [" + this.lastSyncedTick + "]");
                 }
                 this.syncChecksumSentForFrame = true;
@@ -2011,7 +2015,7 @@ public final class NetworkEngine {
                             }
                             networkConnection3.isDirectServer = z2;
                             if (!z2) {
-                                if (this.g) {
+                                if (this.debugLogging) {
                                     GameEngine.log("checksum: client checksum match [" + i6 + "]");
                                 }
                                 networkConnection3.syncMatchCount++;
@@ -2026,7 +2030,7 @@ public final class NetworkEngine {
                             }
                         }
                     } else {
-                        if (this.g) {
+                        if (this.debugLogging) {
                             GameEngine.log("checksum for:" + networkConnection3.getPlayerDisplayName() + " frameMatch==false client:" + i7 + " server:[" + i6 + "]");
                         }
                         break;
@@ -2458,7 +2462,7 @@ public final class NetworkEngine {
 
     public synchronized boolean startSandboxServer()  {
         if (startSingleplayerServer()) {
-            this.p = true;
+            this.isSandboxMode = true;
             this.roomSettings.fogMode = 0;
             return true;
         }
@@ -2479,7 +2483,7 @@ public final class NetworkEngine {
         regenerateOwnServerId();
         this.localPlayerTeam = gameEngine.playerTeam;
         MultiplayerBattleroomActivity.updateUI();
-        this.m = gameEngine.settingsEngine.networkPort;
+        this.networkPort = gameEngine.settingsEngine.networkPort;
         d("singleplayer server started");
         return true;
     }
@@ -2676,8 +2680,8 @@ public final class NetworkEngine {
                 }
                 BanEntry activeBan = getActiveBanForConnection(networkConnection5);
                 if (activeBan != null) {
-                    GameEngine.log("Connection banned for " + activeBan.b() + " more seconds");
-                    a(networkConnection5, activeBan.a());
+                    GameEngine.log("Connection banned for " + activeBan.getRemainingSeconds() + " more seconds");
+                    a(networkConnection5, activeBan.getReasonText());
                     networkConnection5.sendPacket("kicked");
                     return;
                 }
@@ -2717,7 +2721,7 @@ public final class NetworkEngine {
                     networkConnection5.sendPacket("kicked");
                     return;
                 }
-                if (this.gameHasBeenStarted && existingGameTeam == null && !this.s) {
+                if (this.gameHasBeenStarted && existingGameTeam == null && !this.allowJoinInProgress) {
                     a(networkConnection5, "A game has already been started on this server");
                     networkConnection5.sendPacket("kicked");
                     return;
@@ -2780,7 +2784,7 @@ public final class NetworkEngine {
                                     networkConnection5.player = new GameTeam(activeTeamCount);
                                     networkConnection5.player.teamColorId = activeTeamCount % 2;
                                 }
-                                if (this.gameHasBeenStarted && this.s) {
+                                if (this.gameHasBeenStarted && this.allowJoinInProgress) {
                                     networkConnection5.isForwarded = true;
                                 }
                             }
@@ -2817,7 +2821,7 @@ public final class NetworkEngine {
                             e(networkConnection5);
                             c(networkConnection5);
                             this.callbacks.c(networkConnection5, strP, str2);
-                            if ((existingGameTeam != null || this.s) && this.gameHasBeenStarted) {
+                            if ((existingGameTeam != null || this.allowJoinInProgress) && this.gameHasBeenStarted) {
                                 a(networkConnection5, true);
                             }
                         }
@@ -3035,12 +3039,12 @@ public final class NetworkEngine {
                 gameInputStream12.readByte();
                 String strI = i(utf7);
                 if (this.callbacks.a(networkConnection11, gameTeam.teamName, strI)) {
-                    if (this.chatLog.a(networkConnection11, 60000) > this.h) {
+                    if (this.chatLog.countMessagesFrom(networkConnection11, 60000) > this.h) {
                         if (Utility.elapsedMilliseconds(networkConnection11.lastActivityTime, System.nanoTime()) > 60000) {
                             networkConnection11.lastActivityTime = System.nanoTime();
                             j("Anti-spam: Too many messages from '" + networkConnection11.getPlayerDisplayName() + "'");
                         }
-                        if (this.g) {
+                        if (this.debugLogging) {
                             GameEngine.log("extraDebug:" + strI);
                             return;
                         }
@@ -3436,7 +3440,7 @@ public final class NetworkEngine {
         GameEngine gameEngine = GameEngine.getInstance();
         ensureKeepAliveTimerStarted(z);
         MultiplayerBattleroomActivity.updateUI();
-        this.m = gameEngine.settingsEngine.networkPort;
+        this.networkPort = gameEngine.settingsEngine.networkPort;
         DisabledSteamEngine.a().i();
         this.connectionAcceptor1 = new ConnectionAcceptor(this);
         try {
@@ -3451,7 +3455,7 @@ public final class NetworkEngine {
                 this.connectionAcceptorThread2.start();
             } catch (IOException e) {
                 e.printStackTrace();
-                gameEngine.alert("Could not open udp port:" + this.m + ", check this port is not in use or change the port in the game settings", 1);
+                gameEngine.alert("Could not open udp port:" + this.networkPort + ", check this port is not in use or change the port in the game settings", 1);
                 disconnectNetworking("Could not open udp port");
                 return false;
             }
@@ -3467,7 +3471,7 @@ public final class NetworkEngine {
             return true;
         } catch (IOException e2) {
             e2.printStackTrace();
-            gameEngine.alert("Could not open tcp port:" + this.m + ", check this port is not in use or change the port in the game settings", 1);
+            gameEngine.alert("Could not open tcp port:" + this.networkPort + ", check this port is not in use or change the port in the game settings", 1);
             disconnectNetworking("Could not open tcp port");
             return false;
         }
@@ -3546,7 +3550,7 @@ public final class NetworkEngine {
         }
         q();
         GameEngine.getInstance();
-        this.m = socket.getPort();
+        this.networkPort = socket.getPort();
         this.networkGameActive = true;
         this.isServer = false;
         d("connected to Server..");
@@ -3996,7 +4000,7 @@ public final class NetworkEngine {
 
     public void o(String str) {
         String strConvertInlineBlocks = Locale.convertInlineBlocks(str);
-        this.chatLog.a(-1, null, strConvertInlineBlocks, null);
+        this.chatLog.addMessage(-1, null, strConvertInlineBlocks, null);
         this.callbacks.a(-1, (String) null, strConvertInlineBlocks, (NetworkConnection) null);
         boolean z = false;
         if (this.gameHasBeenStarted) {
@@ -4038,7 +4042,7 @@ public final class NetworkEngine {
         if (this.isServer) {
             networkConnection2 = networkConnection;
         }
-        this.chatLog.a(i, str, strConvertInlineBlocks, networkConnection2);
+        this.chatLog.addMessage(i, str, strConvertInlineBlocks, networkConnection2);
         this.callbacks.a(i, str, strConvertInlineBlocks, networkConnection);
         boolean z = false;
         if (this.gameHasBeenStarted) {
@@ -4886,7 +4890,7 @@ public final class NetworkEngine {
                     str = str + this.E;
                 }
             } else if (localIpAddressSummary != null) {
-                String str2 = "Local IP address: " + localIpAddressSummary + " port: " + gameEngine.networkEngine.m;
+                String str2 = "Local IP address: " + localIpAddressSummary + " port: " + gameEngine.networkEngine.networkPort;
                 if (gameEngine.networkEngine.publicIpLookupSuccess != null) {
                     if (!gameEngine.networkEngine.publicIpLookupSuccess.booleanValue()) {
                         str2 = str2 + "\nUnable to get a public IP address, check your internet connection";
@@ -4902,7 +4906,7 @@ public final class NetworkEngine {
             }
         }
         if (gameEngine.isSinglePlayerGame()) {
-            if (this.p) {
+            if (this.isSandboxMode) {
                 str = str + "SandBox Mode!\nPlace any unit, Control all teams, Special powers";
             } else {
                 str = str + "Local skirmish";

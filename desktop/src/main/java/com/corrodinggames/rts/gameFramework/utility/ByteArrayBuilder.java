@@ -6,16 +6,20 @@ import java.io.OutputStream;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.utility.w */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/utility/w.class */
 public class ByteArrayBuilder extends OutputStream {
-    public byte[] a;
-    protected int b;
+
+    /* JADX INFO: renamed from: a */
+    public byte[] buffer;
+
+    /* JADX INFO: renamed from: b */
+    protected int size;
 
     public ByteArrayBuilder() {
-        this.a = new byte[32];
+        this.buffer = new byte[32];
     }
 
     public ByteArrayBuilder(int i) {
         if (i >= 0) {
-            this.a = new byte[i];
+            this.buffer = new byte[i];
             return;
         }
         throw new IllegalArgumentException("size < 0");
@@ -27,24 +31,24 @@ public class ByteArrayBuilder extends OutputStream {
     }
 
     private void a(int i) {
-        if (this.b + i <= this.a.length) {
+        if (this.size + i <= this.buffer.length) {
             return;
         }
-        byte[] bArr = new byte[(this.b + i) * 2];
-        System.arraycopy(this.a, 0, bArr, 0, this.b);
-        this.a = bArr;
+        byte[] bArr = new byte[(this.size + i) * 2];
+        System.arraycopy(this.buffer, 0, bArr, 0, this.size);
+        this.buffer = bArr;
     }
 
     public synchronized void a() {
-        this.b = 0;
+        this.size = 0;
     }
 
     public int b() {
-        return this.b;
+        return this.size;
     }
 
     public String toString() {
-        return new String(this.a, 0, this.b);
+        return new String(this.buffer, 0, this.size);
     }
 
     public static void a(int i, int i2, int i3) {
@@ -60,18 +64,18 @@ public class ByteArrayBuilder extends OutputStream {
             return;
         }
         a(i2);
-        System.arraycopy(bArr, i, this.a, this.b, i2);
-        this.b += i2;
+        System.arraycopy(bArr, i, this.buffer, this.size, i2);
+        this.size += i2;
     }
 
     @Override // java.io.OutputStream
     public synchronized void write(int i) {
-        if (this.b == this.a.length) {
+        if (this.size == this.buffer.length) {
             a(1);
         }
-        byte[] bArr = this.a;
-        int i2 = this.b;
-        this.b = i2 + 1;
+        byte[] bArr = this.buffer;
+        int i2 = this.size;
+        this.size = i2 + 1;
         bArr[i2] = (byte) i;
     }
 }

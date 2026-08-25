@@ -10,7 +10,14 @@ import java.util.Iterator;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.a.l */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/a/l.class */
 public class RallyGroup extends AIUnitGroupBase {
-    float a;
+
+    /* JADX INFO: renamed from: a */
+    float lifetime;
+
+    public RallyGroup(AIController aIController) {
+        super(aIController);
+        this.lifetime = 0.0f;
+    }
 
     @Override // com.corrodinggames.rts.game.ai.AIStrategyNode, com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
@@ -25,7 +32,7 @@ public class RallyGroup extends AIUnitGroupBase {
         while (it2.hasNext()) {
             gameOutputStream.writeOrderableUnit((OrderableUnit) it2.next());
         }
-        gameOutputStream.writeFloat(this.a);
+        gameOutputStream.writeFloat(this.lifetime);
         super.a(gameOutputStream);
     }
 
@@ -49,21 +56,16 @@ public class RallyGroup extends AIUnitGroupBase {
                     this.G.add(unitEntity2);
                 }
             }
-            this.a = gameInputStream.readFloat();
+            this.lifetime = gameInputStream.readFloat();
         }
         super.readFromInputStream(gameInputStream);
-    }
-
-    public RallyGroup(AIController aIController) {
-        super(aIController);
-        this.a = 0.0f;
     }
 
     @Override // com.corrodinggames.rts.game.ai.AIUnitGroupBase
     public void c(float f) {
         n();
         if (!m()) {
-            this.a += f;
+            this.lifetime += f;
         }
         Iterator it = this.F.iterator();
         while (it.hasNext()) {
@@ -75,7 +77,7 @@ public class RallyGroup extends AIUnitGroupBase {
                 it.remove();
             }
         }
-        if (this.F.size() == 0 || this.a > 5000.0f) {
+        if (this.F.size() == 0 || this.lifetime > 5000.0f) {
             destroy();
         }
     }

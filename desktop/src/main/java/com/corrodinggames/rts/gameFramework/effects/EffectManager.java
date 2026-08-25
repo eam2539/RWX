@@ -87,6 +87,17 @@ public final class EffectManager {
     float lastUpdate = 0.0f;
 
     /* JADX INFO: renamed from: a */
+    public static void attachEffectToGameObject(Effect effect, GameObject gameObject) {
+        if (effect == null) {
+            return;
+        }
+        effect.parentObject = gameObject;
+        effect.I -= gameObject.posX;
+        effect.J -= gameObject.posY;
+        effect.K -= gameObject.posZ;
+    }
+
+    /* JADX INFO: renamed from: a */
     public Effect getNewEffect(EffectQuality effectQuality) {
         int i = 0;
         int fps = GameEngine.getInstance().getFps();
@@ -113,35 +124,11 @@ public final class EffectManager {
             effectFindFreeEffect = findFreeEffect(false, EffectQuality.high);
         }
         if (effectFindFreeEffect != null) {
-            if (!effectFindFreeEffect.o) {
-                effectFindFreeEffect.o = true;
+            if (!effectFindFreeEffect.isActive) {
+                effectFindFreeEffect.isActive = true;
                 this.activeEffectsCount++;
             }
             return effectFindFreeEffect;
-        }
-        return null;
-    }
-
-    /* JADX INFO: renamed from: a */
-    private Effect findFreeEffect(boolean z, EffectQuality effectQuality) {
-        Effect[] effectArr = effects;
-        int length = effectArr.length;
-        if (z && effectQuality == null) {
-            for (int i = 0; i < length; i++) {
-                Effect effect = effectArr[i];
-                if (!effect.o) {
-                    if (nextFreeEffect == i) {
-                        nextFreeEffect++;
-                    }
-                    return effect;
-                }
-            }
-            return null;
-        }
-        for (Effect effect2 : effectArr) {
-            if ((!z || !effect2.o) && (effectQuality == null || effect2.q.isLowerThan(effectQuality))) {
-                return effect2;
-            }
         }
         return null;
     }
@@ -167,6 +154,30 @@ public final class EffectManager {
         return Utility.randomFloatInRange(f, f2);
     }
 
+    /* JADX INFO: renamed from: a */
+    private Effect findFreeEffect(boolean z, EffectQuality effectQuality) {
+        Effect[] effectArr = effects;
+        int length = effectArr.length;
+        if (z && effectQuality == null) {
+            for (int i = 0; i < length; i++) {
+                Effect effect = effectArr[i];
+                if (!effect.isActive) {
+                    if (nextFreeEffect == i) {
+                        nextFreeEffect++;
+                    }
+                    return effect;
+                }
+            }
+            return null;
+        }
+        for (Effect effect2 : effectArr) {
+            if ((!z || !effect2.isActive) && (effectQuality == null || effect2.q.isLowerThan(effectQuality))) {
+                return effect2;
+            }
+        }
+        return null;
+    }
+
     /* JADX INFO: renamed from: b */
     public Effect createSmallExplosion(float f, float f2, float f3) {
         setOnlyOnScreen();
@@ -180,7 +191,7 @@ public final class EffectManager {
             effectCreateEffectInternal.ap = 0;
             effectCreateEffectInternal.V = 35.0f;
             effectCreateEffectInternal.W = effectCreateEffectInternal.V - 10.0f;
-            effectCreateEffectInternal.r = true;
+            effectCreateEffectInternal.fadeIn = true;
             effectCreateEffectInternal.E = 0.7f;
             effectCreateEffectInternal.Y = random(-180.0f, 180.0f);
             float fRandom = random(0.8f, 1.0f);
@@ -203,31 +214,10 @@ public final class EffectManager {
             effectCreateEffectInternal.ap = 0;
             effectCreateEffectInternal.V = 35.0f;
             effectCreateEffectInternal.W = effectCreateEffectInternal.V - 10.0f;
-            effectCreateEffectInternal.r = true;
+            effectCreateEffectInternal.fadeIn = true;
             effectCreateEffectInternal.E = 1.0f;
             effectCreateEffectInternal.G = 0.5f;
             effectCreateEffectInternal.F = 0.5f;
-        }
-        return effectCreateEffectInternal;
-    }
-
-    /* JADX INFO: renamed from: a */
-    public Effect createLaserEffect(float f, float f2, float f3, float f4, float f5, float f6) {
-        GameEngine gameEngine = GameEngine.getInstance();
-        if (!gameEngine.tileMap.isWorldPointVisibleForTeam(f, f2, gameEngine.playerTeam) && !gameEngine.tileMap.isWorldPointVisibleForTeam(f4, f5, gameEngine.playerTeam)) {
-            return null;
-        }
-        Effect effectCreateEffectInternal = createEffectInternal(f, f2, f3, EffectType.custom, true, EffectQuality.high);
-        if (effectCreateEffectInternal != null) {
-            effectCreateEffectInternal.an = false;
-            effectCreateEffectInternal.V = 5.0f;
-            effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-            effectCreateEffectInternal.r = true;
-            effectCreateEffectInternal.E = 1.0f;
-            effectCreateEffectInternal.L = true;
-            effectCreateEffectInternal.M = f4;
-            effectCreateEffectInternal.N = f5;
-            effectCreateEffectInternal.O = f6;
         }
         return effectCreateEffectInternal;
     }
@@ -245,6 +235,27 @@ public final class EffectManager {
     /* JADX INFO: renamed from: b */
     public Effect createFlameEffect2(float f, float f2, float f3, float f4, int i) {
         return createFlameEffectInternal(f, f2, f3, f4, i, 1);
+    }
+
+    /* JADX INFO: renamed from: a */
+    public Effect createLaserEffect(float f, float f2, float f3, float f4, float f5, float f6) {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (!gameEngine.tileMap.isWorldPointVisibleForTeam(f, f2, gameEngine.playerTeam) && !gameEngine.tileMap.isWorldPointVisibleForTeam(f4, f5, gameEngine.playerTeam)) {
+            return null;
+        }
+        Effect effectCreateEffectInternal = createEffectInternal(f, f2, f3, EffectType.custom, true, EffectQuality.high);
+        if (effectCreateEffectInternal != null) {
+            effectCreateEffectInternal.an = false;
+            effectCreateEffectInternal.V = 5.0f;
+            effectCreateEffectInternal.W = effectCreateEffectInternal.V;
+            effectCreateEffectInternal.fadeIn = true;
+            effectCreateEffectInternal.E = 1.0f;
+            effectCreateEffectInternal.L = true;
+            effectCreateEffectInternal.M = f4;
+            effectCreateEffectInternal.N = f5;
+            effectCreateEffectInternal.O = f6;
+        }
+        return effectCreateEffectInternal;
     }
 
     /* JADX INFO: renamed from: a */
@@ -269,7 +280,7 @@ public final class EffectManager {
             effectCreateEffectInternal.ap = 0;
             effectCreateEffectInternal.V = 20.0f;
             effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-            effectCreateEffectInternal.r = false;
+            effectCreateEffectInternal.fadeIn = false;
             if (i != 0) {
                 effectCreateEffectInternal.B = new LightingColorFilter(i, 0);
             }
@@ -290,7 +301,7 @@ public final class EffectManager {
             effectCreateEffectInternal.Q = Utility.fastSin(f4) * 0.15f;
             effectCreateEffectInternal.V = 30.0f;
             effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-            effectCreateEffectInternal.r = true;
+            effectCreateEffectInternal.fadeIn = true;
             effectCreateEffectInternal.ar = (short) 1;
             effectCreateEffectInternal.G = 0.8f;
             effectCreateEffectInternal.F = 2.3f;
@@ -299,17 +310,6 @@ public final class EffectManager {
             }
         }
         return effectCreateEffectInternal;
-    }
-
-    /* JADX INFO: renamed from: a */
-    public static void attachEffectToGameObject(Effect effect, GameObject gameObject) {
-        if (effect == null) {
-            return;
-        }
-        effect.b = gameObject;
-        effect.I -= gameObject.posX;
-        effect.J -= gameObject.posY;
-        effect.K -= gameObject.posZ;
     }
 
     /* JADX INFO: renamed from: a */
@@ -329,7 +329,7 @@ public final class EffectManager {
             effectCreateLightEffectInternal.W = effectCreateLightEffectInternal.V;
             effectCreateLightEffectInternal.E = 0.3f;
             effectCreateLightEffectInternal.G = f;
-            effectCreateLightEffectInternal.b = gameObject;
+            effectCreateLightEffectInternal.parentObject = gameObject;
         }
         return effectCreateLightEffectInternal;
     }
@@ -351,12 +351,12 @@ public final class EffectManager {
             effectCreateEffectInternal.aq = 2;
             effectCreateEffectInternal.V = 10.0f;
             effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-            effectCreateEffectInternal.r = true;
+            effectCreateEffectInternal.fadeIn = true;
             effectCreateEffectInternal.E = 0.5f;
             effectCreateEffectInternal.ar = (short) 2;
             effectCreateEffectInternal.d = true;
             if (i != 0) {
-                effectCreateEffectInternal.x = i;
+                effectCreateEffectInternal.startColor = i;
                 effectCreateEffectInternal.B = new LightingColorFilter(i, 0);
             }
         }
@@ -372,7 +372,7 @@ public final class EffectManager {
             effectCreateEffectInternal.aq = 0;
             effectCreateEffectInternal.ap = 13;
             effectCreateEffectInternal.ar = (short) 1;
-            effectCreateEffectInternal.r = true;
+            effectCreateEffectInternal.fadeIn = true;
             effectCreateEffectInternal.E = 0.8f;
             effectCreateEffectInternal.W = 80.0f;
             effectCreateEffectInternal.V = effectCreateEffectInternal.W;
@@ -393,7 +393,7 @@ public final class EffectManager {
             effectCreateEffectInternal.aq = 6;
             effectCreateEffectInternal.V = 120.0f;
             effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-            effectCreateEffectInternal.r = true;
+            effectCreateEffectInternal.fadeIn = true;
             effectCreateEffectInternal.G = 0.2f;
             effectCreateEffectInternal.F = 0.9f;
             effectCreateEffectInternal.ar = (short) 1;
@@ -418,8 +418,8 @@ public final class EffectManager {
             Effect effectCreateSmokeEffect = createSmokeEffect(f + (Utility.fastCos(f7) * (-5.0f)), f2 + (Utility.fastSin(f7) * (-5.0f)), 0.0f, f7);
             if (effectCreateSmokeEffect != null) {
                 effectCreateSmokeEffect.ar = (short) 2;
-                effectCreateSmokeEffect.s = true;
-                effectCreateSmokeEffect.t = 7.0f;
+                effectCreateSmokeEffect.fadeOut = true;
+                effectCreateSmokeEffect.fadeDuration = 7.0f;
             }
         }
     }
@@ -441,7 +441,7 @@ public final class EffectManager {
             effectCreateEffectInternal.aq = 6;
             effectCreateEffectInternal.V = 30.0f;
             effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-            effectCreateEffectInternal.r = true;
+            effectCreateEffectInternal.fadeIn = true;
             effectCreateEffectInternal.G = 0.2f;
             effectCreateEffectInternal.F = 1.3f;
             effectCreateEffectInternal.ar = (short) 1;
@@ -481,12 +481,12 @@ public final class EffectManager {
             effectCreateEffectInternal.ap = Utility.getRandomIntInRange(0, 7);
             effectCreateEffectInternal.V = Utility.randomFloatInRange(400.0f, 800.0f);
             effectCreateEffectInternal.W = effectCreateEffectInternal.V - 150.0f;
-            effectCreateEffectInternal.r = true;
+            effectCreateEffectInternal.fadeIn = true;
             float fRandomFloatInRange = Utility.randomFloatInRange(0.6f, 1.0f);
             effectCreateEffectInternal.G = fRandomFloatInRange;
             effectCreateEffectInternal.F = fRandomFloatInRange;
             effectCreateEffectInternal.ar = (short) 2;
-            effectCreateEffectInternal.v = true;
+            effectCreateEffectInternal.useBounce = true;
             effectCreateEffectInternal.as = true;
             float fRandomFloatInRange2 = Utility.randomFloatInRange(-180.0f, 180.0f);
             float fRandomFloatInRange3 = Utility.randomFloatInRange(0.4f, 1.2f) * f4;
@@ -506,7 +506,7 @@ public final class EffectManager {
             effectCreateEffectInternal.aq = 8;
             effectCreateEffectInternal.V = 480.0f;
             effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-            effectCreateEffectInternal.r = false;
+            effectCreateEffectInternal.fadeIn = false;
             effectCreateEffectInternal.ar = (short) 1;
             effectCreateEffectInternal.ae = true;
             effectCreateEffectInternal.ak = 0.0f;
@@ -520,12 +520,12 @@ public final class EffectManager {
                 effectCreateEffectInternal.aj = Utility.randomFloatInRange(0.06f, 0.16f);
                 effectCreateEffectInternal.ah = true;
                 effectCreateEffectInternal.ag = 6;
-                effectCreateEffectInternal.r = true;
+                effectCreateEffectInternal.fadeIn = true;
             } else {
                 effectCreateEffectInternal.aj = Utility.randomFloatInRange(0.06f, 0.16f);
                 effectCreateEffectInternal.ah = true;
                 effectCreateEffectInternal.ag = 3;
-                effectCreateEffectInternal.r = true;
+                effectCreateEffectInternal.fadeIn = true;
             }
         }
         return effectCreateEffectInternal;
@@ -598,7 +598,7 @@ public final class EffectManager {
         if (effectType == EffectType.hitGround || effectType == EffectType.playerLand || effectType == EffectType.playerJump) {
             newEffect.ap = 7;
             newEffect.V = 12.0f;
-            newEffect.r = true;
+            newEffect.fadeIn = true;
             newEffect.Q = -0.3f;
             newEffect.E = 0.7f;
             if (effectType == EffectType.playerJump) {
@@ -616,26 +616,26 @@ public final class EffectManager {
         if (effectType == EffectType.teleport) {
             newEffect.ap = 1;
             newEffect.V = 25.0f;
-            newEffect.r = true;
+            newEffect.fadeIn = true;
         }
         if (effectType == EffectType.gemCollect) {
             newEffect.ap = 5;
             newEffect.V = 42.0f;
-            newEffect.r = true;
+            newEffect.fadeIn = true;
             newEffect.Q = 0.1f;
             newEffect.E = 2.0f;
         }
         if (effectType == EffectType.keyDoorOpen) {
             newEffect.ap = 6;
             newEffect.V = 39.0f;
-            newEffect.r = true;
+            newEffect.fadeIn = true;
             newEffect.Q = 0.1f;
             newEffect.E = 2.0f;
         }
         if (effectType == EffectType.blood) {
             newEffect.ap = 14;
             newEffect.V = 39.0f;
-            newEffect.r = true;
+            newEffect.fadeIn = true;
             newEffect.Q = 0.1f;
             newEffect.E = 0.7f;
         }
@@ -896,12 +896,12 @@ public final class EffectManager {
         Effect[] effectArr = effects;
         for (int i = 0; i < nextFreeEffect; i++) {
             Effect effect = effectArr[i];
-            if (effect.o && !effect.p) {
+            if (effect.isActive && !effect.p) {
                 effect.draw(f);
             }
         }
         if (useStrictCounting) {
-            while (nextFreeEffect > 0 && !effectArr[nextFreeEffect - 1].o) {
+            while (nextFreeEffect > 0 && !effectArr[nextFreeEffect - 1].isActive) {
                 nextFreeEffect--;
             }
         }
@@ -928,7 +928,7 @@ public final class EffectManager {
         }
         for (int i3 = 0; i3 < nextFreeEffect; i3++) {
             Effect effect = effects[i3];
-            if (effect.o) {
+            if (effect.isActive) {
                 if (!this.activeEffectLayerFlags[effect.ar]) {
                     this.activeEffectLayerFlags[effect.ar] = true;
                 }
@@ -953,7 +953,7 @@ public final class EffectManager {
         Effect[] effectArr = effects;
         for (int i3 = 0; i3 < nextFreeEffect; i3++) {
             Effect effect = effectArr[i3];
-            if (effect.o && effect.ar == i && effect.update(gameEngine, false)) {
+            if (effect.isActive && effect.ar == i && effect.update(gameEngine, false)) {
                 i2++;
             }
         }
@@ -967,8 +967,8 @@ public final class EffectManager {
         }
         for (int i = 0; i < effects.length; i++) {
             Effect effect = effects[i];
-            if (effect.o) {
-                effect.o = false;
+            if (effect.isActive) {
+                effect.isActive = false;
                 this.activeEffectsCount--;
             }
         }

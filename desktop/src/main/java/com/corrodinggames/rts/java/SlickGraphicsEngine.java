@@ -461,14 +461,14 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
     }
 
     public void b(ShaderProgram shaderProgram) {
-        for (ShaderUniform shaderUniform : shaderProgram.p) {
-            if (shaderUniform.c) {
-                shaderUniform.c = false;
+        for (ShaderUniform shaderUniform : shaderProgram.uniforms) {
+            if (shaderUniform.isDirty) {
+                shaderUniform.isDirty = false;
                 if (shaderUniform.b == -1) {
-                    shaderUniform.b = GL20.glGetUniformLocation(shaderProgram.n, shaderUniform.a);
+                    shaderUniform.b = GL20.glGetUniformLocation(shaderProgram.n, shaderUniform.name);
                     if (shaderUniform.b == -1 && !shaderUniform.d) {
                         shaderUniform.d = true;
-                        shaderProgram.b("Unknown parameter: " + shaderUniform.a);
+                        shaderProgram.b("Unknown parameter: " + shaderUniform.name);
                         int iGlGetProgrami = GL20.glGetProgrami(shaderProgram.n, 35718);
                         int iGlGetProgrami2 = GL20.glGetProgrami(shaderProgram.n, 35719);
                         for (int i = 0; i < iGlGetProgrami; i++) {
@@ -477,8 +477,8 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
                         return;
                     }
                 }
-                if (shaderUniform.f != null) {
-                    org.newdawn.slick.opengl.Texture texture = e(shaderUniform.f).C().getTexture();
+                if (shaderUniform.texture != null) {
+                    org.newdawn.slick.opengl.Texture texture = e(shaderUniform.texture).C().getTexture();
                     if (shaderUniform.g) {
                         GL20.glUniform2f(shaderUniform.b, texture.getTextureWidth(), texture.getTextureHeight());
                     } else {
@@ -489,21 +489,21 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
                         GL11.glBindTexture(3553, textureID);
                         GL13.glActiveTexture(33984);
                     }
-                } else if (shaderUniform.e.length == 1) {
-                    GL20.glUniform1f(shaderUniform.b, shaderUniform.e[0]);
-                } else if (shaderUniform.e.length == 2) {
-                    GL20.glUniform2f(shaderUniform.b, shaderUniform.e[0], shaderUniform.e[1]);
-                } else if (shaderUniform.e.length == 4) {
-                    GL20.glUniform4f(shaderUniform.b, shaderUniform.e[0], shaderUniform.e[1], shaderUniform.e[2], shaderUniform.e[3]);
+                } else if (shaderUniform.floatValues.length == 1) {
+                    GL20.glUniform1f(shaderUniform.b, shaderUniform.floatValues[0]);
+                } else if (shaderUniform.floatValues.length == 2) {
+                    GL20.glUniform2f(shaderUniform.b, shaderUniform.floatValues[0], shaderUniform.floatValues[1]);
+                } else if (shaderUniform.floatValues.length == 4) {
+                    GL20.glUniform4f(shaderUniform.b, shaderUniform.floatValues[0], shaderUniform.floatValues[1], shaderUniform.floatValues[2], shaderUniform.floatValues[3]);
                 } else {
-                    shaderProgram.b("Unhandled parameter size: " + shaderUniform.a + " - " + shaderUniform.e.length);
+                    shaderProgram.b("Unhandled parameter size: " + shaderUniform.name + " - " + shaderUniform.floatValues.length);
                 }
             }
         }
     }
 
     public boolean c(ShaderProgram shaderProgram) {
-        if (shaderProgram.o != 0) {
+        if (shaderProgram.programStatus != 0) {
             return false;
         }
         if (shaderProgram.n != 0 && !shaderProgram.m) {
@@ -512,9 +512,9 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
         }
         shaderProgram.m = false;
         shaderProgram.b("Compiling shader");
-        shaderProgram.g = a(shaderProgram, 35633, shaderProgram.e);
-        shaderProgram.h = a(shaderProgram, 35632, shaderProgram.f);
-        if (shaderProgram.o != 0) {
+        shaderProgram.vertexShaderId = a(shaderProgram, 35633, shaderProgram.vertexSource);
+        shaderProgram.fragmentShaderId = a(shaderProgram, 35632, shaderProgram.fragmentSource);
+        if (shaderProgram.programStatus != 0) {
             return false;
         }
         shaderProgram.n = GL20.glCreateProgram();
@@ -522,8 +522,8 @@ public final class SlickGraphicsEngine implements GraphicsEngine {
             shaderProgram.c("could not create program; check ShaderProgram.isSupported()");
             return false;
         }
-        GL20.glAttachShader(shaderProgram.n, shaderProgram.g);
-        GL20.glAttachShader(shaderProgram.n, shaderProgram.h);
+        GL20.glAttachShader(shaderProgram.n, shaderProgram.vertexShaderId);
+        GL20.glAttachShader(shaderProgram.n, shaderProgram.fragmentShaderId);
         GL20.glLinkProgram(shaderProgram.n);
         int iGlGetProgrami = GL20.glGetProgrami(shaderProgram.n, 35714);
         String strGlGetProgramInfoLog = GL20.glGetProgramInfoLog(shaderProgram.n, GL20.glGetProgrami(shaderProgram.n, 35716));

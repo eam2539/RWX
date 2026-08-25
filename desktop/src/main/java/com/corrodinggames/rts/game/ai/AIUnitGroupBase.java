@@ -33,7 +33,7 @@ public abstract class AIUnitGroupBase extends AIStrategyNode {
 
     public boolean m() {
         for (AIStrategyNode aIStrategyNode : this.aiController.strategyNodes) {
-            if ((aIStrategyNode instanceof TransporterGroup) && ((TransporterGroup) aIStrategyNode).m == this) {
+            if ((aIStrategyNode instanceof TransporterGroup) && ((TransporterGroup) aIStrategyNode).unitGroup == this) {
                 return true;
             }
         }

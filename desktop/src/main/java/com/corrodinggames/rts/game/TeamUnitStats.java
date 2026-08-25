@@ -188,9 +188,9 @@ public final class TeamUnitStats {
         FastArrayList<Projectile> fastArrayListDx = factoryQueueInterface.dx();
         if (fastArrayListDx.size != 0) {
             for (Projectile projectile : fastArrayListDx) {
-                if (projectile.f && (unitType = projectile.g) != null && (animationSetX = unitType.x()) != null) {
+                if (projectile.f && (unitType = projectile.unitType) != null && (animationSetX = unitType.x()) != null) {
                     for (AnimationTag animationTag : animationSetX.a) {
-                        a(animationTag).d += projectile.a;
+                        a(animationTag).d += projectile.launchDelay;
                     }
                 }
             }
@@ -203,9 +203,9 @@ public final class TeamUnitStats {
         FastArrayList<Projectile> fastArrayListDx = factoryQueueInterface.dx();
         if (fastArrayListDx.size != 0) {
             for (Projectile projectile : fastArrayListDx) {
-                if (projectile.f && (unitType = projectile.g) != null && (animationSetX = unitType.x()) != null) {
+                if (projectile.f && (unitType = projectile.unitType) != null && (animationSetX = unitType.x()) != null) {
                     for (AnimationTag animationTag : animationSetX.a) {
-                        a(animationTag).d -= projectile.a;
+                        a(animationTag).d -= projectile.launchDelay;
                     }
                 }
             }

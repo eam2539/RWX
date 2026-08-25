@@ -20,17 +20,25 @@ import java.io.IOException;
 public class Tree extends NaturalUnit {
     static Texture[] a = new Texture[3];
     static Texture b = null;
-    Texture c;
-    int d;
-    int e;
-    int f;
+        /* JADX INFO: renamed from: c */
+    Texture texture;
+        /* JADX INFO: renamed from: d */
+    int treeType;
+        /* JADX INFO: renamed from: e */
+    int subType;
+        /* JADX INFO: renamed from: f */
+    int frameIndex;
     float g;
     boolean h;
     float i;
-    int j;
-    int k;
-    float l;
-    boolean m;
+        /* JADX INFO: renamed from: j */
+    int textureOffsetX;
+        /* JADX INFO: renamed from: k */
+    int textureOffsetY;
+        /* JADX INFO: renamed from: l */
+    float scale;
+        /* JADX INFO: renamed from: m */
+    boolean hasSubType;
 
     public static void b() {
         GameEngine gameEngine = GameEngine.getInstance();
@@ -40,46 +48,58 @@ public class Tree extends NaturalUnit {
         b = gameEngine.renderGraphicsEngine.a(R.drawable.palm_leaves);
     }
 
+    public Tree(boolean z) {
+        super(z);
+        this.frameIndex = 0;
+        this.textureOffsetX = 0;
+        this.textureOffsetY = 0;
+        this.scale = 1.0f;
+        this.hasSubType = false;
+        b(1, -1);
+        this.radius = 3.0f;
+        this.displayRadius = this.radius + 1.0f;
+        this.maxHealth = 100.0f;
+        this.currentHealth = this.maxHealth;
+        this.rotationSpeed = -90.0f;
+        S(3);
+    }
+
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
-        gameOutputStream.writeInt(this.d);
-        gameOutputStream.writeInt(this.f);
+        gameOutputStream.writeInt(this.treeType);
+        gameOutputStream.writeInt(this.frameIndex);
         gameOutputStream.writeFloat(this.g);
         gameOutputStream.writeBoolean(this.h);
         gameOutputStream.writeFloat(this.i);
         gameOutputStream.writeByte(2);
-        gameOutputStream.writeFloat(this.l);
-        gameOutputStream.writeInt(this.e);
+        gameOutputStream.writeFloat(this.scale);
+        gameOutputStream.writeInt(this.subType);
         super.a(gameOutputStream);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject
     public void a(GameInputStream gameInputStream) throws IOException {
-        this.d = gameInputStream.readInt();
-        this.f = gameInputStream.readInt();
+        this.treeType = gameInputStream.readInt();
+        this.frameIndex = gameInputStream.readInt();
         this.g = gameInputStream.readFloat();
         this.h = gameInputStream.readBoolean();
         this.i = gameInputStream.readFloat();
         byte b2 = gameInputStream.readByte();
         if (b2 >= 1) {
-            this.l = gameInputStream.readFloat();
+            this.scale = gameInputStream.readFloat();
         } else {
-            this.l = 1.0f;
+            this.scale = 1.0f;
         }
         if (b2 >= 2) {
-            this.e = gameInputStream.readInt();
+            this.subType = gameInputStream.readInt();
         } else {
-            this.e = 0;
+            this.subType = 0;
         }
-        b(this.d, this.e);
+        b(this.treeType, this.subType);
         super.a(gameInputStream);
         if (this.isDead) {
-            this.m = false;
+            this.hasSubType = false;
         }
-    }
-
-    public Texture d() {
-        return this.c;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -88,20 +108,8 @@ public class Tree extends NaturalUnit {
         return true;
     }
 
-    public Tree(boolean z) {
-        super(z);
-        this.f = 0;
-        this.j = 0;
-        this.k = 0;
-        this.l = 1.0f;
-        this.m = false;
-        b(1, -1);
-        this.radius = 3.0f;
-        this.displayRadius = this.radius + 1.0f;
-        this.maxHealth = 100.0f;
-        this.currentHealth = this.maxHealth;
-        this.rotationSpeed = -90.0f;
-        S(3);
+    public Texture d() {
+        return this.texture;
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -128,17 +136,17 @@ public class Tree extends NaturalUnit {
     }
 
     public void b(int i, int i2) {
-        this.d = i;
-        this.e = i2;
-        if (this.d == 0) {
+        this.treeType = i;
+        this.subType = i2;
+        if (this.treeType == 0) {
             T(27);
             U(41);
-            this.j = 1;
-            this.k = 1;
-            this.c = a[0];
+            this.textureOffsetX = 1;
+            this.textureOffsetY = 1;
+            this.texture = a[0];
             return;
         }
-        if (this.d == 1 || this.d == 2) {
+        if (this.treeType == 1 || this.treeType == 2) {
             if (i2 == -1) {
                 i2 = Utility.getDeterministicRandomIntInRange(0, 4, (int) this.objectId);
             }
@@ -147,34 +155,34 @@ public class Tree extends NaturalUnit {
             }
             T(25);
             U(30);
-            if (this.d == 1) {
-                this.c = a[1];
+            if (this.treeType == 1) {
+                this.texture = a[1];
             } else {
-                this.c = a[2];
+                this.texture = a[2];
             }
-            this.j = 0;
-            this.k = 30 * i2;
+            this.textureOffsetX = 0;
+            this.textureOffsetY = 30 * i2;
             if (i2 == 0) {
-                this.l = Utility.getDeterministicRandomFloat(1.0f, 1.2f, ((int) this.objectId) + 1);
+                this.scale = Utility.getDeterministicRandomFloat(1.0f, 1.2f, ((int) this.objectId) + 1);
             } else {
-                this.l = Utility.getDeterministicRandomFloat(1.0f, 2.0f, ((int) this.objectId) + 1);
+                this.scale = Utility.getDeterministicRandomFloat(1.0f, 2.0f, ((int) this.objectId) + 1);
             }
-            this.m = true;
+            this.hasSubType = true;
             return;
         }
-        throw new RuntimeException("Tree type:" + this.d + " is not supported");
+        throw new RuntimeException("Tree type:" + this.treeType + " is not supported");
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.GameObject
     /* JADX INFO: renamed from: a */
     public void update(float f) {
-        if (this.d == 0) {
+        if (this.treeType == 0) {
             if (this.h) {
-                if (this.f < 4) {
+                if (this.frameIndex < 4) {
                     this.g += f;
                     if (this.g > 5.0f) {
                         this.g = 0.0f;
-                        this.f++;
+                        this.frameIndex++;
                         return;
                     }
                     return;
@@ -183,18 +191,18 @@ public class Tree extends NaturalUnit {
             }
             if (this.i != 0.0f) {
                 this.i = Utility.moveTowardsZero(this.i, 0.1f * f);
-                this.f = 2;
-            } else if (this.f > 1) {
-                this.f = 1;
+                this.frameIndex = 2;
+            } else if (this.frameIndex > 1) {
+                this.frameIndex = 1;
             }
         }
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public Rect a_(boolean z) {
-        int i = this.j;
-        int i2 = this.k;
-        int i3 = i + (this.f * (this.es + 1));
+        int i = this.textureOffsetX;
+        int i2 = this.textureOffsetY;
+        int i3 = i + (this.frameIndex * (this.es + 1));
         dC.a(i3, i2, i3 + this.es, i2 + this.et);
         return dC;
     }
@@ -213,10 +221,10 @@ public class Tree extends NaturalUnit {
         dv.a(a_(false));
         GraphicsEngine graphicsEngine = gameEngine.renderGraphicsEngine;
         graphicsEngine.k();
-        if (this.l != 1.0f) {
-            graphicsEngine.a(this.l, this.l, fD, fE);
+        if (this.scale != 1.0f) {
+            graphicsEngine.a(this.scale, this.scale, fD, fE);
         }
-        if (this.m) {
+        if (this.hasSubType) {
             dv.a(this.es, 0);
             gameEngine.renderGraphicsEngine.a(textureD, dv, du, (Paint) null);
             dv.a(-this.es, 0);
@@ -294,14 +302,14 @@ public class Tree extends NaturalUnit {
     public void k() {
         if (!this.h) {
             GameEngine gameEngine = GameEngine.getInstance();
-            this.f = 2;
+            this.frameIndex = 2;
             this.g = 0.0f;
             S(0);
             this.isAlive = false;
             this.isDead = true;
             this.unitCreationTime = gameEngine.gameTimeMillis;
             this.h = true;
-            this.m = false;
+            this.hasSubType = false;
             for (int i = 0; i < 1; i++) {
                 gameEngine.effectManager.setOnlyOnScreen();
                 Effect effectCreateEffectInternal = gameEngine.effectManager.createEffectInternal(this.posX + Utility.randomFloatInRange(-12.0f, 12.0f), this.posY + Utility.randomFloatInRange(-12.0f, 12.0f), this.posZ, EffectType.custom, false, EffectQuality.high);
@@ -313,13 +321,13 @@ public class Tree extends NaturalUnit {
                     effectCreateEffectInternal.K = 5.0f + Utility.randomFloatInRange(0.0f, 3.0f);
                     effectCreateEffectInternal.P = Utility.randomFloatInRange(-0.05f, 0.05f) + (Utility.fastCos(this.rotationSpeed) * 0.4f);
                     effectCreateEffectInternal.Q = Utility.randomFloatInRange(-0.05f, 0.05f) + (Utility.fastSin(this.rotationSpeed) * 0.4f);
-                    effectCreateEffectInternal.v = true;
+                    effectCreateEffectInternal.useBounce = true;
                     effectCreateEffectInternal.w = 0.2f;
-                    effectCreateEffectInternal.G = 0.4f * this.l;
-                    effectCreateEffectInternal.F = 0.4f * this.l;
+                    effectCreateEffectInternal.G = 0.4f * this.scale;
+                    effectCreateEffectInternal.F = 0.4f * this.scale;
                     effectCreateEffectInternal.V = 90 + Utility.getRandomIntInRange(0, 40);
                     effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-                    effectCreateEffectInternal.r = true;
+                    effectCreateEffectInternal.fadeIn = true;
                     effectCreateEffectInternal.ar = (short) 2;
                 }
             }
@@ -341,8 +349,8 @@ public class Tree extends NaturalUnit {
                     if (effectCreateEffectInternal2.ap == 3) {
                         effectCreateEffectInternal2.P = Utility.randomFloatInRange(-0.05f, 0.05f);
                         effectCreateEffectInternal2.Q = Utility.randomFloatInRange(-0.05f, 0.05f);
-                        effectCreateEffectInternal2.G = 1.5f * this.l;
-                        effectCreateEffectInternal2.F = 2.2f * this.l;
+                        effectCreateEffectInternal2.G = 1.5f * this.scale;
+                        effectCreateEffectInternal2.F = 2.2f * this.scale;
                         effectCreateEffectInternal2.V = 90 + Utility.getRandomIntInRange(0, 40);
                         effectCreateEffectInternal2.ar = (short) 2;
                     } else {
@@ -354,10 +362,10 @@ public class Tree extends NaturalUnit {
                         effectCreateEffectInternal2.ar = (short) 1;
                     }
                     effectCreateEffectInternal2.W = effectCreateEffectInternal2.V;
-                    effectCreateEffectInternal2.r = true;
+                    effectCreateEffectInternal2.fadeIn = true;
                 }
             }
-            if (this.d == 1 || this.d == 2) {
+            if (this.treeType == 1 || this.treeType == 2) {
                 this.posX += Utility.fastCos(this.rotationSpeed) * ((this.et / 2) - 3);
                 this.posY += Utility.fastSin(this.rotationSpeed) * ((this.et / 2) - 3);
             }
@@ -368,10 +376,10 @@ public class Tree extends NaturalUnit {
     public void n() {
         super.n();
         this.rotationSpeed = Utility.normalizeAngle((this.posY * 5.0f) + (this.posX * 3.0f), false);
-        if (this.d == 0) {
-            this.f = ((int) ((this.posY * 5.0f) + (this.posX * 3.0f))) % 1;
+        if (this.treeType == 0) {
+            this.frameIndex = ((int) ((this.posY * 5.0f) + (this.posX * 3.0f))) % 1;
         }
-        if (this.d == 1) {
+        if (this.treeType == 1) {
         }
     }
 

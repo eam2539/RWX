@@ -156,7 +156,7 @@ public class CommandCenter extends FactoryWithQueue {
             effectCreateLightEffect.E = 0.9f;
             effectCreateLightEffect.V = 20.0f;
             effectCreateLightEffect.W = effectCreateLightEffect.V;
-            effectCreateLightEffect.r = true;
+            effectCreateLightEffect.fadeIn = true;
         }
         gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
         Effect effectCreateSmallExplosion = gameEngine.effectManager.createSmallExplosion(f, f2, 0.0f, -1127220);
@@ -170,7 +170,7 @@ public class CommandCenter extends FactoryWithQueue {
         }
         gameEngine.effectManager.createExplosionWithVelocity(this.posX, this.posY, this.posZ, 40.0f, 70.0f);
         EffectEmitter.a(this.posX, this.posY);
-        EffectEmitter.b(this.posX, this.posY).a = 800.0f;
+        EffectEmitter.b(this.posX, this.posY).duration = 800.0f;
         return true;
     }
 

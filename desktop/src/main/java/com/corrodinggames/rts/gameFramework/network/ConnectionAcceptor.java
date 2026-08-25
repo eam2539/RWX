@@ -25,9 +25,14 @@ public class ConnectionAcceptor implements Runnable {
 
     /* JADX INFO: renamed from: f */
     boolean isUdp;
-    boolean o;
-    boolean p;
-    boolean q;
+    /* JADX INFO: renamed from: o */
+    boolean tooManyConnectionsLogged;
+
+    /* JADX INFO: renamed from: p */
+    boolean tooManyUniqueAttemptsLogged;
+
+    /* JADX INFO: renamed from: q */
+    boolean tooManyFromSameIpLogged;
     public final boolean a = false;
 
     /* JADX INFO: renamed from: c */
@@ -72,9 +77,9 @@ public class ConnectionAcceptor implements Runnable {
             }
             this.acceptedCount = 0;
             this.pendingLimit = 0;
-            this.o = false;
-            this.p = false;
-            this.q = false;
+            this.tooManyConnectionsLogged = false;
+            this.tooManyUniqueAttemptsLogged = false;
+            this.tooManyFromSameIpLogged = false;
         }
         synchronized (this.l) {
             boolean z2 = false;
@@ -127,8 +132,8 @@ public class ConnectionAcceptor implements Runnable {
                 this.pendingConnections.add(connectionAttemptTracker4);
             }
             if (this.acceptedCount > 500) {
-                if (!this.p) {
-                    this.p = true;
+                if (!this.tooManyUniqueAttemptsLogged) {
+                    this.tooManyUniqueAttemptsLogged = true;
                     GameEngine.log("DOS: Too many unique attempts: " + this.acceptedCount + ". udp:" + this.isUdp);
                     return false;
                 }
@@ -150,16 +155,16 @@ public class ConnectionAcceptor implements Runnable {
                 i4 = 5;
             }
             if (i2 > i4) {
-                if (!this.q) {
-                    this.q = true;
+                if (!this.tooManyFromSameIpLogged) {
+                    this.tooManyFromSameIpLogged = true;
                     GameEngine.log("DOS: Too open connections from same ip:" + inetAddress.toString() + " (count:" + i2 + ") max:" + i4);
                     return false;
                 }
                 return false;
             }
             if (i3 > 300) {
-                if (!this.o) {
-                    this.o = true;
+                if (!this.tooManyConnectionsLogged) {
+                    this.tooManyConnectionsLogged = true;
                     GameEngine.log("DOS: Too open connections locking down:" + inetAddress.toString() + " (count:" + i3 + ")");
                     return false;
                 }
@@ -191,14 +196,14 @@ public class ConnectionAcceptor implements Runnable {
 
     /* JADX INFO: renamed from: a */
     public void startSocket(boolean z) throws IOException {
-        this.port = this.networkEngine.m;
+        this.port = this.networkEngine.networkPort;
         this.networkEngine.d("starting socket.. " + (z ? "udp" : "tcp") + " port: " + this.port);
         this.isUdp = z;
         if (!z) {
             this.serverSocket = new ServerSocket(this.port);
             return;
         }
-        ReliableServerSocket reliableServerSocket = new ReliableServerSocket(this.networkEngine.m, 0, null, true);
+        ReliableServerSocket reliableServerSocket = new ReliableServerSocket(this.networkEngine.networkPort, 0, null, true);
         reliableServerSocket.setAcceptancePolicy(new AcceptFilter() { // from class: com.corrodinggames.rts.gameFramework.j.ao.1
             @Override // net.rudp.socket.AcceptFilter
             /* JADX INFO: renamed from: a */

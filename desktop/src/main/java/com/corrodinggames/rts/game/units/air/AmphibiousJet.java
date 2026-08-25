@@ -30,23 +30,6 @@ import java.util.ArrayList;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.b.c */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/b/c.class */
 public class AmphibiousJet extends AirUnit {
-    float q;
-    boolean r;
-    boolean s;
-    float t;
-    float u;
-    protected Paint v;
-    PointF w;
-    Rect x;
-    static Texture a = null;
-    static Texture b = null;
-    static Texture c = null;
-    static Texture d = null;
-    static Texture[] e = new Texture[10];
-    static Texture[] f = new Texture[10];
-    static Texture[] g = new Texture[10];
-    static Texture o = null;
-    static Texture p = null;
     public static final AbstractUnitAction y = new NoneAction(151) { // from class: com.corrodinggames.rts.game.units.b.c.1
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
@@ -63,7 +46,7 @@ public class AmphibiousJet extends AirUnit {
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return !((AmphibiousJet) baseUnit).r;
+            return !((AmphibiousJet) baseUnit).hasWaterEffect;
         }
     };
     public static final AbstractUnitAction z = new NoneAction(152) { // from class: com.corrodinggames.rts.game.units.b.c.2
@@ -82,9 +65,30 @@ public class AmphibiousJet extends AirUnit {
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public boolean canAfford(BaseUnit baseUnit, boolean z2) {
-            return ((AmphibiousJet) baseUnit).r && ((OrderableUnit) baseUnit).isOverWater();
+            return ((AmphibiousJet) baseUnit).hasWaterEffect && ((OrderableUnit) baseUnit).isOverWater();
         }
     };
+    protected Paint waterPaint;
+    float t;
+    float u;
+    /* JADX INFO: renamed from: q */
+    float bobPhase;
+    /* JADX INFO: renamed from: r */
+    boolean hasWaterEffect;
+    Rect x;
+    static Texture a = null;
+    static Texture b = null;
+    static Texture c = null;
+    static Texture d = null;
+    static Texture[] e = new Texture[10];
+    static Texture[] f = new Texture[10];
+    static Texture[] g = new Texture[10];
+    static Texture o = null;
+    static Texture p = null;
+    /* JADX INFO: renamed from: s */
+    boolean isSubmerged;
+    /* JADX INFO: renamed from: w */
+    PointF tempPoint;
     static ArrayList A = new ArrayList();
 
     static {
@@ -92,18 +96,43 @@ public class AmphibiousJet extends AirUnit {
         A.add(z);
     }
 
+    public AmphibiousJet(boolean z2) {
+        super(z2);
+        this.hasWaterEffect = true;
+        this.isSubmerged = true;
+        this.t = 0.0f;
+        this.u = 0.0f;
+        this.waterPaint = new GamePaint();
+        this.tempPoint = new PointF();
+        this.x = new Rect();
+        b(b);
+        this.radius = 12.0f;
+        this.displayRadius = this.radius + 1.0f;
+        this.maxHealth = 530.0f;
+        this.currentHealth = this.maxHealth;
+        this.baseTexture = b;
+        this.shadowTexture = c;
+        this.posZ = 0.0f;
+        S(5);
+    }
+
     @Override // com.corrodinggames.rts.game.units.air.AirUnit, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
-        gameOutputStream.writeBoolean(this.r);
+        gameOutputStream.writeBoolean(this.hasWaterEffect);
         gameOutputStream.writeFloat(this.t);
         gameOutputStream.writeFloat(this.u);
         super.a(gameOutputStream);
     }
 
+    @Override // com.corrodinggames.rts.game.units.MovableUnit, com.corrodinggames.rts.game.units.BaseUnit
+    public boolean Q() {
+        return this.posZ < -1.0f;
+    }
+
     @Override // com.corrodinggames.rts.game.units.air.AirUnit, com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject
     public void a(GameInputStream gameInputStream) throws IOException {
-        this.r = gameInputStream.readBoolean();
-        this.s = !Q();
+        this.hasWaterEffect = gameInputStream.readBoolean();
+        this.isSubmerged = !Q();
         if (gameInputStream.getProtocolVersion() >= 21) {
             this.t = gameInputStream.readFloat();
         }
@@ -112,18 +141,6 @@ public class AmphibiousJet extends AirUnit {
         }
         M();
         super.a(gameInputStream);
-    }
-
-    @Override // com.corrodinggames.rts.game.units.MovableUnit, com.corrodinggames.rts.game.units.BaseUnit
-    public boolean Q() {
-        return this.posZ < -1.0f;
-    }
-
-    public boolean b() {
-        if (!this.r || this.posZ < 0.0f) {
-            return true;
-        }
-        return false;
     }
 
     @Override // com.corrodinggames.rts.game.units.air.AirUnit, com.corrodinggames.rts.game.units.BaseUnit
@@ -196,6 +213,32 @@ public class AmphibiousJet extends AirUnit {
         return true;
     }
 
+    public boolean b() {
+        if (!this.hasWaterEffect || this.posZ < 0.0f) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit
+    /* JADX INFO: renamed from: bl */
+    public int getTechLevel() {
+        return 3;
+    }
+
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public PointF G(int i) {
+        if (i == ds()) {
+            return super.G(i);
+        }
+        float unitArmorRating = getRenderRotation(false) - 90.0f;
+        PointF pointFA = a(i, false);
+        float f2 = pointFA.x;
+        float f3 = pointFA.y;
+        tempPointF3.a(f2 + (Utility.fastCos(unitArmorRating) * 5.0f), f3 + (Utility.fastSin(unitArmorRating) * 5.0f));
+        return tempPointF3;
+    }
+
     public void f(boolean z2) {
         Paint paintAN;
         Texture texture;
@@ -204,8 +247,8 @@ public class AmphibiousJet extends AirUnit {
         if (!z2) {
             paintAN = getRenderPaint();
         } else {
-            this.v.a(50, 255, 255, 255);
-            paintAN = this.v;
+            this.waterPaint.a(50, 255, 255, 255);
+            paintAN = this.waterPaint;
         }
         for (int i = 0; i <= 1; i++) {
             PointF pointFA = a(i, z2);
@@ -234,41 +277,6 @@ public class AmphibiousJet extends AirUnit {
         }
     }
 
-    @Override // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit
-    /* JADX INFO: renamed from: bl */
-    public int getTechLevel() {
-        return 3;
-    }
-
-    @Override // com.corrodinggames.rts.game.units.OrderableUnit
-    public PointF G(int i) {
-        if (i == ds()) {
-            return super.G(i);
-        }
-        float unitArmorRating = getRenderRotation(false) - 90.0f;
-        PointF pointFA = a(i, false);
-        float f2 = pointFA.x;
-        float f3 = pointFA.y;
-        tempPointF3.a(f2 + (Utility.fastCos(unitArmorRating) * 5.0f), f3 + (Utility.fastSin(unitArmorRating) * 5.0f));
-        return tempPointF3;
-    }
-
-    public PointF a(int i, boolean z2) {
-        float unitArmorRating = getRenderRotation(false) - 90.0f;
-        if (i == ds()) {
-            throw new RuntimeException("index==2 is for base");
-        }
-        float f2 = this.posX;
-        float f3 = this.posY;
-        float fClampTo255 = Utility.clampTo255(this.u * 4.0f, 0.0f, 1.0f);
-        float fClampTo2552 = Utility.clampTo255((this.u * 2.0f) - 1.0f, 0.0f, 1.0f);
-        float fFastCos = f2 + (Utility.fastCos(unitArmorRating) * (7.0f - (5.0f * fClampTo255)));
-        float fFastSin = f3 + (Utility.fastSin(unitArmorRating) * (7.0f - (5.0f * fClampTo255)));
-        float f4 = (-90) + (SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT * i);
-        this.w.a(fFastCos + (Utility.fastCos(unitArmorRating + f4) * (12.0f - (5.0f * fClampTo2552))), fFastSin + (Utility.fastSin(unitArmorRating + f4) * (12.0f - (5.0f * fClampTo2552))));
-        return this.w;
-    }
-
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
         if (this.isDead) {
@@ -287,24 +295,20 @@ public class AmphibiousJet extends AirUnit {
         return d;
     }
 
-    public AmphibiousJet(boolean z2) {
-        super(z2);
-        this.r = true;
-        this.s = true;
-        this.t = 0.0f;
-        this.u = 0.0f;
-        this.v = new GamePaint();
-        this.w = new PointF();
-        this.x = new Rect();
-        b(b);
-        this.radius = 12.0f;
-        this.displayRadius = this.radius + 1.0f;
-        this.maxHealth = 530.0f;
-        this.currentHealth = this.maxHealth;
-        this.baseTexture = b;
-        this.shadowTexture = c;
-        this.posZ = 0.0f;
-        S(5);
+    public PointF a(int i, boolean z2) {
+        float unitArmorRating = getRenderRotation(false) - 90.0f;
+        if (i == ds()) {
+            throw new RuntimeException("index==2 is for base");
+        }
+        float f2 = this.posX;
+        float f3 = this.posY;
+        float fClampTo255 = Utility.clampTo255(this.u * 4.0f, 0.0f, 1.0f);
+        float fClampTo2552 = Utility.clampTo255((this.u * 2.0f) - 1.0f, 0.0f, 1.0f);
+        float fFastCos = f2 + (Utility.fastCos(unitArmorRating) * (7.0f - (5.0f * fClampTo255)));
+        float fFastSin = f3 + (Utility.fastSin(unitArmorRating) * (7.0f - (5.0f * fClampTo255)));
+        float f4 = (-90) + (SlickToAndroidKeycodes.AndroidCodes.KEYCODE_STB_INPUT * i);
+        this.tempPoint.a(fFastCos + (Utility.fastCos(unitArmorRating + f4) * (12.0f - (5.0f * fClampTo2552))), fFastSin + (Utility.fastSin(unitArmorRating + f4) * (12.0f - (5.0f * fClampTo2552))));
+        return this.tempPoint;
     }
 
     @Override // com.corrodinggames.rts.game.units.air.AirUnit, com.corrodinggames.rts.game.units.BaseUnit
@@ -322,7 +326,7 @@ public class AmphibiousJet extends AirUnit {
     }
 
     public void M() {
-        if (!this.s) {
+        if (!this.isSubmerged) {
             S(1);
         } else {
             S(5);
@@ -338,16 +342,16 @@ public class AmphibiousJet extends AirUnit {
             return;
         }
         GameEngine gameEngine = GameEngine.getInstance();
-        this.q += 2.0f * f2;
-        if (this.q > 360.0f) {
-            this.q -= 360.0f;
+        this.bobPhase += 2.0f * f2;
+        if (this.bobPhase > 360.0f) {
+            this.bobPhase -= 360.0f;
         }
-        if (this.r) {
-            fFastSin = 20.0f + (Utility.fastSin(this.q) * 1.5f);
+        if (this.hasWaterEffect) {
+            fFastSin = 20.0f + (Utility.fastSin(this.bobPhase) * 1.5f);
         } else {
             fFastSin = -8.0f;
         }
-        if (this.r && !Q()) {
+        if (this.hasWaterEffect && !Q()) {
             this.u = Utility.distanceSq(this.u, 0.0f, 0.018f * f2);
         } else {
             this.u = Utility.distanceSq(this.u, 1.0f, 0.018f * f2);
@@ -364,17 +368,17 @@ public class AmphibiousJet extends AirUnit {
         }
         this.posZ = Utility.distanceSq(this.posZ, fFastSin, this.t * f2);
         boolean z2 = false;
-        if (this.s && Q()) {
+        if (this.isSubmerged && Q()) {
             if (!isOverWater()) {
-                this.r = true;
+                this.hasWaterEffect = true;
             } else {
-                this.s = false;
+                this.isSubmerged = false;
                 M();
                 z2 = true;
             }
         }
-        if (!this.s && !Q()) {
-            this.s = true;
+        if (!this.isSubmerged && !Q()) {
+            this.isSubmerged = true;
             M();
             z2 = true;
         }
@@ -385,8 +389,8 @@ public class AmphibiousJet extends AirUnit {
                 Effect effectCreateSmokeEffect = gameEngine.effectManager.createSmokeEffect((float) (((double) this.posX) + (Math.cos(Math.toRadians(f4)) * (-5.0d))), (float) (((double) this.posY) + (Math.sin(Math.toRadians(f4)) * (-5.0d))), 0.0f, f4);
                 if (effectCreateSmokeEffect != null) {
                     effectCreateSmokeEffect.ar = (short) 2;
-                    effectCreateSmokeEffect.s = true;
-                    effectCreateSmokeEffect.t = 7.0f;
+                    effectCreateSmokeEffect.fadeOut = true;
+                    effectCreateSmokeEffect.fadeDuration = 7.0f;
                 }
             }
         }
@@ -584,10 +588,10 @@ public class AmphibiousJet extends AirUnit {
     /* JADX INFO: renamed from: a */
     public void performUnitAction(AbstractUnitAction abstractUnitAction, boolean z2) {
         if (abstractUnitAction == y) {
-            this.r = true;
+            this.hasWaterEffect = true;
         }
         if (abstractUnitAction == z) {
-            this.r = false;
+            this.hasWaterEffect = false;
         }
     }
 

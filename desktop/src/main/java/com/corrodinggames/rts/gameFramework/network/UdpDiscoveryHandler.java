@@ -66,7 +66,7 @@ final class UdpDiscoveryHandler implements Runnable {
                             gameOutputStream.writeInt(this.networkEngine.e);
                             gameOutputStream.writeInt(0);
                             gameOutputStream.writeStringUTF("pong");
-                            gameOutputStream.writeInt(this.networkEngine.m);
+                            gameOutputStream.writeInt(this.networkEngine.networkPort);
                             String bufferAsString = gameOutputStream.getBufferAsString();
                             this.datagramSocket.send(new DatagramPacket(bufferAsString.getBytes(), bufferAsString.length(), datagramPacket.getAddress(), this.networkEngine.udpPort));
                         } else {

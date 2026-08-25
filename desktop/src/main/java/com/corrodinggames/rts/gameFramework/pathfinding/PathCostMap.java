@@ -23,8 +23,11 @@ import java.util.HashMap;
 public final class PathCostMap {
     private final PathEngine q;
     public UnitMovementType a;
-    public final int b;
-    public final int c;
+    /* JADX INFO: renamed from: b */
+    public final int width;
+
+    /* JADX INFO: renamed from: c */
+    public final int height;
     public byte[] d;
     public byte[] e;
     public byte[] f;
@@ -41,8 +44,8 @@ public final class PathCostMap {
 
     /* JADX INFO: Access modifiers changed from: package-private */
     public PathCostMap(PathEngine pathEngine, UnitMovementType unitMovementType, int i, int i2) {
-        this.b = i;
-        this.c = i2;
+        this.width = i;
+        this.height = i2;
         this.q = pathEngine;
         this.a = unitMovementType;
         this.d = new byte[i * i2];
@@ -75,43 +78,43 @@ public final class PathCostMap {
         }
         long a = 0L;
         a = PerformanceProfiler.a();
-        final TileMap q = this.q.q;
-        this.j = new byte[this.b * this.c];
+        final TileMap q = this.q.tileMap;
+        this.j = new byte[this.width * this.height];
         short n = 0;
         short n2 = 0;
-        short n3 = this.q.s;
-        short n4 = this.q.t;
+        short n3 = this.q.widthTiles;
+        short n4 = this.q.heightTiles;
         for (short short4 = n; short4 < n3; ++short4) {
             for (short short3 = n2; short3 < n4; ++short3) {
                 boolean b = false;
-                if (this.d[short4 * this.c + short3] == -1) {
+                if (this.d[short4 * this.height + short3] == -1) {
                     b = true;
                 }
-                if (this.e[short4 * this.c + short3] == -1) {
+                if (this.e[short4 * this.height + short3] == -1) {
                     b = true;
                 }
                 if (b) {
-                    this.j[short4 * this.c + short3] = 0;
+                    this.j[short4 * this.height + short3] = 0;
                 }
                 else {
-                    this.j[short4 * this.c + short3] = 4;
+                    this.j[short4 * this.height + short3] = 4;
                 }
             }
         }
         for (short short4 = n; short4 < n3; ++short4) {
             for (short short3 = n2; short3 < n4; ++short3) {
-                if (this.j[short4 * this.c + short3] == 0) {
+                if (this.j[short4 * this.height + short3] == 0) {
                     this.a(q, short4, short3, this.j);
                 }
             }
         }
         for (short short4 = n; short4 < n3; ++short4) {
             this.a(q, short4, (short)(-1), this.j);
-            this.a(q, short4, (short)(this.q.t + 1), this.j);
+            this.a(q, short4, (short)(this.q.heightTiles + 1), this.j);
         }
         for (short short4 = n2; short4 < n4; ++short4) {
             this.a(q, (short)(-1), short4, this.j);
-            this.a(q, (short)(this.q.s + 1), short4, this.j);
+            this.a(q, (short)(this.q.widthTiles + 1), short4, this.j);
         }
         if (var_1_54 == null) {
             final double double1 = PerformanceProfiler.a(a);
@@ -141,9 +144,9 @@ public final class PathCostMap {
         }
         for (int i5 = i; i5 <= i3; i5++) {
             for (int i6 = i2; i6 <= i4; i6++) {
-                byte b = bArr[(i5 * this.c) + i6];
+                byte b = bArr[(i5 * this.height) + i6];
                 if (b != 0 && (iCountChars = Utility.chebyshevDistance((int) s, (int) s2, i5, i6)) < b) {
-                    bArr[(i5 * this.c) + i6] = (byte) iCountChars;
+                    bArr[(i5 * this.height) + i6] = (byte) iCountChars;
                 }
             }
         }
@@ -154,16 +157,16 @@ public final class PathCostMap {
         if (var_1_21 == null) {
             a = PerformanceProfiler.a();
         }
-        final TileMap q = this.q.q;
+        final TileMap q = this.q.tileMap;
         final byte[] j = this.j;
         if (this.j == null) {
             var_1_21 = null;
         }
-        this.j = new byte[this.b * this.c];
+        this.j = new byte[this.width * this.height];
         short n = 0;
         short n2 = 0;
-        short n3 = this.q.s;
-        short n4 = this.q.t;
+        short n3 = this.q.widthTiles;
+        short n4 = this.q.heightTiles;
         if (var_1_21 != null) {
             Utility.copyByteArray(j, this.j);
             q.setCursorTileIndexFromWorldPoint(var_1_21.posX, var_1_21.posY);
@@ -181,15 +184,15 @@ public final class PathCostMap {
         if (n2 < 0) {
             n2 = 0;
         }
-        if (n3 > this.q.s) {
-            n3 = this.q.s;
+        if (n3 > this.q.widthTiles) {
+            n3 = this.q.widthTiles;
         }
-        if (n4 > this.q.t) {
-            n4 = this.q.t;
+        if (n4 > this.q.heightTiles) {
+            n4 = this.q.heightTiles;
         }
         for (short short4 = n; short4 < n3; ++short4) {
             for (short short3 = n2; short3 < n4; ++short3) {
-                this.j[short4 * this.c + short3] = this.a(q, short4, short3);
+                this.j[short4 * this.height + short3] = this.a(q, short4, short3);
             }
         }
         if (var_1_21 == null) {
@@ -199,7 +202,7 @@ public final class PathCostMap {
 
     final byte a(TileMap tileMap, short s, short s2) {
         int iCountChars;
-        if (this.d[(s * this.c) + s2] == -1) {
+        if (this.d[(s * this.height) + s2] == -1) {
             return (byte) 0;
         }
         int i = s2 - 3;
@@ -210,10 +213,10 @@ public final class PathCostMap {
             for (int i6 = i; i6 <= i3; i6++) {
                 boolean z = false;
                 if (tileMap.isInBounds(i5, i6)) {
-                    if (this.d[(i5 * this.c) + i6] == -1) {
+                    if (this.d[(i5 * this.height) + i6] == -1) {
                         z = true;
                     }
-                    if (this.e[(i5 * this.c) + i6] == -1) {
+                    if (this.e[(i5 * this.height) + i6] == -1) {
                         z = true;
                     }
                 } else {
@@ -229,8 +232,8 @@ public final class PathCostMap {
 
     /* JADX INFO: Access modifiers changed from: package-private */
     public void b() {
-        final int b = this.b;
-        final int c = this.c;
+        final int b = this.width;
+        final int c = this.height;
         this.g = new short[b * c];
         this.h = new HashMap();
         short short3 = 1;
@@ -255,8 +258,8 @@ public final class PathCostMap {
     }
 
     int a(short s, short s2, short s3) {
-        int i = this.c;
-        TileMap tileMap = this.q.q;
+        int i = this.height;
+        TileMap tileMap = this.q.tileMap;
         short[] sArr = this.g;
         byte[] bArr = this.d;
         if (bArr[(s * i) + s2] == -1) {
@@ -307,13 +310,13 @@ public final class PathCostMap {
     }
 
     void d() {
-        TileMap tileMap = this.q.q;
+        TileMap tileMap = this.q.tileMap;
         byte[] bArr = this.d;
         short[] tileIds = tileMap.groundLayer.getTileIds();
         MapTile[] mapTileArr = tileMap.uniqueTiles;
         UnitMovementType unitMovementType = this.a;
-        int i = this.b;
-        int i2 = this.c;
+        int i = this.width;
+        int i2 = this.height;
         if (!c()) {
             return;
         }
@@ -399,12 +402,12 @@ public final class PathCostMap {
             }
         }
         GameEngine.getCurrentTimeMillis();
-        this.e = new byte[this.b * this.c];
+        this.e = new byte[this.width * this.height];
         byte[] bArr = this.e;
         if (this.a.equals(UnitMovementType.AIR)) {
             return;
         }
-        TileMap tileMap = this.q.q;
+        TileMap tileMap = this.q.tileMap;
         BaseUnit[] baseUnitArrA = BaseUnit.bE.a();
         int size = BaseUnit.bE.size();
         for (int i = 0; i < size; i++) {
@@ -421,7 +424,7 @@ public final class PathCostMap {
                 for (int i4 = i2 + rectCc.a; i4 <= i2 + rectCc.c; i4++) {
                     for (int i5 = i3 + rectCc.b; i5 <= i3 + rectCc.d; i5++) {
                         if (tileMap.isInBounds(i4, i5)) {
-                            bArr[(i4 * this.c) + i5] = -1;
+                            bArr[(i4 * this.height) + i5] = -1;
                         }
                     }
                 }
@@ -431,12 +434,12 @@ public final class PathCostMap {
 
     public void e() {
         GameEngine.getCurrentTimeMillis();
-        final int c = this.c;
-        this.f = new byte[this.b * c];
+        final int c = this.height;
+        this.f = new byte[this.width * c];
         if (this.a.equals(UnitMovementType.AIR)) {
             return;
         }
-        final TileMap q = this.q.q;
+        final TileMap q = this.q.tileMap;
         final int halfTileWorldSizeX = q.halfTileWorldSizeX;
         final int halfTileWorldSizeY = q.halfTileWorldSizeY;
         final BaseUnit[] a = BaseUnit.bE.a();

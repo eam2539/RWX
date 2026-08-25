@@ -16,21 +16,24 @@ import java.util.ArrayList;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.a.g */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/a/g.class */
 public class WrapperUnitAction extends AbstractUnitAction {
-    public AbstractUnitAction a;
-    public OrderableUnit b;
-    public ActionFilter c;
+
+    /* JADX INFO: renamed from: a */
+    public AbstractUnitAction wrappedAction;
+
+    /* JADX INFO: renamed from: b */
+    public OrderableUnit unit;
+
+    /* JADX INFO: renamed from: c */
+    public ActionFilter actionFilter;
     static UnitList d;
     static final UnitList e = new UnitList();
 
-    private void K() {
-        GameEngine gameEngine = GameEngine.getInstance();
-        if (d != null) {
-            throw new RuntimeException("savedSelectedUnitsCache!=null");
-        }
-        d = gameEngine.gameUI.selectedUnitsList;
-        e.clear();
-        e.add(this.b);
-        gameEngine.gameUI.selectedUnitsList = e;
+    public WrapperUnitAction(AbstractUnitAction abstractUnitAction, OrderableUnit orderableUnit, ActionId actionId) {
+        super(actionId);
+        this.actionFilter = ActionFilter.emptyActionFilter;
+        this.wrappedAction = abstractUnitAction;
+        this.unit = orderableUnit;
+        this.sortOrder = this.wrappedAction.sortOrder;
     }
 
     private void L() {
@@ -55,64 +58,69 @@ public class WrapperUnitAction extends AbstractUnitAction {
         return super.compareTo(abstractUnitAction);
     }
 
+    private void K() {
+        GameEngine gameEngine = GameEngine.getInstance();
+        if (d != null) {
+            throw new RuntimeException("savedSelectedUnitsCache!=null");
+        }
+        d = gameEngine.gameUI.selectedUnitsList;
+        e.clear();
+        e.add(this.unit);
+        gameEngine.gameUI.selectedUnitsList = e;
+    }
+
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
     public String getDisplayName() {
-        return this.a.getDisplayName();
+        return this.wrappedAction.getDisplayName();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: d */
     public String getDisplayName(BaseUnit baseUnit) {
-        return this.a.getDisplayName(this.b);
+        return this.wrappedAction.getDisplayName(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public String getDescription() {
-        return this.a.getDescription();
+        return this.wrappedAction.getDescription();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: e */
     public String getDescriptionForUnit(BaseUnit baseUnit) {
-        return this.a.getDescriptionForUnit(this.b);
+        return this.wrappedAction.getDescriptionForUnit(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
     public int getCostAmount() {
-        return this.a.getCostAmount();
+        return this.wrappedAction.getCostAmount();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
     public int getActiveCount(BaseUnit baseUnit, boolean z) {
-        return this.a.getActiveCount(this.b, z);
+        return this.wrappedAction.getActiveCount(this.unit, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: n_ */
     public boolean isQueuable() {
-        return this.a.isQueuable();
+        return this.wrappedAction.isQueuable();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public boolean canAfford(BaseUnit baseUnit, boolean z) {
-        return this.a.canAfford(this.b, z);
+        return this.wrappedAction.canAfford(this.unit, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: t */
     public int getQueueSize() {
-        return this.a.getQueueSize();
-    }
-
-    @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
-    /* JADX INFO: renamed from: f */
-    public void onConfirmed(BaseUnit baseUnit) {
-        this.a.onConfirmed(this.b);
+        return this.wrappedAction.getQueueSize();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -121,50 +129,56 @@ public class WrapperUnitAction extends AbstractUnitAction {
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
+    /* JADX INFO: renamed from: f */
+    public void onConfirmed(BaseUnit baseUnit) {
+        this.wrappedAction.onConfirmed(this.unit);
+    }
+
+    @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: g */
     public boolean isNotAvailable(BaseUnit baseUnit) {
-        return this.a.isNotAvailable(this.b);
+        return this.wrappedAction.isNotAvailable(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: u */
     public boolean isGuiBlinking() {
-        return this.a.isGuiBlinking();
+        return this.wrappedAction.isGuiBlinking();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: h */
     public boolean alwaysShowsTooltip() {
-        return this.a.alwaysShowsTooltip();
+        return this.wrappedAction.alwaysShowsTooltip();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: i */
     public UnitType getUnitType() {
-        return this.a.getUnitType();
+        return this.wrappedAction.getUnitType();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: g */
     public boolean isHighPriority() {
-        return this.a.isHighPriority();
+        return this.wrappedAction.isHighPriority();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public ActionType getActionType() {
-        return this.a.getActionType();
+        return this.wrappedAction.getActionType();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: f */
     public ActionDisplayType getActionDisplayType() {
-        return this.a.getActionDisplayType();
+        return this.wrappedAction.getActionDisplayType();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public String d() {
         K();
-        String strD = this.a.d();
+        String strD = this.wrappedAction.d();
         L();
         return strD;
     }
@@ -172,14 +186,14 @@ public class WrapperUnitAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: h_ */
     public boolean shouldShowDisplayText() {
-        return this.a.shouldShowDisplayText();
+        return this.wrappedAction.shouldShowDisplayText();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public void renderDisplayText(BaseUnit baseUnit, TextRenderQueue textRenderQueue, Paint paint, Paint paint2) {
         K();
-        this.a.renderDisplayText(this.b, textRenderQueue, paint, paint2);
+        this.wrappedAction.renderDisplayText(this.unit, textRenderQueue, paint, paint2);
         L();
     }
 
@@ -187,76 +201,68 @@ public class WrapperUnitAction extends AbstractUnitAction {
     /* JADX INFO: renamed from: a */
     public void onPurchase(BaseUnit baseUnit, TextRenderQueue textRenderQueue) {
         K();
-        this.a.onPurchase(this.b, textRenderQueue);
+        this.wrappedAction.onPurchase(this.unit, textRenderQueue);
         L();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: j */
     public Texture getIconTexture() {
-        return this.a.getIconTexture();
+        return this.wrappedAction.getIconTexture();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: h */
     public Texture getExtraIconTexture(BaseUnit baseUnit) {
-        return this.a.getExtraIconTexture(baseUnit);
+        return this.wrappedAction.getExtraIconTexture(baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: v */
     public Rect getIconRect() {
-        return this.a.getIconRect();
+        return this.wrappedAction.getIconRect();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: i */
     public BaseUnit getUnitShownInUI(BaseUnit baseUnit) {
-        return this.a.getUnitShownInUI(this.b);
+        return this.wrappedAction.getUnitShownInUI(this.unit);
     }
 
     public int hashCode() {
-        return this.a.hashCode();
+        return this.wrappedAction.hashCode();
     }
 
     public String toString() {
-        return this.a.toString();
-    }
-
-    public WrapperUnitAction(AbstractUnitAction abstractUnitAction, OrderableUnit orderableUnit, ActionId actionId) {
-        super(actionId);
-        this.c = ActionFilter.emptyActionFilter;
-        this.a = abstractUnitAction;
-        this.b = orderableUnit;
-        this.sortOrder = this.a.sortOrder;
+        return this.wrappedAction.toString();
     }
 
     public AbstractUnitAction p_() {
-        return this.a;
+        return this.wrappedAction;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: x */
     public boolean isRightClickAction() {
-        return this.a.isRightClickAction();
+        return this.wrappedAction.isRightClickAction();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: s */
     public boolean isWaitingForTarget() {
-        return this.a.isWaitingForTarget();
+        return this.wrappedAction.isWaitingForTarget();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: y */
     public UnitType getAttachedUnitType() {
-        return this.a.getAttachedUnitType();
+        return this.wrappedAction.getAttachedUnitType();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: z */
     public ActionId getQueueId() {
-        return this.a.getActionId();
+        return this.wrappedAction.getActionId();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -268,182 +274,182 @@ public class WrapperUnitAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public boolean appendTooltip(BaseUnit baseUnit, PlayerTeam playerTeam) {
-        return this.a.appendTooltip(this.b, playerTeam);
+        return this.wrappedAction.appendTooltip(this.unit, playerTeam);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: A */
     public boolean usesActionTarget() {
-        return this.a.usesActionTarget();
+        return this.wrappedAction.usesActionTarget();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public boolean isTargetingGround(BaseUnit baseUnit) {
-        return this.a.isTargetingGround((BaseUnit) this.b);
+        return this.wrappedAction.isTargetingGround((BaseUnit) this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: B */
     public UnitPrice getPrice() {
-        return this.a.getPrice();
+        return this.wrappedAction.getPrice();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: j */
     public String getIcon(BaseUnit baseUnit) {
-        return this.a.getIcon(this.b);
+        return this.wrappedAction.getIcon(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: d */
     public boolean canPlayerCancel(BaseUnit baseUnit, boolean z) {
-        return this.a.canPlayerCancel(this.b, z);
+        return this.wrappedAction.canPlayerCancel(this.unit, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: k */
     public boolean isAlwaysSinglePress(BaseUnit baseUnit) {
-        return this.a.isAlwaysSinglePress(this.b);
+        return this.wrappedAction.isAlwaysSinglePress(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: l */
     public boolean shouldHideQueueInterface(BaseUnit baseUnit) {
-        return this.a.shouldHideQueueInterface(this.b);
+        return this.wrappedAction.shouldHideQueueInterface(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: C */
     public boolean selectsUnitOnClick() {
-        return this.a.selectsUnitOnClick();
+        return this.wrappedAction.selectsUnitOnClick();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: D */
     public boolean shouldShowUnitPreview() {
-        return this.a.shouldShowUnitPreview();
+        return this.wrappedAction.shouldShowUnitPreview();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: E */
     public UnitType getAiConsiderSameAsBuildingUnitType() {
-        return this.a.getAiConsiderSameAsBuildingUnitType();
+        return this.wrappedAction.getAiConsiderSameAsBuildingUnitType();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: F */
     public boolean isDisplayOnly() {
-        return this.a.isDisplayOnly();
+        return this.wrappedAction.isDisplayOnly();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: m */
     public boolean isAiDisabled(BaseUnit baseUnit) {
-        return this.a.isAiDisabled(this.b);
+        return this.wrappedAction.isAiDisabled(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: n */
     public boolean isAiHighPriority(BaseUnit baseUnit) {
-        return this.a.isAiHighPriority(this.b);
+        return this.wrappedAction.isAiHighPriority(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: c */
     public boolean onClicked(BaseUnit baseUnit, boolean z) {
-        return this.a.onClicked(this.b, z);
+        return this.wrappedAction.onClicked(this.unit, z);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: o */
     public boolean isAvailableAndVisible(BaseUnit baseUnit) {
-        return this.a.isAvailableAndVisible(this.b);
+        return this.wrappedAction.isAvailableAndVisible(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: G */
     public boolean isBuildOption() {
-        return this.a.isBuildOption();
+        return this.wrappedAction.isBuildOption();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public void c(BaseUnit baseUnit) {
-        this.a.c(this.b);
+        this.wrappedAction.c(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: l */
     public float getBuildSpeed() {
-        return this.a.getBuildSpeed();
+        return this.wrappedAction.getBuildSpeed();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: m */
     public int getKeyBinding() {
-        return this.a.getKeyBinding();
+        return this.wrappedAction.getKeyBinding();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: H */
     public boolean isHighPriorityQueue() {
-        return this.a.isHighPriorityQueue();
+        return this.wrappedAction.isHighPriorityQueue();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: I */
     public boolean isOnlyOneUnitAtATime() {
-        return this.a.isOnlyOneUnitAtATime();
+        return this.wrappedAction.isOnlyOneUnitAtATime();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: p */
     public float getProgress(BaseUnit baseUnit) {
-        return this.a.getProgress(this.b);
+        return this.wrappedAction.getProgress(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: q */
     public ArrayList getCandidateActionList(BaseUnit baseUnit) {
-        return this.a.getCandidateActionList(this.b);
+        return this.wrappedAction.getCandidateActionList(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: r */
     public boolean isAvailable(BaseUnit baseUnit) {
-        if (!this.c.isAvailable(this, baseUnit)) {
+        if (!this.actionFilter.isAvailable(this, baseUnit)) {
             return false;
         }
-        return this.a.isAvailable(this.b);
+        return this.wrappedAction.isAvailable(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public boolean b(BaseUnit baseUnit) {
-        if (!this.c.isAvailable(this, baseUnit)) {
+        if (!this.actionFilter.isAvailable(this, baseUnit)) {
             return false;
         }
-        return this.a.b(this.b);
+        return this.wrappedAction.b(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: J */
     public int getExtraIconColor() {
-        return this.a.getExtraIconColor();
+        return this.wrappedAction.getExtraIconColor();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: s */
     public boolean shouldShowUnitHealthBar(BaseUnit baseUnit) {
-        return this.a.shouldShowUnitHealthBar(this.b);
+        return this.wrappedAction.shouldShowUnitHealthBar(this.unit);
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: t */
     public boolean shouldShowUnitProgressBar(BaseUnit baseUnit) {
-        return this.a.shouldShowUnitProgressBar(this.b);
+        return this.wrappedAction.shouldShowUnitProgressBar(this.unit);
     }
 
     public boolean a(WrapperUnitAction wrapperUnitAction) {
-        return this.a == wrapperUnitAction.a && this.b == wrapperUnitAction.b && getActionId() == wrapperUnitAction.getActionId() && this.c == wrapperUnitAction.c;
+        return this.wrappedAction == wrapperUnitAction.wrappedAction && this.unit == wrapperUnitAction.unit && getActionId() == wrapperUnitAction.getActionId() && this.actionFilter == wrapperUnitAction.actionFilter;
     }
 }

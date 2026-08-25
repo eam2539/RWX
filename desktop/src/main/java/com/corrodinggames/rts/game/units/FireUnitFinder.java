@@ -6,9 +6,13 @@ import com.corrodinggames.rts.game.units.spatial.FilteredUnitCallback;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.aj */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/aj.class */
 public class FireUnitFinder extends FilteredUnitCallback {
-    float a;
-    float b;
-    public FireUnit c;
+
+    /* JADX INFO: renamed from: c */
+    public FireUnit foundFireUnit;
+    /* JADX INFO: renamed from: a */
+    float queryX;
+    /* JADX INFO: renamed from: b */
+    float queryY;
 
     FireUnitFinder() {
     }
@@ -25,18 +29,18 @@ public class FireUnitFinder extends FilteredUnitCallback {
 
     @Override // com.corrodinggames.rts.game.units.spatial.FilteredUnitCallback
     public void setup(OrderableUnit orderableUnit, float f) {
-        this.c = null;
+        this.foundFireUnit = null;
     }
 
     public void a(float f, float f2) {
-        this.a = f;
-        this.b = f2;
+        this.queryX = f;
+        this.queryY = f2;
     }
 
     @Override // com.corrodinggames.rts.game.units.spatial.UnitSpatialCallback
     public void callback(OrderableUnit orderableUnit, float f, BaseUnit baseUnit) {
-        if ((baseUnit instanceof FireUnit) && !baseUnit.isDead && baseUnit.isWithinRange(this.a, this.b, 0.0f)) {
-            this.c = (FireUnit) baseUnit;
+        if ((baseUnit instanceof FireUnit) && !baseUnit.isDead && baseUnit.isWithinRange(this.queryX, this.queryY, 0.0f)) {
+            this.foundFireUnit = (FireUnit) baseUnit;
         }
     }
 }

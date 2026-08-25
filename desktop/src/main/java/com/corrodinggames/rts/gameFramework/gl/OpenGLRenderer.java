@@ -528,19 +528,19 @@ public class OpenGLRenderer implements IGraphicsEngine {
     }
 
     public void c(ShaderProgram shaderProgram) {
-        for (ShaderUniform shaderUniform : shaderProgram.p) {
-            if (shaderUniform.c || shaderUniform.f != null) {
-                shaderUniform.c = false;
+        for (ShaderUniform shaderUniform : shaderProgram.uniforms) {
+            if (shaderUniform.isDirty || shaderUniform.texture != null) {
+                shaderUniform.isDirty = false;
                 if (shaderUniform.b == -1) {
-                    shaderUniform.b = GLES20.glGetUniformLocation(shaderProgram.n, shaderUniform.a);
+                    shaderUniform.b = GLES20.glGetUniformLocation(shaderProgram.n, shaderUniform.name);
                     if (shaderUniform.b == -1 && !shaderUniform.d) {
                         shaderUniform.d = true;
-                        shaderProgram.b("Unknown parameter: " + shaderUniform.a);
+                        shaderProgram.b("Unknown parameter: " + shaderUniform.name);
                         return;
                     }
                 }
-                if (shaderUniform.f != null) {
-                    Texture textureA = this.l.a(shaderUniform.f.b(), shaderUniform.f);
+                if (shaderUniform.texture != null) {
+                    Texture textureA = this.l.a(shaderUniform.texture.b(), shaderUniform.texture);
                     if (shaderUniform.g) {
                         GLES20.glUniform2f(shaderUniform.b, textureA.e, textureA.f);
                     } else {
@@ -550,21 +550,21 @@ public class OpenGLRenderer implements IGraphicsEngine {
                         GLES20.glUniform1i(shaderUniform.b, 1);
                         GLES20.glActiveTexture(33984);
                     }
-                } else if (shaderUniform.e.length == 1) {
-                    GLES20.glUniform1f(shaderUniform.b, shaderUniform.e[0]);
-                } else if (shaderUniform.e.length == 2) {
-                    GLES20.glUniform2f(shaderUniform.b, shaderUniform.e[0], shaderUniform.e[1]);
-                } else if (shaderUniform.e.length == 4) {
-                    GLES20.glUniform4f(shaderUniform.b, shaderUniform.e[0], shaderUniform.e[1], shaderUniform.e[2], shaderUniform.e[3]);
+                } else if (shaderUniform.floatValues.length == 1) {
+                    GLES20.glUniform1f(shaderUniform.b, shaderUniform.floatValues[0]);
+                } else if (shaderUniform.floatValues.length == 2) {
+                    GLES20.glUniform2f(shaderUniform.b, shaderUniform.floatValues[0], shaderUniform.floatValues[1]);
+                } else if (shaderUniform.floatValues.length == 4) {
+                    GLES20.glUniform4f(shaderUniform.b, shaderUniform.floatValues[0], shaderUniform.floatValues[1], shaderUniform.floatValues[2], shaderUniform.floatValues[3]);
                 } else {
-                    shaderProgram.b("Unhandled parameter size: " + shaderUniform.a + " - " + shaderUniform.e.length);
+                    shaderProgram.b("Unhandled parameter size: " + shaderUniform.name + " - " + shaderUniform.floatValues.length);
                 }
             }
         }
     }
 
     public boolean d(ShaderProgram shaderProgram) {
-        if (shaderProgram.o != 0) {
+        if (shaderProgram.programStatus != 0) {
             return false;
         }
         if (shaderProgram.n != 0 && !shaderProgram.m) {
@@ -576,15 +576,15 @@ public class OpenGLRenderer implements IGraphicsEngine {
         ShaderLocations shaderLocations = new ShaderLocations();
         shaderProgram.q = shaderLocations;
         try {
-            shaderProgram.n = a(shaderLocations.f, this.j.h.a(), shaderProgram.f);
+            shaderProgram.n = a(shaderLocations.f, this.j.h.a(), shaderProgram.fragmentSource);
         } catch (RuntimeException e) {
             shaderProgram.c("Failed to compile shader: " + e.getMessage());
             e.printStackTrace();
-            shaderProgram.o = 1;
+            shaderProgram.programStatus = 1;
         }
-        if (shaderProgram.o != 0 && shaderProgram.n == 0) {
+        if (shaderProgram.programStatus != 0 && shaderProgram.n == 0) {
             shaderProgram.c("Shader program_handle == 0");
-            shaderProgram.o = 1;
+            shaderProgram.programStatus = 1;
         }
         r();
         return true;

@@ -11,7 +11,8 @@ import java.util.Locale;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.c.a */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/c/a.class */
 public class DebugServer implements Runnable {
-    public static float e;
+    /* JADX INFO: renamed from: e */
+    public static float updateTimer;
     /* JADX INFO: renamed from: h */
     public ServerSocket serverSocket;
     public static boolean a = false;

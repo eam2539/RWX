@@ -9,7 +9,7 @@ public class MenuButton extends TextLabel {
 
     @Override // com.corrodinggames.rts.gameFramework.ui.widgets.TextLabel, com.corrodinggames.rts.gameFramework.ui.widgets.UIElement
     public void a(float f, float f2) {
-        if (this.u) {
+        if (this.isHovered) {
             this.c = UIStyle.k;
         } else {
             this.c = UIStyle.j;

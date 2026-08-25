@@ -14,20 +14,24 @@ import java.util.LinkedList;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.k.f */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/k/f.class */
 public class DynamicUnitPath extends Path {
-    PathPositionProvider a;
-    FlowField b;
+
+    /* JADX INFO: renamed from: a */
+    PathPositionProvider positionProvider;
+
+    /* JADX INFO: renamed from: b */
+    FlowField flowField;
     static Paint c = new Paint();
     static Point d = new Point();
 
     public DynamicUnitPath(PathEngine pathEngine, boolean z) {
         super(pathEngine, z);
-        this.a = new FlowFieldPathPositionProvider(this);
+        this.positionProvider = new FlowFieldPathPositionProvider(this);
     }
 
     @Override // com.corrodinggames.rts.gameFramework.pathfinding.Path
     public PathPositionProvider a(BaseUnit baseUnit) {
         if (a() != null) {
-            return this.a;
+            return this.positionProvider;
         }
         return null;
     }
@@ -64,10 +68,10 @@ public class DynamicUnitPath extends Path {
     }
 
     public final byte a(int i, int i2) {
-        if (this.b == null) {
+        if (this.flowField == null) {
             return (byte) -1;
         }
-        return this.b.a(i, i2);
+        return this.flowField.a(i, i2);
     }
 
     public static final void a(byte b, Point point) {

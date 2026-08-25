@@ -32,7 +32,7 @@ public class FrameBufferHelper {
         try {
             this.d = new ShaderProgram(str);
             this.c.a(this.d);
-            if (this.d.o != 0) {
+            if (this.d.programStatus != 0) {
                 this.g = true;
             }
         } catch (IOException e) {
@@ -41,7 +41,7 @@ public class FrameBufferHelper {
     }
 
     public boolean a() {
-        if ((this.d != null && this.d.o != 0) || this.g) {
+        if ((this.d != null && this.d.programStatus != 0) || this.g) {
             return true;
         }
         return false;

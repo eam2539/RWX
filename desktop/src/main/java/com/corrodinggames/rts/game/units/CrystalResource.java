@@ -12,7 +12,8 @@ public class CrystalResource extends BaseBuilding {
 
     /* JADX INFO: renamed from: b */
     float animationTimer;
-    static Texture a = null;
+    /* JADX INFO: renamed from: a */
+    static Texture texture = null;
     static PorterDuffColorFilter c = new PorterDuffColorFilter(Color.a(200, 200, 200), PorterDuff.Mode.MULTIPLY);
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -21,13 +22,21 @@ public class CrystalResource extends BaseBuilding {
         return UnitTypeEnum.crystalResource;
     }
 
-    public static void a_() {
-        a = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.crystal);
+    public CrystalResource(boolean z) {
+        super(z);
+        this.baseTexture = texture;
+        b(texture);
+        this.radius = 11.0f;
+        this.displayRadius = this.radius + 1.0f;
+        this.maxHealth = 600.0f;
+        this.currentHealth = this.maxHealth;
+        S(1);
+        this.buildingTargetRect.a(0, -1, 0, 0);
+        this.buildingVelocityRect.a(this.buildingTargetRect);
     }
 
-    @Override // com.corrodinggames.rts.game.units.OrderableUnit
-    public Texture d() {
-        return a;
+    public static void a_() {
+        texture = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.crystal);
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.BaseUnit
@@ -39,17 +48,9 @@ public class CrystalResource extends BaseBuilding {
     public void a(int i) {
     }
 
-    public CrystalResource(boolean z) {
-        super(z);
-        this.baseTexture = a;
-        b(a);
-        this.radius = 11.0f;
-        this.displayRadius = this.radius + 1.0f;
-        this.maxHealth = 600.0f;
-        this.currentHealth = this.maxHealth;
-        S(1);
-        this.buildingTargetRect.a(0, -1, 0, 0);
-        this.buildingVelocityRect.a(this.buildingTargetRect);
+    @Override // com.corrodinggames.rts.game.units.OrderableUnit
+    public Texture d() {
+        return texture;
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding

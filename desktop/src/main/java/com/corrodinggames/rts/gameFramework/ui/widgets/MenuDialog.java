@@ -7,7 +7,8 @@ import com.corrodinggames.rts.gameFramework.utility.SlickToAndroidKeycodes;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.a.f */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/a/f.class */
 public class MenuDialog extends PopupWindow {
-    LayoutContainer a;
+    /* JADX INFO: renamed from: a */
+    LayoutContainer layoutContainer;
 
     public static MenuDialog a(String str, boolean z) {
         MenuDialog menuDialog = new MenuDialog();
@@ -20,8 +21,8 @@ public class MenuDialog extends PopupWindow {
         textLabel.f(5.0f);
         textLabel.a(-1);
         menuDialog.a(textLabel);
-        menuDialog.a = new LayoutContainer(LayoutDirection.horizontal);
-        menuDialog.a(menuDialog.a);
+        menuDialog.layoutContainer = new LayoutContainer(LayoutDirection.horizontal);
+        menuDialog.a(menuDialog.layoutContainer);
         if (z) {
             menuDialog.b(Locale.get("menus.common.cancel")).a(new UIEventHandler() { // from class: com.corrodinggames.rts.gameFramework.f.a.f.1
                 @Override // com.corrodinggames.rts.gameFramework.ui.widgets.UIEventHandler
@@ -50,7 +51,7 @@ public class MenuDialog extends PopupWindow {
     public MenuButton a(String str, UIEventHandler uIEventHandler) {
         MenuButton menuButtonA = a(str);
         menuButtonA.a(uIEventHandler);
-        this.a.a(menuButtonA);
+        this.layoutContainer.a(menuButtonA);
         return menuButtonA;
     }
 
@@ -65,8 +66,8 @@ public class MenuDialog extends PopupWindow {
     public void b() {
         super.b();
         d();
-        this.i = this.z;
-        this.j = this.y;
+        this.i = this.layoutWidth;
+        this.j = this.layoutHeight;
         this.i += this.m + this.n;
         this.j += this.k + this.l;
     }

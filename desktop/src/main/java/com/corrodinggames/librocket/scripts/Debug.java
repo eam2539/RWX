@@ -374,7 +374,7 @@ public class Debug extends ScriptContext {
     }
 
     public boolean enableExtraNetworkDebug() {
-        GameEngine.getInstance().networkEngine.g = true;
+        GameEngine.getInstance().networkEngine.debugLogging = true;
         return true;
     }
 

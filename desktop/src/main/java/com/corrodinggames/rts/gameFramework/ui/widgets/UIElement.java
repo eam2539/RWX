@@ -10,20 +10,30 @@ import java.util.Iterator;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.a.l */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/a/l.class */
 public abstract class UIElement {
-    float g;
-    float h;
+    /* JADX INFO: renamed from: g */
+    float positionX;
+    /* JADX INFO: renamed from: h */
+    float positionY;
     float k;
     float l;
     float m;
     float n;
-    float o;
-    float p;
-    float q;
-    float r;
-    boolean u;
-    UIElement v;
-    float y;
-    float z;
+    /* JADX INFO: renamed from: o */
+    float marginTop;
+    /* JADX INFO: renamed from: p */
+    float marginBottom;
+    /* JADX INFO: renamed from: q */
+    float marginLeft;
+    /* JADX INFO: renamed from: r */
+    float marginRight;
+    /* JADX INFO: renamed from: u */
+    boolean isHovered;
+    /* JADX INFO: renamed from: v */
+    UIElement parent;
+    /* JADX INFO: renamed from: y */
+    float layoutHeight;
+    /* JADX INFO: renamed from: z */
+    float layoutWidth;
     UIEventHandler B;
     static final PointF e = new PointF();
     static final RectF f = new RectF();
@@ -51,58 +61,6 @@ public abstract class UIElement {
         return rectF;
     }
 
-    public RectF a(RectF rectF) {
-        A.x = this.g;
-        A.y = this.h;
-        if (this.v != null) {
-            this.v.a(A);
-        }
-        rectF.a = 0.0f + A.x;
-        rectF.b = 0.0f + A.y;
-        rectF.c = 0.0f + this.i + A.x;
-        rectF.d = 0.0f + this.j + A.y;
-        return rectF;
-    }
-
-    public void b() {
-        Iterator it = this.w.iterator();
-        while (it.hasNext()) {
-            ((UIElement) it.next()).b();
-        }
-        this.y = 0.0f;
-        this.z = 0.0f;
-        if (this.x != LayoutDirection.none) {
-            if (this.x == LayoutDirection.vertical) {
-                float fG = 0.0f;
-                float fH = 0.0f;
-                for (UIElement uIElement : this.w) {
-                    if (uIElement.i > fG) {
-                        fG = uIElement.g();
-                    }
-                    fH += uIElement.h();
-                }
-                this.y = fH;
-                this.z = fG;
-                b(this.z * 0.5f, this.y * 0.5f, this.w);
-            } else if (this.x == LayoutDirection.horizontal) {
-                float fH2 = 0.0f;
-                float fG2 = 0.0f;
-                for (UIElement uIElement2 : this.w) {
-                    if (uIElement2.j > fH2) {
-                        fH2 = uIElement2.h();
-                    }
-                    fG2 += uIElement2.g();
-                }
-                this.y = fH2;
-                this.z = fG2;
-                a(this.z * 0.5f, this.y * 0.5f, this.w);
-            } else {
-                throw new RuntimeException("Unknown layout style:" + this.x);
-            }
-        }
-        this.s = false;
-    }
-
     public static void a(float f2, float f3, FastArrayList fastArrayList) {
         float fG = 0.0f;
         Iterator it = fastArrayList.iterator();
@@ -113,9 +71,9 @@ public abstract class UIElement {
         Iterator it2 = fastArrayList.iterator();
         while (it2.hasNext()) {
             UIElement uIElement = (UIElement) it2.next();
-            float f5 = f4 + uIElement.q;
-            uIElement.g = f5;
-            f4 = f5 + uIElement.i + uIElement.r;
+            float f5 = f4 + uIElement.marginLeft;
+            uIElement.positionX = f5;
+            f4 = f5 + uIElement.i + uIElement.marginRight;
             uIElement.d(f3);
         }
     }
@@ -130,19 +88,71 @@ public abstract class UIElement {
         Iterator it2 = fastArrayList.iterator();
         while (it2.hasNext()) {
             UIElement uIElement = (UIElement) it2.next();
-            float f5 = f4 + uIElement.o;
-            uIElement.h = f5;
-            f4 = f5 + uIElement.j + uIElement.p;
+            float f5 = f4 + uIElement.marginTop;
+            uIElement.positionY = f5;
+            f4 = f5 + uIElement.j + uIElement.marginBottom;
             uIElement.c(f2);
         }
     }
 
-    public void a(PointF pointF) {
-        if (this.v != null) {
-            this.v.a(pointF);
+    public RectF a(RectF rectF) {
+        A.x = this.positionX;
+        A.y = this.positionY;
+        if (this.parent != null) {
+            this.parent.a(A);
         }
-        pointF.x += this.g;
-        pointF.y += this.h;
+        rectF.a = 0.0f + A.x;
+        rectF.b = 0.0f + A.y;
+        rectF.c = 0.0f + this.i + A.x;
+        rectF.d = 0.0f + this.j + A.y;
+        return rectF;
+    }
+
+    public void b() {
+        Iterator it = this.w.iterator();
+        while (it.hasNext()) {
+            ((UIElement) it.next()).b();
+        }
+        this.layoutHeight = 0.0f;
+        this.layoutWidth = 0.0f;
+        if (this.x != LayoutDirection.none) {
+            if (this.x == LayoutDirection.vertical) {
+                float fG = 0.0f;
+                float fH = 0.0f;
+                for (UIElement uIElement : this.w) {
+                    if (uIElement.i > fG) {
+                        fG = uIElement.g();
+                    }
+                    fH += uIElement.h();
+                }
+                this.layoutHeight = fH;
+                this.layoutWidth = fG;
+                b(this.layoutWidth * 0.5f, this.layoutHeight * 0.5f, this.w);
+            } else if (this.x == LayoutDirection.horizontal) {
+                float fH2 = 0.0f;
+                float fG2 = 0.0f;
+                for (UIElement uIElement2 : this.w) {
+                    if (uIElement2.j > fH2) {
+                        fH2 = uIElement2.h();
+                    }
+                    fG2 += uIElement2.g();
+                }
+                this.layoutHeight = fH2;
+                this.layoutWidth = fG2;
+                a(this.layoutWidth * 0.5f, this.layoutHeight * 0.5f, this.w);
+            } else {
+                throw new RuntimeException("Unknown layout style:" + this.x);
+            }
+        }
+        this.s = false;
+    }
+
+    public void a(PointF pointF) {
+        if (this.parent != null) {
+            this.parent.a(pointF);
+        }
+        pointF.x += this.positionX;
+        pointF.y += this.positionY;
     }
 
     public void a(UIElement uIElement) {
@@ -154,13 +164,13 @@ public abstract class UIElement {
     }
 
     public void a(UIElement uIElement, boolean z) {
-        if (this.v == uIElement) {
+        if (this.parent == uIElement) {
             return;
         }
-        if (this.v != null) {
-            this.v.w.remove(this);
+        if (this.parent != null) {
+            this.parent.w.remove(this);
         }
-        this.v = uIElement;
+        this.parent = uIElement;
         if (uIElement != null) {
             if (!z) {
                 uIElement.w.add(this);
@@ -173,8 +183,8 @@ public abstract class UIElement {
 
     public void e() {
         this.s = true;
-        if (this.v != null) {
-            this.v.e();
+        if (this.parent != null) {
+            this.parent.e();
         }
     }
 
@@ -188,10 +198,10 @@ public abstract class UIElement {
     }
 
     public void f() {
-        A.x = this.g;
-        A.y = this.h;
-        if (this.v != null) {
-            this.v.a(A);
+        A.x = this.positionX;
+        A.y = this.positionY;
+        if (this.parent != null) {
+            this.parent.a(A);
         }
         a(A.x, A.y);
         if (this.w.size() > 0) {
@@ -222,10 +232,10 @@ public abstract class UIElement {
         }
         if (uIEvent.b()) {
             if (c(uIEvent)) {
-                this.u = true;
+                this.isHovered = true;
                 return false;
             }
-            this.u = false;
+            this.isHovered = false;
             return false;
         }
         return false;
@@ -248,22 +258,22 @@ public abstract class UIElement {
 
     public boolean c(UIEvent uIEvent) {
         a(f);
-        return f.b(uIEvent.a, uIEvent.b);
+        return f.b(uIEvent.x, uIEvent.y);
     }
 
     public void c(float f2) {
-        this.g = f2 - (this.i * 0.5f);
+        this.positionX = f2 - (this.i * 0.5f);
     }
 
     public void d(float f2) {
-        this.h = f2 - (this.j * 0.5f);
+        this.positionY = f2 - (this.j * 0.5f);
     }
 
     public void e(float f2) {
-        this.o = f2;
-        this.p = f2;
-        this.q = f2;
-        this.r = f2;
+        this.marginTop = f2;
+        this.marginBottom = f2;
+        this.marginLeft = f2;
+        this.marginRight = f2;
     }
 
     public void f(float f2) {
@@ -274,11 +284,11 @@ public abstract class UIElement {
     }
 
     public float g() {
-        return this.q + this.i + this.r;
+        return this.marginLeft + this.i + this.marginRight;
     }
 
     public float h() {
-        return this.o + this.j + this.p;
+        return this.marginTop + this.j + this.marginBottom;
     }
 
     public void i() {

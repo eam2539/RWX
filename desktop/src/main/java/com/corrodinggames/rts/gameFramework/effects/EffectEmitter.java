@@ -10,62 +10,61 @@ import java.io.IOException;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.d.f */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/d/f.class */
 public class EffectEmitter extends GameObject {
-    public float a;
-    float c;
-    float d;
-    float e;
-    float f;
-    float g;
-    float h;
-    Effect i;
-    float m;
-    float n;
-    float o;
-    float p;
-    float q;
-    float r;
-    EffectQuality s;
-    public float t;
-    static Effect v;
-    static Effect w;
-    private final EffectManager x;
-    public boolean b = true;
-    public int j = 0;
-    public int k = 0;
-    public int l = -1;
+    /* JADX INFO: renamed from: v */
+    static Effect defaultFireEffect;
+    /* JADX INFO: renamed from: w */
+    static Effect alternateFireEffect;
+        /* JADX INFO: renamed from: x */
+    private final EffectManager effectManager;
+        /* JADX INFO: renamed from: a */
+    public float duration;
+    public float startDelay;
+        /* JADX INFO: renamed from: b */
+    public boolean isEmitting = true;
+        /* JADX INFO: renamed from: j */
+    public int startColorOverride = 0;
+        /* JADX INFO: renamed from: k */
+    public int endColorOverride = 0;
+        /* JADX INFO: renamed from: l */
+    public int endColorTransitionTime = -1;
+        /* JADX INFO: renamed from: c */
+    float emitTimer;
+        /* JADX INFO: renamed from: d */
+    float frameTimer;
+        /* JADX INFO: renamed from: e */
+    float frameIndex;
+        /* JADX INFO: renamed from: f */
+    float emitInterval;
+        /* JADX INFO: renamed from: g */
+    float frameInterval;
+        /* JADX INFO: renamed from: h */
+    float maxFrames;
+        /* JADX INFO: renamed from: i */
+    Effect effectTemplate;
+    float velocityRandomRangeX;
+    float velocityRandomRangeY;
+    float velocityRandomRangeZ;
+    float positionRandomRangeX;
+    float positionRandomRangeY;
+    float rotationRandomRange;
+        /* JADX INFO: renamed from: s */
+    EffectQuality effectQuality;
     public boolean u = false;
+
+    public EffectEmitter(EffectManager effectManager) {
+        this.effectManager = effectManager;
+    }
 
     public static void b() {
         EffectManager effectManager = GameEngine.getInstance().effectManager;
         Effect effect = new Effect(effectManager);
         a(effect, false);
         effect.aq = 18;
-        effect.t = 15.0f;
-        v = effect;
+        effect.fadeDuration = 15.0f;
+        defaultFireEffect = effect;
         Effect effect2 = new Effect(effectManager);
         b(effect2, false);
-        w = effect2;
-    }
-
-    @Override // com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
-    public void a(GameOutputStream gameOutputStream) throws IOException {
-        gameOutputStream.writeFloat(this.posX);
-        gameOutputStream.writeFloat(this.posY);
-        gameOutputStream.writeFloat(this.a);
-        super.a(gameOutputStream);
-    }
-
-    @Override // com.corrodinggames.rts.gameFramework.GameObject
-    public void a(GameInputStream gameInputStream) throws IOException {
-        this.posX = gameInputStream.readFloat();
-        this.posY = gameInputStream.readFloat();
-        this.a = gameInputStream.readFloat();
-        this.b = false;
-        super.a(gameInputStream);
-    }
-
-    public EffectEmitter(EffectManager effectManager) {
-        this.x = effectManager;
+        alternateFireEffect = effect2;
     }
 
     public static void a(Effect effect, boolean z) {
@@ -80,12 +79,12 @@ public class EffectEmitter extends GameObject {
         effect.an = true;
         effect.P = 0.1f;
         effect.R = 0.5f;
-        effect.u = true;
+        effect.useGravity = true;
         effect.V = 300.0f;
         effect.W = effect.V;
-        effect.r = true;
-        effect.s = true;
-        effect.t = 40.0f;
+        effect.fadeIn = true;
+        effect.fadeOut = true;
+        effect.fadeDuration = 40.0f;
         effect.as = false;
         effect.ar = (short) 2;
         effect.G = 0.4f;
@@ -105,42 +104,42 @@ public class EffectEmitter extends GameObject {
         effect.an = true;
         effect.P = 0.0f;
         effect.R = 0.2f;
-        effect.u = true;
+        effect.useGravity = true;
         effect.V = 50.0f;
         effect.W = effect.V;
-        effect.r = true;
-        effect.s = true;
-        effect.t = 10.0f;
+        effect.fadeIn = true;
+        effect.fadeOut = true;
+        effect.fadeDuration = 10.0f;
         effect.as = false;
         effect.ar = (short) 2;
         effect.g = Effect.n;
     }
 
     public static EffectEmitter a(float f, float f2) {
-        EffectEmitter effectEmitterA = a(f, f2, v);
-        effectEmitterA.a = 280.0f;
-        effectEmitterA.f = 10.0f;
-        effectEmitterA.c = 10.0f;
-        effectEmitterA.m = 0.03f;
-        effectEmitterA.n = 0.03f;
-        effectEmitterA.p = 6.0f;
-        effectEmitterA.q = 6.0f;
-        effectEmitterA.s = EffectQuality.verylow;
-        effectEmitterA.r = 180.0f;
-        effectEmitterA.j = -16777216;
+        EffectEmitter effectEmitterA = a(f, f2, defaultFireEffect);
+        effectEmitterA.duration = 280.0f;
+        effectEmitterA.emitInterval = 10.0f;
+        effectEmitterA.emitTimer = 10.0f;
+        effectEmitterA.velocityRandomRangeX = 0.03f;
+        effectEmitterA.velocityRandomRangeY = 0.03f;
+        effectEmitterA.positionRandomRangeX = 6.0f;
+        effectEmitterA.positionRandomRangeY = 6.0f;
+        effectEmitterA.effectQuality = EffectQuality.verylow;
+        effectEmitterA.rotationRandomRange = 180.0f;
+        effectEmitterA.startColorOverride = -16777216;
         return effectEmitterA;
     }
 
     public static EffectEmitter b(float f, float f2) {
-        EffectEmitter effectEmitterA = a(f, f2, w);
-        effectEmitterA.a = 330.0f;
-        effectEmitterA.f = 10.0f;
-        effectEmitterA.c = 10.0f;
-        effectEmitterA.m = 0.1f;
-        effectEmitterA.n = 0.03f;
-        effectEmitterA.p = 4.0f;
-        effectEmitterA.q = 4.0f;
-        effectEmitterA.s = EffectQuality.verylow;
+        EffectEmitter effectEmitterA = a(f, f2, alternateFireEffect);
+        effectEmitterA.duration = 330.0f;
+        effectEmitterA.emitInterval = 10.0f;
+        effectEmitterA.emitTimer = 10.0f;
+        effectEmitterA.velocityRandomRangeX = 0.1f;
+        effectEmitterA.velocityRandomRangeY = 0.03f;
+        effectEmitterA.positionRandomRangeX = 4.0f;
+        effectEmitterA.positionRandomRangeY = 4.0f;
+        effectEmitterA.effectQuality = EffectQuality.verylow;
         return effectEmitterA;
     }
 
@@ -149,14 +148,31 @@ public class EffectEmitter extends GameObject {
         EffectEmitter effectEmitter = new EffectEmitter(effectManager);
         effectEmitter.posX = f;
         effectEmitter.posY = f2;
-        effectEmitter.a = 100.0f;
-        effectEmitter.f = 10.0f;
-        effectEmitter.i = effect;
+        effectEmitter.duration = 100.0f;
+        effectEmitter.emitInterval = 10.0f;
+        effectEmitter.effectTemplate = effect;
         if (effect == null) {
-            effectEmitter.i = new Effect(effectManager);
+            effectEmitter.effectTemplate = new Effect(effectManager);
             GameEngine.logColored("Error: Emitter create srcEffect==null");
         }
         return effectEmitter;
+    }
+
+    @Override // com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
+    public void a(GameOutputStream gameOutputStream) throws IOException {
+        gameOutputStream.writeFloat(this.posX);
+        gameOutputStream.writeFloat(this.posY);
+        gameOutputStream.writeFloat(this.duration);
+        super.a(gameOutputStream);
+    }
+
+    @Override // com.corrodinggames.rts.gameFramework.GameObject
+    public void a(GameInputStream gameInputStream) throws IOException {
+        this.posX = gameInputStream.readFloat();
+        this.posY = gameInputStream.readFloat();
+        this.duration = gameInputStream.readFloat();
+        this.isEmitting = false;
+        super.a(gameInputStream);
     }
 
     public boolean c() {
@@ -167,44 +183,44 @@ public class EffectEmitter extends GameObject {
     /* JADX INFO: renamed from: a */
     public void update(float f) {
         Effect effectCreateEffectInternal;
-        this.t = Utility.moveTowardsZero(this.t, f);
-        if (this.t > 0.0f) {
+        this.startDelay = Utility.moveTowardsZero(this.startDelay, f);
+        if (this.startDelay > 0.0f) {
             return;
         }
-        if (this.b) {
-            this.c += f;
-            if (this.c > this.f) {
-                this.d += f;
-                if (this.d > this.g) {
-                    this.d = 0.0f;
-                    this.e += 1.0f;
-                    if (this.e > this.h) {
-                        this.c = 0.0f;
-                        this.e = 0.0f;
+        if (this.isEmitting) {
+            this.emitTimer += f;
+            if (this.emitTimer > this.emitInterval) {
+                this.frameTimer += f;
+                if (this.frameTimer > this.frameInterval) {
+                    this.frameTimer = 0.0f;
+                    this.frameIndex += 1.0f;
+                    if (this.frameIndex > this.maxFrames) {
+                        this.emitTimer = 0.0f;
+                        this.frameIndex = 0.0f;
                     }
-                    if ((this.u || c()) && (effectCreateEffectInternal = this.x.createEffectInternal(this.posX, this.posY, 0.0f, EffectType.custom, false, this.s)) != null) {
-                        effectCreateEffectInternal.recycle(this.i);
-                        effectCreateEffectInternal.P += Utility.randomFloatInRange(-this.m, this.m);
-                        effectCreateEffectInternal.Q += Utility.randomFloatInRange(-this.n, this.n);
-                        effectCreateEffectInternal.R += Utility.randomFloatInRange(-this.o, this.o);
-                        effectCreateEffectInternal.Y = Utility.randomFloatInRange(-this.r, this.r);
+                    if ((this.u || c()) && (effectCreateEffectInternal = this.effectManager.createEffectInternal(this.posX, this.posY, 0.0f, EffectType.custom, false, this.effectQuality)) != null) {
+                        effectCreateEffectInternal.recycle(this.effectTemplate);
+                        effectCreateEffectInternal.P += Utility.randomFloatInRange(-this.velocityRandomRangeX, this.velocityRandomRangeX);
+                        effectCreateEffectInternal.Q += Utility.randomFloatInRange(-this.velocityRandomRangeY, this.velocityRandomRangeY);
+                        effectCreateEffectInternal.R += Utility.randomFloatInRange(-this.velocityRandomRangeZ, this.velocityRandomRangeZ);
+                        effectCreateEffectInternal.Y = Utility.randomFloatInRange(-this.rotationRandomRange, this.rotationRandomRange);
                         effectCreateEffectInternal.I = this.posX;
                         effectCreateEffectInternal.J = this.posY;
-                        effectCreateEffectInternal.I += Utility.randomFloatInRange(-this.p, this.p);
-                        effectCreateEffectInternal.J += Utility.randomFloatInRange(-this.q, this.q);
-                        if (this.j != 0) {
-                            effectCreateEffectInternal.x = this.j;
+                        effectCreateEffectInternal.I += Utility.randomFloatInRange(-this.positionRandomRangeX, this.positionRandomRangeX);
+                        effectCreateEffectInternal.J += Utility.randomFloatInRange(-this.positionRandomRangeY, this.positionRandomRangeY);
+                        if (this.startColorOverride != 0) {
+                            effectCreateEffectInternal.startColor = this.startColorOverride;
                         }
-                        if (this.l >= 0) {
-                            effectCreateEffectInternal.y = this.k;
-                            effectCreateEffectInternal.z = this.l;
+                        if (this.endColorTransitionTime >= 0) {
+                            effectCreateEffectInternal.endColor = this.endColorOverride;
+                            effectCreateEffectInternal.z = this.endColorTransitionTime;
                         }
                     }
                 }
             }
         }
-        this.a -= f;
-        if (this.a < 0.0f) {
+        this.duration -= f;
+        if (this.duration < 0.0f) {
             remove();
         }
     }

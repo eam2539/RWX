@@ -582,7 +582,7 @@ public final class GameUI extends Serializable {
             gameEngine.isTriggerDebugMode = false;
         }
         if (gameEngine.isNetworkConnected() && gameEngine.isSinglePlayerGame()) {
-            gameEngine.isGameStarted = gameEngine.networkEngine.p;
+            gameEngine.isGameStarted = gameEngine.networkEngine.isSandboxMode;
         }
         LagHidingManager.a();
         notifySelectionChanged();
@@ -649,14 +649,14 @@ public final class GameUI extends Serializable {
         this.ninePatchStyle1 = new NinePatchStyle(this.uiTexture1, 32, 27);
         this.ninePatchStyle2 = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_glow_highlight_button), 32, 27);
         this.ninePatchStyle3 = this.ninePatchStyle1.clone();
-        this.ninePatchStyle3.v = this.ninePatchStyle2;
+        this.ninePatchStyle3.hoverStyle = this.ninePatchStyle2;
         this.ninePatchStyle4 = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_dark_box), 32, 27);
         this.ninePatchStyle5 = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_dark_box_titled), 36, 36);
-        this.ninePatchStyle5.r = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_shadow), 36, 36);
+        this.ninePatchStyle5.normalStyle = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_shadow), 36, 36);
         this.ninePatchStyle5.f = true;
         this.ninePatchStyle6 = new NinePatchStyle(gameEngine.renderGraphicsEngine.a(R.drawable.rounded_green), 36, 36);
-        this.ninePatchStyle6.r = this.ninePatchStyle5.r;
-        this.ninePatchStyle6.u = 20;
+        this.ninePatchStyle6.normalStyle = this.ninePatchStyle5.normalStyle;
+        this.ninePatchStyle6.paddingSize = 20;
         this.bk = gameEngine.renderGraphicsEngine.a(R.drawable.icon_upgrade);
         this.bl = gameEngine.renderGraphicsEngine.a(R.drawable.metal_dark, false);
         this.bm = gameEngine.renderGraphicsEngine.a(R.drawable.touch_indicator, false);
@@ -1249,9 +1249,9 @@ public final class GameUI extends Serializable {
             this.mouseScreenX = this.selectionBoxStartX;
             this.mouseScreenY = this.selectionBoxStartY;
         }
-        if (gameEngine.settingsEngine.mouseSupport && (this.lastUIEvent.a != ((int) gameEngine.getTouchX()) || this.lastUIEvent.b != ((int) gameEngine.getTouchY()))) {
-            this.lastUIEvent.a = (int) gameEngine.getTouchX();
-            this.lastUIEvent.b = (int) gameEngine.getTouchY();
+        if (gameEngine.settingsEngine.mouseSupport && (this.lastUIEvent.x != ((int) gameEngine.getTouchX()) || this.lastUIEvent.y != ((int) gameEngine.getTouchY()))) {
+            this.lastUIEvent.x = (int) gameEngine.getTouchX();
+            this.lastUIEvent.y = (int) gameEngine.getTouchY();
             this.rootUIElement.b(this.lastUIEvent);
         }
         if (this.isSelectionBoxActive && isInputEnabled()) {
@@ -1790,8 +1790,8 @@ public final class GameUI extends Serializable {
         if (this.currentAction != null) {
             if (this.currentAction instanceof WrapperUnitAction) {
                 WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) this.currentAction;
-                if (wrapperUnitAction.b != null) {
-                    baseUnitF = wrapperUnitAction.b;
+                if (wrapperUnitAction.unit != null) {
+                    baseUnitF = wrapperUnitAction.unit;
                 }
             }
             if (this.currentAction.getActionType() == ActionType.reclaimTarget) {
@@ -1860,10 +1860,10 @@ public final class GameUI extends Serializable {
                 AbstractUnitAction abstractUnitAction = this.currentAction;
                 if (this.currentAction instanceof WrapperUnitAction) {
                     WrapperUnitAction wrapperUnitAction2 = (WrapperUnitAction) abstractUnitAction;
-                    if (wrapperUnitAction2.b != null) {
-                        baseUnitF2 = wrapperUnitAction2.b;
+                    if (wrapperUnitAction2.unit != null) {
+                        baseUnitF2 = wrapperUnitAction2.unit;
                     }
-                    abstractUnitAction = wrapperUnitAction2.a;
+                    abstractUnitAction = wrapperUnitAction2.wrappedAction;
                 }
                 boolean zCancelCurrentAction = cancelCurrentAction();
                 boolean z = (!this.isSelectionBoxActive || this.isKeyboardCtrlPressed || !this.isGamePaused || this.isInputDisabled || shouldShowMouseCursor()) ? false : true;
@@ -2278,7 +2278,7 @@ public final class GameUI extends Serializable {
                             }
                             OrderableUnit firstControllableSelectedUnit = this.getFirstControllableSelectedUnit();
                             if (this.currentAction instanceof WrapperUnitAction) {
-                                final OrderableUnit b13 = ((WrapperUnitAction)this.currentAction).b;
+                                final OrderableUnit b13 = ((WrapperUnitAction)this.currentAction).unit;
                                 commandForSelectedUnits2.addUnitToCommand(b13);
                                 firstControllableSelectedUnit = b13;
                             }
@@ -2693,7 +2693,7 @@ public final class GameUI extends Serializable {
     /* JADX INFO: renamed from: a */
     void setActionCommandTarget(final Command e, final AbstractUnitAction s, final boolean boolean3) {
         if (s instanceof WrapperUnitAction) {
-            e.addUnitToCommand(((WrapperUnitAction)s).b);
+            e.addUnitToCommand(((WrapperUnitAction)s).unit);
             return;
         }
         final ActionId actionId = s.getActionId();
@@ -2737,7 +2737,7 @@ public final class GameUI extends Serializable {
         AbstractUnitAction abstractUnitActionA;
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
-            OrderableUnit orderableUnit = wrapperUnitAction.b;
+            OrderableUnit orderableUnit = wrapperUnitAction.unit;
             AbstractUnitAction abstractUnitActionP_ = wrapperUnitAction.p_();
             boolean z = false;
             if (abstractUnitActionP_.b(orderableUnit) && abstractUnitActionP_.canAfford((BaseUnit) orderableUnit, true) && !orderableUnit.a(abstractUnitActionP_, f, f2)) {
@@ -2768,7 +2768,7 @@ public final class GameUI extends Serializable {
     void setActionCommandTargets(Command command, AbstractUnitAction abstractUnitAction) {
         AbstractUnitAction abstractUnitActionA;
         if (abstractUnitAction instanceof WrapperUnitAction) {
-            command.addUnitToCommand(((WrapperUnitAction) abstractUnitAction).b);
+            command.addUnitToCommand(((WrapperUnitAction) abstractUnitAction).unit);
             return;
         }
         ActionId actionId = abstractUnitAction.getActionId();
@@ -2787,7 +2787,7 @@ public final class GameUI extends Serializable {
         AbstractUnitAction abstractUnitActionA;
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
-            return wrapperUnitAction.canAfford((BaseUnit) wrapperUnitAction.b, true);
+            return wrapperUnitAction.canAfford((BaseUnit) wrapperUnitAction.unit, true);
         }
         ActionId actionId = abstractUnitAction.getActionId();
         for (BaseUnit baseUnit : this.selectedUnitsList) {
@@ -2810,7 +2810,7 @@ public final class GameUI extends Serializable {
         }
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
-            return wrapperUnitAction.isTargetingGround((BaseUnit) wrapperUnitAction.b);
+            return wrapperUnitAction.isTargetingGround((BaseUnit) wrapperUnitAction.unit);
         }
         for (BaseUnit baseUnit : this.selectedUnitsList) {
             if (baseUnit instanceof OrderableUnit) {
@@ -2828,7 +2828,7 @@ public final class GameUI extends Serializable {
         AbstractUnitAction abstractUnitActionA;
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
-            return wrapperUnitAction.b(wrapperUnitAction.b);
+            return wrapperUnitAction.b(wrapperUnitAction.unit);
         }
         ActionId actionId = abstractUnitAction.getActionId();
         for (BaseUnit baseUnit : this.selectedUnitsList) {
@@ -2848,7 +2848,7 @@ public final class GameUI extends Serializable {
         boolean z = false;
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
-            return wrapperUnitAction.isNotAvailable(wrapperUnitAction.b);
+            return wrapperUnitAction.isNotAvailable(wrapperUnitAction.unit);
         }
         ActionId actionId = abstractUnitAction.getActionId();
         for (BaseUnit baseUnit : this.selectedUnitsList) {
@@ -2874,7 +2874,7 @@ public final class GameUI extends Serializable {
         String icon;
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
-            return wrapperUnitAction.getIcon(wrapperUnitAction.b);
+            return wrapperUnitAction.getIcon(wrapperUnitAction.unit);
         }
         ActionId actionId = abstractUnitAction.getActionId();
         for (BaseUnit baseUnit : this.selectedUnitsList) {
@@ -2893,8 +2893,8 @@ public final class GameUI extends Serializable {
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
             this.tempUnitList.clear();
-            if (wrapperUnitAction.b != null) {
-                this.tempUnitList.add(wrapperUnitAction.b);
+            if (wrapperUnitAction.unit != null) {
+                this.tempUnitList.add(wrapperUnitAction.unit);
             }
             return this.tempUnitList;
         }
@@ -3027,7 +3027,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect.ap = 8;
             effectCreateEffect.V = 30.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 2.0f;
             effectCreateEffect.G = 2.8f * calculateCameraOpacity();
             effectCreateEffect.F = 1.6f * calculateCameraOpacity();
@@ -3041,7 +3041,7 @@ public final class GameUI extends Serializable {
                 effectCreateEffect2.ap = 8;
                 effectCreateEffect2.V = 35.0f;
                 effectCreateEffect2.W = effectCreateEffect.V;
-                effectCreateEffect2.r = true;
+                effectCreateEffect2.fadeIn = true;
                 effectCreateEffect2.E = 2.0f;
                 effectCreateEffect2.G = 1.3f;
                 effectCreateEffect2.F = 0.6f;
@@ -3075,7 +3075,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect.ap = 2;
             effectCreateEffect.V = 30.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 2.0f;
             effectCreateEffect.Z = 1.0f;
             effectCreateEffect.G = 1.9f * calculateCameraOpacity();
@@ -3090,7 +3090,7 @@ public final class GameUI extends Serializable {
                 effectCreateEffect2.ap = 9;
                 effectCreateEffect2.V = 35.0f;
                 effectCreateEffect2.W = effectCreateEffect.V;
-                effectCreateEffect2.r = true;
+                effectCreateEffect2.fadeIn = true;
                 effectCreateEffect2.E = 2.0f;
                 effectCreateEffect2.G = 1.3f;
                 effectCreateEffect2.F = 0.6f;
@@ -3133,7 +3133,7 @@ public final class GameUI extends Serializable {
                 effectCreateEffect.ap = 9;
                 effectCreateEffect.V = 60.0f;
                 effectCreateEffect.W = effectCreateEffect.V;
-                effectCreateEffect.r = true;
+                effectCreateEffect.fadeIn = true;
                 effectCreateEffect.E = 2.0f;
                 effectCreateEffect.G = 3.8f * calculateCameraOpacity();
                 effectCreateEffect.F = 2.0f * calculateCameraOpacity();
@@ -3155,7 +3155,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect.ap = 12;
             effectCreateEffect.V = 25.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 2.0f;
             effectCreateEffect.H = true;
             effectCreateEffect.G = 1.2f * calculateCameraOpacity();
@@ -3175,7 +3175,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect.ap = 8;
             effectCreateEffect.V = 65.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 2.0f;
             effectCreateEffect.H = true;
             effectCreateEffect.Z = 2.0f;
@@ -3202,7 +3202,7 @@ public final class GameUI extends Serializable {
     public void sendMapPing(float f, float f2, PlayerTeam playerTeam, PingMapAction pingMapAction) {
         Effect effectCreateEffect;
         GameEngine gameEngine = GameEngine.getInstance();
-        int iOrdinal = 7 + pingMapAction.a.ordinal();
+        int iOrdinal = 7 + pingMapAction.pingType.ordinal();
         if (!gameEngine.settingsEngine.showMapPingsOnBattlefield && !gameEngine.settingsEngine.showMapPingsOnMinimap) {
             if (!this.isFirstUpdate && !gameEngine.replayEngine.j()) {
                 this.isFirstUpdate = true;
@@ -3219,7 +3219,7 @@ public final class GameUI extends Serializable {
                 effectCreateEffect2.E = 0.7f;
                 effectCreateEffect2.V = 490.0f;
                 effectCreateEffect2.W = effectCreateEffect2.V;
-                effectCreateEffect2.r = true;
+                effectCreateEffect2.fadeIn = true;
                 effectCreateEffect2.S = 6.0f;
                 effectCreateEffect2.T = 60.0f;
                 effectCreateEffect2.J -= effectCreateEffect2.S;
@@ -3228,9 +3228,9 @@ public final class GameUI extends Serializable {
                 effectCreateEffect2.ao = -0.5f;
                 effectCreateEffect2.H = true;
                 if (playerTeam != null) {
-                    effectCreateEffect2.x = playerTeam.getTeamColorArgb();
+                    effectCreateEffect2.startColor = playerTeam.getTeamColorArgb();
                     if (GameEngine.isAndroidPlatform()) {
-                        effectCreateEffect2.B = new LightingColorFilter(effectCreateEffect2.x, 0);
+                        effectCreateEffect2.B = new LightingColorFilter(effectCreateEffect2.startColor, 0);
                     }
                 }
             }
@@ -3239,7 +3239,7 @@ public final class GameUI extends Serializable {
                 effectCreateEffect.ap = iOrdinal;
                 effectCreateEffect.V = 490.0f;
                 effectCreateEffect.W = effectCreateEffect.V;
-                effectCreateEffect.r = true;
+                effectCreateEffect.fadeIn = true;
                 effectCreateEffect.E = 1.2f;
                 effectCreateEffect.S = 6.0f;
                 effectCreateEffect.T = 60.0f;
@@ -3260,15 +3260,15 @@ public final class GameUI extends Serializable {
                 effectCreateEffect3.E = 0.8f;
                 effectCreateEffect3.V = 470.0f;
                 effectCreateEffect3.W = effectCreateEffect3.V;
-                effectCreateEffect3.r = true;
+                effectCreateEffect3.fadeIn = true;
                 effectCreateEffect3.J -= 2.0f;
                 effectCreateEffect3.S = 2.0f;
                 effectCreateEffect3.T = 60.0f;
                 effectCreateEffect3.ao = -0.5f;
                 if (playerTeam != null) {
-                    effectCreateEffect3.x = playerTeam.getTeamColorArgb();
+                    effectCreateEffect3.startColor = playerTeam.getTeamColorArgb();
                     if (GameEngine.isAndroidPlatform()) {
-                        effectCreateEffect3.B = new LightingColorFilter(effectCreateEffect3.x, 0);
+                        effectCreateEffect3.B = new LightingColorFilter(effectCreateEffect3.startColor, 0);
                     }
                 }
                 effectCreateEffect3.G = 1.0f;
@@ -3281,7 +3281,7 @@ public final class GameUI extends Serializable {
                 effectCreateEffect4.ap = iOrdinal;
                 effectCreateEffect4.V = 470.0f;
                 effectCreateEffect4.W = effectCreateEffect4.V;
-                effectCreateEffect4.r = true;
+                effectCreateEffect4.fadeIn = true;
                 effectCreateEffect4.E = 0.8f;
                 effectCreateEffect4.J -= 2.0f;
                 effectCreateEffect4.S = 2.0f;
@@ -3326,14 +3326,14 @@ public final class GameUI extends Serializable {
         }
         Effect effectCreateEffect = gameEngine.effectManager.createEffect(baseUnit.posX, baseUnit.posY, baseUnit.posZ, EffectType.custom, true, EffectQuality.critical);
         if (effectCreateEffect != null) {
-            effectCreateEffect.b = baseUnit;
+            effectCreateEffect.parentObject = baseUnit;
             effectCreateEffect.I = 0.0f;
             effectCreateEffect.J = 0.0f;
             effectCreateEffect.K = 0.0f;
             effectCreateEffect.ap = 9;
             effectCreateEffect.V = 35.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 1.5f;
             effectCreateEffect.H = true;
             effectCreateEffect.Z = 0.8f;
@@ -3342,7 +3342,7 @@ public final class GameUI extends Serializable {
         }
         Effect effectCreateEffect2 = gameEngine.effectManager.createEffect(baseUnit.posX, baseUnit.posY, baseUnit.posZ, EffectType.custom, true, EffectQuality.critical);
         if (effectCreateEffect2 != null) {
-            effectCreateEffect2.b = baseUnit;
+            effectCreateEffect2.parentObject = baseUnit;
             effectCreateEffect2.I = 0.0f;
             effectCreateEffect2.J = 0.0f;
             effectCreateEffect2.K = 0.0f;
@@ -3350,7 +3350,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect2.ap = 0;
             effectCreateEffect2.V = 25.0f;
             effectCreateEffect2.W = effectCreateEffect2.V;
-            effectCreateEffect2.r = true;
+            effectCreateEffect2.fadeIn = true;
             effectCreateEffect2.E = 1.0f;
             effectCreateEffect2.H = true;
             effectCreateEffect2.Z = 0.8f;
@@ -3371,7 +3371,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect.ap = 10;
             effectCreateEffect.V = 35.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 2.0f;
             effectCreateEffect.H = true;
             effectCreateEffect.G = 1.5f * calculateCameraOpacity();
@@ -3392,7 +3392,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect.ap = 1;
             effectCreateEffect.V = 40.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 1.0f;
             effectCreateEffect.H = true;
             effectCreateEffect.Z = 0.0f;
@@ -3411,7 +3411,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect.ap = 14;
             effectCreateEffect.V = 10.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 2.0f;
             effectCreateEffect.Z = 0.0f;
             effectCreateEffect.G = 1.1f * calculateCameraOpacity();
@@ -3436,7 +3436,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect.ap = 0;
             effectCreateEffect.V = 40.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 2.0f;
             effectCreateEffect.Z = 8.0f;
             effectCreateEffect.G = 1.1f * calculateCameraOpacity();
@@ -3451,7 +3451,7 @@ public final class GameUI extends Serializable {
                 effectCreateEffect2.ap = 9;
                 effectCreateEffect2.V = 35.0f;
                 effectCreateEffect2.W = effectCreateEffect.V;
-                effectCreateEffect2.r = true;
+                effectCreateEffect2.fadeIn = true;
                 effectCreateEffect2.E = 2.0f;
                 effectCreateEffect2.G = 1.3f;
                 effectCreateEffect2.F = 0.6f;
@@ -3471,7 +3471,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect.ap = 11;
             effectCreateEffect.V = 25.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 2.0f;
             effectCreateEffect.H = true;
             effectCreateEffect.G = 1.8f * calculateCameraOpacity();
@@ -3491,7 +3491,7 @@ public final class GameUI extends Serializable {
             effectCreateEffect.ap = 11;
             effectCreateEffect.V = 25.0f;
             effectCreateEffect.W = effectCreateEffect.V;
-            effectCreateEffect.r = true;
+            effectCreateEffect.fadeIn = true;
             effectCreateEffect.E = 2.0f;
             effectCreateEffect.H = true;
             effectCreateEffect.G = 1.8f * calculateCameraOpacity();

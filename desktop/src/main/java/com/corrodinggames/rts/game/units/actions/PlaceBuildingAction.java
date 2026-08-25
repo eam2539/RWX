@@ -12,8 +12,33 @@ import com.corrodinggames.rts.gameFramework.ui.GameInterfaceRenderer;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.a.v */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/a/v.class */
 public class PlaceBuildingAction extends AbstractUnitAction {
-    UnitType a;
-    int b;
+    /* JADX INFO: renamed from: a */
+    UnitType unitType;
+
+    /* JADX INFO: renamed from: b */
+    int variant;
+
+    public PlaceBuildingAction(UnitType unitType, int i, Integer num) {
+        super("b_" + unitType.v());
+        this.variant = 1;
+        UnitType unitTypeC = CustomUnitConfig.c(unitType);
+        if (unitTypeC != null) {
+            unitType = unitTypeC;
+            setActionId("b_" + unitType.v());
+        }
+        if (i != 1) {
+            setActionId(getActionId() + "_" + i);
+        }
+        this.unitType = unitType;
+        this.variant = i;
+        if (num != null) {
+            this.sortOrder = num.intValue();
+        }
+    }
+
+    public PlaceBuildingAction(UnitType unitType) {
+        this(unitType, 1, null);
+    }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     public boolean equals(Object obj) {
@@ -24,50 +49,28 @@ public class PlaceBuildingAction extends AbstractUnitAction {
             return false;
         }
         PlaceBuildingAction placeBuildingAction = (PlaceBuildingAction) obj;
-        if (this.b != placeBuildingAction.b || this.a != placeBuildingAction.a) {
+        if (this.variant != placeBuildingAction.variant || this.unitType != placeBuildingAction.unitType) {
             return false;
         }
         return super.equals(obj);
     }
 
-    public PlaceBuildingAction(UnitType unitType) {
-        this(unitType, 1, null);
-    }
-
-    public PlaceBuildingAction(UnitType unitType, int i, Integer num) {
-        super("b_" + unitType.v());
-        this.b = 1;
-        UnitType unitTypeC = CustomUnitConfig.c(unitType);
-        if (unitTypeC != null) {
-            unitType = unitTypeC;
-            setActionId("b_" + unitType.v());
-        }
-        if (i != 1) {
-            setActionId(getActionId() + "_" + i);
-        }
-        this.a = unitType;
-        this.b = i;
-        if (num != null) {
-            this.sortOrder = num.intValue();
-        }
-    }
-
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: i */
     public UnitType getUnitType() {
-        return this.a;
+        return this.unitType;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: y */
     public UnitType getAttachedUnitType() {
-        return this.a;
+        return this.unitType;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: t */
     public int getQueueSize() {
-        return this.b;
+        return this.variant;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -75,11 +78,11 @@ public class PlaceBuildingAction extends AbstractUnitAction {
     public String getDescription() {
         String strF = getUnitType().f();
         BaseUnit baseUnitCanAttack = BaseUnit.getPrototypeForUnitType(getUnitType());
-        if (this.b != 1 && (baseUnitCanAttack instanceof OrderableUnit)) {
-            ((OrderableUnit) baseUnitCanAttack).a(this.b);
+        if (this.variant != 1 && (baseUnitCanAttack instanceof OrderableUnit)) {
+            ((OrderableUnit) baseUnitCanAttack).a(this.variant);
         }
         String str = strF + "\n\n" + GameInterfaceRenderer.a(baseUnitCanAttack, false, false, true);
-        if (this.b != 1 && (baseUnitCanAttack instanceof OrderableUnit)) {
+        if (this.variant != 1 && (baseUnitCanAttack instanceof OrderableUnit)) {
             ((OrderableUnit) baseUnitCanAttack).a(1);
         }
         return str;

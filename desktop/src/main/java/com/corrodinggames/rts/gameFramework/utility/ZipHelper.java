@@ -23,13 +23,18 @@ import java.util.zip.ZipFile;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/utility/ah.class */
 public class ZipHelper {
     String a = VariableScope.nullOrMissingString;
-    String b;
-    ZipFile c;
-    String[] d;
+    /* JADX INFO: renamed from: b */
+    String zipPath;
+
+    /* JADX INFO: renamed from: c */
+    ZipFile zipFile;
+
+    /* JADX INFO: renamed from: d */
+    String[] entries;
     boolean e;
 
     public ZipHelper(String str, String str2) throws IOException {
-        this.b = str;
+        this.zipPath = str;
         GameEngine.logWarningAndStack("Opening new zip at: " + str2);
         IFileLoader zipFileLoaderForPath = FileLoaderFactory.getZipFileLoaderForPath(str2);
         if (zipFileLoaderForPath != null) {
@@ -42,10 +47,10 @@ public class ZipHelper {
             if (assetInputStreamOpenAssetInputStream == null) {
                 throw new IOException("Failed to open file of zip: " + str2);
             }
-            this.c = a(assetInputStreamOpenAssetInputStream, (Charset) null);
+            this.zipFile = a(assetInputStreamOpenAssetInputStream, (Charset) null);
             GameEngine.log("Streamed zip open took:" + PerformanceProfiler.a(PerformanceProfiler.a(jA)));
         } else {
-            this.c = new ZipFile(str2);
+            this.zipFile = new ZipFile(str2);
         }
         try {
             b();
@@ -59,10 +64,10 @@ public class ZipHelper {
                         throw new IOException("Failed to open source zip with mapper: " + str2);
                     }
                     long jA2 = PerformanceProfiler.a();
-                    this.c = a(zipFileLoaderForPath.openAssetInputStream(str2, true), charsetForName);
+                    this.zipFile = a(zipFileLoaderForPath.openAssetInputStream(str2, true), charsetForName);
                     GameEngine.log("Streamed zip open took:" + PerformanceProfiler.a(PerformanceProfiler.a(jA2)));
                 } else {
-                    this.c = a(str2, charsetForName);
+                    this.zipFile = a(str2, charsetForName);
                 }
                 b();
             } catch (RuntimeException e2) {
@@ -75,9 +80,9 @@ public class ZipHelper {
     public void a() {
         if (!this.e) {
             this.e = true;
-            if (this.c != null) {
+            if (this.zipFile != null) {
                 try {
-                    this.c.close();
+                    this.zipFile.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -134,7 +139,7 @@ public class ZipHelper {
     public void b() {
         long jA = PerformanceProfiler.a();
         ArrayList arrayList = new ArrayList();
-        Enumeration<? extends ZipEntry> enumerationEntries = this.c.entries();
+        Enumeration<? extends ZipEntry> enumerationEntries = this.zipFile.entries();
         while (enumerationEntries.hasMoreElements()) {
             String name = enumerationEntries.nextElement().getName();
             if (name == null) {
@@ -142,20 +147,20 @@ public class ZipHelper {
             }
             arrayList.add(name);
         }
-        this.d = (String[]) arrayList.toArray(new String[0]);
+        this.entries = (String[]) arrayList.toArray(new String[0]);
         this.a = VariableScope.nullOrMissingString;
         String[] strArrE = e(VariableScope.nullOrMissingString);
         if (strArrE.length == 1 && d(strArrE[0])) {
             this.a = strArrE[0] + "/";
-            for (int i = 0; i < this.d.length; i++) {
-                if (this.d[i].startsWith(this.a)) {
-                    this.d[i] = this.d[i].substring(this.a.length());
+            for (int i = 0; i < this.entries.length; i++) {
+                if (this.entries[i].startsWith(this.a)) {
+                    this.entries[i] = this.entries[i].substring(this.a.length());
                 }
             }
         }
         double dA = PerformanceProfiler.a(jA);
         if (dA > 3.0d) {
-            GameEngine.log("zip: buildCache for: " + this.b + ", took:" + PerformanceProfiler.a(dA));
+            GameEngine.log("zip: buildCache for: " + this.zipPath + ", took:" + PerformanceProfiler.a(dA));
         }
     }
 
@@ -164,7 +169,7 @@ public class ZipHelper {
     }
 
     public boolean b(String str) {
-        for (String str2 : this.d) {
+        for (String str2 : this.entries) {
             if (str2.equals(str)) {
                 return true;
             }
@@ -173,12 +178,12 @@ public class ZipHelper {
     }
 
     public boolean c(String str) {
-        for (String str2 : this.d) {
+        for (String str2 : this.entries) {
             if (str2.equals(str)) {
                 return true;
             }
         }
-        for (String str3 : this.d) {
+        for (String str3 : this.entries) {
             if (str3.equalsIgnoreCase(str)) {
                 return true;
             }
@@ -193,7 +198,7 @@ public class ZipHelper {
         if (str.equals("/")) {
             return true;
         }
-        for (String str2 : this.d) {
+        for (String str2 : this.entries) {
             if (str2.contains(str)) {
                 return true;
             }
@@ -208,7 +213,7 @@ public class ZipHelper {
             str = str + "/";
         }
         ArrayList arrayList = new ArrayList();
-        for (String str2 : this.d) {
+        for (String str2 : this.entries) {
             if (str.equals(VariableScope.nullOrMissingString) || str2.startsWith(str)) {
                 String strSubstring = str2.substring(str.length());
                 if (strSubstring.length() != 0 && !strSubstring.equals("..")) {
@@ -232,12 +237,12 @@ public class ZipHelper {
         ZipEntry entry = null;
         IllegalArgumentException illegalArgumentException = null;
         try {
-            entry = this.c.getEntry(str2);
+            entry = this.zipFile.getEntry(str2);
         } catch (IllegalArgumentException e) {
             illegalArgumentException = e;
         }
         if (entry == null && b(str) && !d(str)) {
-            Enumeration<? extends ZipEntry> enumerationEntries = this.c.entries();
+            Enumeration<? extends ZipEntry> enumerationEntries = this.zipFile.entries();
             while (enumerationEntries.hasMoreElements()) {
                 try {
                     zipEntryNextElement = enumerationEntries.nextElement();
@@ -261,22 +266,22 @@ public class ZipHelper {
         if (!str2.endsWith("/")) {
             str2 = str2 + "/";
         }
-        for (String str3 : this.d) {
+        for (String str3 : this.entries) {
             if (str3.equals(str)) {
                 return str3;
             }
         }
-        for (String str4 : this.d) {
+        for (String str4 : this.entries) {
             if (str4.equals(str2)) {
                 return str4;
             }
         }
-        for (String str5 : this.d) {
+        for (String str5 : this.entries) {
             if (str5.equalsIgnoreCase(str)) {
                 return str5;
             }
         }
-        for (String str6 : this.d) {
+        for (String str6 : this.entries) {
             if (str6.equalsIgnoreCase(str2)) {
                 return str6;
             }
@@ -303,7 +308,7 @@ public class ZipHelper {
         }
         try {
             try {
-                return new AssetInputStream(this.c.getInputStream(zipEntryF), this.b + "/" + str);
+                return new AssetInputStream(this.zipFile.getInputStream(zipEntryF), this.zipPath + "/" + str);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 return null;

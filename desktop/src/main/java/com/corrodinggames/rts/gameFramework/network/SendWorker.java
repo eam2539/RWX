@@ -110,7 +110,7 @@ final class SendWorker implements Runnable {
                         dataOutputStream.flush();
                         dataOutputStream.close();
                         ReliableSocket h2 = (ReliableSocket)this.networkConnection.socket;
-                        h2.sendDataBytes(((ByteArrayBuilder)object).a, 0, ((ByteArrayBuilder)object).b(), bl2);
+                        h2.sendDataBytes(((ByteArrayBuilder)object).buffer, 0, ((ByteArrayBuilder)object).b(), bl2);
                         if (bl) {
                             ((ByteArrayBuilder)object).close();
                         }
