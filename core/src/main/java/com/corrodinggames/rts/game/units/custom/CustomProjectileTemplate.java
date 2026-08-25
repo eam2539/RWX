@@ -264,9 +264,9 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
         }
         for (String str4 : fastArrayList) {
             UnitFilter unitFilter = new UnitFilter();
-            unitFilter.a = AnimationTag.a(iniFile.getString(str, str4 + "ifUnitWithTags", (String) null));
-            unitFilter.b = AnimationTag.a(iniFile.getString(str, str4 + "ifUnitWithoutTags", (String) null));
-            if (unitFilter.a == null && unitFilter.b == null) {
+            unitFilter.requiredTags = AnimationTag.a(iniFile.getString(str, str4 + "ifUnitWithTags", (String) null));
+            unitFilter.excludedTags = AnimationTag.a(iniFile.getString(str, str4 + "ifUnitWithoutTags", (String) null));
+            if (unitFilter.requiredTags == null && unitFilter.excludedTags == null) {
                 throw new RuntimeException("[" + str + "]" + str4 + " requires: unitWithTags and/or unitWithoutTags");
             }
             unitFilter.c = iniFile.getFloat(str, str4 + "directDamageMultiplier", Float.valueOf(1.0f)).floatValue();
@@ -287,9 +287,9 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
             }
             String string5 = iniFile.getString(str, str4 + "changedExplodeEffect", (String) null);
             if (string5 != null) {
-                unitFilter.g = customUnitConfig.addConfigExtension(string5, (CustomUnitSpawnList) null);
-                if (unitFilter.g != null && !unitFilter.g.a()) {
-                    unitFilter.g = null;
+                unitFilter.spawnList = customUnitConfig.addConfigExtension(string5, (CustomUnitSpawnList) null);
+                if (unitFilter.spawnList != null && !unitFilter.spawnList.a()) {
+                    unitFilter.spawnList = null;
                 }
             }
             boolean z = false;
@@ -319,7 +319,7 @@ public class CustomProjectileTemplate extends ProjectileTemplate {
                 customProjectileTemplate.hasSplashDamage = true;
                 customProjectileTemplate.bf.add(unitFilter);
             }
-            if (unitFilter.g != null) {
+            if (unitFilter.spawnList != null) {
                 if (customProjectileTemplate.bg == null) {
                     customProjectileTemplate.bg = new FastArrayList();
                 }

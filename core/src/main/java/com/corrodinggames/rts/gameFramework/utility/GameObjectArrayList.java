@@ -10,9 +10,13 @@ import java.util.*;
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/utility/s.class */
 public final class GameObjectArrayList extends AbstractList<GameObject> implements Serializable, Cloneable, RandomAccess {
     public static final GameObject[] a = new GameObject[0];
-    int b;
+    /* JADX INFO: renamed from: b */
+    int size;
+
     transient GameObject[] c = a;
-    String d;
+
+    /* JADX INFO: renamed from: d */
+    String name;
 
     static /* synthetic */ int e(GameObjectArrayList gameObjectArrayList) {
         return gameObjectArrayList.modCount;
@@ -25,7 +29,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
     }
 
     public GameObjectArrayList(String str) {
-        this.d = str;
+        this.name = str;
     }
 
     public GameObject[] a() {
@@ -36,7 +40,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
     public boolean add(GameObject gameObject) {
         GameObject[] gameObjectArr = this.c;
-        int i = this.b;
+        int i = this.size;
         if (i == gameObjectArr.length) {
             GameObject[] gameObjectArr2 = new GameObject[i + (i < 6 ? 12 : i >> 1)];
             System.arraycopy(gameObjectArr, 0, gameObjectArr2, 0, i);
@@ -44,7 +48,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
             this.c = gameObjectArr2;
         }
         gameObjectArr[i] = gameObject;
-        this.b = i + 1;
+        this.size = i + 1;
         this.modCount++;
         return true;
     }
@@ -53,7 +57,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
     public void add(int i, GameObject gameObject) {
         GameObject[] gameObjectArr = this.c;
-        int i2 = this.b;
+        int i2 = this.size;
         if (i > i2 || i < 0) {
             a(i, i2);
         }
@@ -67,7 +71,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
             this.c = gameObjectArr2;
         }
         gameObjectArr[i] = gameObject;
-        this.b = i2 + 1;
+        this.size = i2 + 1;
         this.modCount++;
     }
 
@@ -83,7 +87,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
             return false;
         }
         GameObject[] gameObjectArr2 = this.c;
-        int i = this.b;
+        int i = this.size;
         int i2 = i + length;
         if (i2 > gameObjectArr2.length) {
             GameObject[] gameObjectArr3 = new GameObject[c(i2 - 1)];
@@ -92,14 +96,14 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
             this.c = gameObjectArr3;
         }
         System.arraycopy(gameObjectArr, 0, gameObjectArr2, i, length);
-        this.b = i2;
+        this.size = i2;
         this.modCount++;
         return true;
     }
 
     @Override // java.util.AbstractList, java.util.List
     public boolean addAll(int i, Collection collection) {
-        int i2 = this.b;
+        int i2 = this.size;
         if (i > i2 || i < 0) {
             a(i, i2);
         }
@@ -120,7 +124,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
             this.c = gameObjectArr3;
         }
         System.arraycopy(gameObjectArr, 0, gameObjectArr2, i, length);
-        this.b = i3;
+        this.size = i3;
         this.modCount++;
         return true;
     }
@@ -131,16 +135,16 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
 
     @Override // java.util.AbstractList, java.util.AbstractCollection, java.util.Collection, java.util.List
     public void clear() {
-        if (this.b != 0) {
-            Arrays.fill(this.c, 0, this.b, (Object) null);
-            this.b = 0;
+        if (this.size != 0) {
+            Arrays.fill(this.c, 0, this.size, (Object) null);
+            this.size = 0;
             this.modCount++;
         }
     }
 
     public void b() {
-        if (this.b != 0) {
-            this.b = 0;
+        if (this.size != 0) {
+            this.size = 0;
             this.modCount++;
         }
     }
@@ -158,26 +162,26 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
     @Override // java.util.AbstractList, java.util.List
     /* JADX INFO: renamed from: a, reason: merged with bridge method [inline-methods] */
     public GameObject get(int i) {
-        if (i >= this.b) {
-            a(i, this.b);
+        if (i >= this.size) {
+            a(i, this.size);
         }
         return this.c[i];
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public int size() {
-        return this.b;
+        return this.size;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean isEmpty() {
-        return this.b == 0;
+        return this.size == 0;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean contains(Object obj) {
         GameObject[] gameObjectArr = this.c;
-        int i = this.b;
+        int i = this.size;
         if (obj != null) {
             for (int i2 = 0; i2 < i; i2++) {
                 if (obj.equals(gameObjectArr[i2])) {
@@ -197,7 +201,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
     @Override // java.util.AbstractList, java.util.List
     public int indexOf(Object obj) {
         GameObject[] gameObjectArr = this.c;
-        int i = this.b;
+        int i = this.size;
         if (obj != null) {
             for (int i2 = 0; i2 < i; i2++) {
                 if (obj.equals(gameObjectArr[i2])) {
@@ -218,14 +222,14 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
     public int lastIndexOf(Object obj) {
         GameObject[] gameObjectArr = this.c;
         if (obj != null) {
-            for (int i = this.b - 1; i >= 0; i--) {
+            for (int i = this.size - 1; i >= 0; i--) {
                 if (obj.equals(gameObjectArr[i])) {
                     return i;
                 }
             }
             return -1;
         }
-        for (int i2 = this.b - 1; i2 >= 0; i2--) {
+        for (int i2 = this.size - 1; i2 >= 0; i2--) {
             if (gameObjectArr[i2] == null) {
                 return i2;
             }
@@ -237,7 +241,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
     /* JADX INFO: renamed from: b, reason: merged with bridge method [inline-methods] */
     public GameObject remove(int i) {
         GameObject[] gameObjectArr = this.c;
-        int i2 = this.b;
+        int i2 = this.size;
         if (i >= i2) {
             a(i, i2);
         }
@@ -245,7 +249,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
         int i3 = i2 - 1;
         System.arraycopy(gameObjectArr, i + 1, gameObjectArr, i, i3 - i);
         gameObjectArr[i3] = null;
-        this.b = i3;
+        this.size = i3;
         this.modCount++;
         return gameObject;
     }
@@ -253,14 +257,14 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public boolean remove(Object obj) {
         GameObject[] gameObjectArr = this.c;
-        int i = this.b;
+        int i = this.size;
         if (obj != null) {
             for (int i2 = 0; i2 < i; i2++) {
                 if (obj.equals(gameObjectArr[i2])) {
                     int i3 = i - 1;
                     System.arraycopy(gameObjectArr, i2 + 1, gameObjectArr, i2, i3 - i2);
                     gameObjectArr[i3] = null;
-                    this.b = i3;
+                    this.size = i3;
                     this.modCount++;
                     return true;
                 }
@@ -272,7 +276,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
                 int i5 = i - 1;
                 System.arraycopy(gameObjectArr, i4 + 1, gameObjectArr, i4, i5 - i4);
                 gameObjectArr[i5] = null;
-                this.b = i5;
+                this.size = i5;
                 this.modCount++;
                 return true;
             }
@@ -286,12 +290,12 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
             return;
         }
         GameObject[] gameObjectArr = this.c;
-        int i3 = this.b;
+        int i3 = this.size;
         if (i >= i3) {
-            throw new IndexOutOfBoundsException("fromIndex " + i + " >= size " + this.b);
+            throw new IndexOutOfBoundsException("fromIndex " + i + " >= size " + this.size);
         }
         if (i2 > i3) {
-            throw new IndexOutOfBoundsException("toIndex " + i2 + " > size " + this.b);
+            throw new IndexOutOfBoundsException("toIndex " + i2 + " > size " + this.size);
         }
         if (i > i2) {
             throw new IndexOutOfBoundsException("fromIndex " + i + " > toIndex " + i2);
@@ -299,7 +303,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
         System.arraycopy(gameObjectArr, i2, gameObjectArr, i, i3 - i2);
         int i4 = i2 - i;
         Arrays.fill(gameObjectArr, i3 - i4, i3, (Object) null);
-        this.b = i3 - i4;
+        this.size = i3 - i4;
         this.modCount++;
     }
 
@@ -307,8 +311,8 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
     /* JADX INFO: renamed from: b, reason: merged with bridge method [inline-methods] */
     public GameObject set(int i, GameObject gameObject) {
         GameObject[] gameObjectArr = this.c;
-        if (i >= this.b) {
-            a(i, this.b);
+        if (i >= this.size) {
+            a(i, this.size);
         }
         GameObject gameObject2 = gameObjectArr[i];
         gameObjectArr[i] = gameObject;
@@ -317,7 +321,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public Object[] toArray() {
-        int i = this.b;
+        int i = this.size;
         Object[] objArr = new Object[i];
         System.arraycopy(this.c, 0, objArr, 0, i);
         return objArr;
@@ -325,7 +329,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.util.List
     public Object[] toArray(Object[] objArr) {
-        int i = this.b;
+        int i = this.size;
         if (objArr.length < i) {
             objArr = (Object[]) Array.newInstance(objArr.getClass().getComponentType(), i);
         }
@@ -346,7 +350,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
     public int hashCode() {
         GameObject[] gameObjectArr = this.c;
         int iHashCode = 1;
-        int i = this.b;
+        int i = this.size;
         for (int i2 = 0; i2 < i; i2++) {
             GameObject gameObject = gameObjectArr[i2];
             iHashCode = (31 * iHashCode) + (gameObject == null ? 0 : gameObject.hashCode());
@@ -363,7 +367,7 @@ public final class GameObjectArrayList extends AbstractList<GameObject> implemen
             return false;
         }
         List list = (List) obj;
-        int i = this.b;
+        int i = this.size;
         if (list.size() != i) {
             return false;
         }

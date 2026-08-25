@@ -154,24 +154,24 @@ public class FactoryQueueManager {
     public Projectile a(PopupQueueAction popupQueueAction, boolean z, PointF pointF, BaseUnit baseUnit) {
         Projectile projectile = new Projectile();
         projectile.j = popupQueueAction.getActionId();
-        projectile.h = pointF;
-        projectile.i = baseUnit;
+        projectile.targetPoint = pointF;
+        projectile.targetUnit = baseUnit;
         if (projectile.j == null) {
             throw new RuntimeException("item.uIndex==null??");
         }
-        projectile.a = 1;
+        projectile.launchDelay = 1;
         projectile.b = popupQueueAction.K();
         projectile.c = popupQueueAction.getPrice();
         projectile.d = popupQueueAction.getAdditionalCost();
         projectile.e = popupQueueAction.getAnimationSet();
         projectile.f = popupQueueAction.isHighPriority();
-        projectile.g = popupQueueAction.getUnitType();
-        projectile.l = popupQueueAction.isHighPriorityQueue();
+        projectile.unitType = popupQueueAction.getUnitType();
+        projectile.isHighPriority = popupQueueAction.isHighPriorityQueue();
         if (!z) {
             PlayerTeam.b((BaseUnit) this.a);
-            if (projectile.l) {
+            if (projectile.isHighPriority) {
                 int i = 0;
-                for (int i2 = 0; i2 < this.c.size() && ((Projectile) this.c.get(i2)).l; i2++) {
+                for (int i2 = 0; i2 < this.c.size() && ((Projectile) this.c.get(i2)).isHighPriority; i2++) {
                     i = i2 + 1;
                 }
                 if (i != 0 || this.c.size() != 0) {
@@ -286,8 +286,8 @@ public class FactoryQueueManager {
                 }
                 PlayerTeam.b((BaseUnit) this.a);
                 this.e = 0.0f;
-                projectile.a--;
-                if (projectile.a <= 0) {
+                projectile.launchDelay--;
+                if (projectile.launchDelay <= 0) {
                     List listF = f();
                     if (listF.size() == 0) {
                         GameEngine.logColored("-------------buildQueue empty for:" + projectile.j);
@@ -359,8 +359,8 @@ public class FactoryQueueManager {
             Object[] objArrA = this.c.a();
             for (int i3 = 0; i3 < i2; i3++) {
                 Projectile projectile = (Projectile) objArrA[i3];
-                if (projectile.f && projectile.g == unitType) {
-                    i += projectile.a;
+                if (projectile.f && projectile.unitType == unitType) {
+                    i += projectile.launchDelay;
                 }
             }
         }
@@ -391,7 +391,7 @@ public class FactoryQueueManager {
             for (Projectile projectile : this.c) {
                 if (AbstractUnitAction.NONE_ACTION_ID == actionId || projectile.j.equals(actionId)) {
                     if (!z2 || projectile.f) {
-                        i += projectile.a;
+                        i += projectile.launchDelay;
                     }
                 }
             }
@@ -401,9 +401,9 @@ public class FactoryQueueManager {
                 if (AbstractUnitAction.NONE_ACTION_ID == actionId || projectile2.j.equals(actionId)) {
                     if (!z2 || projectile2.f) {
                         if (!projectile2.k) {
-                            i += projectile2.a;
+                            i += projectile2.launchDelay;
                         } else {
-                            i -= projectile2.a;
+                            i -= projectile2.launchDelay;
                         }
                     }
                 }

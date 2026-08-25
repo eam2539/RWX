@@ -14,10 +14,17 @@ import io.github.rwx.render.canvas.KoolPaint;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.a.h */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/a/h.class */
 public class UIStyle {
-    Texture p;
-    public UIStyle r;
-    public int u;
-    public UIStyle v;
+    /* JADX INFO: renamed from: p */
+    Texture backgroundTexture;
+
+    /* JADX INFO: renamed from: r */
+    public UIStyle normalStyle;
+
+    /* JADX INFO: renamed from: u */
+    public int paddingSize;
+
+    /* JADX INFO: renamed from: v */
+    public UIStyle hoverStyle;
     public static final UIStyle j = new UIStyle();
     public static final UIStyle k = new UIStyle();
     public static final UIStyle l = new UIStyle();
@@ -32,11 +39,11 @@ public class UIStyle {
     public int t = 3;
 
     public void a(Texture texture) {
-        this.p = texture;
+        this.backgroundTexture = texture;
     }
 
     public void a(UIStyle uIStyle) {
-        this.p = uIStyle.p;
+        this.backgroundTexture = uIStyle.backgroundTexture;
         if (uIStyle.o != null) {
             this.o = new KoolPaint(uIStyle.o);
         } else {
@@ -68,7 +75,7 @@ public class UIStyle {
         uIStyle4.q.a(KoolPaint.Style.STROKE);
         UIStyle uIStyle5 = n;
         uIStyle5.o.c(255);
-        uIStyle5.p = GameEngine.getInstance().gameUI.bl;
+        uIStyle5.backgroundTexture = GameEngine.getInstance().gameUI.bl;
         uIStyle5.q.b(-7829368);
         uIStyle5.q.c(255);
         uIStyle5.q.a(KoolPaint.Style.STROKE);
@@ -87,18 +94,18 @@ public class UIStyle {
     }
 
     public void a(GraphicsEngine graphicsEngine, Rect rect, UIState uIState) {
-        if (this.u > 0) {
+        if (this.paddingSize > 0) {
             y.a(rect);
             rect = y;
-            Utility.grow(rect, this.u);
+            Utility.grow(rect, this.paddingSize);
         }
-        if (this.r != null) {
+        if (this.normalStyle != null) {
             w.a(rect);
             w.a(this.s, this.t);
-            this.r.a(graphicsEngine, w);
+            this.normalStyle.a(graphicsEngine, w);
         }
-        if (uIState == UIState.hovered && this.v != null) {
-            this.v.a(graphicsEngine, rect);
+        if (uIState == UIState.hovered && this.hoverStyle != null) {
+            this.hoverStyle.a(graphicsEngine, rect);
         } else {
             a(graphicsEngine, rect);
         }
@@ -106,8 +113,8 @@ public class UIStyle {
 
     public void a(GraphicsEngine graphicsEngine, Rect rect) {
         GameEngine gameEngine = GameEngine.getInstance();
-        if (this.p != null) {
-            gameEngine.renderGraphicsEngine.a(this.p, rect, this.o, 0, 0, 0, 0);
+        if (this.backgroundTexture != null) {
+            gameEngine.renderGraphicsEngine.a(this.backgroundTexture, rect, this.o, 0, 0, 0, 0);
         } else if (this.o != null) {
             graphicsEngine.b(rect, this.o);
         }

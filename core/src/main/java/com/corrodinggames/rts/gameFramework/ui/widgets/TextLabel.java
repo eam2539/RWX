@@ -13,10 +13,13 @@ import java.util.ArrayList;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.f.a.j */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/f/a/j.class */
 public class TextLabel extends UIElement {
-    String a;
+
+    /* JADX INFO: renamed from: a */
+    String text;
     KoolPaint b = new GamePaint();
     UIStyle c = UIStyle.l;
-    ArrayList<String> d;
+    /* JADX INFO: renamed from: d */
+    ArrayList<String> lines;
 
     public TextLabel() {
         this.b.a(KoolPaint.Align.CENTER);
@@ -35,7 +38,7 @@ public class TextLabel extends UIElement {
 
     @Override // com.corrodinggames.rts.gameFramework.ui.widgets.UIElement
     public String a() {
-        return super.a() + " (text:" + this.a + ")";
+        return super.a() + " (text:" + this.text + ")";
     }
 
     @Override // com.corrodinggames.rts.gameFramework.ui.widgets.UIElement
@@ -44,14 +47,14 @@ public class TextLabel extends UIElement {
         final GraphicsEngine d = this.d();
         final RectF a = this.a(new RectF(), float1, float2);
         this.c.a(d, a);
-        if (this.a == null) {
+        if (this.text == null) {
             return;
         }
-        if (this.d == null) {
-            d.a(this.a, a.d(), a.d - this.l, this.b);
+        if (this.lines == null) {
+            d.a(this.text, a.d(), a.d - this.l, this.b);
         } else {
             int n = 0;
-            for (final String string : this.d) {
+            for (final String string : this.lines) {
                 final KoolPaint b = this.b;
                 final int lineHeight = TextUtils.getLineHeight(b);
                 d.a(string, a.d(), a.b + this.k + lineHeight + n * lineHeight, b);
@@ -61,7 +64,7 @@ public class TextLabel extends UIElement {
     }
 
     public void a(String str) {
-        this.a = str;
+        this.text = str;
         e();
     }
 
@@ -81,7 +84,7 @@ public class TextLabel extends UIElement {
         super.b();
         this.d();
         final Rect c = this.c();
-        this.d = new ArrayList(TextUtils.wrapText(this.a, c, this.b, this.b, true));
+        this.lines = new ArrayList(TextUtils.wrapText(this.text, c, this.b, this.b, true));
         this.i = (float) c.b();
         this.j = (float) c.c();
         this.i += this.m + this.n;

@@ -60,7 +60,7 @@ public abstract class HoverLandUnit extends LandUnit {
                         effectCreateEffectInternal.aq = 0;
                         effectCreateEffectInternal.ap = 13;
                         effectCreateEffectInternal.ar = (short) 1;
-                        effectCreateEffectInternal.r = true;
+                        effectCreateEffectInternal.fadeIn = true;
                         effectCreateEffectInternal.E = 0.8f;
                         effectCreateEffectInternal.W = 80.0f;
                         effectCreateEffectInternal.V = 80.0f;

@@ -6,10 +6,21 @@ import io.github.rwx.render.canvas.KoolPaint;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.utility.aa */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/utility/aa.class */
 public class DebugDrawItem {
-    public KoolPaint a;
-    RectF b;
-    boolean c;
+
+    /* JADX INFO: renamed from: a */
+    public KoolPaint paint;
+
+    /* JADX INFO: renamed from: b */
+    RectF rect;
+
+    /* JADX INFO: renamed from: c */
+    boolean isExpired;
+
     boolean d;
-    public float e;
-    public String f;
+
+    /* JADX INFO: renamed from: e */
+    public float remainingTime;
+
+    /* JADX INFO: renamed from: f */
+    public String text;
 }

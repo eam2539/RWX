@@ -7,7 +7,7 @@ class CachedThrowable extends Throwable {
 
     /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
     CachedThrowable(CachedStackTrace cachedStackTrace, CachedThrowable cachedThrowable) {
-        super(cachedStackTrace.a, cachedThrowable);
+        super(cachedStackTrace.stackTrace, cachedThrowable);
         this.a = cachedStackTrace;
     }
 

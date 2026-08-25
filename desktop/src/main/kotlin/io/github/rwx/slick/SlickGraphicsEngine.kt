@@ -835,7 +835,7 @@ class SlickGraphicsEngine private constructor(
         }
         shaderProgram.f()
         val binding = shaderState.bindings.getOrPut(shaderProgram) { SlickShaderBinding() }
-        val sourcesChanged = binding.sources != (shaderProgram.e to shaderProgram.f)
+        val sourcesChanged = binding.sources != (shaderProgram.vertexSource to shaderProgram.fragmentSource)
         if (shaderState.currentShader !== shaderProgram || sourcesChanged) {
             graphics.flushBuffer()
             if (!compileSlickShader(shaderProgram, binding)) {
@@ -879,15 +879,15 @@ class SlickGraphicsEngine private constructor(
     }
 
     private fun uploadShaderUniforms(shaderProgram: ShaderProgram, binding: SlickShaderBinding) {
-        for (shaderUniform in shaderProgram.p) {
+        for (shaderUniform in shaderProgram.uniforms) {
             val uniformSnapshot = shaderUniform.toSlickSnapshot()
             val uniformLocation = binding.uniformLocations.getOrPut(shaderUniform) {
-                GL20.glGetUniformLocation(binding.programId, shaderUniform.a)
+                GL20.glGetUniformLocation(binding.programId, shaderUniform.name)
             }
             if (uniformLocation == -1) {
                 binding.uniformSnapshots[shaderUniform] = uniformSnapshot
                 if (binding.missingUniforms.add(shaderUniform)) {
-                    shaderProgram.b("Unknown parameter: " + shaderUniform.a)
+                    shaderProgram.b("Unknown parameter: " + shaderUniform.name)
                     val uniformCount = GL20.glGetProgrami(binding.programId, GL20.GL_ACTIVE_UNIFORMS)
                     for (i in 0 until uniformCount) {
                         val uniformSize = BufferUtils.createIntBuffer(1)
@@ -904,7 +904,7 @@ class SlickGraphicsEngine private constructor(
                 }
                 continue
             }
-            val uniformTexture = shaderUniform.f
+            val uniformTexture = shaderUniform.texture
             if (uniformTexture != null) {
                 val slickTexture = uniformTexture.asSlickTexture()?.image()?.texture ?: continue
                 if (shaderUniform.g) {
@@ -921,34 +921,41 @@ class SlickGraphicsEngine private constructor(
                     GL13.glActiveTexture(GL13.GL_TEXTURE0)
                 }
             } else {
-                when (shaderUniform.h) {
-                    ShaderUniformValueType.INTEGER -> GL20.glUniform1i(uniformLocation, shaderUniform.e[0].toInt())
+                when (shaderUniform.valueType) {
+                    ShaderUniformValueType.INTEGER -> GL20.glUniform1i(
+                        uniformLocation,
+                        shaderUniform.floatValues[0].toInt()
+                    )
                     ShaderUniformValueType.MATRIX4 -> {
                         val values = BufferUtils.createFloatBuffer(16)
-                        values.put(shaderUniform.e).flip()
+                        values.put(shaderUniform.floatValues).flip()
                         GL20.glUniformMatrix4fv(uniformLocation, false, values)
                     }
 
-                    ShaderUniformValueType.FLOAT -> when (shaderUniform.e.size) {
-                        1 -> GL20.glUniform1f(uniformLocation, shaderUniform.e[0])
-                        2 -> GL20.glUniform2f(uniformLocation, shaderUniform.e[0], shaderUniform.e[1])
+                    ShaderUniformValueType.FLOAT -> when (shaderUniform.floatValues.size) {
+                        1 -> GL20.glUniform1f(uniformLocation, shaderUniform.floatValues[0])
+                        2 -> GL20.glUniform2f(
+                            uniformLocation,
+                            shaderUniform.floatValues[0],
+                            shaderUniform.floatValues[1]
+                        )
                         3 -> GL20.glUniform3f(
                             uniformLocation,
-                            shaderUniform.e[0],
-                            shaderUniform.e[1],
-                            shaderUniform.e[2],
+                            shaderUniform.floatValues[0],
+                            shaderUniform.floatValues[1],
+                            shaderUniform.floatValues[2],
                         )
 
                         4 -> GL20.glUniform4f(
                             uniformLocation,
-                            shaderUniform.e[0],
-                            shaderUniform.e[1],
-                            shaderUniform.e[2],
-                            shaderUniform.e[3],
+                            shaderUniform.floatValues[0],
+                            shaderUniform.floatValues[1],
+                            shaderUniform.floatValues[2],
+                            shaderUniform.floatValues[3],
                         )
 
                         else -> shaderProgram.b(
-                            "Unhandled parameter size: " + shaderUniform.a + " - " + shaderUniform.e.size
+                            "Unhandled parameter size: " + shaderUniform.name + " - " + shaderUniform.floatValues.size
                         )
                     }
                 }
@@ -958,18 +965,19 @@ class SlickGraphicsEngine private constructor(
     }
 
     private fun compileSlickShader(shaderProgram: ShaderProgram, binding: SlickShaderBinding): Boolean {
-        if (shaderProgram.o != 0) {
+        if (shaderProgram.programStatus != 0) {
             return false
         }
-        val sources = shaderProgram.e to shaderProgram.f
+        val sources = shaderProgram.vertexSource to shaderProgram.fragmentSource
         if (binding.programId != 0 && binding.sources == sources) {
             GL20.glUseProgram(binding.programId)
             return true
         }
         shaderProgram.b("Compiling shader")
-        val vertexShader = compileSlickShaderPart(shaderProgram, GL20.GL_VERTEX_SHADER, shaderProgram.e)
-        val fragmentShader = compileSlickShaderPart(shaderProgram, GL20.GL_FRAGMENT_SHADER, shaderProgram.f)
-        if (shaderProgram.o != 0) {
+        val vertexShader = compileSlickShaderPart(shaderProgram, GL20.GL_VERTEX_SHADER, shaderProgram.vertexSource)
+        val fragmentShader =
+            compileSlickShaderPart(shaderProgram, GL20.GL_FRAGMENT_SHADER, shaderProgram.fragmentSource)
+        if (shaderProgram.programStatus != 0) {
             return false
         }
         val programId = GL20.glCreateProgram()
@@ -1397,7 +1405,7 @@ private class SlickShaderBinding {
     val uniformSnapshots: MutableMap<ShaderUniform, SlickUniformSnapshot> = IdentityHashMap()
 
     fun hasUniformChanges(shaderProgram: ShaderProgram): Boolean =
-        shaderProgram.p.any { uniform -> uniformSnapshots[uniform] != uniform.toSlickSnapshot() }
+        shaderProgram.uniforms.any { uniform -> uniformSnapshots[uniform] != uniform.toSlickSnapshot() }
 }
 
 private data class SlickUniformSnapshot(
@@ -1409,8 +1417,8 @@ private data class SlickUniformSnapshot(
 
 private fun ShaderUniform.toSlickSnapshot(): SlickUniformSnapshot =
     SlickUniformSnapshot(
-        values = e.toList(),
-        texture = f,
+        values = floatValues.toList(),
+        texture = texture,
         textureSize = g,
-        valueType = h,
+        valueType = valueType,
     )

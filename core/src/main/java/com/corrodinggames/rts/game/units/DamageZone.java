@@ -223,14 +223,14 @@ public class DamageZone extends DummyUnit {
                     if (effectCreateEffectInternal != null) {
                         effectCreateEffectInternal.aq = 19;
                         effectCreateEffectInternal.Y = Utility.randomFloatInRange(-180.0f, 180.0f);
-                        effectCreateEffectInternal.r = true;
+                        effectCreateEffectInternal.fadeIn = true;
                         effectCreateEffectInternal.ar = (short) 1;
                         effectCreateEffectInternal.E = 0.7f;
                         effectCreateEffectInternal.V = 30.0f;
                         effectCreateEffectInternal.W = effectCreateEffectInternal.V;
                         effectCreateEffectInternal.G = 0.2f;
                         effectCreateEffectInternal.F = 1.2f;
-                        effectCreateEffectInternal.x = KoolArgbColor.a(255, 173, 12, 12);
+                        effectCreateEffectInternal.startColor = KoolArgbColor.a(255, 173, 12, 12);
                     }
                 }
             }

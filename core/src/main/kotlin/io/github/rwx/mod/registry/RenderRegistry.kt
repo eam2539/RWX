@@ -292,7 +292,7 @@ object RenderRegistry : OwnedRegistry {
         var worldX = effect.I
         var worldY = effect.J
         var height = effect.K
-        effect.b?.let { source ->
+        effect.parentObject?.let { source ->
             worldX += source.posX
             worldY += source.posY
             height += source.posZ
@@ -314,7 +314,7 @@ object RenderRegistry : OwnedRegistry {
             effect.scaleYFrom + (effect.scaleYTo - effect.scaleYFrom) * progress
         }
         val canvas = EngineRenderCanvas(gameEngine.renderGraphicsEngine)
-        val sourceSpeedFraction = (effect.b as? OrderableUnit)?.let { source ->
+        val sourceSpeedFraction = (effect.parentObject as? OrderableUnit)?.let { source ->
             planarSpeedFraction(source.velocityX, source.velocityY, source.getMoveSpeed())
         }
         try {

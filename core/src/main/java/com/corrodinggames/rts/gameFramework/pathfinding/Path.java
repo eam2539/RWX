@@ -182,11 +182,11 @@ public class Path {
         if (this.startTileY < 0) {
             this.startTileY = (short) 0;
         }
-        if (this.startTileX > this.a.s - 1) {
-            this.startTileX = (short) (this.a.s - 1);
+        if (this.startTileX > this.a.widthTiles - 1) {
+            this.startTileX = (short) (this.a.widthTiles - 1);
         }
-        if (this.startTileY > this.a.t - 1) {
-            this.startTileY = (short) (this.a.t - 1);
+        if (this.startTileY > this.a.heightTiles - 1) {
+            this.startTileY = (short) (this.a.heightTiles - 1);
         }
         if (this.a.a(unitMovementType) == null) {
             throw new RuntimeException("Could not get costs for:" + unitMovementType.toString());
@@ -200,11 +200,11 @@ public class Path {
         if (s2 < 0) {
             s2 = 0;
         }
-        if (s > this.a.s - 1) {
-            s = (short) (this.a.s - 1);
+        if (s > this.a.widthTiles - 1) {
+            s = (short) (this.a.widthTiles - 1);
         }
-        if (s2 > this.a.t - 1) {
-            s2 = (short) (this.a.t - 1);
+        if (s2 > this.a.heightTiles - 1) {
+            s2 = (short) (this.a.heightTiles - 1);
         }
         this.endTileX = s;
         this.endTileY = s2;

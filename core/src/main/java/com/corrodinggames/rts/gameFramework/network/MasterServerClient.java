@@ -346,7 +346,7 @@ public class MasterServerClient {
         addParam(list, "password_required", Utility.booleanToString(gameEngine.networkEngine.roomPassword != null));
         addParam(list, "created_by", gameEngine.networkEngine.playerName);
         addParam(list, "private_ip", gameEngine.networkEngine.getPrimaryLocalIpAddress());
-        addParam(list, "port_number", Integer.toString(gameEngine.networkEngine.m));
+        addParam(list, "port_number", Integer.toString(gameEngine.networkEngine.networkPort));
         if (gameEngine.networkEngine.u != null) {
             addParam(list, "game_map", FileHelper.fixPath(gameEngine.networkEngine.u));
         } else {

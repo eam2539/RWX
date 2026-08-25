@@ -9,19 +9,26 @@ import com.corrodinggames.rts.game.units.custom.price.UnitPrice;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.h */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/h.class */
 public class UnitFilter {
-    public AnimationSet a;
-    public AnimationSet b;
+
+    /* JADX INFO: renamed from: a */
+    public AnimationSet requiredTags;
+
+    /* JADX INFO: renamed from: b */
+    public AnimationSet excludedTags;
+
     public float c;
     public float d;
     public UnitPrice e;
     public UnitPrice f;
-    public CustomUnitSpawnList g;
+
+    /* JADX INFO: renamed from: g */
+    public CustomUnitSpawnList spawnList;
 
     public boolean a(BaseUnit baseUnit) {
-        if (this.b != null && AnimationTag.a(this.b, baseUnit.getTags())) {
+        if (this.excludedTags != null && AnimationTag.a(this.excludedTags, baseUnit.getTags())) {
             return false;
         }
-        if (this.a != null && !AnimationTag.a(this.a, baseUnit.getTags())) {
+        if (this.requiredTags != null && !AnimationTag.a(this.requiredTags, baseUnit.getTags())) {
             return false;
         }
         return true;

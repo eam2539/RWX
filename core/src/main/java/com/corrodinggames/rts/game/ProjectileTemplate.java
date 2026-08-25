@@ -185,8 +185,8 @@ public class ProjectileTemplate {
         FastArrayList<UnitFilter> fastArrayList = this.bg;
         if (fastArrayList != null && fastArrayList.size > 0) {
             for (UnitFilter unitFilter : fastArrayList) {
-                if (unitFilter.a(baseUnit) && unitFilter.g != null) {
-                    return unitFilter.g;
+                if (unitFilter.a(baseUnit) && unitFilter.spawnList != null) {
+                    return unitFilter.spawnList;
                 }
             }
             return null;

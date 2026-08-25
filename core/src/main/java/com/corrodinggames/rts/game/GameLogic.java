@@ -1508,11 +1508,11 @@ public class GameLogic extends GameEngine {
         if (isInNetworkOrReplay() && f < 0.1f) {
             NetworkEngine.reportDesync("updateAllGame3: deltaSpeed:" + f + " frame:" + this.currentTick);
         }
-        int size2 = transactionalArrayListDK.a.size();
+        int size2 = transactionalArrayListDK.pendingOperations.size();
         for (int i2 = 0; i2 < size2; i2++) {
-            ListOperationEntry listOperationEntry = (ListOperationEntry) transactionalArrayListDK.a.get(i2);
-            if (listOperationEntry.a == ListOperation.add) {
-                GameObject gameObject2 = (GameObject) listOperationEntry.b;
+            ListOperationEntry listOperationEntry = (ListOperationEntry) transactionalArrayListDK.pendingOperations.get(i2);
+            if (listOperationEntry.operation == ListOperation.add) {
+                GameObject gameObject2 = (GameObject) listOperationEntry.value;
                 if (!gameObject2.isDestroyed) {
                     gameObject2.update(f);
                 }

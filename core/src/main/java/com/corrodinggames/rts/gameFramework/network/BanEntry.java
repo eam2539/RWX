@@ -13,11 +13,11 @@ public class BanEntry {
     /* JADX INFO: renamed from: c */
     String reason;
 
-    public String a() {
+    public String getReasonText() {
         return this.reason != null ? this.reason : "Active ban";
     }
 
-    public float b() {
+    public float getRemainingSeconds() {
         return (this.expiryTimeMs - System.currentTimeMillis()) / 1000.0f;
     }
 }

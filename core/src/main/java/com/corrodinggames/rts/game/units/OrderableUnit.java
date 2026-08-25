@@ -4566,7 +4566,7 @@ public abstract class OrderableUnit extends UnitBase {
 
                     for (UnitStatistics var8 : var1) {
                         if (var8.a == var4 && (var8.b == var5 || var5 == 0.0F || var8.b == 0.0F)) {
-                            var8.d++;
+                            var8.count++;
                             if (var8.b == 0.0F) {
                                 var8.b = var5;
                             }
@@ -5191,7 +5191,7 @@ public abstract class OrderableUnit extends UnitBase {
                     effectCreateEffectInternal.ap = 6;
                     effectCreateEffectInternal.V = 20.0f;
                     effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-                    effectCreateEffectInternal.r = true;
+                    effectCreateEffectInternal.fadeIn = true;
                     effectCreateEffectInternal.E = 0.8f;
                     effectCreateEffectInternal.G = 0.2f;
                     effectCreateEffectInternal.F = 1.0f;
@@ -5214,7 +5214,7 @@ public abstract class OrderableUnit extends UnitBase {
                     effectCreateEffectInternal.ap = 5;
                     effectCreateEffectInternal.V = 20.0f;
                     effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-                    effectCreateEffectInternal.r = true;
+                    effectCreateEffectInternal.fadeIn = true;
                     effectCreateEffectInternal.E = 0.8f;
                     effectCreateEffectInternal.G = 0.2f;
                     effectCreateEffectInternal.F = 1.0f;

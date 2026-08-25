@@ -246,9 +246,9 @@ public class EndGameScreen {
                         effectCreateLightEffectInternal.K += gameEngine.halfScreenHeight / 2.0f;
                         effectCreateLightEffectInternal.V = Utility.randomFloatInRange(140.0f, 380.0f);
                         effectCreateLightEffectInternal.W = effectCreateLightEffectInternal.V;
-                        effectCreateLightEffectInternal.r = true;
-                        effectCreateLightEffectInternal.s = true;
-                        effectCreateLightEffectInternal.t = 5.0f;
+                        effectCreateLightEffectInternal.fadeIn = true;
+                        effectCreateLightEffectInternal.fadeOut = true;
+                        effectCreateLightEffectInternal.fadeDuration = 5.0f;
                         effectCreateLightEffectInternal.E = 2.0f;
                         effectCreateLightEffectInternal.Q = Utility.randomFloatInRange(-2.7f, 2.7f);
                         effectCreateLightEffectInternal.P = Utility.randomFloatInRange(-12.7f, 12.7f);
@@ -256,7 +256,7 @@ public class EndGameScreen {
                         effectCreateLightEffectInternal.F = 0.2f;
                         effectCreateLightEffectInternal.R = Utility.randomFloatInRange(2.0f, 4.0f);
                         effectCreateLightEffectInternal.w = 2.0f;
-                        effectCreateLightEffectInternal.v = true;
+                        effectCreateLightEffectInternal.useBounce = true;
                         effectCreateLightEffectInternal.p = true;
                     }
                 }

@@ -23,7 +23,7 @@ class GetOwnInfoRunnable implements Runnable {
         try {
             ArrayList arrayList = new ArrayList(2);
             arrayList.add(new BasicNameValuePair("action", "self_info"));
-            MasterServerClient.addParam(arrayList, "port", Integer.toString(gameEngine.networkEngine.m));
+            MasterServerClient.addParam(arrayList, "port", Integer.toString(gameEngine.networkEngine.networkPort));
             MasterServerClient.addParam(arrayList, "id", gameEngine.networkEngine.masterServerGameId);
             MasterServerAuth.instance.addTokenHashParam(gameEngine.networkEngine.masterServerGameId, arrayList);
             MasterServerAuth.instance.addOptionalTokenHashParam(gameEngine.networkEngine.masterServerGameId, arrayList);

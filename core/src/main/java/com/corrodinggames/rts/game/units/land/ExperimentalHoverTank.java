@@ -29,10 +29,13 @@ public class ExperimentalHoverTank extends HoverLandUnit {
     public static Texture e = null;
     static Texture[] f = new Texture[10];
     int g;
-    float h;
-    Projectile i;
+    /* JADX INFO: renamed from: h */
+    float bobPhase;
+    /* JADX INFO: renamed from: i */
+    Projectile chargedProjectile;
     Rect j;
-    KoolPaint k;
+    /* JADX INFO: renamed from: k */
+    KoolPaint paint;
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: b, reason: merged with bridge method [inline-methods] */
@@ -54,17 +57,17 @@ public class ExperimentalHoverTank extends HoverLandUnit {
     @Override
     // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject, com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
-        if (this.i != null && this.i.isDestroyed) {
-            this.i = null;
+        if (this.chargedProjectile != null && this.chargedProjectile.isDestroyed) {
+            this.chargedProjectile = null;
         }
-        gameOutputStream.writeObjectId(this.i);
+        gameOutputStream.writeObjectId(this.chargedProjectile);
         super.a(gameOutputStream);
     }
 
     @Override
     // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.BaseUnit, com.corrodinggames.rts.gameFramework.PositionedObject, com.corrodinggames.rts.gameFramework.GameObject
     public void a(GameInputStream gameInputStream) throws IOException {
-        this.i = (Projectile) gameInputStream.readGameObject(Projectile.class);
+        this.chargedProjectile = (Projectile) gameInputStream.readGameObject(Projectile.class);
         super.a(gameInputStream);
     }
 
@@ -111,9 +114,9 @@ public class ExperimentalHoverTank extends HoverLandUnit {
 
     public ExperimentalHoverTank(boolean z) {
         super(z);
-        this.h = 0.0f;
+        this.bobPhase = 0.0f;
         this.j = new Rect();
-        this.k = GameViewUtils.a();
+        this.paint = GameViewUtils.a();
         a(f[7], 1);
         this.radius = 30.0f;
         this.displayRadius = this.radius + 1.0f;
@@ -160,23 +163,23 @@ public class ExperimentalHoverTank extends HoverLandUnit {
         }
         if (this.isMoving) {
         }
-        this.h += 1.0f * f2;
-        if (this.h > 360.0f) {
-            this.h -= 360.0f;
+        this.bobPhase += 1.0f * f2;
+        if (this.bobPhase > 360.0f) {
+            this.bobPhase -= 360.0f;
         }
-        this.posZ = Utility.distanceSq(this.posZ, 4.0f + (Utility.fastSin(this.h) * 2.0f), 0.1f * f2);
+        this.posZ = Utility.distanceSq(this.posZ, 4.0f + (Utility.fastSin(this.bobPhase) * 2.0f), 0.1f * f2);
         this.shield = Utility.distanceSq(this.shield, this.unitEnergyMax, 0.25f * f2);
         this.unitShieldMax = Utility.distanceSq(this.unitShieldMax, 0.0f, 4.0f * f2);
         if (this.unitShieldMax > 50.0f) {
             this.unitShieldMax = 50.0f;
         }
-        if (this.i != null) {
+        if (this.chargedProjectile != null) {
             PointF pointFE = E(0);
-            this.i.posX = pointFE.x;
-            this.i.posY = pointFE.y;
-            this.i.posZ = this.posZ;
-            if (this.i.isDestroyed) {
-                this.i = null;
+            this.chargedProjectile.posX = pointFE.x;
+            this.chargedProjectile.posY = pointFE.y;
+            this.chargedProjectile.posZ = this.posZ;
+            if (this.chargedProjectile.isDestroyed) {
+                this.chargedProjectile = null;
             }
         }
     }
@@ -196,9 +199,9 @@ public class ExperimentalHoverTank extends HoverLandUnit {
     /* JADX INFO: renamed from: K */
     public PointF getShadowOffsetForLevel(int i) {
         PointF pointFK = super.getShadowOffsetForLevel(i);
-        if (this.i != null) {
-            pointFK.x += this.i.trackOffsetX;
-            pointFK.y += this.i.trackOffsetY;
+        if (this.chargedProjectile != null) {
+            pointFK.x += this.chargedProjectile.trackOffsetX;
+            pointFK.y += this.chargedProjectile.trackOffsetY;
         }
         return pointFK;
     }
@@ -212,21 +215,21 @@ public class ExperimentalHoverTank extends HoverLandUnit {
     public void a(BaseUnit baseUnit, int i) {
         GameEngine.getInstance();
         PointF pointFE = E(i);
-        if (this.i != null) {
+        if (this.chargedProjectile != null) {
             boolean z = false;
-            if (this.i.isDestroyed) {
+            if (this.chargedProjectile.isDestroyed) {
                 z = true;
             }
-            if (this.i.targetUnit != baseUnit) {
+            if (this.chargedProjectile.targetUnit != baseUnit) {
                 z = true;
             }
             if (z) {
-                this.i = null;
+                this.chargedProjectile = null;
             }
         }
         float fB = b(i) + e(i) + 5.0f;
-        if (this.i != null) {
-            this.i.lifeTimer = fB;
+        if (this.chargedProjectile != null) {
+            this.chargedProjectile.lifeTimer = fB;
             return;
         }
         Projectile projectileA = Projectile.a(this, pointFE.x, pointFE.y);
@@ -241,7 +244,7 @@ public class ExperimentalHoverTank extends HoverLandUnit {
         projectileA.maxLifeTime = 230.0f;
         projectileA.targetDamageMultiplier = 0.75f;
         projectileA.drawLayer = this.drawLayer;
-        this.i = projectileA;
+        this.chargedProjectile = projectileA;
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
@@ -320,15 +323,15 @@ public class ExperimentalHoverTank extends HoverLandUnit {
         GameViewUtils.a((OrderableUnit) this);
         if (!this.isDead) {
             float fClamp = 0.0f;
-            if (this.i != null) {
-                fClamp = Utility.clamp(this.i.e(), 0.25f) * 3.0f;
+            if (this.chargedProjectile != null) {
+                fClamp = Utility.clamp(this.chargedProjectile.e(), 0.25f) * 3.0f;
             }
             GameViewUtils.a(this, MammothTank.e, fClamp, 0);
         }
         GameEngine gameEngine = GameEngine.getInstance();
         if (!this.isDead && this.shield > 0.0f && this.energy == 0.0f && (textureT = T()) != null) {
-            this.k.a((int) ((0.09f + ((this.shield / this.unitEnergyMax) * 0.4f) + ((Utility.clamp(this.unitShieldMax, 50.0f) / 50.0f) * 0.5f)) * 255.0f), 255, 255, 255);
-            gameEngine.renderGraphicsEngine.a(textureT, this.posX - gameEngine.viewpointXSnapped, (this.posY - gameEngine.viewpointYSnapped) - this.posZ, getRenderRotation(false) - 90.0f, this.k);
+            this.paint.a((int) ((0.09f + ((this.shield / this.unitEnergyMax) * 0.4f) + ((Utility.clamp(this.unitShieldMax, 50.0f) / 50.0f) * 0.5f)) * 255.0f), 255, 255, 255);
+            gameEngine.renderGraphicsEngine.a(textureT, this.posX - gameEngine.viewpointXSnapped, (this.posY - gameEngine.viewpointYSnapped) - this.posZ, getRenderRotation(false) - 90.0f, this.paint);
             return true;
         }
         return true;

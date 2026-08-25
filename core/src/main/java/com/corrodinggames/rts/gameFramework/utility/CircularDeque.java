@@ -9,9 +9,15 @@ import java.util.Iterator;
 /* JADX INFO: renamed from: com.corrodinggames.rts.gameFramework.utility.g */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/gameFramework/utility/g.class */
 public class CircularDeque extends AbstractCollection implements Serializable, Cloneable {
-    transient Object[] b = new Object[16];
-    transient int c;
-    transient int d;
+
+    /* JADX INFO: renamed from: b */
+    transient Object[] elements = new Object[16];
+
+    /* JADX INFO: renamed from: c */
+    transient int head;
+
+    /* JADX INFO: renamed from: d */
+    transient int tail;
     static final /* synthetic */ boolean a;
 
     static {
@@ -19,31 +25,31 @@ public class CircularDeque extends AbstractCollection implements Serializable, C
     }
 
     private void c() {
-        if (!a && this.c != this.d) {
+        if (!a && this.head != this.tail) {
             throw new AssertionError();
         }
-        int i = this.c;
-        int length = this.b.length;
+        int i = this.head;
+        int length = this.elements.length;
         int i2 = length - i;
         int i3 = length << 1;
         if (i3 < 0) {
             throw new IllegalStateException("Sorry, deque too big");
         }
         Object[] objArr = new Object[i3];
-        System.arraycopy(this.b, i, objArr, 0, i2);
-        System.arraycopy(this.b, 0, objArr, i2, i);
-        this.b = objArr;
-        this.c = 0;
-        this.d = length;
+        System.arraycopy(this.elements, i, objArr, 0, i2);
+        System.arraycopy(this.elements, 0, objArr, i2, i);
+        this.elements = objArr;
+        this.head = 0;
+        this.tail = length;
     }
 
     private Object[] a(Object[] objArr) {
-        if (this.c < this.d) {
-            System.arraycopy(this.b, this.c, objArr, 0, size());
-        } else if (this.c > this.d) {
-            int length = this.b.length - this.c;
-            System.arraycopy(this.b, this.c, objArr, 0, length);
-            System.arraycopy(this.b, 0, objArr, length, this.d);
+        if (this.head < this.tail) {
+            System.arraycopy(this.elements, this.head, objArr, 0, size());
+        } else if (this.head > this.tail) {
+            int length = this.elements.length - this.head;
+            System.arraycopy(this.elements, this.head, objArr, 0, length);
+            System.arraycopy(this.elements, 0, objArr, length, this.tail);
         }
         return objArr;
     }
@@ -52,22 +58,22 @@ public class CircularDeque extends AbstractCollection implements Serializable, C
         if (obj == null) {
             throw new NullPointerException();
         }
-        this.b[this.d] = obj;
-        int length = (this.d + 1) & (this.b.length - 1);
-        this.d = length;
-        if (length == this.c) {
+        this.elements[this.tail] = obj;
+        int length = (this.tail + 1) & (this.elements.length - 1);
+        this.tail = length;
+        if (length == this.head) {
             c();
         }
     }
 
     public Object a() {
-        int i = this.c;
-        Object obj = this.b[i];
+        int i = this.head;
+        Object obj = this.elements[i];
         if (obj == null) {
             return null;
         }
-        this.b[i] = null;
-        this.c = (i + 1) & (this.b.length - 1);
+        this.elements[i] = null;
+        this.head = (i + 1) & (this.elements.length - 1);
         return obj;
     }
 
@@ -75,11 +81,11 @@ public class CircularDeque extends AbstractCollection implements Serializable, C
         if (obj == null) {
             return false;
         }
-        int length = this.b.length - 1;
-        int i = this.c;
+        int length = this.elements.length - 1;
+        int i = this.head;
         while (true) {
             int i2 = i;
-            Object obj2 = this.b[i2];
+            Object obj2 = this.elements[i2];
             if (obj2 != null) {
                 if (obj.equals(obj2)) {
                     a(i2);
@@ -99,13 +105,13 @@ public class CircularDeque extends AbstractCollection implements Serializable, C
     }
 
     private void d() {
-        if (!a && this.b[this.d] != null) {
+        if (!a && this.elements[this.tail] != null) {
             throw new AssertionError();
         }
-        if (!a && (this.c != this.d ? this.b[this.c] == null || this.b[(this.d - 1) & (this.b.length - 1)] == null : this.b[this.c] != null)) {
+        if (!a && (this.head != this.tail ? this.elements[this.head] == null || this.elements[(this.tail - 1) & (this.elements.length - 1)] == null : this.elements[this.head] != null)) {
             throw new AssertionError();
         }
-        if (!a && this.b[(this.c - 1) & (this.b.length - 1)] != null) {
+        if (!a && this.elements[(this.head - 1) & (this.elements.length - 1)] != null) {
             throw new AssertionError();
         }
     }
@@ -113,10 +119,10 @@ public class CircularDeque extends AbstractCollection implements Serializable, C
     /* JADX INFO: Access modifiers changed from: private */
     public boolean a(int i) {
         d();
-        Object[] objArr = this.b;
+        Object[] objArr = this.elements;
         int length = objArr.length - 1;
-        int i2 = this.c;
-        int i3 = this.d;
+        int i2 = this.head;
+        int i3 = this.tail;
         int i4 = (i - i2) & length;
         int i5 = (i3 - i) & length;
         if (i4 >= ((i3 - i2) & length)) {
@@ -131,29 +137,29 @@ public class CircularDeque extends AbstractCollection implements Serializable, C
                 System.arraycopy(objArr, i2, objArr, i2 + 1, length - i2);
             }
             objArr[i2] = null;
-            this.c = (i2 + 1) & length;
+            this.head = (i2 + 1) & length;
             return false;
         }
         if (i < i3) {
             System.arraycopy(objArr, i + 1, objArr, i, i5);
-            this.d = i3 - 1;
+            this.tail = i3 - 1;
             return true;
         }
         System.arraycopy(objArr, i + 1, objArr, i, length - i);
         objArr[length] = objArr[0];
         System.arraycopy(objArr, 1, objArr, 0, i3);
-        this.d = (i3 - 1) & length;
+        this.tail = (i3 - 1) & length;
         return true;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection
     public int size() {
-        return (this.d - this.c) & (this.b.length - 1);
+        return (this.tail - this.head) & (this.elements.length - 1);
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection
     public boolean isEmpty() {
-        return this.c == this.d;
+        return this.head == this.tail;
     }
 
     @Override // java.util.AbstractCollection, java.util.Collection, java.lang.Iterable
@@ -166,11 +172,11 @@ public class CircularDeque extends AbstractCollection implements Serializable, C
         if (obj == null) {
             return false;
         }
-        int length = this.b.length - 1;
-        int i = this.c;
+        int length = this.elements.length - 1;
+        int i = this.head;
         while (true) {
             int i2 = i;
-            Object obj2 = this.b[i2];
+            Object obj2 = this.elements[i2];
             if (obj2 != null) {
                 if (obj.equals(obj2)) {
                     return true;
@@ -189,15 +195,15 @@ public class CircularDeque extends AbstractCollection implements Serializable, C
 
     @Override // java.util.AbstractCollection, java.util.Collection
     public void clear() {
-        int i = this.c;
-        int i2 = this.d;
+        int i = this.head;
+        int i2 = this.tail;
         if (i != i2) {
-            this.d = 0;
-            this.c = 0;
+            this.tail = 0;
+            this.head = 0;
             int i3 = i;
-            int length = this.b.length - 1;
+            int length = this.elements.length - 1;
             do {
-                this.b[i3] = null;
+                this.elements[i3] = null;
                 i3 = (i3 + 1) & length;
             } while (i3 != i2);
         }
@@ -225,7 +231,7 @@ public class CircularDeque extends AbstractCollection implements Serializable, C
     public CircularDeque clone() {
         try {
             CircularDeque circularDeque = (CircularDeque) super.clone();
-            circularDeque.b = (Object[]) this.b.clone();
+            circularDeque.elements = (Object[]) this.elements.clone();
             return circularDeque;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

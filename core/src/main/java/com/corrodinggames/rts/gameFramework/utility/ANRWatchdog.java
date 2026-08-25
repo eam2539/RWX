@@ -17,33 +17,41 @@ public class ANRWatchdog extends Thread {
             Log.c("ANRWatchdog", "Interrupted: " + interruptedException.getMessage());
         }
     };
-    private ANRCallback c;
-    private InterruptCallback d;
-    private final int f;
+    /* JADX INFO: renamed from: c */
+    private ANRCallback anrCallback;
+
+    /* JADX INFO: renamed from: d */
+    private InterruptCallback interruptCallback;
+
+    /* JADX INFO: renamed from: f */
+    private final int intervalMs;
+
     private String g;
     private boolean h;
     private boolean i;
-    private volatile int j;
+
+    /* JADX INFO: renamed from: j */
+    private volatile int tickCount;
 
     public ANRWatchdog() {
         this(5000);
     }
 
     public ANRWatchdog(int i) {
-        this.c = a;
-        this.d = b;
+        this.anrCallback = a;
+        this.interruptCallback = b;
         this.g = VariableScope.nullOrMissingString;
         this.h = false;
         this.i = false;
-        this.j = 0;
-        this.f = i;
+        this.tickCount = 0;
+        this.intervalMs = i;
     }
 
     public ANRWatchdog a(ANRCallback aNRCallback) {
         if (aNRCallback == null) {
-            this.c = a;
+            this.anrCallback = a;
         } else {
-            this.c = aNRCallback;
+            this.anrCallback = aNRCallback;
         }
         return this;
     }
@@ -53,10 +61,10 @@ public class ANRWatchdog extends Thread {
         setName("|ANR-WatchDog|");
         while (!isInterrupted()) {
             try {
-                Thread.sleep(this.f);
-                this.j = (this.j + 1) % Integer.MAX_VALUE;
+                Thread.sleep(this.intervalMs);
+                this.tickCount = (this.tickCount + 1) % Integer.MAX_VALUE;
             } catch (InterruptedException e) {
-                this.d.a(e);
+                this.interruptCallback.a(e);
                 return;
             }
         }

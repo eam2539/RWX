@@ -174,10 +174,10 @@ public class EffectTemplate {
             } else if (this.builtInEffect == BuiltInEffectType.smallExplosion) {
                 effectCreateSmallExplosion = gameEngine.effectManager.createSmallExplosion(f, f2, f3);
             } else if (this.builtInEffect == BuiltInEffectType.resourcePoolSmoke) {
-                EffectEmitter.a(f, f2).j = -6684775;
+                EffectEmitter.a(f, f2).startColorOverride = -6684775;
                 EffectEmitter effectEmitterB = EffectEmitter.b(f, f2);
-                effectEmitterB.a = 500.0f;
-                effectEmitterB.j = -6684775;
+                effectEmitterB.duration = 500.0f;
+                effectEmitterB.startColorOverride = -6684775;
                 gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
                 Effect effectCreateSmallExplosion2 = gameEngine.effectManager.createSmallExplosion(f, f2, f3, -1127220);
                 if (effectCreateSmallExplosion2 != null) {
@@ -187,7 +187,7 @@ public class EffectTemplate {
                     effectCreateSmallExplosion2.V = 35.0f;
                     effectCreateSmallExplosion2.W = effectCreateSmallExplosion2.V;
                     effectCreateSmallExplosion2.U = 0.0f;
-                    effectCreateSmallExplosion2.x = -13378253;
+                    effectCreateSmallExplosion2.startColor = -13378253;
                 }
                 effectCreateSmallExplosion = null;
             } else {
@@ -271,7 +271,7 @@ public class EffectTemplate {
         }
         effectCreateEffectInternal.K += this.hOffset + a(-this.hOffsetRandom, this.hOffsetRandom);
         effectCreateEffectInternal.an = true;
-        effectCreateEffectInternal.r = true;
+        effectCreateEffectInternal.fadeIn = true;
         effectCreateEffectInternal.ar = this.drawLayer;
         effectCreateEffectInternal.G = this.scaleFrom;
         effectCreateEffectInternal.F = this.scaleTo;
@@ -282,7 +282,7 @@ public class EffectTemplate {
         effectCreateEffectInternal.imageAnchorY = this.imageAnchorY;
         effectCreateEffectInternal.E = this.alpha;
         effectCreateEffectInternal.at.a(this.blendMode);
-        effectCreateEffectInternal.x = this.color;
+        effectCreateEffectInternal.startColor = this.color;
         effectCreateEffectInternal.B = this.cachedMultiplyAddColorFilter;
         if (this.teamColorRatio != 0.0f && gameObject != null) {
             PlayerTeam playerTeam = null;
@@ -294,27 +294,27 @@ public class EffectTemplate {
             }
             if (playerTeam != null) {
                 float f5 = 1.0f - this.teamColorRatio;
-                int iA = KoolArgbColor.a(effectCreateEffectInternal.x);
-                int iB = (int) (KoolArgbColor.b(effectCreateEffectInternal.x) * f5);
-                int iC = (int) (KoolArgbColor.c(effectCreateEffectInternal.x) * f5);
-                int iD = (int) (KoolArgbColor.d(effectCreateEffectInternal.x) * f5);
+                int iA = KoolArgbColor.a(effectCreateEffectInternal.startColor);
+                int iB = (int) (KoolArgbColor.b(effectCreateEffectInternal.startColor) * f5);
+                int iC = (int) (KoolArgbColor.c(effectCreateEffectInternal.startColor) * f5);
+                int iD = (int) (KoolArgbColor.d(effectCreateEffectInternal.startColor) * f5);
                 int teamColorArgb = playerTeam.getTeamColorArgb();
-                effectCreateEffectInternal.x = KoolArgbColor.a(iA, Utility.distance((int) (iB + (KoolArgbColor.b(teamColorArgb) * this.teamColorRatio)), 0, 255), Utility.distance((int) (iC + (KoolArgbColor.c(teamColorArgb) * this.teamColorRatio)), 0, 255), Utility.distance((int) (iD + (KoolArgbColor.d(teamColorArgb) * this.teamColorRatio)), 0, 255));
+                effectCreateEffectInternal.startColor = KoolArgbColor.a(iA, Utility.distance((int) (iB + (KoolArgbColor.b(teamColorArgb) * this.teamColorRatio)), 0, 255), Utility.distance((int) (iC + (KoolArgbColor.c(teamColorArgb) * this.teamColorRatio)), 0, 255), Utility.distance((int) (iD + (KoolArgbColor.d(teamColorArgb) * this.teamColorRatio)), 0, 255));
                 if (gameEngine.renderGraphicsEngine.backendCapabilities().getRequiresImageTintColorFilter()) {
-                    effectCreateEffectInternal.B = new KoolMultiplyAddColorFilter(effectCreateEffectInternal.x, 0);
+                    effectCreateEffectInternal.B = new KoolMultiplyAddColorFilter(effectCreateEffectInternal.startColor, 0);
                 }
             }
         }
         if (this.fadeInTime != 0.0f) {
-            effectCreateEffectInternal.s = true;
-            effectCreateEffectInternal.t = this.fadeInTime;
+            effectCreateEffectInternal.fadeOut = true;
+            effectCreateEffectInternal.fadeDuration = this.fadeInTime;
         }
         effectCreateEffectInternal.as = this.shadow;
-        effectCreateEffectInternal.r = this.fadeOut;
+        effectCreateEffectInternal.fadeIn = this.fadeOut;
         effectCreateEffectInternal.U = this.delayedStartTimer;
         effectCreateEffectInternal.U += a(-this.delayedStartTimerRandom, this.delayedStartTimerRandom);
-        effectCreateEffectInternal.u = this.atmospheric;
-        effectCreateEffectInternal.v = this.physics;
+        effectCreateEffectInternal.useGravity = this.atmospheric;
+        effectCreateEffectInternal.useBounce = this.physics;
         effectCreateEffectInternal.w = this.physicsGravity;
         effectCreateEffectInternal.q = this.priority;
         effectCreateEffectInternal.P = this.xSpeedAbsolute + a(this.xSpeedAbsoluteRandom);

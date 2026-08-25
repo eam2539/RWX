@@ -262,7 +262,7 @@ public class PowerFabricator extends FactoryWithQueue {
             effectCreateSmallExplosion.V = 35.0f;
             effectCreateSmallExplosion.W = effectCreateSmallExplosion.V;
             effectCreateSmallExplosion.U = 0.0f;
-            effectCreateSmallExplosion.x = -14492382;
+            effectCreateSmallExplosion.startColor = -14492382;
         }
         bo();
         return true;

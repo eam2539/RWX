@@ -11,15 +11,18 @@ public enum StatsTab {
     buildingValueChart("D", StatisticType.buildingValue),
     totalValueChart("E", StatisticType.totalValue);
 
-    private final String f;
-    private final StatisticType g;
+    /* JADX INFO: renamed from: f */
+    private final String displayName;
+
+    /* JADX INFO: renamed from: g */
+    private final StatisticType statType;
 
     StatsTab(String str, StatisticType statisticType) {
-        this.f = str;
-        this.g = statisticType;
+        this.displayName = str;
+        this.statType = statisticType;
     }
 
     public StatisticType a() {
-        return this.g;
+        return this.statType;
     }
 }

@@ -82,7 +82,7 @@ public class FlowFieldPathPositionProvider extends PathPositionProvider {
 
     public PositionData a(float f, float f2) {
         byte bA;
-        if (this.a.b == null) {
+        if (this.a.flowField == null) {
             return null;
         }
         TileMap tileMap = GameEngine.getInstance().tileMap;

@@ -35,7 +35,8 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
     float e;
     float f;
     boolean g;
-    FastArrayList<BaseUnit> o;
+    /* JADX INFO: renamed from: o */
+    FastArrayList<BaseUnit> transportedUnits;
     Rect p;
     static Texture a = null;
     static Texture b = null;
@@ -58,13 +59,13 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
         // com.corrodinggames.rts.game.units.actions.NoneAction, com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: b */
         public int getActiveCount(BaseUnit baseUnit, boolean z) {
-            return ((Dropship) baseUnit).o.size();
+            return ((Dropship) baseUnit).transportedUnits.size();
         }
 
         @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
         /* JADX INFO: renamed from: a */
         public boolean canAfford(BaseUnit baseUnit, boolean z) {
-            return (((Dropship) baseUnit).g || ((OrderableUnit) baseUnit).isOverLiquid() || ((Dropship) baseUnit).o.size() <= 0) ? false : true;
+            return (((Dropship) baseUnit).g || ((OrderableUnit) baseUnit).isOverLiquid() || ((Dropship) baseUnit).transportedUnits.size() <= 0) ? false : true;
         }
     };
     public static final AbstractUnitAction r = new NoneAction(110) { // from class: com.corrodinggames.rts.game.units.b.d.2
@@ -104,8 +105,8 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
         gameOutputStream.writeFloat(this.e);
         gameOutputStream.writeFloat(this.f);
         gameOutputStream.writeBoolean(this.g);
-        gameOutputStream.writeInt(this.o.size());
-        Iterator it = this.o.iterator();
+        gameOutputStream.writeInt(this.transportedUnits.size());
+        Iterator it = this.transportedUnits.iterator();
         while (it.hasNext()) {
             gameOutputStream.writeUnitIdOrNullBaseUnit((BaseUnit) it.next());
         }
@@ -118,12 +119,12 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
         this.e = gameInputStream.readFloat();
         this.f = gameInputStream.readFloat();
         this.g = gameInputStream.readBoolean();
-        this.o.clear();
+        this.transportedUnits.clear();
         int i = gameInputStream.readInt();
         for (int i2 = 0; i2 < i; i2++) {
             BaseUnit baseUnit = gameInputStream.readBaseUnit();
             if (baseUnit != null) {
-                this.o.add(baseUnit);
+                this.transportedUnits.add(baseUnit);
             }
         }
         super.a(gameInputStream);
@@ -132,7 +133,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     /* JADX INFO: renamed from: bY */
     public int getTransportedUnitsWeight() {
-        return HovercraftUnit.a(this.o);
+        return HovercraftUnit.a(this.transportedUnits);
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -176,7 +177,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
     public Dropship(boolean z) {
         super(z);
         this.e = 0.0f;
-        this.o = new FastArrayList();
+        this.transportedUnits = new FastArrayList();
         this.p = new Rect();
         T(45);
         U(47);
@@ -228,14 +229,14 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
             this.f = Utility.moveTowardsZero(this.f, f);
             if (this.f == 0.0f) {
                 this.f = 30.0f;
-                if (this.o.size() == 0) {
+                if (this.transportedUnits.size() == 0) {
                     this.g = false;
                 } else {
-                    boolean z = this.o.size() % 2 == 0;
+                    boolean z = this.transportedUnits.size() % 2 == 0;
                     float fFastCos = this.posX + (Utility.fastCos(this.rotationSpeed) * (-9.0f));
                     float fFastSin = this.posY + (Utility.fastSin(this.rotationSpeed) * (-9.0f));
                     float fFastCos2 = fFastCos + (Utility.fastCos(this.rotationSpeed + 90.0f) * (z ? -7 : 7)) + (Utility.fastSin(this.rotationSpeed + 90.0f) * (z ? -7 : 7));
-                    BaseUnit baseUnit = (BaseUnit) this.o.remove(this.o.size() - 1);
+                    BaseUnit baseUnit = (BaseUnit) this.transportedUnits.remove(this.transportedUnits.size() - 1);
                     if (!GameViewUtils.a(baseUnit, fFastCos2, fFastSin)) {
                         fFastCos2 += 10.0f;
                     }
@@ -250,7 +251,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
                         fFastSin -= 20.0f;
                     }
                     if (!GameViewUtils.a(baseUnit, fFastCos2, fFastSin)) {
-                        this.o.add(baseUnit);
+                        this.transportedUnits.add(baseUnit);
                     } else {
                         baseUnit.transportContainer = null;
                         baseUnit.posX = fFastCos2;
@@ -264,7 +265,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
                             orderableUnit.clearAllWaypoints();
                             orderableUnit.appendMoveWaypoint(this.posX + (Utility.fastCos(this.rotationSpeed) * (-66.0f)), this.posY + (Utility.fastSin(this.rotationSpeed) * (-66.0f)));
                         }
-                        if (this.o.size() == 0) {
+                        if (this.transportedUnits.size() == 0) {
                             this.g = false;
                         }
                     }
@@ -380,7 +381,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
     }
 
     public void f(boolean z) {
-        for (BaseUnit baseUnit : this.o) {
+        for (BaseUnit baseUnit : this.transportedUnits) {
             baseUnit.transportContainer = null;
             baseUnit.posX = this.posX + (Utility.fastCos(this.rotationSpeed) * (-9.0f));
             baseUnit.posY = this.posY + (Utility.fastSin(this.rotationSpeed) * (-9.0f));
@@ -388,7 +389,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
                 baseUnit.markForDeath();
             }
         }
-        this.o.clear();
+        this.transportedUnits.clear();
     }
 
     @Override
@@ -415,7 +416,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
     public boolean d(BaseUnit baseUnit, boolean z) {
-        if (this.g || !HovercraftUnit.a(this.o, 4, baseUnit) || baseUnit == this) {
+        if (this.g || !HovercraftUnit.a(this.transportedUnits, 4, baseUnit) || baseUnit == this) {
             return false;
         }
         if (this.team != baseUnit.team && !z) {
@@ -435,14 +436,14 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
 
     public void C(BaseUnit baseUnit) {
         baseUnit.transportContainer = this;
-        this.o.add(baseUnit);
+        this.transportedUnits.add(baseUnit);
         GameEngine.getInstance().gameUI.deselectUnit(baseUnit);
     }
 
     @Override // com.corrodinggames.rts.game.units.TransportUnitInterface
     public void e(BaseUnit baseUnit) {
         if (baseUnit.transportContainer == this) {
-            this.o.remove(baseUnit);
+            this.transportedUnits.remove(baseUnit);
             baseUnit.transportContainer = null;
         } else {
             GameEngine.logWarningAndStack("Unit is not being transported");
@@ -464,7 +465,7 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
     // com.corrodinggames.rts.game.units.OrderableUnit, com.corrodinggames.rts.game.units.TransportUnitInterface
     /* JADX INFO: renamed from: bB */
     public int getTransportedUnitCount() {
-        return this.o.size();
+        return this.transportedUnits.size();
     }
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -498,6 +499,6 @@ public class Dropship extends AirUnit implements TransportUnitInterface {
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     /* JADX INFO: renamed from: bz */
     public FastArrayList getTransportedUnitList() {
-        return this.o;
+        return this.transportedUnits;
     }
 }

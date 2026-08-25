@@ -37,12 +37,12 @@ class FrameBufferHelper() {
     constructor(shaderPath: String) : this() {
         shaderProgram = ShaderProgram(shaderPath)
         c.a(shaderProgram)
-        if (shaderProgram?.o != 0) {
+        if (shaderProgram?.programStatus != 0) {
             g = true
         }
     }
 
-    fun a(): Boolean = g || (shaderProgram?.o ?: 0) != 0
+    fun a(): Boolean = g || (shaderProgram?.programStatus ?: 0) != 0
 
     fun a(graphicsEngine: GraphicsEngine) {
         a(graphicsEngine, graphicsEngine.m(), graphicsEngine.n(), 10)

@@ -1147,7 +1147,7 @@ abstract class GameSession {
             val engine = activeEngineLocked() ?: return@synchronized emptyList()
             val networkEngine = engine.networkEngine ?: return@synchronized emptyList()
             if (!engine.isNetworkGameActive()) return@synchronized emptyList<MultiplayerChatSnapshot>()
-            networkEngine.chatLog.b().mapNotNull { entry ->
+            networkEngine.chatLog.getMessages().mapNotNull { entry ->
                 val message = entry as? ChatMessage ?: return@mapNotNull null
                 MultiplayerChatSnapshot(
                     text = message.displayText,

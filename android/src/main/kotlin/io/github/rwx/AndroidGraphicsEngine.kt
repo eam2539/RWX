@@ -500,10 +500,10 @@ internal class AndroidGraphicsEngine(
         val binding = shaderBindings.getOrPut(shaderProgram) {
             AndroidShaderBinding(
                 shader = C0009fo().apply {
-                    c = shaderProgram.c
-                    e = shaderProgram.e
-                    f = shaderProgram.f
-                    m = shaderProgram.o
+                    c = shaderProgram.name
+                    e = shaderProgram.vertexSource
+                    f = shaderProgram.fragmentSource
+                    m = shaderProgram.programStatus
                 },
             )
         }
@@ -512,22 +512,29 @@ internal class AndroidGraphicsEngine(
             return binding.shader
         }
         try {
-            shaderProgram.p.forEach { uniform ->
-                val texture = uniform.f
+            shaderProgram.uniforms.forEach { uniform ->
+                val texture = uniform.texture
                 if (texture != null) {
                     val unitTexture = textureBinding(texture).unitTexture
                     if (uniform.g) {
-                        binding.shader.b(uniform.a, unitTexture)
+                        binding.shader.b(uniform.name, unitTexture)
                     } else {
-                        binding.shader.a(uniform.a, unitTexture)
+                        binding.shader.a(uniform.name, unitTexture)
                     }
                     return@forEach
                 }
-                when (uniform.e.size) {
-                    1 -> binding.shader.a(uniform.a, uniform.e[0])
-                    2 -> binding.shader.a(uniform.a, uniform.e[0], uniform.e[1])
-                    4 -> binding.shader.a(uniform.a, uniform.e[0], uniform.e[1], uniform.e[2], uniform.e[3])
-                    else -> binding.logUnsupportedUniform(uniform.a, uniform.e.size)
+                when (uniform.floatValues.size) {
+                    1 -> binding.shader.a(uniform.name, uniform.floatValues[0])
+                    2 -> binding.shader.a(uniform.name, uniform.floatValues[0], uniform.floatValues[1])
+                    4 -> binding.shader.a(
+                        uniform.name,
+                        uniform.floatValues[0],
+                        uniform.floatValues[1],
+                        uniform.floatValues[2],
+                        uniform.floatValues[3]
+                    )
+
+                    else -> binding.logUnsupportedUniform(uniform.name, uniform.floatValues.size)
                 }
             }
         } finally {
@@ -676,13 +683,13 @@ internal class AndroidGraphicsEngine(
         private val unsupportedUniforms = mutableSetOf<String>()
 
         fun syncSources(source: ShaderProgram) {
-            shader.c = source.c
-            shader.m = source.o
-            if (vertexSource != source.e || fragmentSource != source.f) {
-                vertexSource = source.e
-                fragmentSource = source.f
-                shader.e = source.e
-                shader.f = source.f
+            shader.c = source.name
+            shader.m = source.programStatus
+            if (vertexSource != source.vertexSource || fragmentSource != source.fragmentSource) {
+                vertexSource = source.vertexSource
+                fragmentSource = source.fragmentSource
+                shader.e = source.vertexSource
+                shader.f = source.fragmentSource
                 shader.k = true
             }
         }

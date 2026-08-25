@@ -256,7 +256,7 @@ public class NukeLauncher extends FactoryWithQueue {
             effectCreateLightEffect.E = 0.9f;
             effectCreateLightEffect.V = 20.0f;
             effectCreateLightEffect.W = effectCreateLightEffect.V;
-            effectCreateLightEffect.r = true;
+            effectCreateLightEffect.fadeIn = true;
         }
         gameEngine.effectManager.setOverrideEffectQuality(EffectQuality.critical);
         Effect effectCreateSmallExplosion = gameEngine.effectManager.createSmallExplosion(f, f2, 0.0f, -1127220);
@@ -354,8 +354,8 @@ public class NukeLauncher extends FactoryWithQueue {
             effectCreateLightEffect.G = 2.1f;
             effectCreateLightEffect.F = 2.1f;
             effectCreateLightEffect.ar = (short) 2;
-            effectCreateLightEffect.s = true;
-            effectCreateLightEffect.t = 70.0f;
+            effectCreateLightEffect.fadeOut = true;
+            effectCreateLightEffect.fadeDuration = 70.0f;
             effectCreateLightEffect.V = 370.0f;
             effectCreateLightEffect.W = effectCreateLightEffect.V;
             effectCreateLightEffect.E = 1.0f;

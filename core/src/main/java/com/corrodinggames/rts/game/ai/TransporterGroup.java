@@ -23,22 +23,35 @@ public class TransporterGroup extends AIUnitGroupBase {
     boolean a;
     int b;
     int c;
-    BaseZone d;
+    /* JADX INFO: renamed from: d */
+    BaseZone zone;
     float e;
-    float f;
-    float g;
-    float h;
-    float i;
-    float j;
-    float k;
-    int l;
-    AIUnitGroupBase m;
-    OrderableUnit n;
+    /* JADX INFO: renamed from: f */
+    float repositionTimer;
+    /* JADX INFO: renamed from: g */
+    float pickupSearchTimer;
+    /* JADX INFO: renamed from: h */
+    float updateTimer;
+    /* JADX INFO: renamed from: i */
+    float requestTimer;
+    /* JADX INFO: renamed from: j */
+    float commandTimer;
+    /* JADX INFO: renamed from: k */
+    float retryTimer;
+    /* JADX INFO: renamed from: l */
+    int capacity;
+    /* JADX INFO: renamed from: m */
+    AIUnitGroupBase unitGroup;
+    /* JADX INFO: renamed from: n */
+    OrderableUnit transportUnit;
     float o;
     boolean p;
-    boolean q;
-    float r;
-    float s;
+    /* JADX INFO: renamed from: q */
+    boolean isWaitingForUnits;
+    /* JADX INFO: renamed from: r */
+    float waitPosX;
+    /* JADX INFO: renamed from: s */
+    float waitPosY;
 
     @Override // com.corrodinggames.rts.game.ai.AIStrategyNode, com.corrodinggames.rts.gameFramework.Serializable
     public void a(GameOutputStream gameOutputStream) throws IOException {
@@ -51,13 +64,13 @@ public class TransporterGroup extends AIUnitGroupBase {
             gameOutputStream.writeOrderableUnit((OrderableUnit) it.next());
         }
         gameOutputStream.writeByte(5);
-        gameOutputStream.writeInt(this.aiController.filterUnitAndCommand(this.m));
-        gameOutputStream.writeBoolean(this.q);
-        gameOutputStream.writeOrderableUnit(this.n);
+        gameOutputStream.writeInt(this.aiController.filterUnitAndCommand(this.unitGroup));
+        gameOutputStream.writeBoolean(this.isWaitingForUnits);
+        gameOutputStream.writeOrderableUnit(this.transportUnit);
         gameOutputStream.writeFloat(this.o);
         gameOutputStream.writeBoolean(this.p);
-        gameOutputStream.writeFloat(this.r);
-        gameOutputStream.writeFloat(this.s);
+        gameOutputStream.writeFloat(this.waitPosX);
+        gameOutputStream.writeFloat(this.waitPosY);
         super.a(gameOutputStream);
     }
 
@@ -81,21 +94,21 @@ public class TransporterGroup extends AIUnitGroupBase {
         }
         byte b = gameInputStream.readByte();
         if (b >= 1) {
-            this.m = (AIUnitGroupBase) this.aiController.findNodeById(gameInputStream.readInt());
+            this.unitGroup = (AIUnitGroupBase) this.aiController.findNodeById(gameInputStream.readInt());
         }
         if (b >= 2) {
-            this.q = gameInputStream.readBoolean();
+            this.isWaitingForUnits = gameInputStream.readBoolean();
         }
         if (b >= 3) {
-            this.n = gameInputStream.readOrderableUnit();
+            this.transportUnit = gameInputStream.readOrderableUnit();
         }
         if (b >= 4) {
             this.o = gameInputStream.readFloat();
             this.p = gameInputStream.readBoolean();
         }
         if (b >= 5) {
-            this.r = gameInputStream.readFloat();
-            this.s = gameInputStream.readFloat();
+            this.waitPosX = gameInputStream.readFloat();
+            this.waitPosY = gameInputStream.readFloat();
         }
         super.readFromInputStream(gameInputStream);
     }
@@ -103,15 +116,15 @@ public class TransporterGroup extends AIUnitGroupBase {
     public TransporterGroup(AIController aIController) {
         super(aIController);
         this.e = 100.0f;
-        this.f = 4000.0f;
-        this.g = 100.0f;
+        this.repositionTimer = 4000.0f;
+        this.pickupSearchTimer = 100.0f;
         this.o = 0.0f;
         this.p = false;
     }
 
     public void c() {
         for (BaseUnit baseUnit : BaseUnit.bE) {
-            if (!baseUnit.isDead && baseUnit.team == this.aiController && this.l > this.F.size() && (baseUnit instanceof OrderableUnit)) {
+            if (!baseUnit.isDead && baseUnit.team == this.aiController && this.capacity > this.F.size() && (baseUnit instanceof OrderableUnit)) {
                 OrderableUnit orderableUnit = (OrderableUnit) baseUnit;
                 if (!orderableUnit.isAIUnit && orderableUnit.aB == null && this.aiController.isNonCombatCustomUnit(orderableUnit) && this.aiController.isEligibleUnitForRandomSelection(orderableUnit)) {
                     a(orderableUnit);
@@ -121,38 +134,38 @@ public class TransporterGroup extends AIUnitGroupBase {
     }
 
     public boolean d() {
-        return this.m != null;
+        return this.unitGroup != null;
     }
 
     /* JADX WARN: Multi-variable type inference failed */
     @Override // com.corrodinggames.rts.game.ai.AIUnitGroupBase
     public void c(float f) {
         GameEngine gameEngine = GameEngine.getInstance();
-        this.h += f;
+        this.updateTimer += f;
         n();
-        if (this.l <= this.F.size()) {
+        if (this.capacity <= this.F.size()) {
         }
-        this.i = Utility.moveTowardsZero(this.i, f);
-        this.j = Utility.moveTowardsZero(this.j, f);
-        this.k = Utility.moveTowardsZero(this.k, f);
-        if (!d() && !this.q && this.l > this.F.size() && this.i == 0.0f) {
-            this.i = 300.0f;
+        this.requestTimer = Utility.moveTowardsZero(this.requestTimer, f);
+        this.commandTimer = Utility.moveTowardsZero(this.commandTimer, f);
+        this.retryTimer = Utility.moveTowardsZero(this.retryTimer, f);
+        if (!d() && !this.isWaitingForUnits && this.capacity > this.F.size() && this.requestTimer == 0.0f) {
+            this.requestTimer = 300.0f;
             c();
         }
         if (!d() && this.F.size() != 0) {
             if (!d()) {
-                this.f = Utility.moveTowardsZero(this.f, f);
-                if (this.f == 0.0f) {
-                    this.f = 4000.0f;
-                    if (this.d != null) {
-                        PointF pointFW = this.d.getRandomPointInside();
+                this.repositionTimer = Utility.moveTowardsZero(this.repositionTimer, f);
+                if (this.repositionTimer == 0.0f) {
+                    this.repositionTimer = 4000.0f;
+                    if (this.zone != null) {
+                        PointF pointFW = this.zone.getRandomPointInside();
                         this.posX = pointFW.x;
                         this.posY = pointFW.y;
                     }
                 }
             }
-            if (this.j == 0.0f) {
-                this.j = 400.0f;
+            if (this.commandTimer == 0.0f) {
+                this.commandTimer = 400.0f;
                 Command commandNewCommandForTeam = gameEngine.commandController.newCommandForTeam(this.aiController);
                 for (OrderableUnit orderableUnit : this.F) {
                     if (getDistanceSqToUnit(orderableUnit) > 28900.0f && !orderableUnit.isAttackCommandActive()) {
@@ -166,37 +179,37 @@ public class TransporterGroup extends AIUnitGroupBase {
                 }
                 commandNewCommandForTeam.setMoveTarget(this.posX, this.posY);
             }
-            if (this.m == null) {
-                this.g = Utility.moveTowardsZero(this.g, f);
-                if (this.g == 0.0f) {
-                    this.g = 100.0f;
+            if (this.unitGroup == null) {
+                this.pickupSearchTimer = Utility.moveTowardsZero(this.pickupSearchTimer, f);
+                if (this.pickupSearchTimer == 0.0f) {
+                    this.pickupSearchTimer = 100.0f;
                     if (Utility.getRandomIntInRange(0, 100) < 80) {
                         a(f, true);
                     }
-                    if (this.m == null) {
+                    if (this.unitGroup == null) {
                         a(f, false);
                     }
                 }
             }
         }
-        if (this.m != null && this.m.isDestroyed) {
-            this.m = null;
+        if (this.unitGroup != null && this.unitGroup.isDestroyed) {
+            this.unitGroup = null;
         }
-        if (!this.q) {
-            if (this.m != null) {
-                ArrayList<OrderableUnit> arrayList = this.m.G;
-                if (this.n != null && (this.n.isDead || this.n.transportContainer != null || this.n.parentEntity != null)) {
-                    arrayList.remove(this.n);
-                    this.n = null;
+        if (!this.isWaitingForUnits) {
+            if (this.unitGroup != null) {
+                ArrayList<OrderableUnit> arrayList = this.unitGroup.G;
+                if (this.transportUnit != null && (this.transportUnit.isDead || this.transportUnit.transportContainer != null || this.transportUnit.parentEntity != null)) {
+                    arrayList.remove(this.transportUnit);
+                    this.transportUnit = null;
                 }
-                if (this.n == null) {
+                if (this.transportUnit == null) {
                     for (OrderableUnit orderableUnit2 : arrayList) {
                         if (orderableUnit2.transportContainer == null) {
                             Iterator it = this.F.iterator();
                             while (true) {
                                 if (it.hasNext()) {
                                     if (((OrderableUnit) it.next()).d((BaseUnit) orderableUnit2, false)) {
-                                        this.n = orderableUnit2;
+                                        this.transportUnit = orderableUnit2;
                                         break;
                                     }
                                 } else {
@@ -205,26 +218,26 @@ public class TransporterGroup extends AIUnitGroupBase {
                             }
                         }
                     }
-                    if (this.n == null) {
-                        this.q = true;
-                        this.j = 0.0f;
-                        this.k = 0.0f;
-                        this.r = this.m.posX;
-                        this.s = this.m.posY;
+                    if (this.transportUnit == null) {
+                        this.isWaitingForUnits = true;
+                        this.commandTimer = 0.0f;
+                        this.retryTimer = 0.0f;
+                        this.waitPosX = this.unitGroup.posX;
+                        this.waitPosY = this.unitGroup.posY;
                     }
                 }
-                if (this.n != null) {
-                    if (this.j == 0.0f) {
-                        this.j = 400.0f;
+                if (this.transportUnit != null) {
+                    if (this.commandTimer == 0.0f) {
+                        this.commandTimer = 400.0f;
                         Command commandNewCommandForTeam3 = gameEngine.commandController.newCommandForTeam(this.aiController);
                         Iterator it2 = this.F.iterator();
                         while (it2.hasNext()) {
                             commandNewCommandForTeam3.addUnitToCommand((OrderableUnit) it2.next());
                         }
-                        commandNewCommandForTeam3.setMoveTarget(this.n.posX, this.n.posY);
+                        commandNewCommandForTeam3.setMoveTarget(this.transportUnit.posX, this.transportUnit.posY);
                     }
-                    if (this.k == 0.0f) {
-                        this.k = 80.0f;
+                    if (this.retryTimer == 0.0f) {
+                        this.retryTimer = 80.0f;
                         for (OrderableUnit orderableUnit3 : arrayList) {
                             Iterator it3 = this.F.iterator();
                             while (true) {
@@ -243,23 +256,23 @@ public class TransporterGroup extends AIUnitGroupBase {
                         boolean z = false;
                         Iterator it4 = this.F.iterator();
                         while (it4.hasNext()) {
-                            if (((OrderableUnit) it4.next()).d((BaseUnit) this.n, false)) {
+                            if (((OrderableUnit) it4.next()).d((BaseUnit) this.transportUnit, false)) {
                                 z = true;
                             }
                         }
                         if (!z) {
-                            this.n = null;
+                            this.transportUnit = null;
                         }
                     }
                 }
             }
-        } else if (this.m == null) {
+        } else if (this.unitGroup == null) {
             e();
         } else {
-            if (this.j == 0.0f) {
-                this.j = 400.0f;
-                float fRandomFloatInRange = this.m.posX + Utility.randomFloatInRange(-40.0f, 40.0f);
-                float fRandomFloatInRange2 = this.m.posY + Utility.randomFloatInRange(-40.0f, 40.0f);
+            if (this.commandTimer == 0.0f) {
+                this.commandTimer = 400.0f;
+                float fRandomFloatInRange = this.unitGroup.posX + Utility.randomFloatInRange(-40.0f, 40.0f);
+                float fRandomFloatInRange2 = this.unitGroup.posY + Utility.randomFloatInRange(-40.0f, 40.0f);
                 if (this.o > 600.0f) {
                     fRandomFloatInRange += Utility.randomFloatInRange(-300.0f, 300.0f);
                     fRandomFloatInRange2 += Utility.randomFloatInRange(-300.0f, 300.0f);
@@ -281,27 +294,27 @@ public class TransporterGroup extends AIUnitGroupBase {
                     fRandomFloatInRange2 += Utility.randomFloatInRange(-200.0f, 200.0f);
                 }
                 if (GameViewUtils.a(fRandomFloatInRange, fRandomFloatInRange2, UnitMovementType.LAND)) {
-                    this.j = 30.0f;
+                    this.commandTimer = 30.0f;
                 } else {
-                    this.r = fRandomFloatInRange;
-                    this.s = fRandomFloatInRange2;
+                    this.waitPosX = fRandomFloatInRange;
+                    this.waitPosY = fRandomFloatInRange2;
                     Command commandNewCommandForTeam5 = gameEngine.commandController.newCommandForTeam(this.aiController);
                     for (OrderableUnit orderableUnit5 : this.F) {
                         if (((TransportUnitInterface) orderableUnit5).getTransportedUnitCount() == 0) {
                             Command commandNewCommandForTeam6 = gameEngine.commandController.newCommandForTeam(this.aiController);
                             commandNewCommandForTeam6.addUnitToCommand(orderableUnit5);
                             commandNewCommandForTeam6.setMoveTarget(this.posX, this.posY);
-                        } else if (Utility.distanceSq(orderableUnit5.posX, orderableUnit5.posY, this.r, this.s) > 1600.0f) {
+                        } else if (Utility.distanceSq(orderableUnit5.posX, orderableUnit5.posY, this.waitPosX, this.waitPosY) > 1600.0f) {
                             commandNewCommandForTeam5.addUnitToCommand(orderableUnit5);
                         }
                     }
-                    commandNewCommandForTeam5.setMoveTarget(this.r, this.s);
+                    commandNewCommandForTeam5.setMoveTarget(this.waitPosX, this.waitPosY);
                 }
             }
-            if (this.k == 0.0f) {
-                this.k = 100.0f;
+            if (this.retryTimer == 0.0f) {
+                this.retryTimer = 100.0f;
                 for (OrderableUnit orderableUnit6 : this.F) {
-                    if (Utility.distanceSq(orderableUnit6.posX, orderableUnit6.posY, this.r, this.s) < 6400.0f) {
+                    if (Utility.distanceSq(orderableUnit6.posX, orderableUnit6.posY, this.waitPosX, this.waitPosY) < 6400.0f) {
                         this.p = true;
                         ActionId actionIdCp2 = orderableUnit6.getUnloadActionId();
                         Command commandNewCommandForTeam7 = gameEngine.commandController.newCommandForTeam(this.aiController);
@@ -311,7 +324,7 @@ public class TransporterGroup extends AIUnitGroupBase {
                 }
             }
             if (this.p) {
-                this.m.o();
+                this.unitGroup.o();
                 this.o += f;
             }
             boolean z2 = false;
@@ -324,17 +337,17 @@ public class TransporterGroup extends AIUnitGroupBase {
                 e();
             }
         }
-        if (this.h > 1500.0f && this.F.size() == 0) {
+        if (this.updateTimer > 1500.0f && this.F.size() == 0) {
             destroy();
         }
     }
 
     public void e() {
-        this.q = false;
-        this.m = null;
+        this.isWaitingForUnits = false;
+        this.unitGroup = null;
         this.o = 0.0f;
-        this.j = 0.0f;
-        this.k = 0.0f;
+        this.commandTimer = 0.0f;
+        this.retryTimer = 0.0f;
         this.p = false;
         f();
     }
@@ -344,8 +357,8 @@ public class TransporterGroup extends AIUnitGroupBase {
             if ((aIStrategyNode instanceof AIUnitGroupBase) && !(aIStrategyNode instanceof TransporterGroup) && (!z || (aIStrategyNode instanceof RallyGroup))) {
                 AIUnitGroupBase aIUnitGroupBase = (AIUnitGroupBase) aIStrategyNode;
                 if (aIUnitGroupBase.G.size() != 0 && !aIUnitGroupBase.m()) {
-                    this.m = aIUnitGroupBase;
-                    this.n = null;
+                    this.unitGroup = aIUnitGroupBase;
+                    this.transportUnit = null;
                     return;
                 }
             }
@@ -375,17 +388,17 @@ public class TransporterGroup extends AIUnitGroupBase {
     public void f() {
         PointF randomTilePosition = null;
         if (1 != 0) {
-            this.d = a(true);
-            if (this.d == null) {
-                this.d = a(false);
+            this.zone = a(true);
+            if (this.zone == null) {
+                this.zone = a(false);
             }
-            if (this.d != null) {
-                randomTilePosition = this.d.getRandomPointInside();
+            if (this.zone != null) {
+                randomTilePosition = this.zone.getRandomPointInside();
             }
         }
         if (randomTilePosition == null) {
             randomTilePosition = this.aiController.getRandomTilePosition();
-            this.d = null;
+            this.zone = null;
         }
         this.posX = randomTilePosition.x;
         this.posY = randomTilePosition.y;

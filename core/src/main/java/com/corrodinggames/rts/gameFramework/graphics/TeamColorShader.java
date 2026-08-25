@@ -5,27 +5,29 @@ import io.github.rwx.render.canvas.KoolPaint;
 import java.io.IOException;
 
 public class TeamColorShader extends ShaderProgram {
-    int a;
-    boolean b;
+    /* JADX INFO: renamed from: a */
+    int lastAppliedColor;
+    /* JADX INFO: renamed from: b */
+    boolean isEnabled;
 
     public TeamColorShader(String str, boolean z) throws IOException {
         super(str);
-        this.a = -99;
-        this.b = z;
+        this.lastAppliedColor = -99;
+        this.isEnabled = z;
     }
 
     @Override
     public boolean a() {
-        return this.b;
+        return this.isEnabled;
     }
 
     @Override
     public boolean b() {
         boolean z = false;
-        if (-16711936 != this.a) {
+        if (-16711936 != this.lastAppliedColor) {
             a("teamColor", -16711936);
             z = true;
-            this.a = -16711936;
+            this.lastAppliedColor = -16711936;
         }
         return z;
     }
@@ -35,10 +37,10 @@ public class TeamColorShader extends ShaderProgram {
         boolean z = false;
         if (texture instanceof TeamColorTexture) {
             TeamColorTexture teamColorTexture = (TeamColorTexture) texture;
-            if (teamColorTexture.getTeamColor() != this.a) {
+            if (teamColorTexture.getTeamColor() != this.lastAppliedColor) {
                 a("teamColor", teamColorTexture.getTeamColor());
                 z = true;
-                this.a = teamColorTexture.getTeamColor();
+                this.lastAppliedColor = teamColorTexture.getTeamColor();
             }
         }
         super.a(paint, texture);

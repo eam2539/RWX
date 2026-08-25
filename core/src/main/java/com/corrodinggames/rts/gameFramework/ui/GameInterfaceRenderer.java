@@ -1033,7 +1033,7 @@ public class GameInterfaceRenderer extends Serializable {
             return true;
         }
         if (abstractUnitAction instanceof WrapperUnitAction) {
-            return this.gameUI.canControlUnit(((WrapperUnitAction) abstractUnitAction).b);
+            return this.gameUI.canControlUnit(((WrapperUnitAction) abstractUnitAction).unit);
         }
         ArrayList<OrderableUnit> arrayListG = g();
         ActionId actionId = abstractUnitAction.getActionId();
@@ -1067,10 +1067,10 @@ public class GameInterfaceRenderer extends Serializable {
         }
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
-            if (!wrapperUnitAction.isAvailable(wrapperUnitAction.b)) {
+            if (!wrapperUnitAction.isAvailable(wrapperUnitAction.unit)) {
                 return false;
             }
-            if (this.gameUI.canControlUnit(wrapperUnitAction.b) || wrapperUnitAction.appendTooltip(wrapperUnitAction.b, this.gameEngine.playerTeam)) {
+            if (this.gameUI.canControlUnit(wrapperUnitAction.unit) || wrapperUnitAction.appendTooltip(wrapperUnitAction.unit, this.gameEngine.playerTeam)) {
                 return true;
             }
             return false;
@@ -1093,7 +1093,7 @@ public class GameInterfaceRenderer extends Serializable {
         }
         if (abstractUnitAction instanceof WrapperUnitAction) {
             WrapperUnitAction wrapperUnitAction = (WrapperUnitAction) abstractUnitAction;
-            if (wrapperUnitAction.canAfford((BaseUnit) wrapperUnitAction.b, true)) {
+            if (wrapperUnitAction.canAfford((BaseUnit) wrapperUnitAction.unit, true)) {
                 return true;
             }
         }
@@ -1136,7 +1136,7 @@ public class GameInterfaceRenderer extends Serializable {
             return null;
         }
         if (abstractUnitAction instanceof WrapperUnitAction) {
-            SpecialActionBlockEffect specialActionBlockEffectB = SpecialActionBlockEffect.b(((WrapperUnitAction) abstractUnitAction).b, abstractUnitAction.getActionId());
+            SpecialActionBlockEffect specialActionBlockEffectB = SpecialActionBlockEffect.b(((WrapperUnitAction) abstractUnitAction).unit, abstractUnitAction.getActionId());
             if (specialActionBlockEffectB == null) {
                 return null;
             }
@@ -2214,8 +2214,8 @@ public class GameInterfaceRenderer extends Serializable {
                         }
                         z4 = false;
                         String str4 = str3 + Utility.padString(unitStatistics.a);
-                        if (unitStatistics.d > 1) {
-                            str4 = str4 + "x" + unitStatistics.d;
+                        if (unitStatistics.count > 1) {
+                            str4 = str4 + "x" + unitStatistics.count;
                         }
                         str3 = str4 + "/" + Utility.padString(unitStatistics.a()) + "s";
                     }

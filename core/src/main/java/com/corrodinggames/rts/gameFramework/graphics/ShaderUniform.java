@@ -1,85 +1,89 @@
 package com.corrodinggames.rts.gameFramework.graphics;
 
 public class ShaderUniform {
-    public String a;
+    /* JADX INFO: renamed from: a */
+    public String name;
     public int b = -1;
-    public boolean c;
+    /* JADX INFO: renamed from: c */
+    public boolean isDirty;
     public boolean d;
-    public float[] e = new float[1];
-    public Texture f;
+    /* JADX INFO: renamed from: e */
+    public float[] floatValues = new float[1];
+    /* JADX INFO: renamed from: f */
+    public Texture texture;
     public boolean g;
-    public ShaderUniformValueType h = ShaderUniformValueType.FLOAT;
+    public ShaderUniformValueType valueType = ShaderUniformValueType.FLOAT;
 
     public void a(float f) {
-        if (this.e.length != 1) {
-            this.e = new float[1];
+        if (this.floatValues.length != 1) {
+            this.floatValues = new float[1];
         }
-        if (this.e[0] == f) {
+        if (this.floatValues[0] == f) {
             return;
         }
-        this.e[0] = f;
-        this.c = true;
+        this.floatValues[0] = f;
+        this.isDirty = true;
     }
 
     public void a(float f, float f2) {
-        if (this.e.length != 2) {
-            this.e = new float[2];
+        if (this.floatValues.length != 2) {
+            this.floatValues = new float[2];
         }
-        if (this.e[0] == f && this.e[1] == f2) {
+        if (this.floatValues[0] == f && this.floatValues[1] == f2) {
             return;
         }
-        this.e[0] = f;
-        this.e[1] = f2;
-        this.c = true;
+        this.floatValues[0] = f;
+        this.floatValues[1] = f2;
+        this.isDirty = true;
     }
 
     public void a(float f, float f2, float f3) {
-        if (this.e.length != 3) {
-            this.e = new float[3];
+        if (this.floatValues.length != 3) {
+            this.floatValues = new float[3];
         }
-        if (this.e[0] == f && this.e[1] == f2 && this.e[2] == f3) {
+        if (this.floatValues[0] == f && this.floatValues[1] == f2 && this.floatValues[2] == f3) {
             return;
         }
-        this.e[0] = f;
-        this.e[1] = f2;
-        this.e[2] = f3;
-        this.c = true;
+        this.floatValues[0] = f;
+        this.floatValues[1] = f2;
+        this.floatValues[2] = f3;
+        this.isDirty = true;
     }
 
     public void a(float f, float f2, float f3, float f4) {
-        if (this.e.length != 4) {
-            this.e = new float[4];
+        if (this.floatValues.length != 4) {
+            this.floatValues = new float[4];
         }
-        if (this.e[0] == f && this.e[1] == f2 && this.e[2] == f3 && this.e[3] == f4) {
+        if (this.floatValues[0] == f && this.floatValues[1] == f2 && this.floatValues[2] == f3 && this.floatValues[3] == f4) {
             return;
         }
-        this.e[0] = f;
-        this.e[1] = f2;
-        this.e[2] = f3;
-        this.e[3] = f4;
-        this.c = true;
+        this.floatValues[0] = f;
+        this.floatValues[1] = f2;
+        this.floatValues[2] = f3;
+        this.floatValues[3] = f4;
+        this.isDirty = true;
     }
 
     public void a(Texture texture) {
-        if (this.f != texture) {
-            this.f = texture;
-            this.c = true;
+        if (this.texture != texture) {
+            this.texture = texture;
+            this.isDirty = true;
         }
     }
 
     public void b(Texture texture) {
         this.g = true;
-        if (this.f != texture) {
-            this.f = texture;
-            this.c = true;
+        if (this.texture != texture) {
+            this.texture = texture;
+            this.isDirty = true;
         }
     }
 
     public void a(float[] values, ShaderUniformValueType valueType) {
-        if (!java.util.Arrays.equals(this.e, values) || this.h != valueType) {
-            this.e = java.util.Arrays.copyOf(values, values.length);
-            this.h = valueType;
-            this.c = true;
+        if (!java.util.Arrays.equals(this.floatValues, values) || this.valueType != valueType) {
+            this.floatValues = java.util.Arrays.copyOf(values, values.length);
+            this.valueType = valueType;
+            this.isDirty = true;
         }
     }
 }

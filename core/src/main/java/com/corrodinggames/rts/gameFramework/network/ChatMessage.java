@@ -36,7 +36,7 @@ public class ChatMessage {
         this.timestampNano = System.nanoTime();
     }
 
-    public String a() {
+    public String getPlainText() {
         String str;
         if (this.senderName != null) {
             str = this.senderName + ": " + this.message;
@@ -51,17 +51,17 @@ public class ChatMessage {
     }
 
     public String getDisplayText() {
-        return a();
+        return getPlainText();
     }
 
-    public String b() {
+    public String getHtmlText() {
         String str = VariableScope.nullOrMissingString;
         if (this.senderName != null) {
             int i = -1;
             if (this.teamColorIndex != -1) {
                 i = PlayerTeam.i(this.teamColorIndex);
             }
-            str = "<strong> <font color='" + Utility.toHexString(i) + "'>" + this.f.a(this.senderName) + ": </font></strong>";
+            str = "<strong> <font color='" + Utility.toHexString(i) + "'>" + this.f.escapeHtml(this.senderName) + ": </font></strong>";
         }
         boolean z = true;
         for (String str2 : this.message.split("\n")) {
@@ -71,7 +71,7 @@ public class ChatMessage {
                 } else {
                     str = str + "<br/>";
                 }
-                str = str + this.f.a(str2);
+                str = str + this.f.escapeHtml(str2);
             }
         }
         return str;

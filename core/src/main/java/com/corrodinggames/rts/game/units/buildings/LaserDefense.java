@@ -290,7 +290,7 @@ public class LaserDefense extends FactoryWithQueue {
                         effectCreateEffectInternal.ap = 4;
                         effectCreateEffectInternal.V = 39.0f;
                         effectCreateEffectInternal.W = effectCreateEffectInternal.V;
-                        effectCreateEffectInternal.r = true;
+                        effectCreateEffectInternal.fadeIn = true;
                         effectCreateEffectInternal.E = 1.3f;
                         effectCreateEffectInternal.G = 1.1f;
                         effectCreateEffectInternal.F = 0.7f;
@@ -305,7 +305,7 @@ public class LaserDefense extends FactoryWithQueue {
                             effectCreateEffectInternal2.ap = 4;
                             effectCreateEffectInternal2.V = 23.0f;
                             effectCreateEffectInternal2.W = effectCreateEffectInternal2.V;
-                            effectCreateEffectInternal2.r = true;
+                            effectCreateEffectInternal2.fadeIn = true;
                             effectCreateEffectInternal2.E = 0.9f;
                             effectCreateEffectInternal2.G = 0.5f;
                             effectCreateEffectInternal2.F = 0.2f;

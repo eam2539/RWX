@@ -11,7 +11,9 @@ import java.util.ArrayList;
 /* JADX INFO: renamed from: com.corrodinggames.rts.game.units.a.j */
 /* JADX INFO: loaded from: game-lib.jar:com/corrodinggames/rts/game/units/a/j.class */
 public class PingMapAction extends AbstractUnitAction {
-    public PingType a;
+
+    /* JADX INFO: renamed from: a */
+    public PingType pingType;
     static ArrayList<AbstractUnitAction> b = new ArrayList();
     static Rect c;
 
@@ -21,7 +23,7 @@ public class PingMapAction extends AbstractUnitAction {
 
     public PingMapAction(PingType pingType) {
         super("c_6_" + pingType.name());
-        this.a = pingType;
+        this.pingType = pingType;
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -62,17 +64,17 @@ public class PingMapAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: a */
     public String getDescription() {
-        return "Ping Map" + this.a.a();
+        return "Ping Map" + this.pingType.a();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: b */
     public String getDisplayName() {
-        return this.a.b();
+        return this.pingType.b();
     }
 
     public String K() {
-        return this.a.c();
+        return this.pingType.c();
     }
 
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
@@ -118,7 +120,7 @@ public class PingMapAction extends AbstractUnitAction {
     @Override // com.corrodinggames.rts.game.units.actions.AbstractUnitAction
     /* JADX INFO: renamed from: v */
     public Rect getIconRect() {
-        int iOrdinal = 7 + this.a.ordinal();
+        int iOrdinal = 7 + this.pingType.ordinal();
         c.a(29 * iOrdinal, 0, (29 * iOrdinal) + 28, 28);
         return c;
     }

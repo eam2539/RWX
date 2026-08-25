@@ -16,7 +16,8 @@ public class CrystalResource extends BaseBuilding {
 
     /* JADX INFO: renamed from: b */
     float animationTimer;
-    static Texture a = null;
+    /* JADX INFO: renamed from: a */
+    static Texture texture = null;
     static KoolBlendColorFilter c = new KoolBlendColorFilter(KoolArgbColor.a(200, 200, 200), KoolCanvasBlendMode.Multiply);
 
     @Override // com.corrodinggames.rts.game.units.BaseUnit
@@ -26,12 +27,12 @@ public class CrystalResource extends BaseBuilding {
     }
 
     public static void a_() {
-        a = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.crystal);
+        texture = GameEngine.getInstance().renderGraphicsEngine.a(R.drawable.crystal);
     }
 
     @Override // com.corrodinggames.rts.game.units.OrderableUnit
     public Texture d() {
-        return a;
+        return texture;
     }
 
     @Override // com.corrodinggames.rts.game.units.buildings.BaseBuilding, com.corrodinggames.rts.game.units.BaseUnit
@@ -46,8 +47,8 @@ public class CrystalResource extends BaseBuilding {
 
     public CrystalResource(boolean z) {
         super(z);
-        this.baseTexture = a;
-        b(a);
+        this.baseTexture = texture;
+        b(texture);
         this.radius = 11.0f;
         this.displayRadius = this.radius + 1.0f;
         this.maxHealth = 600.0f;

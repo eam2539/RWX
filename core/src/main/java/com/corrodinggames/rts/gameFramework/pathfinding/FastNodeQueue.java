@@ -22,12 +22,16 @@ public final class FastNodeQueue extends NodeQueue {
     int l;
     int m;
     int n;
-    PathOpenListNode[] o = new PathOpenListNode[975];
+    /* JADX INFO: renamed from: o */
+    PathOpenListNode[] buckets = new PathOpenListNode[975];
     FastArrayList p = new FastArrayList(100);
     final PriorityQueue<PathOpenListNode> q = new PriorityQueue();
     final FastArrayList r = new FastArrayList(300);
-    int s;
-    int t;
+    /* JADX INFO: renamed from: s */
+    int minScore;
+
+    /* JADX INFO: renamed from: t */
+    int activeBuckets;
     public static int u;
 
     private void c() {
@@ -36,7 +40,7 @@ public final class FastNodeQueue extends NodeQueue {
             return;
         }
         int i2 = this.n;
-        PathOpenListNode[] pathOpenListNodeArr = this.o;
+        PathOpenListNode[] pathOpenListNodeArr = this.buckets;
         if (this.j == -2) {
             for (int i3 = 0; i3 <= i2; i3++) {
                 int i4 = pathOpenListNodeArr[i3].score;
@@ -64,7 +68,7 @@ public final class FastNodeQueue extends NodeQueue {
     }
 
     private void a(int i2, PathOpenListNode pathOpenListNode) {
-        this.o[i2] = pathOpenListNode;
+        this.buckets[i2] = pathOpenListNode;
         int i3 = pathOpenListNode.score;
         if (this.j == -1 || this.k >= i3) {
             if (this.k > i3) {
@@ -87,7 +91,7 @@ public final class FastNodeQueue extends NodeQueue {
         this.l = -1;
         this.m = Integer.MIN_VALUE;
         for (int i2 = 0; i2 <= this.n; i2++) {
-            PathOpenListNode pathOpenListNode = this.o[i2];
+            PathOpenListNode pathOpenListNode = this.buckets[i2];
             if (pathOpenListNode == null) {
                 GameEngine.log("n:" + i2);
                 GameEngine.log("lowestBufferLastIndex:" + this.n);
@@ -113,15 +117,15 @@ public final class FastNodeQueue extends NodeQueue {
             }
             PathOpenListNode pathOpenListNode2 = (PathOpenListNode) this.q.peek();
             if (pathOpenListNode2 != null) {
-                this.s = pathOpenListNode2.score;
+                this.minScore = pathOpenListNode2.score;
                 return;
             }
             return;
         }
-        this.s = Integer.MAX_VALUE;
+        this.minScore = Integer.MAX_VALUE;
         PathOpenListNode pathOpenListNode3 = (PathOpenListNode) this.q.peek();
         if (pathOpenListNode3 != null) {
-            this.s = pathOpenListNode3.score;
+            this.minScore = pathOpenListNode3.score;
         }
     }
 
@@ -139,8 +143,8 @@ public final class FastNodeQueue extends NodeQueue {
 
     private void c(PathOpenListNode pathOpenListNode) {
         this.q.offer(pathOpenListNode);
-        if (pathOpenListNode.score < this.s) {
-            this.s = pathOpenListNode.score;
+        if (pathOpenListNode.score < this.minScore) {
+            this.minScore = pathOpenListNode.score;
         }
         if (this.q.size() > b) {
             b = this.q.size();
@@ -151,11 +155,11 @@ public final class FastNodeQueue extends NodeQueue {
     public void a(PathOpenListNode pathOpenListNode) {
         d++;
         boolean z = false;
-        if (this.n < this.o.length - 1) {
+        if (this.n < this.buckets.length - 1) {
             z = true;
         }
         if (z) {
-            if (pathOpenListNode.score <= this.s) {
+            if (pathOpenListNode.score <= this.minScore) {
                 b(pathOpenListNode);
                 return;
             } else {
@@ -164,8 +168,8 @@ public final class FastNodeQueue extends NodeQueue {
             }
         }
         if (pathOpenListNode.score < this.m) {
-            PathOpenListNode pathOpenListNode2 = this.o[this.l];
-            this.o[this.l] = pathOpenListNode;
+            PathOpenListNode pathOpenListNode2 = this.buckets[this.l];
+            this.buckets[this.l] = pathOpenListNode;
             d();
             c(pathOpenListNode2);
             return;
@@ -178,19 +182,19 @@ public final class FastNodeQueue extends NodeQueue {
         if (this.j == -2) {
             int i2 = this.k;
             c();
-            this.t++;
-            if (u < this.t) {
-                u = this.t;
+            this.activeBuckets++;
+            if (u < this.activeBuckets) {
+                u = this.activeBuckets;
             }
             e++;
             if (i2 == this.k) {
                 f++;
             }
         } else {
-            this.t = 0;
+            this.activeBuckets = 0;
         }
-        if (this.k < this.s && this.j != -1) {
-            PathOpenListNode[] pathOpenListNodeArr = this.o;
+        if (this.k < this.minScore && this.j != -1) {
+            PathOpenListNode[] pathOpenListNodeArr = this.buckets;
             PathOpenListNode pathOpenListNode = pathOpenListNodeArr[this.j];
             if (this.n != this.j) {
                 pathOpenListNodeArr[this.j] = pathOpenListNodeArr[this.n];
@@ -213,12 +217,12 @@ public final class FastNodeQueue extends NodeQueue {
     }
 
     public void a(PathOpenListPool pathOpenListPool) {
-        for (int i2 = 0; i2 < this.o.length; i2++) {
-            if (this.o[i2] != null) {
+        for (int i2 = 0; i2 < this.buckets.length; i2++) {
+            if (this.buckets[i2] != null) {
                 if (pathOpenListPool != null) {
-                    pathOpenListPool.a(this.o[i2]);
+                    pathOpenListPool.a(this.buckets[i2]);
                 }
-                this.o[i2] = null;
+                this.buckets[i2] = null;
             }
         }
         this.n = -1;
@@ -236,6 +240,6 @@ public final class FastNodeQueue extends NodeQueue {
         this.k = Integer.MAX_VALUE;
         this.l = -1;
         this.m = Integer.MIN_VALUE;
-        this.s = Integer.MAX_VALUE;
+        this.minScore = Integer.MAX_VALUE;
     }
 }
