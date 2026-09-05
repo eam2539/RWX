@@ -966,8 +966,11 @@ class SlickGame(
     }
 
     private fun captureFrameSnapshot(container: GameContainer): SlickFrameSnapshot? {
-        val width = container.width.takeIf { it > 0 }
-        val height = container.height.takeIf { it > 0 }
+        val framebufferSize = (container as? EmbeddedSlickGameContainer)?.currentFramebufferSize()
+        val width = framebufferSize?.width?.takeIf { it > 0 }
+            ?: container.width.takeIf { it > 0 }
+        val height = framebufferSize?.height?.takeIf { it > 0 }
+            ?: container.height.takeIf { it > 0 }
         if (width == null || height == null) {
             return null
         }

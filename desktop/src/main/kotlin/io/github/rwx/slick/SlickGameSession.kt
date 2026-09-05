@@ -394,9 +394,10 @@ class SlickGameSession(
         lastSlickViewport = requestedViewport
         lastViewport = requestedViewport
         val activeGame = activeGame()
+        val (gameWidth, gameHeight) = slickGameLogicalSize(requestedViewport)
         activeGame?.requestSize(
-            requestedViewport.width.coerceAtLeast(320),
-            requestedViewport.height.coerceAtLeast(240),
+            gameWidth.coerceAtLeast(320),
+            gameHeight.coerceAtLeast(240),
         )
     }
 
@@ -599,7 +600,12 @@ class SlickGameSession(
 
     private fun resizeFromCanvasHost(width: Int, height: Int) {
         if (width <= 0 || height <= 0) return
-        lastSlickViewport = KoolCanvasViewport(width, height)
+        val device = SlickCanvasHost.gameCanvas()?.deviceSizeFor(width, height)
+        lastSlickViewport = if (device != null) {
+            KoolCanvasViewport(device.width, device.height)
+        } else {
+            KoolCanvasViewport(width, height)
+        }
         lastViewport = lastSlickViewport
         val activeGame = activeGame()
         activeGame?.requestSize(width.coerceAtLeast(320), height.coerceAtLeast(240))
@@ -658,7 +664,8 @@ class SlickGameSession(
             null
         }
         if (existingGame != null) {
-            existingGame.requestSize(viewport.width.coerceAtLeast(320), viewport.height.coerceAtLeast(240))
+            val (gameWidth, gameHeight) = slickGameLogicalSize(viewport)
+            existingGame.requestSize(gameWidth.coerceAtLeast(320), gameHeight.coerceAtLeast(240))
             requestToDispatch?.let(existingGame::submit)
             return
         }
@@ -734,19 +741,30 @@ class SlickGameSession(
         }
     }
 
-    private fun normalizedViewport(viewport: KoolCanvasViewport): KoolCanvasViewport =
-        SlickCanvasHost.gameCanvasSize()
-            ?.takeIf { it.width > 0 && it.height > 0 }
-            ?.let { size ->
-                KoolCanvasViewport(
-                    width = size.width,
-                    height = size.height,
-                )
-            }
-            ?: KoolCanvasViewport(
-                width = viewport.width.takeIf { it > 0 } ?: 1280,
-                height = viewport.height.takeIf { it > 0 } ?: 720,
-            )
+    private fun normalizedViewport(viewport: KoolCanvasViewport): KoolCanvasViewport {
+        if (viewport.width > 0 && viewport.height > 0) {
+            return viewport
+        }
+        val logical = SlickCanvasHost.gameCanvasSize()?.takeIf { it.width > 0 && it.height > 0 }
+        val canvas = SlickCanvasHost.gameCanvas()
+        if (canvas != null && logical != null) {
+            val device = canvas.deviceSizeFor(logical.width, logical.height)
+            return KoolCanvasViewport(device.width, device.height)
+        }
+        return KoolCanvasViewport(
+            width = viewport.width.takeIf { it > 0 } ?: 1280,
+            height = viewport.height.takeIf { it > 0 } ?: 720,
+        )
+    }
+
+    private fun slickGameLogicalSize(deviceViewport: KoolCanvasViewport): Pair<Int, Int> {
+        val logical = SlickCanvasHost.gameCanvasSize()?.takeIf { it.width > 0 && it.height > 0 }
+        if (logical != null) {
+            return logical.width to logical.height
+        }
+        return deviceViewport.width to deviceViewport.height
+    }
+
     private fun updateFrameSnapshot(snapshot: SlickFrameSnapshot) {
         if (snapshot.width <= 0 || snapshot.height <= 0 || snapshot.pixels.size < snapshot.width * snapshot.height) {
             return

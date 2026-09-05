@@ -35,6 +35,9 @@ internal class EmbeddedSlickGameContainer(
     private var mouseY = 0
     private val frameSynchronizer = LwjglDisplayFrameSynchronizer()
 
+    @Volatile
+    private var framebufferGeometryLogged = false
+
     init {
         this.width = width.coerceAtLeast(320)
         this.height = height.coerceAtLeast(240)
@@ -100,11 +103,13 @@ internal class EmbeddedSlickGameContainer(
                         requestCanvasFocus()
                         getDelta()
                     }
+                    val framebufferSize = awtCanvas.resolveFramebufferSize(width, height)
+                    logFramebufferGeometryOnce(width, height, framebufferSize)
                     val viewport = framebufferViewportSize(
                         logicalWidth = width,
                         logicalHeight = height,
-                        framebufferWidth = awtCanvas.framebufferWidth,
-                        framebufferHeight = awtCanvas.framebufferHeight,
+                        framebufferWidth = framebufferSize.width,
+                        framebufferHeight = framebufferSize.height,
                     )
                     GL11.glViewport(0, 0, viewport.width, viewport.height)
                     updateAndRender(getDelta())
@@ -395,6 +400,21 @@ internal class EmbeddedSlickGameContainer(
             SwingUtilities.invokeLater(action)
         }
     }
+
+    internal fun currentFramebufferSize(): Dimension =
+        awtCanvas.resolveFramebufferSize(width, height)
+
+    private fun logFramebufferGeometryOnce(logicalWidth: Int, logicalHeight: Int, framebufferSize: Dimension) {
+        if (framebufferGeometryLogged) return
+        framebufferGeometryLogged = true
+        val (scaleX, scaleY) = awtCanvas.hidpiScaleFactors()
+        Log.info(
+            "Slick framebuffer geometry: canvas=${awtCanvas.width}x${awtCanvas.height} " +
+                    "logical=${logicalWidth}x${logicalHeight} scale=${scaleX}x${scaleY} " +
+                    "reportedFramebuffer=${awtCanvas.framebufferWidth}x${awtCanvas.framebufferHeight} " +
+                    "viewport=${framebufferSize.width}x${framebufferSize.height}",
+        )
+    }
 }
 
 internal fun framebufferViewportSize(
@@ -406,6 +426,35 @@ internal fun framebufferViewportSize(
     framebufferWidth.takeIf { it > 0 } ?: logicalWidth.coerceAtLeast(1),
     framebufferHeight.takeIf { it > 0 } ?: logicalHeight.coerceAtLeast(1),
 )
+
+/**
+ * HiDPI scale of the canvas' screen, mirroring kool's `CanvasWrapper` which renders menus
+ * correctly: `canvas.width * defaultTransform.scale` is the physical pixel count that must be
+ * fed to `glViewport`. lwjgl3-awt only refreshes its cached `framebufferWidth/Height` on resize
+ * events (stale `0` before the first one), so the cached value is only a fast path here.
+ */
+internal fun Canvas.hidpiScaleFactors(): Pair<Double, Double> {
+    val transform = runCatching { graphicsConfiguration?.defaultTransform }.getOrNull()
+        ?: return 1.0 to 1.0
+    val scaleX = transform.scaleX.takeIf { it > 0 } ?: 1.0
+    val scaleY = transform.scaleY.takeIf { it > 0 } ?: 1.0
+    return scaleX to scaleY
+}
+
+internal fun Canvas.deviceSizeFor(logicalWidth: Int, logicalHeight: Int): Dimension {
+    val (scaleX, scaleY) = hidpiScaleFactors()
+    return Dimension(
+        (logicalWidth * scaleX).roundToInt().coerceAtLeast(1),
+        (logicalHeight * scaleY).roundToInt().coerceAtLeast(1),
+    )
+}
+
+internal fun AWTGLCanvas.resolveFramebufferSize(logicalWidth: Int, logicalHeight: Int): Dimension {
+    if (framebufferWidth > 0 && framebufferHeight > 0) {
+        return Dimension(framebufferWidth, framebufferHeight)
+    }
+    return deviceSizeFor(logicalWidth, logicalHeight)
+}
 
 private const val CANVAS_RETRY_SLEEP_MILLIS = 16L
 private const val MAX_STANDARD_TARGET_FPS = 120
